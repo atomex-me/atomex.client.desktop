@@ -6,7 +6,6 @@
     <DefaultItemExcludes>$(DefaultItemExcludes);atomex.client.core\**</DefaultItemExcludes>
   </PropertyGroup>
   <ItemGroup>
-    <Folder Include="Models\" />
     <AvaloniaResource Include="Assets\**" />
   </ItemGroup>
   <ItemGroup>
@@ -14,8 +13,20 @@
     <PackageReference Include="Avalonia.Desktop" Version="0.10.0" />
     <PackageReference Include="Avalonia.Diagnostics" Version="0.10.0" />
     <PackageReference Include="Avalonia.ReactiveUI" Version="0.10.0" />
+    <PackageReference Include="Serilog.Settings.Configuration" Version="3.1.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="atomex.client.core\Atomex.Client.Core\Atomex.Client.Core.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Update="Dialogs\Views\DialogServiceView.axaml.cs">
+      <DependentUpon>UnsavedChangesDialogView.axaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\DialogView.axaml.cs">
+      <DependentUpon>DialogView.axaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\SecondDialogView.axaml.cs">
+      <DependentUpon>SecondDialogView.axaml</DependentUpon>
+    </Compile>
   </ItemGroup>
 </Project>

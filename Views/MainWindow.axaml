@@ -6,12 +6,20 @@
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="Atomex.Client.Desktop.Views.MainWindow"
         Icon="/Assets/avalonia-logo.ico"
-        Title="Atomex.Client.Desktop">
+        Title="Atomex.Client.Desktop"
+        Name="MainWindow"
+        MinWidth="800"
+        MinHeight="600">
 
     <Design.DataContext>
         <vm:MainWindowViewModel/>
     </Design.DataContext>
 
-    <TextBlock Text="{Binding Greeting}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+    <StackPanel>
+        <TextBlock Text="{Binding Greeting}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+        <Button Command="{Binding ShowDialog}">Show Dialog</Button>
+        <Button Command="{Binding ShowCustomDialog}">Show Dialog2</Button>
+        <TextBox></TextBox>
+    </StackPanel>
 
 </Window>

@@ -1,0 +1,44 @@
+﻿<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="clr-namespace:Atomex.Client.Desktop.Dialogs.ViewModels;assembly=dotnet-properties"
+        x:Class="Atomex.Client.Desktop.Dialogs.Views.DialogServiceView"
+        Name="Dialog"
+        CanResize="True"
+        ShowInTaskbar="False"
+        SystemDecorations="None">
+    
+    <!-- <Design.DataContext> -->
+    <!--     <vm:UnsavedChangesDialogViewModel /> -->
+    <!-- </Design.DataContext> -->
+
+    <Border Background="Red"    
+            BorderBrush="Black"
+            BorderThickness="2"
+            CornerRadius="3"
+            Padding="4"
+            BoxShadow="4 4 4 gray">
+        <StackPanel Spacing="16"
+                    Margin="16">
+                <Panel>
+                    <ContentControl Content="{Binding Content}" />
+                </Panel>
+            <StackPanel HorizontalAlignment="Right"
+                        Orientation="Horizontal"
+                        Spacing="8">
+        
+                <Button Command="{Binding YesCommand}"
+                        CommandParameter="{Binding #Dialog}"
+                        Content="Yes" />
+        
+                <Button Command="{Binding NoCommand}"
+                        CommandParameter="{Binding #Dialog}"
+                        Content="No" />
+        
+                <Button Command="{Binding CancelCommand}"
+                        CommandParameter="{Binding #Dialog}"
+                        Content="Cancel" />
+        
+            </StackPanel>
+        </StackPanel>
+    </Border>
+</Window>

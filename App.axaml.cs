@@ -1,6 +1,8 @@
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
+using Atomex.Client.Desktop.Dialogs.Views;
+using Atomex.Client.Desktop.Services;
 using Atomex.Client.Desktop.ViewModels;
 using Atomex.Client.Desktop.Views;
 
@@ -17,13 +19,23 @@ namespace Atomex.Client.Desktop
         {
             if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
             {
-                desktop.MainWindow = new MainWindow
+                var mainWindow = new MainWindow();
+                var mainWindowViewModel = BuildMainWindowDataContext(mainWindow);
+
+                if (mainWindowViewModel != null)
                 {
-                    DataContext = new MainWindowViewModel(),
-                };
+                    mainWindow.DataContext = mainWindowViewModel;
+                    desktop.MainWindow = mainWindow;
+                }
             }
 
             base.OnFrameworkInitializationCompleted();
+        }
+
+        private MainWindowViewModel? BuildMainWindowDataContext(MainWindow mainWindow)
+        {
+            return new MainWindowViewModel(
+                new DialogService<DialogServiceView>(mainWindow));
         }
     }
 }
