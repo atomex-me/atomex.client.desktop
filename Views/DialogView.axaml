@@ -5,11 +5,15 @@
              xmlns:vm="clr-namespace:Atomex.Client.Desktop.ViewModels"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="Atomex.Client.Desktop.Views.DialogView">
-    
+
     <Design.DataContext>
         <vm:DialogViewModel />
     </Design.DataContext>
-    
-    
-    <TextBox Text="{Binding cnt, Mode=TwoWay}" />
+
+    <StackPanel>
+        <TextBox
+            AcceptsReturn="True"
+            TextWrapping="Wrap"
+            Text="{Binding cnt, Mode=TwoWay}" />
+    </StackPanel>
 </UserControl>

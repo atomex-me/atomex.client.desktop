@@ -11,8 +11,7 @@ namespace Atomex.Client.Desktop.Services
     {
         private readonly Window _owner;
 
-        public DialogService(
-            Window owner)
+        public DialogService(Window owner)
         {
             _owner = owner;
         }
@@ -20,24 +19,23 @@ namespace Atomex.Client.Desktop.Services
         public void Show(ViewModelBase viewModel)
         {
             var viewLocator = new ViewLocator();
-            TView view = (TView)viewLocator.Build(viewModel);
+            TView view = (TView) viewLocator.Build(viewModel);
             view.DataContext = viewModel;
 
             using (var source = new CancellationTokenSource())
             {
                 view.ShowDialog(_owner)
-                    .ContinueWith(
-                        t => source.Cancel(), TaskScheduler.FromCurrentSynchronizationContext()
-                        );
+                    .ContinueWith(t => source.Cancel(),
+                        TaskScheduler.FromCurrentSynchronizationContext());
 
                 var mainWindowSize = _owner.GetObservable(Window.ClientSizeProperty);
-                
+
                 // todo: make static width of dialog during resize until fit main window size.
                 mainWindowSize.Subscribe(value =>
                 {
                     view.Width = value.Width / 2;
                     view.Height = value.Height / 2;
-                
+
                     view.Position =
                         new PixelPoint(
                             Convert.ToInt32(_owner.Position.X + _owner.ClientSize.Width / 2 - view.Width / 2),
