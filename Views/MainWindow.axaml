@@ -3,6 +3,7 @@
         xmlns:vm="using:Atomex.Client.Desktop.ViewModels"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:controls="clr-namespace:Atomex.Client.Desktop.Controls"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="Atomex.Client.Desktop.Views.MainWindow"
         Icon="/Assets/avalonia-logo.ico"
@@ -12,14 +13,26 @@
         MinHeight="600">
 
     <Design.DataContext>
-        <vm:MainWindowViewModel/>
+        <vm:MainWindowViewModel />
     </Design.DataContext>
 
     <StackPanel>
-        <TextBlock Text="{Binding Greeting}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+        <TextBlock Text="{Binding Greeting}" HorizontalAlignment="Center" VerticalAlignment="Center" />
         <Button Command="{Binding ShowDialog}">Show Dialog</Button>
         <Button Command="{Binding ShowCustomDialog}">Show Dialog2</Button>
-        <TextBox></TextBox>
+
+        <Button Command="{Binding Increase}">+</Button>
+        <Button Command="{Binding Decrease}">-</Button>
+
+        <controls:StepIndicatorPanel Margin="0 0 0 30"
+                                     Height="40"
+                                     Width="450"
+                                     VerticalAlignment="Bottom"
+                                     StepsCount="6"
+                                     CurrentStep="{Binding CS}"
+                                     StepBackground="{DynamicResource StepBackgroundBrush}"
+                                     CompletedStepBackground="{DynamicResource CompletedStepBackgroundBrush}"
+                                     Foreground="{DynamicResource StepForegroundBrush}" />
     </StackPanel>
 
 </Window>

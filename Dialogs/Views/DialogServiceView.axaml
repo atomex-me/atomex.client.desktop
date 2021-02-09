@@ -13,8 +13,7 @@
 
     <!-- todo: Dialog child content fit full width & height; Refactor this XAML;-->
 
-    <Border Background="Red"
-            BorderBrush="Black"
+    <Border BorderBrush="Black"
             BorderThickness="2"
             CornerRadius="3"
             Padding="4"
