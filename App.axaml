@@ -19,5 +19,6 @@
 
         <StyleInclude Source="/Styles/DefaultButtonStyle.axaml"></StyleInclude>
         <StyleInclude Source="/Styles/GenerateButtonStyle.axaml" />
+        <StyleInclude Source="/Styles/IconButtonStyle.axaml" />
     </Application.Styles>
 </Application>

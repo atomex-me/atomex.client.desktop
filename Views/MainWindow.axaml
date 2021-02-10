@@ -17,7 +17,6 @@
     </Design.DataContext>
     
     <Window.Resources>
-        
         <ImageBrush x:Key="GithubBrush" Source="avares://Atomex.Client.Desktop/Resources/Images/github.png"></ImageBrush>
     </Window.Resources>
     
@@ -31,9 +30,17 @@
         <Button Classes="h1" Command="{Binding Decrease}" Content="-">
         </Button>
         
-        <Button OpacityMask="{StaticResource GithubBrush}">
-            <!-- <Image Width="20" Source="avares://Atomex.Client.Desktop/Resources/Images/github.png"></Image> -->
-        </Button> 
+        <!-- <Button OpacityMask="{StaticResource GithubBrush}"> -->
+        <!-- -->
+        <!-- </Button>  -->
+        
+        <controls:IconButton Width="25"
+                             Height="25"
+                             Margin="4 0 0 0"
+                             OpacityMask="{StaticResource GithubBrush}"
+                             Foreground="{DynamicResource SocialDefaultBrush}"
+                             MouseOverBrush="{DynamicResource SocialMouseOverBrush}"
+                             PressedBrush="{DynamicResource SocialDefaultBrush}" />
 
 
         <controls:RoundedButton Width="200"
@@ -43,8 +50,7 @@
                                 Content="MY WALLETS"
                                 VerticalAlignment="Bottom"
                                 FontSize="11"
-                                Command="{Binding CustomBtnCommand}" 
-                                IsEnabled="False"/>
+                                Command="{Binding CustomBtnCommand}" />
 
         <controls:StepIndicatorPanel Margin="0 0 0 30"
                                      Height="40"

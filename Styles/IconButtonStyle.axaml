@@ -1,0 +1,35 @@
+<Styles xmlns='https://github.com/avaloniaui'
+        xmlns:x='http://schemas.microsoft.com/winfx/2006/xaml'
+        xmlns:controls="clr-namespace:Atomex.Client.Desktop.Controls">
+
+    <Style Selector="controls|IconButton">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate>
+                    <Border x:Name="PART_Border"
+                            BorderThickness="0"
+                            OpacityMask="{TemplateBinding OpacityMask}" />
+
+                    <!-- Background="{TemplateBinding Foreground}" -->
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    
+    <!-- todo: PathButtonStyle -->
+
+    <Style Selector="Border#PART_Border">
+        <Setter Property="Background" Value="{Binding Foreground, RelativeSource={RelativeSource TemplatedParent}}" />
+    </Style>
+    <!-- IsMouseOver -->
+    <Style Selector="controls|IconButton:pointerover /template/ Border">
+        <Setter Property="Background"
+                Value="{Binding MouseOverBrush, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:IconButton}}}" />
+    </Style>
+
+    <!-- IsPressed -->
+    <Style Selector="controls|IconButton:pressed /template/ Border">
+        <Setter Property="Background"
+                Value="{Binding PressedBrush, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:IconButton}}}" />
+    </Style>
+</Styles>
