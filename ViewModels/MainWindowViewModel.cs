@@ -51,6 +51,11 @@ namespace Atomex.Client.Desktop.ViewModels
         {
             CS += 1;
         }
+
+        public void CustomBtnCommand()
+        {
+            Console.WriteLine("custom btn clicked;");
+        }
         
         public ReactiveCommand<Unit, Unit> Decrease { get; }
         

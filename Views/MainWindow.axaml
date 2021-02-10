@@ -15,14 +15,36 @@
     <Design.DataContext>
         <vm:MainWindowViewModel />
     </Design.DataContext>
+    
+    <Window.Resources>
+        
+        <ImageBrush x:Key="GithubBrush" Source="avares://Atomex.Client.Desktop/Resources/Images/github.png"></ImageBrush>
+    </Window.Resources>
+    
 
     <StackPanel>
-        <TextBlock Text="{Binding Greeting}" HorizontalAlignment="Center" VerticalAlignment="Center" />
-        <Button Command="{Binding ShowDialog}">Show Dialog</Button>
-        <Button Command="{Binding ShowCustomDialog}">Show Dialog2</Button>
+        <TextBox Text="{Binding Greeting}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+        <Button Classes="h1" Command="{Binding ShowDialog}">Show Dialog</Button>
+        <Button Classes="h1" Command="{Binding ShowCustomDialog}">Show Dialog2</Button>
 
-        <Button Command="{Binding Increase}">+</Button>
-        <Button Command="{Binding Decrease}">-</Button>
+        <Button Classes="h1" Command="{Binding Increase}">+</Button>
+        <Button Classes="h1" Command="{Binding Decrease}" Content="-">
+        </Button>
+        
+        <Button OpacityMask="{StaticResource GithubBrush}">
+            <!-- <Image Width="20" Source="avares://Atomex.Client.Desktop/Resources/Images/github.png"></Image> -->
+        </Button> 
+
+
+        <controls:RoundedButton Width="200"
+                                Height="40"
+                                Margin="0 0 0 5"
+                                CornerRadius="15 15 15 15"
+                                Content="MY WALLETS"
+                                VerticalAlignment="Bottom"
+                                FontSize="11"
+                                Command="{Binding CustomBtnCommand}" 
+                                IsEnabled="False"/>
 
         <controls:StepIndicatorPanel Margin="0 0 0 30"
                                      Height="40"
@@ -33,6 +55,7 @@
                                      StepBackground="{DynamicResource StepBackgroundBrush}"
                                      CompletedStepBackground="{DynamicResource CompletedStepBackgroundBrush}"
                                      Foreground="{DynamicResource StepForegroundBrush}" />
+        
     </StackPanel>
 
 </Window>

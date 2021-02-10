@@ -7,6 +7,9 @@
   </PropertyGroup>
   <ItemGroup>
     <AvaloniaResource Include="Assets\**" />
+    <AvaloniaResource Include="Resources\*" />
+    <AvaloniaResource Include="Resources\Fonts\*" />
+    <AvaloniaResource Include="Resources\Images\*" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Avalonia" Version="0.10.0" />
@@ -28,5 +31,8 @@
     <Compile Update="Views\SecondDialogView.axaml.cs">
       <DependentUpon>SecondDialogView.axaml</DependentUpon>
     </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Helpers" />
   </ItemGroup>
 </Project>
