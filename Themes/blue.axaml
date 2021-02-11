@@ -3,19 +3,19 @@
     <!-- Fonts -->
 
     <FontFamily x:Key="DefaultFontFamily">avares://Atomex.Client.Desktop/Resources/Fonts#Roboto</FontFamily>
-    
+
     <FontFamily x:Key="DefaultLightFontFamily">avares://Atomex.Client.Desktop/Resources/Fonts#Roboto</FontFamily>
     <FontWeight x:Key="DefaultLightFontWeight">Light</FontWeight>
-    
+
     <FontFamily x:Key="DefaultMediumFontFamily">avares://Atomex.Client.Desktop/Resources/Fonts#Roboto</FontFamily>
     <FontWeight x:Key="DefaultMediumFontWeight">Medium</FontWeight>
-    
+
     <FontFamily x:Key="DefaultBoldFontFamily">avares://Atomex.Client.Desktop/Resources/Fonts#Roboto</FontFamily>
     <FontWeight x:Key="DefaultBoldFontWeight">Bold</FontWeight>
-    
+
     <FontFamily x:Key="DefaultButtonFontFamily">avares://Atomex.Client.Desktop/Resources/Fonts#Roboto</FontFamily>
     <FontWeight x:Key="DefaultButtonFontWeight">Medium</FontWeight>
-    
+
     <FontFamily x:Key="DefaultTextBlockFontFamily">avares://Atomex.Client.Desktop/Resources/Fonts#Roboto</FontFamily>
 
     <!-- Base Colors -->
@@ -69,9 +69,11 @@
     <SolidColorBrush x:Key="StatusBarDisconnectedForeground" Color="DarkGray" />
     <SolidColorBrush x:Key="DefaultUpdateForegroundBrush" Color="Gold" />
 
-    <LinearGradientBrush x:Key="MainBackgroundBrush" StartPoint="0,0" EndPoint="1,1">
-        <GradientStop Offset="0" Color="{StaticResource MainBackgroundColor1}" />
-        <GradientStop Offset="1" Color="{StaticResource MainBackgroundColor2}" />
+    <LinearGradientBrush x:Key="MainBackgroundBrush" StartPoint="0%,0%" EndPoint="100%,100%">
+        <LinearGradientBrush.GradientStops>
+            <GradientStop Offset="0" Color="{StaticResource MainBackgroundColor1}" />
+            <GradientStop Offset="1" Color="{StaticResource MainBackgroundColor2}" />
+        </LinearGradientBrush.GradientStops>
     </LinearGradientBrush>
 
     <FontFamily x:Key="MainTitleFontFamily">avares://Atomex.Client.Desktop/Resources/Fonts#Comfortaa</FontFamily>
@@ -82,17 +84,21 @@
     <Color x:Key="ChildViewBackgroundColor1">#1a4274</Color>
     <Color x:Key="ChildViewBackgroundColor2">#1a2e4c</Color>
 
-    <LinearGradientBrush x:Key="ChildViewBackgroundBrush" StartPoint="1,0" EndPoint="0,1">
-        <GradientStop Offset="0" Color="{DynamicResource ChildViewBackgroundColor1}" />
-        <GradientStop Offset="1" Color="{DynamicResource ChildViewBackgroundColor2}" />
+    <LinearGradientBrush x:Key="ChildViewBackgroundBrush" StartPoint="100%,0%" EndPoint="0%,100%">
+        <LinearGradientBrush.GradientStops>
+            <GradientStop Offset="0" Color="{DynamicResource ChildViewBackgroundColor1}" />
+            <GradientStop Offset="1" Color="{DynamicResource ChildViewBackgroundColor2}" />
+        </LinearGradientBrush.GradientStops>
     </LinearGradientBrush>
 
     <Color x:Key="ChildViewBackgroundLightColor1">AliceBlue</Color>
     <Color x:Key="ChildViewBackgroundLightColor2">#c9dae9</Color>
 
-    <LinearGradientBrush x:Key="ChildViewBackgroundBrushLight" StartPoint="0,0" EndPoint="1,1">
-        <GradientStop Offset="0" Color="{DynamicResource ChildViewBackgroundLightColor1}" />
-        <GradientStop Offset="1" Color="{DynamicResource ChildViewBackgroundLightColor2}" />
+    <LinearGradientBrush x:Key="ChildViewBackgroundBrushLight" StartPoint="0%,0%" EndPoint="100%,100%">
+        <LinearGradientBrush.GradientStops>
+            <GradientStop Offset="0" Color="{DynamicResource ChildViewBackgroundLightColor1}" />
+            <GradientStop Offset="1" Color="{DynamicResource ChildViewBackgroundLightColor2}" />
+        </LinearGradientBrush.GradientStops>
     </LinearGradientBrush>
 
     <SolidColorBrush x:Key="ChildViewHeaderForegroundBrush" Color="{DynamicResource DefaultForegroundColor}" />

@@ -10,7 +10,8 @@
         Title="Atomex.Client.Desktop"
         Name="MainWindow"
         MinWidth="800"
-        MinHeight="600">
+        MinHeight="600"
+        Classes="MainWindow">
 
     <Design.DataContext>
         <vm:MainWindowViewModel />
@@ -18,6 +19,8 @@
     
     <Window.Resources>
         <ImageBrush x:Key="GithubBrush" Source="avares://Atomex.Client.Desktop/Resources/Images/github.png"></ImageBrush>
+        <ImageBrush x:Key="TelegramBrush" Source="avares://Atomex.Client.Desktop/Resources/Images/telegram.png"></ImageBrush>
+        <ImageBrush x:Key="TwitterBrush" Source="avares://Atomex.Client.Desktop/Resources/Images/twitter.png"></ImageBrush>
     </Window.Resources>
     
 
@@ -34,14 +37,31 @@
         <!-- -->
         <!-- </Button>  -->
         
-        <controls:IconButton Width="25"
-                             Height="25"
-                             Margin="4 0 0 0"
-                             OpacityMask="{StaticResource GithubBrush}"
-                             Foreground="{DynamicResource SocialDefaultBrush}"
-                             MouseOverBrush="{DynamicResource SocialMouseOverBrush}"
-                             PressedBrush="{DynamicResource SocialDefaultBrush}" />
-
+        <StackPanel Orientation="Horizontal">
+            <controls:IconButton Width="25"
+                                 Height="25"
+                                 Margin="4 0 0 0"
+                                 OpacityMask="{StaticResource GithubBrush}"
+                                 Foreground="{DynamicResource SocialDefaultBrush}"
+                                 MouseOverBrush="{DynamicResource SocialMouseOverBrush}"
+                                 PressedBrush="{DynamicResource SocialDefaultBrush}" />
+            
+            <controls:IconButton Width="25"
+                                 Height="25"
+                                 Margin="4 0 0 0"
+                                 OpacityMask="{StaticResource TelegramBrush}"
+                                 Foreground="{DynamicResource SocialDefaultBrush}"
+                                 MouseOverBrush="{DynamicResource SocialMouseOverBrush}"
+                                 PressedBrush="{DynamicResource SocialDefaultBrush}" />
+            
+            <controls:IconButton Width="25"
+                                 Height="25"
+                                 Margin="4 0 0 0"
+                                 OpacityMask="{StaticResource TwitterBrush}"
+                                 Foreground="{DynamicResource SocialDefaultBrush}"
+                                 MouseOverBrush="{DynamicResource SocialMouseOverBrush}"
+                                 PressedBrush="{DynamicResource SocialDefaultBrush}" />
+        </StackPanel>
 
         <controls:RoundedButton Width="200"
                                 Height="40"
