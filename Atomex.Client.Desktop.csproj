@@ -16,6 +16,7 @@
     <PackageReference Include="Avalonia.Desktop" Version="0.10.0" />
     <PackageReference Include="Avalonia.Diagnostics" Version="0.10.0" />
     <PackageReference Include="Avalonia.ReactiveUI" Version="0.10.0" />
+    <PackageReference Include="Deadpikle.AvaloniaProgressRing" Version="0.9.0" />
     <PackageReference Include="Serilog.Settings.Configuration" Version="3.1.0" />
   </ItemGroup>
   <ItemGroup>
@@ -33,6 +34,30 @@
     </Compile>
     <Compile Update="Views\StartView.axaml.cs">
       <DependentUpon>StartView.axaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\CreateWalletView.axaml.cs">
+      <DependentUpon>CreateWalletView.axaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\WalletTypeView.axaml.cs">
+      <DependentUpon>WalletTypeView.axaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\WalletNameView.axaml.cs">
+      <DependentUpon>WalletNameView.axaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\CreateMnemonicView.axaml.cs">
+      <DependentUpon>CreateMnemonicView.axaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\WriteMnemonicView.axaml.cs">
+      <DependentUpon>WriteMnemonicView.axaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\CreateDerivedKeyPasswordView.axaml.cs">
+      <DependentUpon>CreateDerivedKeyPasswordView.axaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\WriteDerivedKeyPasswordView.axaml.cs">
+      <DependentUpon>WriteDerivedKeyPasswordView.axaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\CreateStoragePasswordView.axaml.cs">
+      <DependentUpon>CreateStoragePasswordViewModel.axaml</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>

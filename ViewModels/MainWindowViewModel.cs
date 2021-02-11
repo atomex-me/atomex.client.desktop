@@ -17,14 +17,30 @@ namespace Atomex.Client.Desktop.ViewModels
             _firstDialog = new DialogViewModel();
             _secondDialog = new SecondDialogViewModel();
 
-            Content = new StartViewModel();
+            ShowStart();
         }
 
+        private void ShowContent(ViewModelBase content)
+        {
+            Content = content;
+        }
+
+        private void ShowStart()
+        {
+            Content = new StartViewModel(ShowContent, ShowStart);
+        }
 
         private ViewModelBase _firstDialog;
         private ViewModelBase _secondDialog;
 
-        public ViewModelBase Content { get; set; }
+
+        private ViewModelBase _content;
+
+        public ViewModelBase Content
+        {
+            get => _content;
+            set => this.RaiseAndSetIfChanged(ref _content, value);
+        }
 
         public void ShowDialog()
         {

@@ -16,7 +16,8 @@
 
     <Application.Styles>
         <FluentTheme Mode="Light" />
-
+        
+        <StyleInclude Source="avares://AvaloniaProgressRing/Styles/ProgressRing.xaml"/>
         <StyleInclude Source="/Styles/MainWindowStyle.axaml" />
         <StyleInclude Source="/Styles/ChildViewStyle.axaml" />
         <StyleInclude Source="/Styles/DefaultButtonStyle.axaml" />
