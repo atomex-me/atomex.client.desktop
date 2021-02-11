@@ -3,7 +3,6 @@
         xmlns:vm="using:Atomex.Client.Desktop.ViewModels"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:controls="clr-namespace:Atomex.Client.Desktop.Controls"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="Atomex.Client.Desktop.Views.MainWindow"
         Icon="/Assets/avalonia-logo.ico"
@@ -17,11 +16,22 @@
         <vm:MainWindowViewModel />
     </Design.DataContext>
 
-    <Window.Resources>
-        <ImageBrush x:Key="GithubBrush" Source="avares://Atomex.Client.Desktop/Resources/Images/github.png" />
-        <ImageBrush x:Key="TelegramBrush" Source="avares://Atomex.Client.Desktop/Resources/Images/telegram.png" />
-        <ImageBrush x:Key="TwitterBrush" Source="avares://Atomex.Client.Desktop/Resources/Images/twitter.png" />
-    </Window.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition />
+            <RowDefinition Height="Auto" />
+            <RowDefinition />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition />
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition />
+        </Grid.ColumnDefinitions>
 
+
+        <ContentControl Grid.Column="1"
+                        Grid.Row="1"
+                        Content="{Binding Content}" />
+    </Grid>
 
 </Window>

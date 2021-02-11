@@ -1,0 +1,23 @@
+<Styles xmlns='https://github.com/avaloniaui'
+        xmlns:x='http://schemas.microsoft.com/winfx/2006/xaml'>
+
+    <Style Selector="Button.LinkButton">
+        <Setter Property="FontFamily" Value="{DynamicResource DefaultFontFamily}" />
+        <Setter Property="FontSize" Value="12" />
+
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+
+                        <TextBlock Text="{TemplateBinding Content}" />
+
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="Foreground" Value="{DynamicResource DefaultLinkButtonForegroundBrush}" />
+    </Style>
+
+    <Style Selector="Button.LinkButton:pointerover">
+        <Setter Property="Foreground" Value="{DynamicResource DefaultLinkButtonMouseOverBrush}" />
+    </Style>
+</Styles>

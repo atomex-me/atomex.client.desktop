@@ -1,0 +1,90 @@
+<Styles xmlns='https://github.com/avaloniaui'
+        xmlns:x='http://schemas.microsoft.com/winfx/2006/xaml'>
+
+    <Style Selector="Border.ChildViewBorder">
+        <Setter Property="CornerRadius" Value="10" />
+        <Setter Property="BoxShadow" Value="2 2 12 3 Black" />
+        <Setter Property="Background" Value="{DynamicResource ChildViewBackgroundBrush}" />
+    </Style>
+
+    <Style Selector="Border.ChildViewBorderLight">
+        <Setter Property="CornerRadius" Value="10" />
+        <Setter Property="BoxShadow" Value="2 2 12 3 Black" />
+        <Setter Property="Background" Value="{DynamicResource ChildViewBackgroundBrushLight}" />
+    </Style>
+
+
+    <!-- todo: Modal Close button -->
+
+    <!-- <Style x:Key="ChildViewCloseButton" TargetType="Button"> -->
+    <!--     <Setter Property="Template"> -->
+    <!--         <Setter.Value> -->
+    <!--             <ControlTemplate TargetType="Button"> -->
+    <!--                 <Border Background="{DynamicResource AlmostTransparentBrush}"> -->
+    <!--                     <Path x:Name="icon" -->
+    <!--                           Stretch="Uniform" -->
+    <!--                           SnapsToDevicePixels="False" -->
+    <!--                           UseLayoutRounding="False" -->
+    <!--                           Width="{TemplateBinding Width}" -->
+    <!--                           Height="{TemplateBinding Height}" -->
+    <!--                           Fill="{DynamicResource ChildViewCloseButtonBrush}" -->
+    <!--                           Data="{DynamicResource JavIcons.CloseCircleF}" /> -->
+    <!--                 </Border> -->
+    <!--                 <ControlTemplate.Triggers> -->
+    <!--                     <Trigger Property="IsMouseOver" Value="True"> -->
+    <!--                         <Setter TargetName="icon" -->
+    <!--                                 Property="Fill" -->
+    <!--                                 Value="{DynamicResource ChildViewCloseButtonMouseOverBrush}" /> -->
+    <!--                     </Trigger> -->
+    <!--                     <Trigger Property="IsDefaulted" Value="True"> -->
+    <!--                         <Setter TargetName="icon" -->
+    <!--                                 Property="Fill" -->
+    <!--                                 Value="{DynamicResource ChildViewCloseButtonBrush}" /> -->
+    <!--                     </Trigger> -->
+    <!--                     <Trigger Property="IsPressed" Value="True"> -->
+    <!--                         <Setter TargetName="icon" -->
+    <!--                                 Property="Fill" -->
+    <!--                                 Value="{DynamicResource ChildViewCloseButtonPressedBrush}" /> -->
+    <!--                     </Trigger> -->
+    <!--                 </ControlTemplate.Triggers> -->
+    <!--             </ControlTemplate> -->
+    <!--         </Setter.Value> -->
+    <!--     </Setter> -->
+    <!-- </Style> -->
+
+    <!-- <Style x:Key="ChildViewCloseButtonLight" TargetType="Button"> -->
+    <!--     <Setter Property="Template"> -->
+    <!--         <Setter.Value> -->
+    <!--             <ControlTemplate TargetType="Button"> -->
+    <!--                 <Border Background="{DynamicResource AlmostTransparentBrush}"> -->
+    <!--                     <Path x:Name="icon" -->
+    <!--                           Stretch="Uniform" -->
+    <!--                           SnapsToDevicePixels="False" -->
+    <!--                           UseLayoutRounding="False" -->
+    <!--                           Width="{TemplateBinding Width}" -->
+    <!--                           Height="{TemplateBinding Height}" -->
+    <!--                           Fill="{DynamicResource ChildViewCloseButtonLightBrush}" -->
+    <!--                           Data="{DynamicResource JavIcons.CloseCircleF}" /> -->
+    <!--                 </Border> -->
+    <!--                 <ControlTemplate.Triggers> -->
+    <!--                     <Trigger Property="IsMouseOver" Value="True"> -->
+    <!--                         <Setter TargetName="icon" -->
+    <!--                                 Property="Fill" -->
+    <!--                                 Value="{DynamicResource ChildViewCloseButtonMouseOverLightBrush}" /> -->
+    <!--                     </Trigger> -->
+    <!--                     <Trigger Property="IsDefaulted" Value="True"> -->
+    <!--                         <Setter TargetName="icon" -->
+    <!--                                 Property="Fill" -->
+    <!--                                 Value="{DynamicResource ChildViewCloseButtonLightBrush}" /> -->
+    <!--                     </Trigger> -->
+    <!--                     <Trigger Property="IsPressed" Value="True"> -->
+    <!--                         <Setter TargetName="icon" -->
+    <!--                                 Property="Fill" -->
+    <!--                                 Value="{DynamicResource ChildViewCloseButtonPressedLightBrush}" /> -->
+    <!--                     </Trigger> -->
+    <!--                 </ControlTemplate.Triggers> -->
+    <!--             </ControlTemplate> -->
+    <!--         </Setter.Value> -->
+    <!--     </Setter> -->
+    <!-- </Style> -->
+</Styles>

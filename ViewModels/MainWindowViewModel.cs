@@ -11,15 +11,20 @@ namespace Atomex.Client.Desktop.ViewModels
     {
         private readonly IDialogService<ViewModelBase> _dialogService;
 
-        private ViewModelBase _firstDialog;
-        private ViewModelBase _secondDialog;
-
         public MainWindowViewModel(IDialogService<ViewModelBase> unsavedChangesDialogService)
         {
             _dialogService = unsavedChangesDialogService;
             _firstDialog = new DialogViewModel();
             _secondDialog = new SecondDialogViewModel();
+
+            Content = new StartViewModel();
         }
+
+
+        private ViewModelBase _firstDialog;
+        private ViewModelBase _secondDialog;
+
+        public ViewModelBase Content { get; set; }
 
         public void ShowDialog()
         {

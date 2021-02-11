@@ -1,0 +1,138 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="Atomex.Client.Desktop.Views.StartView"
+             xmlns:vm="clr-namespace:Atomex.Client.Desktop.ViewModels"
+             xmlns:controls="clr-namespace:Atomex.Client.Desktop.Controls"
+             HorizontalAlignment="Center"
+             VerticalAlignment="Center"
+             Padding="12">
+
+    <Design.DataContext>
+        <vm:StartViewModel />
+    </Design.DataContext>
+
+    <UserControl.Resources>
+        <ImageBrush x:Key="GithubBrush" Source="avares://Atomex.Client.Desktop/Resources/Images/github.png" />
+        <ImageBrush x:Key="TelegramBrush" Source="avares://Atomex.Client.Desktop/Resources/Images/telegram.png" />
+        <ImageBrush x:Key="TwitterBrush" Source="avares://Atomex.Client.Desktop/Resources/Images/twitter.png" />
+    </UserControl.Resources>
+
+    <Border Classes="ChildViewBorderLight"
+            Width="600"
+            Height="320"
+            VerticalAlignment="Center"
+            HorizontalAlignment="Center">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1*" />
+                <ColumnDefinition Width="1.2*" />
+            </Grid.ColumnDefinitions>
+
+            <Border Grid.Column="0" CornerRadius="8 0 0 10" BorderThickness="0">
+                <Border.Background>
+                    <ImageBrush
+                        Stretch="Fill"
+                        Source="avares://Atomex.Client.Desktop/Resources/Images/logo_pillow.png" />
+                </Border.Background>
+
+                <Grid>
+                    <StackPanel Orientation="Horizontal"
+                                Margin="0 30 0 0"
+                                VerticalAlignment="Top"
+                                HorizontalAlignment="Center">
+
+                        <Image
+                            Source="avares://Atomex.Client.Desktop/Resources/Images/logo_white.png"
+                            Width="50"
+                            Height="52"
+                            VerticalAlignment="Center"
+                            HorizontalAlignment="Center" />
+
+                        <TextBlock Text="atomex"
+                                   FontSize="40"
+                                   FontWeight="Light"
+                                   FontFamily="{DynamicResource MainTitleFontFamily}"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center"
+                                   Foreground="White"
+                                   Margin="10 0 0 0" />
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <Grid Grid.Column="1">
+                <StackPanel Margin="0 30 0 0"
+                            Orientation="Vertical"
+                            VerticalAlignment="Center">
+                    <controls:RoundedButton Width="200"
+                                            Height="40"
+                                            Margin="0 0 0 5"
+                                            CornerRadius="15 15 15 15"
+                                            Content="MY WALLETS"
+                                            VerticalAlignment="Bottom"
+                                            FontSize="11"
+                                            Command="{Binding MyWalletsCommand}"
+                                            IsEnabled="{Binding HasWallets}" />
+
+                    <controls:RoundedButton Width="200"
+                                            Height="40"
+                                            Margin="0 0 0 5"
+                                            CornerRadius="15 15 15 15"
+                                            Content="CREATE NEW WALLET"
+                                            VerticalAlignment="Bottom"
+                                            FontSize="11"
+                                            Command="{Binding CreateNewCommand}" />
+
+                    <Button Content="I want to restore my wallet"
+                            Margin="0 5 0 0"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Bottom"
+                            FontSize="12"
+                            Command="{Binding RestoreByMnemonicCommand}"
+                            Classes="LinkButton" />
+                </StackPanel>
+
+                <StackPanel Margin="0 0 0 33"
+                            Orientation="Horizontal"
+                            VerticalAlignment="Bottom"
+                            HorizontalAlignment="Center">
+                    <controls:IconButton Width="25"
+                                         Height="25"
+                                         OpacityMask="{StaticResource TwitterBrush}"
+                                         Foreground="{DynamicResource SocialDefaultBrush}"
+                                         MouseOverBrush="{DynamicResource SocialMouseOverBrush}"
+                                         PressedBrush="{DynamicResource SocialDefaultBrush}"
+                                         Command="{Binding TwitterCommand}" />
+                    <controls:IconButton Width="25"
+                                         Height="25"
+                                         Margin="3 0 0 0"
+                                         OpacityMask="{StaticResource TelegramBrush}"
+                                         Foreground="{DynamicResource SocialDefaultBrush}"
+                                         MouseOverBrush="{DynamicResource SocialMouseOverBrush}"
+                                         PressedBrush="{DynamicResource SocialDefaultBrush}"
+                                         Command="{Binding TelegramCommand}" />
+                    <controls:IconButton Width="25"
+                                         Height="25"
+                                         Margin="4 0 0 0"
+                                         OpacityMask="{StaticResource GithubBrush}"
+                                         Foreground="{DynamicResource SocialDefaultBrush}"
+                                         MouseOverBrush="{DynamicResource SocialMouseOverBrush}"
+                                         PressedBrush="{DynamicResource SocialDefaultBrush}"
+                                         Command="{Binding GithubCommand}" />
+                </StackPanel>
+
+                <TextBlock Foreground="{DynamicResource CopyrightForegroundBrush}"
+                           Text="© 2021 Atomex OÜ, All rights reserved"
+                           Margin="0 0 0 7"
+                           FontSize="11"
+                           FontFamily="{DynamicResource DefaultFontFamily}"
+                           VerticalAlignment="Bottom"
+                           HorizontalAlignment="Center">
+                </TextBlock>
+            </Grid>
+        </Grid>
+    </Border>
+</UserControl>

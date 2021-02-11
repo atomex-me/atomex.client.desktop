@@ -18,8 +18,10 @@
         <FluentTheme Mode="Light" />
 
         <StyleInclude Source="/Styles/MainWindowStyle.axaml" />
+        <StyleInclude Source="/Styles/ChildViewStyle.axaml" />
         <StyleInclude Source="/Styles/DefaultButtonStyle.axaml" />
         <StyleInclude Source="/Styles/GenerateButtonStyle.axaml" />
         <StyleInclude Source="/Styles/IconButtonStyle.axaml" />
+        <StyleInclude Source="/Styles/LinkButtonStyle.axaml" />
     </Application.Styles>
 </Application>

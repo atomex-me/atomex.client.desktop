@@ -31,6 +31,9 @@
     <Compile Update="Views\SecondDialogView.axaml.cs">
       <DependentUpon>SecondDialogView.axaml</DependentUpon>
     </Compile>
+    <Compile Update="Views\StartView.axaml.cs">
+      <DependentUpon>StartView.axaml</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Helpers" />
