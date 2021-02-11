@@ -9,55 +9,28 @@ namespace Atomex.Client.Desktop.ViewModels
 {
     internal sealed class MainWindowViewModel : ViewModelBase
     {
-        private readonly IDialogService<ViewModelBase> _unsavedChangesDialogService;
-        
-        public string Greeting => $"Welcome to Avalonia! {net.ToString()}";
-        private Network net = Network.MainNet;
+        private readonly IDialogService<ViewModelBase> _dialogService;
 
-        private ViewModelBase dialogVM;
+        private ViewModelBase _firstDialog;
+        private ViewModelBase _secondDialog;
 
         public MainWindowViewModel(IDialogService<ViewModelBase> unsavedChangesDialogService)
         {
-            _unsavedChangesDialogService = unsavedChangesDialogService;
-            dialogVM = new DialogViewModel();
-
-
-            Increase = ReactiveCommand.Create(DoIncrease);
+            _dialogService = unsavedChangesDialogService;
+            _firstDialog = new DialogViewModel();
+            _secondDialog = new SecondDialogViewModel();
         }
 
         public void ShowDialog()
         {
-            var unsavedChangesDialogViewModel = new DialogServiceViewModel(dialogVM);
-            _unsavedChangesDialogService.Show(unsavedChangesDialogViewModel);
+            var firstDialogWrapped = new DialogServiceViewModel(_firstDialog);
+            _dialogService.Show(firstDialogWrapped);
         }
 
         public void ShowCustomDialog()
         {
-            var secondDialog = new DialogServiceViewModel(new SecondDialogViewModel());
-            _unsavedChangesDialogService.Show(secondDialog);
+            var secondDialogWrapper = new DialogServiceViewModel(_secondDialog);
+            _dialogService.Show(secondDialogWrapper);
         }
-
-        private int _currentStep = 1;
-        public int CS
-        {
-            get => _currentStep;
-            set => this.RaiseAndSetIfChanged(ref _currentStep, value);
-        }
-
-
-        public ReactiveCommand<Unit, Unit> Increase { get; }
-
-        void DoIncrease()
-        {
-            CS += 1;
-        }
-
-        public void CustomBtnCommand()
-        {
-            Console.WriteLine("custom btn clicked;");
-        }
-        
-        public ReactiveCommand<Unit, Unit> Decrease { get; }
-        
     }
 }

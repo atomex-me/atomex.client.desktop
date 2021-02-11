@@ -16,72 +16,12 @@
     <Design.DataContext>
         <vm:MainWindowViewModel />
     </Design.DataContext>
-    
+
     <Window.Resources>
-        <ImageBrush x:Key="GithubBrush" Source="avares://Atomex.Client.Desktop/Resources/Images/github.png"></ImageBrush>
-        <ImageBrush x:Key="TelegramBrush" Source="avares://Atomex.Client.Desktop/Resources/Images/telegram.png"></ImageBrush>
-        <ImageBrush x:Key="TwitterBrush" Source="avares://Atomex.Client.Desktop/Resources/Images/twitter.png"></ImageBrush>
+        <ImageBrush x:Key="GithubBrush" Source="avares://Atomex.Client.Desktop/Resources/Images/github.png" />
+        <ImageBrush x:Key="TelegramBrush" Source="avares://Atomex.Client.Desktop/Resources/Images/telegram.png" />
+        <ImageBrush x:Key="TwitterBrush" Source="avares://Atomex.Client.Desktop/Resources/Images/twitter.png" />
     </Window.Resources>
-    
 
-    <StackPanel>
-        <TextBox Text="{Binding Greeting}" HorizontalAlignment="Center" VerticalAlignment="Center" />
-        <Button Classes="h1" Command="{Binding ShowDialog}">Show Dialog</Button>
-        <Button Classes="h1" Command="{Binding ShowCustomDialog}">Show Dialog2</Button>
-
-        <Button Classes="h1" Command="{Binding Increase}">+</Button>
-        <Button Classes="h1" Command="{Binding Decrease}" Content="-">
-        </Button>
-        
-        <!-- <Button OpacityMask="{StaticResource GithubBrush}"> -->
-        <!-- -->
-        <!-- </Button>  -->
-        
-        <StackPanel Orientation="Horizontal">
-            <controls:IconButton Width="25"
-                                 Height="25"
-                                 Margin="4 0 0 0"
-                                 OpacityMask="{StaticResource GithubBrush}"
-                                 Foreground="{DynamicResource SocialDefaultBrush}"
-                                 MouseOverBrush="{DynamicResource SocialMouseOverBrush}"
-                                 PressedBrush="{DynamicResource SocialDefaultBrush}" />
-            
-            <controls:IconButton Width="25"
-                                 Height="25"
-                                 Margin="4 0 0 0"
-                                 OpacityMask="{StaticResource TelegramBrush}"
-                                 Foreground="{DynamicResource SocialDefaultBrush}"
-                                 MouseOverBrush="{DynamicResource SocialMouseOverBrush}"
-                                 PressedBrush="{DynamicResource SocialDefaultBrush}" />
-            
-            <controls:IconButton Width="25"
-                                 Height="25"
-                                 Margin="4 0 0 0"
-                                 OpacityMask="{StaticResource TwitterBrush}"
-                                 Foreground="{DynamicResource SocialDefaultBrush}"
-                                 MouseOverBrush="{DynamicResource SocialMouseOverBrush}"
-                                 PressedBrush="{DynamicResource SocialDefaultBrush}" />
-        </StackPanel>
-
-        <controls:RoundedButton Width="200"
-                                Height="40"
-                                Margin="0 0 0 5"
-                                CornerRadius="15 15 15 15"
-                                Content="MY WALLETS"
-                                VerticalAlignment="Bottom"
-                                FontSize="11"
-                                Command="{Binding CustomBtnCommand}" />
-
-        <controls:StepIndicatorPanel Margin="0 0 0 30"
-                                     Height="40"
-                                     Width="450"
-                                     VerticalAlignment="Bottom"
-                                     StepsCount="6"
-                                     CurrentStep="{Binding CS}"
-                                     StepBackground="{DynamicResource StepBackgroundBrush}"
-                                     CompletedStepBackground="{DynamicResource CompletedStepBackgroundBrush}"
-                                     Foreground="{DynamicResource StepForegroundBrush}" />
-        
-    </StackPanel>
 
 </Window>
