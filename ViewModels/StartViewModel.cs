@@ -54,7 +54,7 @@ namespace Atomex.Client.Desktop.ViewModels
                     app: AtomexApp,
                     scenario: CreateWalletScenario.CreateNew,
                     onAccountCreated: OnAccountCreated,
-                    onCanceled: ShowStart));
+                    onCanceled: OnCanceled));
             });
 
         public void RestoreByMnemonicCommand()
@@ -75,7 +75,7 @@ namespace Atomex.Client.Desktop.ViewModels
 
         private void OnCanceled()
         {
-            // DialogViewer.HideDialog(Dialogs.CreateWallet);
+            ShowStart();
         }
 
         private void OnAccountCreated(IAccount account)

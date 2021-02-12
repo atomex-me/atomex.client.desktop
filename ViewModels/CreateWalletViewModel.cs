@@ -85,8 +85,7 @@ namespace Atomex.Client.Desktop.ViewModels
             set => this.RaiseAndSetIfChanged(ref _canNext, value);
         }
 
-        // private string _backText = Properties.Resources.CwvBack;
-        private string _backText = "Back";
+        private string _backText = Properties.Resources.CwvBack;
 
         public string BackText
         {
@@ -94,8 +93,7 @@ namespace Atomex.Client.Desktop.ViewModels
             set => this.RaiseAndSetIfChanged(ref _backText, value);
         }
 
-        // private string _nextText = Properties.Resources.CwvNext;
-        private string _nextText = "Next";
+        private string _nextText = Properties.Resources.CwvNext;
 
         public string NextText
         {
@@ -119,10 +117,8 @@ namespace Atomex.Client.Desktop.ViewModels
                 ViewModels[CurrentViewIndex].Step = _step + 1;
 
                 NextText = _step < ViewIndexes.Length - 1
-                    // ? Properties.Resources.CwvNext
-                    // : Properties.Resources.CwvFinish;
-                    ? "Next"
-                    : "Finish";
+                    ? Properties.Resources.CwvNext
+                    : Properties.Resources.CwvFinish;
             }
         }
 
