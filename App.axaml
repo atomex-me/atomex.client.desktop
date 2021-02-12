@@ -25,5 +25,6 @@
         <StyleInclude Source="/Styles/IconButtonStyle.axaml" />
         <StyleInclude Source="/Styles/LinkButtonStyle.axaml" />
         <StyleInclude Source="/Styles/CustomComboBoxStyle.axaml" />
+        <StyleInclude Source="/Styles/CustomTextBoxStyle.axaml" />
     </Application.Styles>
 </Application>

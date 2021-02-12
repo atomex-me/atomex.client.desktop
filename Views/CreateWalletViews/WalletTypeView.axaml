@@ -4,8 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="Atomex.Client.Desktop.Views.CreateWalletViews.WalletTypeView"
-             xmlns:vm="clr-namespace:Atomex.Client.Desktop.ViewModels.CreateWalletViewModels"
-             xmlns:helpers="clr-namespace:Atomex.Client.Desktop.Helpers">
+             xmlns:vm="clr-namespace:Atomex.Client.Desktop.ViewModels.CreateWalletViewModels">
     
     <Design.DataContext>
         <vm:WalletTypeViewModel />

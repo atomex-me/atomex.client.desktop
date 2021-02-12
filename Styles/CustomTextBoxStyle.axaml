@@ -1,0 +1,29 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <Styles.Resources>
+        <CornerRadius x:Key="TextBoxCornerRadius">20 20 20 20</CornerRadius>
+    </Styles.Resources>
+
+    <Style Selector="TextBox.CustomTextBox">
+        <Setter Property="Background" Value="{DynamicResource CustomTextBoxBackgroundBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource CustomTextBoxForegroundBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource CustomTextBoxBorderBrush}" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="CaretBrush" Value="{DynamicResource CustomTextBoxCaretBrush}" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="FontFamily" Value="{DynamicResource DefaultFontFamily}" />
+        <Setter Property="FontSize" Value="13" />
+    </Style>
+
+
+    <Style Selector="TextBox.CustomTextBox /template/ Border">
+        <Setter Property="CornerRadius" Value="{StaticResource TextBoxCornerRadius}" />
+    </Style>
+    
+    <Style Selector="TextBox:focus /template/ Border">
+        <Setter Property="Background" Value="{DynamicResource CustomTextBoxBackgroundBrush}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource CustomTextBoxBorderBrush}"/>
+        <Setter Property="BorderThickness" Value="0" />
+    </Style>
+</Styles>
