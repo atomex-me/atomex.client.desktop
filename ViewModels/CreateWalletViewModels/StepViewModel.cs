@@ -3,7 +3,7 @@ using NBitcoin;
 using ReactiveUI;
 using Network = Atomex.Core.Network;
 
-namespace Atomex.Client.Desktop.ViewModels
+namespace Atomex.Client.Desktop.ViewModels.CreateWalletViewModels
 {
     public class StepData
     {

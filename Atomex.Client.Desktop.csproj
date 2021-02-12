@@ -38,26 +38,33 @@
     <Compile Update="Views\CreateWalletView.axaml.cs">
       <DependentUpon>CreateWalletView.axaml</DependentUpon>
     </Compile>
-    <Compile Update="Views\WalletTypeView.axaml.cs">
-      <DependentUpon>WalletTypeView.axaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\WalletNameView.axaml.cs">
-      <DependentUpon>WalletNameView.axaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\CreateMnemonicView.axaml.cs">
-      <DependentUpon>CreateMnemonicView.axaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\WriteMnemonicView.axaml.cs">
-      <DependentUpon>WriteMnemonicView.axaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\CreateDerivedKeyPasswordView.axaml.cs">
+    <Compile Update="Views\CreateWalletViews\CreateDerivedKeyPasswordView.axaml.cs">
       <DependentUpon>CreateDerivedKeyPasswordView.axaml</DependentUpon>
+      <SubType>Code</SubType>
     </Compile>
-    <Compile Update="Views\WriteDerivedKeyPasswordView.axaml.cs">
+    <Compile Update="Views\CreateWalletViews\CreateMnemonicView.axaml.cs">
+      <DependentUpon>CreateMnemonicView.axaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Views\CreateWalletViews\CreateStoragePasswordView.axaml.cs">
+      <DependentUpon>CreateStoragePasswordView.axaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Views\CreateWalletViews\WalletNameView.axaml.cs">
+      <DependentUpon>WalletNameView.axaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Views\CreateWalletViews\WalletTypeView.axaml.cs">
+      <DependentUpon>WalletTypeView.axaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Views\CreateWalletViews\WriteDerivedKeyPasswordView.axaml.cs">
       <DependentUpon>WriteDerivedKeyPasswordView.axaml</DependentUpon>
+      <SubType>Code</SubType>
     </Compile>
-    <Compile Update="Views\CreateStoragePasswordView.axaml.cs">
-      <DependentUpon>CreateStoragePasswordViewModel.axaml</DependentUpon>
+    <Compile Update="Views\CreateWalletViews\WriteMnemonicView.axaml.cs">
+      <DependentUpon>WriteMnemonicView.axaml</DependentUpon>
+      <SubType>Code</SubType>
     </Compile>
   </ItemGroup>
   <ItemGroup>

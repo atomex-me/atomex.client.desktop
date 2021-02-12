@@ -2,11 +2,11 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 
-namespace Atomex.Client.Desktop.Views
+namespace Atomex.Client.Desktop.Views.CreateWalletViews
 {
-    public class WalletNameView : UserControl
+    public class CreateDerivedKeyPasswordView : UserControl
     {
-        public WalletNameView()
+        public CreateDerivedKeyPasswordView()
         {
             InitializeComponent();
         }

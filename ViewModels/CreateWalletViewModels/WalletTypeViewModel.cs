@@ -1,7 +1,7 @@
 using Atomex.Core;
 using ReactiveUI;
 
-namespace Atomex.Client.Desktop.ViewModels
+namespace Atomex.Client.Desktop.ViewModels.CreateWalletViewModels
 {
     public class WalletTypeViewModel : StepViewModel
     {

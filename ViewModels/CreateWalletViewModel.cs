@@ -2,6 +2,7 @@ using System;
 using System.Windows.Input;
 using Atomex.Wallet.Abstract;
 using Atomex.Client.Desktop.Common;
+using Atomex.Client.Desktop.ViewModels.CreateWalletViewModels;
 using System.Collections.Generic;
 using ReactiveUI;
 

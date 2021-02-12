@@ -1,4 +1,4 @@
-namespace Atomex.Client.Desktop.ViewModels
+namespace Atomex.Client.Desktop.ViewModels.CreateWalletViewModels
 {
     public class CreateStoragePasswordViewModel : StepViewModel
     {
