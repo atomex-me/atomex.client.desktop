@@ -47,15 +47,6 @@
                      VerticalAlignment="Top"
                      Text="{Binding WalletName}"
                      Watermark="Wallet name:" />
-
-
-            <!--     <i:Interaction.Triggers> -->
-            <!--     <i:EventTrigger EventName="TextChanged"> -->
-            <!--         <i:InvokeCommandAction Command="{Binding TextChangedCommand}"/> -->
-            <!--     </i:EventTrigger> -->
-            <!-- </i:Interaction.Triggers> -->
-
-
         </StackPanel>
 
         <TextBlock Text="{Binding Warning}"

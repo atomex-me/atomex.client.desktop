@@ -3,6 +3,120 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             x:Class="Atomex.Client.Desktop.Views.CreateWalletViews.CreateMnemonicView">
-  create mnemonic view
+             x:Class="Atomex.Client.Desktop.Views.CreateWalletViews.CreateMnemonicView"
+             xmlns:vm="clr-namespace:Atomex.Client.Desktop.ViewModels.CreateWalletViewModels"
+             xmlns:controls="clr-namespace:Atomex.Client.Desktop.Controls">
+
+    <Design.DataContext>
+        <vm:CreateMnemonicViewModel />
+    </Design.DataContext>
+
+    <UserControl.Styles>
+        <Style Selector="TextBox.CreateMnemonic /template/ Border">
+            <Setter Property="CornerRadius" Value="20 0 0 20" />
+        </Style>
+    </UserControl.Styles>
+
+    <StackPanel Orientation="Vertical">
+        <StackPanel Orientation="Horizontal"
+                    Margin="10 30 10 20"
+                    HorizontalAlignment="Center">
+            <TextBlock Text="Step "
+                       Foreground="{DynamicResource DefaultForegroundBrush}"
+                       FontFamily="{DynamicResource DefaultLightFontFamily}"
+                       FontSize="25" />
+            <TextBlock Text="{Binding Step}"
+                       Foreground="{DynamicResource DefaultForegroundBrush}"
+                       FontFamily="{DynamicResource DefaultLightFontFamily}"
+                       FontSize="25" />
+            <TextBlock Text=": Mnemonic phrase"
+                       Foreground="{DynamicResource DefaultForegroundBrush}"
+                       FontFamily="{DynamicResource DefaultLightFontFamily}"
+                       FontSize="25" />
+        </StackPanel>
+
+        <TextBlock
+            Text="Mnemonic phrase is used to restore your wallet if the data on your device has been lost. Please, write it down and keep it in safe place."
+            Foreground="{DynamicResource DefaultForegroundBrush}"
+            FontFamily="{DynamicResource DefaultLightFontFamily}"
+            FontSize="15"
+            Margin="40 0 40 20"
+            TextWrapping="Wrap"
+            HorizontalAlignment="Center" />
+
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+            <Border Width="120"
+                    Height="40"
+                    Background="{DynamicResource DefaultBackgroundBrush}"
+                    CornerRadius="20 0 0 20">
+                <TextBlock Text="Phrase language:"
+                           Margin="0 0 7 0"
+                           Foreground="{DynamicResource DefaultForegroundBrush}"
+                           FontFamily="{DynamicResource DefaultMediumFontFamily}"
+                           FontSize="13"
+                           VerticalAlignment="Center"
+                           HorizontalAlignment="Right" />
+            </Border>
+            <ComboBox Classes="CreateMnemonic"
+                      Width="390"
+                      Height="40"
+                      Margin="0 5 0 5"
+                      Items="{Binding GetLanguages}"
+                      SelectedItem="{Binding Language}" />
+        </StackPanel>
+
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+            <Border Width="120"
+                    Height="40"
+                    Background="{DynamicResource DefaultBackgroundBrush}"
+                    CornerRadius="20 0 0 20">
+                <TextBlock Text="Word count:"
+                           Margin="0 0 7 0"
+                           Foreground="{DynamicResource DefaultForegroundBrush}"
+                           FontFamily="{DynamicResource DefaultMediumFontFamily}"
+                           FontSize="13"
+                           VerticalAlignment="Center"
+                           HorizontalAlignment="Right" />
+            </Border>
+            <ComboBox Classes="CreateMnemonic"
+                      Width="390"
+                      Height="40"
+                      Margin="0 5 0 5"
+                      Items="{Binding GetWordCountToEntropyLength}"
+                      SelectedItem="{Binding EntropyLength}" />
+        </StackPanel>
+
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+            
+            <!-- todo: resolve Azian symbols -->
+            <TextBox Classes="CustomTextBox CreateMnemonic"
+                     Width="430"
+                     MinHeight="40"
+                     IsReadOnly="True"
+                     Margin="0 5 0 5"
+                     Padding="10"
+                     TextWrapping="Wrap"
+                     AcceptsReturn="True"
+                     HorizontalAlignment="Center"
+                     VerticalAlignment="Top"
+                     Watermark="mnemonic phrase..."
+                     Text="{Binding Mnemonic}" />
+
+            <controls:RoundedButton Width="80"
+                                    Margin="0 5 0 5"
+                                    CornerRadius="0 20 20 0"
+                                    Content="Generate"
+                                    HorizontalAlignment="Center"
+                                    Command="{Binding MnemonicCommand}" />
+        </StackPanel>
+
+        <TextBlock Text="{Binding Warning}"
+                   Foreground="{DynamicResource WarningForegroundBrush}"
+                   FontFamily="{DynamicResource DefaultLightFontFamily}"
+                   FontSize="13"
+                   Margin="20 5 20 0"
+                   TextWrapping="Wrap"
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Bottom" />
+    </StackPanel>
 </UserControl>

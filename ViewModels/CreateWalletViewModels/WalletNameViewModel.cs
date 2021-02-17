@@ -24,14 +24,11 @@ namespace Atomex.Client.Desktop.ViewModels.CreateWalletViewModels
 
 
         private string _warning;
-
         public string Warning
         {
             get => _warning;
             set { this.RaiseAndSetIfChanged(ref _warning, value); }
         }
-
-        private ICommand _textChangedCommand;
 
         public override void Initialize(
             object arg)
