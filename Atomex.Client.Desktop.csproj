@@ -66,5 +66,8 @@
       <DependentUpon>WriteMnemonicView.axaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Update="Views\PasswordControlView.axaml.cs">
+      <DependentUpon>PasswordControlView.axaml</DependentUpon>
+    </Compile>
   </ItemGroup>
 </Project>
