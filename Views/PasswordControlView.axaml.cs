@@ -28,12 +28,18 @@ namespace Atomex.Client.Desktop.Views
 
                     textBox.GetObservable(TextBox.SelectionStartProperty).Subscribe(position =>
                     {
-                        dataContext.SelectionStart = position;
+                        if (dataContext != null)
+                        {
+                            dataContext.SelectionStart = position;
+                        }
                     });
 
                     textBox.GetObservable(TextBox.SelectionEndProperty).Subscribe(position =>
                     {
-                        dataContext.SelectionEnd = position;
+                        if (dataContext != null)
+                        {
+                            dataContext.SelectionEnd = position;
+                        }
                     });
                 }
             };

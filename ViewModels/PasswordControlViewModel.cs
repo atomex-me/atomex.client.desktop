@@ -27,26 +27,36 @@ namespace Atomex.Client.Desktop.ViewModels
 
     public class PasswordControlViewModel : ViewModelBase
     {
-        public PasswordControlViewModel(Action onPasswordChanged = null)
+        public PasswordControlViewModel(
+            Action onPasswordChanged = null,
+            string placeholder = "Password",
+            bool isSmall = false
+        )
         {
             if (onPasswordChanged != null)
             {
                 OnPasswordChanged += onPasswordChanged;
             }
+
+            Placeholder = placeholder;
+            IsSmall = isSmall;
         }
 
         private readonly Action OnPasswordChanged;
+        public string Placeholder { get; set; }
+        public bool IsSmall { get; set; }
         public int SelectionStart { get; set; }
         public int SelectionEnd { get; set; }
         private string _stringPass = string.Empty;
         public int CaretIndex { get; set; }
+
         public string StringPass
         {
             get => _stringPass;
             set
             {
                 var diffLen = value.Length - _stringPass.Length;
-                
+
                 // disallow paste operation;
                 if (diffLen > 1)
                 {
@@ -79,7 +89,7 @@ namespace Atomex.Client.Desktop.ViewModels
                 }
             }
         }
-        
+
         public SecureString SecurePass = new SecureString();
         private List<TextboxState> valueQueue = new List<TextboxState>();
         private bool handling = false;
@@ -90,7 +100,7 @@ namespace Atomex.Client.Desktop.ViewModels
             await Task.Run(async () =>
             {
                 await Task.Delay(1, new CancellationTokenSource().Token);
-                
+
 
                 var diffLen = state.Value.Length - _stringPass.Length;
 
@@ -99,7 +109,7 @@ namespace Atomex.Client.Desktop.ViewModels
                 {
                     SecurePass.Clear();
                     _stringPass = string.Empty;
-                    
+
                     OnPasswordChanged?.Invoke();
                     this.RaisePropertyChanged(nameof(StringPass));
                     return;
@@ -139,7 +149,7 @@ namespace Atomex.Client.Desktop.ViewModels
 
                 var randomStringPass = RandomString(state.Value.Length);
                 _stringPass = randomStringPass;
-                
+
                 OnPasswordChanged?.Invoke();
 
                 this.RaisePropertyChanged(nameof(StringPass));
@@ -152,10 +162,12 @@ namespace Atomex.Client.Desktop.ViewModels
                 valueQueue.RemoveAt(0);
                 await handleValue(val);
             }
+
             handling = false;
         }
 
         private Random random = new Random();
+
         private string RandomString(int length)
         {
             const string chars = "abcdefghijklmnopqrstuvwxyz0123456789";

@@ -113,6 +113,10 @@
             </ControlTemplate>
         </Setter>
     </Style>
+    
+    <!-- <Style Selector="ComboBox:pointerover /template/ Border"> -->
+    <!--     <Setter Property="Background" Value="{DynamicResource CustomComboBoxBackgroundBrush}" /> -->
+    <!-- </Style> -->
 
     <Style Selector="ComboBoxItem">
         <Setter Property="Foreground" Value="{DynamicResource CustomComboBoxForegroundBrush}" />

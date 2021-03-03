@@ -9,6 +9,7 @@
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
+                <ResourceInclude Source="/Resources/Icons.axaml"/>
                 <ResourceInclude Source="/Themes/blue.axaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
@@ -26,5 +27,6 @@
         <StyleInclude Source="/Styles/LinkButtonStyle.axaml" />
         <StyleInclude Source="/Styles/CustomComboBoxStyle.axaml" />
         <StyleInclude Source="/Styles/CustomTextBoxStyle.axaml" />
+        <StyleInclude Source="/Styles/PasswordTextBoxStyle.axaml" />
     </Application.Styles>
 </Application>
