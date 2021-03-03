@@ -10,13 +10,15 @@ namespace Atomex.Client.Desktop.ViewModels
     internal sealed class MainWindowViewModel : ViewModelBase
     {
         private readonly IDialogService<ViewModelBase> _dialogService;
+        public static IAtomexApp AtomexApp { get; private set; }
 
-        public MainWindowViewModel(IDialogService<ViewModelBase> unsavedChangesDialogService)
+        public MainWindowViewModel(IDialogService<ViewModelBase> dialogService, IAtomexApp atomexApp)
         {
-            _dialogService = unsavedChangesDialogService;
+            _dialogService = dialogService;
             _firstDialog = new DialogViewModel();
             _secondDialog = new SecondDialogViewModel();
-
+            AtomexApp = atomexApp;
+            
             ShowStart();
         }
 
@@ -27,12 +29,11 @@ namespace Atomex.Client.Desktop.ViewModels
 
         private void ShowStart()
         {
-            Content = new StartViewModel(ShowContent, ShowStart);
+            Content = new StartViewModel(ShowContent, ShowStart, AtomexApp);
         }
 
         private ViewModelBase _firstDialog;
         private ViewModelBase _secondDialog;
-
 
         private ViewModelBase _content;
 

@@ -12,31 +12,31 @@ namespace Atomex.Client.Desktop.ViewModels.CreateWalletViewModels
     {
         public CreateDerivedKeyPasswordViewModel()
         {
-            PassVM1 = new PasswordControlViewModel(PasswordChanged, "Password...");
-            PassVM2 = new PasswordControlViewModel(PasswordChanged, "Password confirmation...");
+            PasswordVM = new PasswordControlViewModel(PasswordChanged, "Password...");
+            PasswordConfirmationVM = new PasswordControlViewModel(PasswordChanged, "Password confirmation...");
         }
 
-        private PasswordControlViewModel _passVM1;
+        private PasswordControlViewModel _passwordVM;
 
-        public PasswordControlViewModel PassVM1
+        public PasswordControlViewModel PasswordVM
         {
-            get => _passVM1;
+            get => _passwordVM;
             set
             {
-                _passVM1 = value;
-                this.RaisePropertyChanged(nameof(PassVM1));
+                _passwordVM = value;
+                this.RaisePropertyChanged(nameof(PasswordVM));
             }
         }
 
-        private PasswordControlViewModel _passVM2;
+        private PasswordControlViewModel _passwordConfirmationVM;
 
-        public PasswordControlViewModel PassVM2
+        public PasswordControlViewModel PasswordConfirmationVM
         {
-            get => _passVM2;
+            get => _passwordConfirmationVM;
             set
             {
-                _passVM2 = value;
-                this.RaisePropertyChanged(nameof(PassVM2));
+                _passwordConfirmationVM = value;
+                this.RaisePropertyChanged(nameof(PasswordConfirmationVM));
             }
         }
 
@@ -70,7 +70,7 @@ namespace Atomex.Client.Desktop.ViewModels.CreateWalletViewModels
         private void PasswordChanged()
         {
             Warning = string.Empty;
-            PasswordScore = (int) PasswordAdvisor.CheckStrength(PassVM1.SecurePass);
+            PasswordScore = (int) PasswordAdvisor.CheckStrength(PasswordVM.SecurePass);
         }
 
         public override void Initialize(
@@ -82,8 +82,8 @@ namespace Atomex.Client.Desktop.ViewModels.CreateWalletViewModels
         public override void Back()
         {
             Warning = string.Empty;
-            PassVM1.StringPass = string.Empty;
-            PassVM2.StringPass = string.Empty;
+            PasswordVM.StringPass = string.Empty;
+            PasswordConfirmationVM.StringPass = string.Empty;
             PasswordScore = 0;
 
             base.Back();
@@ -92,7 +92,7 @@ namespace Atomex.Client.Desktop.ViewModels.CreateWalletViewModels
         public override void Next()
         {
             // password is optional
-            if (PassVM1.SecurePass.Length > 0)
+            if (PasswordVM.SecurePass.Length > 0)
             {
                 if (PasswordScore < (int) PasswordAdvisor.PasswordScore.Medium)
                 {
@@ -100,8 +100,9 @@ namespace Atomex.Client.Desktop.ViewModels.CreateWalletViewModels
                     return;
                 }
 
-                if (PassVM2.SecurePass.Length > 0 && !PassVM1.SecurePass.SecureEqual(PassVM2.SecurePass) ||
-                    PassVM2.SecurePass.Length == 0)
+                if (PasswordConfirmationVM.SecurePass.Length > 0 &&
+                    !PasswordVM.SecurePass.SecureEqual(PasswordConfirmationVM.SecurePass) ||
+                    PasswordConfirmationVM.SecurePass.Length == 0)
                 {
                     Warning = Properties.Resources.CwvPasswordsDoNotMatch;
                     return;
@@ -111,15 +112,15 @@ namespace Atomex.Client.Desktop.ViewModels.CreateWalletViewModels
             var wallet = new HdWallet(
                 mnemonic: StepData.Mnemonic,
                 wordList: StepData.Language,
-                passPhrase: PassVM1.SecurePass,
+                passPhrase: PasswordVM.SecurePass,
                 network: StepData.Network)
             {
                 PathToWallet = StepData.PathToWallet
             };
 
             Warning = string.Empty;
-            PassVM1.StringPass = string.Empty;
-            PassVM2.StringPass = string.Empty;
+            PasswordVM.StringPass = string.Empty;
+            PasswordConfirmationVM.StringPass = string.Empty;
             PasswordScore = 0;
 
             RaiseOnNext(wallet);

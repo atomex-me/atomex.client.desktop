@@ -153,8 +153,7 @@ namespace Atomex.Client.Desktop.ViewModels
             Action<IAccount> onAccountCreated = null,
             Action onCanceled = null)
         {
-            // todo: uncomment this
-            // App = app ?? throw new ArgumentNullException(nameof(app));
+            App = app ?? throw new ArgumentNullException(nameof(app));
 
             ViewModels = new List<StepViewModel>
             {

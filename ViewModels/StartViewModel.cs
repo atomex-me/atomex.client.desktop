@@ -1,5 +1,6 @@
 using System;
 using System.Windows.Input;
+using System.Linq;
 using Atomex.Client.Desktop.Common;
 using Atomex.Wallet.Abstract;
 using ReactiveUI;
@@ -8,13 +9,15 @@ namespace Atomex.Client.Desktop.ViewModels
 {
     public class StartViewModel : ViewModelBase
     {
-        public StartViewModel(Action<ViewModelBase> showContent, Action showStart)
+        public StartViewModel(Action<ViewModelBase> showContent, Action showStart, IAtomexApp app)
         {
 #if DEBUG
             if (Env.IsInDesignerMode())
                 DesignerMode();
 #endif
-
+            AtomexApp = app ?? throw new ArgumentNullException(nameof(app));
+            HasWallets = WalletInfo.AvailableWallets().Count() > 0;
+            
             ShowContent += showContent;
             ShowStart += showStart;
         }
