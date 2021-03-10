@@ -17,7 +17,7 @@ namespace Atomex.Client.Desktop.ViewModels
 #endif
             AtomexApp = app ?? throw new ArgumentNullException(nameof(app));
             HasWallets = WalletInfo.AvailableWallets().Count() > 0;
-            
+
             ShowContent += showContent;
             ShowStart += showStart;
         }
@@ -43,14 +43,16 @@ namespace Atomex.Client.Desktop.ViewModels
             set => this.RaiseAndSetIfChanged(ref _content, value);
         }
 
-        public void MyWalletsCommand()
+        private ICommand _myWalletsCommand;
+
+        public ICommand MyWalletsCommand => _myWalletsCommand ??= ReactiveCommand.Create(() =>
         {
-        }
+            ShowContent?.Invoke(new MyWalletsViewModel(AtomexApp));
+        });
 
         private ICommand _createNewCommand;
 
-        // _createNewCommand ??=
-        public ICommand CreateNewCommand =>
+        public ICommand CreateNewCommand => _createNewCommand ??=
             ReactiveCommand.Create(() =>
             {
                 ShowContent?.Invoke(new CreateWalletViewModel(

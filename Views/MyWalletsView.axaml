@@ -1,0 +1,159 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="Atomex.Client.Desktop.Views.MyWalletsView"
+             xmlns:controls="clr-namespace:Atomex.Client.Desktop.Controls"
+             xmlns:vm="clr-namespace:Atomex.Client.Desktop.ViewModels"
+             xmlns:i="using:Avalonia.Xaml.Interactivity"
+             xmlns:ia="using:Avalonia.Xaml.Interactions.Core">
+
+    <Design.DataContext>
+        <vm:MyWalletsViewModel />
+    </Design.DataContext>
+
+    <UserControl.Styles>
+        <Style Selector="Panel.MyWalletsView">
+            <Setter Property="Background" Value="{DynamicResource ChildViewBackgroundBrush}" />
+        </Style>
+
+        <Style Selector="ListBoxItem">
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Template">
+                <ControlTemplate>
+                    <ContentPresenter Name="PART_ContentPresenter"
+                                      Background="{TemplateBinding Background}"
+                                      BorderBrush="{TemplateBinding BorderBrush}"
+                                      BorderThickness="{TemplateBinding BorderThickness}"
+                                      ContentTemplate="{TemplateBinding ContentTemplate}"
+                                      Content="{TemplateBinding Content}"
+                                      Padding="{TemplateBinding Padding}"
+                                      VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+                                      HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}" />
+                </ControlTemplate>
+            </Setter>
+        </Style>
+    </UserControl.Styles>
+
+    <UserControl.KeyBindings>
+        <KeyBinding Gesture="Enter"
+                    Command="{Binding SelectWalletCommand}"
+                    CommandParameter="{Binding ElementName=WalletListBox, Path=SelectedItem}" />
+    </UserControl.KeyBindings>
+
+    <Panel Classes="MyWalletsView"
+           Width="{Binding $parent[Window].Bounds.Width}"
+           Height="{Binding $parent[Window].Bounds.Height}">
+
+        <Border CornerRadius="0"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="219*" />
+                    <RowDefinition Height="98*" />
+                </Grid.RowDefinitions>
+                <StackPanel Orientation="Vertical"
+                            VerticalAlignment="Center"
+                            Grid.RowSpan="2">
+                    <StackPanel Orientation="Horizontal"
+                                Margin="10 0 10 0"
+                                HorizontalAlignment="Center">
+                        <TextBlock Text="Please select your wallet:"
+                                   Foreground="{DynamicResource DefaultForegroundBrush}"
+                                   FontFamily="{DynamicResource DefaultLightFontFamily}"
+                                   FontSize="15"
+                                   TextWrapping="Wrap" />
+                    </StackPanel>
+
+                    <Border Width="270"
+                            Padding="7"
+                            Margin="0 10"
+                            CornerRadius="10"
+                            Background="{DynamicResource AvailableWalletListBackgroundBrush}">
+                        <ListBox x:Name="WalletListBox"
+                                 Background="Transparent"
+                                 MaxHeight="450"
+                                 ScrollViewer.HorizontalScrollBarVisibility="Hidden"
+                                 Items="{Binding Wallets}"
+                                 SelectionMode="Single">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel
+                                        x:Name="Wallet"
+                                        Orientation="Horizontal"
+                                        Margin="3 0 0 0"
+
+                                        Width="255"
+                                        Height="50"
+                                        Background="Transparent">
+
+                                        <Path x:Name="WalletIcon"
+                                              Stretch="Uniform"
+                                              UseLayoutRounding="False"
+                                              Width="30"
+                                              Height="30"
+                                              Data="{DynamicResource Entypo.Wallet}" />
+
+                                        <TextBlock x:Name="WalletName"
+                                                   Text="{Binding Description}"
+                                                   Margin="7 0 0 0"
+                                                   VerticalAlignment="Center"
+                                                   FontSize="13"
+                                                   FontFamily="{DynamicResource DefaultLightFontFamily}" />
+
+                                        <i:Interaction.Behaviors>
+                                            <ia:EventTriggerBehavior EventName="DoubleTapped"
+                                                                     SourceObject="{Binding #Wallet}">
+                                                <ia:InvokeCommandAction
+                                                    Command="{Binding $parent[ListBox].DataContext.SelectWalletCommand}"
+                                                    CommandParameter="{Binding ElementName=WalletListBox, Path=SelectedItem}" />
+                                            </ia:EventTriggerBehavior>
+
+                                            <ia:DataTriggerBehavior Binding="{Binding Network}"
+                                                                    ComparisonCondition="Equal"
+                                                                    Value="0">
+                                                <ia:ChangePropertyAction TargetObject="{Binding #WalletIcon}"
+                                                                         PropertyName="Fill"
+                                                                         Value="{StaticResource MainNetWalletForegroundBrush}" />
+
+                                                <ia:ChangePropertyAction TargetObject="{Binding #WalletName}"
+                                                                         PropertyName="Foreground"
+                                                                         Value="{StaticResource MainNetWalletForegroundBrush}" />
+                                            </ia:DataTriggerBehavior>
+
+                                            <ia:DataTriggerBehavior Binding="{Binding Network}"
+                                                                    ComparisonCondition="Equal"
+                                                                    Value="1">
+                                                <ia:ChangePropertyAction TargetObject="{Binding #WalletIcon}"
+                                                                         PropertyName="Fill"
+                                                                         Value="{StaticResource TestNetWalletForegroundBrush}" />
+
+                                                <ia:ChangePropertyAction TargetObject="{Binding #WalletName}"
+                                                                         PropertyName="Foreground"
+                                                                         Value="{StaticResource TestNetWalletForegroundBrush}" />
+                                            </ia:DataTriggerBehavior>
+                                        </i:Interaction.Behaviors>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                    </Border>
+
+                    <StackPanel Orientation="Horizontal"
+                                HorizontalAlignment="Center">
+                        <controls:RoundedButton Width="120"
+                                                Height="40"
+                                                Margin="0 5 0 5"
+                                                CornerRadius="20"
+                                                Content="Cancel"
+                                                FontSize="13"
+                                                Command="{Binding $parent[Window].DataContext.ShowStart}" />
+                    </StackPanel>
+                </StackPanel>
+            </Grid>
+        </Border>
+    </Panel>
+</UserControl>

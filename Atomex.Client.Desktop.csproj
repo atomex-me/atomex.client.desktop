@@ -6,26 +6,26 @@
         <DefaultItemExcludes>$(DefaultItemExcludes);atomex.client.core\**</DefaultItemExcludes>
     </PropertyGroup>
     <ItemGroup>
-        <AvaloniaResource Include="Assets\**"/>
-        <AvaloniaResource Include="Resources\*"/>
-        <AvaloniaResource Include="Resources\Fonts\*"/>
-        <AvaloniaResource Include="Resources\Images\*"/>
+        <AvaloniaResource Include="Assets\**" />
+        <AvaloniaResource Include="Resources\*" />
+        <AvaloniaResource Include="Resources\Fonts\*" />
+        <AvaloniaResource Include="Resources\Images\*" />
     </ItemGroup>
     <ItemGroup>
-        <PackageReference Include="Avalonia" Version="0.10.0"/>
-        <PackageReference Include="Avalonia.Desktop" Version="0.10.0"/>
-        <PackageReference Include="Avalonia.Diagnostics" Version="0.10.0"/>
-        <PackageReference Include="Avalonia.ReactiveUI" Version="0.10.0"/>
-        <PackageReference Include="Avalonia.Xaml.Behaviors" Version="0.10.0"/>
-        <PackageReference Include="Deadpikle.AvaloniaProgressRing" Version="0.9.0"/>
-        <PackageReference Include="Serilog.Settings.Configuration" Version="3.1.0"/>
-        <PackageReference Include="Serilog.Sinks.Console" Version="3.1.1"/>
+        <PackageReference Include="Avalonia" Version="0.10.0" />
+        <PackageReference Include="Avalonia.Desktop" Version="0.10.0" />
+        <PackageReference Include="Avalonia.Diagnostics" Version="0.10.0" />
+        <PackageReference Include="Avalonia.ReactiveUI" Version="0.10.0" />
+        <PackageReference Include="Avalonia.Xaml.Behaviors" Version="0.10.0" />
+        <PackageReference Include="Deadpikle.AvaloniaProgressRing" Version="0.9.0" />
+        <PackageReference Include="Serilog.Settings.Configuration" Version="3.1.0" />
+        <PackageReference Include="Serilog.Sinks.Console" Version="3.1.1" />
     </ItemGroup>
 
 
     <ItemGroup>
-        <None Remove="config.debug.json"/>
-        <None Remove="config.json"/>
+        <None Remove="config.debug.json" />
+        <None Remove="config.json" />
     </ItemGroup>
     <ItemGroup>
         <EmbeddedResource Include="config.debug.json">
@@ -82,6 +82,9 @@
         </Compile>
         <Compile Update="Views\PasswordControlView.axaml.cs">
             <DependentUpon>PasswordControlView.axaml</DependentUpon>
+        </Compile>
+        <Compile Update="Views\MyWalletsView.axaml.cs">
+          <DependentUpon>MyWalletsView.axaml</DependentUpon>
         </Compile>
     </ItemGroup>
     <ItemGroup>

@@ -27,7 +27,7 @@ namespace Atomex.Client.Desktop.ViewModels
             Content = content;
         }
 
-        private void ShowStart()
+        public void ShowStart()
         {
             Content = new StartViewModel(ShowContent, ShowStart, AtomexApp);
         }
