@@ -1,90 +1,92 @@
 <Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <OutputType>WinExe</OutputType>
-    <TargetFramework>net5.0</TargetFramework>
-    <Nullable>enable</Nullable>
-    <DefaultItemExcludes>$(DefaultItemExcludes);atomex.client.core\**</DefaultItemExcludes>
-  </PropertyGroup>
-  <ItemGroup>
-    <AvaloniaResource Include="Assets\**" />
-    <AvaloniaResource Include="Resources\*" />
-    <AvaloniaResource Include="Resources\Fonts\*" />
-    <AvaloniaResource Include="Resources\Images\*" />
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="Avalonia" Version="0.10.0" />
-    <PackageReference Include="Avalonia.Desktop" Version="0.10.0" />
-    <PackageReference Include="Avalonia.Diagnostics" Version="0.10.0" />
-    <PackageReference Include="Avalonia.ReactiveUI" Version="0.10.0" />
-    <PackageReference Include="Avalonia.Xaml.Behaviors" Version="0.10.0" />
-    <PackageReference Include="Deadpikle.AvaloniaProgressRing" Version="0.9.0" />
-    <PackageReference Include="Serilog.Settings.Configuration" Version="3.1.0" />
-    <PackageReference Include="Serilog.Sinks.Console" Version="3.1.1" />
-  </ItemGroup>
-  
+    <PropertyGroup>
+        <OutputType>WinExe</OutputType>
+        <TargetFramework>net5.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <DefaultItemExcludes>$(DefaultItemExcludes);atomex.client.core\**</DefaultItemExcludes>
+    </PropertyGroup>
+    <ItemGroup>
+        <AvaloniaResource Include="Assets\**"/>
+        <AvaloniaResource Include="Resources\*"/>
+        <AvaloniaResource Include="Resources\Fonts\*"/>
+        <AvaloniaResource Include="Resources\Images\*"/>
+    </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="Avalonia" Version="0.10.0"/>
+        <PackageReference Include="Avalonia.Desktop" Version="0.10.0"/>
+        <PackageReference Include="Avalonia.Diagnostics" Version="0.10.0"/>
+        <PackageReference Include="Avalonia.ReactiveUI" Version="0.10.0"/>
+        <PackageReference Include="Avalonia.Xaml.Behaviors" Version="0.10.0"/>
+        <PackageReference Include="Deadpikle.AvaloniaProgressRing" Version="0.9.0"/>
+        <PackageReference Include="Serilog.Settings.Configuration" Version="3.1.0"/>
+        <PackageReference Include="Serilog.Sinks.Console" Version="3.1.1"/>
+    </ItemGroup>
 
-  <ItemGroup>
-    <None Remove="config.debug.json" />
-    <None Remove="config.json" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="config.debug.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="config.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </EmbeddedResource>
-  </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="atomex.client.core\Atomex.Client.Core\Atomex.Client.Core.csproj" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Update="Dialogs\Views\DialogServiceView.axaml.cs">
-      <DependentUpon>UnsavedChangesDialogView.axaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\DialogView.axaml.cs">
-      <DependentUpon>DialogView.axaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\SecondDialogView.axaml.cs">
-      <DependentUpon>SecondDialogView.axaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\StartView.axaml.cs">
-      <DependentUpon>StartView.axaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\CreateWalletView.axaml.cs">
-      <DependentUpon>CreateWalletView.axaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\CreateWalletViews\CreateDerivedKeyPasswordView.axaml.cs">
-      <DependentUpon>CreateDerivedKeyPasswordView.axaml</DependentUpon>
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Update="Views\CreateWalletViews\CreateMnemonicView.axaml.cs">
-      <DependentUpon>CreateMnemonicView.axaml</DependentUpon>
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Update="Views\CreateWalletViews\CreateStoragePasswordView.axaml.cs">
-      <DependentUpon>CreateStoragePasswordView.axaml</DependentUpon>
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Update="Views\CreateWalletViews\WalletNameView.axaml.cs">
-      <DependentUpon>WalletNameView.axaml</DependentUpon>
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Update="Views\CreateWalletViews\WalletTypeView.axaml.cs">
-      <DependentUpon>WalletTypeView.axaml</DependentUpon>
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Update="Views\CreateWalletViews\WriteDerivedKeyPasswordView.axaml.cs">
-      <DependentUpon>WriteDerivedKeyPasswordView.axaml</DependentUpon>
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Update="Views\CreateWalletViews\WriteMnemonicView.axaml.cs">
-      <DependentUpon>WriteMnemonicView.axaml</DependentUpon>
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Update="Views\PasswordControlView.axaml.cs">
-      <DependentUpon>PasswordControlView.axaml</DependentUpon>
-    </Compile>
-  </ItemGroup>
+    <ItemGroup>
+        <None Remove="config.debug.json"/>
+        <None Remove="config.json"/>
+    </ItemGroup>
+    <ItemGroup>
+        <EmbeddedResource Include="config.debug.json">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </EmbeddedResource>
+        <EmbeddedResource Include="config.json">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </EmbeddedResource>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Compile Update="Dialogs\Views\DialogServiceView.axaml.cs">
+            <DependentUpon>UnsavedChangesDialogView.axaml</DependentUpon>
+        </Compile>
+        <Compile Update="Views\DialogView.axaml.cs">
+            <DependentUpon>DialogView.axaml</DependentUpon>
+        </Compile>
+        <Compile Update="Views\SecondDialogView.axaml.cs">
+            <DependentUpon>SecondDialogView.axaml</DependentUpon>
+        </Compile>
+        <Compile Update="Views\StartView.axaml.cs">
+            <DependentUpon>StartView.axaml</DependentUpon>
+        </Compile>
+        <Compile Update="Views\CreateWalletView.axaml.cs">
+            <DependentUpon>CreateWalletView.axaml</DependentUpon>
+        </Compile>
+        <Compile Update="Views\CreateWalletViews\CreateDerivedKeyPasswordView.axaml.cs">
+            <DependentUpon>CreateDerivedKeyPasswordView.axaml</DependentUpon>
+            <SubType>Code</SubType>
+        </Compile>
+        <Compile Update="Views\CreateWalletViews\CreateMnemonicView.axaml.cs">
+            <DependentUpon>CreateMnemonicView.axaml</DependentUpon>
+            <SubType>Code</SubType>
+        </Compile>
+        <Compile Update="Views\CreateWalletViews\CreateStoragePasswordView.axaml.cs">
+            <DependentUpon>CreateStoragePasswordView.axaml</DependentUpon>
+            <SubType>Code</SubType>
+        </Compile>
+        <Compile Update="Views\CreateWalletViews\WalletNameView.axaml.cs">
+            <DependentUpon>WalletNameView.axaml</DependentUpon>
+            <SubType>Code</SubType>
+        </Compile>
+        <Compile Update="Views\CreateWalletViews\WalletTypeView.axaml.cs">
+            <DependentUpon>WalletTypeView.axaml</DependentUpon>
+            <SubType>Code</SubType>
+        </Compile>
+        <Compile Update="Views\CreateWalletViews\WriteDerivedKeyPasswordView.axaml.cs">
+            <DependentUpon>WriteDerivedKeyPasswordView.axaml</DependentUpon>
+            <SubType>Code</SubType>
+        </Compile>
+        <Compile Update="Views\CreateWalletViews\WriteMnemonicView.axaml.cs">
+            <DependentUpon>WriteMnemonicView.axaml</DependentUpon>
+            <SubType>Code</SubType>
+        </Compile>
+        <Compile Update="Views\PasswordControlView.axaml.cs">
+            <DependentUpon>PasswordControlView.axaml</DependentUpon>
+        </Compile>
+    </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="atomex.client.core\Atomex.Client.Core\Atomex.Client.Core.csproj">
+            <GlobalPropertiesToRemove></GlobalPropertiesToRemove>
+        </ProjectReference>
+    </ItemGroup>
 </Project>

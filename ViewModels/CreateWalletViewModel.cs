@@ -52,6 +52,7 @@ namespace Atomex.Client.Desktop.ViewModels
         private int[] ViewIndexes { get; }
 
         private int _currentViewIndex;
+
         public int CurrentViewIndex
         {
             get => _currentViewIndex;
@@ -212,15 +213,15 @@ namespace Atomex.Client.Desktop.ViewModels
         }
 
         private ICommand _backCommand;
-        // _backCommand ??
-        public ICommand BackCommand =>
-            _backCommand = ReactiveCommand.Create(() => { ViewModels[CurrentViewIndex].Back(); });
 
-        
+        public ICommand BackCommand =>
+            _backCommand ??= ReactiveCommand.Create(() => { ViewModels[CurrentViewIndex].Back(); });
+
+
         private ICommand _nextCommand;
-        // _nextCommand ??
+
         public ICommand NextCommand =>
-            _nextCommand = ReactiveCommand.Create(() => { ViewModels[CurrentViewIndex].Next(); });
+            _nextCommand ??= ReactiveCommand.Create(() => { ViewModels[CurrentViewIndex].Next(); });
 
         private int[] ResolveViewIndexes(
             CreateWalletScenario scenario)

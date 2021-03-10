@@ -7,6 +7,8 @@
              xmlns:vm="clr-namespace:Atomex.Client.Desktop.ViewModels"
              xmlns:controls="clr-namespace:Atomex.Client.Desktop.Controls"
              xmlns:progRing="clr-namespace:AvaloniaProgressRing;assembly=AvaloniaProgressRing"
+             xmlns:i="using:Avalonia.Xaml.Interactivity"
+             xmlns:ia="using:Avalonia.Xaml.Interactions.Core"
              Padding="12">
 
     <Design.DataContext>
@@ -18,63 +20,59 @@
             Height="460">
         <Grid>
 
-            <ContentControl Content="{Binding Content}" />
+            <Panel Opacity="0.5" Name="Panel">
+                <ContentControl Content="{Binding Content}" />
 
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Bottom"
-                        Margin="0 0 0 80">
-                <controls:RoundedButton Width="120"
-                                        Height="40"
-                                        Margin="0 5 0 5"
-                                        CornerRadius="20 0 0 20"
-                                        Content="{Binding BackText}"
-                                        FontSize="13"
-                                        Command="{Binding BackCommand}"
-                                        IsEnabled="{Binding CanBack}" />
-                <controls:RoundedButton Width="120"
-                                        Height="40"
-                                        Margin="3 5 0 5"
-                                        CornerRadius="0 20 20 0"
-                                        Content="{Binding NextText}"
-                                        FontSize="13"
-                                        Command="{Binding NextCommand}"
-                                        IsEnabled="{Binding CanNext}">
+                <i:Interaction.Behaviors>
+                    <ia:DataTriggerBehavior Binding="{Binding InProgress}" ComparisonCondition="Equal" Value="true">
+                        <ia:ChangePropertyAction TargetObject="{Binding #Panel}" PropertyName="Opacity" Value="0.5" />
+                    </ia:DataTriggerBehavior>
+                    <ia:DataTriggerBehavior Binding="{Binding InProgress}" ComparisonCondition="Equal" Value="false">
+                        <ia:ChangePropertyAction TargetObject="{Binding #Panel}" PropertyName="Opacity" Value="1" />
+                    </ia:DataTriggerBehavior>
+                </i:Interaction.Behaviors>
 
-                    <!-- <controls:RoundedButton.Styles> -->
-                    <!--     <Style BasedOn="{StaticResource DefaultRoundedButtonStyle}" -->
-                    <!--            TargetType="{x:Type controls:RoundedButton}"> -->
-                    <!--         <Style.Triggers> -->
-                    <!--             <DataTrigger Binding="{Binding CanBack}" Value="false"> -->
-                    <!--                 <Setter Property="CornerRadius" Value="20 20 20 20" /> -->
-                    <!--             </DataTrigger> -->
-                    <!--             <DataTrigger Binding="{Binding CanBack}" Value="true"> -->
-                    <!--                 <Setter Property="CornerRadius" Value="0 20 20 0" /> -->
-                    <!--             </DataTrigger> -->
-                    <!--         </Style.Triggers> -->
-                    <!--     </Style> -->
-                    <!-- </controls:RoundedButton.Styles> -->
-                </controls:RoundedButton>
-            </StackPanel>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Bottom"
+                            Margin="0 0 0 80">
+                    <controls:RoundedButton Width="120"
+                                            Height="40"
+                                            Margin="0 5 0 5"
+                                            CornerRadius="20 0 0 20"
+                                            Content="{Binding BackText}"
+                                            FontSize="13"
+                                            Command="{Binding BackCommand}"
+                                            IsEnabled="{Binding CanBack}" />
+                    <controls:RoundedButton Width="120"
+                                            Height="40"
+                                            Margin="3 5 0 5"
+                                            CornerRadius="0 20 20 0"
+                                            Content="{Binding NextText}"
+                                            FontSize="13"
+                                            Command="{Binding NextCommand}"
+                                            IsEnabled="{Binding CanNext}">
+                    </controls:RoundedButton>
+                </StackPanel>
 
-            <controls:StepIndicatorPanel Margin="0 0 0 30"
-                                         Height="40"
-                                         Width="450"
-                                         VerticalAlignment="Bottom"
-                                         StepsCount="{Binding StepsCount}"
-                                         CurrentStep="{Binding Step}"
-                                         StepBackground="{DynamicResource StepBackgroundBrush}"
-                                         CompletedStepBackground="{DynamicResource CompletedStepBackgroundBrush}"
-                                         Foreground="{DynamicResource StepForegroundBrush}" />
+                <controls:StepIndicatorPanel Margin="0 0 0 30"
+                                             Height="40"
+                                             Width="450"
+                                             VerticalAlignment="Bottom"
+                                             StepsCount="{Binding StepsCount}"
+                                             CurrentStep="{Binding Step}"
+                                             StepBackground="{DynamicResource StepBackgroundBrush}"
+                                             CompletedStepBackground="{DynamicResource CompletedStepBackgroundBrush}"
+                                             Foreground="{DynamicResource StepForegroundBrush}" />
+            </Panel>
 
             <Border Background="{DynamicResource DefaultSubstrateBrush}"
                     IsVisible="{Binding InProgress}">
-
-                <!-- todo: check overlay color and opacity during InProgress -->
+                
                 <progRing:ProgressRing Width="60"
                                        Height="60"
                                        IsActive="{Binding InProgress}"
                                        HorizontalAlignment="Center"
                                        VerticalAlignment="Center"
-                                       Foreground="Gray"
+                                       Foreground="Blue"
                                        Margin="10,20,0,0" />
             </Border>
         </Grid>
