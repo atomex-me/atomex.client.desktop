@@ -35,6 +35,14 @@
                 </ControlTemplate>
             </Setter>
         </Style>
+        
+        <!-- <Style Selector="ListBoxItem:pointerover /template/ ContentPresenter#PART_ContentPresenter"> -->
+        <!--     <Setter Property="Background" Value="#112F51" /> -->
+        <!-- </Style> -->
+        <!-- -->
+        <!-- <Style Selector="ListBoxItem:selected /template/ ContentPresenter"> -->
+        <!--     <Setter Property="Background" Value="#133E62" /> -->
+        <!-- </Style> -->
     </UserControl.Styles>
 
     <UserControl.KeyBindings>
