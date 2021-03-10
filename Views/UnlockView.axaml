@@ -1,0 +1,88 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="Atomex.Client.Desktop.Views.UnlockView"
+             xmlns:controls="clr-namespace:Atomex.Client.Desktop.Controls"
+             xmlns:vm="clr-namespace:Atomex.Client.Desktop.ViewModels"
+             xmlns:progRing="clr-namespace:AvaloniaProgressRing;assembly=AvaloniaProgressRing">
+
+    <Design.DataContext>
+        <vm:UnlockViewModel />
+    </Design.DataContext>
+
+    <UserControl.Styles>
+        <Style Selector="Panel.UnlockView">
+            <Setter Property="Background" Value="{DynamicResource ChildViewBackgroundBrush}" />
+        </Style>
+    </UserControl.Styles>
+
+    <Panel
+        Classes="UnlockView"
+        Width="{Binding $parent[Window].Bounds.Width}"
+        Height="{Binding $parent[Window].Bounds.Height}">
+        <Border CornerRadius="0"
+                VerticalAlignment="Center"
+                HorizontalAlignment="Center">
+            <Grid>
+                <StackPanel Orientation="Vertical"
+                            VerticalAlignment="Center">
+                    <StackPanel Orientation="Horizontal"
+                                Margin="10 0 10 5"
+                                HorizontalAlignment="Center">
+                        <TextBlock Text="Please enter password to unlock "
+                                   Foreground="{DynamicResource DefaultForegroundBrush}"
+                                   FontFamily="{DynamicResource DefaultLightFontFamily}"
+                                   FontSize="15"
+                                   TextWrapping="Wrap" />
+                        <TextBlock Text="{Binding WalletName}"
+                                   Foreground="{DynamicResource DefaultForegroundBrush}"
+                                   FontFamily="{DynamicResource DefaultLightFontFamily}"
+                                   FontSize="15"
+                                   TextWrapping="Wrap" />
+                    </StackPanel>
+
+                    <ContentControl Content="{Binding PasswordVM}" />
+
+                    <StackPanel Width="328"
+                                Margin="0 5"
+                                IsVisible="{Binding InvalidPassword}">
+                        <TextBlock Text="Invalid password"
+                                   Foreground="OrangeRed"
+                                   HorizontalAlignment="Center" />
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal"
+                                HorizontalAlignment="Center">
+                        <controls:RoundedButton Width="120"
+                                                Height="40"
+                                                Margin="0 5 0 5"
+                                                CornerRadius="20 0 0 20"
+                                                Content="Cancel"
+                                                FontSize="13"
+                                                Command="{Binding GoBackCommand}"
+                                                IsEnabled="{Binding !InProgress}" />
+                        <controls:RoundedButton Width="120"
+                                                Height="40"
+                                                Margin="3 5 0 5"
+                                                Content="Unlock"
+                                                CornerRadius="0 20 20 0"
+                                                FontSize="13"
+                                                IsDefault="True"
+                                                Command="{Binding UnlockCommand}"
+                                                IsEnabled="{Binding !InProgress}" />
+                    </StackPanel>
+                </StackPanel>
+                
+                <progRing:ProgressRing Width="60"
+                                       Height="60"
+                                       IsActive="{Binding InProgress}"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center"
+                                       Foreground="Blue"
+                                       Margin="0 220 0 0" />
+            </Grid>
+        </Border>
+    </Panel>
+</UserControl>

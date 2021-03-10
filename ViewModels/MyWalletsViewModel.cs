@@ -8,6 +8,7 @@ using Atomex.Subsystems;
 using Atomex.Wallet;
 using Atomex.Wallet.Abstract;
 using ReactiveUI;
+using Serilog;
 
 namespace Atomex.Client.Desktop.ViewModels
 {
@@ -26,11 +27,15 @@ namespace Atomex.Client.Desktop.ViewModels
         }
 
         public MyWalletsViewModel(
-            IAtomexApp app)
+            IAtomexApp app, Action<ViewModelBase> showContent)
         {
             AtomexApp = app ?? throw new ArgumentNullException(nameof(app));
             Wallets = WalletInfo.AvailableWallets();
+
+            ShowContent += showContent;
         }
+
+        private Action<ViewModelBase> ShowContent;
 
         private ICommand _selectWalletCommand;
 
@@ -38,38 +43,30 @@ namespace Atomex.Client.Desktop.ViewModels
         public ICommand SelectWalletCommand => _selectWalletCommand ??= ReactiveCommand.Create<WalletInfo>(info =>
         {
             IAccount account = null;
-            Console.WriteLine(info.Name);
 
-            // var unlockViewModel = new UnlockViewModel(info.Name, password =>
-            // {
-            //     account = Account.LoadFromFile(
-            //         pathToAccount: info.Path,
-            //         password: password,
-            //         currenciesProvider: AtomexApp.CurrenciesProvider,
-            //         clientType: ClientType.Wpf);
-            // });
-            //
-            // unlockViewModel.Unlocked += (sender, args) =>
-            // {
-            //     var atomexClient = new WebSocketAtomexClient(
-            //         configuration: App.Configuration,
-            //         account: account,
-            //         symbolsProvider: AtomexApp.SymbolsProvider,
-            //         quotesProvider: AtomexApp.QuotesProvider);
-            //
-            //     AtomexApp.UseTerminal(atomexClient, restart: true);
-            //
-            //     DialogViewer.HideDialog(Dialogs.MyWallets);
-            //     DialogViewer.HideDialog(Dialogs.Start);
-            //     DialogViewer.HideDialog(Dialogs.Unlock);
-            // };
-            //
-            // DialogViewer.ShowDialog(Dialogs.Unlock, unlockViewModel);
+            var unlockViewModel = new UnlockViewModel(info.Name, password =>
+            {
+                account = Account.LoadFromFile(
+                    pathToAccount: info.Path,
+                    password: password,
+                    currenciesProvider: AtomexApp.CurrenciesProvider,
+                    clientType: ClientType.Unknown);
+            }, () => ShowContent(this));
+
+            unlockViewModel.Unlocked += (sender, args) =>
+            {
+                var atomexClient = new WebSocketAtomexClient(
+                    configuration: App.Configuration,
+                    account: account,
+                    symbolsProvider: AtomexApp.SymbolsProvider,
+                    quotesProvider: AtomexApp.QuotesProvider);
+
+                AtomexApp.UseTerminal(atomexClient, restart: true);
+            };
+
+
+            ShowContent?.Invoke(unlockViewModel);
         });
-
-        public void CloseButtonCommand()
-        {
-        }
 
         private void DesignerMode()
         {

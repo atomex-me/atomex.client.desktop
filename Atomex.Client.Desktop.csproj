@@ -86,6 +86,9 @@
         <Compile Update="Views\MyWalletsView.axaml.cs">
           <DependentUpon>MyWalletsView.axaml</DependentUpon>
         </Compile>
+        <Compile Update="Views\UnlockView.axaml.cs">
+          <DependentUpon>UnlockView.axaml</DependentUpon>
+        </Compile>
     </ItemGroup>
     <ItemGroup>
         <ProjectReference Include="atomex.client.core\Atomex.Client.Core\Atomex.Client.Core.csproj">

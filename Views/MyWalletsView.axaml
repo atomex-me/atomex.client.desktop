@@ -93,7 +93,6 @@
                                         x:Name="Wallet"
                                         Orientation="Horizontal"
                                         Margin="3 0 0 0"
-
                                         Width="255"
                                         Height="50"
                                         Background="Transparent">

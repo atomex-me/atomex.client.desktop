@@ -47,7 +47,7 @@ namespace Atomex.Client.Desktop.ViewModels
 
         public ICommand MyWalletsCommand => _myWalletsCommand ??= ReactiveCommand.Create(() =>
         {
-            ShowContent?.Invoke(new MyWalletsViewModel(AtomexApp));
+            ShowContent?.Invoke(new MyWalletsViewModel(AtomexApp, ShowContent));
         });
 
         private ICommand _createNewCommand;
