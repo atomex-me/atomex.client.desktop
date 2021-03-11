@@ -1,23 +1,19 @@
 ﻿<Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:vm="clr-namespace:Atomex.Client.Desktop.Dialogs.ViewModels;assembly=dotnet-properties"
         x:Class="Atomex.Client.Desktop.Dialogs.Views.DialogServiceView"
         Name="Dialog"
         CanResize="True"
         ShowInTaskbar="False"
-        SystemDecorations="None">
-
-    <!-- <Design.DataContext> -->
-    <!--     <vm:UnsavedChangesDialogViewModel /> -->
-    <!-- </Design.DataContext> -->
+        SystemDecorations="None"
+        TransparencyLevelHint="Transparent"
+        Background="Transparent">
 
     <!-- todo: Dialog child content fit full width & height; Refactor this XAML;-->
 
-    <Border BorderBrush="Black"
-            BorderThickness="2"
-            CornerRadius="3"
-            Padding="4"
-            BoxShadow="4 4 4 gray">
+    <Border
+        CornerRadius="{DynamicResource DialogCornerRadius}"
+        BoxShadow="{DynamicResource DialogBoxShadow}"
+        Margin="12">
 
         <DockPanel>
             <StackPanel DockPanel.Dock="Bottom"

@@ -32,9 +32,6 @@ namespace Atomex.Client.Desktop.ViewModels
             Content = new StartViewModel(ShowContent, ShowStart, AtomexApp);
         }
 
-        private ViewModelBase _firstDialog;
-        private ViewModelBase _secondDialog;
-
         private ViewModelBase _content;
 
         public ViewModelBase Content
@@ -43,6 +40,8 @@ namespace Atomex.Client.Desktop.ViewModels
             set => this.RaiseAndSetIfChanged(ref _content, value);
         }
 
+        private ViewModelBase _firstDialog;
+        private ViewModelBase _secondDialog;
         public void ShowDialog()
         {
             var firstDialogWrapped = new DialogServiceViewModel(_firstDialog);

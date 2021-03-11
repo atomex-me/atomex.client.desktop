@@ -1,15 +1,21 @@
 <Styles xmlns='https://github.com/avaloniaui'
         xmlns:x='http://schemas.microsoft.com/winfx/2006/xaml'>
+    
+    <Styles.Resources>
+        <CornerRadius x:Key="DialogCornerRadius">10</CornerRadius>
+        <BoxShadows x:Key="DialogBoxShadow">2 2 12 3 Black</BoxShadows>
+    </Styles.Resources>
+    
 
     <Style Selector="Border.ChildViewBorder">
-        <Setter Property="CornerRadius" Value="10" />
-        <Setter Property="BoxShadow" Value="2 2 12 3 Black" />
+        <Setter Property="CornerRadius" Value="{DynamicResource DialogCornerRadius}" />
+        <Setter Property="BoxShadow" Value="{DynamicResource DialogBoxShadow}" />
         <Setter Property="Background" Value="{DynamicResource ChildViewBackgroundBrush}" />
     </Style>
 
     <Style Selector="Border.ChildViewBorderLight">
         <Setter Property="CornerRadius" Value="10" />
-        <Setter Property="BoxShadow" Value="2 2 12 3 Black" />
+        <Setter Property="BoxShadow" Value="{DynamicResource DialogBoxShadow}" />
         <Setter Property="Background" Value="{DynamicResource ChildViewBackgroundBrushLight}" />
     </Style>
 
