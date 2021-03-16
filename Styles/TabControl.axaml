@@ -1,0 +1,124 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:sys="clr-namespace:System;assembly=netstandard">
+    <Styles.Resources>
+        <x:Double x:Key="TabItemMinHeight">48</x:Double>
+        <x:Double x:Key="TabItemVerticalPipeHeight">24</x:Double>
+        <x:Double x:Key="TabItemPipeThickness">2</x:Double>
+        <Thickness x:Key="TabControlTopPlacementItemMargin">0 0 0 2</Thickness>
+    </Styles.Resources>
+  
+    <Style Selector="TabControl">
+        <Setter Property="Margin" Value="0" />
+        <Setter Property="Padding" Value="{DynamicResource TabItemMargin}" />
+        <Setter Property="Background" Value="{DynamicResource TabControlBackground}" />
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Border Margin="0"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        Background="{TemplateBinding Background}"
+                        HorizontalAlignment="{TemplateBinding HorizontalAlignment}"
+                        VerticalAlignment="{TemplateBinding VerticalAlignment}">
+                    <DockPanel>
+                        <ItemsPresenter Name="PART_ItemsPresenter"
+                                        Items="{TemplateBinding Items}"
+                                        ItemsPanel="{TemplateBinding ItemsPanel}"
+                                        ItemTemplate="{TemplateBinding ItemTemplate}"
+                                        DockPanel.Dock="{TemplateBinding TabStripPlacement}"/>
+                        <ContentPresenter Name="PART_SelectedContentHost"
+                                          Margin="{TemplateBinding Padding}"
+                                          HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                          VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+                                          Content="{TemplateBinding SelectedContent}"
+                                          ContentTemplate="{TemplateBinding SelectedContentTemplate}" />
+                    </DockPanel>
+                </Border>
+            </ControlTemplate>
+        </Setter>
+        
+        <!-- <Setter Property="ItemsPanel"> -->
+        <!--     <ItemsPanelTemplate> -->
+        <!--         <StackPanel /> -->
+        <!--     </ItemsPanelTemplate> -->
+        <!-- </Setter> -->
+    </Style>
+
+    <Style Selector="TabItem">
+        <Setter Property="FontSize" Value="{DynamicResource TabItemHeaderFontSize}" />
+        <Setter Property="FontWeight" Value="{DynamicResource TabItemHeaderThemeFontWeight}" />
+        <Setter Property="Background" Value="{DynamicResource TabItemHeaderBackgroundUnselected}" />
+        <Setter Property="Foreground" Value="{DynamicResource TabItemHeaderForegroundUnselected}" />
+        <Setter Property="Padding" Value="{DynamicResource TabItemHeaderMargin}" />
+        <Setter Property="Margin" Value="0" />
+        <Setter Property="MinHeight" Value="{DynamicResource TabItemMinHeight}" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Border Name="PART_LayoutRoot"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        Padding="0">
+                    <Panel>
+                        <ContentPresenter Name="PART_ContentPresenter"
+                                          ContentTemplate="{TemplateBinding HeaderTemplate}"
+                                          Content="{TemplateBinding Header}"
+                                          HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                          VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                          TextBlock.FontFamily="{TemplateBinding FontFamily}"
+                                          TextBlock.FontSize="{TemplateBinding FontSize}"
+                                          TextBlock.FontWeight="{TemplateBinding FontWeight}" />
+                        <!-- <Border Name="PART_SelectedPipe" -->
+                        <!--         Background="Yellow" /> -->
+                    </Panel>
+                </Border>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+    
+    <Style Selector="TabControl">
+        <Setter Property="Padding" Value="0" />
+    </Style>
+    
+    <Style Selector="TabControl /template/ ItemsPresenter#PART_ItemsPresenter > WrapPanel">
+        <!-- Backgorund of left panel -->
+        <Setter Property="Background" Value="Blue" />
+    </Style>
+
+    <!-- Nornal state -->
+    <Style Selector="TabItem /template/ Border#PART_LayoutRoot">
+        <Setter Property="Background" Value="Green" />
+        <Setter Property="Padding" Value="0" />
+    </Style>
+    
+    <Style Selector="TabItem /template/ ContentPresenter#PART_ContentPresenter">
+
+        <Setter Property="Margin" Value="0" />
+    </Style>
+    
+    
+    <Style Selector="TabItem /template/ Border#PART_SelectedPipe">
+        <Setter Property="IsVisible" Value="false" />
+        <!-- <Setter Property="CornerRadius" Value="{DynamicResource ControlCornerRadius}" /> -->
+    </Style>
+    
+    <!-- PointerOver state -->
+    <Style Selector="TabItem:pointerover /template/ Border#PART_LayoutRoot">
+        <Setter Property="Background" Value="Red" />
+        <Setter Property="TextBlock.Foreground" Value="{DynamicResource TabItemHeaderForegroundUnselectedPointerOver}" />
+    </Style>
+    
+    <!-- Selected PointerOver state -->
+    <Style Selector="TabItem:selected:pointerover /template/ Border#PART_LayoutRoot">
+        <Setter Property="Background" Value="Yellow" />
+        <!-- <Setter Property="TextBlock.Foreground" Value="{DynamicResource TabItemHeaderForegroundSelectedPointerOver}" /> -->
+    </Style>
+    
+    <!-- Selected state -->
+    <!--  We don't use selector to PART_LayoutRoot, so developer can override selected item background with TabStripItem.Background  -->
+    <Style Selector="TabItem:selected /template/ Border#PART_LayoutRoot">
+        <Setter Property="Background" Value="Yellow" />
+        <!-- <Setter Property="TextBlock.Foreground" Value="{DynamicResource TabItemHeaderForegroundSelected}" /> -->
+    </Style>
+
+</Styles>

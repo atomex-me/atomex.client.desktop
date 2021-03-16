@@ -70,7 +70,7 @@ namespace Atomex.Client.Desktop
         private MainWindowViewModel? BuildMainWindowDataContext(MainWindow mainWindow)
         {
             return new MainWindowViewModel(
-                new DialogService<DialogServiceView>(mainWindow), AtomexApp);
+                new DialogService<DialogServiceView>(mainWindow), AtomexApp, mainWindow);
         }
 
         void OnExit(object sender, ControlledApplicationLifetimeExitEventArgs e)

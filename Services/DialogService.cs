@@ -1,4 +1,5 @@
 using System;
+using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Avalonia;
@@ -28,11 +29,12 @@ namespace Atomex.Client.Desktop.Services
                     .ContinueWith(t => source.Cancel(),
                         TaskScheduler.FromCurrentSynchronizationContext());
 
-                var mainWindowSize = _owner.GetObservable(Window.ClientSizeProperty);
+                var mainWindowSize = _owner.GetObservable(Window.ClientSizeProperty).Skip(1);
 
                 // todo: make static width of dialog during resize until fit main window size.
                 mainWindowSize.Subscribe(value =>
                 {
+                    Console.WriteLine($"ClientSizeProperty Changed; Dialog width: {view.Width}, Height: {view.Height}");
                     view.Width = value.Width / 2;
                     view.Height = value.Height / 2;
 

@@ -3,6 +3,8 @@ using Avalonia;
 
 namespace Atomex.Client.Desktop.Controls
 {
+    
+    // todo: remove
     public class NavigationMenuItem : AvaloniaObject
     {
         public string Header { get; set; }

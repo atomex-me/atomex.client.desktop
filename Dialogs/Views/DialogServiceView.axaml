@@ -6,6 +6,8 @@
         ShowInTaskbar="False"
         SystemDecorations="None"
         TransparencyLevelHint="Transparent"
+        Width="800"
+        Height="600"
         Background="Transparent">
 
     <!-- todo: Dialog child content fit full width & height; Refactor this XAML;-->

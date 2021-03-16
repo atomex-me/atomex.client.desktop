@@ -95,6 +95,10 @@ namespace Atomex.Client.Desktop.ViewModels
                 Error?.Invoke(this, new ErrorEventArgs(e));
                 return;
             }
+            finally
+            {
+                InProgress = false;
+            }
 
             PasswordVM.StringPass = string.Empty;
 

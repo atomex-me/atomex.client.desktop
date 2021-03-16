@@ -72,6 +72,7 @@
                                                 IsDefault="True"
                                                 Command="{Binding UnlockCommand}"
                                                 IsEnabled="{Binding !InProgress}" />
+                        <Button Command="{Binding $parent[Window].DataContext.ShowDialog}">Opendialog</Button>
                     </StackPanel>
                 </StackPanel>
                 

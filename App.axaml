@@ -28,5 +28,6 @@
         <StyleInclude Source="/Styles/CustomComboBoxStyle.axaml" />
         <StyleInclude Source="/Styles/CustomTextBoxStyle.axaml" />
         <StyleInclude Source="/Styles/PasswordTextBoxStyle.axaml" />
+        <StyleInclude Source="/Styles/TabControl.axaml" />
     </Application.Styles>
 </Application>

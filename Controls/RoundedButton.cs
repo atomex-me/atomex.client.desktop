@@ -7,7 +7,7 @@ namespace Atomex.Client.Desktop.Controls
     {
         static RoundedButton()
         {
-            AffectsRender<StepIndicatorPanel>(
+            AffectsRender<RoundedButton>(
                 CornerRadiusProperty
             );
         }
