@@ -20,6 +20,8 @@ namespace Atomex.Client.Desktop
 {
     public class App : Application
     {
+        public static IDialogService<ViewModelBase>? DialogService;
+
         public override void Initialize()
         {
             AvaloniaXamlLoader.Load(this);
@@ -50,14 +52,12 @@ namespace Atomex.Client.Desktop
             if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
             {
                 var mainWindow = new MainWindow();
-                var mainWindowViewModel = BuildMainWindowDataContext(mainWindow);
-
-                if (mainWindowViewModel != null)
-                {
-                    mainWindow.DataContext = mainWindowViewModel;
-                    desktop.MainWindow = mainWindow;
-                }
-
+                DialogService = new DialogService<DialogServiceView>(mainWindow);
+                var mainWindowViewModel = new MainWindowViewModel(AtomexApp, mainWindow);
+                
+                mainWindow.DataContext = mainWindowViewModel;
+                desktop.MainWindow = mainWindow;
+                
                 desktop.Exit += OnExit;
             }
 
@@ -66,12 +66,6 @@ namespace Atomex.Client.Desktop
             base.OnFrameworkInitializationCompleted();
         }
         
-        
-        private MainWindowViewModel? BuildMainWindowDataContext(MainWindow mainWindow)
-        {
-            return new MainWindowViewModel(
-                new DialogService<DialogServiceView>(mainWindow), AtomexApp, mainWindow);
-        }
 
         void OnExit(object sender, ControlledApplicationLifetimeExitEventArgs e)
         {
@@ -84,10 +78,10 @@ namespace Atomex.Client.Desktop
                 }
 
                 AtomexApp.Stop();
-                
+
                 // try { Updater.Stop(); }
                 // catch (TimeoutException) { Log.Error("Failed to stop the updater due to timeout"); }
-                
+
                 // update has been requested
                 // if (e.ApplicationExitCode == 101)
                 // {

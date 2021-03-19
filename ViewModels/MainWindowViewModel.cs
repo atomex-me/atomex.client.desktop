@@ -2,22 +2,15 @@
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
-using System.Reactive;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using Atomex.Client.Desktop.Controls;
-using Atomex.Core;
-using Atomex.Client.Desktop.Services;
 using Atomex.Client.Desktop.Dialogs.ViewModels;
 using Atomex.Client.Desktop.Common;
-using Atomex.Client.Desktop.Views;
+using Atomex.Client.Desktop.ViewModels.Abstract;
 using Atomex.Common;
 using ReactiveUI;
 using Atomex.Subsystems;
-using Atomex.Subsystems.Abstract;
-using Atomex.MarketData.Abstract;
-using Atomex.Wallet.Abstract;
-using Atomex.MarketData;
 using Atomex.Wallet;
 using Avalonia.Controls.ApplicationLifetimes;
 using Serilog;
@@ -48,20 +41,21 @@ namespace Atomex.Client.Desktop.ViewModels
             set => this.RaiseAndSetIfChanged(ref _content, value);
         }
 
-        private ViewModelBase _firstDialog;
-        private ViewModelBase _secondDialog;
+        // private ViewModelBase _firstDialog;
+        // private ViewModelBase _secondDialog;
+        private ViewModelBase MainWalletVM;
 
-        public void ShowDialog()
-        {
-            var firstDialogWrapped = new DialogServiceViewModel(_firstDialog);
-            _dialogService.Show(firstDialogWrapped);
-        }
-
-        public void ShowCustomDialog()
-        {
-            var secondDialogWrapper = new DialogServiceViewModel(_secondDialog);
-            _dialogService.Show(secondDialogWrapper);
-        }
+        // public void ShowDialog()
+        // {
+        //     var firstDialogWrapped = new DialogServiceViewModel(_firstDialog);
+        //     App.DialogService.Show(firstDialogWrapped);
+        // }
+        //
+        // public void ShowCustomDialog()
+        // {
+        //     var secondDialogWrapper = new DialogServiceViewModel(_secondDialog);
+        //     App.DialogService.Show(secondDialogWrapper);
+        // }
 
         public MainWindowViewModel()
         {
@@ -71,22 +65,12 @@ namespace Atomex.Client.Desktop.ViewModels
 #endif
         }
 
-        public MainWindowViewModel(
-            IDialogService<ViewModelBase> dialogService,
-            IAtomexApp app,
-            IMainView mainView = null
-        )
+        public MainWindowViewModel(IAtomexApp app, IMainView mainView = null)
         {
-            _dialogService = dialogService;
-            _firstDialog = new DialogViewModel();
-            _secondDialog = new SecondDialogViewModel();
-
             AtomexApp = app ?? throw new ArgumentNullException(nameof(app));
-
-            // PortfolioViewModel = new PortfolioViewModel(AtomexApp);
-            // ConversionViewModel = new ConversionViewModel(AtomexApp);
-            // WalletsViewModel = new WalletsViewModel(AtomexApp, this, ConversionViewModel);
-            // SettingsViewModel = new SettingsViewModel(AtomexApp, DialogViewer);
+            // _firstDialog = new DialogViewModel();
+            // _secondDialog = new SecondDialogViewModel();
+            MainWalletVM = new WalletMainViewModel(AtomexApp);
 
             // InstalledVersion = App.Updater.InstalledVersion.ToString();
 
@@ -105,51 +89,9 @@ namespace Atomex.Client.Desktop.ViewModels
             ShowStart();
         }
 
-
-        private readonly IDialogService<ViewModelBase> _dialogService;
         public static IAtomexApp AtomexApp { get; private set; }
         public IMainView MainView { get; set; }
 
-        // public PortfolioViewModel PortfolioViewModel { get; set; }
-        // public WalletsViewModel WalletsViewModel { get; set; }
-        // public ConversionViewModel ConversionViewModel { get; set; }
-        // public SettingsViewModel SettingsViewModel { get; set; }
-
-        private int _selectedMenuIndex;
-
-        public int SelectedMenuIndex
-        {
-            get => _selectedMenuIndex;
-            set
-            {
-                _selectedMenuIndex = value;
-                this.RaisePropertyChanged(nameof(SelectedMenuIndex));
-            }
-        }
-
-        private string _installedVersion;
-
-        public string InstalledVersion
-        {
-            get => _installedVersion;
-            set
-            {
-                _installedVersion = value;
-                this.RaisePropertyChanged(nameof(InstalledVersion));
-            }
-        }
-
-        private bool _updatesReady;
-
-        public bool UpdatesReady
-        {
-            get => _updatesReady;
-            set
-            {
-                _updatesReady = value;
-                this.RaisePropertyChanged(nameof(UpdatesReady));
-            }
-        }
 
         private bool _hasAccount;
 
@@ -159,67 +101,12 @@ namespace Atomex.Client.Desktop.ViewModels
             set
             {
                 _hasAccount = value;
+                if (_hasAccount)
+                {
+                    ShowContent(MainWalletVM);
+                }
+
                 this.RaisePropertyChanged(nameof(HasAccount));
-            }
-        }
-
-        private bool _isLocked;
-
-        public bool IsLocked
-        {
-            get => _isLocked;
-            set
-            {
-                _isLocked = value;
-                this.RaisePropertyChanged(nameof(IsLocked));
-            }
-        }
-
-        private bool _isExchangeConnected;
-
-        public bool IsExchangeConnected
-        {
-            get => _isExchangeConnected;
-            set
-            {
-                _isExchangeConnected = value;
-                this.RaisePropertyChanged(nameof(IsExchangeConnected));
-            }
-        }
-
-        private bool _isMarketDataConnected;
-
-        public bool IsMarketDataConnected
-        {
-            get => _isMarketDataConnected;
-            set
-            {
-                _isMarketDataConnected = value;
-                this.RaisePropertyChanged(nameof(IsMarketDataConnected));
-            }
-        }
-
-        private bool _isQuotesProviderAvailable;
-
-        public bool IsQuotesProviderAvailable
-        {
-            get => _isQuotesProviderAvailable;
-            set
-            {
-                _isQuotesProviderAvailable = value;
-                this.RaisePropertyChanged(nameof(IsQuotesProviderAvailable));
-            }
-        }
-
-        private string _login;
-
-        public string Login
-        {
-            get => _login;
-            set
-            {
-                _login = value;
-                this.RaisePropertyChanged(nameof(Login));
             }
         }
 
@@ -236,7 +123,6 @@ namespace Atomex.Client.Desktop.ViewModels
         private void SubscribeToServices()
         {
             AtomexApp.TerminalChanged += OnTerminalChangedEventHandler;
-            AtomexApp.QuotesProvider.AvailabilityChanged += OnQuotesProviderAvailabilityChangedEventHandler;
         }
 
         private void OnTerminalChangedEventHandler(object sender, TerminalChangedEventArgs args)
@@ -250,14 +136,8 @@ namespace Atomex.Client.Desktop.ViewModels
                 return;
             }
 
-            terminal.ServiceConnected += OnTerminalServiceStateChangedEventHandler;
-            terminal.ServiceDisconnected += OnTerminalServiceStateChangedEventHandler;
-
             var account = terminal.Account;
-            account.Locked += OnAccountLockChangedEventHandler;
-            account.Unlocked += OnAccountLockChangedEventHandler;
 
-            IsLocked = account.IsLocked;
             HasAccount = true;
 
             // auto sign out after timeout
@@ -265,37 +145,6 @@ namespace Atomex.Client.Desktop.ViewModels
                 MainView.StartInactivityControl(TimeSpan.FromMinutes(account.UserSettings.PeriodOfInactivityInMin));
         }
 
-        private void OnTerminalServiceStateChangedEventHandler(object sender, TerminalServiceEventArgs args)
-        {
-            if (!(sender is IAtomexClient terminal))
-                return;
-
-            IsExchangeConnected = terminal.IsServiceConnected(TerminalService.Exchange);
-            IsMarketDataConnected = terminal.IsServiceConnected(TerminalService.MarketData);
-
-            // subscribe to symbols updates
-            if (args.Service == TerminalService.MarketData && IsMarketDataConnected)
-            {
-                terminal.SubscribeToMarketData(SubscriptionType.TopOfBook);
-                terminal.SubscribeToMarketData(SubscriptionType.DepthTwenty);
-            }
-        }
-
-        private void OnQuotesProviderAvailabilityChangedEventHandler(object sender, EventArgs args)
-        {
-            if (!(sender is ICurrencyQuotesProvider provider))
-                return;
-
-            IsQuotesProviderAvailable = provider.IsAvailable;
-        }
-
-        private void OnAccountLockChangedEventHandler(object sender, EventArgs args)
-        {
-            if (!(sender is IAccount account))
-                return;
-
-            IsLocked = account.IsLocked;
-        }
 
         private ICommand _updateCommand;
         public ICommand UpdateCommand => _updateCommand ??= ReactiveCommand.Create(OnUpdateClick);
@@ -315,10 +164,8 @@ namespace Atomex.Client.Desktop.ViewModels
                 if (await WhetherToCancelClosingAsync())
                     return;
 
-                // DialogViewer.HideAllDialogs();
-
                 AtomexApp.UseTerminal(null);
-                
+
                 ShowStart();
             }
             catch (Exception e)
@@ -405,11 +252,9 @@ namespace Atomex.Client.Desktop.ViewModels
                     clientType: ClientType.Unknown);
             }, SignOut);
 
-            unlockViewModel.Unlocked += (s, a) =>
-            {
-                // todo: show main wallet window
-            };
+            unlockViewModel.Unlocked += (s, a) => { ShowContent(MainWalletVM); };
 
+            App.DialogService?.CloseAll();
             ShowContent(unlockViewModel);
         }
 

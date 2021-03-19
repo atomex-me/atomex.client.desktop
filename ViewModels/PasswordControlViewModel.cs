@@ -80,12 +80,12 @@ namespace Atomex.Client.Desktop.ViewModels
                 }
                 else
                 {
-                    handleValue(new TextboxState(
+                    _ = HandleValue(new TextboxState(
                         caretIndex: CaretIndex,
                         selectionStart: SelectionStart,
                         selectionEnd: SelectionEnd,
                         value: value)
-                    ).FireAndForget();
+                    );
                 }
             }
         }
@@ -94,7 +94,7 @@ namespace Atomex.Client.Desktop.ViewModels
         private List<TextboxState> valueQueue = new List<TextboxState>();
         private bool handling = false;
 
-        private async Task handleValue(TextboxState state)
+        private async Task HandleValue(TextboxState state)
         {
             handling = true;
             await Task.Run(async () =>
@@ -160,7 +160,7 @@ namespace Atomex.Client.Desktop.ViewModels
             {
                 var val = valueQueue[0];
                 valueQueue.RemoveAt(0);
-                await handleValue(val);
+                await HandleValue(val);
             }
 
             handling = false;

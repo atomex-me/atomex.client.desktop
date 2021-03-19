@@ -1,7 +1,9 @@
 ﻿namespace Atomex.Client.Desktop.Services
 {
-    internal interface IDialogService<TViewModel>
+    public interface IDialogService<TViewModel>
     {
         void Show(TViewModel viewModel);
+
+        void CloseAll();
     }
 }

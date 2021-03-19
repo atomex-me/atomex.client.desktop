@@ -1,26 +1,46 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
 using Atomex.Client.Desktop.ViewModels;
+using Avalonia.Threading;
 
 namespace Atomex.Client.Desktop.Services
 {
     internal sealed class DialogService<TView> : IDialogService<ViewModelBase> where TView : Window
     {
         private readonly Window _owner;
+        private IList<TView> openedViews;
+        private ViewModelBase lastOpenedVM;
 
         public DialogService(Window owner)
         {
             _owner = owner;
+            openedViews = new List<TView>();
+        }
+
+        public void CloseAll()
+        {
+            Dispatcher.UIThread.InvokeAsync(() =>
+            {
+                foreach (var view in openedViews)
+                {
+                    view.Close();
+                }
+
+                openedViews = new List<TView>();
+            });
         }
 
         public void Show(ViewModelBase viewModel)
         {
             var viewLocator = new ViewLocator();
             TView view = (TView) viewLocator.Build(viewModel);
+            openedViews.Add(view);
             view.DataContext = viewModel;
 
             using (var source = new CancellationTokenSource())

@@ -29,7 +29,7 @@ namespace Atomex.Client.Desktop.Views
                     textBox.GetObservable(TextBox.SelectionStartProperty).Subscribe(position =>
                     {
                         if (dataContext != null)
-                        {
+                        { 
                             dataContext.SelectionStart = position;
                         }
                     });

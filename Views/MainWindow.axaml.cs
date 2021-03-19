@@ -50,15 +50,13 @@ namespace Atomex.Client.Desktop.Views
 
         public void StartInactivityControl(TimeSpan timeOut)
         {
-            
-
-            _activityTimer = new Timer(TimeSpan.FromSeconds(5).TotalMilliseconds) {AutoReset = true, Enabled = true};
-            _activityTimer.Elapsed += inactivityTimerElapsed;
+            _activityTimer = new Timer(timeOut.TotalMilliseconds) {AutoReset = true, Enabled = true};
+            _activityTimer.Elapsed += InactivityTimerElapsed;
 
             _inactivityControlEnabled = true;
         }
 
-        private void inactivityTimerElapsed(object sender, ElapsedEventArgs e)
+        private void InactivityTimerElapsed(object sender, ElapsedEventArgs e)
         {
             Inactivity?.Invoke(sender, null);
         }

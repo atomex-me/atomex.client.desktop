@@ -6,9 +6,10 @@
         ShowInTaskbar="False"
         SystemDecorations="None"
         TransparencyLevelHint="Transparent"
-        Width="800"
-        Height="600"
-        Background="Transparent">
+        Width="600"
+        Height="400"
+        Background="Transparent"
+        WindowStartupLocation="CenterOwner">
 
     <!-- todo: Dialog child content fit full width & height; Refactor this XAML;-->
 
