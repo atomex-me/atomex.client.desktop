@@ -6,7 +6,8 @@
              x:Class="Atomex.Client.Desktop.Views.PortfolioView"
              xmlns:vm="clr-namespace:Atomex.Client.Desktop.ViewModels"
              xmlns:abstractViewModels="clr-namespace:Atomex.Client.Desktop.ViewModels.Abstract"
-             xmlns:converters="clr-namespace:Atomex.Client.Desktop.Converters">
+             xmlns:converters="clr-namespace:Atomex.Client.Desktop.Converters"
+             xmlns:oxy="http://oxyplot.org/avalonia">
 
     <Design.DataContext>
         <vm:PortfolioViewModel />
@@ -27,28 +28,31 @@
         <Grid Grid.Row="0"
               Margin="0 30 0 30">
 
-            <!-- <oxy:PlotView Background="Transparent" -->
-            <!--               Model="{Binding PlotModel}" -->
-            <!--               Opacity="1"> -->
-            <!-- -->
-            <!--     <oxy:PlotView.DefaultTrackerTemplate> -->
-            <!--         <ControlTemplate> -->
-            <!--             <Canvas> -->
-            <!--                 <Border Canvas.Left="{Binding Position.X}" -->
-            <!--                         Canvas.Top="{Binding Position.Y}" -->
-            <!--                         CornerRadius="5" -->
-            <!--                         Background="{DynamicResource DefaultTooltipBackgroundBrush}"> -->
-            <!--                     <TextBlock Text="{Binding}" -->
-            <!--                                Padding="16 8" -->
-            <!--                                VerticalAlignment="Center" -->
-            <!--                                FontFamily="{DynamicResource DefaultFontFamily}" -->
-            <!--                                FontSize="12"/> -->
-            <!--                 </Border> -->
-            <!--             </Canvas> -->
-            <!--         </ControlTemplate> -->
-            <!--     </oxy:PlotView.DefaultTrackerTemplate> -->
-            <!-- -->
-            <!-- </oxy:PlotView> -->
+            <oxy:PlotView Background="Transparent"
+                          Model="{Binding PlotModel}"
+                          Controller="{Binding ActualController, Mode=TwoWay}"
+                          Opacity="1"
+                          x:Name="PlotView">
+            
+                <oxy:PlotView.DefaultTrackerTemplate>
+                    <ControlTemplate>
+                        <Canvas>
+                            <Border Canvas.Left="{Binding Position.X}"
+                                    Canvas.Top="{Binding Position.Y}"
+                                    CornerRadius="5"
+                                    Background="{DynamicResource DefaultTooltipBackgroundBrush}">
+                                <TextBlock Text="{Binding}"
+                                           Padding="16 8"
+                                           Foreground="White"
+                                           VerticalAlignment="Center"
+                                           FontFamily="{DynamicResource DefaultFontFamily}"
+                                           FontSize="12"/>
+                            </Border>
+                        </Canvas>
+                    </ControlTemplate>
+                </oxy:PlotView.DefaultTrackerTemplate>
+            
+            </oxy:PlotView>
             
             <TextBlock Foreground="White"
                        Text="{Binding PortfolioValue, StringFormat=$0.00}"

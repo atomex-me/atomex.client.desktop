@@ -9,6 +9,10 @@ using Atomex.Client.Desktop.ViewModels.Abstract;
 using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
 using Avalonia.Media;
 using ReactiveUI;
+using OxyPlot;
+using OxyPlot.Avalonia;
+using OxyPlot.Series;
+using PieSeries = OxyPlot.Series.PieSeries;
 
 
 namespace Atomex.Client.Desktop.ViewModels
@@ -17,7 +21,7 @@ namespace Atomex.Client.Desktop.ViewModels
     {
         private IAtomexApp App { get; }
 
-        // public PlotModel PlotModel { get; set; }
+        public PlotModel PlotModel { get; set; }
         public IList<CurrencyViewModel> AllCurrencies { get; set; }
         private Color NoTokensColor { get; } = Color.FromArgb(50, 0, 0, 0);
 
@@ -48,7 +52,7 @@ namespace Atomex.Client.Desktop.ViewModels
             SubscribeToServices();
         }
 
-        private void SubscribeToServices()
+        private async void SubscribeToServices()
         {
             App.TerminalChanged += OnTerminalChangedEventHandler;
         }
@@ -67,7 +71,7 @@ namespace Atomex.Client.Desktop.ViewModels
             OnAmountUpdatedEventHandler(this, EventArgs.Empty);
         }
 
-        private void OnAmountUpdatedEventHandler(object sender, EventArgs args)
+        private async void OnAmountUpdatedEventHandler(object sender, EventArgs args)
         {
             // update total portfolio value
             PortfolioValue = AllCurrencies.Sum(c => c.TotalAmountInBase);
@@ -77,65 +81,71 @@ namespace Atomex.Client.Desktop.ViewModels
                 ? c.TotalAmountInBase / PortfolioValue
                 : 0);
             this.RaisePropertyChanged(nameof(PortfolioValue));
-            this.RaisePropertyChanged(nameof(AllCurrencies));
 
             UpdatePlotModel();
         }
 
         private void UpdatePlotModel()
         {
-            // var series = new PieSeries
-            // {
-            //     StrokeThickness = 0,
-            //     StartAngle = 0,
-            //     AngleSpan = 360,
-            //     //ExplodedDistance = 0.1,
-            //     InnerDiameter = 0.6,
-            //     TickHorizontalLength = 0,
-            //     TickRadialLength = 0,
-            //     OutsideLabelFormat = string.Empty,
-            //     InsideLabelFormat = string.Empty,
-            //     TrackerFormatString = "{1}: ${2:0.00} ({3:P2})"
-            // };
-            //
-            // foreach (var currency in AllCurrencies)
-            // {
-            //     series.Slices.Add(
-            //         new PieSlice(currency.Currency.Name, (double)currency.TotalAmountInBase) {
-            //             Fill = currency.AccentColor.ToOxyColor()
-            //         });
-            // }
-            //
-            // if (PortfolioValue == 0)
-            // {
-            //     series.Slices.Add(new PieSlice(Properties.Resources.PwNoTokens, 1) {Fill = NoTokensColor.ToOxyColor()});
-            //     series.TrackerFormatString = "{1}";
-            // }
-            //
-            // PlotModel = new PlotModel {Culture = CultureInfo.InvariantCulture};
-            // PlotModel.Series.Add(series);
-            //
-            // this.RaisePropertyChanged(nameof(PortfolioValue));
-            // if (PlotModel.PlotView != null) {
-            //     PlotModel.PlotView.ActualController.UnbindMouseDown(OxyMouseButton.Left);
-            //     PlotModel.PlotView.ActualController.BindMouseEnter(OxyPlot.PlotCommands.HoverSnapTrack);
-            // }
+            var series = new PieSeries
+            {
+                StrokeThickness = 0,
+                StartAngle = 0,
+                AngleSpan = 360,
+                //ExplodedDistance = 0.1,
+                InnerDiameter = 0.6,
+                TickHorizontalLength = 0,
+                TickRadialLength = 0,
+                OutsideLabelFormat = string.Empty,
+                InsideLabelFormat = string.Empty,
+                TrackerFormatString = "{1}: ${2:0.00} ({3:P2})"
+            };
+
+            foreach (var currency in AllCurrencies)
+            {
+                series.Slices.Add(
+                    new PieSlice(currency.Currency.Name, (double) currency.TotalAmountInBase)
+                    {
+                        Fill = currency.AccentColor.ToOxyColor()
+                    });
+            }
+
+            if (PortfolioValue == 0)
+            {
+                series.Slices.Add(new PieSlice(Properties.Resources.PwNoTokens, 1) {Fill = NoTokensColor.ToOxyColor()});
+                series.TrackerFormatString = "{1}";
+            }
+
+            PlotModel = new PlotModel {Culture = CultureInfo.InvariantCulture};
+            PlotModel.Series.Add(series);
+
+            this.RaisePropertyChanged(nameof(PortfolioValue));
+        }
+
+        private IController _actualController;
+        public IController ActualController
+        {
+            get => _actualController;
+            set
+            {
+                _actualController = value;
+            }
         }
 
         private void DesignerMode()
         {
-            // var random = new Random();
-            //
-            // AllCurrencies = DesignTime.Currencies
-            //     .Select(c =>
-            //     {
-            //         var vm = CurrencyViewModelCreator.CreateViewModel(c, subscribeToUpdates: false);
-            //         vm.TotalAmountInBase = random.Next(100);
-            //         return vm;
-            //     })
-            //     .ToList();
-            //
-            // OnAmountUpdatedEventHandler(this, EventArgs.Empty);
+            var random = new Random();
+            
+            AllCurrencies = DesignTime.Currencies
+                .Select(c =>
+                {
+                    var vm = CurrencyViewModelCreator.CreateViewModel(c, subscribeToUpdates: false);
+                    vm.TotalAmountInBase = random.Next(100);
+                    return vm;
+                })
+                .ToList();
+            
+            OnAmountUpdatedEventHandler(this, EventArgs.Empty);
         }
     }
 }
