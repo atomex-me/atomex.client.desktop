@@ -3,6 +3,145 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             x:Class="Atomex.Client.Desktop.Views.PortfolioView">
-  portfolio view
+             x:Class="Atomex.Client.Desktop.Views.PortfolioView"
+             xmlns:vm="clr-namespace:Atomex.Client.Desktop.ViewModels"
+             xmlns:abstractViewModels="clr-namespace:Atomex.Client.Desktop.ViewModels.Abstract"
+             xmlns:converters="clr-namespace:Atomex.Client.Desktop.Converters">
+
+    <Design.DataContext>
+        <vm:PortfolioViewModel />
+    </Design.DataContext>
+
+    <UserControl.Resources>
+        <converters:AmountToStringConverter x:Key="AmountToStringConverter" />
+        <converters:StringToUpperCaseConverter x:Key="StringToUpperCaseConverter" />
+    </UserControl.Resources>
+
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition MaxHeight="500" MinHeight="300" />
+            <RowDefinition />
+        </Grid.RowDefinitions>
+
+        <Grid Grid.Row="0"
+              Margin="0 30 0 30">
+
+            <!-- <oxy:PlotView Background="Transparent" -->
+            <!--               Model="{Binding PlotModel}" -->
+            <!--               Opacity="1"> -->
+            <!-- -->
+            <!--     <oxy:PlotView.DefaultTrackerTemplate> -->
+            <!--         <ControlTemplate> -->
+            <!--             <Canvas> -->
+            <!--                 <Border Canvas.Left="{Binding Position.X}" -->
+            <!--                         Canvas.Top="{Binding Position.Y}" -->
+            <!--                         CornerRadius="5" -->
+            <!--                         Background="{DynamicResource DefaultTooltipBackgroundBrush}"> -->
+            <!--                     <TextBlock Text="{Binding}" -->
+            <!--                                Padding="16 8" -->
+            <!--                                VerticalAlignment="Center" -->
+            <!--                                FontFamily="{DynamicResource DefaultFontFamily}" -->
+            <!--                                FontSize="12"/> -->
+            <!--                 </Border> -->
+            <!--             </Canvas> -->
+            <!--         </ControlTemplate> -->
+            <!--     </oxy:PlotView.DefaultTrackerTemplate> -->
+            <!-- -->
+            <!-- </oxy:PlotView> -->
+            
+            <TextBlock Foreground="White"
+                       Text="{Binding PortfolioValue, StringFormat=$0.00}"
+                       FontFamily="{DynamicResource DefaultFontFamily}"
+                       FontSize="30"
+                       VerticalAlignment="Center"
+                       HorizontalAlignment="Center" />
+        </Grid>
+
+        <!-- Style="{StaticResource CustomDataGrid}" -->
+        <DataGrid Margin="10"
+                  AutoGenerateColumns="False"
+                  IsReadOnly="True"
+                  Items="{Binding AllCurrencies}"
+                  Grid.Row="1">
+            <DataGrid.Columns>
+                <DataGridTemplateColumn Header="CURRENCY" Width="*">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate DataType="{x:Type abstractViewModels:CurrencyViewModel}">
+                            <Grid Margin="5 5 5 5" Background="Transparent">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="48" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+
+                                <!-- todo: LargeIconPath -->
+                                <Image Source="{Binding IconPath}"
+                                       Grid.Column="0" />
+
+                                <!-- Style="{StaticResource BaseTextBlockStyle}" -->
+                                <TextBlock
+                                    Text="{Binding Header, Converter={StaticResource StringToUpperCaseConverter}}"
+                                    FontFamily="{DynamicResource DefaultBoldFontFamily}"
+                                    FontWeight="Bold"
+                                    FontSize="14"
+                                    Margin="7 0 0 0"
+                                    VerticalAlignment="Center"
+                                    Grid.Column="1" />
+                            </Grid>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTemplateColumn Header="BALANCE">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate DataType="{x:Type abstractViewModels:CurrencyViewModel}">
+                            <StackPanel Orientation="Horizontal"
+                                        HorizontalAlignment="Left"
+                                        Margin="0 0 10 0">
+
+                                <TextBlock FontFamily="{DynamicResource DefaultFontFamily}"
+                                           VerticalAlignment="Center">
+                                    <TextBlock.Text>
+                                        <MultiBinding Converter="{StaticResource AmountToStringConverter}">
+                                            <Binding Path="AvailableAmount" Mode="OneWay" />
+                                            <Binding Path="CurrencyFormat" Mode="OneWay" />
+                                        </MultiBinding>
+                                    </TextBlock.Text>
+                                </TextBlock>
+                                <TextBlock Margin="3 0 0 2"
+                                           Text="{Binding CurrencyCode}"
+                                           FontSize="10"
+                                           VerticalAlignment="Center" />
+                            </StackPanel>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTemplateColumn Header="VALUE">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate DataType="{x:Type abstractViewModels:CurrencyViewModel}">
+                            <TextBlock Margin="0 0 10 0"
+                                       FontFamily="{DynamicResource DefaultFontFamily}"
+                                       VerticalAlignment="Center"
+                                       HorizontalAlignment="Center">
+                                <TextBlock.Text>
+                                    <MultiBinding Converter="{StaticResource AmountToStringConverter}">
+                                        <Binding Path="AvailableAmountInBase" Mode="OneWay" />
+                                        <Binding Path="BaseCurrencyFormat" Mode="OneWay" />
+                                    </MultiBinding>
+                                </TextBlock.Text>
+                            </TextBlock>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTextColumn Header="% IN PORTFOLIO"
+                                    Binding="{Binding PortfolioPercent, StringFormat=0.00%, Mode=TwoWay}">
+
+                    <!-- <DataGridTextColumn.ElementStyle> -->
+                    <!--     <Style TargetType="TextBlock"> -->
+                    <!--         <Setter Property="HorizontalAlignment" Value="Center" /> -->
+                    <!--     </Style> -->
+                    <!-- </DataGridTextColumn.ElementStyle> -->
+                </DataGridTextColumn>
+            </DataGrid.Columns>
+        </DataGrid>
+    </Grid>
 </UserControl>

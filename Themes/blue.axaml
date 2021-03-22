@@ -34,6 +34,34 @@
     <Color x:Key="DefaultSubstrateColor">#2f000000</Color>
     <Color x:Key="DefaultMenuItemSelectedColor">#1183b5</Color>
     <Color x:Key="DefaultMenuItemMouseOverColor">#0f4d6d</Color>
+    <Color x:Key="CriticalWarningColor">#ef6a41</Color>
+    
+    <Color x:Key="MahApps.Colors.Gray1">#FF333333</Color>
+    <Color x:Key="MahApps.Colors.Gray2">#FF7F7F7F</Color>
+    <Color x:Key="MahApps.Colors.Gray3">#FF9D9D9D</Color>
+    <Color x:Key="MahApps.Colors.Gray4">#FFA59F93</Color>
+    <Color x:Key="MahApps.Colors.Gray5">#FFB9B9B9</Color>
+    <Color x:Key="MahApps.Colors.Gray6">#FFCCCCCC</Color>
+    <Color x:Key="MahApps.Colors.Gray7">#FFD8D8D9</Color>
+    <Color x:Key="MahApps.Colors.Gray8">#FFE0E0E0</Color>
+    <Color x:Key="MahApps.Colors.Gray9">#5EC9C9C9</Color>
+    <Color x:Key="MahApps.Colors.Gray10">#FFF7F7F7</Color>
+
+    <Color x:Key="MahApps.Colors.Gray">#FFBEBEBE</Color>
+    <Color x:Key="MahApps.Colors.Gray.MouseOver">#FF333333</Color>
+    <Color x:Key="MahApps.Colors.Gray.SemiTransparent">#40808080</Color>
+    
+    <SolidColorBrush x:Key="GrayBrush1" Color="{DynamicResource MahApps.Colors.Gray1}" />
+    <SolidColorBrush x:Key="GrayBrush2" Color="{DynamicResource MahApps.Colors.Gray2}" />
+    <SolidColorBrush x:Key="GrayBrush3" Color="{DynamicResource MahApps.Colors.Gray3}" />
+    <SolidColorBrush x:Key="GrayBrush4" Color="{DynamicResource MahApps.Colors.Gray4}" />
+    <SolidColorBrush x:Key="GrayBrush5" Color="{DynamicResource MahApps.Colors.Gray5}" />
+    <SolidColorBrush x:Key="GrayBrush6" Color="{DynamicResource MahApps.Colors.Gray6}" />
+    <SolidColorBrush x:Key="GrayBrush7" Color="{DynamicResource MahApps.Colors.Gray7}" />
+    <SolidColorBrush x:Key="GrayBrush8" Color="{DynamicResource MahApps.Colors.Gray8}" />
+    <SolidColorBrush x:Key="GrayBrush9" Color="{DynamicResource MahApps.Colors.Gray9}" />
+    <SolidColorBrush x:Key="GrayBrush10" Color="{DynamicResource MahApps.Colors.Gray10}" />
+    
 
     <SolidColorBrush x:Key="DefaultBackgroundBrush" Color="{DynamicResource DefaultBackgroundColor}" />
     <SolidColorBrush x:Key="DefaultForegroundBrush" Color="{DynamicResource DefaultForegroundColor}" />
@@ -43,7 +71,7 @@
     <SolidColorBrush x:Key="DefaultTextBoxCuretBrush" Color="{DynamicResource DefaultTextBoxCuretColor}" />
     <SolidColorBrush x:Key="DefaultSubstrateBrush" Color="{DynamicResource DefaultSubstrateColor}" />
     <SolidColorBrush x:Key="WarningForegroundBrush" Color="Gold" />
-    <SolidColorBrush x:Key="CriticalWarningForegroundBrush" Color="#ef6a41" />
+    <SolidColorBrush x:Key="CriticalWarningForegroundBrush" Color="{DynamicResource CriticalWarningColor}" />
     <SolidColorBrush x:Key="FieldHeaderBackgroundBrush" Color="#214174" />
     <SolidColorBrush x:Key="DefaultAmountForegroundBrush" Color="#eeff00" />
     <SolidColorBrush x:Key="DefaultAmountInBaseForegroundBrush" Color="DarkGray" />
@@ -66,7 +94,8 @@
     <SolidColorBrush x:Key="MainBorderBrush" Color="{StaticResource MainBorderColor}" />
     <SolidColorBrush x:Key="MainOverlayBrush" Color="{StaticResource MainOverlayColor}" />
     <SolidColorBrush x:Key="StatusBarConnectedForeground" Color="AliceBlue" />
-    <SolidColorBrush x:Key="StatusBarDisconnectedForeground" Color="DarkGray" />
+    <SolidColorBrush x:Key="StatusBarDisconnectedForeground" Color="{StaticResource CriticalWarningColor}" />
+    <SolidColorBrush x:Key="StatusBarVersionForeground" Color="DarkGray"/>
     <SolidColorBrush x:Key="DefaultUpdateForegroundBrush" Color="Gold" />
 
     <LinearGradientBrush x:Key="MainBackgroundBrush" StartPoint="0%,0%" EndPoint="100%,100%">

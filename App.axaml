@@ -19,6 +19,7 @@
         <FluentTheme Mode="Light" />
         
         <StyleInclude Source="avares://AvaloniaProgressRing/Styles/ProgressRing.xaml"/>
+        <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml" />
         <StyleInclude Source="/Styles/MainWindowStyle.axaml" />
         <StyleInclude Source="/Styles/ChildViewStyle.axaml" />
         <StyleInclude Source="/Styles/DefaultButtonStyle.axaml" />
@@ -29,5 +30,8 @@
         <StyleInclude Source="/Styles/CustomTextBoxStyle.axaml" />
         <StyleInclude Source="/Styles/PasswordTextBoxStyle.axaml" />
         <StyleInclude Source="/Styles/TabControl.axaml" />
+        <StyleInclude Source="/Styles/CustomTooltipStyle.axaml" />
+        <StyleInclude Source="/Styles/WalletMenuButton.axaml" />
+        <StyleInclude Source="/Styles/CustomDataGridStyle.axaml" />
     </Application.Styles>
 </Application>

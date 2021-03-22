@@ -20,15 +20,14 @@ namespace Atomex.Client.Desktop.ViewModels
             WalletsViewModel = new WalletsViewModel(AtomexApp, this, ConversionViewModel);
             SettingsViewModel = new SettingsViewModel(AtomexApp);
 
-            Content = PortfolioViewModel;
+            SelectPortfolio();
 
             // InstalledVersion = App.Updater.InstalledVersion.ToString();
             InstalledVersion = "1.0.72";
 
             SubscribeToServices();
         }
-        
-        
+
         public IAtomexApp AtomexApp { get; set; }
         public PortfolioViewModel PortfolioViewModel { get; set; }
         public WalletsViewModel WalletsViewModel { get; set; }
@@ -161,25 +160,43 @@ namespace Atomex.Client.Desktop.ViewModels
         {
             SelectedMenuIndex = index;
         }
-        
+
+        private void RefreshAllMenus()
+        {
+            this.RaisePropertyChanged(nameof(IsPortfolioSectionActive));
+            this.RaisePropertyChanged(nameof(IsWalletsSectionActive));
+            this.RaisePropertyChanged(nameof(IsConversionSectionActive));
+            this.RaisePropertyChanged(nameof(IsSettingsSectionActive));
+        }
+
+
         public void SelectPortfolio()
         {
             Content = PortfolioViewModel;
+            RefreshAllMenus();
         }
         
         public void SelectWallets()
         {
             Content = WalletsViewModel;
+            RefreshAllMenus();
         }
         
         public void SelectConversion()
         {
             Content = ConversionViewModel;
+            RefreshAllMenus();
         }
         
         public void SelectSettings()
         {
             Content = SettingsViewModel;
+            RefreshAllMenus();
         }
+
+        public bool IsPortfolioSectionActive => Content.GetType() == typeof(PortfolioViewModel);
+        public bool IsWalletsSectionActive => Content.GetType() == typeof(WalletsViewModel);
+        public bool IsConversionSectionActive => Content.GetType() == typeof(ConversionViewModel);
+        public bool IsSettingsSectionActive => Content.GetType() == typeof(SettingsViewModel);
     }
 }

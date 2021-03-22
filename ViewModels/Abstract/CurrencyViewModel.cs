@@ -12,11 +12,11 @@ using Avalonia.Threading;
 using ReactiveUI;
 using Serilog;
 
-namespace Atomex.Client.Desktop.ViewModels
+namespace Atomex.Client.Desktop.ViewModels.Abstract
 {
-    public class CurrencyViewModel : ViewModelBase
+    public abstract class CurrencyViewModel : ViewModelBase
     {
-        private const string PathToImages = "pack://application:,,,/Atomex.Client.Wpf;component/Resources/Images";
+        private const string PathToImages = "avares://Atomex.Client.Desktop/Resources/Images";
 
         private IAccount Account { get; set; }
         private ICurrencyQuotesProvider QuotesProvider { get; set; }
@@ -31,9 +31,8 @@ namespace Atomex.Client.Desktop.ViewModels
         public Brush IconMaskBrush { get; set; }
         public Color AccentColor { get; set; }
         public Color AmountColor { get; set; }
-        public string IconPath { get; set; }
-        public string LargeIconPath { get; set; }
-
+        public IImage IconPath { get; set; }
+        public IImage LargeIconPath { get; set; }
         public decimal TotalAmount { get; set; }
         public decimal TotalAmountInBase { get; set; }
         public decimal AvailableAmount { get; set; }
@@ -158,6 +157,7 @@ namespace Atomex.Client.Desktop.ViewModels
         
         public IBitmap GetBitmap(string uri)
         {
+            Console.WriteLine($"Getting bitmap {uri}");
             var assets = AvaloniaLocator.Current.GetService<IAssetLoader>();
             var bitmap = new Bitmap(assets.Open(new Uri(uri)));
             return bitmap;

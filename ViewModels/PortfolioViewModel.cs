@@ -77,6 +77,7 @@ namespace Atomex.Client.Desktop.ViewModels
                 ? c.TotalAmountInBase / PortfolioValue
                 : 0);
             this.RaisePropertyChanged(nameof(PortfolioValue));
+            this.RaisePropertyChanged(nameof(AllCurrencies));
 
             UpdatePlotModel();
         }
