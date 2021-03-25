@@ -1,11 +1,11 @@
 <Styles xmlns='https://github.com/avaloniaui'
         xmlns:x='http://schemas.microsoft.com/winfx/2006/xaml'>
-    
+
     <Styles.Resources>
         <CornerRadius x:Key="DialogCornerRadius">10</CornerRadius>
         <BoxShadows x:Key="DialogBoxShadow">2 2 12 3 Black</BoxShadows>
     </Styles.Resources>
-    
+
 
     <Style Selector="Border.ChildViewBorder">
         <Setter Property="CornerRadius" Value="{DynamicResource DialogCornerRadius}" />
@@ -58,39 +58,38 @@
     <!--     </Setter> -->
     <!-- </Style> -->
 
-    <!-- <Style x:Key="ChildViewCloseButtonLight" TargetType="Button"> -->
-    <!--     <Setter Property="Template"> -->
-    <!--         <Setter.Value> -->
-    <!--             <ControlTemplate TargetType="Button"> -->
-    <!--                 <Border Background="{DynamicResource AlmostTransparentBrush}"> -->
-    <!--                     <Path x:Name="icon" -->
-    <!--                           Stretch="Uniform" -->
-    <!--                           SnapsToDevicePixels="False" -->
-    <!--                           UseLayoutRounding="False" -->
-    <!--                           Width="{TemplateBinding Width}" -->
-    <!--                           Height="{TemplateBinding Height}" -->
-    <!--                           Fill="{DynamicResource ChildViewCloseButtonLightBrush}" -->
-    <!--                           Data="{DynamicResource JavIcons.CloseCircleF}" /> -->
-    <!--                 </Border> -->
-    <!--                 <ControlTemplate.Triggers> -->
-    <!--                     <Trigger Property="IsMouseOver" Value="True"> -->
-    <!--                         <Setter TargetName="icon" -->
-    <!--                                 Property="Fill" -->
-    <!--                                 Value="{DynamicResource ChildViewCloseButtonMouseOverLightBrush}" /> -->
-    <!--                     </Trigger> -->
-    <!--                     <Trigger Property="IsDefaulted" Value="True"> -->
-    <!--                         <Setter TargetName="icon" -->
-    <!--                                 Property="Fill" -->
-    <!--                                 Value="{DynamicResource ChildViewCloseButtonLightBrush}" /> -->
-    <!--                     </Trigger> -->
-    <!--                     <Trigger Property="IsPressed" Value="True"> -->
-    <!--                         <Setter TargetName="icon" -->
-    <!--                                 Property="Fill" -->
-    <!--                                 Value="{DynamicResource ChildViewCloseButtonPressedLightBrush}" /> -->
-    <!--                     </Trigger> -->
-    <!--                 </ControlTemplate.Triggers> -->
-    <!--             </ControlTemplate> -->
-    <!--         </Setter.Value> -->
-    <!--     </Setter> -->
-    <!-- </Style> -->
+    <Style Selector="Button.ChildViewCloseButtonLight">
+        <Setter Property="Template">
+            <ControlTemplate>
+                <ContentPresenter Name="PART_ContentPresenter"
+                                  Background="{DynamicResource AlmostTransparentBrush}"
+                                  BorderBrush="{TemplateBinding BorderBrush}"
+                                  BorderThickness="0"
+                                  Padding="0"
+                                  HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                  VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}">
+                    <ContentPresenter.Content>
+                        <Path x:Name="icon"
+                              Stretch="Uniform"
+                              UseLayoutRounding="False"
+                              Width="{TemplateBinding Width}"
+                              Height="{TemplateBinding Height}"
+                              Fill="{DynamicResource ChildViewCloseButtonLightBrush}"
+                              Data="{DynamicResource JavIcons.CloseCircleF}" />
+                    </ContentPresenter.Content>
+                </ContentPresenter>
+            </ControlTemplate>
+
+        </Setter>
+    </Style>
+
+    
+    <Style Selector="Button.ChildViewCloseButtonLight:pointerover /template/ ContentPresenter">
+        <Setter Property="Opacity" Value="0.8" />
+    </Style>
+    
+
+    <Style Selector="Button.ChildViewCloseButtonLight:pressed /template/ ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource AlmostTransparentBrush}" />
+    </Style>
 </Styles>

@@ -93,11 +93,12 @@ namespace Atomex.Client.Desktop.ViewModels.CreateWalletViewModels
 
         public override async void Next()
         {
-            if (PasswordScore < (int) PasswordAdvisor.PasswordScore.Medium)
-            {
-                Warning = Resources.CwvPasswordInsufficientComplexity;
-                return;
-            }
+            // todo: rollback password strength cheking;
+            // if (PasswordScore < (int) PasswordAdvisor.PasswordScore.Medium)
+            // {
+            //     Warning = Resources.CwvPasswordInsufficientComplexity;
+            //     return;
+            // }
 
             if (PasswordVM.SecurePass.Length > 0 &&
                 PasswordConfirmationVM.SecurePass.Length > 0 &&

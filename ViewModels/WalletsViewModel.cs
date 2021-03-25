@@ -42,8 +42,7 @@ namespace Atomex.Client.Desktop.ViewModels
 
                 if (_selected != null)
                     _selected.IsSelected = true;
-
-                Console.WriteLine($"Selected WalletViewModel {Selected.Header}");
+                
                 this.RaisePropertyChanged(nameof(Wallets));
             }
         }

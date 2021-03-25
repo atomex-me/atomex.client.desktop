@@ -94,11 +94,12 @@ namespace Atomex.Client.Desktop.ViewModels.CreateWalletViewModels
             // password is optional
             if (PasswordVM.SecurePass.Length > 0)
             {
-                if (PasswordScore < (int) PasswordAdvisor.PasswordScore.Medium)
-                {
-                    Warning = Properties.Resources.CwvPasswordInsufficientComplexity;
-                    return;
-                }
+                // todo: rollback password strength cheking;
+                // if (PasswordScore < (int) PasswordAdvisor.PasswordScore.Medium)
+                // {
+                //     Warning = Properties.Resources.CwvPasswordInsufficientComplexity;
+                //     return;
+                // }
 
                 if (PasswordConfirmationVM.SecurePass.Length > 0 &&
                     !PasswordVM.SecurePass.SecureEqual(PasswordConfirmationVM.SecurePass) ||

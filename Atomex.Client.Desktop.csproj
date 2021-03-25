@@ -97,13 +97,18 @@
         <Compile Update="Views\ConversionView.axaml.cs">
           <DependentUpon>ConversionView.axaml</DependentUpon>
         </Compile>
+        <Compile Update="Views\WalletViews\WalletView.axaml.cs">
+          <DependentUpon>WalletView.axaml</DependentUpon>
+          <SubType>Code</SubType>
+        </Compile>
+        <Compile Update="Views\WalletViews\TezosWalletView.axaml.cs">
+          <DependentUpon>TezosWalletView.axaml</DependentUpon>
+          <SubType>Code</SubType>
+        </Compile>
     </ItemGroup>
     <ItemGroup>
         <ProjectReference Include="atomex.client.core\Atomex.Client.Core\Atomex.Client.Core.csproj">
             <GlobalPropertiesToRemove></GlobalPropertiesToRemove>
         </ProjectReference>
-    </ItemGroup>
-    <ItemGroup>
-      <Folder Include="Views\WalletViews" />
     </ItemGroup>
 </Project>

@@ -15,11 +15,12 @@ using Atomex.Client.Desktop.ViewModels.Abstract;
 using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
 // using Atomex.Client.Desktop.ViewModels.ReceiveViewModels;
 // using Atomex.Client.Desktop.ViewModels.SendViewModels;
-// using Atomex.Client.Desktop.ViewModels.TransactionViewModels;
+using Atomex.Client.Desktop.ViewModels.TransactionViewModels;
 using Atomex.Common;
 using Atomex.Core;
 using Atomex.Wallet;
 using Avalonia.Media;
+using Avalonia.Threading;
 using NBitcoin;
 using ReactiveUI;
 using Serilog;
@@ -31,12 +32,12 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
     {
         private const int ConversionViewIndex = 2;
 
-        // private ObservableCollection<TransactionViewModel> _transactions;
-        // public ObservableCollection<TransactionViewModel> Transactions
-        // {
-        //     get => _transactions;
-        //     set { _transactions = value; OnPropertyChanged(nameof(Transactions)); }
-        // }
+        private ObservableCollection<TransactionViewModel> _transactions;
+        public ObservableCollection<TransactionViewModel> Transactions
+        {
+            get => _transactions;
+            set { _transactions = value; this.RaisePropertyChanged(nameof(Transactions)); }
+        }
 
         private CurrencyViewModel _currencyViewModel;
 
@@ -96,8 +97,8 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         public WalletViewModel()
         {
 #if DEBUG
-            // if (Env.IsInDesignerMode())
-            //     DesignerMode();
+            if (Env.IsInDesignerMode())
+                DesignerMode();
 #endif
         }
 
@@ -113,155 +114,155 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
             CurrencyViewModel = CurrencyViewModelCreator.CreateViewModel(currency);
 
-            // SubscribeToServices();
+            SubscribeToServices();
 
             // update transactions list
-            // _ = LoadTransactionsAsync();
+            _ = LoadTransactionsAsync();
         }
 
         private void SubscribeToServices()
         {
-            // App.Account.BalanceUpdated += OnBalanceUpdatedEventHandler;
+            App.Account.BalanceUpdated += OnBalanceUpdatedEventHandler;
         }
 
         protected virtual async void OnBalanceUpdatedEventHandler(object sender, CurrencyEventArgs args)
         {
-            // try
-            // {
-            //     if (Currency.Name == args.Currency)
-            //     {
-            //         // update transactions list
-            //         await LoadTransactionsAsync();
-            //     }
-            // }
-            // catch (Exception e)
-            // {
-            //     Log.Error(e, "Account balance updated event handler error");
-            // }
+            try
+            {
+                if (Currency.Name == args.Currency)
+                {
+                    // update transactions list
+                    await LoadTransactionsAsync();
+                }
+            }
+            catch (Exception e)
+            {
+                Log.Error(e, "Account balance updated event handler error");
+            }
         }
 
         protected async Task LoadTransactionsAsync()
         {
-            // Log.Debug("LoadTransactionsAsync for {@currency}", Currency.Name);
-            //
-            // try
-            // {
-            //     if (App.Account == null)
-            //         return;
-            //
-            //     var transactions = (await App.Account
-            //         .GetTransactionsAsync(Currency.Name))
-            //         .ToList();
-            //
-            //     await Application.Current.Dispatcher.InvokeAsync(() =>
-            //     {
-            //         Transactions = new ObservableCollection<TransactionViewModel>(
-            //             transactions.Select(t => TransactionViewModelCreator
-            //                 .CreateViewModel(t))
-            //                 .ToList()
-            //                 .SortList((t1, t2) => t2.Time.CompareTo(t1.Time))
-            //                 .ForEachDo(t =>
-            //                 {
-            //                     t.UpdateClicked += UpdateTransactonEventHandler;
-            //                     t.RemoveClicked += RemoveTransactonEventHandler;
-            //                 }));
-            //     },
-            //     DispatcherPriority.Background);
-            // }
-            // catch (OperationCanceledException)
-            // {
-            //     Log.Debug("LoadTransactionsAsync canceled.");
-            // }
-            // catch (Exception e)
-            // {
-            //     Log.Error(e, "LoadTransactionAsync error for {@currency}", Currency?.Name);
-            // }
+            Log.Debug("LoadTransactionsAsync for {@currency}", Currency.Name);
+            
+            try
+            {
+                if (App.Account == null)
+                    return;
+            
+                var transactions = (await App.Account
+                    .GetTransactionsAsync(Currency.Name))
+                    .ToList();
+            
+                await Dispatcher.UIThread.InvokeAsync(() =>
+                {
+                    Transactions = new ObservableCollection<TransactionViewModel>(
+                        transactions.Select(t => TransactionViewModelCreator
+                            .CreateViewModel(t))
+                            .ToList()
+                            .SortList((t1, t2) => t2.Time.CompareTo(t1.Time))
+                            .ForEachDo(t =>
+                            {
+                                t.UpdateClicked += UpdateTransactonEventHandler;
+                                t.RemoveClicked += RemoveTransactonEventHandler;
+                            }));
+                },
+                DispatcherPriority.Background);
+            }
+            catch (OperationCanceledException)
+            {
+                Log.Debug("LoadTransactionsAsync canceled.");
+            }
+            catch (Exception e)
+            {
+                Log.Error(e, "LoadTransactionAsync error for {@currency}", Currency?.Name);
+            }
         }
 
-        // private ICommand _sendCommand;
-        // public ICommand SendCommand => _sendCommand ?? (_sendCommand = new Command(OnSendClick));
-        //
-        // private ICommand _receiveCommand;
-        // public ICommand ReceiveCommand => _receiveCommand ?? (_receiveCommand = new Command(OnReceiveClick));
-        //
-        // private ICommand _convertCommand;
-        // public ICommand ConvertCommand => _convertCommand ?? (_convertCommand = new Command(OnConvertClick));
-        //
-        // private ICommand _updateCommand;
-        // public ICommand UpdateCommand => _updateCommand ?? (_updateCommand = new Command(OnUpdateClick));
-        //
-        // private ICommand _addressesCommand;
-        // public ICommand AddressesCommand => _addressesCommand ?? (_addressesCommand = new Command(OnAddressesClick));
-        //
-        // private ICommand _cancelUpdateCommand;
-        // public ICommand CancelUpdateCommand => _cancelUpdateCommand ?? (_cancelUpdateCommand = new Command(() =>
-        // {
-        //     Cancellation.Cancel();
-        // }));
+        private ICommand _sendCommand;
+        public ICommand SendCommand => _sendCommand ??= (_sendCommand = ReactiveCommand.Create(OnSendClick));
+        
+        private ICommand _receiveCommand;
+        public ICommand ReceiveCommand => _receiveCommand ??= (_receiveCommand = ReactiveCommand.Create(OnReceiveClick));
+        
+        private ICommand _convertCommand;
+        public ICommand ConvertCommand => _convertCommand ??= (_convertCommand = ReactiveCommand.Create(OnConvertClick));
+        
+        private ICommand _updateCommand;
+        public ICommand UpdateCommand => _updateCommand ??= (_updateCommand = ReactiveCommand.Create(OnUpdateClick));
+        
+        private ICommand _addressesCommand;
+        public ICommand AddressesCommand => _addressesCommand ??= (_addressesCommand = ReactiveCommand.Create(OnAddressesClick));
+        
+        private ICommand _cancelUpdateCommand;
+        public ICommand CancelUpdateCommand => _cancelUpdateCommand ??= (_cancelUpdateCommand = ReactiveCommand.Create(() =>
+        {
+            Cancellation.Cancel();
+        }));
 
-        // private void OnSendClick()
-        // {
-        //     var sendViewModel = SendViewModelCreator.CreateViewModel(App, DialogViewer, Currency);
-        //     var sendPageId = SendViewModelCreator.GetSendPageId(Currency);
-        //
-        //     DialogViewer.ShowDialog(Dialogs.Send, sendViewModel, defaultPageId: sendPageId);
-        // }
+        private void OnSendClick()
+        {
+            // var sendViewModel = SendViewModelCreator.CreateViewModel(App, DialogViewer, Currency);
+            // var sendPageId = SendViewModelCreator.GetSendPageId(Currency);
+            //
+            // DialogViewer.ShowDialog(Dialogs.Send, sendViewModel, defaultPageId: sendPageId);
+        }
 
-        // private void OnReceiveClick()
-        // {
-        //     var receiveViewModel = ReceiveViewModelCreator.CreateViewModel(App, Currency);
-        //
-        //     DialogViewer.ShowDialog(Dialogs.Receive, receiveViewModel);
-        // }
+        private void OnReceiveClick()
+        {
+            // var receiveViewModel = ReceiveViewModelCreator.CreateViewModel(App, Currency);
+            //
+            // DialogViewer.ShowDialog(Dialogs.Receive, receiveViewModel);
+        }
 
-        // private void OnConvertClick()
-        // {
-        //     MenuSelector.SelectMenu(ConversionViewIndex);
-        //     ConversionViewModel.FromCurrency = Currency;
-        // }
+        private void OnConvertClick()
+        {
+            MenuSelector.SelectMenu(ConversionViewIndex);
+            ConversionViewModel.FromCurrency = Currency;
+        }
 
-        // protected async void OnUpdateClick()
-        // {
-        //     if (IsBalanceUpdating)
-        //         return;
-        //
-        //     IsBalanceUpdating = true;
-        //
-        //     Cancellation = new CancellationTokenSource();
-        //
-        //     try
-        //     {
-        //         var scanner = new HdWalletScanner(App.Account);
-        //
-        //         await scanner.ScanAsync(
-        //             currency: Currency.Name,
-        //             skipUsed: true,
-        //             cancellationToken: Cancellation.Token);
-        //
-        //         await LoadTransactionsAsync();
-        //     }
-        //     catch (OperationCanceledException)
-        //     {
-        //         Log.Debug("Wallet update operation canceled");
-        //     }
-        //     catch (Exception e)
-        //     {
-        //         Log.Error(e, "WalletViewModel.OnUpdateClick");
-        //         // todo: message to user!?
-        //     }
-        //
-        //     IsBalanceUpdating = false;
-        // }
+        protected async void OnUpdateClick()
+        {
+            if (IsBalanceUpdating)
+                return;
+        
+            IsBalanceUpdating = true;
+        
+            Cancellation = new CancellationTokenSource();
+        
+            try
+            {
+                var scanner = new HdWalletScanner(App.Account);
+        
+                await scanner.ScanAsync(
+                    currency: Currency.Name,
+                    skipUsed: true,
+                    cancellationToken: Cancellation.Token);
+        
+                await LoadTransactionsAsync();
+            }
+            catch (OperationCanceledException)
+            {
+                Log.Debug("Wallet update operation canceled");
+            }
+            catch (Exception e)
+            {
+                Log.Error(e, "WalletViewModel.OnUpdateClick");
+                // todo: message to user!?
+            }
+        
+            IsBalanceUpdating = false;
+        }
 
-        // private void OnAddressesClick()
-        // {
-        //     DialogViewer.ShowDialog(Dialogs.Addresses, new AddressesViewModel(App, DialogViewer, Currency));
-        // }
+        private void OnAddressesClick()
+        {
+            // DialogViewer.ShowDialog(Dialogs.Addresses, new AddressesViewModel(App, DialogViewer, Currency));
+        }
 
-        // private void UpdateTransactonEventHandler(object sender, TransactionEventArgs args)
-        // {
-        //     // todo:
-        // }
+        private void UpdateTransactonEventHandler(object sender, TransactionEventArgs args)
+        {
+            // todo:
+        }
 
         private async void RemoveTransactonEventHandler(object sender, TransactionEventArgs args)
         {
