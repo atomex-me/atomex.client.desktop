@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using Avalonia;
 using Avalonia.Data.Converters;
-using Avalonia.Markup.Xaml;
+
 
 namespace Atomex.Client.Desktop.Converters
 {
@@ -34,10 +34,5 @@ namespace Atomex.Client.Desktop.Converters
                 null
             };
         }
-
-        // public override object ProvideValue(IServiceProvider serviceProvider)
-        // {
-        //     return new AmountToStringConverter();
-        // }
     }
 }

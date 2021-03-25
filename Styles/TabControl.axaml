@@ -1,13 +1,95 @@
 <Styles xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:sys="clr-namespace:System;assembly=netstandard">
+        xmlns:controls="clr-namespace:Atomex.Client.Desktop.Controls"
+        xmlns:converters="clr-namespace:Atomex.Client.Desktop.Converters">
     <Styles.Resources>
         <x:Double x:Key="TabItemMinHeight">48</x:Double>
         <x:Double x:Key="TabItemVerticalPipeHeight">24</x:Double>
         <x:Double x:Key="TabItemPipeThickness">2</x:Double>
         <Thickness x:Key="TabControlTopPlacementItemMargin">0 0 0 2</Thickness>
+
+        <converters:CanScrollConverter x:Key="CanScrollConverter" />
     </Styles.Resources>
-  
+
+    <Style Selector="Button.ScrollViewButton /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderBrush" Value="Transparent" />
+    </Style>
+
+
+    <Style Selector="Button.ScrollViewButton:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderBrush" Value="Transparent" />
+    </Style>
+
+    <Style Selector="Button.ScrollViewButton:pressed  /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderBrush" Value="Transparent" />
+    </Style>
+
+    <Style Selector="Button.ScrollViewButton:pressed">
+        <Setter Property="RenderTransform" Value="scale(0.9)" />
+        <Setter Property="Opacity" Value="0.8" />
+    </Style>
+    
+    <Style Selector="Button.ScrollViewButton:disabled /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Opacity" Value="0" />
+    </Style>
+
+    <Style Selector="controls|CustomScrollViewer.CurrenciesScroll">
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Grid ColumnDefinitions="*,Auto" RowDefinitions="*,Auto">
+                    <ScrollContentPresenter Name="PART_ContentPresenter"
+                                            Grid.Row="0"
+                                            Grid.Column="0"
+                                            Grid.RowSpan="2"
+                                            Grid.ColumnSpan="2"
+                                            Background="{TemplateBinding Background}"
+                                            CanHorizontallyScroll="{TemplateBinding CanHorizontallyScroll}"
+                                            CanVerticallyScroll="{TemplateBinding CanVerticallyScroll}"
+                                            Content="{TemplateBinding Content}"
+                                            Extent="{TemplateBinding Extent, Mode=TwoWay}"
+                                            Margin="{TemplateBinding Padding}"
+                                            Offset="{TemplateBinding Offset, Mode=TwoWay}"
+                                            Viewport="{TemplateBinding Viewport, Mode=TwoWay}">
+                        <ScrollContentPresenter.GestureRecognizers>
+                            <ScrollGestureRecognizer
+                                CanHorizontallyScroll="{TemplateBinding CanHorizontallyScroll}"
+                                CanVerticallyScroll="{TemplateBinding CanVerticallyScroll}" />
+                        </ScrollContentPresenter.GestureRecognizers>
+                    </ScrollContentPresenter>
+                    <ScrollBar Name="PART_HorizontalScrollBar"
+                               AllowAutoHide="{TemplateBinding AllowAutoHide}"
+                               Orientation="Horizontal"
+                               LargeChange="{Binding LargeChange.Width, RelativeSource={RelativeSource TemplatedParent}}"
+                               SmallChange="{Binding SmallChange.Width, RelativeSource={RelativeSource TemplatedParent}}"
+                               Maximum="{TemplateBinding HorizontalScrollBarMaximum}"
+                               Value="{TemplateBinding HorizontalScrollBarValue, Mode=TwoWay}"
+                               ViewportSize="{TemplateBinding HorizontalScrollBarViewportSize}"
+                               Visibility="{TemplateBinding HorizontalScrollBarVisibility}"
+                               IsVisible="{Binding HorizontalScrollVisible, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"
+                               Grid.Row="1"
+                               Focusable="False" />
+                    <ScrollBar Name="PART_VerticalScrollBar"
+                               AllowAutoHide="{TemplateBinding AllowAutoHide}"
+                               Orientation="Vertical"
+                               LargeChange="{Binding LargeChange.Height, RelativeSource={RelativeSource TemplatedParent}}"
+                               SmallChange="{Binding SmallChange.Height, RelativeSource={RelativeSource TemplatedParent}}"
+                               Maximum="{TemplateBinding VerticalScrollBarMaximum}"
+                               Value="{TemplateBinding VerticalScrollBarValue, Mode=TwoWay}"
+                               ViewportSize="{TemplateBinding VerticalScrollBarViewportSize}"
+                               Visibility="{TemplateBinding VerticalScrollBarVisibility}"
+                               Grid.Column="1"
+                               Focusable="False" />
+                    <Panel x:Name="PART_ScrollBarsSeparator" Grid.Row="1" Grid.Column="1"
+                           Background="{DynamicResource ScrollViewerScrollBarsSeparatorBackground}" />
+                </Grid>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+
+
     <Style Selector="TabControl">
         <Setter Property="Margin" Value="0" />
         <Setter Property="Padding" Value="{DynamicResource TabItemMargin}" />
@@ -20,12 +102,69 @@
                         Background="{TemplateBinding Background}"
                         HorizontalAlignment="{TemplateBinding HorizontalAlignment}"
                         VerticalAlignment="{TemplateBinding VerticalAlignment}">
+                    
                     <DockPanel>
-                        <ItemsPresenter Name="PART_ItemsPresenter"
-                                        Items="{TemplateBinding Items}"
-                                        ItemsPanel="{TemplateBinding ItemsPanel}"
-                                        ItemTemplate="{TemplateBinding ItemTemplate}"
-                                        DockPanel.Dock="{TemplateBinding TabStripPlacement}"/>
+                        <Grid HorizontalAlignment="Stretch"
+                              DockPanel.Dock="{TemplateBinding TabStripPlacement}">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="auto" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="auto" />
+                            </Grid.ColumnDefinitions>
+
+                            <Button Grid.Column="0"
+                                    Name="ScrollLeftButton"
+                                    Classes="ScrollViewButton"
+                                    Width="25"
+                                    Height="25"
+                                    Padding="0"
+                                    Margin="0 0 8 0"
+                                    IsEnabled="{Binding #CurrenciesScroll.HorizontalScrollVisible}"
+                                    Command="{Binding #CurrenciesScroll.LineLeft}">
+                                <Path Stretch="Uniform"
+                                      VerticalAlignment="Center"
+                                      HorizontalAlignment="Right"
+                                      UseLayoutRounding="False"
+                                      Width="12"
+                                      Height="23"
+                                      Fill="{DynamicResource GrayBrush3}"
+                                      Data="M6 2L0 8l6 6z" />
+                            </Button>
+
+                            <controls:CustomScrollViewer
+                                Grid.Column="1"
+                                Classes="CurrenciesScroll"
+                                Name="CurrenciesScroll"
+                                HorizontalScrollBarVisibility="Auto"
+                                VerticalScrollBarVisibility="Disabled"
+                                Background="{TemplateBinding Background}">
+
+                                <ItemsPresenter Name="PART_ItemsPresenter"
+                                                HorizontalAlignment="Center"
+                                                Items="{TemplateBinding Items}"
+                                                ItemsPanel="{TemplateBinding ItemsPanel}"
+                                                ItemTemplate="{TemplateBinding ItemTemplate}" />
+                            </controls:CustomScrollViewer>
+
+                            <Button Grid.Column="2"
+                                    Classes="ScrollViewButton"
+                                    Name="ScrollRightButton"
+                                    Width="25"
+                                    Height="25"
+                                    Padding="0"
+                                    Margin="8 0 0 0"
+                                    IsEnabled="{Binding #CurrenciesScroll.HorizontalScrollVisible}"
+                                    Command="{Binding #CurrenciesScroll.LineRight}">
+                                <Path Stretch="Uniform"
+                                      VerticalAlignment="Center"
+                                      HorizontalAlignment="Left"
+                                      UseLayoutRounding="False"
+                                      Width="12"
+                                      Height="23"
+                                      Fill="{DynamicResource GrayBrush3}"
+                                      Data="M0 14l6-6-6-6z" />
+                            </Button>
+                        </Grid>
                         <ContentPresenter Name="PART_SelectedContentHost"
                                           Margin="{TemplateBinding Padding}"
                                           HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
@@ -36,12 +175,13 @@
                 </Border>
             </ControlTemplate>
         </Setter>
-        
-        <!-- <Setter Property="ItemsPanel"> -->
-        <!--     <ItemsPanelTemplate> -->
-        <!--         <StackPanel /> -->
-        <!--     </ItemsPanelTemplate> -->
-        <!-- </Setter> -->
+
+        <Setter Property="ItemsPanel">
+            <ItemsPanelTemplate>
+                <WrapPanel />
+            </ItemsPanelTemplate>
+        </Setter>
+
     </Style>
 
     <Style Selector="TabItem">
@@ -75,50 +215,44 @@
             </ControlTemplate>
         </Setter>
     </Style>
-    
+
     <Style Selector="TabControl">
         <Setter Property="Padding" Value="0" />
     </Style>
-    
-    <Style Selector="TabControl /template/ ItemsPresenter#PART_ItemsPresenter > WrapPanel">
-        <!-- Backgorund of left panel -->
-        <Setter Property="Background" Value="Blue" />
-    </Style>
 
-    <!-- Nornal state -->
+    <Style Selector="TabControl /template/ ItemsPresenter#PART_ItemsPresenter > WrapPanel">
+        <Setter Property="Background" Value="Transparent" />
+    </Style>
+    
     <Style Selector="TabItem /template/ Border#PART_LayoutRoot">
-        <Setter Property="Background" Value="Green" />
+        <Setter Property="Background" Value="Transparent" />
         <Setter Property="Padding" Value="0" />
     </Style>
-    
+
     <Style Selector="TabItem /template/ ContentPresenter#PART_ContentPresenter">
 
         <Setter Property="Margin" Value="0" />
     </Style>
-    
-    
+
+
     <Style Selector="TabItem /template/ Border#PART_SelectedPipe">
         <Setter Property="IsVisible" Value="false" />
         <!-- <Setter Property="CornerRadius" Value="{DynamicResource ControlCornerRadius}" /> -->
     </Style>
-    
+
     <!-- PointerOver state -->
     <Style Selector="TabItem:pointerover /template/ Border#PART_LayoutRoot">
-        <Setter Property="Background" Value="Red" />
-        <Setter Property="TextBlock.Foreground" Value="{DynamicResource TabItemHeaderForegroundUnselectedPointerOver}" />
+        <Setter Property="Background" Value="Transparent" />
     </Style>
-    
+
     <!-- Selected PointerOver state -->
     <Style Selector="TabItem:selected:pointerover /template/ Border#PART_LayoutRoot">
-        <Setter Property="Background" Value="Yellow" />
-        <!-- <Setter Property="TextBlock.Foreground" Value="{DynamicResource TabItemHeaderForegroundSelectedPointerOver}" /> -->
+        <Setter Property="Background" Value="Transparent" />
     </Style>
-    
+
     <!-- Selected state -->
-    <!--  We don't use selector to PART_LayoutRoot, so developer can override selected item background with TabStripItem.Background  -->
     <Style Selector="TabItem:selected /template/ Border#PART_LayoutRoot">
-        <Setter Property="Background" Value="Yellow" />
-        <!-- <Setter Property="TextBlock.Foreground" Value="{DynamicResource TabItemHeaderForegroundSelected}" /> -->
+        <Setter Property="Background" Value="Transparent" />
     </Style>
 
 </Styles>

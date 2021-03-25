@@ -3,6 +3,76 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             x:Class="Atomex.Client.Desktop.Views.WalletsView">
-  wallets view;
+             x:Class="Atomex.Client.Desktop.Views.WalletsView"
+             xmlns:vm="clr-namespace:Atomex.Client.Desktop.ViewModels">
+
+    <Design.DataContext>
+        <vm:WalletsViewModel />
+    </Design.DataContext>
+
+    <!-- <UserControl.Resources> -->
+    <!--     <DataTemplate x:Key="DefaultWalletTemplate"> -->
+    <!--         <walletViews:WalletView /> -->
+    <!--     </DataTemplate> -->
+    <!--     <DataTemplate x:Key="TezosWalletTemplate"> -->
+    <!--         <walletViews:TezosWalletView /> -->
+    <!--     </DataTemplate> -->
+    <!--     <controls:WalletDataTemplateSelector x:Key="WalletDataTemplateSelector" -->
+    <!--                                          DefaultTemplate="{StaticResource DefaultWalletTemplate}" -->
+    <!--                                          TezosTemplate="{StaticResource TezosWalletTemplate}" /> -->
+    <!-- </UserControl.Resources> -->
+
+
+    <Grid>
+        <!-- Style="{StaticResource WalletTabControl}" -->
+        <!-- ContentTemplateSelector="{StaticResource WalletDataTemplateSelector}" -->
+        
+        
+        
+        <TabControl Name="Wallets"
+                    Items="{Binding Wallets}"
+                    SelectedItem="{Binding Selected}"
+                    Margin="0 5 0 0">
+
+            <!-- DataType="{x:Type walletViewModels:WalletViewModel}" -->
+            <TabControl.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel x:Name="walletTabItem" Orientation="Vertical" Background="Transparent">
+                        <ContentControl x:Name="ContentControl"
+                                        HorizontalAlignment="Center"
+                                        VerticalContentAlignment="Center"
+                                        HorizontalContentAlignment="Center"
+                                        Width="64"
+                                        Height="64"
+                                        Opacity="0.8"
+                                        Margin="3 0 3 0">
+                            <Canvas Width="48"
+                                    Height="48"
+                                    Background="{Binding Background}"
+                                    OpacityMask="{Binding OpacityMask}" />
+                        </ContentControl>
+
+                        <TextBlock x:Name="HeaderTextBlock" Text="{Binding Header}"
+                                   Foreground="{DynamicResource DefaultForegroundBrush}"
+                                   FontFamily="{StaticResource AgencyFb}"
+                                   FontSize="20"
+                                   TextAlignment="Center"
+                                   TextWrapping="Wrap"
+                                   Opacity="0.4" />
+                    </StackPanel>
+                    <!-- <DataTemplate.Triggers> -->
+                    <!--     <DataTrigger Binding="{Binding ElementName=walletTabItem, Path=IsMouseOver}" Value="True"> -->
+                    <!--         <Setter TargetName="ContentControl" Property="Opacity" Value="1" /> -->
+                    <!--         <Setter TargetName="HeaderTextBlock" Property="Opacity" Value="1" /> -->
+                    <!--     </DataTrigger> -->
+                    <!--     <DataTrigger Binding="{Binding IsSelected}" Value="True"> -->
+                    <!--         <Setter TargetName="ContentControl" Property="Opacity" Value="1" /> -->
+                    <!--         <Setter TargetName="HeaderTextBlock" Property="Opacity" Value="1" /> -->
+                    <!--     </DataTrigger> -->
+                    <!-- </DataTemplate.Triggers> -->
+                </DataTemplate>
+            </TabControl.ItemTemplate>
+        </TabControl>
+    </Grid>
+
 </UserControl>

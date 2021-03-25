@@ -106,6 +106,7 @@
     </LinearGradientBrush>
 
     <FontFamily x:Key="MainTitleFontFamily">avares://Atomex.Client.Desktop/Resources/Fonts#Comfortaa</FontFamily>
+    <FontFamily x:Key="AgencyFb">avares://Atomex.Client.Desktop/Resources/Fonts/Agency-FB.ttf#Agency FB</FontFamily>
 
     <!-- Child View -->
 
