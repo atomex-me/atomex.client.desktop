@@ -1,0 +1,161 @@
+<Styles xmlns='https://github.com/avaloniaui'
+        xmlns:x='http://schemas.microsoft.com/winfx/2006/xaml'
+        xmlns:abstractViewModels="clr-namespace:Atomex.Client.Desktop.ViewModels.Abstract"
+        xmlns:converters="clr-namespace:Atomex.Client.Desktop.Converters">
+
+    <Styles.Resources>
+        <converters:AmountToStringConverter x:Key="AmountToStringConverter" />
+        <converters:StringToUpperCaseConverter x:Key="StringToUpperCaseConverter" />
+
+        <CornerRadius x:Key="ComboboxCornerRadius">0 20 20 0</CornerRadius>
+
+        <DataTemplate x:Key="CurrencyItemTemplate" DataType="{x:Type abstractViewModels:CurrencyViewModel}">
+            <Grid Margin="3">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="48" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="26" />
+                    <RowDefinition Height="22" />
+                </Grid.RowDefinitions>
+
+                <Image Width="48"
+                       Height="48"
+                       Source="{Binding IconPath}"
+                       UseLayoutRounding="True"
+                       Grid.Column="0"
+                       Grid.RowSpan="2" />
+
+                <TextBlock Text="{Binding Header, Converter={StaticResource StringToUpperCaseConverter}}"
+                           FontFamily="{DynamicResource DefaultBoldFontFamily}"
+                           FontWeight="Bold"
+                           FontSize="16"
+                           Foreground="{DynamicResource DefaultForegroundBrush}"
+                           Margin="7 0 0 0"
+                           VerticalAlignment="Bottom"
+                           Grid.Column="1"
+                           Grid.Row="0" />
+
+                <StackPanel Orientation="Horizontal"
+                            VerticalAlignment="Top"
+                            Grid.Column="1"
+                            Grid.Row="1">
+                    <TextBlock FontFamily="{DynamicResource DefaultFontFamily}"
+                               FontSize="13"
+                               Foreground="{DynamicResource DefaultForegroundBrush}"
+                               Margin="7 0 0 0">
+                        <TextBlock.Text>
+                            <MultiBinding Converter="{StaticResource AmountToStringConverter}">
+                                <Binding Path="TotalAmount" Mode="OneWay" />
+                                <Binding Path="CurrencyFormat" Mode="OneWay" />
+                            </MultiBinding>
+                        </TextBlock.Text>
+                    </TextBlock>
+                    <TextBlock Text="{Binding CurrencyCode}"
+                               FontFamily="{DynamicResource DefaultFontFamily}"
+                               FontSize="9"
+                               Foreground="{DynamicResource DefaultForegroundBrush}"
+                               Margin="4 3 0 0" />
+                </StackPanel>
+            </Grid>
+        </DataTemplate>
+    </Styles.Resources>
+
+    <!-- <Style x:Key="CurrencyContainerStyle" TargetType="{x:Type ComboBoxItem}"> -->
+    <!--     <Setter Property="BorderThickness" Value="0" /> -->
+    <!-- -->
+    <!--     <Setter Property="Template"> -->
+    <!--         <Setter.Value> -->
+    <!--             <ControlTemplate TargetType="{x:Type ComboBoxItem}"> -->
+    <!--                 <Grid Background="{DynamicResource CurrencyComboBoxItemBackground}" -->
+    <!--                       RenderOptions.ClearTypeHint="{TemplateBinding RenderOptions.ClearTypeHint}"> -->
+    <!--                     <Border x:Name="Border" -->
+    <!--                             BorderBrush="{TemplateBinding BorderBrush}" -->
+    <!--                             BorderThickness="{TemplateBinding BorderThickness}" -->
+    <!--                             SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" /> -->
+    <!--                     <Grid Margin="{TemplateBinding BorderThickness}"> -->
+    <!--                         <ContentPresenter x:Name="contentPresenter" -->
+    <!--                                           Margin="{TemplateBinding Padding}" -->
+    <!--                                           HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" -->
+    <!--                                           VerticalAlignment="{TemplateBinding VerticalContentAlignment}" -->
+    <!--                                           SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" /> -->
+    <!--                     </Grid> -->
+    <!--                 </Grid> -->
+    <!--                 <ControlTemplate.Triggers> -->
+    <!--                     <Trigger Property="IsSelected" Value="True"> -->
+    <!--                         <Setter Property="Foreground" -->
+    <!--                                 Value="{Binding RelativeSource={RelativeSource Self}, Path=(сontrols:ItemHelper.SelectedForegroundBrush), Mode=OneWay}" /> -->
+    <!--                         <Setter TargetName="Border" -->
+    <!--                                 Property="Background" -->
+    <!--                                 Value="{DynamicResource CurrencyComboBoxItemSelectedBackground}" /> -->
+    <!--                     </Trigger> -->
+    <!--                     <MultiTrigger> -->
+    <!--                         <MultiTrigger.Conditions> -->
+    <!--                             <Condition Property="IsSelected" Value="True" /> -->
+    <!--                             <Condition Property="Selector.IsSelectionActive" Value="True" /> -->
+    <!--                         </MultiTrigger.Conditions> -->
+    <!--                         <Setter Property="Foreground" -->
+    <!--                                 Value="{Binding RelativeSource={RelativeSource Self}, Path=(сontrols:ItemHelper.ActiveSelectionForegroundBrush), Mode=OneWay}" /> -->
+    <!--                         <Setter TargetName="Border" -->
+    <!--                                 Property="Background" -->
+    <!--                                 Value="{DynamicResource CurrencyComboBoxItemSelectedBackground}" /> -->
+    <!--                     </MultiTrigger> -->
+    <!-- -->
+    <!--                     <MultiTrigger> -->
+    <!--                         <MultiTrigger.Conditions> -->
+    <!--                             <Condition Property="IsMouseOver" Value="True" /> -->
+    <!--                             <Condition Property="IsSelected" Value="True" /> -->
+    <!--                         </MultiTrigger.Conditions> -->
+    <!--                         <Setter TargetName="Border" -->
+    <!--                                 Property="Background" -->
+    <!--                                 Value="{DynamicResource CurrencyComboBoxItemSelectedMouseOverBackground}" /> -->
+    <!--                     </MultiTrigger> -->
+    <!--                     <MultiTrigger> -->
+    <!--                         <MultiTrigger.Conditions> -->
+    <!--                             <Condition Property="IsMouseOver" Value="True" /> -->
+    <!--                             <Condition Property="IsSelected" Value="False" /> -->
+    <!--                         </MultiTrigger.Conditions> -->
+    <!--                         <Setter TargetName="Border" -->
+    <!--                                 Property="Background" -->
+    <!--                                 Value="{DynamicResource CurrencyComboBoxItemUnselectedMouseOverBackground}" /> -->
+    <!--                     </MultiTrigger> -->
+    <!-- -->
+    <!--                     <Trigger Property="IsEnabled" Value="False"> -->
+    <!--                         <Setter Property="Foreground" -->
+    <!--                                 Value="{Binding RelativeSource={RelativeSource Self}, Path=(сontrols:ItemHelper.DisabledForegroundBrush), Mode=OneWay}" /> -->
+    <!--                         <Setter TargetName="Border" -->
+    <!--                                 Property="Background" -->
+    <!--                                 Value="{DynamicResource CurrencyComboBoxItemDisabledBackground}" /> -->
+    <!--                     </Trigger> -->
+    <!--                     <MultiTrigger> -->
+    <!--                         <MultiTrigger.Conditions> -->
+    <!--                             <Condition Property="IsEnabled" Value="False" /> -->
+    <!--                             <Condition Property="IsSelected" Value="True" /> -->
+    <!--                         </MultiTrigger.Conditions> -->
+    <!--                         <Setter Property="Foreground" -->
+    <!--                                 Value="{Binding RelativeSource={RelativeSource Self}, Path=(сontrols:ItemHelper.DisabledSelectedForegroundBrush), Mode=OneWay}" /> -->
+    <!--                         <Setter TargetName="Border" -->
+    <!--                                 Property="Background" -->
+    <!--                                 Value="{DynamicResource CurrencyComboBoxItemDisabledBackground}" /> -->
+    <!--                     </MultiTrigger> -->
+    <!--                 </ControlTemplate.Triggers> -->
+    <!--             </ControlTemplate> -->
+    <!--         </Setter.Value> -->
+    <!--     </Setter> -->
+    <!-- </Style> -->
+
+    <!-- BasedOn="{StaticResource CustomComboBox}" -->
+    <Style Selector="ComboBox.CurrencyComboBox">
+
+        <Setter Property="BorderThickness" Value="0" />
+
+        <Setter Property="ItemTemplate" Value="{StaticResource CurrencyItemTemplate}" />
+        <!-- <Setter Property="ItemContainerStyle" Value="{StaticResource CurrencyContainerStyle}"/> -->
+        <Setter Property="Background" Value="{DynamicResource DefaultSubstrateBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource DefaultForegroundBrush}" />
+    </Style>
+
+
+</Styles>

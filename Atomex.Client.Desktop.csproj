@@ -20,6 +20,7 @@
         <PackageReference Include="Avalonia.Xaml.Behaviors" Version="0.10.0" />
         <PackageReference Include="Deadpikle.AvaloniaProgressRing" Version="0.9.0" />
         <PackageReference Include="OxyPlot.Avalonia" Version="2.1.0-20201211.2" />
+        <PackageReference Include="QRCoder" Version="1.4.1" />
         <PackageReference Include="Serilog.Settings.Configuration" Version="3.1.0" />
         <PackageReference Include="Serilog.Sinks.Console" Version="3.1.1" />
     </ItemGroup>
@@ -103,6 +104,10 @@
         </Compile>
         <Compile Update="Views\WalletViews\TezosWalletView.axaml.cs">
           <DependentUpon>TezosWalletView.axaml</DependentUpon>
+          <SubType>Code</SubType>
+        </Compile>
+        <Compile Update="Views\ReceiveViews\ReceiveView.axaml.cs">
+          <DependentUpon>ReceiveView.axaml</DependentUpon>
           <SubType>Code</SubType>
         </Compile>
     </ItemGroup>

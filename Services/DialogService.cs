@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Atomex.Client.Desktop.Dialogs.ViewModels;
 using Avalonia;
 using Avalonia.Controls;
 using Atomex.Client.Desktop.ViewModels;
@@ -16,6 +17,7 @@ namespace Atomex.Client.Desktop.Services
         private readonly Window _owner;
         private IList<TView> openedViews;
         private ViewModelBase lastOpenedVM;
+        private DialogServiceViewModel _dialogServiceViewModel;
 
         public DialogService(Window owner)
         {

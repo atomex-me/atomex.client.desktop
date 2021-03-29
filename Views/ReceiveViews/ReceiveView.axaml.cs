@@ -1,13 +1,12 @@
 using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Controls.Primitives;
 using Avalonia.Markup.Xaml;
 
-namespace Atomex.Client.Desktop.Views
+namespace Atomex.Client.Desktop.Views.ReceiveViews
 {
-    public class WalletsView : UserControl
+    public class ReceiveView : UserControl
     {
-        public WalletsView()
+        public ReceiveView()
         {
             InitializeComponent();
         }

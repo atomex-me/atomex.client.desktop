@@ -18,26 +18,41 @@
         BoxShadow="{DynamicResource DialogBoxShadow}"
         Margin="12">
 
-        <DockPanel>
-            <StackPanel DockPanel.Dock="Bottom"
-                        HorizontalAlignment="Center"
-                        Orientation="Horizontal"
-                        Spacing="8">
-
-                <Button Command="{Binding YesCommand}"
-                        CommandParameter="{Binding #Dialog}"
-                        Content="Yes" />
-
-                <Button Command="{Binding NoCommand}"
-                        CommandParameter="{Binding #Dialog}"
-                        Content="No" />
-
-                <Button Command="{Binding CancelCommand}"
-                        CommandParameter="{Binding #Dialog}"
-                        Content="Cancel" />
-
-            </StackPanel>
-            <ContentControl Content="{Binding Content}" />
-        </DockPanel>
+        <Grid>
+            <Canvas ZIndex="1">
+                <Button Classes="ChildViewCloseButtonLight"
+                        Canvas.Right="-13"
+                        Canvas.Top="-17"
+                        Width="24"
+                        Height="24"
+                        Margin="0 5 2 0"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Top"
+                        Command="{Binding NoCommand}"
+                        CommandParameter="{Binding #Dialog}" />
+            </Canvas>
+            <DockPanel>
+                <!-- <StackPanel DockPanel.Dock="Bottom" -->
+                <!--             HorizontalAlignment="Center" -->
+                <!--             Orientation="Horizontal" -->
+                <!--             Spacing="8"> -->
+                <!-- -->
+                <!--     <Button Command="{Binding YesCommand}" -->
+                <!--             CommandParameter="{Binding #Dialog}" -->
+                <!--             Content="Yes" /> -->
+                <!-- -->
+                <!--     <Button Command="{Binding NoCommand}" -->
+                <!--             CommandParameter="{Binding #Dialog}" -->
+                <!--             Content="No" /> -->
+                <!-- -->
+                <!--     <Button Command="{Binding CancelCommand}" -->
+                <!--             CommandParameter="{Binding #Dialog}" -->
+                <!--             Content="Cancel" /> -->
+                <!-- -->
+                <!-- </StackPanel> -->
+                
+                <ContentControl Content="{Binding Content}" />
+            </DockPanel>
+        </Grid>
     </Border>
 </Window>

@@ -38,5 +38,6 @@
         <StyleInclude Source="/Styles/WalletMenuButton.axaml" />
         <StyleInclude Source="/Styles/CustomDataGridStyle.axaml" />
         <StyleInclude Source="/Styles/WalletViewStyle.axaml" />
+        <StyleInclude Source="/Styles/CurrencyComboBoxStyle.axaml" />
     </Application.Styles>
 </Application>
