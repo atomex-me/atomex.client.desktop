@@ -71,7 +71,7 @@ namespace Atomex.Client.Desktop.ViewModels
             OnAmountUpdatedEventHandler(this, EventArgs.Empty);
         }
 
-        private async void OnAmountUpdatedEventHandler(object sender, EventArgs args)
+        private void OnAmountUpdatedEventHandler(object sender, EventArgs args)
         {
             // update total portfolio value
             PortfolioValue = AllCurrencies.Sum(c => c.TotalAmountInBase);
@@ -80,7 +80,8 @@ namespace Atomex.Client.Desktop.ViewModels
             AllCurrencies.ForEachDo(c => c.PortfolioPercent = PortfolioValue != 0
                 ? c.TotalAmountInBase / PortfolioValue
                 : 0);
-            this.RaisePropertyChanged(nameof(PortfolioValue));
+            
+            this.RaisePropertyChanged(nameof(AllCurrencies));
 
             UpdatePlotModel();
         }
@@ -103,6 +104,7 @@ namespace Atomex.Client.Desktop.ViewModels
 
             foreach (var currency in AllCurrencies)
             {
+                // Console.WriteLine($"{currency.Currency.Name} is {currency.TotalAmountInBase}");
                 series.Slices.Add(
                     new PieSlice(currency.Currency.Name, (double) currency.TotalAmountInBase)
                     {
@@ -119,7 +121,7 @@ namespace Atomex.Client.Desktop.ViewModels
             PlotModel = new PlotModel {Culture = CultureInfo.InvariantCulture};
             PlotModel.Series.Add(series);
 
-            this.RaisePropertyChanged(nameof(PortfolioValue));
+            this.RaisePropertyChanged(nameof(PlotModel));
         }
 
         private IController _actualController;

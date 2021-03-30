@@ -16,6 +16,8 @@
     <UserControl.Resources>
         <converters:AmountToStringConverter x:Key="AmountToStringConverter" />
         <converters:StringToUpperCaseConverter x:Key="StringToUpperCaseConverter" />
+        <converters:PortfolioToTotalConverter x:Key="PortfolioToTotalConverter" />
+        <converters:PortfolioToPercentConverter x:Key="PortfolioToPercentConverter" />
     </UserControl.Resources>
 
 
@@ -33,7 +35,7 @@
                           Controller="{Binding ActualController, Mode=TwoWay}"
                           Opacity="1"
                           x:Name="PlotView">
-            
+
                 <oxy:PlotView.DefaultTrackerTemplate>
                     <ControlTemplate>
                         <Canvas>
@@ -46,16 +48,16 @@
                                            Foreground="White"
                                            VerticalAlignment="Center"
                                            FontFamily="{DynamicResource DefaultFontFamily}"
-                                           FontSize="12"/>
+                                           FontSize="12" />
                             </Border>
                         </Canvas>
                     </ControlTemplate>
                 </oxy:PlotView.DefaultTrackerTemplate>
-            
+
             </oxy:PlotView>
-            
+
             <TextBlock Foreground="White"
-                       Text="{Binding PortfolioValue, StringFormat=$0.00}"
+                       Text="{Binding PortfolioValue, Converter={StaticResource PortfolioToTotalConverter}}"
                        FontFamily="{DynamicResource DefaultFontFamily}"
                        FontSize="30"
                        VerticalAlignment="Center"
@@ -125,7 +127,7 @@
                             <TextBlock Margin="0 0 10 0"
                                        FontFamily="{DynamicResource DefaultFontFamily}"
                                        VerticalAlignment="Center"
-                                       HorizontalAlignment="Center">
+                                       HorizontalAlignment="Left">
                                 <TextBlock.Text>
                                     <MultiBinding Converter="{StaticResource AmountToStringConverter}">
                                         <Binding Path="AvailableAmountInBase" Mode="OneWay" />
@@ -137,13 +139,8 @@
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
                 <DataGridTextColumn Header="% IN PORTFOLIO"
-                                    Binding="{Binding PortfolioPercent, StringFormat=0.00%, Mode=TwoWay}">
-
-                    <!-- <DataGridTextColumn.ElementStyle> -->
-                    <!--     <Style TargetType="TextBlock"> -->
-                    <!--         <Setter Property="HorizontalAlignment" Value="Center" /> -->
-                    <!--     </Style> -->
-                    <!-- </DataGridTextColumn.ElementStyle> -->
+                                    Binding="{Binding PortfolioPercent, Converter={StaticResource PortfolioToPercentConverter}, Mode=TwoWay}">
+                    
                 </DataGridTextColumn>
             </DataGrid.Columns>
         </DataGrid>
