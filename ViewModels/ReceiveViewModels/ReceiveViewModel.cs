@@ -63,7 +63,6 @@ namespace Atomex.Client.Desktop.ViewModels.ReceiveViewModels
             set
             {
                 _currency = value;
-                // this.RaisePropertyChanged(nameof(Currency));
 #if DEBUG
                 if (!Env.IsInDesignerMode())
                 {
@@ -225,7 +224,7 @@ namespace Atomex.Client.Desktop.ViewModels.ReceiveViewModels
                 if (activeAddressViewModel != null)
                     return activeAddressViewModel.WalletAddress;
             }
-
+            
             return FromAddressList.First(vm => vm.IsFreeAddress).WalletAddress;
         }
 

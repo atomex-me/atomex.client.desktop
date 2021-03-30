@@ -2,6 +2,7 @@ using System;
 using Avalonia.Controls;
 using Avalonia.Controls.Templates;
 using Atomex.Client.Desktop.ViewModels;
+using Atomex.Client.Desktop.ViewModels.ReceiveViewModels;
 
 namespace Atomex.Client.Desktop
 {
@@ -14,13 +15,19 @@ namespace Atomex.Client.Desktop
             var name = data.GetType().FullName!.Replace("ViewModel", "View");
             var type = Type.GetType(name);
 
+            if (type == null)
+            {
+                name = data.GetType().BaseType?.FullName!.Replace("ViewModel", "View");
+                type = Type.GetType(name);
+            }
+
             if (type != null)
             {
-                return (Control)Activator.CreateInstance(type)!;
+                return (Control) Activator.CreateInstance(type)!;
             }
             else
             {
-                return new TextBlock { Text = "Not Found: " + name };
+                return new TextBlock {Text = "Not Found: " + name};
             }
         }
 

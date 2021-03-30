@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using Atomex.Core;
 using Atomex.Client.Desktop.Common;
 using Atomex.Common;
@@ -14,7 +15,6 @@ namespace Atomex.Client.Desktop.ViewModels.ReceiveViewModels
             set
             {
                 _currency = value;
-                this.RaisePropertyChanged(nameof(Currency));
 #if DEBUG
                 if (!Env.IsInDesignerMode())
                 {
