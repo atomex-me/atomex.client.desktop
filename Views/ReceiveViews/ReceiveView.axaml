@@ -80,7 +80,7 @@
                                         FontFamily="{DynamicResource DefaultFontFamily}"
                                         HorizontalAlignment="Left"
                                         VerticalAlignment="Center"
-                                        IsVisible="{Binding IsFreeAddress}"/>
+                                        IsVisible="{Binding IsFreeAddress}" />
                                     <TextBlock
                                         Margin="3 0 0 0"
                                         Text="{Binding Address}"
@@ -107,25 +107,27 @@
                         </ComboBox.ItemTemplate>
                     </ComboBox>
 
-                    <!-- ToolTip="Copy to clipboard" -->
-                    <controls:IconButton
-                        Classes="PathButtonStyle"
-                        VerticalAlignment="Center"
-                        Foreground="{DynamicResource IconButtonForegroundBrush}"
-                        MouseOverBrush="{DynamicResource IconButtonMouseOverBrush}"
-                        PressedBrush="{DynamicResource IconButtonPressedBrush}"
-                        Path="{DynamicResource Octicons.Clippy}"
-                        Margin="7 0 0 0"
-                        Width="25"
-                        Height="25"
-                        Command="{Binding CopyCommand}">
 
-                        <!-- <controls:IconButton.Styles> -->
-                        <!--     <Style Selector="Button.ChildViewCloseButtonLight:pressed /template/ ContentPresenter"> -->
-                        <!--         <Setter Property="Background" Value="{DynamicResource AlmostTransparentBrush}" /> -->
-                        <!--     </Style> -->
-                        <!-- </controls:IconButton.Styles> -->
-                    </controls:IconButton>
+                    <Border ToolTip.Placement="AnchorAndGravity"
+                            ToolTip.VerticalOffset="-32"
+                            VerticalAlignment="Center"
+                            Cursor="Help">
+                        <controls:IconButton
+                            Classes="PathButtonStyle"
+                            VerticalAlignment="Center"
+                            Foreground="{DynamicResource IconButtonForegroundBrush}"
+                            MouseOverBrush="{DynamicResource IconButtonMouseOverBrush}"
+                            PressedBrush="{DynamicResource IconButtonPressedBrush}"
+                            Path="{DynamicResource Octicons.Clippy}"
+                            Margin="7 0 0 0"
+                            Width="25"
+                            Height="25"
+                            Command="{Binding CopyCommand}" />
+                        <ToolTip.Tip>
+                            <TextBlock x:Name="ToolTipTextBoxExchange"
+                                       Text="Copy to clipboard" />
+                        </ToolTip.Tip>
+                    </Border>
                 </StackPanel>
 
                 <TextBlock Text="{Binding Warning}"
