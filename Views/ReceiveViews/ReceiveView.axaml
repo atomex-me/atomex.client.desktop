@@ -4,8 +4,10 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="Atomex.Client.Desktop.Views.ReceiveViews.ReceiveView"
-             xmlns:vm="clr-namespace:Atomex.Client.Desktop.ViewModels.ReceiveViewModels">
-    
+             xmlns:vm="clr-namespace:Atomex.Client.Desktop.ViewModels.ReceiveViewModels"
+             xmlns:controls="clr-namespace:Atomex.Client.Desktop.Controls"
+             xmlns:helpers="clr-namespace:Atomex.Client.Desktop.Helpers">
+
     <Design.DataContext>
         <vm:ReceiveViewModel />
     </Design.DataContext>
@@ -31,13 +33,16 @@
                 <ComboBox Width="500"
                           MinHeight="68"
                           Classes="CurrencyComboBox"
+                          HorizontalAlignment="Center"
                           Margin="0 5 0 5"
                           Items="{Binding FromCurrencies}"
-                          SelectedIndex="{Binding CurrencyIndex}"/>
+                          SelectedIndex="{Binding CurrencyIndex, Mode=TwoWay}"
+                          helpers:ComboBoxHelper.CornerRadius="20"
+                          helpers:ComboBoxHelper.IconColor="{DynamicResource CurrencyComboBoxIconBrush}" />
 
                 <StackPanel Orientation="Horizontal"
                             HorizontalAlignment="Center"
-                            Margin="37 0 0 0">
+                            Margin="33 0 0 0">
                     <Border Width="90"
                             Height="40"
                             Background="{DynamicResource FieldHeaderBackgroundBrush}"
@@ -59,11 +64,14 @@
                               Height="40"
                               Margin="0 5 0 5"
                               Items="{Binding FromAddressList}"
-                              SelectedItem="{Binding SelectedAddress, Mode=TwoWay}"
+                              SelectedIndex="{Binding SelectedAddressIndex, Mode=TwoWay}"
                               Background="{DynamicResource DefaultSubstrateBrush}"
-                              Foreground="{DynamicResource DefaultForegroundBrush}">
+                              Foreground="{DynamicResource DefaultForegroundBrush}"
+                              helpers:ComboBoxHelper.CornerRadius="0 20 20 0"
+                              helpers:ComboBoxHelper.PopupPadding="1 1 20 0"
+                              helpers:ComboBoxHelper.IconColor="{DynamicResource CurrencyComboBoxIconBrush}">
                         <ComboBox.ItemTemplate>
-                            <DataTemplate DataType="{x:Type ComboBoxItem}">
+                            <DataTemplate>
                                 <StackPanel Orientation="Horizontal">
                                     <TextBlock
                                         Text="(new)"
@@ -72,7 +80,7 @@
                                         FontFamily="{DynamicResource DefaultFontFamily}"
                                         HorizontalAlignment="Left"
                                         VerticalAlignment="Center"
-                                        IsVisible="{Binding IsFreeAddress}" />
+                                        IsVisible="{Binding IsFreeAddress}"/>
                                     <TextBlock
                                         Margin="3 0 0 0"
                                         Text="{Binding Address}"
@@ -99,18 +107,25 @@
                         </ComboBox.ItemTemplate>
                     </ComboBox>
 
-                    <!-- <controls:IconButton -->
-                    <!--     VerticalAlignment="Center" -->
-                    <!--     Foreground="{DynamicResource IconButtonForegroundBrush}" -->
-                    <!--     MouseOverBrush="{DynamicResource IconButtonMouseOverBrush}" -->
-                    <!--     PressedBrush="{DynamicResource IconButtonPressedBrush}" -->
-                    <!--     Path="{DynamicResource Octicons.Clippy}" -->
-                    <!--     Margin="7 0 0 0" -->
-                    <!--     Width="25" -->
-                    <!--     Height="25" -->
-                    <!--     ToolTip="Copy to clipboard" -->
-                    <!--     Command="{Binding CopyCommand}" -->
-                    <!--     Style="{StaticResource PathButtonStyle}" /> -->
+                    <!-- ToolTip="Copy to clipboard" -->
+                    <controls:IconButton
+                        Classes="PathButtonStyle"
+                        VerticalAlignment="Center"
+                        Foreground="{DynamicResource IconButtonForegroundBrush}"
+                        MouseOverBrush="{DynamicResource IconButtonMouseOverBrush}"
+                        PressedBrush="{DynamicResource IconButtonPressedBrush}"
+                        Path="{DynamicResource Octicons.Clippy}"
+                        Margin="7 0 0 0"
+                        Width="25"
+                        Height="25"
+                        Command="{Binding CopyCommand}">
+
+                        <!-- <controls:IconButton.Styles> -->
+                        <!--     <Style Selector="Button.ChildViewCloseButtonLight:pressed /template/ ContentPresenter"> -->
+                        <!--         <Setter Property="Background" Value="{DynamicResource AlmostTransparentBrush}" /> -->
+                        <!--     </Style> -->
+                        <!-- </controls:IconButton.Styles> -->
+                    </controls:IconButton>
                 </StackPanel>
 
                 <TextBlock Text="{Binding Warning}"
@@ -124,8 +139,11 @@
 
                 <!-- <Image Width="128" -->
                 <!--        Height="Auto" -->
-                <!--        Margin="0 10 0 5" -->
-                <!--        Source="{Binding QrCode}" /> -->
+                <!--        Margin="0 10 0 5" /> -->
+
+                <Image Width="128"
+                       Margin="0 10 0 5"
+                       Source="{Binding QrCode}" />
 
                 <StackPanel Orientation="Horizontal"
                             Margin="0 5 0 20" />

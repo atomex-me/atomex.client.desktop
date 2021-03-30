@@ -8,6 +8,8 @@ using Atomex.Common;
 using QRCoder;
 using System;
 using System.Collections.ObjectModel;
+using System.Drawing.Imaging;
+using System.IO;
 using System.Windows.Input;
 using Serilog;
 using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
@@ -37,9 +39,10 @@ namespace Atomex.Client.Desktop.ViewModels.ReceiveViewModels
                 this.RaisePropertyChanged(nameof(FromCurrencies));
             }
         }
-        
-        
+
+
         private int _currencyIndex;
+
         public int CurrencyIndex
         {
             get => _currencyIndex;
@@ -47,12 +50,13 @@ namespace Atomex.Client.Desktop.ViewModels.ReceiveViewModels
             {
                 _currencyIndex = value;
                 this.RaisePropertyChanged(nameof(CurrencyIndex));
-                
+
                 Currency = FromCurrencies.ElementAt(_currencyIndex).Currency;
             }
         }
 
         protected Currency _currency;
+
         public virtual Currency Currency
         {
             get => _currency;
@@ -77,7 +81,8 @@ namespace Atomex.Client.Desktop.ViewModels.ReceiveViewModels
                         .ToList();
 
                     if (activeAddresses.FirstOrDefault(w => w.Address == freeAddress.Address) == null)
-                        receiveAddresses.AddEx(new WalletAddressViewModel(freeAddress, _currency.Format, isFreeAddress: true));
+                        receiveAddresses.AddEx(new WalletAddressViewModel(freeAddress, _currency.Format,
+                            isFreeAddress: true));
 
                     FromAddressList = receiveAddresses;
 #if DEBUG
@@ -97,6 +102,23 @@ namespace Atomex.Client.Desktop.ViewModels.ReceiveViewModels
                 this.RaisePropertyChanged(nameof(FromAddressList));
 
                 SelectedAddress = GetDefaultAddress();
+                
+                _selectedAddressIndex = _fromAddressList.FindIndex(fal => fal.WalletAddress == SelectedAddress);
+                this.RaisePropertyChanged(nameof(SelectedAddressIndex));
+            }
+        }
+
+        private int _selectedAddressIndex;
+
+        public int SelectedAddressIndex
+        {
+            get => _selectedAddressIndex;
+            set
+            {
+                _selectedAddressIndex = value;
+                this.RaisePropertyChanged(nameof(SelectedAddressIndex));
+
+                SelectedAddress = FromAddressList.ElementAt(_selectedAddressIndex).WalletAddress;
             }
         }
 
@@ -108,7 +130,7 @@ namespace Atomex.Client.Desktop.ViewModels.ReceiveViewModels
             set
             {
                 _selectedAddress = value;
-                this.RaisePropertyChanged(nameof(SelectedAddress));
+                // this.RaisePropertyChanged(nameof(SelectedAddress));
 
                 if (_selectedAddress != null)
                     _ = CreateQrCodeAsync();
@@ -129,11 +151,7 @@ namespace Atomex.Client.Desktop.ViewModels.ReceiveViewModels
             }
         }
 
-        public IBitmap QrCode
-        {
-            get => GetBitmap("avares://Atomex.Client.Desktop/Resources/Images/tezos.png");
-            private set { }
-        }
+        public IBitmap QrCode { get; private set; }
 
         public ReceiveViewModel()
         {
@@ -159,29 +177,34 @@ namespace Atomex.Client.Desktop.ViewModels.ReceiveViewModels
 
             var currencyVM = FromCurrencies
                 .FirstOrDefault(c => c.Currency.Name == currency.Name);
-            
+
             CurrencyIndex = FromCurrencies.IndexOf(currencyVM);
         }
 
         private async Task CreateQrCodeAsync()
         {
-            Bitmap qrCodeBitmap = null;
+            System.Drawing.Bitmap qrCodeBitmap = null;
 
             await Task.Run(() =>
             {
                 using var qrGenerator = new QRCodeGenerator();
                 using var qrData = qrGenerator.CreateQrCode(_selectedAddress.Address, QRCodeGenerator.ECCLevel.Q);
                 using var qrCode = new QRCode(qrData);
-                // qrCodeBitmap = qrCode.GetGraphic(PixelsPerModule);
+                qrCodeBitmap = qrCode.GetGraphic(PixelsPerModule);
             });
 
             await Dispatcher.UIThread.InvokeAsync(() =>
             {
-                QrCode = GetBitmap("avares://Atomex.Client.Desktop/Resources/Images/tezos.png");
-
-                this.RaisePropertyChanged(nameof(QrCode));
-
-                // qrCodeBitmap.Dispose();
+                using (MemoryStream memory = new())
+                {
+                    qrCodeBitmap?.Save(memory, ImageFormat.Png);
+                    memory.Position = 0;
+                    
+                    QrCode = new Bitmap(memory);
+                    this.RaisePropertyChanged(nameof(QrCode));
+                }
+                
+                qrCodeBitmap?.Dispose();
             });
         }
 

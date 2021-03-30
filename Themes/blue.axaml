@@ -180,6 +180,7 @@
     <SolidColorBrush x:Key="CurrencyComboBoxItemUnselectedMouseOverBackground"
                      Color="{DynamicResource ChildViewBackgroundColor1}" />
     <SolidColorBrush x:Key="CurrencyComboBoxItemDisabledBackground" Color="#303030" />
+    <SolidColorBrush x:Key="CurrencyComboBoxIconBrush" Color="LightGray" />
 
     <!-- Custom PasswordBox -->
 

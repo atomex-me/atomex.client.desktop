@@ -15,12 +15,11 @@
             </Setter.Value>
         </Setter>
     </Style>
-    
-    <!-- todo: PathButtonStyle -->
 
     <Style Selector="Border#PART_Border">
         <Setter Property="Background" Value="{Binding Foreground, RelativeSource={RelativeSource TemplatedParent}}" />
     </Style>
+    
     <!-- IsMouseOver -->
     <Style Selector="controls|IconButton:pointerover /template/ Border">
         <Setter Property="Background"
@@ -31,5 +30,40 @@
     <Style Selector="controls|IconButton:pressed /template/ Border">
         <Setter Property="Background"
                 Value="{Binding PressedBrush, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:IconButton}}}" />
+    </Style>
+    
+    <Style Selector="controls|IconButton:pressed">
+        <Setter Property="RenderTransform" Value="scale(0.95)" />    
+    </Style>
+    
+    
+    <Style Selector="controls|IconButton.PathButtonStyle">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type controls:IconButton}">
+                    <Border Background="{DynamicResource AlmostTransparentBrush}">
+                        <Path x:Name="iconPath"
+                              Stretch="Uniform"
+                              UseLayoutRounding="False"
+                              Width="{TemplateBinding Width}"
+                              Height="{TemplateBinding Height}"
+                              Fill="{TemplateBinding Foreground}"
+                              Data="{Binding Path, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:IconButton}}}"/>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    
+    <!-- IsMouseOver -->
+    <Style Selector="controls|IconButton.PathButtonStyle:pointerover /template/ Border">
+        <Setter Property="Opacity" Value="0.8" />
+        <Setter Property="Background" Value="{DynamicResource AlmostTransparentBrush}" />
+    </Style>
+
+    <!-- IsPressed -->
+    <Style Selector="controls|IconButton.PathButtonStyle:pressed /template/ Border">
+        <Setter Property="Opacity" Value="0.9" />
+        <Setter Property="Background" Value="{DynamicResource AlmostTransparentBrush}" />
     </Style>
 </Styles>

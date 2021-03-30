@@ -6,7 +6,7 @@
         ShowInTaskbar="False"
         SystemDecorations="None"
         TransparencyLevelHint="Transparent"
-        Width="600"
+        Width="640"
         Height="400"
         Background="Transparent"
         WindowStartupLocation="CenterOwner">

@@ -1,9 +1,6 @@
 <Styles xmlns="https://github.com/avaloniaui"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-
-    <Styles.Resources>
-        <CornerRadius x:Key="ComboboxCornerRadius">0 20 20 0</CornerRadius>
-    </Styles.Resources>
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:helpers="clr-namespace:Atomex.Client.Desktop.Helpers">
 
     <Style Selector="ComboBox">
         <Setter Property="Background" Value="{DynamicResource CustomComboBoxBackgroundBrush}" />
@@ -36,14 +33,14 @@
                                 Background="{TemplateBinding Background}"
                                 BorderBrush="{TemplateBinding BorderBrush}"
                                 BorderThickness="0"
-                                CornerRadius="{StaticResource ComboboxCornerRadius}" />
+                                CornerRadius="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ComboBox}}, Path=(helpers:ComboBoxHelper.CornerRadius)}" />
 
                         <Border x:Name="HighlightBackground"
                                 Grid.Row="1"
                                 Grid.Column="0"
                                 Grid.ColumnSpan="2"
                                 BorderThickness="0"
-                                CornerRadius="{StaticResource ComboboxCornerRadius}" />
+                                CornerRadius="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ComboBox}}, Path=(helpers:ComboBoxHelper.CornerRadius)}" />
 
                         <TextBlock x:Name="PlaceholderTextBlock"
                                    Grid.Row="1"
@@ -80,6 +77,7 @@
                                 <Path x:Name="DropDownGlyph"
                                       Stretch="Uniform"
                                       VerticalAlignment="Center"
+                                      Fill="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ComboBox}}, Path=(helpers:ComboBoxHelper.IconColor)}"
                                       Data="M1939 486L2029 576L1024 1581L19 576L109 486L1024 1401L1939 486Z" />
                             </Panel>
                         </Viewbox>
@@ -91,11 +89,11 @@
                                IsLightDismissEnabled="True">
 
                             <Border x:Name="DropDownBorder"
-                                    Background="{DynamicResource CustomComboBoxBackgroundBrush}"
+                                    Background="{DynamicResource CurrencyComboBoxItemBackground}"
                                     BorderThickness="0"
                                     Padding="{DynamicResource ComboBoxDropdownBorderPadding}"
                                     HorizontalAlignment="Stretch"
-                                    Margin="0 1 20 0">
+                                    Margin="{Binding RelativeSource={RelativeSource Mode=TemplatedParent, AncestorType={x:Type ComboBox}}, Path=(helpers:ComboBoxHelper.PopupPadding)}">
                                 <ScrollViewer
                                     HorizontalScrollBarVisibility="{TemplateBinding ScrollViewer.HorizontalScrollBarVisibility}"
                                     VerticalScrollBarVisibility="{TemplateBinding ScrollViewer.VerticalScrollBarVisibility}">
@@ -113,26 +111,28 @@
             </ControlTemplate>
         </Setter>
     </Style>
-    
-    <!-- <Style Selector="ComboBox:pointerover /template/ Border"> -->
-    <!--     <Setter Property="Background" Value="{DynamicResource CustomComboBoxBackgroundBrush}" /> -->
-    <!-- </Style> -->
+
+    <!--  PointerOver State  -->
+    <Style Selector="ComboBox:pointerover /template/ Border#Background">
+        <Setter Property="Background" Value="{TemplateBinding Background}" />
+    </Style>
 
     <Style Selector="ComboBoxItem">
-        <Setter Property="Foreground" Value="{DynamicResource CustomComboBoxForegroundBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource DefaultForegroundBrush}" />
     </Style>
 
     <Style Selector="ComboBoxItem:selected /template/ ContentPresenter">
         <Setter Property="Background" Value="{DynamicResource DefaultButtonMouseOverColor}" />
-        <Setter Property="TextBlock.Foreground" Value="White" />
+        <Setter Property="TextBlock.Foreground" Value="{DynamicResource DefaultForegroundBrush}" />
     </Style>
 
     <Style Selector="ComboBoxItem:pointerover /template/ ContentPresenter">
-        <Setter Property="TextBlock.Foreground" Value="{DynamicResource CustomComboBoxForegroundBrush}" />
+        <Setter Property="TextBlock.Foreground" Value="{DynamicResource DefaultForegroundBrush}" />
+        <Setter Property="Background" Value="#162843" />
     </Style>
 
     <Style Selector="ComboBoxItem:selected:pointerover /template/ ContentPresenter">
-        <Setter Property="TextBlock.Foreground" Value="White" />
+        <Setter Property="TextBlock.Foreground" Value="{DynamicResource DefaultForegroundBrush}" />
+        <Setter Property="Background" Value="{DynamicResource DefaultButtonMouseOverColor}" />
     </Style>
-
 </Styles>

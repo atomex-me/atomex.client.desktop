@@ -8,7 +8,7 @@ namespace Atomex.Client.Desktop.Common
         public static bool IsInDesignerMode()
         {
             // return LicenseManager.UsageMode == LicenseUsageMode.Designtime;
-            return Environment.GetEnvironmentVariable("IS_DESIGNER") != null;
+            return Convert.ToBoolean(Environment.GetEnvironmentVariable("IS_DESIGNER"));
         }
     }
 }
