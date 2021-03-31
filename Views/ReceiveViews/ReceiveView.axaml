@@ -6,14 +6,15 @@
              x:Class="Atomex.Client.Desktop.Views.ReceiveViews.ReceiveView"
              xmlns:vm="clr-namespace:Atomex.Client.Desktop.ViewModels.ReceiveViewModels"
              xmlns:controls="clr-namespace:Atomex.Client.Desktop.Controls"
-             xmlns:helpers="clr-namespace:Atomex.Client.Desktop.Helpers">
+             xmlns:helpers="clr-namespace:Atomex.Client.Desktop.Helpers"
+             Width="630"
+             Height="400">
 
     <Design.DataContext>
         <vm:ReceiveViewModel />
     </Design.DataContext>
 
-    <Border Classes="ChildViewBorder"
-            Padding="3">
+    <Border Classes="ChildViewBorder">
         <Grid>
             <StackPanel Orientation="Vertical">
                 <Border Margin="0 10 0 20"
@@ -26,10 +27,7 @@
                                HorizontalAlignment="Center"
                                VerticalAlignment="Center" />
                 </Border>
-
-                <!-- SelectedValuePath="Currency" -->
-                <!-- helpers:ComboBoxHelper.CornerRadius="20" -->
-                <!-- Style="{StaticResource CurrencyComboBox}" -->
+                
                 <ComboBox Width="500"
                           MinHeight="68"
                           Classes="CurrencyComboBox"
@@ -55,11 +53,7 @@
                                    VerticalAlignment="Center"
                                    HorizontalAlignment="Right" />
                     </Border>
-
-                    <!-- SelectedValuePath="WalletAddress" -->
-                    <!-- helpers:ComboBoxHelper.CornerRadius="0 20 20 0" -->
-                    <!-- Style="{StaticResource CustomComboBox}" -->
-                    <!-- UpdateSourceTrigger=PropertyChanged, -->
+                    
                     <ComboBox Width="410"
                               Height="40"
                               Margin="0 5 0 5"
@@ -138,15 +132,11 @@
                            TextWrapping="Wrap"
                            HorizontalAlignment="Center"
                            VerticalAlignment="Center" />
-
-                <!-- <Image Width="128" -->
-                <!--        Height="Auto" -->
-                <!--        Margin="0 10 0 5" /> -->
-
+                
                 <Image Width="128"
                        Margin="0 10 0 5"
                        Source="{Binding QrCode}" />
-
+                
                 <StackPanel Orientation="Horizontal"
                             Margin="0 5 0 20" />
             </StackPanel>

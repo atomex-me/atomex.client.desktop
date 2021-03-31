@@ -8,14 +8,13 @@ namespace Atomex.Client.Desktop.Dialogs.ViewModels
 {
     internal sealed class DialogServiceViewModel : ViewModelBase
     {
-        private DialogResult _dialogResult = Models.DialogResult.Cancel;
+        private DialogResult _dialogResult = DialogResult.Cancel;
 
-        public DialogServiceViewModel(ViewModelBase content)
+        public DialogServiceViewModel()
         {
-            YesCommand = ReactiveCommand.Create<Window>(window => Close(DialogResult.Yes, window));
-            NoCommand = ReactiveCommand.Create<Window>(window => Close(DialogResult.No, window));
-            CancelCommand = ReactiveCommand.Create<Window>(window => Close(DialogResult.Cancel, window));
-            Content = content;
+            YesCommand = ReactiveCommand.Create<Window>(_ => Close(DialogResult.Yes));
+            NoCommand = ReactiveCommand.Create<Window>(_ => Close(DialogResult.No));
+            CancelCommand = ReactiveCommand.Create<Window>(_ => Close(DialogResult.Cancel));
         }
 
         public ICommand YesCommand { get; }
@@ -30,12 +29,22 @@ namespace Atomex.Client.Desktop.Dialogs.ViewModels
             set => this.RaiseAndSetIfChanged(ref _dialogResult, value);
         }
 
-        public ViewModelBase Content { get; set; }
+        private ViewModelBase _content;
 
-        private void Close(DialogResult dialogResult, Window window)
+        public ViewModelBase Content
+        {
+            get => _content;
+            set
+            {
+                _content = value;
+                this.RaisePropertyChanged(nameof(Content));
+            }
+        }
+
+        private void Close(DialogResult dialogResult)
         {
             DialogResult = dialogResult;
-            window.Close();
+            App.DialogService?.CloseDialog();
         }
     }
 }

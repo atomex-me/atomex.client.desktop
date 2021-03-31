@@ -4,7 +4,6 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows;
 using System.Windows.Input;
 using Atomex.Blockchain;
 using Atomex.Blockchain.BitcoinBased;
@@ -15,8 +14,7 @@ using Atomex.Client.Desktop.Dialogs.ViewModels;
 using Atomex.Client.Desktop.ViewModels.Abstract;
 using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
 using Atomex.Client.Desktop.ViewModels.ReceiveViewModels;
-// using Atomex.Client.Desktop.ViewModels.ReceiveViewModels;
-// using Atomex.Client.Desktop.ViewModels.SendViewModels;
+using Atomex.Client.Desktop.ViewModels.SendViewModels;
 using Atomex.Client.Desktop.ViewModels.TransactionViewModels;
 using Atomex.Common;
 using Atomex.Core;
@@ -204,16 +202,14 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
         private void OnSendClick()
         {
-            // var sendViewModel = SendViewModelCreator.CreateViewModel(App, DialogViewer, Currency);
-            // var sendPageId = SendViewModelCreator.GetSendPageId(Currency);
-            //
-            // DialogViewer.ShowDialog(Dialogs.Send, sendViewModel, defaultPageId: sendPageId);
+            var sendViewModel = SendViewModelCreator.CreateViewModel(App, Currency);
+            Desktop.App.DialogService?.Show(sendViewModel);
         }
 
         private void OnReceiveClick()
         {
             var receiveViewModel = ReceiveViewModelCreator.CreateViewModel(App, Currency);
-            Desktop.App.DialogService?.Show(new DialogServiceViewModel(receiveViewModel));
+            Desktop.App.DialogService?.Show(receiveViewModel);
         }
 
         private void OnConvertClick()

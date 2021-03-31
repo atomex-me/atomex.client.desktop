@@ -2,7 +2,6 @@ using System;
 using Avalonia.Controls;
 using Avalonia.Controls.Templates;
 using Atomex.Client.Desktop.ViewModels;
-using Atomex.Client.Desktop.ViewModels.ReceiveViewModels;
 
 namespace Atomex.Client.Desktop
 {

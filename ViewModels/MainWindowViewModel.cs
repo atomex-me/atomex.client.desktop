@@ -254,7 +254,7 @@ namespace Atomex.Client.Desktop.ViewModels
 
             unlockViewModel.Unlocked += (s, a) => { ShowContent(MainWalletVM); };
 
-            App.DialogService?.CloseAll();
+            App.DialogService?.CloseDialog();
             ShowContent(unlockViewModel);
         }
 

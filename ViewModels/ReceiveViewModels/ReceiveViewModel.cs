@@ -7,7 +7,6 @@ using Atomex.Client.Desktop.ViewModels.Abstract;
 using Atomex.Common;
 using QRCoder;
 using System;
-using System.Collections.ObjectModel;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Windows.Input;
@@ -101,7 +100,7 @@ namespace Atomex.Client.Desktop.ViewModels.ReceiveViewModels
                 this.RaisePropertyChanged(nameof(FromAddressList));
 
                 SelectedAddress = GetDefaultAddress();
-                
+
                 _selectedAddressIndex = _fromAddressList.FindIndex(fal => fal.WalletAddress == SelectedAddress);
                 this.RaisePropertyChanged(nameof(SelectedAddressIndex));
             }
@@ -178,6 +177,8 @@ namespace Atomex.Client.Desktop.ViewModels.ReceiveViewModels
                 .FirstOrDefault(c => c.Currency.Name == currency.Name);
 
             CurrencyIndex = FromCurrencies.IndexOf(currencyVM);
+            
+            Console.WriteLine("Creating RECEIVE VM");
         }
 
         private async Task CreateQrCodeAsync()
@@ -198,11 +199,11 @@ namespace Atomex.Client.Desktop.ViewModels.ReceiveViewModels
                 {
                     qrCodeBitmap?.Save(memory, ImageFormat.Png);
                     memory.Position = 0;
-                    
+
                     QrCode = new Bitmap(memory);
                     this.RaisePropertyChanged(nameof(QrCode));
                 }
-                
+
                 qrCodeBitmap?.Dispose();
             });
         }
@@ -224,7 +225,7 @@ namespace Atomex.Client.Desktop.ViewModels.ReceiveViewModels
                 if (activeAddressViewModel != null)
                     return activeAddressViewModel.WalletAddress;
             }
-            
+
             return FromAddressList.First(vm => vm.IsFreeAddress).WalletAddress;
         }
 

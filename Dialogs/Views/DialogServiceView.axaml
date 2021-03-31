@@ -6,14 +6,11 @@
         ShowInTaskbar="False"
         SystemDecorations="None"
         TransparencyLevelHint="Transparent"
-        Width="640"
-        Height="400"
         Background="Transparent"
         WindowStartupLocation="CenterOwner">
 
-    <!-- todo: Dialog child content fit full width & height; Refactor this XAML;-->
-
     <Border
+        Background="{DynamicResource ChildViewBackgroundBrush}"
         CornerRadius="{DynamicResource DialogCornerRadius}"
         BoxShadow="{DynamicResource DialogBoxShadow}"
         Margin="12">
@@ -32,25 +29,6 @@
                         CommandParameter="{Binding #Dialog}" />
             </Canvas>
             <DockPanel>
-                <!-- <StackPanel DockPanel.Dock="Bottom" -->
-                <!--             HorizontalAlignment="Center" -->
-                <!--             Orientation="Horizontal" -->
-                <!--             Spacing="8"> -->
-                <!-- -->
-                <!--     <Button Command="{Binding YesCommand}" -->
-                <!--             CommandParameter="{Binding #Dialog}" -->
-                <!--             Content="Yes" /> -->
-                <!-- -->
-                <!--     <Button Command="{Binding NoCommand}" -->
-                <!--             CommandParameter="{Binding #Dialog}" -->
-                <!--             Content="No" /> -->
-                <!-- -->
-                <!--     <Button Command="{Binding CancelCommand}" -->
-                <!--             CommandParameter="{Binding #Dialog}" -->
-                <!--             Content="Cancel" /> -->
-                <!-- -->
-                <!-- </StackPanel> -->
-                
                 <ContentControl Content="{Binding Content}" />
             </DockPanel>
         </Grid>

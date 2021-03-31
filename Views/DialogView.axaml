@@ -5,124 +5,82 @@
              xmlns:vm="clr-namespace:Atomex.Client.Desktop.ViewModels"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="Atomex.Client.Desktop.Views.DialogView"
-             xmlns:controls="clr-namespace:Atomex.Client.Desktop.Controls">
-    
+             xmlns:controls="clr-namespace:Atomex.Client.Desktop.Controls"
+             Width="630"
+             Height="400">
+
     <Design.DataContext>
         <vm:DialogViewModel />
     </Design.DataContext>
 
-    <!-- <DockPanel Background="White"> -->
-    <!--         <Button DockPanel.Dock="Bottom"  -->
-    <!--                 ZIndex="1" -->
-    <!--                 Height="60" -->
-    <!--                 Width="150" -->
-    <!--                 Background="Red" -->
-    <!--                 Margin="0 -60 0 0">Settings</Button> -->
-    <!-- -->
-    <!--         <TabControl -->
-    <!--             Items="{Binding Tabs}" -->
-    <!--             TabStripPlacement="Left"> -->
-    <!--             <TabControl.ItemTemplate> -->
-    <!--                 <DataTemplate> -->
-    <!--                     <StackPanel -->
-    <!--                         Orientation="Horizontal" -->
-    <!--                         Width="150" -->
-    <!--                         Height="60"> -->
-    <!--                         <Image Source="avares://Atomex.Client.Desktop/Resources/Images/bitcoin_90x90.png" -->
-    <!--                                VerticalAlignment="Center" -->
-    <!--                                Margin="10 0 0 0" -->
-    <!--                                Width="30" /> -->
-    <!--                         <TextBlock -->
-    <!--                             Margin="5 0 0 0" -->
-    <!--                             VerticalAlignment="Center" -->
-    <!--                             Text="{Binding Header}" /> -->
-    <!--                     </StackPanel> -->
-    <!-- -->
-    <!--                 </DataTemplate> -->
-    <!--             </TabControl.ItemTemplate> -->
-    <!--             <TabControl.ContentTemplate> -->
-    <!--                 <DataTemplate> -->
-    <!--                     <StackPanel Orientation="Vertical" Spacing="8"> -->
-    <!--                         <TextBlock Text="{Binding Text}" /> -->
-    <!--                         <Image Source="{Binding Image}" Width="300" /> -->
-    <!--                     </StackPanel> -->
-    <!--                 </DataTemplate> -->
-    <!--             </TabControl.ContentTemplate> -->
-    <!--             <TabControl.Styles> -->
-    <!--                 <Style Selector="TabItem"> -->
-    <!--                     <Setter Property="IsEnabled" Value="{Binding IsEnabled}" /> -->
-    <!--                 </Style> -->
-    <!--             </TabControl.Styles> -->
-    <!--         </TabControl> -->
-    <!--     </DockPanel> -->
+    <Border Classes="ChildViewBorder">
+        <DockPanel x:Name="MainDockerPanel" Background="{DynamicResource AlmostTransparentBrush}" Margin="0 10">
+            <DockPanel DockPanel.Dock="Bottom"
+                       Background="{DynamicResource MainWindowTitleBrush}">
 
+                <StackPanel Orientation="Horizontal"
+                            DockPanel.Dock="Right"
+                            VerticalAlignment="Center"
+                            Background="Red">
+                    <TextBlock Text="Exchange"
+                               FontSize="11" />
+                    <Separator />
+                    <TextBlock Text="Market Data"
+                               FontSize="11" />
+                    <TextBlock Text="Rates Provider"
+                               FontSize="11" />
+                </StackPanel>
+                <StackPanel Orientation="Horizontal"
+                            VerticalAlignment="Center">
+                    <TextBlock Text="Version:" Margin="2 0 4 0"
+                               FontSize="11"
+                               Foreground="{DynamicResource StatusBarDisconnectedForeground}" />
+                    <TextBlock Text="{Binding InstalledVersion}"
+                               FontSize="11"
+                               Foreground="{DynamicResource StatusBarDisconnectedForeground}" />
+                </StackPanel>
+            </DockPanel>
 
-    <DockPanel x:Name="MainDockerPanel" Background="Green">
-        <DockPanel DockPanel.Dock="Bottom"
-                   Background="{DynamicResource MainWindowTitleBrush}">
+            <DockPanel DockPanel.Dock="Left"
+                       Background="Green">
 
-            <StackPanel Orientation="Horizontal"
-                        DockPanel.Dock="Right"
-                        VerticalAlignment="Center"
-                        Background="Red">
-                <TextBlock Text="Exchange"
-                           FontSize="11" />
-                <Separator />
-                <TextBlock Text="Market Data"
-                           FontSize="11" />
-                <TextBlock Text="Rates Provider"
-                           FontSize="11" />
-            </StackPanel>
-            <StackPanel Orientation="Horizontal"
-                        VerticalAlignment="Center">
-                <TextBlock Text="Version:" Margin="2 0 4 0"
-                           FontSize="11"
-                           Foreground="{DynamicResource StatusBarDisconnectedForeground}" />
-                <TextBlock Text="{Binding InstalledVersion}"
-                           FontSize="11"
-                           Foreground="{DynamicResource StatusBarDisconnectedForeground}" />
-            </StackPanel>
+                <StackPanel DockPanel.Dock="Bottom">
+                    <Button Background="Transparent" Foreground="White" Width="180">Conversion</Button>
+                </StackPanel>
+                <StackPanel>
+                    <controls:MenuButton
+                        Background="Transparent"
+                        Foreground="White"
+                        IsSelected="True"
+                        Width="180"
+                        Command="{Binding OnPortfolio}">
+                        Portfolio
+                    </controls:MenuButton>
+
+                    <controls:MenuButton
+                        Background="Transparent"
+                        Foreground="White"
+                        IsSelected="False"
+                        Width="180"
+                        Command="{Binding OnPortfolio}">
+                        Wallets
+                    </controls:MenuButton>
+                    <controls:MenuButton
+                        Background="Transparent"
+                        Foreground="White"
+                        IsSelected="True"
+                        Width="180"
+                        Command="{Binding OnPortfolio}">
+                        Conversion
+                    </controls:MenuButton>
+                </StackPanel>
+            </DockPanel>
+
+            <!-- DockPanel.Dderock="Left" -->
+
+            <ContentControl Content="{Binding Content}" />
         </DockPanel>
-
-        <DockPanel DockPanel.Dock="Left"
-                   Background="Green">
-            
-            <StackPanel DockPanel.Dock="Bottom">
-                <Button Background="Transparent" Foreground="White" Width="180">Conversion</Button>
-            </StackPanel>
-            <StackPanel>
-                <controls:MenuButton
-                    Background="Transparent"
-                    Foreground="White"
-                    IsSelected="True"
-                    Width="180"
-                    Command="{Binding OnPortfolio}">
-                    Portfolio
-                </controls:MenuButton>
-
-                <controls:MenuButton
-                    Background="Transparent"
-                    Foreground="White"
-                    IsSelected="False"
-                    Width="180"
-                    Command="{Binding OnPortfolio}">
-                    Wallets
-                </controls:MenuButton>
-                <controls:MenuButton
-                    Background="Transparent"
-                    Foreground="White"
-                    IsSelected="True"
-                    Width="180"
-                    Command="{Binding OnPortfolio}">
-                    Conversion
-                </controls:MenuButton>
-            </StackPanel>
-        </DockPanel>
-
-        <!-- DockPanel.Dderock="Left" -->
-
-        <ContentControl Content="{Binding Content}" Background="Blue" />
-    </DockPanel>
+    </Border>
 
     <UserControl.Styles>
         <Style Selector="Button">

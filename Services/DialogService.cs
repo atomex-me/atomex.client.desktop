@@ -5,6 +5,7 @@ using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Atomex.Client.Desktop.Dialogs.ViewModels;
+using Atomex.Client.Desktop.Dialogs.Views;
 using Avalonia;
 using Avalonia.Controls;
 using Atomex.Client.Desktop.ViewModels;
@@ -15,59 +16,87 @@ namespace Atomex.Client.Desktop.Services
     internal sealed class DialogService<TView> : IDialogService<ViewModelBase> where TView : Window
     {
         private readonly Window _owner;
-        private IList<TView> openedViews;
-        private ViewModelBase lastOpenedVM;
+
+        private bool IsDialogOpened;
         private DialogServiceViewModel _dialogServiceViewModel;
+        private TView _dialogServiceView;
+        private ViewLocator _viewLocator;
+
+        private double DEFAULT_WIDTH = 630;
+        private double DEFAULT_HEIGHT = 400;
+        private double DEFAULT_PARENT_WINDOW_MARGIN = 12;
 
         public DialogService(Window owner)
         {
             _owner = owner;
-            openedViews = new List<TView>();
+
+            _viewLocator = new ViewLocator();
+            _dialogServiceViewModel = new DialogServiceViewModel();
+
+            BuildDialogServiceView();
+
+            var mainWindowSize = _owner.GetObservable(Window.ClientSizeProperty).Skip(1);
+            // todo: make static width of dialog during resize until fit main window size.
+            mainWindowSize.Subscribe(value =>
+            {
+                // _dialogServiceView.Width = value.Width / 2;
+                // _dialogServiceView.Height = value.Height / 2;
+
+                CenterDialogWindow();
+            });
         }
 
-        public void CloseAll()
+        private void BuildDialogServiceView()
         {
-            Dispatcher.UIThread.InvokeAsync(() =>
-            {
-                foreach (var view in openedViews)
-                {
-                    view.Close();
-                }
+            _dialogServiceView = (TView) _viewLocator.Build(_dialogServiceViewModel);
+            _dialogServiceView.DataContext = _dialogServiceViewModel;
+        }
 
-                openedViews = new List<TView>();
-            });
+        public void CloseDialog()
+        {
+            _dialogServiceView.Close();
+
+            IsDialogOpened = false;
+            BuildDialogServiceView();
         }
 
         public void Show(ViewModelBase viewModel)
         {
-            var viewLocator = new ViewLocator();
-            TView view = (TView) viewLocator.Build(viewModel);
-            openedViews.Add(view);
-            view.DataContext = viewModel;
+            using var source = new CancellationTokenSource();
+            _dialogServiceViewModel.Content = viewModel;
+            AdjustDialogWindowSize(viewModel);
 
-            using (var source = new CancellationTokenSource())
-            {
-                view.ShowDialog(_owner)
-                    .ContinueWith(t => source.Cancel(),
-                        TaskScheduler.FromCurrentSynchronizationContext());
+            if (IsDialogOpened) return;
 
-                var mainWindowSize = _owner.GetObservable(Window.ClientSizeProperty).Skip(1);
+            _dialogServiceView.ShowDialog(_owner)
+                .ContinueWith(t => source.Cancel(),
+                    TaskScheduler.FromCurrentSynchronizationContext());
+            IsDialogOpened = true;
 
-                // todo: make static width of dialog during resize until fit main window size.
-                mainWindowSize.Subscribe(value =>
-                {
-                    Console.WriteLine($"ClientSizeProperty Changed; Dialog width: {view.Width}, Height: {view.Height}");
-                    view.Width = value.Width / 2;
-                    view.Height = value.Height / 2;
+            // Dispatcher.UIThread.MainLoop(source.Token);
+        }
 
-                    view.Position =
-                        new PixelPoint(
-                            Convert.ToInt32(_owner.Position.X + _owner.ClientSize.Width / 2 - view.Width / 2),
-                            Convert.ToInt32(_owner.Position.Y + _owner.ClientSize.Height / 2 - view.Height / 2));
-                });
+        private void AdjustDialogWindowSize(ViewModelBase dialogVM)
+        {
+            var contentView = _viewLocator.Build(dialogVM);
 
-                // Dispatcher.UIThread.MainLoop(source.Token);
-            }
+            var contentHeight = contentView.Height;
+            var contentWidth = contentView.Width;
+
+            _dialogServiceView.Height =
+                (contentHeight > 0 ? contentHeight : DEFAULT_HEIGHT) + DEFAULT_PARENT_WINDOW_MARGIN * 2;
+            _dialogServiceView.Width =
+                (contentWidth > 0 ? contentWidth : DEFAULT_WIDTH) + DEFAULT_PARENT_WINDOW_MARGIN * 2;
+
+            CenterDialogWindow();
+        }
+
+        private void CenterDialogWindow()
+        {
+            _dialogServiceView.Position =
+                new PixelPoint(
+                    Convert.ToInt32(_owner.Position.X + _owner.ClientSize.Width / 2 - _dialogServiceView.Width / 2),
+                    Convert.ToInt32(_owner.Position.Y + _owner.ClientSize.Height / 2 - _dialogServiceView.Height / 2));
         }
     }
 }
