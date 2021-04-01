@@ -1,0 +1,33 @@
+<Styles xmlns='https://github.com/avaloniaui'
+        xmlns:x='http://schemas.microsoft.com/winfx/2006/xaml'>
+
+    <!-- NormalState -->
+    <Style Selector="ToggleSwitch /template/ Border#SwitchKnobBounds">
+        <Setter Property="Background" Value="{DynamicResource RoundedButtonMouseOverBrush}"/>
+    </Style>
+    
+    <Style Selector="ToggleSwitch /template/ Border#OuterBorder">
+        <Setter Property="BorderBrush" Value="{DynamicResource GrayBrush6}"/>
+    </Style>
+
+    <Style Selector="ToggleSwitch /template/ Border#SwitchKnobBounds">
+        <Setter Property="BorderBrush" Value="{DynamicResource GrayBrush6}"/>
+    </Style>
+
+    <Style Selector="ToggleSwitch /template/ Ellipse#SwitchKnobOff">
+        <Setter Property="Fill" Value="{DynamicResource GrayBrush6}"/>
+    </Style>
+    
+    <!-- PointerOverState -->
+    <Style Selector="ToggleSwitch:pointerover /template/ Border#OuterBorder">
+        <Setter Property="BorderBrush" Value="{DynamicResource DefaultForegroundBrush}"/>
+    </Style>
+
+    <Style Selector="ToggleSwitch:pointerover /template/ Border#SwitchKnobBounds">
+        <Setter Property="BorderBrush" Value="{DynamicResource DefaultForegroundBrush}"/>
+    </Style>
+
+    <Style Selector="ToggleSwitch:pointerover /template/ Ellipse#SwitchKnobOff">
+        <Setter Property="Fill" Value="{DynamicResource DefaultForegroundBrush}"/>
+    </Style>
+</Styles>

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Input;
 using Atomex.Blockchain.Abstract;
 using Atomex.Client.Desktop.Common;
@@ -20,13 +21,33 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         protected IAtomexApp App { get; set; }
 
         private List<CurrencyViewModel> _fromCurrencies;
+
         public virtual List<CurrencyViewModel> FromCurrencies
         {
             get => _fromCurrencies;
-            set { _fromCurrencies = value; this.RaisePropertyChanged(nameof(FromCurrencies)); }
+            set
+            {
+                _fromCurrencies = value;
+                this.RaisePropertyChanged(nameof(FromCurrencies));
+            }
+        }
+
+        private int _currencyIndex;
+
+        public int CurrencyIndex
+        {
+            get => _currencyIndex;
+            set
+            {
+                _currencyIndex = value;
+                this.RaisePropertyChanged(nameof(CurrencyIndex));
+
+                Currency = FromCurrencies.ElementAt(_currencyIndex).Currency;
+            }
         }
 
         protected Currency _currency;
+
         public virtual Currency Currency
         {
             get => _currency;
@@ -39,7 +60,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     var sendViewModel = SendViewModelCreator.CreateViewModel(App, value);
                     var sendPageId = SendViewModelCreator.GetSendPageId(value);
 
-                    // DialogViewer.ShowDialog(Dialogs.Send, sendViewModel, defaultPageId: sendPageId);
+                    Desktop.App.DialogService?.Show(sendViewModel);
                     return;
                 }
 
@@ -59,6 +80,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         }
 
         protected CurrencyViewModel _currencyViewModel;
+
         public virtual CurrencyViewModel CurrencyViewModel
         {
             get => _currencyViewModel;
@@ -77,10 +99,11 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         }
 
         protected string _to;
+
         public virtual string To
         {
             get => _to;
-            set 
+            set
             {
                 _to = value;
                 this.RaisePropertyChanged(nameof(To));
@@ -92,24 +115,39 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         protected string FeeCurrencyFormat { get; set; }
 
         private string _baseCurrencyFormat;
+
         public virtual string BaseCurrencyFormat
         {
-            get => _baseCurrencyFormat;
-            set { _baseCurrencyFormat = value; this.RaisePropertyChanged(nameof(BaseCurrencyFormat)); }
+            get
+            {
+                Console.WriteLine(_baseCurrencyFormat);
+                return _baseCurrencyFormat;
+            }
+            set
+            {
+                _baseCurrencyFormat = value;
+                this.RaisePropertyChanged(nameof(BaseCurrencyFormat));
+            }
         }
 
         protected decimal _amount;
+
         public decimal Amount
         {
             get => _amount;
-            set { UpdateAmount(value); }
+            set => UpdateAmount(value);
         }
 
         private bool _isAmountUpdating;
+
         public bool IsAmountUpdating
         {
             get => _isAmountUpdating;
-            set { _isAmountUpdating = value; this.RaisePropertyChanged(nameof(IsAmountUpdating)); }
+            set
+            {
+                _isAmountUpdating = value;
+                this.RaisePropertyChanged(nameof(IsAmountUpdating));
+            }
         }
 
         public string AmountString
@@ -117,39 +155,57 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             get => Amount.ToString(CurrencyFormat, CultureInfo.InvariantCulture);
             set
             {
-                if (!decimal.TryParse(value, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out var amount))
+                if (!decimal.TryParse(value, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture,
+                    out var amount))
+                {
+                    RaisePropertyChangedAsync(nameof(AmountString));
+                    // Task.Run(() => { this.RaisePropertyChanged(nameof(AmountString)); }).Wait();
                     return;
+                }
+
 
                 Amount = amount.TruncateByFormat(CurrencyFormat);
             }
         }
 
         private bool _isFeeUpdating;
+
         public bool IsFeeUpdating
         {
             get => _isFeeUpdating;
-            set { _isFeeUpdating = value; this.RaisePropertyChanged(nameof(IsFeeUpdating)); }
+            set
+            {
+                _isFeeUpdating = value;
+                this.RaisePropertyChanged(nameof(IsFeeUpdating));
+            }
         }
 
         protected decimal _fee;
+
         public decimal Fee
         {
             get => _fee;
-            set { UpdateFee(value); }
+            set => UpdateFee(value);
         }
 
         public virtual string FeeString
         {
             get => Fee.ToString(FeeCurrencyFormat, CultureInfo.InvariantCulture);
-            set {
+            set
+            {
                 if (!decimal.TryParse(value, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out var fee))
+                {
+                    RaisePropertyChangedAsync(nameof(FeeString));
+                    // Task.Run(() => { this.RaisePropertyChanged(nameof(FeeString)); }).Wait();
                     return;
+                }
 
                 Fee = fee.TruncateByFormat(FeeCurrencyFormat);
             }
         }
 
         protected bool _useDefaultFee;
+
         public virtual bool UseDefaultFee
         {
             get => _useDefaultFee;
@@ -164,51 +220,82 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         }
 
         protected decimal _amountInBase;
+
         public decimal AmountInBase
         {
             get => _amountInBase;
-            set { _amountInBase = value; this.RaisePropertyChanged(nameof(AmountInBase)); }
+            set
+            {
+                _amountInBase = value;
+                this.RaisePropertyChanged(nameof(AmountInBase));
+            }
         }
 
         protected decimal _feeInBase;
+
         public decimal FeeInBase
         {
             get => _feeInBase;
-            set { _feeInBase = value; this.RaisePropertyChanged(nameof(FeeInBase)); }
+            set
+            {
+                _feeInBase = value;
+                this.RaisePropertyChanged(nameof(FeeInBase));
+            }
         }
 
         protected string _currencyCode;
+
         public string CurrencyCode
         {
             get => _currencyCode;
-            set { _currencyCode = value; this.RaisePropertyChanged(nameof(CurrencyCode)); }
+            set
+            {
+                _currencyCode = value;
+                this.RaisePropertyChanged(nameof(CurrencyCode));
+            }
         }
 
         protected string _feeCurrencyCode;
+
         public string FeeCurrencyCode
         {
             get => _feeCurrencyCode;
-            set { _feeCurrencyCode = value; this.RaisePropertyChanged(nameof(FeeCurrencyCode)); }
+            set
+            {
+                _feeCurrencyCode = value;
+                this.RaisePropertyChanged(nameof(FeeCurrencyCode));
+            }
         }
 
         protected string _baseCurrencyCode;
+
         public string BaseCurrencyCode
         {
             get => _baseCurrencyCode;
-            set { _baseCurrencyCode = value; this.RaisePropertyChanged(nameof(BaseCurrencyCode)); }
+            set
+            {
+                _baseCurrencyCode = value;
+                this.RaisePropertyChanged(nameof(BaseCurrencyCode));
+            }
         }
 
         protected string _warning;
+
         public string Warning
         {
             get => _warning;
-            set { _warning = value; this.RaisePropertyChanged(nameof(Warning)); }
+            set
+            {
+                _warning = value;
+                this.RaisePropertyChanged(nameof(Warning));
+            }
         }
 
         private ICommand _backCommand;
+
         public ICommand BackCommand => _backCommand ??= (_backCommand = ReactiveCommand.Create(() =>
         {
-            // DialogViewer.HideDialog(Dialogs.Send);
+            Desktop.App.DialogService?.CloseDialog();
         }));
 
         private ICommand _nextCommand;
@@ -291,14 +378,16 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 .Select(CurrencyViewModelCreator.CreateViewModel)
                 .ToList();
 
-            Currency = FromCurrencies
-                .FirstOrDefault(c => c.Currency.Name == currency.Name)
-                .Currency;
+            var CurrencyVM = FromCurrencies
+                .FirstOrDefault(c => c.Currency.Name == currency.Name);
+
+            CurrencyIndex = FromCurrencies.IndexOf(CurrencyVM);
 
             UseDefaultFee = true; // use default fee by default
 
             SubscribeToServices();
         }
+
         private void SubscribeToServices()
         {
             if (App.HasQuotesProvider)
@@ -313,7 +402,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             IsAmountUpdating = true;
 
             Warning = string.Empty;
-            
+
             _amount = amount;
 
             try
@@ -333,12 +422,14 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     }
 
                     var estimatedFeeAmount = _amount != 0
-                        ? await App.Account.EstimateFeeAsync(Currency.Name, To, _amount, BlockchainTransactionType.Output)
+                        ? await App.Account.EstimateFeeAsync(Currency.Name, To, _amount,
+                            BlockchainTransactionType.Output)
                         : 0;
 
                     this.RaisePropertyChanged(nameof(AmountString));
 
-                    _fee = Currency.GetFeeFromFeeAmount(estimatedFeeAmount ?? Currency.GetDefaultFee(), defaultFeePrice);
+                    _fee = Currency.GetFeeFromFeeAmount(estimatedFeeAmount ?? Currency.GetDefaultFee(),
+                        defaultFeePrice);
                     this.RaisePropertyChanged(nameof(FeeString));
                 }
                 else
@@ -369,6 +460,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             finally
             {
                 IsAmountUpdating = false;
+                this.RaisePropertyChanged(nameof(AmountString));
             }
         }
 
@@ -398,7 +490,8 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 if (!UseDefaultFee)
                 {
                     var estimatedFeeAmount = _amount != 0
-                        ? await App.Account.EstimateFeeAsync(Currency.Name, To, _amount, BlockchainTransactionType.Output)
+                        ? await App.Account.EstimateFeeAsync(Currency.Name, To, _amount,
+                            BlockchainTransactionType.Output)
                         : 0;
 
                     var (maxAmount, maxFeeAmount, _) = await App.Account
@@ -480,7 +573,8 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                         _amount = availableAmount - feeAmount;
 
                         var estimatedFeeAmount = _amount != 0
-                            ? await App.Account.EstimateFeeAsync(Currency.Name, To, _amount, BlockchainTransactionType.Output)
+                            ? await App.Account.EstimateFeeAsync(Currency.Name, To, _amount,
+                                BlockchainTransactionType.Output)
                             : 0;
 
                         if (estimatedFeeAmount == null || feeAmount < estimatedFeeAmount.Value)

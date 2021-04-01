@@ -30,11 +30,16 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                         conversionViewModel: conversionViewModel,
                         currency: currency);
                 case Tezos _:
-                    return new TezosWalletViewModel(
+                    return new WalletViewModel(
                         app: app,
                         menuSelector: menuSelector,
                         conversionViewModel: conversionViewModel,
                         currency: currency);
+                //     return new TezosWalletViewModel(
+                //         app: app,
+                //         menuSelector: menuSelector,
+                //         conversionViewModel: conversionViewModel,
+                //         currency: currency);
                 default:
                     throw new NotSupportedException($"Can't create wallet view model for {currency.Name}. This currency is not supported.");
 

@@ -21,6 +21,7 @@ namespace Atomex.Client.Desktop.Services
         private DialogServiceViewModel _dialogServiceViewModel;
         private TView _dialogServiceView;
         private ViewLocator _viewLocator;
+        private ViewModelBase lastDialog;
 
         private double DEFAULT_WIDTH = 630;
         private double DEFAULT_HEIGHT = 400;
@@ -54,10 +55,15 @@ namespace Atomex.Client.Desktop.Services
 
         public void CloseDialog()
         {
-            _dialogServiceView.Close();
-
-            IsDialogOpened = false;
-            BuildDialogServiceView();
+            if (IsDialogOpened)
+            {
+                Dispatcher.UIThread.InvokeAsync(() =>
+                {
+                    _dialogServiceView.Close();
+                    IsDialogOpened = false;
+                    BuildDialogServiceView();
+                });
+            }
         }
 
         public void Show(ViewModelBase viewModel)

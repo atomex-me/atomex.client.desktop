@@ -1,7 +1,7 @@
 ﻿<Styles xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-
-    <Style Selector="Control.BaseDisabledStyle[IsEnabled=False]">
+    
+    <Style Selector=":is(Control).BaseDisabledStyle[IsEnabled=False]">
         <Setter Property="Opacity" Value="0.5" />
     </Style>
     

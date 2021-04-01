@@ -81,6 +81,9 @@
     <SolidColorBrush x:Key="DefaultMenuItemMouseOverBrush" Color="{DynamicResource DefaultMenuItemMouseOverColor}" />
 
     <x:Int32 x:Key="DefaultTooltipFontSize">12</x:Int32>
+    <!-- <x:Int32 x:Key="CurrencyCodeFontSize">12</x:Int32> -->
+    <!-- <x:Int32 x:Key="BaseCurrencyCodeFontSize">10</x:Int32> -->
+    <!-- <x:Int32 x:Key="AmountInBaseFontSize">15</x:Int32> -->
 
     <!-- Main View -->
 
@@ -164,6 +167,7 @@
     <SolidColorBrush x:Key="CustomTextBoxForegroundBrush" Color="{DynamicResource DefaultTextBoxForegroundColor}" />
     <SolidColorBrush x:Key="CustomTextBoxBorderBrush" Color="{DynamicResource DefaultTextBoxBackgroundColor}" />
     <SolidColorBrush x:Key="CustomTextBoxCaretBrush" Color="#1388ba" />
+    
 
     <!-- Custom ComboBox -->
 

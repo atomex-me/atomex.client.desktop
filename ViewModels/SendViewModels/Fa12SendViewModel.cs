@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Globalization;
+using System.Threading.Tasks;
 using Atomex.Blockchain.Abstract;
 using Atomex.Client.Desktop.Controls;
 using Atomex.Client.Desktop.Properties;
@@ -57,7 +58,8 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     if (_amount > maxAmount)
                     {
                         if (_amount <= availableAmount)
-                            Warning = string.Format(CultureInfo.InvariantCulture, Resources.CvInsufficientChainFunds, Currency.FeeCurrencyName);
+                            Warning = string.Format(CultureInfo.InvariantCulture, Resources.CvInsufficientChainFunds,
+                                Currency.FeeCurrencyName);
                         else
                             Warning = Resources.CvInsufficientFunds;
 
@@ -66,15 +68,18 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     }
 
                     var estimatedFeeAmount = _amount != 0
-                        ? await App.Account.EstimateFeeAsync(Currency.Name, To, _amount, BlockchainTransactionType.Output)
+                        ? await App.Account.EstimateFeeAsync(Currency.Name, To, _amount,
+                            BlockchainTransactionType.Output)
                         : 0;
-
-                    this.RaisePropertyChanged(nameof(AmountString));
+                    
+                    RaisePropertyChangedAsync(nameof(AmountString));
 
                     var defaultFeePrice = await Currency.GetDefaultFeePriceAsync();
 
-                    _fee = Currency.GetFeeFromFeeAmount(estimatedFeeAmount ?? Currency.GetDefaultFee(), defaultFeePrice);
-                    this.RaisePropertyChanged(nameof(FeeString));
+                    _fee = Currency.GetFeeFromFeeAmount(estimatedFeeAmount ?? Currency.GetDefaultFee(),
+                        defaultFeePrice);
+                    
+                    RaisePropertyChangedAsync(nameof(FeeString));
                 }
                 else
                 {
@@ -84,7 +89,8 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     if (_amount > maxAmount)
                     {
                         if (_amount <= availableAmount)
-                            Warning = string.Format(CultureInfo.InvariantCulture, Resources.CvInsufficientChainFunds, Currency.FeeCurrencyName);
+                            Warning = string.Format(CultureInfo.InvariantCulture, Resources.CvInsufficientChainFunds,
+                                Currency.FeeCurrencyName);
                         else
                             Warning = Resources.CvInsufficientFunds;
 
@@ -92,7 +98,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                         return;
                     }
 
-                    this.RaisePropertyChanged(nameof(AmountString));
+                    RaisePropertyChangedAsync(nameof(AmountString));
 
                     Fee = _fee;
                 }
@@ -102,6 +108,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             finally
             {
                 IsAmountUpdating = false;
+                // Task.Run(() => { this.RaisePropertyChanged(nameof(AmountString)); }).Wait();
             }
         }
 
@@ -133,20 +140,23 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     var availableAmount = CurrencyViewModel.AvailableAmount;
 
                     var (maxAmount, maxAvailableFee, _) = await App.Account
-                        .EstimateMaxAmountToSendAsync(Currency.Name, To, BlockchainTransactionType.Output, decimal.MaxValue, 0, false);
+                        .EstimateMaxAmountToSendAsync(Currency.Name, To, BlockchainTransactionType.Output,
+                            decimal.MaxValue, 0, false);
 
                     var defaultFeePrice = await Currency.GetDefaultFeePriceAsync();
 
                     var feeAmount = Currency.GetFeeAmount(_fee, defaultFeePrice);
 
                     var estimatedFeeAmount = _amount != 0
-                        ? await App.Account.EstimateFeeAsync(Currency.Name, To, _amount, BlockchainTransactionType.Output)
+                        ? await App.Account.EstimateFeeAsync(Currency.Name, To, _amount,
+                            BlockchainTransactionType.Output)
                         : 0;
 
                     if (_amount > maxAmount)
                     {
                         if (_amount <= availableAmount)
-                            Warning = string.Format(CultureInfo.InvariantCulture, Resources.CvInsufficientChainFunds, Currency.FeeCurrencyName);
+                            Warning = string.Format(CultureInfo.InvariantCulture, Resources.CvInsufficientChainFunds,
+                                Currency.FeeCurrencyName);
                         else
                             Warning = Resources.CvInsufficientFunds;
 
@@ -158,9 +168,10 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     }
 
                     if (feeAmount > maxAvailableFee)
-                        Warning = string.Format(CultureInfo.InvariantCulture, Resources.CvInsufficientChainFunds, Currency.FeeCurrencyName);
+                        Warning = string.Format(CultureInfo.InvariantCulture, Resources.CvInsufficientChainFunds,
+                            Currency.FeeCurrencyName);
 
-                    this.RaisePropertyChanged(nameof(FeeString));
+                    RaisePropertyChangedAsync(nameof(FeeString));
                 }
 
                 OnQuotesUpdatedEventHandler(App.QuotesProvider, EventArgs.Empty);
@@ -168,6 +179,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             finally
             {
                 IsFeeUpdating = false;
+                // Task.Run(() => { this.RaisePropertyChanged(nameof(FeeString)); }).Wait();
             }
         }
 
@@ -197,12 +209,13 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     if (maxAmount > 0)
                         _amount = maxAmount;
                     else
-                        Warning = string.Format(CultureInfo.InvariantCulture, Resources.CvInsufficientChainFunds, Currency.FeeCurrencyName);
+                        Warning = string.Format(CultureInfo.InvariantCulture, Resources.CvInsufficientChainFunds,
+                            Currency.FeeCurrencyName);
 
-                    this.RaisePropertyChanged(nameof(AmountString));
+                    RaisePropertyChangedAsync(nameof(AmountString));
 
                     _fee = Currency.GetFeeFromFeeAmount(maxFeeAmount, defaultFeePrice);
-                    this.RaisePropertyChanged(nameof(FeeString));
+                    RaisePropertyChangedAsync(nameof(FeeString));
                 }
                 else
                 {
@@ -217,7 +230,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                         if (_fee == 0)
                         {
                             _amount = 0;
-                            this.RaisePropertyChanged(nameof(AmountString));
+                            RaisePropertyChangedAsync(nameof(AmountString));
                             return;
                         }
                     }
@@ -225,14 +238,16 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     _amount = maxAmount;
 
                     var (_, maxAvailableFee, _) = await App.Account
-                        .EstimateMaxAmountToSendAsync(Currency.Name, To, BlockchainTransactionType.Output, decimal.MaxValue, 0, false);
+                        .EstimateMaxAmountToSendAsync(Currency.Name, To, BlockchainTransactionType.Output,
+                            decimal.MaxValue, 0, false);
 
                     if (maxAmount < availableAmount || feeAmount > maxAvailableFee)
-                        Warning = string.Format(CultureInfo.InvariantCulture, Resources.CvInsufficientChainFunds, Currency.FeeCurrencyName);
+                        Warning = string.Format(CultureInfo.InvariantCulture, Resources.CvInsufficientChainFunds,
+                            Currency.FeeCurrencyName);
 
-                    this.RaisePropertyChanged(nameof(AmountString));
+                    RaisePropertyChangedAsync(nameof(AmountString));
 
-                    this.RaisePropertyChanged(nameof(FeeString));
+                    RaisePropertyChangedAsync(nameof(FeeString));
                 }
 
                 OnQuotesUpdatedEventHandler(App.QuotesProvider, EventArgs.Empty);
@@ -240,6 +255,11 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             finally
             {
                 IsAmountUpdating = false;
+                // Task.Run(() =>
+                // {
+                //     this.RaisePropertyChanged(nameof(AmountString));
+                //     this.RaisePropertyChanged(nameof(FeeString));
+                // }).Wait();
             }
         }
 

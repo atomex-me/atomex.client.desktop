@@ -1,0 +1,213 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:helpers="clr-namespace:Atomex.Client.Desktop.Helpers">
+
+    <Style Selector="TextBox.AmountTextBox">
+        <Setter Property="helpers:AmountTextBoxHelper.CurrencyCodeFontSize" Value="12" />
+        <!-- <Setter Property="helpers:AmountTextBoxHelper.BaseCurrencyCodeFontSize" Value="10" /> -->
+        <!-- <Setter Property="helpers:AmountTextBoxHelper.AmountInBaseFontSize" Value="15" /> -->
+        <Setter Property="CaretBrush" Value="{DynamicResource DefaultTextBoxCuretBrush}" />
+        <!-- <Setter Property="Template"> -->
+        <!--     <Setter.Value> -->
+        <!--         <ControlTemplate> -->
+        <!--             ~1~ <ControlTemplate.Resources> @1@ -->
+        <!--             ~1~     <Storyboard x:Key="EnterGotFocus"> @1@ -->
+        <!--             ~1~         <DoubleAnimation Storyboard.TargetName="PART_PlaceHolder" @1@ -->
+        <!--             ~1~                          Storyboard.TargetProperty="Opacity" @1@ -->
+        <!--             ~1~                          From=".7" @1@ -->
+        <!--             ~1~                          To=".4" @1@ -->
+        <!--             ~1~                          Duration="0:0:0.2"/> @1@ -->
+        <!--             ~1~     </Storyboard> @1@ -->
+        <!--             ~1~     <Storyboard x:Key="ExitGotFocus"> @1@ -->
+        <!--             ~1~         <DoubleAnimation Storyboard.TargetName="PART_PlaceHolder" @1@ -->
+        <!--             ~1~                          Storyboard.TargetProperty="Opacity" @1@ -->
+        <!--             ~1~                          From=".4" @1@ -->
+        <!--             ~1~                          To=".7" @1@ -->
+        <!--             ~1~                          Duration="0:0:0.2"/> @1@ -->
+        <!--             ~1~     </Storyboard> @1@ -->
+        <!--             ~1~ </ControlTemplate.Resources> @1@ -->
+        <!--             <Grid> -->
+        <!--                 <Border x:Name="PART_Border" -->
+        <!--                         Background="{TemplateBinding Background}" -->
+        <!--                         BorderBrush="{TemplateBinding BorderBrush}" -->
+        <!--                         BorderThickness="{TemplateBinding BorderThickness}" -->
+        <!--                         CornerRadius="{TemplateBinding helpers:TextBoxHelper.CornerRadius}" /> -->
+        <!-- -->
+        <!--                 <Grid x:Name="PART_InnerGrid"> -->
+        <!--                     <Grid.ColumnDefinitions> -->
+        <!--                         <ColumnDefinition Width="Auto" /> -->
+        <!--                         <ColumnDefinition Width="*" /> -->
+        <!--                         <ColumnDefinition Width="Auto" /> -->
+        <!--                         <ColumnDefinition Width="Auto" /> -->
+        <!--                     </Grid.ColumnDefinitions> -->
+        <!-- -->
+        <!--                     <ContentPresenter x:Name="PART_Icon" -->
+        <!--                                       Grid.Column="0" -->
+        <!--                                       Margin="10 0 -7 0" -->
+        <!--                                       HorizontalAlignment="Left" -->
+        <!--                                       VerticalAlignment="Center" -->
+        <!--                                       Content="{TemplateBinding helpers:TextBoxHelper.Icon}" -->
+        <!--                                       IsVisible="True" /> -->
+        <!-- -->
+        <!--                     <Grid Grid.Column="1" -->
+        <!--                           VerticalAlignment="Center"> -->
+        <!--                         <StackPanel Orientation="Horizontal" -->
+        <!--                                     VerticalAlignment="Center" -->
+        <!--                                     Margin="12 5 2 5"> -->
+        <!-- -->
+        <!--                             ~1~ IsTabStop="False" @1@ -->
+        <!--                             <ScrollViewer x:Name="PART_ContentHost" -->
+        <!--                                           VerticalAlignment="Center" -->
+        <!--                                           HorizontalAlignment="Left" -->
+        <!--                                           BorderThickness="0" /> -->
+        <!--                             <TextBlock x:Name="CurrencyCode" -->
+        <!--                                        HorizontalAlignment="Left" -->
+        <!--                                        VerticalAlignment="Bottom" -->
+        <!--                                        Margin="2 0 0 2" -->
+        <!--                                        Foreground="{TemplateBinding Foreground}" -->
+        <!--                                        Text="{TemplateBinding helpers:AmountTextBoxHelper.CurrencyCode}" -->
+        <!--                                        FontSize="{TemplateBinding helpers:AmountTextBoxHelper.CurrencyCodeFontSize}" -->
+        <!--                                        IsVisible="True" /> -->
+        <!--                         </StackPanel> -->
+        <!--                     </Grid> -->
+        <!-- -->
+        <!--                     <Grid x:Name="BaseCurrencyInfo" -->
+        <!--                           Grid.Column="2" -->
+        <!--                           IsVisible="True"> -->
+        <!--                         <StackPanel Orientation="Horizontal" -->
+        <!--                                     VerticalAlignment="Center"> -->
+        <!--                             <TextBlock HorizontalAlignment="Right" -->
+        <!--                                        VerticalAlignment="Center" -->
+        <!--                                        Foreground="{DynamicResource DefaultAmountInBaseForegroundBrush}" -->
+        <!--                                        Text="{TemplateBinding helpers:AmountTextBoxHelper.AmountInBase}" -->
+        <!--                                        FontSize="{TemplateBinding helpers:AmountTextBoxHelper.AmountInBaseFontSize}" /> -->
+        <!--                             <TextBlock HorizontalAlignment="Right" -->
+        <!--                                        VerticalAlignment="Bottom" -->
+        <!--                                        Margin="3 0 10 2" -->
+        <!--                                        Foreground="{DynamicResource DefaultAmountInBaseForegroundBrush}" -->
+        <!--                                        Text="{TemplateBinding helpers:AmountTextBoxHelper.BaseCurrencyCode}" -->
+        <!--                                        FontSize="{TemplateBinding helpers:AmountTextBoxHelper.BaseCurrencyCodeFontSize}" /> -->
+        <!--                         </StackPanel> -->
+        <!--                     </Grid> -->
+        <!-- -->
+        <!--                     ~1~ Visibility: collapsed @1@ -->
+        <!--                     <TextBlock x:Name="PART_PlaceHolder" -->
+        <!--                                Grid.Column="1" -->
+        <!--                                VerticalAlignment="{TemplateBinding VerticalContentAlignment}" -->
+        <!--                                HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" -->
+        <!--                                Margin="14 2 2 2" -->
+        <!--                                Padding="{TemplateBinding Padding}" -->
+        <!--                                Text="{TemplateBinding Watermark}" -->
+        <!--                                FontSize="{TemplateBinding FontSize}" -->
+        <!--                                Opacity=".7" /> -->
+        <!--                 </Grid> -->
+        <!--             </Grid> -->
+        <!--             ~1~ <ControlTemplate.Triggers> @1@ -->
+        <!--             ~1~     <DataTrigger Binding="{Binding Text, RelativeSource={RelativeSource Self}}" Value=""> @1@ -->
+        <!--             ~1~         <Setter TargetName="PART_PlaceHolder" Property="Visibility" Value="Visible"/> @1@ -->
+        <!--             ~1~         <Setter TargetName="CurrencyCode" Property="Visibility" Value="Collapsed"/> @1@ -->
+        <!--             ~1~         <Setter TargetName="BaseCurrencyInfo" Property="Visibility" Value="Collapsed"/> @1@ -->
+        <!--             ~1~     </DataTrigger> @1@ -->
+        <!--             ~1~     <Trigger Property="IsMouseOver" Value="True"> @1@ -->
+        <!--             ~1~         <Setter TargetName="PART_Border" @1@ -->
+        <!--             ~1~                 Property="BorderBrush" @1@ -->
+        <!--             ~1~                 Value="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(helpers:TextBoxHelper.MouseOverBorderBrush)}"/> @1@ -->
+        <!--             ~1~     </Trigger> @1@ -->
+        <!--             ~1~     <Trigger Property="IsFocused" Value="True"> @1@ -->
+        <!--             ~1~         <Setter TargetName="PART_Border" @1@ -->
+        <!--             ~1~                 Property="BorderBrush" @1@ -->
+        <!--             ~1~                 Value="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(helpers:TextBoxHelper.FocusBorderBrush)}" /> @1@ -->
+        <!--             ~1~         <Trigger.EnterActions> @1@ -->
+        <!--             ~1~             <BeginStoryboard Storyboard="{StaticResource EnterGotFocus}" /> @1@ -->
+        <!--             ~1~         </Trigger.EnterActions> @1@ -->
+        <!--             ~1~         <Trigger.ExitActions> @1@ -->
+        <!--             ~1~             <BeginStoryboard Storyboard="{StaticResource ExitGotFocus}" /> @1@ -->
+        <!--             ~1~         </Trigger.ExitActions> @1@ -->
+        <!--             ~1~     </Trigger> @1@ -->
+        <!--             ~1~ </ControlTemplate.Triggers> @1@ -->
+        <!--         </ControlTemplate> -->
+        <!--     </Setter.Value> -->
+        <!-- </Setter> -->
+    </Style>
+    <Style Selector="TextBox.AmountTextBox">
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Border Name="border"
+                        Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}">
+                    <DockPanel Margin="{TemplateBinding Padding}"
+                               HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                               VerticalAlignment="{TemplateBinding VerticalContentAlignment}">
+
+                        <TextBlock Name="floatingWatermark"
+                                   Foreground="{DynamicResource ThemeAccentBrush}"
+                                   FontSize="{DynamicResource FontSizeSmall}"
+                                   Text="{TemplateBinding Watermark}"
+                                   DockPanel.Dock="Top">
+                            <TextBlock.IsVisible>
+                                <MultiBinding Converter="{x:Static BoolConverters.And}">
+                                    <Binding RelativeSource="{RelativeSource TemplatedParent}"
+                                             Path="UseFloatingWatermark" />
+                                    <Binding RelativeSource="{RelativeSource TemplatedParent}"
+                                             Path="Text"
+                                             Converter="{x:Static StringConverters.IsNotNullOrEmpty}" />
+                                </MultiBinding>
+                            </TextBlock.IsVisible>
+                        </TextBlock>
+
+                        <DataValidationErrors>
+
+                            <Grid ColumnDefinitions="Auto,*,Auto">
+                                <ContentPresenter Grid.Column="0" Grid.ColumnSpan="1"
+                                                  Content="{TemplateBinding InnerLeftContent}" />
+                                <ScrollViewer Grid.Column="1" Grid.ColumnSpan="1"
+                                              HorizontalScrollBarVisibility="{TemplateBinding (ScrollViewer.HorizontalScrollBarVisibility)}"
+                                              VerticalScrollBarVisibility="{TemplateBinding (ScrollViewer.VerticalScrollBarVisibility)}">
+                                    <Panel>
+                                        <TextBlock Name="watermark"
+                                                   Opacity="0.5"
+                                                   Text="{TemplateBinding Watermark}"
+                                                   TextAlignment="{TemplateBinding TextAlignment}"
+                                                   TextWrapping="{TemplateBinding TextWrapping}"
+                                                   IsVisible="{TemplateBinding Text, Converter={x:Static StringConverters.IsNullOrEmpty}}" />
+                                        <TextPresenter Name="PART_TextPresenter"
+                                                       Text="{TemplateBinding Text, Mode=TwoWay}"
+                                                       CaretIndex="{TemplateBinding CaretIndex}"
+                                                       SelectionStart="{TemplateBinding SelectionStart}"
+                                                       SelectionEnd="{TemplateBinding SelectionEnd}"
+                                                       TextAlignment="{TemplateBinding TextAlignment}"
+                                                       TextWrapping="{TemplateBinding TextWrapping}"
+                                                       PasswordChar="{TemplateBinding PasswordChar}"
+                                                       RevealPassword="{TemplateBinding RevealPassword}"
+                                                       SelectionBrush="{TemplateBinding SelectionBrush}"
+                                                       SelectionForegroundBrush="{TemplateBinding SelectionForegroundBrush}"
+                                                       CaretBrush="{TemplateBinding CaretBrush}" />
+                                    </Panel>
+                                </ScrollViewer>
+                                <ContentPresenter Grid.Column="2" Grid.ColumnSpan="1">
+                                    <ContentPresenter.Content>
+                                        <StackPanel Orientation="Horizontal"
+                                                    VerticalAlignment="Center">
+                                            <TextBlock HorizontalAlignment="Right"
+                                                       VerticalAlignment="Center"
+                                                       Foreground="{DynamicResource DefaultAmountInBaseForegroundBrush}"
+                                                       Text="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type TextBox}}, Path=(helpers:AmountTextBoxHelper.AmountInBase)}"
+                                                       FontSize="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type TextBox}}, Path=(helpers:AmountTextBoxHelper.AmountInBaseFontSize)}"/>
+                                            <TextBlock HorizontalAlignment="Right"
+                                                       VerticalAlignment="Bottom"
+                                                       Margin="3 4 10 2"
+                                                       Foreground="{DynamicResource DefaultAmountInBaseForegroundBrush}"
+                                                       Text="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type TextBox}}, Path=(helpers:AmountTextBoxHelper.BaseCurrencyCode)}"
+                                                       FontSize="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type TextBox}}, Path=(helpers:AmountTextBoxHelper.BaseCurrencyCodeFontSize)}" />
+                                        </StackPanel>
+                                    </ContentPresenter.Content>
+                                </ContentPresenter>
+                            </Grid>
+                        </DataValidationErrors>
+                    </DockPanel>
+                </Border>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+</Styles>

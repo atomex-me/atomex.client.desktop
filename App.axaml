@@ -31,6 +31,7 @@
         <StyleInclude Source="/Styles/LinkButtonStyle.axaml" />
         <StyleInclude Source="/Styles/CustomComboBoxStyle.axaml" />
         <StyleInclude Source="/Styles/CustomTextBoxStyle.axaml" />
+        <StyleInclude Source="/Styles/AmountTextBoxStyle.axaml" />
         <StyleInclude Source="/Styles/PasswordTextBoxStyle.axaml" />
         <StyleInclude Source="/Styles/TabControl.axaml" />
         <!-- <StyleInclude Source="/Styles/WalletTabControlStyle.axaml" /> -->
@@ -39,5 +40,6 @@
         <StyleInclude Source="/Styles/CustomDataGridStyle.axaml" />
         <StyleInclude Source="/Styles/WalletViewStyle.axaml" />
         <StyleInclude Source="/Styles/CurrencyComboBoxStyle.axaml" />
+        <StyleInclude Source="/Styles/ToggleSwitchStyle.axaml" />
     </Application.Styles>
 </Application>
