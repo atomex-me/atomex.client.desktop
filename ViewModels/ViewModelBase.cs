@@ -9,20 +9,17 @@ namespace Atomex.Client.Desktop.ViewModels
 {
     public class ViewModelBase : ReactiveObject
     {
-        private string[] AsyncProperties = new[]
+        private readonly string[] _asyncProperties =
         {
             "AmountString",
-            "FeeString"
+            "FeeString",
+            "FeePriceString",
+            "GasString"
         };
-        
-        // public void RaisePropertyChangedAsync(string name)
-        // {
-        //     Task.Run(() => { this.RaisePropertyChanged(name); }).Wait();
-        // }
 
-        public void OnPropertyChanged(string name)
+        protected void OnPropertyChanged(string name)
         {
-            if (AsyncProperties.IndexOf(name) >= 0)
+            if (_asyncProperties.IndexOf(name) >= 0)
             {
                 Task.Run(() => { this.RaisePropertyChanged(name); }).Wait();
                 return;

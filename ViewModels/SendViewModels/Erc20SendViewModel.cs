@@ -19,30 +19,27 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             {
                 if (_currency != null && _currency != value)
                 {
-                    // DialogViewer.HideDialog(Dialogs.Send);
-
                     var sendViewModel = SendViewModelCreator.CreateViewModel(App, value);
-                    var sendPageId = SendViewModelCreator.GetSendPageId(value);
 
-                    // DialogViewer.ShowDialog(Dialogs.Send, sendViewModel, defaultPageId: sendPageId);
+                    Desktop.App.DialogService?.Show(sendViewModel);
                     return;
                 }
 
                 _currency = value;
-                this.RaisePropertyChanged(nameof(Currency));
+                OnPropertyChanged(nameof(Currency));
 
                 CurrencyViewModel = FromCurrencies.FirstOrDefault(c => c.Currency.Name == Currency.Name);
 
                 _amount = 0;
-                this.RaisePropertyChanged(nameof(AmountString));
+                OnPropertyChanged(nameof(AmountString));
 
                 _fee = 0;
-                this.RaisePropertyChanged(nameof(FeeString));
+                OnPropertyChanged(nameof(FeeString));
 
                 _feePrice = 0;
-                this.RaisePropertyChanged(nameof(FeePriceString));
+                OnPropertyChanged(nameof(FeePriceString));
 
-                this.RaisePropertyChanged(nameof(TotalFeeString));
+                OnPropertyChanged(nameof(TotalFeeString));
 
                 FeePriceFormat = _currency.FeePriceFormat;
                 FeePriceCode = _currency.FeePriceCode;
@@ -79,7 +76,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 Warning = string.Empty;
 
                 _useDefaultFee = value;
-                this.RaisePropertyChanged(nameof(UseDefaultFee));
+                OnPropertyChanged(nameof(UseDefaultFee));
 
                 Amount = _amount; // recalculate amount
             }
@@ -105,10 +102,10 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                         .EstimateMaxAmountToSendAsync(Currency.Name, To, BlockchainTransactionType.Output, 0, 0, false);
 
                     _fee = Currency.GetDefaultFee();
-                    this.RaisePropertyChanged(nameof(GasString));
+                    OnPropertyChanged(nameof(GasString));
 
                     _feePrice = await Currency.GetDefaultFeePriceAsync();
-                    this.RaisePropertyChanged(nameof(FeePriceString));
+                    OnPropertyChanged(nameof(FeePriceString));
 
                     if (_amount > maxAmount)
                     {
@@ -121,10 +118,10 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                         return;
                     }
 
-                    this.RaisePropertyChanged(nameof(AmountString));
+                    OnPropertyChanged(nameof(AmountString));
 
                     UpdateTotalFeeString();
-                    this.RaisePropertyChanged(nameof(TotalFeeString));
+                    OnPropertyChanged(nameof(TotalFeeString));
                 }
                 else
                 {
@@ -142,7 +139,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                         return;
                     }
 
-                    this.RaisePropertyChanged(nameof(AmountString));
+                    OnPropertyChanged(nameof(AmountString));
 
                     if (_fee < Currency.GetDefaultFee() || _feePrice == 0)
                         Warning = Resources.CvLowFees;
@@ -180,7 +177,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 {
                     Warning = Resources.CvLowFees;
                     UpdateTotalFeeString();
-                    this.RaisePropertyChanged(nameof(TotalFeeString));
+                    OnPropertyChanged(nameof(TotalFeeString));
                     return;
                 }
 
@@ -200,10 +197,10 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                         return;
                     }
 
-                    this.RaisePropertyChanged(nameof(FeePriceString));
+                    OnPropertyChanged(nameof(FeePriceString));
 
                     UpdateTotalFeeString();
-                    this.RaisePropertyChanged(nameof(TotalFeeString));
+                    OnPropertyChanged(nameof(TotalFeeString));
                 }
 
                 OnQuotesUpdatedEventHandler(App.QuotesProvider, EventArgs.Empty);
@@ -240,7 +237,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     if (fee == 0)
                     {
                         UpdateTotalFeeString();
-                        this.RaisePropertyChanged(nameof(TotalFeeString));
+                        OnPropertyChanged(nameof(TotalFeeString));
                         return;
                     }
                 }
@@ -261,10 +258,10 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                         return;
                     }
 
-                    this.RaisePropertyChanged(nameof(FeePriceString));
+                    OnPropertyChanged(nameof(FeePriceString));
 
                     UpdateTotalFeeString();
-                    this.RaisePropertyChanged(nameof(TotalFeeString));
+                    OnPropertyChanged(nameof(TotalFeeString));
                 }
 
                 OnQuotesUpdatedEventHandler(App.QuotesProvider, EventArgs.Empty);
@@ -301,16 +298,16 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     else if(CurrencyViewModel.AvailableAmount > 0)
                         Warning = string.Format(CultureInfo.InvariantCulture, Resources.CvInsufficientChainFunds, Currency.FeeCurrencyName);
 
-                    this.RaisePropertyChanged(nameof(AmountString));
+                    OnPropertyChanged(nameof(AmountString));
 
                     _fee = Currency.GetDefaultFee();
-                    this.RaisePropertyChanged(nameof(GasString));
+                    OnPropertyChanged(nameof(GasString));
 
                     _feePrice = await Currency.GetDefaultFeePriceAsync();
-                    this.RaisePropertyChanged(nameof(FeePriceString));
+                    OnPropertyChanged(nameof(FeePriceString));
 
                     UpdateTotalFeeString(maxFeeAmount);
-                    this.RaisePropertyChanged(nameof(TotalFeeString));
+                    OnPropertyChanged(nameof(TotalFeeString));
                 }
                 else
                 {
@@ -320,7 +317,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                         if (_fee == 0 || _feePrice == 0)
                         {
                             _amount = 0;
-                            this.RaisePropertyChanged(nameof(AmountString));
+                            OnPropertyChanged(nameof(AmountString));
                             return;
                         }
                     }
@@ -333,10 +330,10 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     if (maxAmount < availableAmount)
                         Warning = string.Format(CultureInfo.InvariantCulture, Resources.CvInsufficientChainFunds, Currency.FeeCurrencyName);
 
-                    this.RaisePropertyChanged(nameof(AmountString));
+                    OnPropertyChanged(nameof(AmountString));
 
                     UpdateTotalFeeString(maxFeeAmount);
-                    this.RaisePropertyChanged(nameof(TotalFeeString));
+                    OnPropertyChanged(nameof(TotalFeeString));
                 }
 
                 OnQuotesUpdatedEventHandler(App.QuotesProvider, EventArgs.Empty);

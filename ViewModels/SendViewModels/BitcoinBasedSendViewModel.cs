@@ -18,7 +18,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         public decimal FeeRate
         {
             get => _feeRate;
-            set { _feeRate = value; this.RaisePropertyChanged(nameof(FeeRate)); }
+            set { _feeRate = value; OnPropertyChanged(nameof(FeeRate)); }
         }
 
         private BitcoinBasedCurrency BtcBased => Currency as BitcoinBasedCurrency;
@@ -64,10 +64,10 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                         ? await App.Account.EstimateFeeAsync(Currency.Name, To, _amount, BlockchainTransactionType.Output)
                         : 0;
 
-                    this.RaisePropertyChanged(nameof(AmountString));
+                    OnPropertyChanged(nameof(AmountString));
 
                     _fee = estimatedFeeAmount ?? Currency.GetDefaultFee();
-                    this.RaisePropertyChanged(nameof(FeeString));
+                    OnPropertyChanged(nameof(FeeString));
 
                     FeeRate = await BtcBased.GetFeeRateAsync();
                 }
@@ -82,7 +82,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                         return;
                     }
 
-                    this.RaisePropertyChanged(nameof(AmountString));
+                    OnPropertyChanged(nameof(AmountString));
 
                     Fee = _fee;
                 }
@@ -146,8 +146,8 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
                 FeeRate = BtcBased.CoinToSatoshi(_fee) / estimatedTxSize.Value;
 
-                this.RaisePropertyChanged(nameof(AmountString));
-                this.RaisePropertyChanged(nameof(FeeString));
+                OnPropertyChanged(nameof(AmountString));
+                OnPropertyChanged(nameof(FeeString));
 
                 OnQuotesUpdatedEventHandler(App.QuotesProvider, EventArgs.Empty);
             }
@@ -178,12 +178,12 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     if (maxAmount > 0)
                         _amount = maxAmount;
 
-                    this.RaisePropertyChanged(nameof(AmountString));
+                    OnPropertyChanged(nameof(AmountString));
 
                     var defaultFeePrice = await Currency.GetDefaultFeePriceAsync();
 
                     _fee = Currency.GetFeeFromFeeAmount(maxFeeAmount, defaultFeePrice);
-                    this.RaisePropertyChanged(nameof(FeeString));
+                    OnPropertyChanged(nameof(FeeString));
 
                     FeeRate = await BtcBased.GetFeeRateAsync();
                 }
@@ -201,7 +201,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                         Warning = Resources.CvInsufficientFunds;
                         IsAmountUpdating = false;
 
-                        this.RaisePropertyChanged(nameof(AmountString));
+                        OnPropertyChanged(nameof(AmountString));
 
                         return;
                     }
@@ -218,8 +218,8 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     FeeRate = BtcBased.CoinToSatoshi(_fee) / estimatedTxSize.Value;
                 }
 
-                this.RaisePropertyChanged(nameof(AmountString));
-                this.RaisePropertyChanged(nameof(FeeString));
+                OnPropertyChanged(nameof(AmountString));
+                OnPropertyChanged(nameof(FeeString));
 
                 OnQuotesUpdatedEventHandler(App.QuotesProvider, EventArgs.Empty);
             }

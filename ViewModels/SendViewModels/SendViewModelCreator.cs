@@ -24,21 +24,5 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 _ => throw new NotSupportedException($"Can't create send view model for {currency.Name}. This currency is not supported."),
             };
         }
-
-        public static int GetSendPageId(Currency currency)
-        {
-            return 0;
-            // return currency switch
-            // {
-            //     BitcoinBasedCurrency _ => Pages.SendBitcoinBased,
-            //     ERC20 _ => Pages.SendErc20,
-            //     Ethereum _ => Pages.SendEthereum,
-            //     NYX _ => Pages.SendNYX,
-            //     FA2 _ => Pages.SendFA2,
-            //     FA12 _ => Pages.SendFa12,
-            //     Tezos _ => Pages.SendTezos,
-            //     _ => throw new NotSupportedException($"Can't get send page id for currency {currency.Name}. This currency is not supported."),
-            // };
-        }
     }
 }
