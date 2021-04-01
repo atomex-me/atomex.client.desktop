@@ -68,6 +68,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 }
 
                 Fee = fee.TruncateByFormat(GasFormat);
+                OnPropertyChanged(nameof(GasString));
             }
         }
 
@@ -98,6 +99,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 }
 
                 FeePrice = gasPrice.TruncateByFormat(FeePriceFormat);
+                OnPropertyChanged(nameof(FeePriceString));
             }
         }
 

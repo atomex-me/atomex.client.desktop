@@ -108,12 +108,6 @@
                             <Binding Path="BaseCurrencyFormat" Mode="OneWay" />
                         </MultiBinding>
                     </helpers:AmountTextBoxHelper.AmountInBase>
-
-                    <!-- <i:Interaction.Behaviors> -->
-                    <!--     <behaviors:TextBoxInputBehavior InputMode="DecimalInput" -->
-                    <!--                                     UseInvariantCulture="True" -->
-                    <!--                                     JustPositiveDecimalInput="True" /> -->
-                    <!-- </i:Interaction.Behaviors> -->
                 </TextBox>
                 <controls:RoundedButton Width="60"
                                         Height="40"
@@ -155,11 +149,6 @@
                             <Binding Path="BaseCurrencyFormat" Mode="OneWay" />
                         </MultiBinding>
                     </helpers:AmountTextBoxHelper.AmountInBase>
-                    <!-- <i:Interaction.Behaviors> -->
-                    <!--     <behaviors:TextBoxInputBehavior InputMode="DecimalInput" -->
-                    <!--                                     UseInvariantCulture="True" -->
-                    <!--                                     JustPositiveDecimalInput="True" /> -->
-                    <!-- </i:Interaction.Behaviors> -->
                 </TextBox>
             </StackPanel>
 

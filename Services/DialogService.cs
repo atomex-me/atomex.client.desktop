@@ -99,10 +99,14 @@ namespace Atomex.Client.Desktop.Services
 
         private void CenterDialogWindow()
         {
-            _dialogServiceView.Position =
-                new PixelPoint(
-                    Convert.ToInt32(_owner.Position.X + _owner.ClientSize.Width / 2 - _dialogServiceView.Width / 2),
-                    Convert.ToInt32(_owner.Position.Y + _owner.ClientSize.Height / 2 - _dialogServiceView.Height / 2));
+            if (IsDialogOpened)
+            {
+                _dialogServiceView.Position =
+                    new PixelPoint(
+                        Convert.ToInt32(_owner.Position.X + _owner.ClientSize.Width / 2 - _dialogServiceView.Width / 2),
+                        Convert.ToInt32(
+                            _owner.Position.Y + _owner.ClientSize.Height / 2 - _dialogServiceView.Height / 2));
+            }
         }
     }
 }

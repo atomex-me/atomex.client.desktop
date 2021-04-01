@@ -157,6 +157,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
 
                 Amount = amount.TruncateByFormat(CurrencyFormat);
+                OnPropertyChanged(nameof(AmountString));
             }
         }
 
@@ -192,6 +193,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 }
 
                 Fee = fee.TruncateByFormat(FeeCurrencyFormat);
+                OnPropertyChanged(nameof(FeeString));
             }
         }
 
