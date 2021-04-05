@@ -6,6 +6,8 @@ using Atomex.Client.Desktop.Services;
 using Atomex.Client.Desktop.ViewModels;
 using Atomex.Client.Desktop.Views;
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Reflection;
 using Microsoft.Extensions.Configuration;
 using System.Linq;
@@ -15,12 +17,14 @@ using Atomex.Common.Configuration;
 using Atomex.Core;
 using Atomex.MarketData.Bitfinex;
 using Atomex.Subsystems;
+using Avalonia.Styling;
 
 namespace Atomex.Client.Desktop
 {
     public class App : Application
     {
         public static IDialogService<ViewModelBase>? DialogService;
+        public static TemplateService TemplateService;
 
         public override void Initialize()
         {
@@ -29,6 +33,8 @@ namespace Atomex.Client.Desktop
 
         public override void OnFrameworkInitializationCompleted()
         {
+            TemplateService = new TemplateService();
+            
             // init logger
             Log.Logger = new LoggerConfiguration()
                 .ReadFrom.Configuration(Configuration)
@@ -54,10 +60,10 @@ namespace Atomex.Client.Desktop
                 var mainWindow = new MainWindow();
                 DialogService = new DialogService<DialogServiceView>(mainWindow);
                 var mainWindowViewModel = new MainWindowViewModel(AtomexApp, mainWindow);
-                
+
                 mainWindow.DataContext = mainWindowViewModel;
                 desktop.MainWindow = mainWindow;
-                
+
                 desktop.Exit += OnExit;
             }
 
@@ -65,7 +71,7 @@ namespace Atomex.Client.Desktop
 
             base.OnFrameworkInitializationCompleted();
         }
-        
+
 
         void OnExit(object sender, ControlledApplicationLifetimeExitEventArgs e)
         {
@@ -126,5 +132,6 @@ namespace Atomex.Client.Desktop
             .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
             .AddEmbeddedJsonFile(CoreAssembly, "symbols.json")
             .Build();
+        
     }
 }

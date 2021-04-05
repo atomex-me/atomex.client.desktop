@@ -3,7 +3,117 @@
         xmlns:controls="clr-namespace:Atomex.Client.Desktop.Controls"
         xmlns:viewModels="clr-namespace:Atomex.Client.Desktop.ViewModels.TransactionViewModels"
         xmlns:views="clr-namespace:Atomex.Client.Desktop.Views">
-    
+
+    <Styles.Resources>
+        <DataTemplate x:Key="UnknownStateTemplate" DataType="viewModels:TransactionViewModel">
+            <Border Background="{DynamicResource UnknownBrush}"
+                    CornerRadius="5"
+                    Margin="3 0 3 0"
+                    HorizontalAlignment="Center">
+                <TextBlock Foreground="White"
+                           Text="{Binding State}"
+                           FontSize="11"
+                           Margin="5"
+                           HorizontalAlignment="Center" />
+            </Border>
+        </DataTemplate>
+
+        <DataTemplate x:Key="PendingStateTemplate" DataType="viewModels:TransactionViewModel">
+            <Border Background="{DynamicResource PendingBrush}"
+                    CornerRadius="5"
+                    Margin="3 0 3 0"
+                    HorizontalAlignment="Center">
+                <TextBlock Foreground="White"
+                           Text="{Binding State}"
+                           FontSize="11"
+                           Margin="5"
+                           HorizontalAlignment="Center" />
+            </Border>
+        </DataTemplate>
+
+        <DataTemplate x:Key="ConfirmedStateTemplate" DataType="viewModels:TransactionViewModel">
+            <Border Background="{DynamicResource ConfirmedBrush}"
+                    CornerRadius="5"
+                    Margin="3 0 3 0"
+                    HorizontalAlignment="Center">
+                <TextBlock Foreground="White"
+                           Text="{Binding State}"
+                           FontSize="11"
+                           Margin="5"
+                           HorizontalAlignment="Center" />
+            </Border>
+        </DataTemplate>
+
+        <DataTemplate x:Key="UnconfirmedStateTemplate" DataType="viewModels:TransactionViewModel">
+            <Border Background="{DynamicResource UnconfirmedBrush}"
+                    CornerRadius="5"
+                    Margin="3 0 3 0"
+                    HorizontalAlignment="Center">
+                <TextBlock Foreground="White"
+                           Text="{Binding State}"
+                           FontSize="11"
+                           Margin="5"
+                           HorizontalAlignment="Center" />
+            </Border>
+        </DataTemplate>
+
+        <DataTemplate x:Key="FailedStateTemplate" DataType="viewModels:TransactionViewModel">
+            <Border Background="{DynamicResource FailedBrush}"
+                    CornerRadius="5"
+                    Margin="3 0 3 0"
+                    HorizontalAlignment="Center">
+                <TextBlock Foreground="White"
+                           Text="{Binding State}"
+                           FontSize="11"
+                           Margin="5"
+                           HorizontalAlignment="Center" />
+            </Border>
+        </DataTemplate>
+
+        <DataTemplate x:Key="SentTypeTemplate">
+            <Image Width="24"
+                   Height="24"
+                   Source="avares://Atomex.Client.Desktop/Resources/Images/sent.png" />
+        </DataTemplate>
+
+        <DataTemplate x:Key="ReceivedTypeTemplate">
+            <Image Width="24"
+                   Height="24"
+                   Source="avares://Atomex.Client.Desktop/Resources/Images/received.png" />
+        </DataTemplate>
+
+        <DataTemplate x:Key="TokenApproveTypeTemplate">
+            <Image Width="24"
+                   Height="24"
+                   Source="avares://Atomex.Client.Desktop/Resources/Images/sent.png" />
+        </DataTemplate>
+
+        <DataTemplate x:Key="SwapPaymentTypeTemplate">
+            <Image Width="24"
+                   Height="24"
+                   Source="avares://Atomex.Client.Desktop/Resources/Images/exchanged.png" />
+        </DataTemplate>
+
+        <DataTemplate x:Key="SwapRefundTypeTemplate">
+            <Image Width="24"
+                   Height="24"
+                   Source="avares://Atomex.Client.Desktop/Resources/Images/refunded.png" />
+        </DataTemplate>
+
+        <DataTemplate x:Key="SwapRedeemTypeTemplate">
+            <Image Width="24"
+                   Height="24"
+                   Source="avares://Atomex.Client.Desktop/Resources/Images/refunded.png" />
+        </DataTemplate>
+
+        <DataTemplate x:Key="UnknownTypeTemplate">
+            <Image Width="24"
+                   Height="24"
+                   Source="avares://Atomex.Client.Desktop/Resources/Images/unknown.png" />
+        </DataTemplate>
+        
+    </Styles.Resources>
+
     <!-- <Style x:Key="ExplorerLinkButton" TargetType="Button"> -->
     <!--     <Setter Property="FontFamily" Value="{DynamicResource DefaultFontFamily}"/> -->
     <!--     <Setter Property="FontSize" Value="12"/> -->
@@ -23,57 +133,7 @@
     <!--         </Trigger> -->
     <!--     </Style.Triggers> -->
     <!-- </Style> -->
-    <!-- -->
-    <!-- <DataTemplate x:Key="SentTemplate"> -->
-    <!--     <Image Width="24" -->
-    <!--            Height="24" -->
-    <!--            Source="pack://application:,,,/Atomex.Client.Wpf;component/Resources/Images/sent.png"/> -->
-    <!-- </DataTemplate> -->
-    <!-- -->
-    <!-- <DataTemplate x:Key="ReceivedTemplate"> -->
-    <!--     <Image Width="24" -->
-    <!--            Height="24" -->
-    <!--            Source="pack://application:,,,/Atomex.Client.Wpf;component/Resources/Images/received.png"/> -->
-    <!-- </DataTemplate> -->
-    <!-- -->
-    <!-- <DataTemplate x:Key="TokenApproveTemplate"> -->
-    <!--     <Image Width="24" -->
-    <!--            Height="24" -->
-    <!--            Source="pack://application:,,,/Atomex.Client.Wpf;component/Resources/Images/sent.png"/> -->
-    <!-- </DataTemplate> -->
-    <!-- -->
-    <!-- <DataTemplate x:Key="SwapPaymentTemplate"> -->
-    <!--     <Image Width="24" -->
-    <!--            Height="24" -->
-    <!--            Source="pack://application:,,,/Atomex.Client.Wpf;component/Resources/Images/exchanged.png"/> -->
-    <!-- </DataTemplate> -->
-    <!-- -->
-    <!-- <DataTemplate x:Key="SwapRefundTemplate"> -->
-    <!--     <Image Width="24" -->
-    <!--            Height="24" -->
-    <!--            Source="pack://application:,,,/Atomex.Client.Wpf;component/Resources/Images/refunded.png"/> -->
-    <!-- </DataTemplate> -->
-    <!-- -->
-    <!-- <DataTemplate x:Key="SwapRedeemTemplate"> -->
-    <!--     <Image Width="24" -->
-    <!--            Height="24" -->
-    <!--            Source="pack://application:,,,/Atomex.Client.Wpf;component/Resources/Images/refunded.png"/> -->
-    <!-- </DataTemplate> -->
-    <!-- -->
-    <!-- <DataTemplate x:Key="UnknownTemplate"> -->
-    <!--     <Image Width="24" -->
-    <!--            Height="24" -->
-    <!--            Source="pack://application:,,,/Atomex.Client.Wpf;component/Resources/Images/unknown.png"/> -->
-    <!-- </DataTemplate> -->
-    <!-- -->
-    <!-- <controls:TransactionDataTemplateSelector x:Key="TransactionTypeDataTemplateSelector" -->
-    <!--     UnknownTemplate="{StaticResource UnknownTemplate}" -->
-    <!--     SentTemplate="{StaticResource SentTemplate}" -->
-    <!--     ReceivedTemplate="{StaticResource ReceivedTemplate}" -->
-    <!--     TokenApproveTemplate="{StaticResource TokenApproveTemplate}" -->
-    <!--     SwapPaymentTemplate="{StaticResource SwapPaymentTemplate}" -->
-    <!--     SwapRedeemTemplate="{StaticResource SwapRedeemTemplate}" -->
-    <!--     SwapRefundTemplate="{StaticResource SwapRefundTemplate}"/> -->
+
     <!-- -->
     <!-- <DataTemplate x:Key="TransactionDetailsTemplate" -->
     <!--               DataType="viewModels:TransactionViewModel"> -->
@@ -206,86 +266,14 @@
     <!--         </controls:TransactionDataTemplateSelectorList> -->
     <!--     </controls:TransactionDataTemplateByCurrencySelector.Selectors> -->
     <!-- </controls:TransactionDataTemplateByCurrencySelector> -->
-    <!-- -->
-    <!-- <DataTemplate x:Key="UnknownStateTemplate" DataType="viewModels:TransactionViewModel"> -->
-    <!--     <Border Background="{DynamicResource UnknownBrush}" -->
-    <!--             CornerRadius="5" -->
-    <!--             Margin="3 0 3 0" -->
-    <!--             HorizontalAlignment="Center"> -->
-    <!--         <TextBlock Foreground="White" -->
-    <!--                    Text="{Binding State}" -->
-    <!--                    FontSize="11" -->
-    <!--                    Margin="5" -->
-    <!--                    HorizontalAlignment="Center"/> -->
-    <!--     </Border> -->
-    <!-- </DataTemplate> -->
-    <!-- -->
-    <!-- <DataTemplate x:Key="PendingStateTemplate" DataType="viewModels:TransactionViewModel"> -->
-    <!--     <Border Background="{DynamicResource PendingBrush}" -->
-    <!--             CornerRadius="5" -->
-    <!--             Margin="3 0 3 0" -->
-    <!--             HorizontalAlignment="Center"> -->
-    <!--         <TextBlock Foreground="White" -->
-    <!--                    Text="{Binding State}" -->
-    <!--                    FontSize="11" -->
-    <!--                    Margin="5" -->
-    <!--                    HorizontalAlignment="Center"/> -->
-    <!--     </Border> -->
-    <!-- </DataTemplate> -->
-    <!-- -->
-    <!-- <DataTemplate x:Key="ConfirmedStateTemplate" DataType="viewModels:TransactionViewModel"> -->
-    <!--     <Border Background="{DynamicResource ConfirmedBrush}" -->
-    <!--             CornerRadius="5" -->
-    <!--             Margin="3 0 3 0" -->
-    <!--             HorizontalAlignment="Center"> -->
-    <!--         <TextBlock Foreground="White" -->
-    <!--                    Text="{Binding State}" -->
-    <!--                    FontSize="11" -->
-    <!--                    Margin="5" -->
-    <!--                    HorizontalAlignment="Center"/> -->
-    <!--     </Border> -->
-    <!-- </DataTemplate> -->
-    <!-- -->
-    <!-- <DataTemplate x:Key="UnconfirmedStateTemplate" DataType="viewModels:TransactionViewModel"> -->
-    <!--     <Border Background="{DynamicResource UnconfirmedBrush}" -->
-    <!--             CornerRadius="5" -->
-    <!--             Margin="3 0 3 0" -->
-    <!--             HorizontalAlignment="Center"> -->
-    <!--         <TextBlock Foreground="White" -->
-    <!--                    Text="{Binding State}" -->
-    <!--                    FontSize="11" -->
-    <!--                    Margin="5" -->
-    <!--                    HorizontalAlignment="Center"/> -->
-    <!--     </Border> -->
-    <!-- </DataTemplate> -->
-    <!-- -->
-    <!-- <DataTemplate x:Key="FailedStateTemplate" DataType="viewModels:TransactionViewModel"> -->
-    <!--     <Border Background="{DynamicResource FailedBrush}" -->
-    <!--             CornerRadius="5" -->
-    <!--             Margin="3 0 3 0" -->
-    <!--             HorizontalAlignment="Center"> -->
-    <!--         <TextBlock Foreground="White" -->
-    <!--                    Text="{Binding State}" -->
-    <!--                    FontSize="11" -->
-    <!--                    Margin="5" -->
-    <!--                    HorizontalAlignment="Center"/> -->
-    <!--     </Border> -->
-    <!-- </DataTemplate> -->
-    <!-- -->
-    <!-- <controls:TransactionStateDataTemplateSelector x:Key="TransactionStateDataTemplateSelector" -->
-    <!--     UnknownTemplate="{StaticResource UnknownStateTemplate}" -->
-    <!--     PendingTemplate="{StaticResource PendingStateTemplate}" -->
-    <!--     ConfirmedTemplate="{StaticResource ConfirmedStateTemplate}" -->
-    <!--     UnconfirmedTemplate="{StaticResource UnconfirmedStateTemplate}" -->
-    <!--     FailedTemplate="{StaticResource FailedStateTemplate}"/> -->
 
-    
+
     <Style Selector="controls|RoundedButton.WalletMenuButton">
-        <Setter Property="FontFamily" Value="{DynamicResource DefaultFontFamily}"/>
-        <Setter Property="FontSize" Value="12"/>
-        <Setter Property="Width" Value="90"/>
-        <Setter Property="Height" Value="30"/>
-        <Setter Property="CornerRadius" Value="5"/>
+        <Setter Property="FontFamily" Value="{DynamicResource DefaultFontFamily}" />
+        <Setter Property="FontSize" Value="12" />
+        <Setter Property="Width" Value="90" />
+        <Setter Property="Height" Value="30" />
+        <Setter Property="CornerRadius" Value="5" />
     </Style>
 
 </Styles>
