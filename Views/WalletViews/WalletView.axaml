@@ -356,18 +356,7 @@
             <DataGrid.Columns>
                 <DataGridTemplateColumn Header="Type">
                     <DataGridTemplateColumn.CellTemplate>
-                        <!-- <controls:TransactionTypeDataTemplateSelector /> -->
-                        <DataTemplate x:Key="SentTypeTemplate">
-                            <Image Width="24"
-                                   Height="24"
-                                   Source="avares://Atomex.Client.Desktop/Resources/Images/sent.png" />
-                        </DataTemplate>
-
-                        <!-- <DataTemplate x:Key="ReceivedTypeTemplate"> -->
-                        <!--     <Image Width="24" -->
-                        <!--            Height="24" -->
-                        <!--            Source="avares://Atomex.Client.Desktop/Resources/Images/received.png" /> -->
-                        <!-- </DataTemplate> -->
+                        <controls:TransactionTypeDataTemplateSelector />
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
                 <DataGridTextColumn Header="Description" Binding="{Binding Description}" Width="*" />
