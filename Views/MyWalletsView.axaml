@@ -84,7 +84,7 @@
                         <ListBox x:Name="WalletListBox"
                                  Background="Transparent"
                                  MaxHeight="450"
-                                 ScrollViewer.HorizontalScrollBarVisibility="Hidden"
+                                 ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                                  Items="{Binding Wallets}"
                                  SelectionMode="Single">
                             <ListBox.ItemTemplate>

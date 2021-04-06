@@ -33,6 +33,7 @@
     <Color x:Key="DefaultTextBoxCuretColor">#1388ba</Color>
     <Color x:Key="DefaultSubstrateColor">#2f000000</Color>
     <Color x:Key="DefaultMenuItemSelectedColor">#1183b5</Color>
+    <Color x:Key="DefaultProgressRingColor">#1183b5</Color>
     <Color x:Key="DefaultMenuItemMouseOverColor">#0f4d6d</Color>
     <Color x:Key="CriticalWarningColor">#ef6a41</Color>
     
@@ -79,11 +80,10 @@
     <SolidColorBrush x:Key="DefaultTooltipBackgroundBrush" Color="#80000000" />
     <SolidColorBrush x:Key="DefaultMenuItemSelectedBrush" Color="{DynamicResource DefaultMenuItemSelectedColor}" />
     <SolidColorBrush x:Key="DefaultMenuItemMouseOverBrush" Color="{DynamicResource DefaultMenuItemMouseOverColor}" />
+    
+    <SolidColorBrush x:Key="DefaultProgressRingBrush" Color="{DynamicResource DefaultProgressRingColor}" />
 
     <x:Int32 x:Key="DefaultTooltipFontSize">12</x:Int32>
-    <!-- <x:Int32 x:Key="CurrencyCodeFontSize">12</x:Int32> -->
-    <!-- <x:Int32 x:Key="BaseCurrencyCodeFontSize">10</x:Int32> -->
-    <!-- <x:Int32 x:Key="AmountInBaseFontSize">15</x:Int32> -->
 
     <!-- Main View -->
 

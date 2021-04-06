@@ -23,7 +23,7 @@ namespace Atomex.Client.Desktop
 {
     public class App : Application
     {
-        public static IDialogService<ViewModelBase>? DialogService;
+        public static IDialogService<ViewModelBase> DialogService;
         public static TemplateService TemplateService;
 
         public override void Initialize()

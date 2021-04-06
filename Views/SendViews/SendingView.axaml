@@ -1,0 +1,32 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="Atomex.Client.Desktop.Views.SendViews.SendingView"
+             xmlns:mah="clr-namespace:AvaloniaProgressRing;assembly=AvaloniaProgressRing"
+             Width="560"
+             Height="200">
+    <StackPanel Orientation="Vertical"
+                Width="560">
+        <Border Margin="0 10 0 10"
+                Height="33"
+                VerticalAlignment="Top"
+                HorizontalAlignment="Stretch"
+                Background="{DynamicResource ChildViewHeaderBackgroundBrush}">
+            <TextBlock Text="Sending..."
+                       Foreground="{DynamicResource ChildViewHeaderForegroundBrush}"
+                       FontFamily="{DynamicResource DefaultLightFontFamily}"
+                       FontSize="25"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center" />
+        </Border>
+
+        <Grid>
+            <mah:ProgressRing Width="50"
+                              Height="50"
+                              Foreground="{DynamicResource DefaultProgressRingBrush}"
+                              Margin="0 40 0 40" />
+        </Grid>
+    </StackPanel>
+</UserControl>

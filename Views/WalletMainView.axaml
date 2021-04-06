@@ -13,56 +13,6 @@
         <vm:WalletMainViewModel />
     </Design.DataContext>
 
-    <!-- <UserControl.Resources> -->
-    <!--     <local:MyConverter x:Key="myConverter"/> -->
-    <!-- </UserControl.Resources> -->
-
-    <!-- <DockPanel Background="White"> -->
-    <!--         <Button DockPanel.Dock="Bottom"  -->
-    <!--                 ZIndex="1" -->
-    <!--                 Height="60" -->
-    <!--                 Width="150" -->
-    <!--                 Background="Red" -->
-    <!--                 Margin="0 -60 0 0">Settings</Button> -->
-    <!-- -->
-    <!--         <TabControl -->
-    <!--             Items="{Binding Tabs}" -->
-    <!--             TabStripPlacement="Left"> -->
-    <!--             <TabControl.ItemTemplate> -->
-    <!--                 <DataTemplate> -->
-    <!--                     <StackPanel -->
-    <!--                         Orientation="Horizontal" -->
-    <!--                         Width="150" -->
-    <!--                         Height="60"> -->
-    <!--                         <Image Source="avares://Atomex.Client.Desktop/Resources/Images/bitcoin_90x90.png" -->
-    <!--                                VerticalAlignment="Center" -->
-    <!--                                Margin="10 0 0 0" -->
-    <!--                                Width="30" /> -->
-    <!--                         <TextBlock -->
-    <!--                             Margin="5 0 0 0" -->
-    <!--                             VerticalAlignment="Center" -->
-    <!--                             Text="{Binding Header}" /> -->
-    <!--                     </StackPanel> -->
-    <!-- -->
-    <!--                 </DataTemplate> -->
-    <!--             </TabControl.ItemTemplate> -->
-    <!--             <TabControl.ContentTemplate> -->
-    <!--                 <DataTemplate> -->
-    <!--                     <StackPanel Orientation="Vertical" Spacing="8"> -->
-    <!--                         <TextBlock Text="{Binding Text}" /> -->
-    <!--                         <Image Source="{Binding Image}" Width="300" /> -->
-    <!--                     </StackPanel> -->
-    <!--                 </DataTemplate> -->
-    <!--             </TabControl.ContentTemplate> -->
-    <!--             <TabControl.Styles> -->
-    <!--                 <Style Selector="TabItem"> -->
-    <!--                     <Setter Property="IsEnabled" Value="{Binding IsEnabled}" /> -->
-    <!--                 </Style> -->
-    <!--             </TabControl.Styles> -->
-    <!--         </TabControl> -->
-    <!--     </DockPanel> -->
-
-
     <DockPanel x:Name="MainDockerPanel"
                Width="{Binding $parent[Window].Bounds.Width}"
                Height="{Binding $parent[Window].Bounds.Height}">
@@ -79,24 +29,24 @@
                         VerticalAlignment="Center"
                         Cursor="Help"
                         Margin="8 0">
+                    
                     <TextBlock Text="Exchange"
                                x:Name="ExchangeTextBox"
-                               FontSize="11"
-                               Foreground="{DynamicResource StatusBarDisconnectedForeground}"/>
+                               FontSize="11" />
                     <ToolTip.Tip>
                         <TextBlock x:Name="ToolTipTextBoxExchange"
                                    Text="Disconnected" />
                     </ToolTip.Tip>
                     <i:Interaction.Behaviors>
                         <ia:DataTriggerBehavior Binding="{Binding IsExchangeConnected}"
-                                                ComparisonCondition="Equal"
-                                                Value="False">
+                                                ComparisonCondition="NotEqual"
+                                                Value="True">
                             <ia:ChangePropertyAction TargetObject="{Binding #ToolTipTextBoxExchange}"
                                                      PropertyName="Text"
                                                      Value="Disconnected" />
                             <ia:ChangePropertyAction TargetObject="{Binding #ExchangeTextBox}"
                                                      PropertyName="Foreground"
-                                                     Value="{DynamicResource StatusBarDisconnectedForeground}" />
+                                                     Value="{StaticResource StatusBarDisconnectedForeground}" />
                         </ia:DataTriggerBehavior>
                         <ia:DataTriggerBehavior Binding="{Binding IsExchangeConnected}"
                                                 ComparisonCondition="Equal"
@@ -106,7 +56,7 @@
                                                      Value="Connected" />
                             <ia:ChangePropertyAction TargetObject="{Binding #ExchangeTextBox}"
                                                      PropertyName="Foreground"
-                                                     Value="{DynamicResource StatusBarConnectedForeground}" />
+                                                     Value="{StaticResource StatusBarConnectedForeground}" />
                         </ia:DataTriggerBehavior>
                     </i:Interaction.Behaviors>
                 </Border>
@@ -121,24 +71,24 @@
                         VerticalAlignment="Center"
                         Cursor="Help"
                         Margin="8 0">
+                    
                     <TextBlock Text="Market Data"
                                x:Name="MarketTextBox"
-                               FontSize="11"
-                               Foreground="{DynamicResource StatusBarDisconnectedForeground}"/>
+                               FontSize="11" />
                     <ToolTip.Tip>
                         <TextBlock x:Name="ToolTipTextBoxMarket"
                                    Text="Disconnected" />
                     </ToolTip.Tip>
                     <i:Interaction.Behaviors>
                         <ia:DataTriggerBehavior Binding="{Binding IsMarketDataConnected}"
-                                                ComparisonCondition="Equal"
-                                                Value="False">
+                                                ComparisonCondition="NotEqual"
+                                                Value="True">
                             <ia:ChangePropertyAction TargetObject="{Binding #ToolTipTextBoxMarket}"
                                                      PropertyName="Text"
                                                      Value="Disconnected" />
                             <ia:ChangePropertyAction TargetObject="{Binding #MarketTextBox}"
                                                      PropertyName="Foreground"
-                                                     Value="{DynamicResource StatusBarDisconnectedForeground}" />
+                                                     Value="{StaticResource StatusBarDisconnectedForeground}" />
                         </ia:DataTriggerBehavior>
                         <ia:DataTriggerBehavior Binding="{Binding IsMarketDataConnected}"
                                                 ComparisonCondition="Equal"
@@ -148,7 +98,7 @@
                                                      Value="Connected" />
                             <ia:ChangePropertyAction TargetObject="{Binding #MarketTextBox}"
                                                      PropertyName="Foreground"
-                                                     Value="{DynamicResource StatusBarConnectedForeground}" />
+                                                     Value="{StaticResource StatusBarConnectedForeground}" />
                         </ia:DataTriggerBehavior>
                     </i:Interaction.Behaviors>
                 </Border>
@@ -163,24 +113,24 @@
                         VerticalAlignment="Center"
                         Cursor="Help"
                         Margin="8 0">
+                    
                     <TextBlock Text="Rates Provider"
                                x:Name="RatesTextBox"
-                               FontSize="11"
-                               Foreground="{DynamicResource StatusBarConnectedForeground}"/>
+                               FontSize="11" />
                     <ToolTip.Tip>
                         <TextBlock x:Name="ToolTipTextBoxRates"
-                                   Text="Connected" />
+                                   Text="Disconnected" />
                     </ToolTip.Tip>
                     <i:Interaction.Behaviors>
                         <ia:DataTriggerBehavior Binding="{Binding IsQuotesProviderAvailable}"
-                                                ComparisonCondition="Equal"
-                                                Value="False">
+                                                ComparisonCondition="NotEqual"
+                                                Value="True">
                             <ia:ChangePropertyAction TargetObject="{Binding #ToolTipTextBoxRates}"
                                                      PropertyName="Text"
                                                      Value="Disconnected" />
                             <ia:ChangePropertyAction TargetObject="{Binding #RatesTextBox}"
                                                      PropertyName="Foreground"
-                                                     Value="{DynamicResource StatusBarDisconnectedForeground}" />
+                                                     Value="{StaticResource StatusBarDisconnectedForeground}" />
                         </ia:DataTriggerBehavior>
                         <ia:DataTriggerBehavior Binding="{Binding IsQuotesProviderAvailable}"
                                                 ComparisonCondition="Equal"
@@ -190,7 +140,7 @@
                                                      Value="Connected" />
                             <ia:ChangePropertyAction TargetObject="{Binding #RatesTextBox}"
                                                      PropertyName="Foreground"
-                                                     Value="{DynamicResource StatusBarConnectedForeground}" />
+                                                     Value="{StaticResource StatusBarConnectedForeground}" />
                         </ia:DataTriggerBehavior>
                     </i:Interaction.Behaviors>
                 </Border>

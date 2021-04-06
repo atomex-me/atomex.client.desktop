@@ -80,7 +80,7 @@
                                        IsActive="{Binding InProgress}"
                                        HorizontalAlignment="Center"
                                        VerticalAlignment="Center"
-                                       Foreground="Blue"
+                                       Foreground="{DynamicResource DefaultProgressRingBrush}"
                                        Margin="0 220 0 0" />
             </Grid>
         </Border>

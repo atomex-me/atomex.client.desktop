@@ -23,7 +23,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 {
                     var sendViewModel = SendViewModelCreator.CreateViewModel(App, value);
 
-                    Desktop.App.DialogService?.Show(sendViewModel);
+                    Desktop.App.DialogService.Show(sendViewModel);
                     return;
                 }
 
@@ -451,26 +451,27 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 return;
             }
 
-            // var confirmationViewModel = new SendConfirmationViewModel(DialogViewer, Dialogs.Send)
-            // {
-            //     Currency = Currency,
-            //     To = To,
-            //     Amount = Amount,
-            //     AmountInBase = AmountInBase,
-            //     BaseCurrencyCode = BaseCurrencyCode,
-            //     BaseCurrencyFormat = BaseCurrencyFormat,
-            //     Fee = Fee,
-            //     UseDeafultFee = UseDefaultFee,
-            //     FeeInBase = FeeInBase,
-            //     FeePrice = FeePrice,
-            //     CurrencyCode = CurrencyCode,
-            //     CurrencyFormat = CurrencyFormat,
-            //
-            //     FeeCurrencyCode = FeeCurrencyCode,
-            //     FeeCurrencyFormat = FeeCurrencyFormat
-            // };
-            //
-            // DialogViewer.PushPage(Dialogs.Send, Pages.SendConfirmation, confirmationViewModel);
+            var confirmationViewModel = new SendConfirmationViewModel
+            {
+                Currency = Currency,
+                To = To,
+                Amount = Amount,
+                AmountInBase = AmountInBase,
+                BaseCurrencyCode = BaseCurrencyCode,
+                BaseCurrencyFormat = BaseCurrencyFormat,
+                Fee = Fee,
+                UseDeafultFee = UseDefaultFee,
+                FeeInBase = FeeInBase,
+                FeePrice = FeePrice,
+                CurrencyCode = CurrencyCode,
+                CurrencyFormat = CurrencyFormat,
+            
+                FeeCurrencyCode = FeeCurrencyCode,
+                FeeCurrencyFormat = FeeCurrencyFormat,
+                BackView = this
+            };
+            
+            Desktop.App.DialogService.Show(confirmationViewModel);
         }
 
         protected override void OnQuotesUpdatedEventHandler(object sender, EventArgs args)

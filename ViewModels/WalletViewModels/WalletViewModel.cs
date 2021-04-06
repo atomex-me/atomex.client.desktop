@@ -203,13 +203,13 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         private void OnSendClick()
         {
             var sendViewModel = SendViewModelCreator.CreateViewModel(App, Currency);
-            Desktop.App.DialogService?.Show(sendViewModel);
+            Desktop.App.DialogService.Show(sendViewModel);
         }
 
         private void OnReceiveClick()
         {
             var receiveViewModel = ReceiveViewModelCreator.CreateViewModel(App, Currency);
-            Desktop.App.DialogService?.Show(receiveViewModel);
+            Desktop.App.DialogService.Show(receiveViewModel);
         }
 
         private void OnConvertClick()

@@ -6,7 +6,7 @@
 
     <Styles.Resources>
         <DataTemplate x:Key="UnknownStateTemplate" DataType="viewModels:TransactionViewModel">
-            <Border Background="{DynamicResource UnknownBrush}"
+            <Border Background="{StaticResource UnknownBrush}"
                     CornerRadius="5"
                     Margin="3 0 3 0"
                     HorizontalAlignment="Center">
@@ -18,8 +18,9 @@
             </Border>
         </DataTemplate>
 
+        <!-- {StaticResource PendingBrush} -->
         <DataTemplate x:Key="PendingStateTemplate" DataType="viewModels:TransactionViewModel">
-            <Border Background="{DynamicResource PendingBrush}"
+            <Border Background="red"
                     CornerRadius="5"
                     Margin="3 0 3 0"
                     HorizontalAlignment="Center">
@@ -31,8 +32,9 @@
             </Border>
         </DataTemplate>
 
+        <!-- {StaticResource ConfirmedBrush} -->
         <DataTemplate x:Key="ConfirmedStateTemplate" DataType="viewModels:TransactionViewModel">
-            <Border Background="{DynamicResource ConfirmedBrush}"
+            <Border Background="Green"
                     CornerRadius="5"
                     Margin="3 0 3 0"
                     HorizontalAlignment="Center">
@@ -44,8 +46,9 @@
             </Border>
         </DataTemplate>
 
+        <!-- {StaticResource UnconfirmedBrush} -->
         <DataTemplate x:Key="UnconfirmedStateTemplate" DataType="viewModels:TransactionViewModel">
-            <Border Background="{DynamicResource UnconfirmedBrush}"
+            <Border Background="Brown"
                     CornerRadius="5"
                     Margin="3 0 3 0"
                     HorizontalAlignment="Center">
@@ -58,7 +61,7 @@
         </DataTemplate>
 
         <DataTemplate x:Key="FailedStateTemplate" DataType="viewModels:TransactionViewModel">
-            <Border Background="{DynamicResource FailedBrush}"
+            <Border Background="{StaticResource FailedBrush}"
                     CornerRadius="5"
                     Margin="3 0 3 0"
                     HorizontalAlignment="Center">

@@ -15,7 +15,7 @@ namespace Atomex.Client.Desktop.ViewModels
 
         public void OnPortfolio()
         {
-            App.DialogService?.Show(PreviousVM);
+            App.DialogService.Show(PreviousVM);
         }
     }
 }

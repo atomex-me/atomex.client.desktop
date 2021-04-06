@@ -1,0 +1,143 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="Atomex.Client.Desktop.Views.MessageView"
+             xmlns:controls="clr-namespace:Atomex.Client.Desktop.Controls"
+             xmlns:vm="clr-namespace:Atomex.Client.Desktop.ViewModels"
+             Height="200"
+             Width="560"
+             xmlns:i="using:Avalonia.Xaml.Interactivity"
+             xmlns:ia="using:Avalonia.Xaml.Interactions.Core">
+
+    <Design.DataContext>
+        <vm:MessageViewModel />
+    </Design.DataContext>
+
+    <UserControl.Resources>
+        <CornerRadius x:Key="FullRoundCorner">20</CornerRadius>
+        <CornerRadius x:Key="LeftRoundCorner">20 0 0 20</CornerRadius>
+        <CornerRadius x:Key="RightRoundCorner">0 20 20 0</CornerRadius>
+    </UserControl.Resources>
+
+    <StackPanel Orientation="Vertical"
+                Width="560">
+
+        <Border Margin="0 10 0 10"
+                Height="33"
+                VerticalAlignment="Top"
+                HorizontalAlignment="Stretch"
+                Background="{DynamicResource ChildViewHeaderBackgroundBrush}">
+            <TextBlock Text="{Binding Title}"
+                       Foreground="{DynamicResource ChildViewHeaderForegroundBrush}"
+                       FontFamily="{DynamicResource DefaultLightFontFamily}"
+                       FontSize="25"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center" />
+        </Border>
+
+        <TextBlock Text="{Binding Text}"
+                   Margin="20 20 20 0"
+                   FontSize="15"
+                   FontFamily="{DynamicResource DefaultLightFontFamily}"
+                   HorizontalAlignment="Center"
+                   TextAlignment="Center"
+                   TextWrapping="Wrap"
+                   Foreground="{DynamicResource DefaultForegroundBrush}" />
+
+        <StackPanel Orientation="Horizontal"
+                    HorizontalAlignment="Center"
+                    IsVisible="{Binding IsLinkVisible}">
+
+            <!-- Style="{StaticResource ExplorerLinkButton}" -->
+            <!-- ToolTip="{Binding TxExplorerUri}" -->
+            <Button Content="{Binding Id}"
+                    Margin="20 20 20 0"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Command="{Binding OpenTxInExplorerCommand}"
+                    CommandParameter="{Binding Id}" />
+
+            <!-- ToolTip="Copy transaction id to clipboard" -->
+            <controls:IconButton
+                VerticalAlignment="Center"
+                Foreground="{DynamicResource IconButtonForegroundBrush}"
+                MouseOverBrush="{DynamicResource IconButtonMouseOverBrush}"
+                PressedBrush="{DynamicResource IconButtonPressedBrush}"
+                Path="{DynamicResource Octicons.Clippy}"
+                Margin="5 20 20 0"
+                Width="15"
+                Height="15"
+                Command="{Binding CopyCommand}"
+                CommandParameter="{Binding Id}"
+                Classes="PathButtonStyle" />
+        </StackPanel>
+
+        <StackPanel Orientation="Horizontal"
+                    HorizontalAlignment="Center"
+                    Margin="0 20 0 20">
+            <controls:RoundedButton Width="100"
+                                    Height="40"
+                                    Margin="0 0 3 0"
+                                    Content="{Binding BackText}"
+                                    Command="{Binding BackCommand}"
+                                    IsVisible="{Binding IsBackVisible}"
+                                    CornerRadius="20"
+                                    x:Name="FirstRoundedBtn">
+
+                <i:Interaction.Behaviors>
+                    <ia:DataTriggerBehavior Binding="{Binding IsNextVisible}"
+                                            ComparisonCondition="NotEqual"
+                                            Value="True">
+                        <ia:ChangePropertyAction TargetObject="{Binding #FirstRoundedBtn}"
+                                                 PropertyName="CornerRadius"
+                                                 Value="{StaticResource FullRoundCorner}" />
+                        <ia:ChangePropertyAction TargetObject="{Binding #FirstRoundedBtn}"
+                                                 PropertyName="Width"
+                                                 Value="150" />
+                    </ia:DataTriggerBehavior>
+                    <ia:DataTriggerBehavior Binding="{Binding IsNextVisible}"
+                                            ComparisonCondition="Equal"
+                                            Value="True">
+                        <ia:ChangePropertyAction TargetObject="{Binding #FirstRoundedBtn}"
+                                                 PropertyName="CornerRadius"
+                                                 Value="{StaticResource LeftRoundCorner}" />
+                        <ia:ChangePropertyAction TargetObject="{Binding #FirstRoundedBtn}"
+                                                 PropertyName="Width"
+                                                 Value="100" />
+                    </ia:DataTriggerBehavior>
+                </i:Interaction.Behaviors>
+            </controls:RoundedButton>
+            
+            <controls:RoundedButton Height="40"
+                                    Content="{Binding NextText}"
+                                    Command="{Binding NextCommand}"
+                                    IsVisible="{Binding IsNextVisible}"
+                                    Name="SecondRoundedBtn">
+                <i:Interaction.Behaviors>
+                    <ia:DataTriggerBehavior Binding="{Binding IsBackVisible}"
+                                            ComparisonCondition="NotEqual"
+                                            Value="True">
+                        <ia:ChangePropertyAction TargetObject="{Binding #SecondRoundedBtn}"
+                                                 PropertyName="CornerRadius"
+                                                 Value="{StaticResource FullRoundCorner}" />
+                        <ia:ChangePropertyAction TargetObject="{Binding #SecondRoundedBtn}"
+                                                 PropertyName="Width"
+                                                 Value="150" />
+                    </ia:DataTriggerBehavior>
+                    <ia:DataTriggerBehavior Binding="{Binding IsBackVisible}"
+                                            ComparisonCondition="Equal"
+                                            Value="True">
+                        <ia:ChangePropertyAction TargetObject="{Binding #SecondRoundedBtn}"
+                                                 PropertyName="CornerRadius"
+                                                 Value="{StaticResource RightRoundCorner}" />
+                        <ia:ChangePropertyAction TargetObject="{Binding #SecondRoundedBtn}"
+                                                 PropertyName="Width"
+                                                 Value="100" />
+                    </ia:DataTriggerBehavior>
+                </i:Interaction.Behaviors>
+            </controls:RoundedButton>
+        </StackPanel>
+    </StackPanel>
+</UserControl>

@@ -6,30 +6,30 @@
         <DefaultItemExcludes>$(DefaultItemExcludes);atomex.client.core\**</DefaultItemExcludes>
     </PropertyGroup>
     <ItemGroup>
-        <AvaloniaResource Include="Assets\**" />
-        <AvaloniaResource Include="Resources\*" />
-        <AvaloniaResource Include="Resources\Fonts\*" />
-        <AvaloniaResource Include="Resources\Images\*" />
+        <AvaloniaResource Include="Assets\**"/>
+        <AvaloniaResource Include="Resources\*"/>
+        <AvaloniaResource Include="Resources\Fonts\*"/>
+        <AvaloniaResource Include="Resources\Images\*"/>
     </ItemGroup>
     <ItemGroup>
-        <PackageReference Include="Avalonia" Version="0.10.0" />
-        <PackageReference Include="Avalonia.Controls.DataGrid" Version="0.10.0" />
-        <PackageReference Include="Avalonia.Desktop" Version="0.10.0" />
-        <PackageReference Include="Avalonia.Diagnostics" Version="0.10.0" />
-        <PackageReference Include="Avalonia.ReactiveUI" Version="0.10.0" />
-        <PackageReference Include="Avalonia.Xaml.Behaviors" Version="0.10.0" />
-        <PackageReference Include="Deadpikle.AvaloniaProgressRing" Version="0.9.0" />
-        <PackageReference Include="OxyPlot.Avalonia" Version="2.1.0-20201211.2" />
-        <PackageReference Include="QRCoder" Version="1.4.1" />
-        <PackageReference Include="runtime.osx.10.10-x64.CoreCompat.System.Drawing" Version="5.8.64" />
-        <PackageReference Include="Serilog.Settings.Configuration" Version="3.1.0" />
-        <PackageReference Include="Serilog.Sinks.Console" Version="3.1.1" />
+        <PackageReference Include="Avalonia" Version="0.10.0"/>
+        <PackageReference Include="Avalonia.Controls.DataGrid" Version="0.10.0"/>
+        <PackageReference Include="Avalonia.Desktop" Version="0.10.0"/>
+        <PackageReference Include="Avalonia.Diagnostics" Version="0.10.0"/>
+        <PackageReference Include="Avalonia.ReactiveUI" Version="0.10.0"/>
+        <PackageReference Include="Avalonia.Xaml.Behaviors" Version="0.10.0"/>
+        <PackageReference Include="Deadpikle.AvaloniaProgressRing" Version="0.9.0"/>
+        <PackageReference Include="OxyPlot.Avalonia" Version="2.1.0-20201211.2"/>
+        <PackageReference Include="QRCoder" Version="1.4.1"/>
+        <PackageReference Include="runtime.osx.10.10-x64.CoreCompat.System.Drawing" Version="5.8.64"/>
+        <PackageReference Include="Serilog.Settings.Configuration" Version="3.1.0"/>
+        <PackageReference Include="Serilog.Sinks.Console" Version="3.1.1"/>
     </ItemGroup>
 
 
     <ItemGroup>
-        <None Remove="config.debug.json" />
-        <None Remove="config.json" />
+        <None Remove="config.debug.json"/>
+        <None Remove="config.json"/>
     </ItemGroup>
     <ItemGroup>
         <EmbeddedResource Include="config.debug.json">
@@ -88,40 +88,51 @@
             <DependentUpon>PasswordControlView.axaml</DependentUpon>
         </Compile>
         <Compile Update="Views\MyWalletsView.axaml.cs">
-          <DependentUpon>MyWalletsView.axaml</DependentUpon>
+            <DependentUpon>MyWalletsView.axaml</DependentUpon>
         </Compile>
         <Compile Update="Views\UnlockView.axaml.cs">
-          <DependentUpon>UnlockView.axaml</DependentUpon>
+            <DependentUpon>UnlockView.axaml</DependentUpon>
         </Compile>
         <Compile Update="Views\WalletMainView.axaml.cs">
-          <DependentUpon>WalletMainView.axaml</DependentUpon>
+            <DependentUpon>WalletMainView.axaml</DependentUpon>
         </Compile>
         <Compile Update="Views\ConversionView.axaml.cs">
-          <DependentUpon>ConversionView.axaml</DependentUpon>
+            <DependentUpon>ConversionView.axaml</DependentUpon>
         </Compile>
         <Compile Update="Views\WalletViews\WalletView.axaml.cs">
-          <DependentUpon>WalletView.axaml</DependentUpon>
-          <SubType>Code</SubType>
+            <DependentUpon>WalletView.axaml</DependentUpon>
+            <SubType>Code</SubType>
         </Compile>
         <Compile Update="Views\WalletViews\TezosWalletView.axaml.cs">
-          <DependentUpon>TezosWalletView.axaml</DependentUpon>
-          <SubType>Code</SubType>
+            <DependentUpon>TezosWalletView.axaml</DependentUpon>
+            <SubType>Code</SubType>
         </Compile>
         <Compile Update="Views\ReceiveViews\ReceiveView.axaml.cs">
-          <DependentUpon>ReceiveView.axaml</DependentUpon>
-          <SubType>Code</SubType>
+            <DependentUpon>ReceiveView.axaml</DependentUpon>
+            <SubType>Code</SubType>
         </Compile>
         <Compile Update="Views\SendViews\SendView.axaml.cs">
-          <DependentUpon>SendView.axaml</DependentUpon>
-          <SubType>Code</SubType>
+            <DependentUpon>SendView.axaml</DependentUpon>
+            <SubType>Code</SubType>
         </Compile>
         <Compile Update="Views\SendViews\EthereumSendView.axaml.cs">
-          <DependentUpon>EthereumSendView.axaml</DependentUpon>
-          <SubType>Code</SubType>
+            <DependentUpon>EthereumSendView.axaml</DependentUpon>
+            <SubType>Code</SubType>
         </Compile>
         <Compile Update="Views\SendViews\BitcoinBasedSendView.axaml.cs">
-          <DependentUpon>BitcoinBasedSendView.axaml</DependentUpon>
-          <SubType>Code</SubType>
+            <DependentUpon>BitcoinBasedSendView.axaml</DependentUpon>
+            <SubType>Code</SubType>
+        </Compile>
+        <Compile Update="Views\SendViews\SendConfirmationView.axaml.cs">
+            <DependentUpon>SendConfirmationView.axaml</DependentUpon>
+            <SubType>Code</SubType>
+        </Compile>
+        <Compile Update="Views\SendViews\SendingView.axaml.cs">
+            <DependentUpon>SendingView.axaml</DependentUpon>
+            <SubType>Code</SubType>
+        </Compile>
+        <Compile Update="Views\MessageView.axaml.cs">
+            <DependentUpon>MessageView.axaml</DependentUpon>
         </Compile>
     </ItemGroup>
     <ItemGroup>

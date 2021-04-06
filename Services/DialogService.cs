@@ -21,7 +21,7 @@ namespace Atomex.Client.Desktop.Services
         private DialogServiceViewModel _dialogServiceViewModel;
         private TView _dialogServiceView;
         private ViewLocator _viewLocator;
-        private ViewModelBase lastDialog;
+        private ViewModelBase _lastDialog;
 
         private double DEFAULT_WIDTH = 630;
         private double DEFAULT_HEIGHT = 400;
@@ -37,7 +37,7 @@ namespace Atomex.Client.Desktop.Services
             BuildDialogServiceView();
 
             var mainWindowSize = _owner.GetObservable(Window.ClientSizeProperty).Skip(1);
-            // todo: make static width of dialog during resize until fit main window size.
+
             mainWindowSize.Subscribe(value =>
             {
                 // _dialogServiceView.Width = value.Width / 2;
@@ -53,22 +53,37 @@ namespace Atomex.Client.Desktop.Services
             _dialogServiceView.DataContext = _dialogServiceViewModel;
         }
 
-        public void CloseDialog()
+        public bool CloseDialog()
         {
+            var result = IsDialogOpened;
             if (IsDialogOpened)
             {
                 Dispatcher.UIThread.InvokeAsync(() =>
                 {
+                    _lastDialog = _dialogServiceViewModel.Content;
                     _dialogServiceView.Close();
                     IsDialogOpened = false;
                     BuildDialogServiceView();
                 });
+            }
+
+            return result;
+        }
+
+        public void ShowPrevious()
+        {
+            if (_lastDialog != null)
+            {
+                Show(_lastDialog);
             }
         }
 
         public void Show(ViewModelBase viewModel)
         {
             using var source = new CancellationTokenSource();
+
+            _lastDialog = _dialogServiceViewModel.Content;
+
             _dialogServiceViewModel.Content = viewModel;
             AdjustDialogWindowSize(viewModel);
 

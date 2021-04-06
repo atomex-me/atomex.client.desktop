@@ -10,6 +10,10 @@ namespace Atomex.Client.Desktop.Controls
             AffectsRender<RoundedButton>(
                 CornerRadiusProperty
             );
+
+            AffectsMeasure<RoundedButton>(
+                CornerRadiusProperty
+            );
         }
 
         public static readonly StyledProperty<CornerRadius> CornerRadiusProperty =

@@ -177,8 +177,6 @@ namespace Atomex.Client.Desktop.ViewModels.ReceiveViewModels
                 .FirstOrDefault(c => c.Currency.Name == currency.Name);
 
             CurrencyIndex = FromCurrencies.IndexOf(currencyVM);
-            
-            Console.WriteLine("Creating RECEIVE VM");
         }
 
         private async Task CreateQrCodeAsync()

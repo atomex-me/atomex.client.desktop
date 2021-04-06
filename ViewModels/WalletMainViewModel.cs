@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using Atomex.Client.Desktop.Dialogs.ViewModels;
 using Atomex.Client.Desktop.ViewModels.Abstract;
 using Atomex.MarketData;

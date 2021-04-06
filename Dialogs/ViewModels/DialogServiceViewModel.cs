@@ -44,7 +44,7 @@ namespace Atomex.Client.Desktop.Dialogs.ViewModels
         private void Close(DialogResult dialogResult)
         {
             DialogResult = dialogResult;
-            App.DialogService?.CloseDialog();
+            App.DialogService.CloseDialog();
         }
     }
 }

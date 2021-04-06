@@ -252,9 +252,19 @@ namespace Atomex.Client.Desktop.ViewModels
                     clientType: ClientType.Unknown);
             }, SignOut);
 
-            unlockViewModel.Unlocked += (s, a) => { ShowContent(MainWalletVM); };
+            var wasClosed = App.DialogService.CloseDialog();
 
-            App.DialogService?.CloseDialog();
+            unlockViewModel.Unlocked += (s, a) =>
+            {
+                ShowContent(MainWalletVM);
+
+                if (wasClosed)
+                {
+                    App.DialogService.ShowPrevious();
+                }
+            };
+
+            
             ShowContent(unlockViewModel);
         }
 

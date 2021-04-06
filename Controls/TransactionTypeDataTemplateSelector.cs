@@ -1,3 +1,4 @@
+using System;
 using Atomex.Blockchain.Abstract;
 using Avalonia.Controls;
 using Avalonia.Controls.Templates;
@@ -13,6 +14,8 @@ namespace Atomex.Client.Desktop.Controls
 
         public IControl Build(object data)
         {
+            var tx = data as TransactionViewModel;
+            Console.WriteLine($"Getting type template for {tx.Time} {tx.Type.ToString()}");
             return GetTemplate(data)?.Build(data) ?? new TextBlock {Text = "Transaction Template Not Found"};
         }
 
@@ -50,7 +53,7 @@ namespace Atomex.Client.Desktop.Controls
 
         public bool Match(object data)
         {
-            return data is TransactionViewModel;
+            return true;
         }
     }
 }

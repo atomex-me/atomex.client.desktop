@@ -21,7 +21,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 {
                     var sendViewModel = SendViewModelCreator.CreateViewModel(App, value);
 
-                    Desktop.App.DialogService?.Show(sendViewModel);
+                    Desktop.App.DialogService.Show(sendViewModel);
                     return;
                 }
 

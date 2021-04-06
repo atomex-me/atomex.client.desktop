@@ -4,13 +4,13 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="Atomex.Client.Desktop.Views.WalletViews.WalletView"
-             xmlns:vm="clr-namespace:Atomex.Client.Desktop.ViewModels"
+             xmlns:vm="clr-namespace:Atomex.Client.Desktop.ViewModels.WalletViewModels"
              xmlns:txViewModels="clr-namespace:Atomex.Client.Desktop.ViewModels.TransactionViewModels"
              xmlns:controls="clr-namespace:Atomex.Client.Desktop.Controls"
              xmlns:converters="clr-namespace:Atomex.Client.Desktop.Converters">
 
     <Design.DataContext>
-        <vm:WalletsViewModel />
+        <vm:WalletViewModel />
     </Design.DataContext>
 
     <UserControl.Resources>
@@ -341,21 +341,33 @@
         <!-- SelectionChanged="OnSelectionChanged" -->
         <!-- MouseLeftButtonDown="OnMouseLeftButtonDown" -->
         
+        <!-- SelectionMode="Single" -->
         <!-- CanUserSortColumns="True" -->
         <!-- CanUserResizeColumns="True" -->
+        <!-- RowDetailsVisibilityMode="VisibleWhenSelected" -->
+
         <DataGrid x:Name="DgTransactions"
                   Margin="10"
                   AutoGenerateColumns="False"
                   IsReadOnly="True"
-                  SelectionMode="Single"
 
-                  RowDetailsVisibilityMode="VisibleWhenSelected"
                   Items="{Binding Transactions}"
                   Grid.Row="1">
             <DataGrid.Columns>
                 <DataGridTemplateColumn Header="Type">
                     <DataGridTemplateColumn.CellTemplate>
-                        <controls:TransactionTypeDataTemplateSelector />
+                        <!-- <controls:TransactionTypeDataTemplateSelector /> -->
+                        <DataTemplate x:Key="SentTypeTemplate">
+                            <Image Width="24"
+                                   Height="24"
+                                   Source="avares://Atomex.Client.Desktop/Resources/Images/sent.png" />
+                        </DataTemplate>
+
+                        <!-- <DataTemplate x:Key="ReceivedTypeTemplate"> -->
+                        <!--     <Image Width="24" -->
+                        <!--            Height="24" -->
+                        <!--            Source="avares://Atomex.Client.Desktop/Resources/Images/received.png" /> -->
+                        <!-- </DataTemplate> -->
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
                 <DataGridTextColumn Header="Description" Binding="{Binding Description}" Width="*" />

@@ -14,7 +14,8 @@ namespace Atomex.Client.Desktop.ViewModels
             "AmountString",
             "FeeString",
             "FeePriceString",
-            "GasString"
+            "GasString",
+            "IsExchangeConnected"
         };
 
         protected void OnPropertyChanged(string name)
