@@ -41,5 +41,6 @@
         <StyleInclude Source="/Styles/WalletViewStyle.axaml" />
         <StyleInclude Source="/Styles/CurrencyComboBoxStyle.axaml" />
         <StyleInclude Source="/Styles/ToggleSwitchStyle.axaml" />
+        <StyleInclude Source="/Styles/TypeTest.axaml"></StyleInclude>
     </Application.Styles>
 </Application>

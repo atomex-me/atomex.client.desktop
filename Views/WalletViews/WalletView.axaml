@@ -7,7 +7,8 @@
              xmlns:vm="clr-namespace:Atomex.Client.Desktop.ViewModels.WalletViewModels"
              xmlns:txViewModels="clr-namespace:Atomex.Client.Desktop.ViewModels.TransactionViewModels"
              xmlns:controls="clr-namespace:Atomex.Client.Desktop.Controls"
-             xmlns:converters="clr-namespace:Atomex.Client.Desktop.Converters">
+             xmlns:converters="clr-namespace:Atomex.Client.Desktop.Converters"
+             xmlns:styles="clr-namespace:Atomex.Client.Desktop.Styles">
 
     <Design.DataContext>
         <vm:WalletViewModel />
@@ -356,7 +357,13 @@
             <DataGrid.Columns>
                 <DataGridTemplateColumn Header="Type">
                     <DataGridTemplateColumn.CellTemplate>
-                        <controls:TransactionTypeDataTemplateSelector />
+                        <DataTemplate>
+                            <styles:TypeTest>
+                                <styles:TypeTest.DataTemplate>
+                                    <controls:TransactionTypeDataTemplateSelector/>
+                                </styles:TypeTest.DataTemplate>
+                            </styles:TypeTest>
+                        </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
                 <DataGridTextColumn Header="Description" Binding="{Binding Description}" Width="*" />
@@ -405,7 +412,14 @@
 
                 <DataGridTemplateColumn Header="State">
                     <DataGridTemplateColumn.CellTemplate>
-                        <controls:TransactionStateDataTemplateSelector />
+                        <DataTemplate>
+                            <styles:TypeTest>
+                                <styles:TypeTest.DataTemplate>
+                                    <controls:TransactionStateDataTemplateSelector />
+                                </styles:TypeTest.DataTemplate>
+                            </styles:TypeTest>
+                        </DataTemplate>
+                        
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
                 <DataGridTextColumn Header="Time"

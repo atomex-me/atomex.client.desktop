@@ -14,8 +14,6 @@ namespace Atomex.Client.Desktop.Controls
 
         public IControl Build(object data)
         {
-            var tx = data as TransactionViewModel;
-            Console.WriteLine($"Getting type template for {tx.Time} {tx.Type.ToString()}");
             return GetTemplate(data)?.Build(data) ?? new TextBlock {Text = "Transaction Template Not Found"};
         }
 
@@ -53,7 +51,7 @@ namespace Atomex.Client.Desktop.Controls
 
         public bool Match(object data)
         {
-            return true;
+            return data is TransactionViewModel;
         }
     }
 }
