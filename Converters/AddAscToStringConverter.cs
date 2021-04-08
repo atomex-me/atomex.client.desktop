@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Globalization;
 using Avalonia.Data.Converters;
+using Atomex.Client.Desktop.Common;
 
 namespace Atomex.Client.Desktop.Converters
 {
@@ -12,7 +13,7 @@ namespace Atomex.Client.Desktop.Converters
         {
             if (value is string val)
             {
-                return $"{val}/asc";
+                return $"{val}/{SortType.Asc}";
             }
 
             return value;

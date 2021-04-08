@@ -166,7 +166,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                             transactions.Select(t => TransactionViewModelCreator
                                     .CreateViewModel(t))
                                 .ToList()
-                                .SortList((t1, t2) => t2.Time.CompareTo(t1.Time))
+                                .SortList((t1, t2) => t2.LocalTime.CompareTo(t1.LocalTime))
                                 .ForEachDo(t =>
                                 {
                                     t.UpdateClicked += UpdateTransactonEventHandler;
@@ -356,7 +356,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             get => _sortInfo;
             set
             {
-                string newSortType = "asc";
+                SortType newSortType = SortType.Desc;
                 if (!String.IsNullOrEmpty(_sortInfo))
                 {
                     var lastSortType = _sortInfo.Split(Convert.ToChar("/"))[1];
@@ -364,13 +364,60 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
                     if (String.Equals(lastSortedColumn, value))
                     {
-                        if (lastSortType == "asc") newSortType = "desc";
-                        if (lastSortType == "desc") newSortType = "asc";
+                        if (lastSortType == SortType.Asc.ToString()) newSortType = SortType.Desc;
+                        if (lastSortType == SortType.Desc.ToString()) newSortType = SortType.Asc;
                     }
                 }
 
                 _sortInfo = $"{value}/{newSortType}";
                 OnPropertyChanged(nameof(SortInfo));
+
+                SortTransactions(value, newSortType);
+            }
+        }
+
+        private void SortTransactions(string columnName, SortType sortType)
+        {
+            DGSelectedIndex = -1;
+            if (columnName.ToLower() == "time" && sortType == SortType.Asc)
+            {
+                Transactions = new ObservableCollection<TransactionViewModel>(Transactions.OrderBy(tx => tx.LocalTime));
+            }
+
+            if (columnName.ToLower() == "time" && sortType == SortType.Desc)
+            {
+                Transactions =
+                    new ObservableCollection<TransactionViewModel>(Transactions.OrderByDescending(tx => tx.LocalTime));
+            }
+
+            if (columnName.ToLower() == "amount" && sortType == SortType.Asc)
+            {
+                Transactions = new ObservableCollection<TransactionViewModel>(Transactions.OrderBy(tx => tx.Amount));
+            }
+            
+            if (columnName.ToLower() == "amount" && sortType == SortType.Desc)
+            {
+                Transactions = new ObservableCollection<TransactionViewModel>(Transactions.OrderByDescending(tx => tx.Amount));
+            }
+            
+            if (columnName.ToLower() == "state" && sortType == SortType.Asc)
+            {
+                Transactions = new ObservableCollection<TransactionViewModel>(Transactions.OrderBy(tx => tx.State));
+            }
+            
+            if (columnName.ToLower() == "state" && sortType == SortType.Desc)
+            {
+                Transactions = new ObservableCollection<TransactionViewModel>(Transactions.OrderByDescending(tx => tx.State));
+            }
+            
+            if (columnName.ToLower() == "type" && sortType == SortType.Asc)
+            {
+                Transactions = new ObservableCollection<TransactionViewModel>(Transactions.OrderBy(tx => tx.Type));
+            }
+            
+            if (columnName.ToLower() == "type" && sortType == SortType.Desc)
+            {
+                Transactions = new ObservableCollection<TransactionViewModel>(Transactions.OrderByDescending(tx => tx.Type));
             }
         }
     }

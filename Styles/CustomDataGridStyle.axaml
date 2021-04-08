@@ -9,6 +9,10 @@
         <converters:AddDescToStringConverter x:Key="AddDescToStringConverter" />
     </Styles.Resources>
 
+    <Style Selector="Path.SortPath[IsEnabled=False]">
+        <Setter Property="Opacity" Value="0" />
+    </Style>
+
     <Style Selector="DataGridColumnHeader">
         <Setter Property="Background" Value="{DynamicResource CustomDataGridColumnBackground}" />
         <Setter Property="BorderBrush" Value="{DynamicResource GrayBrush5}" />
@@ -53,16 +57,17 @@
                               Fill="{DynamicResource GrayBrush2}"
                               RenderTransformOrigin="0.5,0.5"
                               Data="F1 M 34,57L 42,57L 42,32.25L 52,42.25L 52,31.75L 38,17.75L 24,31.75L 24,42.25L 34,32.25L 34,57 Z "
-                              Stretch="Fill">
-                            <Path.IsVisible>
+                              Stretch="Fill"
+                              Classes="SortPath">
+                            <Path.IsEnabled>
                                 <MultiBinding Converter="{StaticResource ShouldShowSort}">
                                     <Binding
                                         RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type DataGrid}}"
                                         Path="(helpers:DataGridHelper.SortInfo)" />
                                     <Binding RelativeSource="{RelativeSource TemplatedParent}" Path="Content"
-                                             Converter="{StaticResource AddAscToStringConverter}" />
+                                             Converter="{StaticResource AddDescToStringConverter}" />
                                 </MultiBinding>
-                            </Path.IsVisible>
+                            </Path.IsEnabled>
                         </Path>
 
                         <Path x:Name="SortArrowDesc"
@@ -74,17 +79,18 @@
                               Fill="{DynamicResource GrayBrush2}"
                               RenderTransformOrigin="0.5,0.5"
                               Data="F1 M 42,19.0002L 34,19.0002L 34,43.7502L 24,33.7502L 24,44.2502L 38,58.2502L 52,44.2502L 52,33.7502L 42,43.7502L 42,19.0002 Z "
-                              Stretch="Fill">
+                              Stretch="Fill"
+                              Classes="SortPath">
 
-                            <Path.IsVisible>
+                            <Path.IsEnabled>
                                 <MultiBinding Converter="{StaticResource ShouldShowSort}">
                                     <Binding
                                         RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type DataGrid}}"
                                         Path="(helpers:DataGridHelper.SortInfo)" />
                                     <Binding RelativeSource="{RelativeSource TemplatedParent}" Path="Content"
-                                             Converter="{StaticResource AddDescToStringConverter}" />
+                                             Converter="{StaticResource AddAscToStringConverter}" />
                                 </MultiBinding>
-                            </Path.IsVisible>
+                            </Path.IsEnabled>
                         </Path>
 
                         <Thumb x:Name="PART_LeftHeaderGripper"
