@@ -7,6 +7,7 @@
              xmlns:vm="clr-namespace:Atomex.Client.Desktop.ViewModels"
              xmlns:abstractViewModels="clr-namespace:Atomex.Client.Desktop.ViewModels.Abstract"
              xmlns:converters="clr-namespace:Atomex.Client.Desktop.Converters"
+             xmlns:helpers="clr-namespace:Atomex.Client.Desktop.Helpers"
              xmlns:oxy="http://oxyplot.org/avalonia">
 
     <Design.DataContext>

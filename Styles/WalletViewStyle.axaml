@@ -17,10 +17,9 @@
                            HorizontalAlignment="Center" />
             </Border>
         </DataTemplate>
-
-        <!-- {StaticResource PendingBrush} -->
+        
         <DataTemplate x:Key="PendingStateTemplate" DataType="viewModels:TransactionViewModel">
-            <Border Background="red"
+            <Border Background="{StaticResource PendingBrush}"
                     CornerRadius="5"
                     Margin="3 0 3 0"
                     HorizontalAlignment="Center">
@@ -31,10 +30,9 @@
                            HorizontalAlignment="Center" />
             </Border>
         </DataTemplate>
-
-        <!-- {StaticResource ConfirmedBrush} -->
+        
         <DataTemplate x:Key="ConfirmedStateTemplate" DataType="viewModels:TransactionViewModel">
-            <Border Background="Green"
+            <Border Background="{StaticResource ConfirmedBrush}"
                     CornerRadius="5"
                     Margin="3 0 3 0"
                     HorizontalAlignment="Center">
@@ -45,10 +43,9 @@
                            HorizontalAlignment="Center" />
             </Border>
         </DataTemplate>
-
-        <!-- {StaticResource UnconfirmedBrush} -->
+        
         <DataTemplate x:Key="UnconfirmedStateTemplate" DataType="viewModels:TransactionViewModel">
-            <Border Background="Brown"
+            <Border Background="{StaticResource UnconfirmedBrush}"
                     CornerRadius="5"
                     Margin="3 0 3 0"
                     HorizontalAlignment="Center">

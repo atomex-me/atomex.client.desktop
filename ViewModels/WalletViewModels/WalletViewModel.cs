@@ -19,6 +19,7 @@ using Atomex.Client.Desktop.ViewModels.TransactionViewModels;
 using Atomex.Common;
 using Atomex.Core;
 using Atomex.Wallet;
+using Avalonia.Controls;
 using Avalonia.Media;
 using Avalonia.Threading;
 using NBitcoin;
@@ -33,10 +34,15 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         private const int ConversionViewIndex = 2;
 
         private ObservableCollection<TransactionViewModel> _transactions;
+
         public ObservableCollection<TransactionViewModel> Transactions
         {
             get => _transactions;
-            set { _transactions = value; this.RaisePropertyChanged(nameof(Transactions)); }
+            set
+            {
+                _transactions = value;
+                this.RaisePropertyChanged(nameof(Transactions));
+            }
         }
 
         private CurrencyViewModel _currencyViewModel;
@@ -144,30 +150,30 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         protected async Task LoadTransactionsAsync()
         {
             Log.Debug("LoadTransactionsAsync for {@currency}", Currency.Name);
-            
+
             try
             {
                 if (App.Account == null)
                     return;
-            
+
                 var transactions = (await App.Account
-                    .GetTransactionsAsync(Currency.Name))
+                        .GetTransactionsAsync(Currency.Name))
                     .ToList();
-            
+
                 await Dispatcher.UIThread.InvokeAsync(() =>
-                {
-                    Transactions = new ObservableCollection<TransactionViewModel>(
-                        transactions.Select(t => TransactionViewModelCreator
-                            .CreateViewModel(t))
-                            .ToList()
-                            .SortList((t1, t2) => t2.Time.CompareTo(t1.Time))
-                            .ForEachDo(t =>
-                            {
-                                t.UpdateClicked += UpdateTransactonEventHandler;
-                                t.RemoveClicked += RemoveTransactonEventHandler;
-                            }));
-                },
-                DispatcherPriority.Background);
+                    {
+                        Transactions = new ObservableCollection<TransactionViewModel>(
+                            transactions.Select(t => TransactionViewModelCreator
+                                    .CreateViewModel(t))
+                                .ToList()
+                                .SortList((t1, t2) => t2.Time.CompareTo(t1.Time))
+                                .ForEachDo(t =>
+                                {
+                                    t.UpdateClicked += UpdateTransactonEventHandler;
+                                    t.RemoveClicked += RemoveTransactonEventHandler;
+                                }));
+                    },
+                    DispatcherPriority.Background);
             }
             catch (OperationCanceledException)
             {
@@ -181,24 +187,29 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
         private ICommand _sendCommand;
         public ICommand SendCommand => _sendCommand ??= (_sendCommand = ReactiveCommand.Create(OnSendClick));
-        
+
         private ICommand _receiveCommand;
-        public ICommand ReceiveCommand => _receiveCommand ??= (_receiveCommand = ReactiveCommand.Create(OnReceiveClick));
-        
+
+        public ICommand ReceiveCommand =>
+            _receiveCommand ??= (_receiveCommand = ReactiveCommand.Create(OnReceiveClick));
+
         private ICommand _convertCommand;
-        public ICommand ConvertCommand => _convertCommand ??= (_convertCommand = ReactiveCommand.Create(OnConvertClick));
-        
+
+        public ICommand ConvertCommand =>
+            _convertCommand ??= (_convertCommand = ReactiveCommand.Create(OnConvertClick));
+
         private ICommand _updateCommand;
         public ICommand UpdateCommand => _updateCommand ??= (_updateCommand = ReactiveCommand.Create(OnUpdateClick));
-        
+
         private ICommand _addressesCommand;
-        public ICommand AddressesCommand => _addressesCommand ??= (_addressesCommand = ReactiveCommand.Create(OnAddressesClick));
-        
+
+        public ICommand AddressesCommand =>
+            _addressesCommand ??= (_addressesCommand = ReactiveCommand.Create(OnAddressesClick));
+
         private ICommand _cancelUpdateCommand;
-        public ICommand CancelUpdateCommand => _cancelUpdateCommand ??= (_cancelUpdateCommand = ReactiveCommand.Create(() =>
-        {
-            Cancellation.Cancel();
-        }));
+
+        public ICommand CancelUpdateCommand => _cancelUpdateCommand ??=
+            (_cancelUpdateCommand = ReactiveCommand.Create(() => { Cancellation.Cancel(); }));
 
         private void OnSendClick()
         {
@@ -222,20 +233,20 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         {
             if (IsBalanceUpdating)
                 return;
-        
+
             IsBalanceUpdating = true;
-        
+
             Cancellation = new CancellationTokenSource();
-        
+
             try
             {
                 var scanner = new HdWalletScanner(App.Account);
-        
+
                 await scanner.ScanAsync(
                     currency: Currency.Name,
                     skipUsed: true,
                     cancellationToken: Cancellation.Token);
-        
+
                 await LoadTransactionsAsync();
             }
             catch (OperationCanceledException)
@@ -247,7 +258,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                 Log.Error(e, "WalletViewModel.OnUpdateClick");
                 // todo: message to user!?
             }
-        
+
             IsBalanceUpdating = false;
         }
 
@@ -265,14 +276,14 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         {
             if (App.Account == null)
                 return;
-        
+
             try
             {
                 var txId = $"{args.Transaction.Id}:{args.Transaction.Currency.Name}";
-        
+
                 var isRemoved = await App.Account
                     .RemoveTransactionAsync(txId);
-        
+
                 if (isRemoved)
                     await LoadTransactionsAsync();
             }
@@ -316,6 +327,51 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             //
             // Transactions = new ObservableCollection<TransactionViewModel>(
             //     transactions.SortList((t1, t2) => t2.Time.CompareTo(t1.Time)));
+        }
+
+        private int _dgSelectedIndex;
+
+        public int DGSelectedIndex
+        {
+            get => _dgSelectedIndex;
+            set
+            {
+                _dgSelectedIndex = value;
+                OnPropertyChanged(nameof(DGSelectedIndex));
+            }
+        }
+
+        public void CellPointerPressed(int cellIndex)
+        {
+            if (cellIndex == DGSelectedIndex)
+            {
+                DGSelectedIndex = -1;
+            }
+        }
+
+        private string _sortInfo;
+
+        public string SortInfo
+        {
+            get => _sortInfo;
+            set
+            {
+                string newSortType = "asc";
+                if (!String.IsNullOrEmpty(_sortInfo))
+                {
+                    var lastSortType = _sortInfo.Split(Convert.ToChar("/"))[1];
+                    var lastSortedColumn = _sortInfo.Split(Convert.ToChar("/"))[0];
+
+                    if (String.Equals(lastSortedColumn, value))
+                    {
+                        if (lastSortType == "asc") newSortType = "desc";
+                        if (lastSortType == "desc") newSortType = "asc";
+                    }
+                }
+
+                _sortInfo = $"{value}/{newSortType}";
+                OnPropertyChanged(nameof(SortInfo));
+            }
         }
     }
 }

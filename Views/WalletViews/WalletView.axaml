@@ -8,7 +8,8 @@
              xmlns:txViewModels="clr-namespace:Atomex.Client.Desktop.ViewModels.TransactionViewModels"
              xmlns:controls="clr-namespace:Atomex.Client.Desktop.Controls"
              xmlns:converters="clr-namespace:Atomex.Client.Desktop.Converters"
-             xmlns:styles="clr-namespace:Atomex.Client.Desktop.Styles">
+             xmlns:styles="clr-namespace:Atomex.Client.Desktop.Styles"
+             xmlns:helpers="clr-namespace:Atomex.Client.Desktop.Helpers">
 
     <Design.DataContext>
         <vm:WalletViewModel />
@@ -17,6 +18,12 @@
     <UserControl.Resources>
         <converters:AmountToStringConverter x:Key="AmountToStringConverter" />
         <converters:DateTimeToTxTimeConverter x:Key="DateTimeToTxTimeConverter" />
+
+        <DataTemplate x:Key="TestDataTemplate">
+            <Panel Background="Black">
+                <TextBlock Foreground="White">TestDataTemplate!</TextBlock>
+            </Panel>
+        </DataTemplate>
     </UserControl.Resources>
 
     <UserControl.Styles>
@@ -341,33 +348,53 @@
         <!-- RowDetailsTemplateSelector="{StaticResource TransactionDetailsDataTemplateSelector}" -->
         <!-- SelectionChanged="OnSelectionChanged" -->
         <!-- MouseLeftButtonDown="OnMouseLeftButtonDown" -->
-        
+
         <!-- SelectionMode="Single" -->
         <!-- CanUserSortColumns="True" -->
         <!-- CanUserResizeColumns="True" -->
         <!-- RowDetailsVisibilityMode="VisibleWhenSelected" -->
 
+        <!-- RowDetailsTemplate="{StaticResource TestDataTemplate}" -->
         <DataGrid x:Name="DgTransactions"
                   Margin="10"
                   AutoGenerateColumns="False"
                   IsReadOnly="True"
-
+                  RowDetailsVisibilityMode="VisibleWhenSelected"
+                  SelectionMode="Single"
+                  SelectedIndex="{Binding DGSelectedIndex, Mode=TwoWay}"
                   Items="{Binding Transactions}"
+                  helpers:DataGridHelper.SortInfo="{Binding SortInfo}"
                   Grid.Row="1">
+            
+
+            <DataGrid.RowDetailsTemplate>
+                <DataTemplate>
+                    <styles:TypeTest>
+                        <styles:TypeTest.DataTemplate>
+                            <controls:TransactionTypeDataTemplateSelector />
+                        </styles:TypeTest.DataTemplate>
+                    </styles:TypeTest>
+                </DataTemplate>
+            </DataGrid.RowDetailsTemplate>
+            
+            
             <DataGrid.Columns>
-                <DataGridTemplateColumn Header="Type">
+                <DataGridTemplateColumn Header="Type" CanUserSort="True">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <styles:TypeTest>
                                 <styles:TypeTest.DataTemplate>
-                                    <controls:TransactionTypeDataTemplateSelector/>
+                                    <controls:TransactionTypeDataTemplateSelector />
                                 </styles:TypeTest.DataTemplate>
                             </styles:TypeTest>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
-                <DataGridTextColumn Header="Description" Binding="{Binding Description}" Width="*" />
-                <DataGridTemplateColumn Header="Amount">
+                <DataGridTextColumn Header="Description"
+                                    CanUserSort="False"
+                                    Binding="{Binding Description}"
+                                    Width="*" />
+                <DataGridTemplateColumn Header="Amount" CanUserSort="True">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate DataType="{x:Type txViewModels:TransactionViewModel}">
                             <StackPanel Orientation="Horizontal" Margin="3 0 3 0">
@@ -410,7 +437,7 @@
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
 
-                <DataGridTemplateColumn Header="State">
+                <DataGridTemplateColumn Header="State" CanUserSort="True">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <styles:TypeTest>
@@ -419,10 +446,11 @@
                                 </styles:TypeTest.DataTemplate>
                             </styles:TypeTest>
                         </DataTemplate>
-                        
+
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
                 <DataGridTextColumn Header="Time"
+                                    CanUserSort="True"
                                     Binding="{Binding LocalTime, Converter={StaticResource DateTimeToTxTimeConverter}}" />
             </DataGrid.Columns>
         </DataGrid>

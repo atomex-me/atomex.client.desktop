@@ -1,5 +1,13 @@
 ﻿<Styles xmlns="https://github.com/avaloniaui"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:helpers="clr-namespace:Atomex.Client.Desktop.Helpers"
+        xmlns:converters="clr-namespace:Atomex.Client.Desktop.Converters">
+
+    <Styles.Resources>
+        <converters:ShouldShowSort x:Key="ShouldShowSort" />
+        <converters:AddAscToStringConverter x:Key="AddAscToStringConverter" />
+        <converters:AddDescToStringConverter x:Key="AddDescToStringConverter" />
+    </Styles.Resources>
 
     <Style Selector="DataGridColumnHeader">
         <Setter Property="Background" Value="{DynamicResource CustomDataGridColumnBackground}" />
@@ -36,7 +44,7 @@
                                         Content="{TemplateBinding Content}"
                                         ContentTemplate="{TemplateBinding ContentTemplate}" />
 
-                        <Path x:Name="SortArrow"
+                        <Path x:Name="SortArrowAsc"
                               Grid.Column="1"
                               Width="8"
                               Height="10"
@@ -44,7 +52,40 @@
                               VerticalAlignment="Center"
                               Fill="{DynamicResource GrayBrush2}"
                               RenderTransformOrigin="0.5,0.5"
-                              Stretch="Fill" />
+                              Data="F1 M 34,57L 42,57L 42,32.25L 52,42.25L 52,31.75L 38,17.75L 24,31.75L 24,42.25L 34,32.25L 34,57 Z "
+                              Stretch="Fill">
+                            <Path.IsVisible>
+                                <MultiBinding Converter="{StaticResource ShouldShowSort}">
+                                    <Binding
+                                        RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type DataGrid}}"
+                                        Path="(helpers:DataGridHelper.SortInfo)" />
+                                    <Binding RelativeSource="{RelativeSource TemplatedParent}" Path="Content"
+                                             Converter="{StaticResource AddAscToStringConverter}" />
+                                </MultiBinding>
+                            </Path.IsVisible>
+                        </Path>
+
+                        <Path x:Name="SortArrowDesc"
+                              Grid.Column="1"
+                              Width="8"
+                              Height="10"
+                              Margin="0 0 8 0"
+                              VerticalAlignment="Center"
+                              Fill="{DynamicResource GrayBrush2}"
+                              RenderTransformOrigin="0.5,0.5"
+                              Data="F1 M 42,19.0002L 34,19.0002L 34,43.7502L 24,33.7502L 24,44.2502L 38,58.2502L 52,44.2502L 52,33.7502L 42,43.7502L 42,19.0002 Z "
+                              Stretch="Fill">
+
+                            <Path.IsVisible>
+                                <MultiBinding Converter="{StaticResource ShouldShowSort}">
+                                    <Binding
+                                        RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type DataGrid}}"
+                                        Path="(helpers:DataGridHelper.SortInfo)" />
+                                    <Binding RelativeSource="{RelativeSource TemplatedParent}" Path="Content"
+                                             Converter="{StaticResource AddDescToStringConverter}" />
+                                </MultiBinding>
+                            </Path.IsVisible>
+                        </Path>
 
                         <Thumb x:Name="PART_LeftHeaderGripper"
                                Grid.Column="0"
