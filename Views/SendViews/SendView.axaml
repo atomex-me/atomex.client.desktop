@@ -90,7 +90,6 @@
 
 
                 <TextBox Classes="CustomTextBox AmountTextBox"
-                         Name="AmountTextBox"
                          Width="318"
                          Height="40"
                          Margin="0 5 0 5"
@@ -100,7 +99,8 @@
                          helpers:TextBoxHelper.CornerRadius="0"
                          helpers:AmountTextBoxHelper.CurrencyCode="{Binding CurrencyCode}"
                          helpers:AmountTextBoxHelper.BaseCurrencyCode="{Binding BaseCurrencyCode}"
-                         Text="{Binding AmountString, Mode=TwoWay}">
+                         Text="{Binding AmountString, Mode=OneWay}"
+                         Name="AmountString">
                     
                     <helpers:AmountTextBoxHelper.AmountInBase>
                         <MultiBinding Converter="{StaticResource AmountToStringConverter}">
@@ -142,7 +142,8 @@
                          helpers:AmountTextBoxHelper.BaseCurrencyCode="{Binding BaseCurrencyCode}"
                          Background="{DynamicResource DefaultSubstrateBrush}"
                          Foreground="{DynamicResource DefaultForegroundBrush}"
-                         Text="{Binding FeeString, Mode=TwoWay}">
+                         Text="{Binding FeeString, Mode=OneWay}"
+                         Name="FeeString">
                     <helpers:AmountTextBoxHelper.AmountInBase>
                         <MultiBinding Converter="{StaticResource AmountToStringConverter}">
                             <Binding Path="FeeInBase" Mode="OneWay" />

@@ -206,6 +206,7 @@
     <SolidColorBrush x:Key="CustomDataGridRowBackground" Color="Transparent" />
     <SolidColorBrush x:Key="CustomDataGridAlternativeRowBackground" Color="#15253c" />
     <SolidColorBrush x:Key="CustomDataGridNoData" Color="#03ffffff" />
+    <SolidColorBrush x:Key="CustomDataGridHeaderPointerOver" Color="{DynamicResource MahApps.Colors.Gray2}" Opacity="0.5" />
 
     <!-- Baker ComboBox -->
 

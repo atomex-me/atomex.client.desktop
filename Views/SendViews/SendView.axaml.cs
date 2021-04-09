@@ -1,9 +1,10 @@
 using System;
+using System.Reactive.Linq;
+using Atomex.Client.Desktop.ViewModels.SendViewModels;
 using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Input;
-using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
+using Avalonia.Threading;
 
 namespace Atomex.Client.Desktop.Views.SendViews
 {
@@ -13,17 +14,28 @@ namespace Atomex.Client.Desktop.Views.SendViews
         {
             InitializeComponent();
             
-            // var AmountTextBox = this.FindControl<TextBox>("AmountTextBox");
-            //
-            // AmountTextBox.AddHandler(TextInputEvent, ViewBlock_TextInput, RoutingStrategies.Tunnel);
-            // AmountTextBox.AddHandler(TextInputEvent, ViewBlock_TextInput, RoutingStrategies.Tunnel);
-            //
-            // void ViewBlock_TextInput(object sender, TextInputEventArgs e)
-            // {
-            //     Console.WriteLine("AmountInput");
-            //     e.Handled = true;
-            //     return;
-            // }
+            var amountStringTextBox = this.FindControl<TextBox>("AmountString");
+            var feeStringTextBox = this.FindControl<TextBox>("FeeString");
+
+            amountStringTextBox.GetObservable(TextBox.TextProperty)
+                .Throttle(TimeSpan.FromMilliseconds(1))
+                .Subscribe(text =>
+                {
+                    Dispatcher.UIThread.InvokeAsync(() =>
+                    {
+                        ((SendViewModel) DataContext)!.AmountString = text;
+                    });
+                });
+            
+            feeStringTextBox.GetObservable(TextBox.TextProperty)
+                .Throttle(TimeSpan.FromMilliseconds(1))
+                .Subscribe(text =>
+                {
+                    Dispatcher.UIThread.InvokeAsync(() =>
+                    {
+                        ((SendViewModel) DataContext)!.FeeString = text;
+                    });
+                });
         }
 
         private void InitializeComponent()

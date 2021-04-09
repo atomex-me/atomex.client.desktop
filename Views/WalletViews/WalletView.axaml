@@ -9,7 +9,9 @@
              xmlns:controls="clr-namespace:Atomex.Client.Desktop.Controls"
              xmlns:converters="clr-namespace:Atomex.Client.Desktop.Converters"
              xmlns:styles="clr-namespace:Atomex.Client.Desktop.Styles"
-             xmlns:helpers="clr-namespace:Atomex.Client.Desktop.Helpers">
+             xmlns:helpers="clr-namespace:Atomex.Client.Desktop.Helpers"
+             xmlns:i="using:Avalonia.Xaml.Interactivity"
+             xmlns:ia="using:Avalonia.Xaml.Interactions.Core">
 
     <Design.DataContext>
         <vm:WalletViewModel />
@@ -364,8 +366,9 @@
                   SelectedIndex="{Binding DGSelectedIndex, Mode=TwoWay}"
                   Items="{Binding Transactions}"
                   helpers:DataGridHelper.SortInfo="{Binding SortInfo}"
+                  CanUserResizeColumns="True"
                   Grid.Row="1">
-            
+
 
             <DataGrid.RowDetailsTemplate>
                 <DataTemplate>
@@ -376,10 +379,10 @@
                     </styles:TypeTest>
                 </DataTemplate>
             </DataGrid.RowDetailsTemplate>
-            
-            
+
+
             <DataGrid.Columns>
-                <DataGridTemplateColumn Header="Type" CanUserSort="True">
+                <DataGridTemplateColumn Header="TYPE" CanUserSort="True">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <styles:TypeTest>
@@ -390,15 +393,18 @@
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
-                <DataGridTextColumn Header="Description"
+                <DataGridTextColumn Header="DESCRIPTION"
                                     CanUserSort="False"
                                     Binding="{Binding Description}"
                                     Width="*" />
-                <DataGridTemplateColumn Header="Amount" CanUserSort="True">
+                <DataGridTemplateColumn Header="AMOUNT" CanUserSort="True">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate DataType="{x:Type txViewModels:TransactionViewModel}">
                             <StackPanel Orientation="Horizontal" Margin="3 0 3 0">
                                 <TextBlock FontFamily="{DynamicResource DefaultFontFamily}"
+                                           VerticalAlignment="Center"
+                                           HorizontalAlignment="Left"
+                                           Name="AmountTextBlock"
                                            FontSize="13">
                                     <TextBlock.Text>
                                         <MultiBinding Converter="{StaticResource AmountToStringConverter}">
@@ -406,38 +412,36 @@
                                             <Binding Path="AmountFormat" Mode="OneWay" />
                                         </MultiBinding>
                                     </TextBlock.Text>
-                                    <!-- <TextBlock.Style> -->
-                                    <!--     <Style TargetType="TextBlock"> -->
-                                    <!--         <Style.Triggers> -->
-                                    <!--             <DataTrigger -->
-                                    <!--                 Binding="{Binding Amount, Converter={StaticResource IsPositiveValueConverter}}" -->
-                                    <!--                 Value="False"> -->
-                                    <!--                 <Setter Property="Foreground" -->
-                                    <!--                         Value="{DynamicResource NegativeAmountBrush}" /> -->
-                                    <!--             </DataTrigger> -->
-                                    <!--             <DataTrigger -->
-                                    <!--                 Binding="{Binding Amount, Converter={StaticResource IsPositiveValueConverter}}" -->
-                                    <!--                 Value="True"> -->
-                                    <!--                 <Setter Property="Foreground" -->
-                                    <!--                         Value="{DynamicResource PositiveAmountBrush}" /> -->
-                                    <!--             </DataTrigger> -->
-                                    <!--         </Style.Triggers> -->
-                                    <!--     </Style> -->
-                                    <!-- </TextBlock.Style> -->
+                                    <i:Interaction.Behaviors>
+                                        <ia:DataTriggerBehavior Binding="{Binding Amount}"
+                                                                ComparisonCondition="LessThan"
+                                                                Value="0">
+                                            <ia:ChangePropertyAction TargetObject="{Binding #AmountTextBlock}"
+                                                                     PropertyName="Foreground"
+                                                                     Value="{StaticResource NegativeAmountBrush}" />
+                                        </ia:DataTriggerBehavior>
+                                        <ia:DataTriggerBehavior Binding="{Binding Amount}"
+                                                                ComparisonCondition="GreaterThanOrEqual"
+                                                                Value="0">
+                                            <ia:ChangePropertyAction TargetObject="{Binding #AmountTextBlock}"
+                                                                     PropertyName="Foreground"
+                                                                     Value="{StaticResource PositiveAmountBrush}" />
+                                        </ia:DataTriggerBehavior>
+                                    </i:Interaction.Behaviors>
                                 </TextBlock>
-
-                                <!-- Visibility="Collapsed" -->
+                                
                                 <TextBlock Text="{Binding CurrencyCode}"
                                            FontFamily="{DynamicResource DefaultFontFamily}"
                                            FontSize="8"
                                            VerticalAlignment="Bottom"
+                                           IsVisible="False"
                                            Margin="3 0 0 2" />
                             </StackPanel>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
 
-                <DataGridTemplateColumn Header="State" CanUserSort="True">
+                <DataGridTemplateColumn Header="STATE" CanUserSort="True">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <styles:TypeTest>
@@ -449,7 +453,7 @@
 
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
-                <DataGridTextColumn Header="Time"
+                <DataGridTextColumn Header="TIME"
                                     CanUserSort="True"
                                     Binding="{Binding LocalTime, Converter={StaticResource DateTimeToTxTimeConverter}}" />
             </DataGrid.Columns>

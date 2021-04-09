@@ -16,11 +16,13 @@ namespace Atomex.Client.Desktop.Views.WalletViews
         public WalletView()
         {
             InitializeComponent();
-            
+
             var dgTransactions = this.FindControl<DataGrid>("DgTransactions");
+
+
             dgTransactions.CellPointerPressed += (sender, args) =>
             {
-                ((WalletViewModel) DataContext!).CellPointerPressed(args.Row.GetIndex());
+                Task.Run(() => { ((WalletViewModel) DataContext!).CellPointerPressed(args.Row.GetIndex()); });
             };
 
             dgTransactions.Sorting += (sender, args) =>
