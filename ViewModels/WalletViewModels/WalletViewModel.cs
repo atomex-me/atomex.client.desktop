@@ -329,7 +329,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             //     transactions.SortList((t1, t2) => t2.Time.CompareTo(t1.Time)));
         }
 
-        private int _dgSelectedIndex;
+        private int _dgSelectedIndex = -1;
 
         public int DGSelectedIndex
         {
@@ -346,7 +346,10 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             if (cellIndex == DGSelectedIndex)
             {
                 DGSelectedIndex = -1;
+                return;
             }
+
+            DGSelectedIndex = cellIndex;
         }
 
         private string _sortInfo;
@@ -394,30 +397,33 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             {
                 Transactions = new ObservableCollection<TransactionViewModel>(Transactions.OrderBy(tx => tx.Amount));
             }
-            
+
             if (columnName.ToLower() == "amount" && sortType == SortType.Desc)
             {
-                Transactions = new ObservableCollection<TransactionViewModel>(Transactions.OrderByDescending(tx => tx.Amount));
+                Transactions =
+                    new ObservableCollection<TransactionViewModel>(Transactions.OrderByDescending(tx => tx.Amount));
             }
-            
+
             if (columnName.ToLower() == "state" && sortType == SortType.Asc)
             {
                 Transactions = new ObservableCollection<TransactionViewModel>(Transactions.OrderBy(tx => tx.State));
             }
-            
+
             if (columnName.ToLower() == "state" && sortType == SortType.Desc)
             {
-                Transactions = new ObservableCollection<TransactionViewModel>(Transactions.OrderByDescending(tx => tx.State));
+                Transactions =
+                    new ObservableCollection<TransactionViewModel>(Transactions.OrderByDescending(tx => tx.State));
             }
-            
+
             if (columnName.ToLower() == "type" && sortType == SortType.Asc)
             {
                 Transactions = new ObservableCollection<TransactionViewModel>(Transactions.OrderBy(tx => tx.Type));
             }
-            
+
             if (columnName.ToLower() == "type" && sortType == SortType.Desc)
             {
-                Transactions = new ObservableCollection<TransactionViewModel>(Transactions.OrderByDescending(tx => tx.Type));
+                Transactions =
+                    new ObservableCollection<TransactionViewModel>(Transactions.OrderByDescending(tx => tx.Type));
             }
         }
     }

@@ -363,7 +363,7 @@
                   IsReadOnly="True"
                   RowDetailsVisibilityMode="VisibleWhenSelected"
                   SelectionMode="Single"
-                  SelectedIndex="{Binding DGSelectedIndex, Mode=TwoWay}"
+                  SelectedIndex="{Binding DGSelectedIndex, Mode=OneWay}"
                   Items="{Binding Transactions}"
                   helpers:DataGridHelper.SortInfo="{Binding SortInfo}"
                   CanUserResizeColumns="True"

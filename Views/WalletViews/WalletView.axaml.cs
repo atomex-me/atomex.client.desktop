@@ -8,6 +8,7 @@ using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
+using Avalonia.Threading;
 
 namespace Atomex.Client.Desktop.Views.WalletViews
 {
@@ -22,7 +23,11 @@ namespace Atomex.Client.Desktop.Views.WalletViews
 
             dgTransactions.CellPointerPressed += (sender, args) =>
             {
-                Task.Run(() => { ((WalletViewModel) DataContext!).CellPointerPressed(args.Row.GetIndex()); });
+                var cellIndex = args.Row.GetIndex();
+                Dispatcher.UIThread.InvokeAsync(() =>
+                {
+                    ((WalletViewModel) DataContext!).CellPointerPressed(cellIndex);
+                });
             };
 
             dgTransactions.Sorting += (sender, args) =>
