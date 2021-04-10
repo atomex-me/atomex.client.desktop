@@ -275,6 +275,7 @@
     <SolidColorBrush x:Key="ConfirmedBrush" Color="{DynamicResource ConfirmedColor}" />
     <SolidColorBrush x:Key="UnconfirmedBrush" Color="{DynamicResource UnconfirmedColor}" />
     <SolidColorBrush x:Key="FailedBrush" Color="{DynamicResource FailedColor}" />
+    <SolidColorBrush x:Key="CheckboxCheckedBrush" Color="{DynamicResource ConfirmedColor}" />
 
     <SolidColorBrush x:Key="BalanceBackgroundBrush" Color="White" />
     <SolidColorBrush x:Key="UsdBalanceBackgroundBrush" Color="Gray" />

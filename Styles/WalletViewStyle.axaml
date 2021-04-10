@@ -156,4 +156,9 @@
         <Setter Property="Height" Value="30" />
         <Setter Property="CornerRadius" Value="5" />
     </Style>
+    
+    <Style Selector="CheckBox:checked /template/ Border#NormalRectangle">
+        <Setter Property="BorderBrush" Value="{DynamicResource CheckboxCheckedBrush}" />
+        <Setter Property="Background" Value="{DynamicResource CheckboxCheckedBrush}" />
+    </Style>
 </Styles>

@@ -3,7 +3,7 @@
         xmlns:sys="clr-namespace:System;assembly=netstandard">
     
     <Styles.Resources>
-        <sys:Double x:Key="ToolTipContentMaxWidth">500</sys:Double>
+        <sys:Double x:Key="ToolTipContentMaxWidth">560</sys:Double>
     </Styles.Resources>
 
     <Style Selector="ToolTip">
