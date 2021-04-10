@@ -3,6 +3,260 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             x:Class="Atomex.Client.Desktop.Views.TransactionViews.TezosTransactionDetailsView">
-    Tezos Transaction details view;
+             x:Class="Atomex.Client.Desktop.Views.TransactionViews.TezosTransactionDetailsView"
+             xmlns:controls="clr-namespace:Atomex.Client.Desktop.Controls"
+             xmlns:vm="clr-namespace:Atomex.Client.Desktop.ViewModels.TransactionViewModels"
+             xmlns:converters="clr-namespace:Atomex.Client.Desktop.Converters">
+
+    <Design.DataContext>
+        <vm:TezosTransactionViewModel />
+    </Design.DataContext>
+
+    <UserControl.Resources>
+        <converters:DateTimeToTxDetailsConverter x:Key="DateTimeToTxDetailsConverter" />
+    </UserControl.Resources>
+    
+        <Grid Background="{DynamicResource TransactionDetailsBackgroundBrush}">
+        <Grid Margin="10">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition/>
+                <ColumnDefinition Width="60"/>
+            </Grid.ColumnDefinitions>
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="22"/>
+                <RowDefinition Height="22"/>
+                <RowDefinition Height="22"/>
+                <RowDefinition Height="22"/>
+                <RowDefinition Height="22"/>
+                <RowDefinition Height="22"/>
+                <RowDefinition Height="22"/>
+            </Grid.RowDefinitions>
+
+            <TextBlock Text="Transaction Id:"
+                       FontFamily="{DynamicResource DefaultFontFamily}"
+                       Foreground="{DynamicResource TransactionDetailsLineHeaderBrush}"
+                       HorizontalAlignment="Right"
+                       VerticalAlignment="Center"
+                       Grid.Column="0"
+                       Grid.Row="0"/>
+
+            <StackPanel Orientation="Horizontal"
+                        Grid.Column="1"
+                        Grid.Row="0">
+                
+                <Border ToolTip.Placement="AnchorAndGravity"
+                        ToolTip.VerticalOffset="-42">
+                    <Button Content="{Binding Id}"
+                            Margin="10 0 0 0"
+                            HorizontalAlignment="Left"
+                            VerticalAlignment="Center"
+                            Command="{Binding OpenTxInExplorerCommand}"
+                            CommandParameter="{Binding Id}"
+                            Classes="ExplorerLinkButton"/>
+                    <ToolTip.Tip>
+                        <TextBlock Text="{Binding TxExplorerUri}" />
+                    </ToolTip.Tip>
+                </Border>
+                
+                <Border ToolTip.Placement="AnchorAndGravity"
+                        ToolTip.VerticalOffset="-32">
+                    <controls:IconButton HorizontalAlignment="Center"
+                                         VerticalAlignment="Center"
+                                         Foreground="{DynamicResource IconButtonForegroundBrush}"
+                                         MouseOverBrush="{DynamicResource IconButtonMouseOverBrush}"
+                                         PressedBrush="{DynamicResource IconButtonPressedBrush}"
+                                         Path="{DynamicResource Octicons.Clippy}"
+                                         Margin="7 0 0 0"
+                                         Width="15"
+                                         Height="15"
+                                         Command="{Binding CopyCommand}"
+                                         CommandParameter="{Binding Id}"
+                                         Classes="PathButtonStyle"/>
+                    <ToolTip.Tip>
+                        <TextBlock Text="Copy transaction id to clipboard" />
+                    </ToolTip.Tip>
+                </Border>
+            </StackPanel>
+
+            <TextBlock Text="Time Stamp:"
+                       FontFamily="{DynamicResource DefaultFontFamily}"
+                       Foreground="{DynamicResource TransactionDetailsLineHeaderBrush}"
+                       HorizontalAlignment="Right"
+                       VerticalAlignment="Center"
+                       Grid.Column="0"
+                       Grid.Row="1"/>
+            <TextBlock Text="{Binding LocalTime, Converter={StaticResource DateTimeToTxDetailsConverter}}"
+                       FontFamily="{DynamicResource DefaultFontFamily}"
+                       Foreground="{DynamicResource DefaultForegroundBrush}"
+                       VerticalAlignment="Center"
+                       Margin="10 0 0 0"
+                       Grid.Column="1"
+                       Grid.Row="1"/>
+
+            <TextBlock Text="From:"
+                       FontFamily="{DynamicResource DefaultFontFamily}"
+                       Foreground="{DynamicResource TransactionDetailsLineHeaderBrush}"
+                       HorizontalAlignment="Right"
+                       VerticalAlignment="Center"
+                       Grid.Column="0"
+                       Grid.Row="2"/>
+            <StackPanel Orientation="Horizontal"
+                        Grid.Column="1"
+                        Grid.Row="2">
+                
+                <Border ToolTip.Placement="AnchorAndGravity"
+                        ToolTip.VerticalOffset="-32">
+                    <Button Content="{Binding From}"
+                            Margin="10 0 0 0"
+                            HorizontalAlignment="Left"
+                            VerticalAlignment="Center"
+                            Command="{Binding OpenAddressInExplorerCommand}"
+                            CommandParameter="{Binding From}"
+                            Classes="ExplorerLinkButton"/>
+                    <ToolTip.Tip>
+                        <TextBlock Text="{Binding FromExplorerUri}" />
+                    </ToolTip.Tip>
+                </Border>
+                
+                <Border ToolTip.Placement="AnchorAndGravity"
+                        ToolTip.VerticalOffset="-32">
+                    <controls:IconButton HorizontalAlignment="Center"
+                                         VerticalAlignment="Center"
+                                         Foreground="{DynamicResource IconButtonForegroundBrush}"
+                                         MouseOverBrush="{DynamicResource IconButtonMouseOverBrush}"
+                                         PressedBrush="{DynamicResource IconButtonPressedBrush}"
+                                         Path="{DynamicResource Octicons.Clippy}"
+                                         Margin="7 0 0 0"
+                                         Width="15"
+                                         Height="15"
+                                         Command="{Binding CopyCommand}"
+                                         CommandParameter="{Binding From}"
+                                         Classes="PathButtonStyle"/>
+                    <ToolTip.Tip>
+                        <TextBlock Text="Copy address to clipboard" />
+                    </ToolTip.Tip>
+                </Border>
+            </StackPanel>
+
+            <TextBlock Text="To:"
+                       FontFamily="{DynamicResource DefaultFontFamily}"
+                       Foreground="{DynamicResource TransactionDetailsLineHeaderBrush}"
+                       HorizontalAlignment="Right"
+                       VerticalAlignment="Center"
+                       Grid.Column="0"
+                       Grid.Row="3"/>
+
+            <StackPanel Orientation="Horizontal"
+                        Grid.Column="1"
+                        Grid.Row="3">
+
+                <Border ToolTip.Placement="AnchorAndGravity"
+                        ToolTip.VerticalOffset="-32">
+                    <Button Content="{Binding To}"
+                            Margin="10 1 0 0"
+                            HorizontalAlignment="Left"
+                            VerticalAlignment="Center"
+                            Command="{Binding OpenAddressInExplorerCommand}"
+                            CommandParameter="{Binding To}"
+                            Classes="ExplorerLinkButton"/>
+                    <ToolTip.Tip>
+                        <TextBlock Text="{Binding ToExplorerUri}" />
+                    </ToolTip.Tip>
+                </Border>
+                
+                <Border ToolTip.Placement="AnchorAndGravity"
+                        ToolTip.VerticalOffset="-32">
+                    <controls:IconButton HorizontalAlignment="Center"
+                                         VerticalAlignment="Center"
+                                         Foreground="{StaticResource IconButtonForegroundBrush}"
+                                         MouseOverBrush="{StaticResource IconButtonMouseOverBrush}"
+                                         PressedBrush="{StaticResource IconButtonPressedBrush}"
+                                         Path="{DynamicResource Octicons.Clippy}"
+                                         Margin="7 0 0 0"
+                                         Width="15"
+                                         Height="15"
+                                         Command="{Binding CopyCommand}"
+                                         CommandParameter="{Binding To}"
+                                         Classes="PathButtonStyle"/>
+                    <ToolTip.Tip>
+                        <TextBlock Text="Copy address to clipboard" />
+                    </ToolTip.Tip>
+                </Border>
+            </StackPanel>
+
+            <TextBlock Text="Gas Limit:"
+                       FontFamily="{DynamicResource DefaultFontFamily}"
+                       Foreground="{DynamicResource TransactionDetailsLineHeaderBrush}"
+                       HorizontalAlignment="Right"
+                       VerticalAlignment="Center"
+                       Grid.Column="0"
+                       Grid.Row="4"/>
+            <TextBlock Text="{Binding GasLimit}"
+                       FontFamily="{DynamicResource DefaultFontFamily}"
+                       Foreground="{DynamicResource DefaultForegroundBrush}"
+                       Margin="10 0 0 0"
+                       VerticalAlignment="Center"
+                       Grid.Column="1"
+                       Grid.Row="4"/>
+
+            <TextBlock Text="Fee:"
+                       FontFamily="{DynamicResource DefaultFontFamily}"
+                       Foreground="{DynamicResource TransactionDetailsLineHeaderBrush}"
+                       HorizontalAlignment="Right"
+                       VerticalAlignment="Center"
+                       Grid.Column="0"
+                       Grid.Row="5"/>
+            <TextBlock Text="{Binding Fee}"
+                       FontFamily="{DynamicResource DefaultFontFamily}"
+                       Foreground="{DynamicResource DefaultForegroundBrush}"
+                       Margin="10 0 0 0"
+                       VerticalAlignment="Center"
+                       Grid.Column="1"
+                       Grid.Row="5"/>
+
+            <TextBlock Text="Is Internal:"
+                       FontFamily="{DynamicResource DefaultFontFamily}"
+                       Foreground="{DynamicResource TransactionDetailsLineHeaderBrush}"
+                       HorizontalAlignment="Right"
+                       VerticalAlignment="Center"
+                       Grid.Column="0"
+                       Grid.Row="6"/>
+            <CheckBox IsChecked="{Binding IsInternal, Mode=OneWay}"
+                      IsHitTestVisible="False"
+                      Focusable="False"
+                      FontFamily="{DynamicResource DefaultFontFamily}"
+                      Margin="10 0 0 0"
+                      VerticalAlignment="Center"
+                      Grid.Column="1"
+                      Grid.Row="6"/>
+
+            <StackPanel Orientation="Horizontal"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Top"
+                        Grid.Column="2"
+                        Grid.Row="0">
+
+                <Border ToolTip.Placement="AnchorAndGravity"
+                        ToolTip.VerticalOffset="-32">
+                    <controls:IconButton HorizontalAlignment="Center"
+                                         VerticalAlignment="Center"
+                                         Foreground="{DynamicResource IconButtonForegroundBrush}"
+                                         MouseOverBrush="{DynamicResource IconButtonMouseOverBrush}"
+                                         PressedBrush="{DynamicResource IconButtonPressedBrush}"
+                                         Path="{DynamicResource FontAwesome.TrashAltSolid}"
+                                         Margin="10 0 0 0"
+                                         Width="20"
+                                         Height="20"
+                                         Command="{Binding RemoveCommand}"
+                                         IsVisible="{Binding CanBeRemoved}"
+                                         Classes="PathButtonStyle"/>
+                    <ToolTip.Tip>
+                        <TextBlock Text="Remove transaction from local storage" />
+                    </ToolTip.Tip>
+                </Border>
+            </StackPanel>
+        </Grid>
+    </Grid>
 </UserControl>

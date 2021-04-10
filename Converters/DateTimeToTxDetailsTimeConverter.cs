@@ -11,7 +11,7 @@ namespace Atomex.Client.Desktop.Converters
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             if (value is DateTime time && targetType == typeof(string))
-                return time.ToString("dd MMM yyyy, HH:mm:ss.fff");
+                return time.ToString("dd MMM yyyy, HH:mm:ss");
 
             return value;
         }

@@ -22,44 +22,6 @@
         <converters:DateTimeToTxTimeConverter x:Key="DateTimeToTxTimeConverter" />
     </UserControl.Resources>
 
-    <UserControl.Styles>
-        <Style Selector="Image.CurrencyLogo[IsEnabled=True]">
-            <Style.Animations>
-                <Animation Duration="0:0:2.5"
-                           IterationCount="INFINITE"
-                           FillMode="Forward"
-                           PlaybackDirection="Normal">
-                    <KeyFrame Cue="0%">
-                        <Setter Property="RotateTransform.Angle" Value="0" />
-                    </KeyFrame>
-                    <KeyFrame Cue="100%">
-                        <Setter Property="RotateTransform.Angle" Value="360" />
-                    </KeyFrame>
-                </Animation>
-            </Style.Animations>
-        </Style>
-
-        <Style Selector="TextBlock.UpdatingTextBlock[IsEnabled=True]">
-            <Style.Animations>
-                <Animation Duration="0:0:2.5"
-                           IterationCount="INFINITE"
-                           FillMode="Forward"
-                           PlaybackDirection="Normal">
-                    <KeyFrame Cue="0%">
-                        <Setter Property="Opacity" Value="1" />
-                    </KeyFrame>
-                    <KeyFrame Cue="50%">
-                        <Setter Property="Opacity" Value="0.1" />
-                    </KeyFrame>
-
-                    <KeyFrame Cue="100%">
-                        <Setter Property="Opacity" Value="1" />
-                    </KeyFrame>
-                </Animation>
-            </Style.Animations>
-        </Style>
-    </UserControl.Styles>
-
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -89,7 +51,6 @@
                             <StackPanel Orientation="Vertical"
                                         Margin="20 10 0 0">
                                 <StackPanel Orientation="Horizontal">
-
                                     <TextBlock Classes="BaseDisabledStyle"
                                                Foreground="{DynamicResource BalanceBackgroundBrush}"
                                                FontFamily="{DynamicResource DefaultFontFamily}"
@@ -283,7 +244,6 @@
                                VerticalAlignment="Top"
                                IsEnabled="{Binding IsBalanceUpdating}">
                             <Image.RenderTransform>
-                                <!-- CenterX="32" CenterY="32" -->
                                 <RotateTransform Angle="0" />
                             </Image.RenderTransform>
                         </Image>
@@ -296,49 +256,25 @@
                                    FontSize="15"
                                    VerticalAlignment="Center"
                                    IsEnabled="{Binding IsBalanceUpdating}">
-                            <!-- <TextBlock.Style> -->
-                            <!--     <Style TargetType="TextBlock"> -->
-                            <!--         <Style.Triggers> -->
-                            <!--             <Trigger Property="IsEnabled" Value="True"> -->
-                            <!--                 <Trigger.EnterActions> -->
-                            <!--                     <BeginStoryboard Name="UpdatingTextBlockAnimation"> -->
-                            <!--                         <Storyboard> -->
-                            <!--                             <DoubleAnimation Storyboard.TargetProperty="Opacity" -->
-                            <!--                                              From="1.0" -->
-                            <!--                                              To="0.1" -->
-                            <!--                                              Duration="00:00:01.000" -->
-                            <!--                                              AutoReverse="True" -->
-                            <!--                                              RepeatBehavior="Forever" /> -->
-                            <!--                         </Storyboard> -->
-                            <!--                     </BeginStoryboard> -->
-                            <!--                 </Trigger.EnterActions> -->
-                            <!--                 <Trigger.ExitActions> -->
-                            <!--                     <StopStoryboard BeginStoryboardName="UpdatingTextBlockAnimation" /> -->
-                            <!--                 </Trigger.ExitActions> -->
-                            <!--             </Trigger> -->
-                            <!--         </Style.Triggers> -->
-                            <!--     </Style> -->
-                            <!-- </TextBlock.Style> -->
                         </TextBlock>
                     </StackPanel>
-
-                    <!-- ToolTip="Cancel" -->
-                    <!-- Style="{DynamicResource ChildViewCloseButtonLight}" -->
-                    <Button Classes="ChildViewCloseButtonLight"
-                            Width="24"
-                            Height="24"
-                            Margin="0 5 2 0"
-                            HorizontalAlignment="Right"
-                            VerticalAlignment="Top"
-                            Command="{Binding CancelUpdateCommand}"
-                            IsVisible="{Binding IsBalanceUpdating}" />
+                    
+                    <Border>
+                        <Button Classes="ChildViewCloseButtonLight"
+                                Width="24"
+                                Height="24"
+                                Margin="0 5 2 0"
+                                HorizontalAlignment="Right"
+                                VerticalAlignment="Top"
+                                Command="{Binding CancelUpdateCommand}"
+                                IsVisible="{Binding IsBalanceUpdating}" />
+                        <ToolTip.Tip>
+                            <TextBlock Text="Cancel" />
+                        </ToolTip.Tip>
+                    </Border>
                 </Grid>
             </Border>
         </StackPanel>
-        
-        <!-- RowDetailsTemplateSelector="{StaticResource TransactionDetailsDataTemplateSelector}" -->
-        <!-- SelectionChanged="OnSelectionChanged" -->
-        <!-- MouseLeftButtonDown="OnMouseLeftButtonDown" -->
         
         <DataGrid x:Name="DgTransactions"
                   Margin="10"
@@ -351,8 +287,7 @@
                   helpers:DataGridHelper.SortInfo="{Binding SortInfo}"
                   CanUserResizeColumns="True"
                   Grid.Row="1">
-
-
+            
             <DataGrid.RowDetailsTemplate>
                 <DataTemplate>
                     <styles:TypeTest>
@@ -362,8 +297,7 @@
                     </styles:TypeTest>
                 </DataTemplate>
             </DataGrid.RowDetailsTemplate>
-
-
+            
             <DataGrid.Columns>
                 <DataGridTemplateColumn Header="TYPE" CanUserSort="True">
                     <DataGridTemplateColumn.CellTemplate>

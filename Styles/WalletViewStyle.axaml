@@ -156,9 +156,45 @@
         <Setter Property="Height" Value="30" />
         <Setter Property="CornerRadius" Value="5" />
     </Style>
-    
+
     <Style Selector="CheckBox:checked /template/ Border#NormalRectangle">
         <Setter Property="BorderBrush" Value="{DynamicResource CheckboxCheckedBrush}" />
         <Setter Property="Background" Value="{DynamicResource CheckboxCheckedBrush}" />
+    </Style>
+
+    <Style Selector="Image.CurrencyLogo[IsEnabled=True]">
+        <Style.Animations>
+            <Animation Duration="0:0:2.5"
+                       IterationCount="INFINITE"
+                       FillMode="Forward"
+                       PlaybackDirection="Normal">
+                <KeyFrame Cue="0%">
+                    <Setter Property="RotateTransform.Angle" Value="0" />
+                </KeyFrame>
+                <KeyFrame Cue="100%">
+                    <Setter Property="RotateTransform.Angle" Value="360" />
+                </KeyFrame>
+            </Animation>
+        </Style.Animations>
+    </Style>
+
+    <Style Selector="TextBlock.UpdatingTextBlock[IsEnabled=True]">
+        <Style.Animations>
+            <Animation Duration="0:0:2.5"
+                       IterationCount="INFINITE"
+                       FillMode="Forward"
+                       PlaybackDirection="Normal">
+                <KeyFrame Cue="0%">
+                    <Setter Property="Opacity" Value="1" />
+                </KeyFrame>
+                <KeyFrame Cue="50%">
+                    <Setter Property="Opacity" Value="0.1" />
+                </KeyFrame>
+
+                <KeyFrame Cue="100%">
+                    <Setter Property="Opacity" Value="1" />
+                </KeyFrame>
+            </Animation>
+        </Style.Animations>
     </Style>
 </Styles>
