@@ -114,7 +114,7 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
         public ICommand OpenTxInExplorerCommand => _openTxInExplorerCommand ??= (_openTxInExplorerCommand = ReactiveCommand.Create<string>((id) =>
         {
             if (Uri.TryCreate($"{Currency.TxExplorerUri}{id}", UriKind.Absolute, out var uri))      
-                Process.Start(uri.ToString());        
+                App.OpenBrowser(uri.ToString());
             else
                 Log.Error("Invalid uri for transaction explorer");
         }));
@@ -123,7 +123,7 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
         public ICommand OpenAddressInExplorerCommand => _openAddressInExplorerCommand ??= (_openAddressInExplorerCommand = ReactiveCommand.Create<string>((address) =>
         {
             if (Uri.TryCreate($"{Currency.AddressExplorerUri}{address}", UriKind.Absolute, out var uri))
-                Process.Start(uri.ToString());
+                App.OpenBrowser(uri.ToString());
             else
                 Log.Error("Invalid uri for address explorer");
         }));

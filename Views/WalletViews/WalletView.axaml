@@ -20,12 +20,6 @@
     <UserControl.Resources>
         <converters:AmountToStringConverter x:Key="AmountToStringConverter" />
         <converters:DateTimeToTxTimeConverter x:Key="DateTimeToTxTimeConverter" />
-
-        <DataTemplate x:Key="TestDataTemplate">
-            <Panel Background="Black">
-                <TextBlock Foreground="White">TestDataTemplate!</TextBlock>
-            </Panel>
-        </DataTemplate>
     </UserControl.Resources>
 
     <UserControl.Styles>
@@ -341,22 +335,11 @@
                 </Grid>
             </Border>
         </StackPanel>
-
-        <!-- MinRowHeight="35" -->
-        <!-- SelectionUnit="FullRow" -->
-        <!-- EnableRowVirtualization="True" -->
-        <!-- EnableColumnVirtualization="True" -->
-        <!-- -->
+        
         <!-- RowDetailsTemplateSelector="{StaticResource TransactionDetailsDataTemplateSelector}" -->
         <!-- SelectionChanged="OnSelectionChanged" -->
         <!-- MouseLeftButtonDown="OnMouseLeftButtonDown" -->
-
-        <!-- SelectionMode="Single" -->
-        <!-- CanUserSortColumns="True" -->
-        <!-- CanUserResizeColumns="True" -->
-        <!-- RowDetailsVisibilityMode="VisibleWhenSelected" -->
-
-        <!-- RowDetailsTemplate="{StaticResource TestDataTemplate}" -->
+        
         <DataGrid x:Name="DgTransactions"
                   Margin="10"
                   AutoGenerateColumns="False"
@@ -374,7 +357,7 @@
                 <DataTemplate>
                     <styles:TypeTest>
                         <styles:TypeTest.DataTemplate>
-                            <controls:TransactionTypeDataTemplateSelector />
+                            <controls:TransactionDetailsDataTemplateSelector />
                         </styles:TypeTest.DataTemplate>
                     </styles:TypeTest>
                 </DataTemplate>

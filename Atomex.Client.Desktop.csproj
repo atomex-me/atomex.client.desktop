@@ -134,6 +134,18 @@
         <Compile Update="Views\MessageView.axaml.cs">
             <DependentUpon>MessageView.axaml</DependentUpon>
         </Compile>
+        <Compile Update="Views\TransactionViews\TransactionDetailsView.axaml.cs">
+          <DependentUpon>TransactionDetailsView.axaml</DependentUpon>
+          <SubType>Code</SubType>
+        </Compile>
+        <Compile Update="Views\TransactionViews\TezosTransactionDetailsView.axaml.cs">
+          <DependentUpon>TezosTransactionDetailsView.axaml</DependentUpon>
+          <SubType>Code</SubType>
+        </Compile>
+        <Compile Update="Views\TransactionViews\EthereumTransactionDetailsView.axaml.cs">
+          <DependentUpon>EthereumTransactionDetailsView.axaml</DependentUpon>
+          <SubType>Code</SubType>
+        </Compile>
     </ItemGroup>
     <ItemGroup>
         <ProjectReference Include="atomex.client.core\Atomex.Client.Core\Atomex.Client.Core.csproj">

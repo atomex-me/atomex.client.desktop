@@ -22,23 +22,34 @@ namespace Atomex.Client.Desktop.Services
     }
     
     public enum TxStateTemplate {
-        UnknownStateTemplate,
         PendingStateTemplate,
         ConfirmedStateTemplate,
         UnconfirmedStateTemplate,
-        FailedStateTemplate
+        FailedStateTemplate,
+        UnknownStateTemplate
+    }
+
+    public enum TxDetailsTemplate
+    {
+        TransactionDetailsTemplate,
+        BitcoinBasedTransactionDetailsTemplate,
+        TezosTransactionDetailsTemplate,
+        EthereumTransactionDetailsTemplate,
+        EthereumERC20TransactionDetailsTemplate
     }
 
     public class TemplateService
     {
         public IDictionary<string, DataTemplate> Templates;
+        
 
         public TemplateService()
         {
             Templates = new Dictionary<string, DataTemplate>();
-
-            LoadTxTypeTemplates();
-            LoadTxStateTemplates();
+            
+            LoadTemplates(typeof(TxTypeTemplate));
+            LoadTemplates(typeof(TxStateTemplate));
+            LoadTemplates(typeof(TxDetailsTemplate));
         }
         
         public DataTemplate GetTxTypeTemplate(TxTypeTemplate templateType)
@@ -55,20 +66,17 @@ namespace Atomex.Client.Desktop.Services
                 : Templates[TxStateTemplate.UnknownStateTemplate.ToString()];
         }
 
-        private void LoadTxTypeTemplates()
+        public DataTemplate GetTxDetailsTemplate(TxDetailsTemplate templateType)
         {
-            var txTypeTemplates = new List<string>(Enum.GetNames(typeof(TxTypeTemplate)));
-            txTypeTemplates
-                .ForEach(templateName =>
-                {
-                    Templates.Add(templateName, (DataTemplate) App.Current.FindResource(templateName));
-                });
+            return Templates.TryGetValue(templateType.ToString(), out var template)
+                ? template
+                : Templates[TxDetailsTemplate.TransactionDetailsTemplate.ToString()];
         }
 
-        private void LoadTxStateTemplates()
+        private void LoadTemplates(Type enumType)
         {
-            var txstateTemplates = new List<string>(Enum.GetNames(typeof(TxStateTemplate)));
-            txstateTemplates
+            var templates = new List<string>(Enum.GetNames(enumType));
+            templates
                 .ForEach(templateName =>
                 {
                     Templates.Add(templateName, (DataTemplate) App.Current.FindResource(templateName));

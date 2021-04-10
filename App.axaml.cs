@@ -8,9 +8,11 @@ using Atomex.Client.Desktop.Views;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Reflection;
 using Microsoft.Extensions.Configuration;
 using System.Linq;
+using System.Runtime.InteropServices;
 using Atomex.Client.Desktop.Common;
 using Serilog;
 using Atomex.Common.Configuration;
@@ -34,7 +36,7 @@ namespace Atomex.Client.Desktop
         public override void OnFrameworkInitializationCompleted()
         {
             TemplateService = new TemplateService();
-            
+
             // init logger
             Log.Logger = new LoggerConfiguration()
                 .ReadFrom.Configuration(Configuration)
@@ -132,6 +134,48 @@ namespace Atomex.Client.Desktop
             .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
             .AddEmbeddedJsonFile(CoreAssembly, "symbols.json")
             .Build();
-        
+
+        public static void OpenBrowser(string url)
+        {
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+            {
+                // If no associated application/json MimeType is found xdg-open opens retrun error
+                // but it tries to open it anyway using the console editor (nano, vim, other..)
+                ShellExec($"xdg-open {url}", waitForExit: false);
+            }
+            else
+            {
+                using (Process process = Process.Start(new ProcessStartInfo
+                {
+                    FileName = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? url : "open",
+                    Arguments = RuntimeInformation.IsOSPlatform(OSPlatform.OSX) ? $"{url}" : "",
+                    CreateNoWindow = true,
+                    UseShellExecute = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+                })) ;
+            }
+        }
+
+        private static void ShellExec(string cmd, bool waitForExit = true)
+        {
+            var escapedArgs = cmd.Replace("\"", "\\\"");
+
+            using (var process = Process.Start(
+                new ProcessStartInfo
+                {
+                    FileName = "/bin/sh",
+                    Arguments = $"-c \"{escapedArgs}\"",
+                    RedirectStandardOutput = true,
+                    UseShellExecute = false,
+                    CreateNoWindow = true,
+                    WindowStyle = ProcessWindowStyle.Hidden
+                }
+            ))
+            {
+                if (waitForExit)
+                {
+                    process.WaitForExit();
+                }
+            }
+        }
     }
 }

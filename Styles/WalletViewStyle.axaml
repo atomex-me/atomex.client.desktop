@@ -3,18 +3,16 @@
         xmlns:controls="clr-namespace:Atomex.Client.Desktop.Controls"
         xmlns:viewModels="clr-namespace:Atomex.Client.Desktop.ViewModels.TransactionViewModels"
         xmlns:sys="clr-namespace:System;assembly=netstandard"
-        xmlns:views="clr-namespace:Atomex.Client.Desktop.Views">
-    
-    
+        xmlns:views="clr-namespace:Atomex.Client.Desktop.Views.TransactionViews">
+
     <Styles.Resources>
         <sys:Double x:Key="StateBadgeHeight">23</sys:Double>
-        
-        
+
         <DataTemplate x:Key="UnknownStateTemplate" DataType="viewModels:TransactionViewModel">
             <Border Background="{StaticResource UnknownBrush}"
                     CornerRadius="5"
                     Margin="3 0 3 0"
-                    
+
                     HorizontalAlignment="Center">
                 <TextBlock Foreground="White"
                            Text="{Binding State}"
@@ -23,7 +21,6 @@
                            HorizontalAlignment="Center" />
             </Border>
         </DataTemplate>
-        
         <DataTemplate x:Key="PendingStateTemplate" DataType="viewModels:TransactionViewModel">
             <Border Background="{StaticResource PendingBrush}"
                     CornerRadius="5"
@@ -37,7 +34,6 @@
                            HorizontalAlignment="Center" />
             </Border>
         </DataTemplate>
-        
         <DataTemplate x:Key="ConfirmedStateTemplate" DataType="viewModels:TransactionViewModel">
             <Border Background="{StaticResource ConfirmedBrush}"
                     CornerRadius="5"
@@ -51,7 +47,6 @@
                            HorizontalAlignment="Center" />
             </Border>
         </DataTemplate>
-        
         <DataTemplate x:Key="UnconfirmedStateTemplate" DataType="viewModels:TransactionViewModel">
             <Border Background="{StaticResource UnconfirmedBrush}"
                     CornerRadius="5"
@@ -65,7 +60,6 @@
                            HorizontalAlignment="Center" />
             </Border>
         </DataTemplate>
-
         <DataTemplate x:Key="FailedStateTemplate" DataType="viewModels:TransactionViewModel">
             <Border Background="{StaticResource FailedBrush}"
                     CornerRadius="5"
@@ -85,198 +79,75 @@
                    Height="24"
                    Source="avares://Atomex.Client.Desktop/Resources/Images/sent.png" />
         </DataTemplate>
-
         <DataTemplate x:Key="ReceivedTypeTemplate">
-                <Image Width="24"
-                       Height="24"
-                       Source="avares://Atomex.Client.Desktop/Resources/Images/received.png" />
+            <Image Width="24"
+                   Height="24"
+                   Source="avares://Atomex.Client.Desktop/Resources/Images/received.png" />
         </DataTemplate>
-
         <DataTemplate x:Key="TokenApproveTypeTemplate">
             <Image Width="24"
                    Height="24"
                    Source="avares://Atomex.Client.Desktop/Resources/Images/sent.png" />
         </DataTemplate>
-
         <DataTemplate x:Key="SwapPaymentTypeTemplate">
             <Image Width="24"
                    Height="24"
                    Source="avares://Atomex.Client.Desktop/Resources/Images/exchanged.png" />
         </DataTemplate>
-
         <DataTemplate x:Key="SwapRefundTypeTemplate">
             <Image Width="24"
                    Height="24"
                    Source="avares://Atomex.Client.Desktop/Resources/Images/refunded.png" />
         </DataTemplate>
-
         <DataTemplate x:Key="SwapRedeemTypeTemplate">
             <Image Width="24"
                    Height="24"
                    Source="avares://Atomex.Client.Desktop/Resources/Images/refunded.png" />
         </DataTemplate>
-
         <DataTemplate x:Key="UnknownTypeTemplate">
             <Image Width="24"
                    Height="24"
                    Source="avares://Atomex.Client.Desktop/Resources/Images/unknown.png" />
         </DataTemplate>
-        
+
+        <DataTemplate x:Key="TransactionDetailsTemplate"
+                      DataType="viewModels:TransactionViewModel">
+            <views:TransactionDetailsView />
+        </DataTemplate>
+        <DataTemplate x:Key="BitcoinBasedTransactionDetailsTemplate"
+                      DataType="viewModels:BitcoinBasedTransactionViewModel">
+            <views:TransactionDetailsView />
+        </DataTemplate>
+        <DataTemplate x:Key="TezosTransactionDetailsTemplate"
+                      DataType="viewModels:TezosTransactionViewModel">
+            <views:TezosTransactionDetailsView />
+        </DataTemplate>
+        <DataTemplate x:Key="EthereumTransactionDetailsTemplate"
+                      DataType="viewModels:EthereumTransactionViewModel">
+            <views:EthereumTransactionDetailsView />
+        </DataTemplate>
+        <DataTemplate x:Key="EthereumERC20TransactionDetailsTemplate"
+                      DataType="viewModels:EthereumERC20TransactionViewModel">
+            <views:EthereumTransactionDetailsView />
+        </DataTemplate>
     </Styles.Resources>
 
-    <!-- <Style x:Key="ExplorerLinkButton" TargetType="Button"> -->
-    <!--     <Setter Property="FontFamily" Value="{DynamicResource DefaultFontFamily}"/> -->
-    <!--     <Setter Property="FontSize" Value="12"/> -->
-    <!--     <Setter Property="Template"> -->
-    <!--         <Setter.Value> -->
-    <!--             <ControlTemplate TargetType="Button"> -->
-    <!--                 <TextBlock> -->
-    <!--                     <ContentPresenter/> -->
-    <!--                 </TextBlock> -->
-    <!--             </ControlTemplate> -->
-    <!--         </Setter.Value> -->
-    <!--     </Setter> -->
-    <!--     <Setter Property="Foreground" Value="{DynamicResource ExplorerLinkButtonForegroundBrush}" /> -->
-    <!--     <Style.Triggers> -->
-    <!--         <Trigger Property="IsMouseOver" Value="true"> -->
-    <!--             <Setter Property="Foreground" Value="{DynamicResource ExplorerLinkButtonMouseOverBrush}" /> -->
-    <!--         </Trigger> -->
-    <!--     </Style.Triggers> -->
-    <!-- </Style> -->
+    <Style Selector="Button.ExplorerLinkButton">
+        <Setter Property="FontFamily" Value="{DynamicResource DefaultFontFamily}" />
+        <Setter Property="FontSize" Value="12" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <TextBlock Text="{TemplateBinding Content}" />
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="Foreground" Value="{DynamicResource ExplorerLinkButtonForegroundBrush}" />
+    </Style>
 
-    <!-- -->
-    <!-- <DataTemplate x:Key="TransactionDetailsTemplate" -->
-    <!--               DataType="viewModels:TransactionViewModel"> -->
-    <!--     <views:TransactionDetailsView/> -->
-    <!-- </DataTemplate> -->
-    <!-- -->
-    <!-- <DataTemplate x:Key="BitcoinBasedTransactionDetailsTemplate" -->
-    <!--               DataType="viewModels:BitcoinBasedTransactionViewModel"> -->
-    <!--     <views:TransactionDetailsView/> -->
-    <!-- </DataTemplate> -->
-    <!-- -->
-    <!-- <DataTemplate x:Key="TezosTransactionDetailsTemplate" -->
-    <!--               DataType="viewModels:TezosTransactionViewModel"> -->
-    <!--     <views:TezosTransactionDetailsView/> -->
-    <!-- </DataTemplate> -->
-    <!-- -->
-    <!-- <DataTemplate x:Key="EthereumTransactionDetailsTemplate" -->
-    <!--               DataType="viewModels:EthereumTransactionViewModel"> -->
-    <!--     <views:EthereumTransactionDetailsView/> -->
-    <!-- </DataTemplate> -->
-    <!-- -->
-    <!-- <DataTemplate x:Key="EthereumERC20TransactionDetailsTemplate" -->
-    <!--               DataType="viewModels:EthereumERC20TransactionViewModel"> -->
-    <!--     <views:EthereumTransactionDetailsView/> -->
-    <!-- </DataTemplate> -->
-    <!-- -->
-    <!-- <controls:TransactionDataTemplateByCurrencySelector x:Key="TransactionDetailsDataTemplateSelector"> -->
-    <!--     <controls:TransactionDataTemplateByCurrencySelector.Selectors> -->
-    <!--         <controls:TransactionDataTemplateSelectorList> -->
-    <!--             <controls:TransactionDataTemplateSelector -->
-    <!--                 Currency="BTC" -->
-    <!--                 UnknownTemplate="{StaticResource BitcoinBasedTransactionDetailsTemplate}" -->
-    <!--                 SentTemplate="{StaticResource BitcoinBasedTransactionDetailsTemplate}" -->
-    <!--                 ReceivedTemplate="{StaticResource BitcoinBasedTransactionDetailsTemplate}" -->
-    <!--                 TokenApproveTemplate="{StaticResource BitcoinBasedTransactionDetailsTemplate}" -->
-    <!--                 SwapPaymentTemplate="{StaticResource BitcoinBasedTransactionDetailsTemplate}" -->
-    <!--                 SwapRedeemTemplate="{StaticResource BitcoinBasedTransactionDetailsTemplate}" -->
-    <!--                 SwapRefundTemplate="{StaticResource BitcoinBasedTransactionDetailsTemplate}"/> -->
-    <!--             <controls:TransactionDataTemplateSelector -->
-    <!--                 Currency="LTC" -->
-    <!--                 UnknownTemplate="{StaticResource BitcoinBasedTransactionDetailsTemplate}" -->
-    <!--                 SentTemplate="{StaticResource BitcoinBasedTransactionDetailsTemplate}" -->
-    <!--                 ReceivedTemplate="{StaticResource BitcoinBasedTransactionDetailsTemplate}" -->
-    <!--                 TokenApproveTemplate="{StaticResource BitcoinBasedTransactionDetailsTemplate}" -->
-    <!--                 SwapPaymentTemplate="{StaticResource BitcoinBasedTransactionDetailsTemplate}" -->
-    <!--                 SwapRedeemTemplate="{StaticResource BitcoinBasedTransactionDetailsTemplate}" -->
-    <!--                 SwapRefundTemplate="{StaticResource BitcoinBasedTransactionDetailsTemplate}"/> -->
-    <!--             <controls:TransactionDataTemplateSelector -->
-    <!--                 Currency="ETH" -->
-    <!--                 UnknownTemplate="{StaticResource EthereumTransactionDetailsTemplate}" -->
-    <!--                 SentTemplate="{StaticResource EthereumTransactionDetailsTemplate}" -->
-    <!--                 ReceivedTemplate="{StaticResource EthereumTransactionDetailsTemplate}" -->
-    <!--                 TokenApproveTemplate="{StaticResource EthereumTransactionDetailsTemplate}" -->
-    <!--                 SwapPaymentTemplate="{StaticResource EthereumTransactionDetailsTemplate}" -->
-    <!--                 SwapRedeemTemplate="{StaticResource EthereumTransactionDetailsTemplate}" -->
-    <!--                 SwapRefundTemplate="{StaticResource EthereumTransactionDetailsTemplate}"/> -->
-    <!--             <controls:TransactionDataTemplateSelector -->
-    <!--                 Currency="XTZ" -->
-    <!--                 UnknownTemplate="{StaticResource TezosTransactionDetailsTemplate}" -->
-    <!--                 SentTemplate="{StaticResource TezosTransactionDetailsTemplate}" -->
-    <!--                 ReceivedTemplate="{StaticResource TezosTransactionDetailsTemplate}" -->
-    <!--                 TokenApproveTemplate="{StaticResource TezosTransactionDetailsTemplate}" -->
-    <!--                 SwapPaymentTemplate="{StaticResource TezosTransactionDetailsTemplate}" -->
-    <!--                 SwapRedeemTemplate="{StaticResource TezosTransactionDetailsTemplate}" -->
-    <!--                 SwapRefundTemplate="{StaticResource TezosTransactionDetailsTemplate}"/> -->
-    <!--             <controls:TransactionDataTemplateSelector -->
-    <!--                 Currency="USDT" -->
-    <!--                 UnknownTemplate="{StaticResource EthereumERC20TransactionDetailsTemplate}" -->
-    <!--                 SentTemplate="{StaticResource EthereumERC20TransactionDetailsTemplate}" -->
-    <!--                 ReceivedTemplate="{StaticResource EthereumERC20TransactionDetailsTemplate}" -->
-    <!--                 TokenApproveTemplate="{StaticResource EthereumERC20TransactionDetailsTemplate}" -->
-    <!--                 SwapPaymentTemplate="{StaticResource EthereumERC20TransactionDetailsTemplate}" -->
-    <!--                 SwapRedeemTemplate="{StaticResource EthereumERC20TransactionDetailsTemplate}" -->
-    <!--                 SwapRefundTemplate="{StaticResource EthereumERC20TransactionDetailsTemplate}"/> -->
-    <!--             <controls:TransactionDataTemplateSelector -->
-    <!--                 Currency="TBTC" -->
-    <!--                 UnknownTemplate="{StaticResource EthereumERC20TransactionDetailsTemplate}" -->
-    <!--                 SentTemplate="{StaticResource EthereumERC20TransactionDetailsTemplate}" -->
-    <!--                 ReceivedTemplate="{StaticResource EthereumERC20TransactionDetailsTemplate}" -->
-    <!--                 TokenApproveTemplate="{StaticResource EthereumERC20TransactionDetailsTemplate}" -->
-    <!--                 SwapPaymentTemplate="{StaticResource EthereumERC20TransactionDetailsTemplate}" -->
-    <!--                 SwapRedeemTemplate="{StaticResource EthereumERC20TransactionDetailsTemplate}" -->
-    <!--                 SwapRefundTemplate="{StaticResource EthereumERC20TransactionDetailsTemplate}"/> -->
-    <!--             <controls:TransactionDataTemplateSelector -->
-    <!--                 Currency="WBTC" -->
-    <!--                 UnknownTemplate="{StaticResource EthereumERC20TransactionDetailsTemplate}" -->
-    <!--                 SentTemplate="{StaticResource EthereumERC20TransactionDetailsTemplate}" -->
-    <!--                 ReceivedTemplate="{StaticResource EthereumERC20TransactionDetailsTemplate}" -->
-    <!--                 TokenApproveTemplate="{StaticResource EthereumERC20TransactionDetailsTemplate}" -->
-    <!--                 SwapPaymentTemplate="{StaticResource EthereumERC20TransactionDetailsTemplate}" -->
-    <!--                 SwapRedeemTemplate="{StaticResource EthereumERC20TransactionDetailsTemplate}" -->
-    <!--                 SwapRefundTemplate="{StaticResource EthereumERC20TransactionDetailsTemplate}"/> -->
-    <!--             <controls:TransactionDataTemplateSelector -->
-    <!--                 Currency="TZBTC" -->
-    <!--                 UnknownTemplate="{StaticResource TezosTransactionDetailsTemplate}" -->
-    <!--                 SentTemplate="{StaticResource TezosTransactionDetailsTemplate}" -->
-    <!--                 ReceivedTemplate="{StaticResource TezosTransactionDetailsTemplate}" -->
-    <!--                 TokenApproveTemplate="{StaticResource TezosTransactionDetailsTemplate}" -->
-    <!--                 SwapPaymentTemplate="{StaticResource TezosTransactionDetailsTemplate}" -->
-    <!--                 SwapRedeemTemplate="{StaticResource TezosTransactionDetailsTemplate}" -->
-    <!--                 SwapRefundTemplate="{StaticResource TezosTransactionDetailsTemplate}"/> -->
-    <!--             <controls:TransactionDataTemplateSelector -->
-    <!--                 Currency="KUSD" -->
-    <!--                 UnknownTemplate="{StaticResource TezosTransactionDetailsTemplate}" -->
-    <!--                 SentTemplate="{StaticResource TezosTransactionDetailsTemplate}" -->
-    <!--                 ReceivedTemplate="{StaticResource TezosTransactionDetailsTemplate}" -->
-    <!--                 TokenApproveTemplate="{StaticResource TezosTransactionDetailsTemplate}" -->
-    <!--                 SwapPaymentTemplate="{StaticResource TezosTransactionDetailsTemplate}" -->
-    <!--                 SwapRedeemTemplate="{StaticResource TezosTransactionDetailsTemplate}" -->
-    <!--                 SwapRefundTemplate="{StaticResource TezosTransactionDetailsTemplate}"/> -->
-    <!--             <controls:TransactionDataTemplateSelector -->
-    <!--                 Currency="NYX" -->
-    <!--                 UnknownTemplate="{StaticResource TezosTransactionDetailsTemplate}" -->
-    <!--                 SentTemplate="{StaticResource TezosTransactionDetailsTemplate}" -->
-    <!--                 ReceivedTemplate="{StaticResource TezosTransactionDetailsTemplate}" -->
-    <!--                 TokenApproveTemplate="{StaticResource TezosTransactionDetailsTemplate}" -->
-    <!--                 SwapPaymentTemplate="{StaticResource TezosTransactionDetailsTemplate}" -->
-    <!--                 SwapRedeemTemplate="{StaticResource TezosTransactionDetailsTemplate}" -->
-    <!--                 SwapRefundTemplate="{StaticResource TezosTransactionDetailsTemplate}"/> -->
-    <!--             <controls:TransactionDataTemplateSelector -->
-    <!--                 Currency="FA2" -->
-    <!--                 UnknownTemplate="{StaticResource TezosTransactionDetailsTemplate}" -->
-    <!--                 SentTemplate="{StaticResource TezosTransactionDetailsTemplate}" -->
-    <!--                 ReceivedTemplate="{StaticResource TezosTransactionDetailsTemplate}" -->
-    <!--                 TokenApproveTemplate="{StaticResource TezosTransactionDetailsTemplate}" -->
-    <!--                 SwapPaymentTemplate="{StaticResource TezosTransactionDetailsTemplate}" -->
-    <!--                 SwapRedeemTemplate="{StaticResource TezosTransactionDetailsTemplate}" -->
-    <!--                 SwapRefundTemplate="{StaticResource TezosTransactionDetailsTemplate}"/> -->
-    <!--             ~1~ todo: default data template @1@ -->
-    <!--         </controls:TransactionDataTemplateSelectorList> -->
-    <!--     </controls:TransactionDataTemplateByCurrencySelector.Selectors> -->
-    <!-- </controls:TransactionDataTemplateByCurrencySelector> -->
-
+    <Style Selector="Button.ExplorerLinkButton:pointerover">
+        <Setter Property="Foreground" Value="{DynamicResource ExplorerLinkButtonMouseOverBrush}" />
+    </Style>
 
     <Style Selector="controls|RoundedButton.WalletMenuButton">
         <Setter Property="FontFamily" Value="{DynamicResource DefaultFontFamily}" />
@@ -285,5 +156,4 @@
         <Setter Property="Height" Value="30" />
         <Setter Property="CornerRadius" Value="5" />
     </Style>
-
 </Styles>

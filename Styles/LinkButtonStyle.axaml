@@ -8,9 +8,7 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Button">
-
-                        <TextBlock Text="{TemplateBinding Content}" />
-
+                    <TextBlock Text="{TemplateBinding Content}" />
                 </ControlTemplate>
             </Setter.Value>
         </Setter>

@@ -33,7 +33,7 @@
     </Style>
     
     <Style Selector="controls|IconButton:pressed">
-        <Setter Property="RenderTransform" Value="scale(0.95)" />    
+        <Setter Property="RenderTransform" Value="scale(0.94)" />    
     </Style>
     
     
