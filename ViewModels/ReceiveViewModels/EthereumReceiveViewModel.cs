@@ -29,7 +29,8 @@ namespace Atomex.Client.Desktop.ViewModels.ReceiveViewModels
                         .WaitForResult()
                         .ToList();
 
-                    activeTokenAddresses.ForEach(a => a.Balance = activeAddresses.Find(b => b.Address == a.Address)?.Balance ?? 0m);
+                    activeTokenAddresses.ForEach(a =>
+                        a.Balance = activeAddresses.Find(b => b.Address == a.Address)?.Balance ?? 0m);
 
                     activeAddresses = activeAddresses
                         .Where(a => activeTokenAddresses.FirstOrDefault(b => b.Address == a.Address) == null)
@@ -39,12 +40,15 @@ namespace Atomex.Client.Desktop.ViewModels.ReceiveViewModels
                         .GetFreeExternalAddressAsync(_currency.Name)
                         .WaitForResult();
 
-                    var receiveAddresses = activeTokenAddresses.Select(w => new WalletAddressViewModel(w, _currency.Format))
+                    var receiveAddresses = activeTokenAddresses
+                        .DistinctBy(wa => wa.Address)
+                        .Select(w => new WalletAddressViewModel(w, _currency.Format))
                         .Concat(activeAddresses.Select(w => new WalletAddressViewModel(w, _currency.Format)))
                         .ToList();
-                    
+
                     if (receiveAddresses.FirstOrDefault(w => w.Address == freeAddress.Address) == null)
-                        receiveAddresses.AddEx(new WalletAddressViewModel(freeAddress, _currency.Format, isFreeAddress: true));
+                        receiveAddresses.AddEx(new WalletAddressViewModel(freeAddress, _currency.Format,
+                            isFreeAddress: true));
 
                     FromAddressList = receiveAddresses;
 #if DEBUG
