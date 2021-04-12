@@ -1,0 +1,62 @@
+<Styles xmlns='https://github.com/avaloniaui'
+        xmlns:x='http://schemas.microsoft.com/winfx/2006/xaml'
+        xmlns:controls="clr-namespace:Atomex.Client.Desktop.Controls">
+
+    <Style Selector="Button.LinkButton">
+        <Setter Property="FontFamily" Value="{DynamicResource DefaultFontFamily}" />
+        <Setter Property="FontSize" Value="12" />
+
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <TextBlock Text="{TemplateBinding Content}" />
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="Foreground" Value="{DynamicResource DefaultLinkButtonForegroundBrush}" />
+    </Style>
+
+    <Style Selector="Button.LinkButton:pointerover">
+        <Setter Property="Foreground" Value="{DynamicResource DefaultLinkButtonMouseOverBrush}" />
+    </Style>
+
+    <Style Selector="controls|RoundedButton.ConvertButtonStyle">
+        <Setter Property="Background" Value="#214174" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type controls:RoundedButton}">
+                    <Border Name="border"
+                            BorderThickness="0"
+                            CornerRadius="{TemplateBinding CornerRadius}"
+                            Background="{TemplateBinding Background}"
+                            Padding="{TemplateBinding Padding}">
+                        <Grid>
+                            <ContentPresenter
+                                Content="{Binding Path=Content, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Button}}}"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center" />
+                        </Grid>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    
+    <Style Selector="controls|RoundedButton.ConvertButtonStyle:pointerover /template/ Border">
+        <Setter Property="Background" Value="{DynamicResource RoundedButtonMouseOverBrush}" />
+    </Style>
+    
+    <Style Selector="controls|RoundedButton.ConvertButtonStyle:pressed /template/ Border">
+        <Setter Property="Background" Value="{DynamicResource RoundedButtonMouseOverBrush}" />
+    </Style>
+    
+    <Style Selector="controls|RoundedButton.ConvertButtonStyle[IsEnabled=False] /template/ Border">
+        <Setter Property="Background" Value="{DynamicResource RoundedButtonDisabledBrush}"/>
+        <Setter Property="Opacity" Value="0.5"/>
+    </Style>
+    
+    <Style Selector="controls|RoundedButton.ConvertButtonStyle[IsDefault=True] /template/ Border">
+        <Setter Property="Background" Value="{DynamicResource RoundedButtonBackgroundBrush}"/>
+        <Setter Property="Opacity" Value="0.5"/>
+    </Style>
+</Styles>

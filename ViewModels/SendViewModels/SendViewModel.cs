@@ -151,6 +151,8 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 if (!decimal.TryParse(value, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture,
                     out var amount))
                 {
+                    if (amount == 0)
+                        Amount = amount;
                     OnPropertyChanged(nameof(AmountString));
                     return;
                 }
@@ -188,6 +190,8 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             {
                 if (!decimal.TryParse(value, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out var fee))
                 {
+                    if (fee == 0)
+                        Fee = fee;
                     OnPropertyChanged(nameof(FeeString));
                     return;
                 }

@@ -1,0 +1,71 @@
+﻿<Styles xmlns='https://github.com/avaloniaui'
+        xmlns:x='http://schemas.microsoft.com/winfx/2006/xaml'
+        xmlns:viewModels="clr-namespace:Atomex.Client.Desktop.ViewModels">
+
+    <Styles.Resources>
+        <DataTemplate x:Key="SwapCanceledTemplate" DataType="viewModels:SwapViewModel">
+            <Border Background="{DynamicResource SwapStateCanceledBackgroundBrush}"
+                    CornerRadius="5"
+                    Margin="3 0 3 0"
+                    HorizontalAlignment="Center">
+                <TextBlock Foreground="White"
+                           Text="{Binding State}"
+                           FontSize="11"
+                           Margin="5 3 5 3"
+                           HorizontalAlignment="Center" />
+            </Border>
+        </DataTemplate>
+
+        <DataTemplate x:Key="SwapCompletedTemplate" DataType="viewModels:SwapViewModel">
+            <Border Background="{DynamicResource SwapStateCompletedBackgroundBrush}"
+                    CornerRadius="5"
+                    Margin="3 0 3 0"
+                    HorizontalAlignment="Center">
+                <TextBlock Foreground="White"
+                           Text="{Binding State}"
+                           FontSize="11"
+                           Margin="5 3 5 3"
+                           HorizontalAlignment="Center" />
+            </Border>
+        </DataTemplate>
+
+        <DataTemplate x:Key="SwapInProgressTemplate" DataType="viewModels:SwapViewModel">
+            <Border Background="{DynamicResource SwapStateInProgressBackgroundBrush}"
+                    CornerRadius="5"
+                    Margin="3 0 3 0"
+                    HorizontalAlignment="Center">
+                <TextBlock Foreground="White"
+                           Text="{Binding State}"
+                           FontSize="11"
+                           Margin="5 3 5 3"
+                           HorizontalAlignment="Center" />
+            </Border>
+        </DataTemplate>
+
+        <DataTemplate x:Key="SwapRefundTemplate" DataType="viewModels:SwapViewModel">
+            <Border Background="{DynamicResource SwapStateRefundedBackgroundBrush}"
+                    CornerRadius="5"
+                    Margin="3 0 3 0"
+                    HorizontalAlignment="Center">
+                <TextBlock Foreground="White"
+                           Text="{Binding State}"
+                           FontSize="11"
+                           Margin="5 3 5 3"
+                           HorizontalAlignment="Center" />
+            </Border>
+        </DataTemplate>
+
+        <DataTemplate x:Key="SwapUnsettledTemplate" DataType="viewModels:SwapViewModel">
+            <Border Background="{DynamicResource SwapStateUnsettledBackgroundBrush}"
+                    CornerRadius="5"
+                    Margin="3 0 3 0"
+                    HorizontalAlignment="Center">
+                <TextBlock Foreground="White"
+                           Text="{Binding State}"
+                           FontSize="11"
+                           Margin="5 3 5 3"
+                           HorizontalAlignment="Center" />
+            </Border>
+        </DataTemplate>
+    </Styles.Resources>
+</Styles>

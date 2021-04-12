@@ -63,6 +63,8 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             {
                 if (!decimal.TryParse(value, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out var fee))
                 {
+                    if (fee == 0)
+                        Fee = fee;
                     OnPropertyChanged(nameof(GasString));
                     return;
                 }
@@ -94,6 +96,8 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 if (!decimal.TryParse(value, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture,
                     out var gasPrice))
                 {
+                    if (gasPrice == 0)
+                        FeePrice = gasPrice;
                     OnPropertyChanged(nameof(FeePriceString));
                     return;
                 }

@@ -39,8 +39,9 @@
         <StyleInclude Source="/Styles/WalletMenuButton.axaml" />
         <StyleInclude Source="/Styles/CustomDataGridStyle.axaml" />
         <StyleInclude Source="/Styles/WalletViewStyle.axaml" />
+        <StyleInclude Source="/Styles/SwapViewStyle.axaml" />
         <StyleInclude Source="/Styles/CurrencyComboBoxStyle.axaml" />
         <StyleInclude Source="/Styles/ToggleSwitchStyle.axaml" />
-        <StyleInclude Source="/Styles/TypeTest.axaml"></StyleInclude>
+        <StyleInclude Source="/Styles/TypeTest.axaml" />
     </Application.Styles>
 </Application>

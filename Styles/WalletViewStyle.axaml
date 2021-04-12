@@ -2,12 +2,9 @@
         xmlns:x='http://schemas.microsoft.com/winfx/2006/xaml'
         xmlns:controls="clr-namespace:Atomex.Client.Desktop.Controls"
         xmlns:viewModels="clr-namespace:Atomex.Client.Desktop.ViewModels.TransactionViewModels"
-        xmlns:sys="clr-namespace:System;assembly=netstandard"
         xmlns:views="clr-namespace:Atomex.Client.Desktop.Views.TransactionViews">
 
     <Styles.Resources>
-        <sys:Double x:Key="StateBadgeHeight">23</sys:Double>
-
         <DataTemplate x:Key="UnknownStateTemplate" DataType="viewModels:TransactionViewModel">
             <Border Background="{StaticResource UnknownBrush}"
                     CornerRadius="5"
