@@ -9,7 +9,7 @@
         Title="Atomex.Client.Desktop"
         Name="MainWindow"
         MinWidth="800"
-        MinHeight="600"
+        MinHeight="700"
         Classes="MainWindow">
 
     <Design.DataContext>

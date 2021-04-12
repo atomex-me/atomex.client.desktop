@@ -87,11 +87,11 @@ namespace Atomex.Client.Desktop.ViewModels
             {
                 _fromCurrencyIndex = value;
                 OnPropertyChanged(nameof(FromCurrencyIndex));
-                
+
                 FromCurrency = FromCurrencies.ElementAt(_fromCurrencyIndex).Currency;
             }
         }
-        
+
         private int _toCurrencyIndex;
 
         public int ToCurrencyIndex
@@ -101,7 +101,7 @@ namespace Atomex.Client.Desktop.ViewModels
             {
                 _toCurrencyIndex = value;
                 OnPropertyChanged(nameof(ToCurrencyIndex));
-                
+
                 ToCurrency = ToCurrencies.ElementAt(_toCurrencyIndex).Currency;
             }
         }
@@ -134,13 +134,13 @@ namespace Atomex.Client.Desktop.ViewModels
                 {
                     var ToCurrencyVM = ToCurrencies
                         .FirstOrDefault(c => c.Currency.Name == oldToCurrency.Name);
-                    ToCurrencyIndex = ToCurrencies.IndexOf(ToCurrencyVM); 
+                    ToCurrencyIndex = ToCurrencies.IndexOf(ToCurrencyVM);
                 }
                 else
                 {
                     var ToCurrencyVM = ToCurrencies
                         .First();
-                    ToCurrencyIndex = ToCurrencies.IndexOf(ToCurrencyVM); 
+                    ToCurrencyIndex = ToCurrencies.IndexOf(ToCurrencyVM);
                 }
 
                 FromCurrencyViewModel = _currencyViewModels
@@ -298,16 +298,18 @@ namespace Atomex.Client.Desktop.ViewModels
                 if (!decimal.TryParse(value, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture,
                     out var amount))
                 {
+                    if (amount == 0)
+                        _amount = amount;
                     OnPropertyChanged(nameof(AmountString));
                     return;
                 }
-                
+
 
                 _amount = amount.TruncateByFormat(CurrencyFormat);
 
                 if (_amount > long.MaxValue)
                     _amount = long.MaxValue;
-                
+
                 OnPropertyChanged(nameof(AmountString));
 
                 _ = UpdateAmountAsync(_amount, updateUi: false);
@@ -716,10 +718,10 @@ namespace Atomex.Client.Desktop.ViewModels
         public ICommand SwapCurrenciesCommand => _swapCurrenciesCommand ??= ReactiveCommand.Create(() =>
         {
             var temp = _fromCurrency;
-            
+
             var fromCurrencyVm = FromCurrencies.FirstOrDefault(c => c.Currency.Name == _toCurrency.Name);
             FromCurrencyIndex = FromCurrencies.IndexOf(fromCurrencyVm);
-            
+
             var toCurrencyVm = ToCurrencies.FirstOrDefault(c => c.Currency.Name == temp.Name);
             ToCurrencyIndex = ToCurrencies.IndexOf(toCurrencyVm);
         });
@@ -860,16 +862,16 @@ namespace Atomex.Client.Desktop.ViewModels
                 .ToList();
 
             FromCurrencies = _currencyViewModels.ToList();
-            
-            
+
+
             var fromCurrencyVm = FromCurrencies
                 .FirstOrDefault(c => c.Currency.Name == "BTC");
             FromCurrencyIndex = FromCurrencies.IndexOf(fromCurrencyVm);
-            
+
             var toCurrencyVm = ToCurrencies
                 .FirstOrDefault(c => c.Currency.Name == "LTC");
             ToCurrencyIndex = ToCurrencies.IndexOf(toCurrencyVm);
-            
+
 
             OnSwapEventHandler(this, null);
         }
@@ -1009,32 +1011,52 @@ namespace Atomex.Client.Desktop.ViewModels
         {
             if (_amount == 0)
             {
-                // DialogViewer.ShowMessage(Resources.CvWarning, Resources.CvZeroAmount);
+                Desktop.App.DialogService.Show(
+                    MessageViewModel.Message(
+                        title: Resources.CvWarning,
+                        text: Resources.CvZeroAmount,
+                        backAction: () => Desktop.App.DialogService.CloseDialog())
+                );
                 return;
             }
 
             if (!IsAmountValid)
             {
-                // DialogViewer.ShowMessage(Resources.CvWarning, Resources.CvBigAmount);
+                Desktop.App.DialogService.Show(
+                    MessageViewModel.Message(
+                        title: Resources.CvWarning,
+                        text: Resources.CvBigAmount,
+                        backAction: () => Desktop.App.DialogService.CloseDialog()));
                 return;
             }
 
             if (EstimatedPrice == 0)
             {
-                // DialogViewer.ShowMessage(Resources.CvWarning, Resources.CvNoLiquidity);
+                Desktop.App.DialogService.Show(
+                    MessageViewModel.Message(
+                        title: Resources.CvWarning,
+                        text: Resources.CvNoLiquidity,
+                        backAction: () => Desktop.App.DialogService.CloseDialog()));
                 return;
             }
 
             if (!App.Terminal.IsServiceConnected(TerminalService.All))
             {
-                // DialogViewer.ShowMessage(Resources.CvWarning, Resources.CvServicesUnavailable);
+                Desktop.App.DialogService.Show(
+                    MessageViewModel.Message(
+                        title: Resources.CvWarning,
+                        text: Resources.CvServicesUnavailable,
+                        backAction: () => Desktop.App.DialogService.CloseDialog()));
                 return;
             }
 
             var symbol = Symbols.SymbolByCurrencies(FromCurrency, ToCurrency);
             if (symbol == null)
             {
-                // DialogViewer.ShowMessage(Resources.CvError, Resources.CvNotSupportedSymbol);
+                Desktop.App.DialogService.Show(
+                    MessageViewModel.Error(
+                        text: Resources.CvNotSupportedSymbol,
+                        backAction: () => Desktop.App.DialogService.CloseDialog()));
                 return;
             }
 
@@ -1049,60 +1071,64 @@ namespace Atomex.Client.Desktop.ViewModels
                     AmountHelper.QtyToAmount(side, symbol.MinimumQty, price, FromCurrency.DigitsMultiplier);
                 var message = string.Format(CultureInfo.InvariantCulture, Resources.CvMinimumAllowedQtyWarning,
                     minimumAmount, FromCurrency.Name);
-
-                // DialogViewer.ShowMessage(Resources.CvWarning, message);
+                
+                Desktop.App.DialogService.Show(
+                    MessageViewModel.Message(
+                        title: Resources.CvWarning,
+                        text: message,
+                        backAction: () => Desktop.App.DialogService.CloseDialog()));
                 return;
             }
 
-            //
-            // var viewModel = new ConversionConfirmationViewModel(App, DialogViewer)
-            // {
-            //     FromCurrency = FromCurrency,
-            //     ToCurrency = ToCurrency,
-            //     FromCurrencyViewModel = FromCurrencyViewModel,
-            //     ToCurrencyViewModel = ToCurrencyViewModel,
-            //
-            //     PriceFormat = PriceFormat,
-            //     CurrencyCode = CurrencyCode,
-            //     CurrencyFormat = CurrencyFormat,
-            //     TargetCurrencyCode = TargetCurrencyCode,
-            //     TargetCurrencyFormat = TargetCurrencyFormat,
-            //     BaseCurrencyCode = BaseCurrencyCode,
-            //     BaseCurrencyFormat = BaseCurrencyFormat,
-            //
-            //     FromFeeCurrencyCode = FromFeeCurrencyCode,
-            //     FromFeeCurrencyFormat = FromFeeCurrencyFormat,
-            //     TargetFeeCurrencyCode = TargetFeeCurrencyCode,
-            //     TargetFeeCurrencyFormat = TargetFeeCurrencyFormat,
-            //
-            //     Amount = _amount,
-            //     AmountInBase = AmountInBase,
-            //     TargetAmount = TargetAmount,
-            //     TargetAmountInBase = TargetAmountInBase,
-            //
-            //     EstimatedPrice = EstimatedPrice,
-            //     EstimatedOrderPrice = _estimatedOrderPrice,
-            //     EstimatedPaymentFee = EstimatedPaymentFee,
-            //     EstimatedRedeemFee = EstimatedRedeemFee,
-            //     EstimatedMakerNetworkFee = EstimatedMakerNetworkFee,
-            //     
-            //     EstimatedPaymentFeeInBase = EstimatedPaymentFeeInBase,
-            //     EstimatedRedeemFeeInBase = EstimatedRedeemFeeInBase,
-            //     EstimatedMakerNetworkFeeInBase = EstimatedMakerNetworkFeeInBase,
-            //     EstimatedTotalNetworkFeeInBase = EstimatedTotalNetworkFeeInBase,
-            //
-            //     RewardForRedeem = RewardForRedeem,
-            //     RewardForRedeemInBase = RewardForRedeemInBase,
-            //     HasRewardForRedeem = HasRewardForRedeem
-            // };
-            //
-            // viewModel.OnSuccess += OnSuccessConvertion;
-            //
-            // DialogViewer.ShowDialog(Dialogs.Convert, viewModel, defaultPageId: Pages.ConversionConfirmation);
+            var viewModel = new ConversionConfirmationViewModel(App)
+            {
+                FromCurrency = FromCurrency,
+                ToCurrency = ToCurrency,
+                FromCurrencyViewModel = FromCurrencyViewModel,
+                ToCurrencyViewModel = ToCurrencyViewModel,
+            
+                PriceFormat = PriceFormat,
+                CurrencyCode = CurrencyCode,
+                CurrencyFormat = CurrencyFormat,
+                TargetCurrencyCode = TargetCurrencyCode,
+                TargetCurrencyFormat = TargetCurrencyFormat,
+                BaseCurrencyCode = BaseCurrencyCode,
+                BaseCurrencyFormat = BaseCurrencyFormat,
+            
+                FromFeeCurrencyCode = FromFeeCurrencyCode,
+                FromFeeCurrencyFormat = FromFeeCurrencyFormat,
+                TargetFeeCurrencyCode = TargetFeeCurrencyCode,
+                TargetFeeCurrencyFormat = TargetFeeCurrencyFormat,
+            
+                Amount = _amount,
+                AmountInBase = AmountInBase,
+                TargetAmount = TargetAmount,
+                TargetAmountInBase = TargetAmountInBase,
+            
+                EstimatedPrice = EstimatedPrice,
+                EstimatedOrderPrice = _estimatedOrderPrice,
+                EstimatedPaymentFee = EstimatedPaymentFee,
+                EstimatedRedeemFee = EstimatedRedeemFee,
+                EstimatedMakerNetworkFee = EstimatedMakerNetworkFee,
+                
+                EstimatedPaymentFeeInBase = EstimatedPaymentFeeInBase,
+                EstimatedRedeemFeeInBase = EstimatedRedeemFeeInBase,
+                EstimatedMakerNetworkFeeInBase = EstimatedMakerNetworkFeeInBase,
+                EstimatedTotalNetworkFeeInBase = EstimatedTotalNetworkFeeInBase,
+            
+                RewardForRedeem = RewardForRedeem,
+                RewardForRedeemInBase = RewardForRedeemInBase,
+                HasRewardForRedeem = HasRewardForRedeem
+            };
+            
+            viewModel.OnSuccess += OnSuccessConvertion;
+            
+            Desktop.App.DialogService.Show(viewModel);
         }
 
         private void OnSuccessConvertion(object sender, EventArgs e)
         {
+            Console.WriteLine("OnSuccessConvertion invoked");
             _amount = Math.Min(_amount, EstimatedMaxAmount); // recalculate amount
             _ = UpdateAmountAsync(_amount, updateUi: true);
         }

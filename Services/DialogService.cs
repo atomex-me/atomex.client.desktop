@@ -22,6 +22,7 @@ namespace Atomex.Client.Desktop.Services
         private TView _dialogServiceView;
         private ViewLocator _viewLocator;
         private ViewModelBase _lastDialog;
+        private Action CloseAction;
 
         private double DEFAULT_WIDTH = 630;
         private double DEFAULT_HEIGHT = 400;
@@ -63,6 +64,7 @@ namespace Atomex.Client.Desktop.Services
                     _lastDialog = _dialogServiceViewModel.Content;
                     _dialogServiceView.Close();
                     IsDialogOpened = false;
+                    CloseAction?.Invoke();
                     BuildDialogServiceView();
                 });
             }
@@ -78,14 +80,15 @@ namespace Atomex.Client.Desktop.Services
             }
         }
 
-        public void Show(ViewModelBase viewModel)
+        public void Show(ViewModelBase viewModel, Action? closeAction = null, double? customHeight = null)
         {
             using var source = new CancellationTokenSource();
 
             _lastDialog = _dialogServiceViewModel.Content;
 
             _dialogServiceViewModel.Content = viewModel;
-            AdjustDialogWindowSize(viewModel);
+            CloseAction = closeAction;
+            AdjustDialogWindowSize(viewModel, customHeight);
 
             if (IsDialogOpened) return;
 
@@ -97,11 +100,18 @@ namespace Atomex.Client.Desktop.Services
             // Dispatcher.UIThread.MainLoop(source.Token);
         }
 
-        private void AdjustDialogWindowSize(ViewModelBase dialogVM)
+        private void AdjustDialogWindowSize(ViewModelBase dialogVM, double? customHeight)
         {
             var contentView = _viewLocator.Build(dialogVM);
 
-            var contentHeight = contentView.Height;
+            double viewHeight = contentView.Height;
+            if (contentView.Name == "MessageView" && viewHeight is Double.NaN)
+            {
+                viewHeight = 200;
+            }
+
+
+            var contentHeight = customHeight ?? viewHeight;
             var contentWidth = contentView.Width;
 
             _dialogServiceView.Height =

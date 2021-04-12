@@ -6,7 +6,7 @@
              x:Class="Atomex.Client.Desktop.Views.MessageView"
              xmlns:controls="clr-namespace:Atomex.Client.Desktop.Controls"
              xmlns:vm="clr-namespace:Atomex.Client.Desktop.ViewModels"
-             Height="200"
+             Name="MessageView"
              Width="560"
              xmlns:i="using:Avalonia.Xaml.Interactivity"
              xmlns:ia="using:Avalonia.Xaml.Interactions.Core">
@@ -49,15 +49,15 @@
         <StackPanel Orientation="Horizontal"
                     HorizontalAlignment="Center"
                     IsVisible="{Binding IsLinkVisible}">
-
-            <!-- Style="{StaticResource ExplorerLinkButton}" -->
+            
             <!-- ToolTip="{Binding TxExplorerUri}" -->
             <Button Content="{Binding Id}"
                     Margin="20 20 20 0"
                     HorizontalAlignment="Center"
                     VerticalAlignment="Center"
                     Command="{Binding OpenTxInExplorerCommand}"
-                    CommandParameter="{Binding Id}" />
+                    CommandParameter="{Binding Id}"
+                    Classes="ExplorerLinkButton"/>
 
             <!-- ToolTip="Copy transaction id to clipboard" -->
             <controls:IconButton

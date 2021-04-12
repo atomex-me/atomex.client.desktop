@@ -592,5 +592,22 @@ namespace Atomex.Client.Desktop.Properties {
                 return ResourceManager.GetString("Warning", resourceCulture);
             }
         }
+
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Amount must be greater than zero.
+        /// </summary>
+        public static string CvZeroAmount
+        { 
+            get {
+                return ResourceManager.GetString("CvZeroAmount", resourceCulture);
+            }
+        }
+
+        public static string CvBigAmount
+        {
+            get {
+                return ResourceManager.GetString("CvBigAmount", resourceCulture);
+            }
+        }
     }
 }
