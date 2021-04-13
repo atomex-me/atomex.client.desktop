@@ -264,7 +264,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
         private void OnAddressesClick()
         {
-            // DialogViewer.ShowDialog(Dialogs.Addresses, new AddressesViewModel(App, DialogViewer, Currency));
+            Desktop.App.DialogService.Show(new AddressesViewModel(App, Currency));
         }
 
         private void UpdateTransactonEventHandler(object sender, TransactionEventArgs args)

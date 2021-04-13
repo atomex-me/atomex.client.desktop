@@ -260,6 +260,7 @@ namespace Atomex.Client.Desktop.ViewModels
 
                 if (wasClosed)
                 {
+                    // todo: extra params
                     App.DialogService.ShowPrevious();
                 }
             };

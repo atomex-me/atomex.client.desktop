@@ -133,8 +133,7 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
         {
             try
             {
-                var clipboard = AvaloniaLocator.Current.GetService<IClipboard>();
-                clipboard?.SetTextAsync(s);
+                App.Clipboard.SetTextAsync(s);
             }
             catch (Exception e)
             {

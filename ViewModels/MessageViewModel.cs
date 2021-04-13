@@ -110,6 +110,15 @@ namespace Atomex.Client.Desktop.ViewModels
                 nextTitle: null,
                 backAction: backAction,
                 nextAction: null);
+        
+        public static MessageViewModel Message(string title, string text, string nextTitle, Action backAction, Action nextAction) =>
+            new MessageViewModel(
+                title: title,
+                text: text,
+                backTitle: Resources.SvBack,
+                nextTitle: nextTitle,
+                backAction: backAction,
+                nextAction: nextAction);
 
         public static MessageViewModel Success(string text, string baseUrl, string id, Action nextAction) =>
             new MessageViewModel(
@@ -139,8 +148,7 @@ namespace Atomex.Client.Desktop.ViewModels
         {
             try
             {
-                var clipboard = AvaloniaLocator.Current.GetService<IClipboard>();
-                clipboard?.SetTextAsync(s);
+                App.Clipboard.SetTextAsync(s);
             }
             catch (Exception e)
             {

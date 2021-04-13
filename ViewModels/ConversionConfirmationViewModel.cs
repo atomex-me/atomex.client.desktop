@@ -95,7 +95,7 @@ namespace Atomex.Client.Desktop.ViewModels
                     if (error.Code == Errors.PriceHasChanged)
                     {
                         Desktop.App.DialogService.Show(MessageViewModel.Message(
-                            title: Resources.SvPriceHasChanged,
+                            title: Resources.SvFailed,
                             text: error.Description,
                             backAction: () => Desktop.App.DialogService.Show(this)));
                     }

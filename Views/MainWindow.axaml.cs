@@ -7,14 +7,7 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Input.Raw;
 using Avalonia.Markup.Xaml;
-using Avalonia.Threading;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Threading.Tasks;
 using System.Timers;
-using System.Windows;
-using System.Windows.Input;
 
 namespace Atomex.Client.Desktop.Views
 {
@@ -38,14 +31,12 @@ namespace Atomex.Client.Desktop.Views
                 .Subscribe(
                     (_) =>
                     {
-
                         if (_inactivityControlEnabled && _activityTimer != null)
                         {
                             _activityTimer.Stop();
                             _activityTimer.Start();
                         }
                     });
-            
         }
 
         public void StartInactivityControl(TimeSpan timeOut)

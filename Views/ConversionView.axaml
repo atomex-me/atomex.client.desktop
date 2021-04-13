@@ -711,7 +711,7 @@
                 <DataGridTemplateColumn Header="DESCRIPTION" CanUserSort="False" Width="*">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate DataType="{x:Type vm:SwapViewModel}">
-                            <StackPanel Orientation="Horizontal" Margin="5 0 5 0">
+                            <StackPanel Orientation="Horizontal" Margin="10 0 5 0">
                                 <TextBlock Text="Convert "
                                            FontFamily="{DynamicResource DefaultFontFamily}"
                                            FontSize="13" />
@@ -730,7 +730,7 @@
                                            FontSize="9"
                                            Foreground="{Binding FromBrush}"
                                            VerticalAlignment="Bottom"
-                                           Margin="3 0 0 2" />
+                                           Margin="3 3 0 2" />
                                 <TextBlock Text=" to "
                                            FontFamily="{DynamicResource DefaultFontFamily}"
                                            FontSize="13" />
@@ -754,7 +754,7 @@
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
-                <DataGridTemplateColumn Header="STATE">
+                <DataGridTemplateColumn Header="STATE" MinWidth="82">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <styles:TypeTest>
@@ -766,6 +766,7 @@
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
                 <DataGridTextColumn Header="TIME"
+                                    MinWidth="158"
                                     Binding="{Binding LocalTime, Converter={StaticResource DateTimeToTxTimeConverter}}" />
             </DataGrid.Columns>
         </DataGrid>

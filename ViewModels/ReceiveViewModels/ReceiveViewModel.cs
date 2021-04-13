@@ -233,9 +233,7 @@ namespace Atomex.Client.Desktop.ViewModels.ReceiveViewModels
         {
             try
             {
-                var clipboard = AvaloniaLocator.Current.GetService<IClipboard>();
-                clipboard?.SetTextAsync(SelectedAddress.Address);
-
+                Desktop.App.Clipboard.SetTextAsync(SelectedAddress.Address);
                 Warning = "Address successfully copied to clipboard.";
             }
             catch (Exception e)

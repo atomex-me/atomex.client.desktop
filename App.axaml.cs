@@ -19,6 +19,7 @@ using Atomex.Common.Configuration;
 using Atomex.Core;
 using Atomex.MarketData.Bitfinex;
 using Atomex.Subsystems;
+using Avalonia.Input.Platform;
 using Avalonia.Styling;
 
 namespace Atomex.Client.Desktop
@@ -27,6 +28,7 @@ namespace Atomex.Client.Desktop
     {
         public static IDialogService<ViewModelBase> DialogService;
         public static TemplateService TemplateService;
+        public static IClipboard Clipboard;
 
         public override void Initialize()
         {
@@ -36,6 +38,7 @@ namespace Atomex.Client.Desktop
         public override void OnFrameworkInitializationCompleted()
         {
             TemplateService = new TemplateService();
+            Clipboard = AvaloniaLocator.Current.GetService<IClipboard>();
 
             // init logger
             Log.Logger = new LoggerConfiguration()

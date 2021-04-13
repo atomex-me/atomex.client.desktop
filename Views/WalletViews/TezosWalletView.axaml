@@ -392,7 +392,7 @@
                                     CanUserSort="False"
                                     Binding="{Binding Description}"
                                     Width="*" />
-                <DataGridTemplateColumn Header="AMOUNT" CanUserSort="True">
+                <DataGridTemplateColumn Header="AMOUNT" MinWidth="100" CanUserSort="True">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate DataType="{x:Type txViewModels:TransactionViewModel}">
                             <StackPanel Orientation="Horizontal" Margin="3 0 3 0">
@@ -436,7 +436,7 @@
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
 
-                <DataGridTemplateColumn Header="STATE" CanUserSort="True">
+                <DataGridTemplateColumn Header="STATE" CanUserSort="True" MinWidth="82">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <styles:TypeTest>
@@ -449,6 +449,7 @@
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
                 <DataGridTextColumn Header="TIME"
+                                    MinWidth="158"
                                     CanUserSort="True"
                                     Binding="{Binding LocalTime, Converter={StaticResource DateTimeToTxTimeConverter}}" />
             </DataGrid.Columns>
