@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Globalization;
 using System.Windows.Input;
@@ -60,7 +61,7 @@ namespace Atomex.Client.Desktop.ViewModels
             IsUpdating = true;
             UpdateAddress?.Invoke(address);
         });
-        
+
         private ICommand _setAddressUpdated;
 
         public ICommand SetAddressUpdated => _setAddressUpdated ??= ReactiveCommand.Create<string>((balance) =>
@@ -96,7 +97,7 @@ namespace Atomex.Client.Desktop.ViewModels
         private readonly IAtomexApp _app;
         private Currency _currency;
 
-        public IEnumerable<AddressInfo> Addresses { get; set; }
+        public ObservableCollection<AddressInfo> Addresses { get; set; }
 
         private string _warning;
 
@@ -147,16 +148,17 @@ namespace Atomex.Client.Desktop.ViewModels
                         : chainResult;
                 });
 
-                Addresses = addresses.Select(a => new AddressInfo
-                {
-                    Address = a.Address,
-                    Path = $"m/44'/{_currency.Bip44Code}/0'/{a.KeyIndex.Chain}/{a.KeyIndex.Index}",
-                    Balance = a.Balance.ToString(CultureInfo.InvariantCulture),
-                    CopyToClipboard = CopyToClipboard,
-                    OpenInExplorer = OpenInExplorer,
-                    ExportKey = ExportKey,
-                    UpdateAddress = UpdateAddress
-                });
+                Addresses = new ObservableCollection<AddressInfo>(
+                    addresses.Select(a => new AddressInfo
+                    {
+                        Address = a.Address,
+                        Path = $"m/44'/{_currency.Bip44Code}/0'/{a.KeyIndex.Chain}/{a.KeyIndex.Index}",
+                        Balance = a.Balance.ToString(CultureInfo.InvariantCulture),
+                        CopyToClipboard = CopyToClipboard,
+                        OpenInExplorer = OpenInExplorer,
+                        ExportKey = ExportKey,
+                        UpdateAddress = UpdateAddress
+                    }));
 
                 OnPropertyChanged(nameof(Addresses));
             }
@@ -207,7 +209,8 @@ namespace Atomex.Client.Desktop.ViewModels
                     .GetAddressBalanceAsync(_currency.Name, address)
                     .ConfigureAwait(false);
 
-                Load();
+                var targetAddr = Addresses.FirstOrDefault(a => a.Address == address);
+                targetAddr!.SetAddressUpdated.Execute(balance.Available.ToString(CultureInfo.InvariantCulture));
             }
             catch (Exception e)
             {
@@ -261,27 +264,28 @@ namespace Atomex.Client.Desktop.ViewModels
         {
             _currency = DesignTime.Currencies.First();
 
-            Addresses = new List<AddressInfo>
-            {
-                new AddressInfo
+            Addresses = new ObservableCollection<AddressInfo>(
+                new List<AddressInfo>
                 {
-                    Address = "mzztP8VVJYxV93EUiiYrJUbL55MLx7KLoM",
-                    Path = "m/44'/0'/0'/0/0",
-                    Balance = 4.0000000.ToString(CultureInfo.InvariantCulture),
-                },
-                new AddressInfo
-                {
-                    Address = "mzztP8VVJYxV93EUiiYrJUbL55MLx7KLoM",
-                    Path = "m/44'/0'/0'/0/0",
-                    Balance = 100.ToString(CultureInfo.InvariantCulture),
-                },
-                new AddressInfo
-                {
-                    Address = "mzztP8VVJYxV93EUiiYrJUbL55MLx7KLoM",
-                    Path = "m/44'/0'/0'/0/0",
-                    Balance = 16.0000001.ToString(CultureInfo.InvariantCulture),
-                }
-            };
+                    new AddressInfo
+                    {
+                        Address = "mzztP8VVJYxV93EUiiYrJUbL55MLx7KLoM",
+                        Path = "m/44'/0'/0'/0/0",
+                        Balance = 4.0000000.ToString(CultureInfo.InvariantCulture),
+                    },
+                    new AddressInfo
+                    {
+                        Address = "mzztP8VVJYxV93EUiiYrJUbL55MLx7KLoM",
+                        Path = "m/44'/0'/0'/0/0",
+                        Balance = 100.ToString(CultureInfo.InvariantCulture),
+                    },
+                    new AddressInfo
+                    {
+                        Address = "mzztP8VVJYxV93EUiiYrJUbL55MLx7KLoM",
+                        Path = "m/44'/0'/0'/0/0",
+                        Balance = 16.0000001.ToString(CultureInfo.InvariantCulture),
+                    }
+                });
         }
     }
 }
