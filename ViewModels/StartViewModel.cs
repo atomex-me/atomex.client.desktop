@@ -55,9 +55,16 @@ namespace Atomex.Client.Desktop.ViewModels
                     onCanceled: OnCanceled));
             });
 
-        public void RestoreByMnemonicCommand()
+        private ICommand _restoreByMnemonicCommand;
+
+        public ICommand RestoreByMnemonicCommand => _restoreByMnemonicCommand ??= ReactiveCommand.Create(() =>
         {
-        }
+            ShowContent?.Invoke(new CreateWalletViewModel(
+                app: AtomexApp,
+                scenario: CreateWalletScenario.Restore,
+                onAccountCreated: OnAccountCreated,
+                onCanceled: OnCanceled));
+        });
 
         public void TwitterCommand()
         {
@@ -83,7 +90,7 @@ namespace Atomex.Client.Desktop.ViewModels
                 account: account,
                 symbolsProvider: AtomexApp.SymbolsProvider,
                 quotesProvider: AtomexApp.QuotesProvider);
-            
+
             AtomexApp.UseTerminal(atomexClient, restart: true);
         }
 

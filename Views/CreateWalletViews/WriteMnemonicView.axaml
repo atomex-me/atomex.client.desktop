@@ -3,6 +3,85 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             x:Class="Atomex.Client.Desktop.Views.CreateWalletViews.WriteMnemonicView">
-  write mnemonic view
+             x:Class="Atomex.Client.Desktop.Views.CreateWalletViews.WriteMnemonicView"
+             xmlns:helpers="clr-namespace:Atomex.Client.Desktop.Helpers"
+             xmlns:vm="clr-namespace:Atomex.Client.Desktop.ViewModels.CreateWalletViewModels">
+    
+    <Design.DataContext>
+        <vm:WriteMnemonicViewModel />
+    </Design.DataContext>
+    <StackPanel Orientation="Vertical">
+        <StackPanel Orientation="Horizontal"
+                    Margin="10 30 10 20"
+                    HorizontalAlignment="Center">
+            <TextBlock Text="Step "
+                       Foreground="{DynamicResource DefaultForegroundBrush}"
+                       FontFamily="{DynamicResource DefaultLightFontFamily}"
+                       FontSize="25"/>
+            <TextBlock Text="{Binding Step}"
+                       Foreground="{DynamicResource DefaultForegroundBrush}"
+                       FontFamily="{DynamicResource DefaultLightFontFamily}"
+                       FontSize="25"/>
+            <TextBlock Text=": Mnemonic phrase"
+                       Foreground="{DynamicResource DefaultForegroundBrush}"
+                       FontFamily="{DynamicResource DefaultLightFontFamily}"
+                       FontSize="25"/>
+        </StackPanel>
+
+        <TextBlock Text="Please enter a mnemonic phrase for your wallet."
+                   Foreground="{DynamicResource DefaultForegroundBrush}"
+                   FontFamily="{DynamicResource DefaultLightFontFamily}"
+                   FontSize="15"
+                   Margin="40 0 40 20"
+                   TextWrapping="Wrap"
+                   HorizontalAlignment="Center"/>
+
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+            <Border Width="90"
+                    Height="40"
+                    Background="{DynamicResource DefaultBackgroundBrush}"
+                    CornerRadius="20 0 0 20">
+                <TextBlock Text="Language:"
+                           Margin="0 0 7 0"
+                           Foreground="{DynamicResource DefaultForegroundBrush}"
+                           FontFamily="{DynamicResource DefaultMediumFontFamily}"
+                           FontSize="13"
+                           VerticalAlignment="Center"
+                           HorizontalAlignment="Right"/>
+            </Border>
+            
+            <ComboBox Width="390"
+                      Height="40"
+                      helpers:ComboBoxHelper.CornerRadius="0 20 20 0"
+                      helpers:ComboBoxHelper.IconColor="{DynamicResource GrayBrush1}"
+                      Margin="0 5 0 5"
+                      Items="{Binding GetLanguages}"
+                      SelectedItem="{Binding LanguageString}" />
+        </StackPanel>
+        
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+            <TextBox Width="480"
+                     MinHeight="40"
+                     Margin="0 5 0 5"
+                     TextWrapping="Wrap"
+                     AcceptsReturn="True"
+                     HorizontalAlignment="Center"                       
+                     VerticalAlignment="Top"  
+                     Text="{Binding Mnemonic}"
+                     helpers:TextBoxHelper.CornerRadius="20 20 20 20"
+                     Padding="16 6 6 8"
+                     Watermark="mnemonic phrase..."
+                     Classes="CustomTextBox"/>
+            
+        </StackPanel>
+
+        <TextBlock Text="{Binding Warning}"
+                   Foreground="{DynamicResource WarningForegroundBrush}"
+                   FontFamily="{DynamicResource DefaultLightFontFamily}"
+                   FontSize="13"
+                   Margin="20 5 20 0"
+                   TextWrapping="Wrap"
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Bottom"/>
+    </StackPanel>
 </UserControl>

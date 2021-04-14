@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Windows.Input;
 using System.Linq;
 using Atomex.Client.Desktop.Properties;
+using Atomex.Client.Desktop.Common;
 using Atomex.Cryptography;
 using NBitcoin;
 using ReactiveUI;
@@ -60,24 +61,14 @@ namespace Atomex.Client.Desktop.ViewModels.CreateWalletViewModels
             set { this.RaiseAndSetIfChanged(ref _warning, value); }
         }
 
-        private static T GetValueByKey<T>(IEnumerable<KeyValuePair<string, T>> collection, string value)
-        {
-            return collection.Where(kv => kv.Key == value).ToList()[0].Value;
-        }
-
-        private static string GetKeyByValue<T>(IEnumerable<KeyValuePair<string, T>> collection, T value)
-        {
-            return collection.Where(kv => kv.Value.Equals(value)).ToList()[0].Key;
-        }
-
         private Wordlist _language = Wordlist.English;
 
         public string Language
         {
-            get => GetKeyByValue(Languages, _language);
+            get => KeyValExtension.GetKeyByValue(Languages, _language);
             set
             {
-                var newValue = GetValueByKey(Languages, value);
+                var newValue = KeyValExtension.GetValueByKey(Languages, value);
                 if (_language != newValue)
                 {
                     _language = newValue;
@@ -90,10 +81,10 @@ namespace Atomex.Client.Desktop.ViewModels.CreateWalletViewModels
 
         public string EntropyLength
         {
-            get => GetKeyByValue(WordCountToEntropyLength, _entropyLength);
+            get => KeyValExtension.GetKeyByValue(WordCountToEntropyLength, _entropyLength);
             set
             {
-                var newValue = GetValueByKey(WordCountToEntropyLength, value);
+                var newValue = KeyValExtension.GetValueByKey(WordCountToEntropyLength, value);
                 if (_entropyLength != newValue)
                 {
                     _entropyLength = newValue;
