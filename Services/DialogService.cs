@@ -80,6 +80,12 @@ namespace Atomex.Client.Desktop.Services
             }
         }
 
+        public bool CurrentlyShowed(ViewModelBase viewModel)
+        {
+            var res = _dialogServiceViewModel.Content?.GetType() == viewModel.GetType() && IsDialogOpened;
+            return res;
+        }
+
         public void Show(ViewModelBase viewModel, Action? closeAction = null, double? customHeight = null)
         {
             using var source = new CancellationTokenSource();

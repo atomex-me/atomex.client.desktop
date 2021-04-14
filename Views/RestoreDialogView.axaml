@@ -1,0 +1,77 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="Atomex.Client.Desktop.Views.RestoreDialogView"
+             xmlns:vm="clr-namespace:Atomex.Client.Desktop.ViewModels"
+             xmlns:controls="clr-namespace:Atomex.Client.Desktop.Controls"
+             xmlns:mah="clr-namespace:AvaloniaProgressRing;assembly=AvaloniaProgressRing"
+             Width="560"
+             Height="260">
+
+    <Design.DataContext>
+        <vm:RestoreDialogViewModel />
+    </Design.DataContext>
+
+    <Grid Width="560">
+        <StackPanel Orientation="Vertical">
+
+            <Border Margin="0 10 0 10"
+                    Height="33"
+                    VerticalAlignment="Top"
+                    HorizontalAlignment="Stretch"
+                    Background="{DynamicResource ChildViewHeaderBackgroundBrush}">
+                <TextBlock Text="Restoring"
+                           Foreground="{DynamicResource ChildViewHeaderForegroundBrush}"
+                           FontFamily="{DynamicResource DefaultLightFontFamily}"
+                           FontSize="25"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center" />
+            </Border>
+            
+            <TextBlock Text="Restoring wallet data from blockchain, please wait..."
+                       Foreground="{DynamicResource DefaultForegroundBrush}"
+                       FontFamily="{DynamicResource DefaultLightFontFamily}"
+                       FontSize="15"
+                       Margin="40 20"
+                       TextWrapping="Wrap"
+                       HorizontalAlignment="Center" />
+
+            <Grid>
+                <mah:ProgressRing Width="50"
+                                  Height="50"
+                                  Foreground="{DynamicResource DefaultProgressRingBrush}"
+                                  Margin="0 10" />
+            </Grid>
+
+
+            <StackPanel Orientation="Horizontal"
+                        HorizontalAlignment="Center"
+                        Margin="0 20 0 20">
+                <Border>
+                    <controls:RoundedButton Width="100"
+                                            Height="40"
+                                            Margin="0 0 3 0"
+                                            CornerRadius="20 0 0 20"
+                                            Content="Hide"
+                                            Command="{Binding HideCommand}" />
+                    <ToolTip.Tip>
+                        <TextBlock Text="Close this window and continue restoring in background."/> 
+                    </ToolTip.Tip>
+                </Border>
+
+                <Border>
+                    <controls:RoundedButton Width="100"
+                                            Height="40"
+                                            CornerRadius="0 20 20 0"
+                                            Content="Cancel"
+                                            Command="{Binding CancelCommand}" />
+                    <ToolTip.Tip>
+                        <TextBlock Text="Close this window and stop restoring data."/> 
+                    </ToolTip.Tip>
+                </Border>
+            </StackPanel>
+        </StackPanel>
+    </Grid>
+</UserControl>

@@ -152,6 +152,9 @@
         <Compile Update="Views\AddressesView.axaml.cs">
           <DependentUpon>AddressesView.axaml</DependentUpon>
         </Compile>
+        <Compile Update="Views\RestoreDialogView.axaml.cs">
+          <DependentUpon>RestoreDialogView.axaml</DependentUpon>
+        </Compile>
     </ItemGroup>
     <ItemGroup>
         <ProjectReference Include="atomex.client.core\Atomex.Client.Core\Atomex.Client.Core.csproj">

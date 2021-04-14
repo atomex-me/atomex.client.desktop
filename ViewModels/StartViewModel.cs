@@ -10,7 +10,8 @@ namespace Atomex.Client.Desktop.ViewModels
 {
     public class StartViewModel : ViewModelBase
     {
-        public StartViewModel(Action<ViewModelBase> showContent, Action showStart, IAtomexApp app)
+        public StartViewModel(Action<ViewModelBase> showContent, Action showStart, IAtomexApp app,
+            MainWindowViewModel mainWindowWM)
         {
 #if DEBUG
             if (Env.IsInDesignerMode())
@@ -19,9 +20,12 @@ namespace Atomex.Client.Desktop.ViewModels
             AtomexApp = app ?? throw new ArgumentNullException(nameof(app));
             HasWallets = WalletInfo.AvailableWallets().Count() > 0;
 
+            MainWindowVM = mainWindowWM;
             ShowContent += showContent;
             ShowStart += showStart;
         }
+
+        private MainWindowViewModel MainWindowVM;
 
         public event Action<ViewModelBase> ShowContent;
         public event Action ShowStart;
@@ -62,7 +66,7 @@ namespace Atomex.Client.Desktop.ViewModels
             ShowContent?.Invoke(new CreateWalletViewModel(
                 app: AtomexApp,
                 scenario: CreateWalletScenario.Restore,
-                onAccountCreated: OnAccountCreated,
+                onAccountCreated: OnAccountRestored,
                 onCanceled: OnCanceled));
         });
 
@@ -90,6 +94,19 @@ namespace Atomex.Client.Desktop.ViewModels
                 account: account,
                 symbolsProvider: AtomexApp.SymbolsProvider,
                 quotesProvider: AtomexApp.QuotesProvider);
+
+            AtomexApp.UseTerminal(atomexClient, restart: true);
+        }
+        
+        private void OnAccountRestored(IAccount account)
+        {
+            var atomexClient = new WebSocketAtomexClient(
+                configuration: App.Configuration,
+                account: account,
+                symbolsProvider: AtomexApp.SymbolsProvider,
+                quotesProvider: AtomexApp.QuotesProvider);
+
+            MainWindowVM.AccountRestored = true;
 
             AtomexApp.UseTerminal(atomexClient, restart: true);
         }

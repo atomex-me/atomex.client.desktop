@@ -2,12 +2,11 @@
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using Atomex.Client.Desktop.Controls;
-using Atomex.Client.Desktop.Dialogs.ViewModels;
 using Atomex.Client.Desktop.Common;
-using Atomex.Client.Desktop.ViewModels.Abstract;
 using Atomex.Common;
 using ReactiveUI;
 using Atomex.Subsystems;
@@ -18,7 +17,7 @@ using Serilog;
 
 namespace Atomex.Client.Desktop.ViewModels
 {
-    internal sealed class MainWindowViewModel : ViewModelBase
+    public sealed class MainWindowViewModel : ViewModelBase
     {
         private void ShowContent(ViewModelBase content)
         {
@@ -30,7 +29,7 @@ namespace Atomex.Client.Desktop.ViewModels
 
         public void ShowStart()
         {
-            ShowContent(new StartViewModel(ShowContent, ShowStart, AtomexApp));
+            ShowContent(new StartViewModel(ShowContent, ShowStart, AtomexApp, this));
         }
 
         private ViewModelBase _content;
@@ -41,21 +40,7 @@ namespace Atomex.Client.Desktop.ViewModels
             set => this.RaiseAndSetIfChanged(ref _content, value);
         }
 
-        // private ViewModelBase _firstDialog;
-        // private ViewModelBase _secondDialog;
         private ViewModelBase MainWalletVM;
-
-        // public void ShowDialog()
-        // {
-        //     var firstDialogWrapped = new DialogServiceViewModel(_firstDialog);
-        //     App.DialogService.Show(firstDialogWrapped);
-        // }
-        //
-        // public void ShowCustomDialog()
-        // {
-        //     var secondDialogWrapper = new DialogServiceViewModel(_secondDialog);
-        //     App.DialogService.Show(secondDialogWrapper);
-        // }
 
         public MainWindowViewModel()
         {
@@ -68,8 +53,6 @@ namespace Atomex.Client.Desktop.ViewModels
         public MainWindowViewModel(IAtomexApp app, IMainView mainView = null)
         {
             AtomexApp = app ?? throw new ArgumentNullException(nameof(app));
-            // _firstDialog = new DialogViewModel();
-            // _secondDialog = new SecondDialogViewModel();
             MainWalletVM = new WalletMainViewModel(AtomexApp);
 
             // InstalledVersion = App.Updater.InstalledVersion.ToString();
@@ -104,11 +87,20 @@ namespace Atomex.Client.Desktop.ViewModels
                 if (_hasAccount)
                 {
                     ShowContent(MainWalletVM);
+
+                    if (AccountRestored)
+                    {
+                        App.DialogService.Show(new RestoreDialogViewModel(AtomexApp));
+                        AccountRestored = false;
+                    }
+                    
                 }
 
                 this.RaisePropertyChanged(nameof(HasAccount));
             }
         }
+
+        public bool AccountRestored { get; set; }
 
         // private void SubscribeToUpdates(Updater updater)
         // {
@@ -265,7 +257,7 @@ namespace Atomex.Client.Desktop.ViewModels
                 }
             };
 
-            
+
             ShowContent(unlockViewModel);
         }
 
