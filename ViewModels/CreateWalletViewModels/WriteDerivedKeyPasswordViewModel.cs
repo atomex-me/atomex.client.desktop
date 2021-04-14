@@ -5,29 +5,25 @@ namespace Atomex.Client.Desktop.ViewModels.CreateWalletViewModels
 {
     public class WriteDerivedKeyPasswordViewModel : StepViewModel
     {
-        private StepData StepData { get; set; }
-
-        private SecureString _password;
-
-        public SecureString Password
+        public WriteDerivedKeyPasswordViewModel()
         {
-            get => _password;
-            set
-            {
-                _password = value;
-                OnPropertyChanged(nameof(Password));
-            }
+            PasswordVM = new PasswordControlViewModel(placeholder: "Password...");
         }
 
-        public override void Initialize(
-            object o)
+        public PasswordControlViewModel PasswordVM { get; }
+
+        private StepData StepData { get; set; }
+
+        private SecureString Password => PasswordVM.SecurePass;
+
+        public override void Initialize(object o)
         {
             StepData = (StepData) o;
         }
 
         public override void Back()
         {
-            Password = null;
+            PasswordVM.StringPass = string.Empty;
 
             base.Back();
         }
@@ -43,7 +39,7 @@ namespace Atomex.Client.Desktop.ViewModels.CreateWalletViewModels
                 PathToWallet = StepData.PathToWallet
             };
 
-            Password = null;
+            PasswordVM.StringPass = string.Empty;
 
             RaiseOnNext(wallet);
         }

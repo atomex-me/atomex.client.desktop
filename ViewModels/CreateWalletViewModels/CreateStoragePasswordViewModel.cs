@@ -1,5 +1,6 @@
 using System;
 using System.Security;
+using System.Threading.Tasks;
 using System.Windows.Input;
 using Serilog;
 using Atomex.Common;
@@ -113,20 +114,25 @@ namespace Atomex.Client.Desktop.ViewModels.CreateWalletViewModels
             {
                 RaiseProgressBarShow();
 
-                await Wallet.EncryptAsync(PasswordVM.SecurePass);
-                
-                Wallet.SaveToFile(Wallet.PathToWallet, PasswordVM.SecurePass);
-                
-                var account = new Account(
-                    Wallet,
-                    PasswordVM.SecurePass,
-                    App.CurrenciesProvider,
-                    ClientType.Unknown);
-                
-                PasswordVM.StringPass = string.Empty;
-                PasswordConfirmationVM.StringPass = string.Empty;
-                PasswordScore = 0;
-                
+                var account = await Task.Run(async () =>
+                {
+                    await Wallet.EncryptAsync(PasswordVM.SecurePass);
+
+                    Wallet.SaveToFile(Wallet.PathToWallet, PasswordVM.SecurePass);
+
+                    var acc = new Account(
+                        Wallet,
+                        PasswordVM.SecurePass,
+                        App.CurrenciesProvider,
+                        ClientType.Unknown);
+
+                    PasswordVM.StringPass = string.Empty;
+                    PasswordConfirmationVM.StringPass = string.Empty;
+                    PasswordScore = 0;
+
+                    return acc;
+                });
+
                 RaiseOnNext(account);
             }
             catch (Exception e)
