@@ -2,6 +2,7 @@ using System;
 using System.Windows.Input;
 using System.Linq;
 using Atomex.Client.Desktop.Common;
+using Atomex.Subsystems;
 using Atomex.Wallet.Abstract;
 using ReactiveUI;
 
@@ -33,14 +34,6 @@ namespace Atomex.Client.Desktop.ViewModels
         {
             get => _hasWallets;
             private set => this.RaiseAndSetIfChanged(ref _hasWallets, value);
-        }
-
-        private ViewModelBase _content;
-
-        public ViewModelBase Content
-        {
-            get => _content;
-            set => this.RaiseAndSetIfChanged(ref _content, value);
         }
 
         private ICommand _myWalletsCommand;
@@ -85,16 +78,13 @@ namespace Atomex.Client.Desktop.ViewModels
 
         private void OnAccountCreated(IAccount account)
         {
-            // var atomexClient = new WebSocketAtomexClient(
-            //     configuration: App.Configuration,
-            //     account: account,
-            //     symbolsProvider: AtomexApp.SymbolsProvider,
-            //     quotesProvider: AtomexApp.QuotesProvider);
-            //
-            // AtomexApp.UseTerminal(atomexClient, restart: true);
-            //
-            // DialogViewer?.HideDialog(Dialogs.CreateWallet);
-            // DialogViewer?.HideDialog(Dialogs.Start);
+            var atomexClient = new WebSocketAtomexClient(
+                configuration: App.Configuration,
+                account: account,
+                symbolsProvider: AtomexApp.SymbolsProvider,
+                quotesProvider: AtomexApp.QuotesProvider);
+            
+            AtomexApp.UseTerminal(atomexClient, restart: true);
         }
 
         private void DesignerMode()

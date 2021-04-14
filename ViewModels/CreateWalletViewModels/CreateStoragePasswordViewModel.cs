@@ -114,29 +114,26 @@ namespace Atomex.Client.Desktop.ViewModels.CreateWalletViewModels
                 RaiseProgressBarShow();
 
                 await Wallet.EncryptAsync(PasswordVM.SecurePass);
-
+                
                 Wallet.SaveToFile(Wallet.PathToWallet, PasswordVM.SecurePass);
-
+                
                 var account = new Account(
                     Wallet,
                     PasswordVM.SecurePass,
                     App.CurrenciesProvider,
                     ClientType.Unknown);
-
+                
                 PasswordVM.StringPass = string.Empty;
                 PasswordConfirmationVM.StringPass = string.Empty;
                 PasswordScore = 0;
-
+                
                 RaiseOnNext(account);
             }
             catch (Exception e)
             {
                 // todo: warning
-                Log.Error(e, "Create storage password error");
-            }
-            finally
-            {
                 RaiseProgressBarHide();
+                Log.Error(e, "Create storage password error");
             }
         }
     }

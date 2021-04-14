@@ -96,7 +96,7 @@
                               UseLayoutRounding="False"
                               Width="24"
                               Height="24"
-                              Margin="0 0 5 0"
+                              Margin="0 0 6 0"
                               Fill="{DynamicResource ConversionArrowBrush}"
                               Data="{DynamicResource Unicons.ExchangeAlt}">
                             <Path.RenderTransform>
@@ -656,7 +656,7 @@
                 </Grid>
             </Border>
 
-            <StackPanel Margin="20 15 20 0"
+            <StackPanel Margin="20 5 20 0"
                         Orientation="Horizontal"
                         HorizontalAlignment="Center"
                         IsVisible="{Binding Warning, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
