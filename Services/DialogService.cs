@@ -22,7 +22,9 @@ namespace Atomex.Client.Desktop.Services
         private TView _dialogServiceView;
         private ViewLocator _viewLocator;
         private ViewModelBase _lastDialog;
-        private Action CloseAction;
+        private Action _closeAction;
+
+        private double? _customHeight;
 
         private double DEFAULT_WIDTH = 630;
         private double DEFAULT_HEIGHT = 400;
@@ -64,7 +66,7 @@ namespace Atomex.Client.Desktop.Services
                     _lastDialog = _dialogServiceViewModel.Content;
                     _dialogServiceView.Close();
                     IsDialogOpened = false;
-                    CloseAction?.Invoke();
+                    _closeAction?.Invoke();
                     BuildDialogServiceView();
                 });
             }
@@ -76,7 +78,7 @@ namespace Atomex.Client.Desktop.Services
         {
             if (_lastDialog != null)
             {
-                Show(_lastDialog);
+                Show(_lastDialog, _closeAction, _customHeight);
             }
         }
 
@@ -93,7 +95,8 @@ namespace Atomex.Client.Desktop.Services
             _lastDialog = _dialogServiceViewModel.Content;
 
             _dialogServiceViewModel.Content = viewModel;
-            CloseAction = closeAction;
+            _closeAction = closeAction;
+            _customHeight = customHeight;
             AdjustDialogWindowSize(viewModel, customHeight);
 
             if (IsDialogOpened) return;

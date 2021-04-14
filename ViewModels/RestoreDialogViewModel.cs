@@ -39,6 +39,7 @@ namespace Atomex.Client.Desktop.ViewModels
 
         private async void ScanAllCurrenciesAsync()
         {
+            Log.Information("Starting Scan All Currencies");
             var currencies = App.Account.Currencies.ToList();
             var hdWalletScanner = new HdWalletScanner(App.Account);
 

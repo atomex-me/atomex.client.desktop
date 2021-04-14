@@ -1135,7 +1135,6 @@ namespace Atomex.Client.Desktop.ViewModels
 
         private void OnSuccessConvertion(object sender, EventArgs e)
         {
-            Console.WriteLine("OnSuccessConvertion invoked");
             _amount = Math.Min(_amount, EstimatedMaxAmount); // recalculate amount
             _ = UpdateAmountAsync(_amount, updateUi: true);
         }
