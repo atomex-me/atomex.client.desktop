@@ -72,14 +72,17 @@ namespace Atomex.Client.Desktop.ViewModels
 
         public void TwitterCommand()
         {
+            App.OpenBrowser("https://twitter.com/atomex_official");
         }
 
         public void GithubCommand()
         {
+            App.OpenBrowser("https://github.com/atomex-me");
         }
 
         public void TelegramCommand()
         {
+            App.OpenBrowser("tg://resolve?domain=atomex_official");
         }
 
         private void OnCanceled()
