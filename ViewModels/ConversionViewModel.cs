@@ -726,6 +726,13 @@ namespace Atomex.Client.Desktop.ViewModels
             ToCurrencyIndex = ToCurrencies.IndexOf(toCurrencyVm);
         });
 
+        public void SetFromCurrency(Currency fromCurrency)
+        {
+            var fromCurrencyVm = FromCurrencies
+                .FirstOrDefault(c => c?.Currency?.Name == fromCurrency?.Name);
+            FromCurrencyIndex = FromCurrencies.IndexOf(fromCurrencyVm);
+        }
+
         private void SubscribeToServices()
         {
             App.TerminalChanged += OnTerminalChangedEventHandler;

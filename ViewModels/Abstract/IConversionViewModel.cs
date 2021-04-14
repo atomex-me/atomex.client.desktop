@@ -6,5 +6,7 @@ namespace Atomex.Client.Desktop.ViewModels.Abstract
     {
         Currency FromCurrency { get; set; }
         Currency ToCurrency { get; set; }
+
+        public void SetFromCurrency(Currency fromCurrency);
     }
 }

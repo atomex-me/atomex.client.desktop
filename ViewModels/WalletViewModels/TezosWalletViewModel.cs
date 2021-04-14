@@ -56,10 +56,9 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
         public TezosWalletViewModel(
             IAtomexApp app,
-            IMenuSelector menuSelector,
-            IConversionViewModel conversionViewModel,
+            Action<Currency> setConversionTab,
             Currency currency)
-            : base(app, menuSelector, conversionViewModel, currency)
+            : base(app, setConversionTab, currency)
         {
             Delegations = new List<Delegation>();
 

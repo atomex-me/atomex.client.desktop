@@ -2,6 +2,7 @@ using System;
 using System.Threading.Tasks;
 using Atomex.Client.Desktop.Dialogs.ViewModels;
 using Atomex.Client.Desktop.ViewModels.Abstract;
+using Atomex.Core;
 using Atomex.MarketData;
 using Atomex.MarketData.Abstract;
 using Atomex.Subsystems;
@@ -10,7 +11,7 @@ using ReactiveUI;
 
 namespace Atomex.Client.Desktop.ViewModels
 {
-    public class WalletMainViewModel : ViewModelBase, IMenuSelector
+    public class WalletMainViewModel : ViewModelBase
     {
         public WalletMainViewModel(IAtomexApp app)
         {
@@ -18,7 +19,7 @@ namespace Atomex.Client.Desktop.ViewModels
             
             PortfolioViewModel = new PortfolioViewModel(AtomexApp);
             ConversionViewModel = new ConversionViewModel(AtomexApp);
-            WalletsViewModel = new WalletsViewModel(AtomexApp, this, ConversionViewModel);
+            WalletsViewModel = new WalletsViewModel(AtomexApp, SelectConversion);
             SettingsViewModel = new SettingsViewModel(AtomexApp);
 
             SelectPortfolio();
@@ -183,9 +184,13 @@ namespace Atomex.Client.Desktop.ViewModels
             RefreshAllMenus();
         }
         
-        public void SelectConversion()
+        public void SelectConversion(Currency? fromCurrency = null)
         {
             Content = ConversionViewModel;
+            if (fromCurrency != null)
+            {
+                ConversionViewModel.SetFromCurrency(fromCurrency);
+            }
             RefreshAllMenus();
         }
         

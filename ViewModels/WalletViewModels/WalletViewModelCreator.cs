@@ -11,8 +11,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
     {
         public static WalletViewModel CreateViewModel(
             IAtomexApp app,
-            IMenuSelector menuSelector,
-            IConversionViewModel conversionViewModel,
+            Action<Currency> setConversionTab,
             Currency currency)
         {
             switch (currency)
@@ -25,14 +24,12 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                 case FA12 _:
                     return new WalletViewModel(
                         app: app,
-                        menuSelector: menuSelector,
-                        conversionViewModel: conversionViewModel,
+                        setConversionTab: setConversionTab,
                         currency: currency);
                 case Tezos _:
                     return new TezosWalletViewModel(
                         app: app,
-                        menuSelector: menuSelector,
-                        conversionViewModel: conversionViewModel,
+                        setConversionTab: setConversionTab,
                         currency: currency);
                 default:
                     throw new NotSupportedException(

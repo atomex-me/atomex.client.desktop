@@ -58,8 +58,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         }
 
         protected IAtomexApp App { get; }
-        private IMenuSelector MenuSelector { get; }
-        private IConversionViewModel ConversionViewModel { get; }
+        private Action<Currency> SetConversionTab { get;  }
 
         public string Header => CurrencyViewModel.Header;
         public Currency Currency => CurrencyViewModel.Currency;
@@ -110,14 +109,11 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
         public WalletViewModel(
             IAtomexApp app,
-            IMenuSelector menuSelector,
-            IConversionViewModel conversionViewModel,
+            Action<Currency> setConversionTab,
             Currency currency)
         {
             App = app ?? throw new ArgumentNullException(nameof(app));
-            MenuSelector = menuSelector ?? throw new ArgumentNullException(nameof(menuSelector));
-            ConversionViewModel = conversionViewModel ?? throw new ArgumentNullException(nameof(conversionViewModel));
-
+            SetConversionTab = setConversionTab ?? throw new ArgumentNullException(nameof(setConversionTab));
             CurrencyViewModel = CurrencyViewModelCreator.CreateViewModel(currency);
 
             SubscribeToServices();
@@ -225,8 +221,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
         private void OnConvertClick()
         {
-            MenuSelector.SelectMenu(ConversionViewIndex);
-            ConversionViewModel.FromCurrency = Currency;
+            SetConversionTab?.Invoke(Currency);
         }
 
         protected async void OnUpdateClick()

@@ -6,6 +6,7 @@ using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.ViewModels.Abstract;
 using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
 using Atomex.Client.Desktop.ViewModels.WalletViewModels;
+using Atomex.Core;
 using ReactiveUI;
 
 namespace Atomex.Client.Desktop.ViewModels
@@ -13,8 +14,7 @@ namespace Atomex.Client.Desktop.ViewModels
     public class WalletsViewModel : ViewModelBase
     {
         private IAtomexApp App { get; }
-        private IMenuSelector MenuSelector { get; }
-        private IConversionViewModel ConversionViewModel { get; }
+        private Action<Currency> SetConversionTab { get; }
 
         private ObservableCollection<WalletViewModel> _wallets;
 
@@ -55,14 +55,10 @@ namespace Atomex.Client.Desktop.ViewModels
 #endif
         }
 
-        public WalletsViewModel(
-            IAtomexApp app,
-            IMenuSelector menuSelector,
-            IConversionViewModel conversionViewModel)
+        public WalletsViewModel(IAtomexApp app,  Action<Currency> setConversionTab)
         {
             App = app ?? throw new ArgumentNullException(nameof(app));
-            MenuSelector = menuSelector ?? throw new ArgumentNullException(nameof(menuSelector));
-            ConversionViewModel = conversionViewModel ?? throw new ArgumentNullException(nameof(conversionViewModel));
+            SetConversionTab = setConversionTab;
 
             SubscribeToServices();
         }
@@ -78,8 +74,7 @@ namespace Atomex.Client.Desktop.ViewModels
                 ? new ObservableCollection<WalletViewModel>(
                     e.Terminal.Account.Currencies.Select(currency => WalletViewModelCreator.CreateViewModel(
                         app: App,
-                        menuSelector: MenuSelector,
-                        conversionViewModel: ConversionViewModel,
+                        setConversionTab: SetConversionTab,
                         currency: currency)))
                 : new ObservableCollection<WalletViewModel>();
 
