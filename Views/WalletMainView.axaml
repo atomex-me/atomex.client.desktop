@@ -6,6 +6,7 @@
              x:Class="Atomex.Client.Desktop.Views.WalletMainView"
              xmlns:vm="clr-namespace:Atomex.Client.Desktop.ViewModels"
              xmlns:controls="clr-namespace:Atomex.Client.Desktop.Controls"
+             xmlns:converters="clr-namespace:Atomex.Client.Desktop.Converters"
              xmlns:i="using:Avalonia.Xaml.Interactivity"
              xmlns:ia="using:Avalonia.Xaml.Interactions.Core">
 
@@ -13,9 +14,13 @@
         <vm:WalletMainViewModel />
     </Design.DataContext>
 
+    <UserControl.Resources>
+        <converters:CalcChildHeightConverter x:Key="CalcChildHeightConverter" />
+    </UserControl.Resources>
+
     <DockPanel x:Name="MainDockerPanel"
                Width="{Binding $parent[Window].Bounds.Width}"
-               Height="{Binding $parent[Window].Bounds.Height}">
+               Height="{Binding $parent[Window].Bounds.Height, Converter={StaticResource CalcChildHeightConverter}}">
         <DockPanel DockPanel.Dock="Bottom"
                    Background="{DynamicResource MainWindowTitleBrush}">
 
@@ -23,13 +28,13 @@
                         DockPanel.Dock="Right"
                         VerticalAlignment="Center"
                         Height="20">
-                
+
                 <Border ToolTip.Placement="AnchorAndGravity"
                         ToolTip.VerticalOffset="-32"
                         VerticalAlignment="Center"
                         Cursor="Help"
                         Margin="8 0">
-                    
+
                     <TextBlock Text="Exchange"
                                x:Name="ExchangeTextBox"
                                FontSize="11" />
@@ -60,18 +65,18 @@
                         </ia:DataTriggerBehavior>
                     </i:Interaction.Behaviors>
                 </Border>
-                
+
                 <Rectangle Margin="0 4"
                            VerticalAlignment="Stretch"
                            Fill="{DynamicResource StatusBarVersionForeground}"
-                           Width="1"/>
-                
+                           Width="1" />
+
                 <Border ToolTip.Placement="AnchorAndGravity"
                         ToolTip.VerticalOffset="-32"
                         VerticalAlignment="Center"
                         Cursor="Help"
                         Margin="8 0">
-                    
+
                     <TextBlock Text="Market Data"
                                x:Name="MarketTextBox"
                                FontSize="11" />
@@ -102,18 +107,18 @@
                         </ia:DataTriggerBehavior>
                     </i:Interaction.Behaviors>
                 </Border>
-                
+
                 <Rectangle Margin="0 4"
                            VerticalAlignment="Stretch"
-                           Fill="{DynamicResource StatusBarVersionForeground}" 
-                           Width="1"/>
-                
+                           Fill="{DynamicResource StatusBarVersionForeground}"
+                           Width="1" />
+
                 <Border ToolTip.Placement="AnchorAndGravity"
                         ToolTip.VerticalOffset="-32"
                         VerticalAlignment="Center"
                         Cursor="Help"
                         Margin="8 0">
-                    
+
                     <TextBlock Text="Rates Provider"
                                x:Name="RatesTextBox"
                                FontSize="11" />
@@ -159,7 +164,7 @@
 
         <DockPanel DockPanel.Dock="Left"
                    Background="{DynamicResource HamburgerMenuBackgroundBrush}">
-            
+
             <StackPanel DockPanel.Dock="Bottom">
                 <controls:MenuButton
                     Background="Transparent"
@@ -174,7 +179,7 @@
                               Width="30"
                               Height="30"
                               Fill="{DynamicResource DefaultForegroundBrush}"
-                              Data="{DynamicResource Material.Settings}"/>
+                              Data="{DynamicResource Material.Settings}" />
                         <TextBlock VerticalAlignment="Center"
                                    Margin="8 0 0 0">
                             Settings
@@ -182,7 +187,7 @@
                     </StackPanel>
                 </controls:MenuButton>
             </StackPanel>
-            
+
             <StackPanel>
                 <controls:MenuButton
                     Background="Transparent"
@@ -197,7 +202,7 @@
                               Width="30"
                               Height="30"
                               Fill="{DynamicResource DefaultForegroundBrush}"
-                              Data="{DynamicResource FontAwesome.ChartPieSolid}"/>
+                              Data="{DynamicResource FontAwesome.ChartPieSolid}" />
                         <Panel Height="30">
                             <TextBlock VerticalAlignment="Center"
                                        Margin="8 0 0 0">
@@ -220,7 +225,7 @@
                               Width="30"
                               Height="30"
                               Fill="{DynamicResource DefaultForegroundBrush}"
-                              Data="{DynamicResource Entypo.Wallet}"/>
+                              Data="{DynamicResource Entypo.Wallet}" />
                         <Panel Height="30">
                             <TextBlock VerticalAlignment="Center"
                                        Margin="8 0 0 0">
@@ -242,7 +247,7 @@
                               Width="30"
                               Height="20"
                               Fill="{DynamicResource DefaultForegroundBrush}"
-                              Data="{DynamicResource Unicons.ExchangeAlt}"/>
+                              Data="{DynamicResource Unicons.ExchangeAlt}" />
                         <Panel Height="30">
                             <TextBlock VerticalAlignment="Center"
                                        Margin="8 0 0 0">
@@ -253,7 +258,7 @@
                 </controls:MenuButton>
             </StackPanel>
         </DockPanel>
-        
+
 
         <ContentControl Content="{Binding Content}" />
     </DockPanel>

@@ -99,6 +99,7 @@
     <SolidColorBrush x:Key="StatusBarConnectedForeground" Color="AliceBlue" />
     <SolidColorBrush x:Key="StatusBarDisconnectedForeground" Color="{StaticResource CriticalWarningColor}" />
     <SolidColorBrush x:Key="StatusBarVersionForeground" Color="DarkGray"/>
+    <SolidColorBrush x:Key="MainWindowTitleBarForeground" Color="DarkGray"/>
     <SolidColorBrush x:Key="DefaultUpdateForegroundBrush" Color="Gold" />
 
     <LinearGradientBrush x:Key="MainBackgroundBrush" StartPoint="0%,0%" EndPoint="100%,100%">

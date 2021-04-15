@@ -6,7 +6,10 @@
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="Atomex.Client.Desktop.Views.MainWindow"
         Icon="/Assets/avalonia-logo.ico"
-        Title="Atomex.Client.Desktop"
+        xmlns:titlebars="clr-namespace:Atomex.Client.Desktop.Views.CustomTitleBars"
+        ExtendClientAreaToDecorationsHint="True"
+        ExtendClientAreaChromeHints="NoChrome"
+        ExtendClientAreaTitleBarHeightHint="-1"
         Name="MainWindow"
         MinWidth="800"
         MinHeight="700"
@@ -16,22 +19,25 @@
         <vm:MainWindowViewModel />
     </Design.DataContext>
 
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition />
-            <RowDefinition Height="Auto" />
-            <RowDefinition />
-        </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition />
-            <ColumnDefinition Width="Auto" />
-            <ColumnDefinition />
-        </Grid.ColumnDefinitions>
-
-
-        <ContentControl Grid.Column="1"
-                        Grid.Row="1"
-                        Content="{Binding Content}" />
-    </Grid>
+    <DockPanel HorizontalAlignment="Stretch"
+               VerticalAlignment="Stretch">
+        <titlebars:MacosTitleBarView IsSeamless="False"></titlebars:MacosTitleBarView>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition />
+                <RowDefinition Height="Auto" />
+                <RowDefinition />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+        
+            <ContentControl Grid.Column="1"
+                            Grid.Row="1"
+                            Content="{Binding Content}" />
+        </Grid>
+    </DockPanel>
 
 </Window>

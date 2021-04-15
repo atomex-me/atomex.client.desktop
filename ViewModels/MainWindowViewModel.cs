@@ -101,6 +101,13 @@ namespace Atomex.Client.Desktop.ViewModels
         }
 
         public bool AccountRestored { get; set; }
+        
+        private bool _updatesReady;
+        public bool UpdatesReady
+        {
+            get => true;
+            set { _updatesReady = value; OnPropertyChanged(nameof(UpdatesReady)); }
+        }
 
         // private void SubscribeToUpdates(Updater updater)
         // {
@@ -208,8 +215,8 @@ namespace Atomex.Client.Desktop.ViewModels
 
             var hasActiveSwaps = await HasActiveSwapsAsync();
 
-            if (!hasActiveSwaps)
-                return false;
+            if (hasActiveSwaps)
+                return true;
 
             // var result = await DialogViewer
             //     .ShowMessageAsync(

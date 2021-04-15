@@ -155,6 +155,10 @@
         <Compile Update="Views\RestoreDialogView.axaml.cs">
           <DependentUpon>RestoreDialogView.axaml</DependentUpon>
         </Compile>
+        <Compile Update="Views\CustomTitleBars\MacosTitleBarView.axaml.cs">
+          <DependentUpon>MacosTitleBarView.axaml</DependentUpon>
+          <SubType>Code</SubType>
+        </Compile>
     </ItemGroup>
     <ItemGroup>
         <ProjectReference Include="atomex.client.core\Atomex.Client.Core\Atomex.Client.Core.csproj">
