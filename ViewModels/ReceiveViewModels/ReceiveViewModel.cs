@@ -193,7 +193,7 @@ namespace Atomex.Client.Desktop.ViewModels.ReceiveViewModels
 
             await Dispatcher.UIThread.InvokeAsync(() =>
             {
-                using (MemoryStream memory = new())
+                using (MemoryStream memory = new MemoryStream())
                 {
                     qrCodeBitmap?.Save(memory, ImageFormat.Png);
                     memory.Position = 0;
