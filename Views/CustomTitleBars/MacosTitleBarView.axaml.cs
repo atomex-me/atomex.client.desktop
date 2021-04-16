@@ -17,12 +17,13 @@ namespace Atomex.Client.Desktop.Views.CustomTitleBars
         private StackPanel titleAndWindowIconWrapper;
 
         public static readonly StyledProperty<bool> IsSeamlessProperty =
-        AvaloniaProperty.Register<MacosTitleBarView, bool>(nameof(IsSeamless));
+            AvaloniaProperty.Register<MacosTitleBarView, bool>(nameof(IsSeamless));
 
         public bool IsSeamless
         {
             get { return GetValue(IsSeamlessProperty); }
-            set {
+            set
+            {
                 SetValue(IsSeamlessProperty, value);
                 if (titleBarBackground != null && titleAndWindowIconWrapper != null)
                 {
@@ -36,36 +37,30 @@ namespace Atomex.Client.Desktop.Views.CustomTitleBars
         {
             this.InitializeComponent();
 
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX) == false)
-            {
-                this.IsVisible = false;
-            }
-            else
-            {
-                minimizeButton = this.FindControl<Button>("MinimizeButton");
-                zoomButton = this.FindControl<Button>("MaximizeButton");
-                closeButton = this.FindControl<Button>("CloseButton");
 
-                minimizeButton.Click += MinimizeWindow;
-                zoomButton.Click += MaximizeWindow;
-                closeButton.Click += CloseWindow;
+            minimizeButton = this.FindControl<Button>("MinimizeButton");
+            zoomButton = this.FindControl<Button>("MaximizeButton");
+            closeButton = this.FindControl<Button>("CloseButton");
 
-                titleBarBackground = this.FindControl<DockPanel>("TitleBarBackground");
-                titleAndWindowIconWrapper = this.FindControl<StackPanel>("TitleAndWindowIconWrapper");
+            minimizeButton.Click += MinimizeWindow;
+            zoomButton.Click += MaximizeWindow;
+            closeButton.Click += CloseWindow;
 
-                SubscribeToWindowState();
-            }
+            titleBarBackground = this.FindControl<DockPanel>("TitleBarBackground");
+            titleAndWindowIconWrapper = this.FindControl<StackPanel>("TitleAndWindowIconWrapper");
+
+            SubscribeToWindowState();
         }
 
         private void CloseWindow(object sender, Avalonia.Interactivity.RoutedEventArgs e)
         {
-            Window hostWindow = (Window)this.VisualRoot;
+            Window hostWindow = (Window) this.VisualRoot;
             hostWindow.Close();
         }
 
         private void MaximizeWindow(object sender, Avalonia.Interactivity.RoutedEventArgs e)
         {
-            Window hostWindow = (Window)this.VisualRoot;
+            Window hostWindow = (Window) this.VisualRoot;
 
             if (hostWindow.WindowState == WindowState.Normal)
             {
@@ -79,17 +74,17 @@ namespace Atomex.Client.Desktop.Views.CustomTitleBars
 
         private void MinimizeWindow(object sender, Avalonia.Interactivity.RoutedEventArgs e)
         {
-            Window hostWindow = (Window)this.VisualRoot;
+            Window hostWindow = (Window) this.VisualRoot;
             hostWindow.WindowState = WindowState.Minimized;
         }
 
         private async void SubscribeToWindowState()
         {
-            Window hostWindow = (Window)this.VisualRoot;
+            Window hostWindow = (Window) this.VisualRoot;
 
             while (hostWindow == null)
             {
-                hostWindow = (Window)this.VisualRoot;
+                hostWindow = (Window) this.VisualRoot;
                 await Task.Delay(50);
             }
 
@@ -100,6 +95,7 @@ namespace Atomex.Client.Desktop.Views.CustomTitleBars
                 {
                     hostWindow.Padding = new Thickness(0, 0, 0, 0);
                 }
+
                 if (s == WindowState.Maximized)
                 {
                     hostWindow.Padding = new Thickness(7, 7, 7, 7);
