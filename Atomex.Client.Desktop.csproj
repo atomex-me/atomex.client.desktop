@@ -183,6 +183,6 @@
       <Folder Include="dist_osx" />
     </ItemGroup>
     <ItemGroup>
-      <Content Include=".github\workflows\build.yml" />
+      <Content Include=".github\workflows\build_mac.yml" />
     </ItemGroup>
 </Project>
