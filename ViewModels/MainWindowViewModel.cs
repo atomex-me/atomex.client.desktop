@@ -2,7 +2,6 @@
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using Atomex.Client.Desktop.Controls;
@@ -11,7 +10,6 @@ using Atomex.Common;
 using ReactiveUI;
 using Atomex.Subsystems;
 using Atomex.Wallet;
-using Avalonia.Controls.ApplicationLifetimes;
 using Serilog;
 
 
@@ -49,6 +47,8 @@ namespace Atomex.Client.Desktop.ViewModels
                 DesignerMode();
 #endif
         }
+        
+        public Action OnUpdateAction;
 
         public MainWindowViewModel(IAtomexApp app, IMainView mainView = null)
         {
@@ -93,7 +93,6 @@ namespace Atomex.Client.Desktop.ViewModels
                         App.DialogService.Show(new RestoreDialogViewModel(AtomexApp));
                         AccountRestored = false;
                     }
-                    
                 }
 
                 this.RaisePropertyChanged(nameof(HasAccount));
@@ -101,12 +100,62 @@ namespace Atomex.Client.Desktop.ViewModels
         }
 
         public bool AccountRestored { get; set; }
-        
+
         private bool _updatesReady;
-        public bool UpdatesReady
+
+        public bool UpdatesReady => HasUpdates && UpdateDownloadProgress == 100;
+        public bool IsDownloadingUpdate => HasUpdates && UpdateDownloadProgress > 0 && UpdateDownloadProgress < 100;
+
+        private bool _hasUpdates;
+
+        public bool HasUpdates
         {
-            get => true;
-            set { _updatesReady = value; OnPropertyChanged(nameof(UpdatesReady)); }
+            get => _hasUpdates;
+            set
+            {
+                _hasUpdates = value;
+                OnPropertyChanged(nameof(HasUpdates));
+            }
+        }
+
+        private string _updateVersion;
+
+        public string UpdateVersion
+        {
+            get => _updateVersion;
+            set
+            {
+                _updateVersion = value;
+                OnPropertyChanged(nameof(UpdateVersion));
+            }
+        }
+
+        private bool _updateStarted;
+        public bool UpdateStarted
+        {
+            get => _updateStarted;
+            set
+            {
+                _updateStarted = value;
+                OnPropertyChanged(nameof(UpdateStarted));
+            }
+        }
+
+        private int _updateDownloadProgress;
+
+        public int UpdateDownloadProgress
+        {
+            get => _updateDownloadProgress;
+            set
+            {
+                if (_updateDownloadProgress != value)
+                {
+                    _updateDownloadProgress = value;
+                    OnPropertyChanged(nameof(UpdateDownloadProgress));
+                    OnPropertyChanged(nameof(IsDownloadingUpdate));
+                    OnPropertyChanged(nameof(UpdatesReady));
+                }
+            }
         }
 
         // private void SubscribeToUpdates(Updater updater)
@@ -150,7 +199,8 @@ namespace Atomex.Client.Desktop.ViewModels
 
         private void OnUpdateClick()
         {
-            (App.Current.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime).Shutdown(101);
+            OnUpdateAction?.Invoke();
+            UpdateStarted = true;
         }
 
         private ICommand _signOutCommand;
@@ -177,27 +227,27 @@ namespace Atomex.Client.Desktop.ViewModels
 
         private async void Closing(CancelEventArgs args)
         {
-            if (AtomexApp.Account == null || _forcedClose)
-                return;
-
-            args.Cancel = true;
-
-            try
-            {
-                await Task.Yield();
-
-                var cancel = await WhetherToCancelClosingAsync();
-
-                if (!cancel)
-                {
-                    _forcedClose = true;
-                    MainView.Close();
-                }
-            }
-            catch (Exception e)
-            {
-                Log.Error(e, "Closing error");
-            }
+            // if (AtomexApp.Account == null || _forcedClose)
+            //     return;
+            //
+            // args.Cancel = true;
+            //
+            // try
+            // {
+            //     await Task.Yield();
+            //
+            //     var cancel = await WhetherToCancelClosingAsync();
+            //
+            //     if (!cancel)
+            //     {
+            //         _forcedClose = true;
+            //         MainView.Close();
+            //     }
+            // }
+            // catch (Exception e)
+            // {
+            //     Log.Error(e, "Closing error");
+            // }
         }
 
         private async Task<bool> HasActiveSwapsAsync()

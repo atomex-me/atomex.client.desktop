@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using Atomex.Core;
 using Serilog;
 
@@ -24,11 +25,12 @@ namespace Atomex.Client.Desktop.Common
         {
             var result = new List<WalletInfo>();
 
-            if (!Directory.Exists(DefaultWalletsDirectory))
+            if (!Directory.Exists(CurrentWalletDirectory))
+            {
                 return result;
+            }
 
-            var walletsDirectory = new DirectoryInfo(
-                $"{AppDomain.CurrentDomain.BaseDirectory}{DefaultWalletsDirectory}");
+            var walletsDirectory = new DirectoryInfo(CurrentWalletDirectory);
 
             foreach (var directory in walletsDirectory.GetDirectories())
             {
@@ -68,7 +70,10 @@ namespace Atomex.Client.Desktop.Common
             return result;
         }
 
+
         public static string CurrentWalletDirectory =>
-            $"{AppDomain.CurrentDomain.BaseDirectory}{DefaultWalletsDirectory}";
+            RuntimeInformation.IsOSPlatform(OSPlatform.OSX)
+                ? $"{Environment.GetFolderPath(Environment.SpecialFolder.Personal)}/Library/Application Support/com.atomex.osx/{DefaultWalletsDirectory}"
+                : $"{AppDomain.CurrentDomain.BaseDirectory}{DefaultWalletsDirectory}";
     }
 }

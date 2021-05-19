@@ -4,9 +4,11 @@
         <TargetFramework>net5.0</TargetFramework>
         <Nullable>enable</Nullable>
         <DefaultItemExcludes>$(DefaultItemExcludes);atomex.client.core\**</DefaultItemExcludes>
-        
         <UseAppHost>true</UseAppHost>
         <RuntimeIdentifiers>osx-x64</RuntimeIdentifiers>
+
+        <AssemblyVersion>1.0.76</AssemblyVersion>
+        <Version>1.0.76</Version>
     </PropertyGroup>
     <ItemGroup>
         <AvaloniaResource Include="Assets\**" />
@@ -15,17 +17,18 @@
         <AvaloniaResource Include="Resources\Images\*" />
     </ItemGroup>
     <ItemGroup>
-        <PackageReference Include="Avalonia" Version="0.10.0" />
-        <PackageReference Include="Avalonia.Controls.DataGrid" Version="0.10.0" />
-        <PackageReference Include="Avalonia.Desktop" Version="0.10.0" />
-        <PackageReference Include="Avalonia.Diagnostics" Version="0.10.0" />
-        <PackageReference Include="Avalonia.ReactiveUI" Version="0.10.0" />
-        <PackageReference Include="Avalonia.Xaml.Behaviors" Version="0.10.0" />
+        <PackageReference Include="Avalonia" Version="0.10.4" />
+        <PackageReference Include="Avalonia.Controls.DataGrid" Version="0.10.4" />
+        <PackageReference Include="Avalonia.Desktop" Version="0.10.4" />
+        <PackageReference Include="Avalonia.Diagnostics" Version="0.10.4" />
+        <PackageReference Include="Avalonia.ReactiveUI" Version="0.10.4" />
+        <PackageReference Include="Avalonia.Xaml.Behaviors" Version="0.10.4" />
         <PackageReference Include="Deadpikle.AvaloniaProgressRing" Version="0.9.0" />
-        <PackageReference Include="NetSparkleUpdater.UI.Avalonia" Version="2.0.0-preview20210414001" />
+        <PackageReference Include="NetSparkleUpdater.UI.Avalonia" Version="2.0.6" />
         <PackageReference Include="OxyPlot.Avalonia" Version="2.1.0-20201211.2" />
         <PackageReference Include="QRCoder" Version="1.4.1" />
         <PackageReference Include="runtime.osx.10.10-x64.CoreCompat.System.Drawing" Version="5.8.64" />
+        <PackageReference Include="Sentry.Serilog" Version="2.1.4" />
         <PackageReference Include="Serilog.Settings.Configuration" Version="3.1.0" />
         <PackageReference Include="Serilog.Sinks.Console" Version="3.1.1" />
     </ItemGroup>
@@ -34,6 +37,7 @@
     <ItemGroup>
         <None Remove="config.debug.json" />
         <None Remove="config.json" />
+        <None Remove="NetSparkle_Ed25519.pub" />
     </ItemGroup>
     <ItemGroup>
         <EmbeddedResource Include="config.debug.json">
@@ -163,10 +167,22 @@
           <DependentUpon>MacosTitleBarView.axaml</DependentUpon>
           <SubType>Code</SubType>
         </Compile>
+        <Compile Update="Views\DelegateView.axaml.cs">
+          <DependentUpon>DelegateView.axaml</DependentUpon>
+        </Compile>
+        <Compile Update="Views\DelegateConfirmationView.axaml.cs">
+          <DependentUpon>DelegateConfirmationView.axaml</DependentUpon>
+        </Compile>
     </ItemGroup>
     <ItemGroup>
         <ProjectReference Include="atomex.client.core\Atomex.Client.Core\Atomex.Client.Core.csproj">
             <GlobalPropertiesToRemove></GlobalPropertiesToRemove>
         </ProjectReference>
+    </ItemGroup>
+    <ItemGroup>
+      <Folder Include="dist_osx" />
+    </ItemGroup>
+    <ItemGroup>
+      <Content Include=".github\workflows\build.yml" />
     </ItemGroup>
 </Project>

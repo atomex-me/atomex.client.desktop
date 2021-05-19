@@ -20,6 +20,7 @@
     <UserControl.Resources>
         <converters:AmountToStringConverter x:Key="AmountToStringConverter" />
         <converters:DateTimeToTxTimeConverter x:Key="DateTimeToTxTimeConverter" />
+        <converters:TezosDelegationCurrencyFormatConverter x:Key="TezosDelegationCurrencyFormatConverter" />
     </UserControl.Resources>
 
     <Grid>
@@ -274,6 +275,7 @@
             <Border Background="{DynamicResource DefaultSubstrateBrush}"
                     CornerRadius="10"
                     Margin="10 0 0 0"
+                    MaxHeight="160"
                     MinWidth="350">
                 <Grid>
                     <StackPanel Orientation="Vertical"
@@ -308,7 +310,7 @@
                         <!-- </ListBox.ItemContainerStyle> -->
                         <ListBox.ItemTemplate>
                             <DataTemplate DataType="{x:Type vm:Delegation}">
-                                <Grid>
+                                <Grid MaxHeight="20">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="34" />
                                         <ColumnDefinition Width="*" />
@@ -318,7 +320,7 @@
                                     <Image Width="30"
                                            Height="30"
                                            Margin="2"
-                                           Source="{Binding Baker.Logo}"
+                                           Source="{Binding GetBakerLogo}"
                                            VerticalAlignment="Center"
                                            HorizontalAlignment="Center"
                                            Grid.Column="0" />
@@ -329,7 +331,7 @@
                                                FontFamily="{DynamicResource DefaultLightFontFamily}"
                                                Foreground="{DynamicResource DefaultForegroundBrush}"
                                                Grid.Column="1" />
-                                    <TextBlock Text="{Binding Balance, StringFormat=0.000000}"
+                                    <TextBlock Text="{Binding Balance, Converter={StaticResource TezosDelegationCurrencyFormatConverter}}"
                                                Margin="10 0 5 0"
                                                VerticalAlignment="Center"
                                                HorizontalAlignment="Center"

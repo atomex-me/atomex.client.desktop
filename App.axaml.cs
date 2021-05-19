@@ -7,11 +7,14 @@ using Atomex.Client.Desktop.ViewModels;
 using Atomex.Client.Desktop.Views;
 using System;
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Reflection;
 using Microsoft.Extensions.Configuration;
 using System.Linq;
+using System.Reactive.Linq;
 using System.Runtime.InteropServices;
 using Atomex.Client.Desktop.Common;
 using Serilog;
@@ -21,6 +24,12 @@ using Atomex.MarketData.Bitfinex;
 using Atomex.Subsystems;
 using Avalonia.Input.Platform;
 using Avalonia.Styling;
+using Nethereum.Contracts;
+using Sentry;
+using Serilog.Core;
+using Serilog.Events;
+using Serilog.Formatting;
+using Serilog.Formatting.Display;
 
 namespace Atomex.Client.Desktop
 {
@@ -28,6 +37,7 @@ namespace Atomex.Client.Desktop
     {
         public static IDialogService<ViewModelBase> DialogService;
         public static TemplateService TemplateService;
+        public static ImageService ImageService;
         public static IClipboard Clipboard;
 
         public override void Initialize()
@@ -38,14 +48,21 @@ namespace Atomex.Client.Desktop
         public override void OnFrameworkInitializationCompleted()
         {
             TemplateService = new TemplateService();
+            ImageService = new ImageService();
             Clipboard = AvaloniaLocator.Current.GetService<IClipboard>();
 
             // init logger
             Log.Logger = new LoggerConfiguration()
                 .ReadFrom.Configuration(Configuration)
+                // .WriteTo.Sentry(o =>
+                // {
+                //     o.Dsn = new Dsn("https://793b3e5e430143be9f9c240d83b9ff3f@sentry.baking-bad.org/8");
+                //     // Debug and higher are stored as breadcrumbs (default is Information)
+                //     o.MinimumBreadcrumbLevel = LogEventLevel.Debug;
+                //     // Warning and higher is sent as event (default is Error)
+                //     o.MinimumEventLevel = LogEventLevel.Debug;
+                // })
                 .CreateLogger();
-
-            Log.Information("Application startup");
 
             var currenciesProvider = new CurrenciesProvider(CurrenciesConfiguration);
             var symbolsProvider = new SymbolsProvider(SymbolsConfiguration);
@@ -70,6 +87,12 @@ namespace Atomex.Client.Desktop
                 desktop.MainWindow = mainWindow;
 
                 desktop.Exit += OnExit;
+
+                // var sink = new InMemorySink(mainWindowViewModel.LogEvent);
+                //
+                // Log.Logger = new LoggerConfiguration()
+                //     .WriteTo.Sink(sink)
+                //     .CreateLogger();
             }
 
             AtomexApp.Start();
@@ -165,7 +188,7 @@ namespace Atomex.Client.Desktop
             using (var process = Process.Start(
                 new ProcessStartInfo
                 {
-                    FileName = "/bin/sh",
+                    FileName = "/bin/bash",
                     Arguments = $"-c \"{escapedArgs}\"",
                     RedirectStandardOutput = true,
                     UseShellExecute = false,
@@ -179,6 +202,31 @@ namespace Atomex.Client.Desktop
                     process.WaitForExit();
                 }
             }
+        }
+    }
+
+    class InMemorySink : ILogEventSink
+    {
+        private Action<string> _logAction;
+
+        public InMemorySink(Action<string> logAction)
+        {
+            _logAction = logAction;
+        }
+
+        readonly ITextFormatter _textFormatter = new MessageTemplateTextFormatter("[{Level}] {Message}{Exception}");
+
+        public ConcurrentQueue<string> Events { get; } = new ConcurrentQueue<string>();
+
+        public void Emit(LogEvent logEvent)
+        {
+            if (logEvent == null) throw new ArgumentNullException(nameof(logEvent));
+            var renderSpace = new StringWriter();
+            _textFormatter.Format(logEvent, renderSpace);
+
+            Events.Enqueue(renderSpace.ToString());
+
+            _logAction.Invoke(renderSpace.ToString());
         }
     }
 }

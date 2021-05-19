@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Security.Cryptography;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using Atomex.Blockchain.Tezos;
@@ -11,6 +12,7 @@ using Atomex.Client.Desktop.ViewModels.WalletViewModels;
 using Atomex.Common;
 using Atomex.Core;
 using Atomex.Wallet;
+using Avalonia.Media.Imaging;
 using Avalonia.Threading;
 using Serilog;
 using ReactiveUI;
@@ -22,6 +24,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         public BakerData Baker { get; set; }
         public string Address { get; set; }
         public decimal Balance { get; set; }
+        public IBitmap GetBakerLogo => App.ImageService.GetImage(Baker.Logo);
     }
 
     public class TezosWalletViewModel : WalletViewModel
@@ -54,16 +57,22 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         {
         }
 
-        public TezosWalletViewModel(
-            IAtomexApp app,
-            Action<Currency> setConversionTab,
-            Currency currency)
+        public DelegateViewModel DelegateVM { get; set; }
+
+        public TezosWalletViewModel(IAtomexApp app, Action<Currency> setConversionTab, Currency currency)
             : base(app, setConversionTab, currency)
         {
             Delegations = new List<Delegation>();
-
-            // update delegation info
+            
             _ = LoadDelegationInfoAsync();
+            
+            DelegateVM = new DelegateViewModel(App, async () =>
+            {
+                await Task.Delay(TimeSpan.FromSeconds(DelegationCheckIntervalInSec))
+                    .ConfigureAwait(false);
+            
+                await Dispatcher.UIThread.InvokeAsync(OnUpdateClick);
+            });
         }
 
         protected override async void OnBalanceUpdatedEventHandler(object sender, CurrencyEventArgs args)
@@ -125,6 +134,11 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                         Address = wa.Address,
                         Balance = wa.Balance
                     });
+                    
+                    _ = Task.Run(() =>
+                    {
+                        Desktop.App.ImageService.LoadImage(baker.Logo);
+                    });
                 }
 
                 await Dispatcher.UIThread.InvokeAsync(() =>
@@ -146,22 +160,14 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         }
 
         private ICommand _delegateCommand;
-        public ICommand DelegateCommand => _delegateCommand ?? (_delegateCommand = ReactiveCommand.Create(OnDelegateClick));
+        public ICommand DelegateCommand => _delegateCommand ??= (_delegateCommand = ReactiveCommand.Create(OnDelegateClick));
 
         //private ICommand _undelegateCommand;
         //public ICommand UndelegateCommand => _undelegateCommand ?? (_undelegateCommand = new Command(OnUndelegateClick));
 
         private void OnDelegateClick()
         {
-            // var viewModel = new DelegateViewModel(App, DialogViewer, async () =>
-            // {
-            //     await Task.Delay(TimeSpan.FromSeconds(DelegationCheckIntervalInSec))
-            //         .ConfigureAwait(false);
-            //
-            //     await Application.Current.Dispatcher.InvokeAsync(OnUpdateClick);
-            // });
-            //
-            // DialogViewer.ShowDialog(Dialogs.Delegate, viewModel, defaultPageId: Pages.Delegate);
+            Desktop.App.DialogService.Show(DelegateVM);
         }
 
         //private void OnUndelegateClick()

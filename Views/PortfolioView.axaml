@@ -18,10 +18,9 @@
         <converters:AmountToStringConverter x:Key="AmountToStringConverter" />
         <converters:StringToUpperCaseConverter x:Key="StringToUpperCaseConverter" />
         <converters:PortfolioToTotalConverter x:Key="PortfolioToTotalConverter" />
-        <converters:PortfolioToPercentConverter x:Key="PortfolioToPercentConverter" />
+        <converters:PercentConverter x:Key="PercentConverter" />
     </UserControl.Resources>
-
-
+    
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition MaxHeight="500" MinHeight="300" />
@@ -80,9 +79,8 @@
                                     <ColumnDefinition Width="48" />
                                     <ColumnDefinition Width="*" />
                                 </Grid.ColumnDefinitions>
-
-                                <!-- todo: LargeIconPath -->
-                                <Image Source="{Binding IconPath}"
+                                
+                                <Image Source="{Binding LargeIconPath}"
                                        Grid.Column="0" />
 
                                 <!-- Style="{StaticResource BaseTextBlockStyle}" -->
@@ -140,7 +138,7 @@
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
                 <DataGridTextColumn Header="% IN PORTFOLIO"
-                                    Binding="{Binding PortfolioPercent, Converter={StaticResource PortfolioToPercentConverter}, Mode=TwoWay}">
+                                    Binding="{Binding PortfolioPercent, Converter={StaticResource PercentConverter}, Mode=TwoWay}">
                     
                 </DataGridTextColumn>
             </DataGrid.Columns>

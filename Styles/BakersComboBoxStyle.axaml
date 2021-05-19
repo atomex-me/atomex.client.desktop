@@ -1,0 +1,163 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:i="using:Avalonia.Xaml.Interactivity"
+        xmlns:ia="using:Avalonia.Xaml.Interactions.Core"
+        xmlns:converters="clr-namespace:Atomex.Client.Desktop.Converters"
+        xmlns:vm="clr-namespace:Atomex.Client.Desktop.ViewModels">
+
+    <Styles.Resources>
+        <converters:PercentConverter x:Key="PercentConverter" />
+        <converters:MinTezConverter x:Key="MinTezConverter" />
+
+        <DataTemplate x:Key="BakerItemTemplate" DataType="{x:Type vm:BakerViewModel}">
+            <Grid Margin="3" Width="440">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="48" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="150" />
+                </Grid.ColumnDefinitions>
+
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="26" />
+                    <RowDefinition Height="22" />
+                </Grid.RowDefinitions>
+
+                <Image Width="48"
+                       Height="48"
+                       Source="{Binding BitmapLogo}"
+                       Grid.Column="0"
+                       Grid.RowSpan="2" />
+
+                <TextBlock Text="{Binding Name}"
+                           FontFamily="{DynamicResource DefaultBoldFontFamily}"
+                           FontWeight="Bold"
+                           FontSize="16"
+                           Margin="7 0 0 0"
+                           VerticalAlignment="Bottom"
+                           Grid.Column="1"
+                           Grid.Row="0"
+                           Name="NameTextBlock">
+                    
+                    <i:Interaction.Behaviors>
+                        <ia:DataTriggerBehavior Binding="{Binding IsFull}"
+                                                ComparisonCondition="Equal"
+                                                Value="true">
+                            <ia:ChangePropertyAction TargetObject="{Binding #NameTextBlock}"
+                                                     PropertyName="Foreground"
+                                                     Value="{StaticResource BakerFullForegroundBrush}" />
+                        </ia:DataTriggerBehavior>
+                        <ia:DataTriggerBehavior Binding="{Binding IsFull}"
+                                                ComparisonCondition="NotEqual"
+                                                Value="true">
+                            <ia:ChangePropertyAction TargetObject="{Binding #NameTextBlock}"
+                                                     PropertyName="Foreground"
+                                                     Value="{StaticResource DefaultForegroundBrush}" />
+                        </ia:DataTriggerBehavior>
+                    </i:Interaction.Behaviors>
+                </TextBlock>
+
+                <StackPanel Orientation="Horizontal"
+                            Margin="7 0 0 0"
+                            VerticalAlignment="Top"
+                            Grid.Column="1"
+                            Grid.Row="1">
+                    <TextBlock FontFamily="{DynamicResource DefaultFontFamily}"
+                               VerticalAlignment="Center"
+                               FontSize="13"
+                               Text="{Binding Fee, Converter={StaticResource PercentConverter}}"
+                               Name="FeeTextBlock">
+                        
+                        <i:Interaction.Behaviors>
+                            <ia:DataTriggerBehavior Binding="{Binding IsFull}"
+                                                    ComparisonCondition="Equal"
+                                                    Value="true">
+                                <ia:ChangePropertyAction TargetObject="{Binding #FeeTextBlock}"
+                                                         PropertyName="Foreground"
+                                                         Value="{StaticResource BakerFullForegroundBrush}" />
+                            </ia:DataTriggerBehavior>
+                            <ia:DataTriggerBehavior Binding="{Binding IsFull}"
+                                                    ComparisonCondition="NotEqual"
+                                                    Value="true">
+                                <ia:ChangePropertyAction TargetObject="{Binding #FeeTextBlock}"
+                                                         PropertyName="Foreground"
+                                                         Value="{StaticResource DefaultForegroundBrush}" />
+                            </ia:DataTriggerBehavior>
+                        </i:Interaction.Behaviors>
+                    </TextBlock>
+
+                    <TextBlock FontFamily="{DynamicResource DefaultFontFamily}"
+                               FontSize="11"
+                               Margin="7 0 0 0"
+                               VerticalAlignment="Center"
+                               Foreground="{DynamicResource MinDelegationBrush}"
+                               IsVisible="{Binding IsMinDelegation}"
+                               Text="{Binding MinDelegation, Converter={StaticResource MinTezConverter}}"
+                               Name="MinDelegationTextBlock">
+                        
+                        <i:Interaction.Behaviors>
+                            <ia:DataTriggerBehavior Binding="{Binding IsFull}"
+                                                    ComparisonCondition="Equal"
+                                                    Value="true">
+                                <ia:ChangePropertyAction TargetObject="{Binding #MinDelegationTextBlock}"
+                                                         PropertyName="Foreground"
+                                                         Value="{StaticResource BakerFullForegroundBrush}" />
+                            </ia:DataTriggerBehavior>
+                            <ia:DataTriggerBehavior Binding="{Binding IsFull}"
+                                                    ComparisonCondition="NotEqual"
+                                                    Value="true">
+                                <ia:ChangePropertyAction TargetObject="{Binding #MinDelegationTextBlock}"
+                                                         PropertyName="Foreground"
+                                                         Value="{StaticResource DefaultForegroundBrush}" />
+                            </ia:DataTriggerBehavior>
+                        </i:Interaction.Behaviors>
+                    </TextBlock>
+
+                </StackPanel>
+
+
+                <TextBlock FontFamily="{DynamicResource DefaultFontFamily}"
+                           FontSize="12"
+                           Text="BAKER IS FULL"
+                           Foreground="{DynamicResource BakerFullForegroundBrush}"
+                           Margin="7 0 0 0"
+                           VerticalAlignment="Center"
+                           HorizontalAlignment="Right"
+                           Grid.Column="2"
+                           Grid.Row="0"
+                           Grid.RowSpan="2"
+                           IsVisible="{Binding IsFull}" />
+
+                <TextBlock FontFamily="{DynamicResource DefaultFontFamily}"
+                           FontSize="11"
+                           Text="Available"
+                           Foreground="{DynamicResource DefaultForegroundBrush}"
+                           Margin="7 0 0 0"
+                           VerticalAlignment="Bottom"
+                           HorizontalAlignment="Right"
+                           Grid.Column="2"
+                           Grid.Row="0"
+                           IsVisible="{Binding !IsFull}" />
+
+                <TextBlock FontFamily="{DynamicResource DefaultFontFamily}"
+                           FontSize="11"
+                           Text="{Binding StakingAvailable}"
+                           Foreground="{DynamicResource DefaultForegroundBrush}"
+                           Margin="7 0 0 0"
+                           VerticalAlignment="Top"
+                           HorizontalAlignment="Right"
+                           Grid.Column="2"
+                           Grid.Row="1"
+                           IsVisible="{Binding !IsFull}" />
+            </Grid>
+        </DataTemplate>
+    </Styles.Resources>
+
+
+    <Style Selector="ComboBox.BakersComboBox">
+        <Setter Property="ItemTemplate" Value="{StaticResource BakerItemTemplate}" />
+        <!--<Setter Property="ItemContainerStyle" Value="{StaticResource BakerContainerStyle}"/>-->
+        <Setter Property="Background" Value="{DynamicResource DefaultSubstrateBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource DefaultForegroundBrush}" />
+    </Style>
+
+</Styles>

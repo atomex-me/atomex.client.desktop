@@ -10,31 +10,12 @@
         <vm:WalletsViewModel />
     </Design.DataContext>
 
-    <!-- <UserControl.Resources> -->
-    <!--     <DataTemplate x:Key="DefaultWalletTemplate"> -->
-    <!--         <walletViews:WalletView /> -->
-    <!--     </DataTemplate> -->
-    <!--     <DataTemplate x:Key="TezosWalletTemplate"> -->
-    <!--         <walletViews:TezosWalletView /> -->
-    <!--     </DataTemplate> -->
-    <!--     <controls:WalletDataTemplateSelector x:Key="WalletDataTemplateSelector" -->
-    <!--                                          DefaultTemplate="{StaticResource DefaultWalletTemplate}" -->
-    <!--                                          TezosTemplate="{StaticResource TezosWalletTemplate}" /> -->
-    <!-- </UserControl.Resources> -->
-
-
     <Grid>
-        <!-- Style="{StaticResource WalletTabControl}" -->
-        <!-- ContentTemplateSelector="{StaticResource WalletDataTemplateSelector}" -->
-        
-        
-        
         <TabControl Name="Wallets"
                     Items="{Binding Wallets}"
                     SelectedItem="{Binding Selected}"
                     Margin="0 5 0 0">
-
-            <!-- DataType="{x:Type walletViewModels:WalletViewModel}" -->
+            
             <TabControl.ItemTemplate>
                 <DataTemplate>
                     <StackPanel x:Name="walletTabItem" Orientation="Vertical" Background="Transparent">

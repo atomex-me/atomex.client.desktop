@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using Atomex.Client.Desktop.Dialogs.ViewModels;
 using Atomex.Client.Desktop.ViewModels.Abstract;
@@ -23,11 +24,9 @@ namespace Atomex.Client.Desktop.ViewModels
             SettingsViewModel = new SettingsViewModel(AtomexApp);
 
             SelectPortfolio();
-
-            // InstalledVersion = App.Updater.InstalledVersion.ToString();
-            InstalledVersion = "1.0.72";
-
             SubscribeToServices();
+            
+            InstalledVersion = GetAssemblyFileVersion();
         }
 
         public IAtomexApp AtomexApp { get; set; }
@@ -204,5 +203,12 @@ namespace Atomex.Client.Desktop.ViewModels
         public bool IsWalletsSectionActive => Content.GetType() == typeof(WalletsViewModel);
         public bool IsConversionSectionActive => Content.GetType() == typeof(ConversionViewModel);
         public bool IsSettingsSectionActive => Content.GetType() == typeof(SettingsViewModel);
+        
+        public static string GetAssemblyFileVersion()
+        {
+            System.Reflection.Assembly assembly = System.Reflection.Assembly.GetExecutingAssembly();
+            FileVersionInfo fileVersion = FileVersionInfo.GetVersionInfo(assembly.Location);
+            return fileVersion.FileVersion;
+        }
     }
 }

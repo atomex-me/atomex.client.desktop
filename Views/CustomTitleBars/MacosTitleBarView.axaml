@@ -67,6 +67,26 @@
                 </Animation>
             </Style.Animations>
         </Style>
+        
+        <Style Selector="Button.TitleBarCommandBtn.UpdateBtn.NoAnimation">
+            <Style.Animations>
+                <Animation Duration="0:0:10"
+                           IterationCount="INFINITE"
+                           FillMode="Forward"
+                           PlaybackDirection="Normal">
+                    <KeyFrame Cue="0%">
+                        <Setter Property="Opacity" Value="1" />
+                    </KeyFrame>
+                    <KeyFrame Cue="50%">
+                        <Setter Property="Opacity" Value="1" />
+                    </KeyFrame>
+
+                    <KeyFrame Cue="100%">
+                        <Setter Property="Opacity" Value="1" />
+                    </KeyFrame>
+                </Animation>
+            </Style.Animations>
+        </Style>
 
 
         <Style Selector="Button.WindowControlBtn:pointerover /template/ ContentPresenter#PART_ContentPresenter">
@@ -114,7 +134,8 @@
                 HorizontalAlignment="Right"
                 Orientation="Horizontal"
                 Spacing="0">
-                <StackPanel Orientation="Horizontal" IsVisible="{Binding UpdatesReady}">
+                <StackPanel Orientation="Horizontal" 
+                            IsVisible="{Binding UpdatesReady}">
                     <Button Command="{Binding UpdateCommand}"
                             Classes="TitleBarCommandBtn UpdateBtn">
 
@@ -128,7 +149,54 @@
                             <TextBlock FontFamily="{DynamicResource DefaultFontFamily}"
                                        VerticalAlignment="Center"
                                        FontSize="14"
-                                       Text="Update Atomex" />
+                                       IsVisible="{Binding !UpdateStarted}"
+                                       Text="Update Atomex to" />
+                            <TextBlock FontFamily="{DynamicResource DefaultFontFamily}"
+                                       VerticalAlignment="Center"
+                                       FontSize="14"
+                                       IsVisible="{Binding UpdateStarted}"
+                                       Text="Updating, please wait..." />
+                            <TextBlock FontFamily="{DynamicResource DefaultFontFamily}"
+                                       VerticalAlignment="Center"
+                                       FontSize="14"
+                                       IsVisible="{Binding !UpdateStarted}"
+                                       Margin="3 0 0 0"
+                                       Text="{Binding UpdateVersion}" />
+                        </StackPanel>
+                    </Button>
+                    <Rectangle Margin="0 8"
+                               VerticalAlignment="Stretch"
+                               Fill="{DynamicResource StatusBarVersionForeground}"
+                               Width="1" />
+                </StackPanel>
+                
+                <StackPanel Orientation="Horizontal" 
+                            IsVisible="{Binding IsDownloadingUpdate}">
+                    <Button Classes="TitleBarCommandBtn UpdateBtn">
+
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock FontFamily="{DynamicResource DefaultFontFamily}"
+                                       VerticalAlignment="Center"
+                                       FontSize="14"
+                                       Text="Downloading update" />
+                            <TextBlock FontFamily="{DynamicResource DefaultFontFamily}"
+                                       Margin="3 0 0 0"
+                                       VerticalAlignment="Center"
+                                       FontSize="14"
+                                       Text="{Binding UpdateVersion}" />
+                            <TextBlock FontFamily="{DynamicResource DefaultFontFamily}"
+                                       VerticalAlignment="Center"
+                                       FontSize="14"
+                                       Text=":" />
+                            <TextBlock FontFamily="{DynamicResource DefaultFontFamily}"
+                                       Margin="3 0 0 0"
+                                       VerticalAlignment="Center"
+                                       FontSize="14"
+                                       Text="{Binding UpdateDownloadProgress}" />
+                            <TextBlock FontFamily="{DynamicResource DefaultFontFamily}"
+                                       VerticalAlignment="Center"
+                                       FontSize="14"
+                                       Text="%" />
                         </StackPanel>
                     </Button>
                     <Rectangle Margin="0 8"

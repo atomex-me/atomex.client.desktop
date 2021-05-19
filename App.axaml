@@ -21,7 +21,7 @@
         <StyleInclude Source="avares://AvaloniaProgressRing/Styles/ProgressRing.xaml"/>
         <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml" />
         <!-- Add the line below to get OxyPlot UI theme applied. -->
-        <StyleInclude Source="resm:OxyPlot.Avalonia.Themes.Default.xaml?assembly=OxyPlot.Avalonia"/>
+        <StyleInclude Source="resm:OxyPlot.Avalonia.Themes.Default.xaml?assembly=OxyPlot.Avalonia" />
         <StyleInclude Source="/Styles/Styles.axaml" />
         <StyleInclude Source="/Styles/MainWindowStyle.axaml" />
         <StyleInclude Source="/Styles/ChildViewStyle.axaml" />
@@ -30,6 +30,7 @@
         <StyleInclude Source="/Styles/IconButtonStyle.axaml" />
         <StyleInclude Source="/Styles/LinkButtonStyle.axaml" />
         <StyleInclude Source="/Styles/CustomComboBoxStyle.axaml" />
+        <StyleInclude Source="/Styles/BakersComboBoxStyle.axaml" />
         <StyleInclude Source="/Styles/CustomTextBoxStyle.axaml" />
         <StyleInclude Source="/Styles/AmountTextBoxStyle.axaml" />
         <StyleInclude Source="/Styles/PasswordTextBoxStyle.axaml" />
