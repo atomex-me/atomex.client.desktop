@@ -7,8 +7,8 @@
         <UseAppHost>true</UseAppHost>
         <RuntimeIdentifiers>osx-x64</RuntimeIdentifiers>
 
-        <AssemblyVersion>1.0.76</AssemblyVersion>
-        <Version>1.0.76</Version>
+        <AssemblyVersion>1.0.75</AssemblyVersion>
+        <Version>1.0.75</Version>
     </PropertyGroup>
     <ItemGroup>
         <AvaloniaResource Include="Assets\**" />
