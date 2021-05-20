@@ -43,7 +43,7 @@ jobs:
       - uses: "marvinpinto/action-automatic-releases@latest"
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
-          title: "$VER"
-          automatic_release_tag: "$VER"
+          title: $DESCRIPTION
+          automatic_release_tag: $VER
           prerelease: false
           files: dist_osx/*

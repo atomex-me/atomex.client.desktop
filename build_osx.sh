@@ -116,7 +116,7 @@ xcrun stapler staple "$dmg_file_name"
 
 export PUB_DATE=$(date -u +"%a, %d %b %Y %T GMT")
 export VER=$(xmllint --xpath "//Project/PropertyGroup/Version/text()" Atomex.Client.Desktop.csproj)
-export DESCRIPTION="Atomex release Version ${VER}"
+export DESCRIPTION="Atomex release ${VER} ${PUB_DATE}"
 export SIGNATURE=$(netsparkle-generate-appcast --generate-signature ${ZIP_PATH} | awk '{print $2}')
 export ZIP_SIZE=$(ls -la ${ZIP_PATH} | awk '{print $5}')
 
