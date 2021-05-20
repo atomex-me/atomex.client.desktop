@@ -121,11 +121,11 @@ export ZIP_SIZE=$(ls -la ${ZIP_PATH} | awk '{print $5}')
 
 envsubst < appcast.xml > dist_osx/appcast.xml
 
-export APPCAST_SIGNATURE=$(netsparkle-generate-appcast --generate-signature "${DIST_FOLDER}/appcast.xml" | awk '{print $2}')
-envsubst < appcast.xml.signature > dist_osx/appcast.xml.signature
+# export APPCAST_SIGNATURE=$(netsparkle-generate-appcast --generate-signature "${DIST_FOLDER}/appcast.xml" | awk '{print $2}')
+# envsubst < appcast.xml.signature > dist_osx/appcast.xml.signature
 
 echo "## ZIP SIGNATURE: ${SIGNATURE}"
-echo "## APPCAST SIGNATURE: ${APPCAST_SIGNATURE}"
+# echo "## APPCAST SIGNATURE: ${APPCAST_SIGNATURE}"
 echo "## ZIP SIZE: ${ZIP_SIZE}"
 
 rm -rf "$APP_NAME"
