@@ -41,9 +41,12 @@ jobs:
           ./build_osx.sh $MACOS_NOTARIZE_PWD
 
       - uses: "marvinpinto/action-automatic-releases@latest"
+        env:
+          VER: $(xmllint --xpath "//Project/PropertyGroup/Version/text()" Atomex.Client.Desktop.csproj)
+          PUB_DATE: $(date -u +"%a, %d %b %Y %T GMT")
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
-          title: $DESCRIPTION
+          title: "Atomex release ${VER} ${PUB_DATE}"
           automatic_release_tag: $VER
           prerelease: false
           files: dist_osx/*
