@@ -128,4 +128,5 @@ echo "## ZIP SIGNATURE: ${SIGNATURE}"
 echo "## APPCAST SIGNATURE: ${APPCAST_SIGNATURE}"
 echo "## ZIP SIZE: ${ZIP_SIZE}"
 
+rm -rf "$APP_NAME"
 echo '## Done!'
