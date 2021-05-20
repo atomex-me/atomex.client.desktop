@@ -29,5 +29,7 @@ jobs:
           security import certificate.p12 -k atomex.build.keychain -P $MACOS_CERTIFICATE_PWD -T /usr/bin/codesign
           security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k $MACOS_CERTIFICATE_PWD atomex.build.keychain
 
-      - name: Run Macos Build script
+      - name: Run Macos build bash script
+        env:
+          MACOS_NOTARIZE_PWD: ${{ secrets.MACOS_NOTARIZE_PWD }}
         run: ./build_osx.sh $MACOS_NOTARIZE_PWD
