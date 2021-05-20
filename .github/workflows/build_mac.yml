@@ -10,6 +10,9 @@ jobs:
       - uses: actions/checkout@v2
         with:
           submodules: true
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '14'
       - name: Setup .NET Core
         uses: actions/setup-dotnet@v1
         with:
@@ -21,7 +24,6 @@ jobs:
           MACOS_CERTIFICATE_PWD: ${{ secrets.MACOS_CERTIFICATE_PWD }}
           MACOS_NOTARIZE_PWD: ${{ secrets.MACOS_NOTARIZE_PWD }}
         run: |
-          echo $MACOS_CERTIFICATE_PWD
           echo $MACOS_CERTIFICATE | base64 --decode > certificate.p12
           security create-keychain -p $MACOS_CERTIFICATE_PWD atomex.build.keychain
           security default-keychain -s atomex.build.keychain
@@ -32,4 +34,6 @@ jobs:
       - name: Run Macos build bash script
         env:
           MACOS_NOTARIZE_PWD: ${{ secrets.MACOS_NOTARIZE_PWD }}
-        run: ./build_osx.sh $MACOS_NOTARIZE_PWD
+        run: npm install create-dmg |
+          ./build_osx.sh $MACOS_NOTARIZE_PWD
+          rm -rf dist_osx/Atomex.app
