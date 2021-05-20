@@ -37,3 +37,9 @@ jobs:
         run: |
           npm install --global create-dmg
           ./build_osx.sh $MACOS_NOTARIZE_PWD
+
+      - uses: "marvinpinto/action-automatic-releases@latest"
+        with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          prerelease: false
+          files: dist_osx/*
