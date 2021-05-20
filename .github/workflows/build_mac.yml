@@ -34,6 +34,6 @@ jobs:
       - name: Run Macos build bash script
         env:
           MACOS_NOTARIZE_PWD: ${{ secrets.MACOS_NOTARIZE_PWD }}
-        run: npm install create-dmg |
+        run: |
+          npm install --global create-dmg
           ./build_osx.sh $MACOS_NOTARIZE_PWD
-          rm -rf dist_osx/Atomex.app
