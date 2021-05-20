@@ -30,6 +30,7 @@ jobs:
           security unlock-keychain -p $MACOS_CERTIFICATE_PWD atomex.build.keychain
           security import certificate.p12 -k atomex.build.keychain -P $MACOS_CERTIFICATE_PWD -T /usr/bin/codesign
           security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k $MACOS_CERTIFICATE_PWD atomex.build.keychain
+          echo 'VER='$(xmllint --xpath "//Project/PropertyGroup/Version/text()" Atomex.Client.Desktop.csproj) >> $GITHUB_ENV
 
       - name: Run Macos build bash script
         env:
@@ -41,12 +42,9 @@ jobs:
           ./build_osx.sh $MACOS_NOTARIZE_PWD
 
       - uses: "marvinpinto/action-automatic-releases@latest"
-        env:
-          VER: $(xmllint --xpath "//Project/PropertyGroup/Version/text()" Atomex.Client.Desktop.csproj)
-          PUB_DATE: $(date -u +"%a, %d %b %Y %T GMT")
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
-          title: "Atomex release ${VER} ${PUB_DATE}"
-          automatic_release_tag: $VER
+          title: "${{ env.VER }}"
+          automatic_release_tag: "${{ env.VER }}"
           prerelease: false
           files: dist_osx/*
