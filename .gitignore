@@ -8,3 +8,4 @@ obj/
 *.user
 dist_osx/
 
+.DS_Store
