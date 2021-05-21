@@ -47,7 +47,7 @@ namespace Atomex.Client.Desktop.ViewModels
                 DesignerMode();
 #endif
         }
-        
+
         public Action OnUpdateAction;
 
         public MainWindowViewModel(IAtomexApp app, IMainView mainView = null)
@@ -131,6 +131,7 @@ namespace Atomex.Client.Desktop.ViewModels
         }
 
         private bool _updateStarted;
+
         public bool UpdateStarted
         {
             get => _updateStarted;
@@ -197,23 +198,46 @@ namespace Atomex.Client.Desktop.ViewModels
         private ICommand _updateCommand;
         public ICommand UpdateCommand => _updateCommand ??= ReactiveCommand.Create(OnUpdateClick);
 
-        private void OnUpdateClick()
+        private async void OnUpdateClick()
         {
+            await SignOut(withAppUpdate: true);
+            if (AtomexApp.Terminal != null) return;
+
             OnUpdateAction?.Invoke();
             UpdateStarted = true;
         }
 
         private ICommand _signOutCommand;
-        public ICommand SignOutCommand => _signOutCommand ??= ReactiveCommand.Create(SignOut);
+        public ICommand SignOutCommand => _signOutCommand ??= ReactiveCommand.Create(() => SignOut());
 
-        private async void SignOut()
+        private bool _userIgnoreActiveSwaps { get; set; }
+
+        private async Task SignOut(bool withAppUpdate = false)
         {
             try
             {
-                if (await WhetherToCancelClosingAsync())
+                if (await WhetherToCancelClosingAsync() && !_userIgnoreActiveSwaps)
+                {
+                    App.DialogService.Show(new SignOutWarningViewModel
+                    {
+                        OnIgnoreCommand = async () =>
+                        {
+                            _userIgnoreActiveSwaps = true;
+                            if (withAppUpdate)
+                            {
+                                OnUpdateClick();
+                            }
+                            else
+                            {
+                                await SignOut();
+                            }
+                        }
+                    });
                     return;
+                }
 
                 AtomexApp.UseTerminal(null);
+                _userIgnoreActiveSwaps = false;
 
                 ShowStart();
             }
@@ -260,6 +284,7 @@ namespace Atomex.Client.Desktop.ViewModels
 
         private async Task<bool> WhetherToCancelClosingAsync()
         {
+            if (AtomexApp.Account == null) return false;
             if (!AtomexApp.Account.UserSettings.ShowActiveSwapWarning)
                 return false;
 
@@ -267,14 +292,6 @@ namespace Atomex.Client.Desktop.ViewModels
 
             if (hasActiveSwaps)
                 return true;
-
-            // var result = await DialogViewer
-            //     .ShowMessageAsync(
-            //         title: Resources.Warning,
-            //         message: Resources.ActiveSwapsWarning,
-            //         style: MessageDialogStyle.AffirmativeAndNegative);
-            //
-            // return result == MessageDialogResult.Negative;
 
             return false;
         }
@@ -299,7 +316,7 @@ namespace Atomex.Client.Desktop.ViewModels
                     password: password,
                     currenciesProvider: AtomexApp.CurrenciesProvider,
                     clientType: ClientType.Unknown);
-            }, SignOut);
+            }, async () => await SignOut());
 
             var wasClosed = App.DialogService.CloseDialog();
 
