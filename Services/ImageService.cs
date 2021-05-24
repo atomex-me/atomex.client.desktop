@@ -6,6 +6,7 @@ using System.Net;
 using Avalonia;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
+using Serilog;
 
 namespace Atomex.Client.Desktop.Services
 {
@@ -26,13 +27,20 @@ namespace Atomex.Client.Desktop.Services
 
         public async void LoadImage(string url)
         {
-            using WebClient wc = new();
-            await using Stream s = wc.OpenRead(url);
-            using System.Drawing.Bitmap bmp = new(s);
-            await using MemoryStream memory = new();
-            bmp.Save(memory, ImageFormat.Png);
-            memory.Position = 0;
-            Images[url] = new Bitmap(memory);
+            try
+            {
+                using WebClient wc = new();
+                await using Stream s = wc.OpenRead(url);
+                using System.Drawing.Bitmap bmp = new(s);
+                await using MemoryStream memory = new();
+                bmp.Save(memory, ImageFormat.Png);
+                memory.Position = 0;
+                Images[url] = new Bitmap(memory);
+            }
+            catch (Exception e)
+            {
+                Log.Error("Error during Loading Image");
+            }
         }
 
 
