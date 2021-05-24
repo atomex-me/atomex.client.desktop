@@ -26,6 +26,7 @@ using Avalonia.Input.Platform;
 using Avalonia.Styling;
 using Nethereum.Contracts;
 using Sentry;
+using Sentry.Protocol;
 using Serilog.Core;
 using Serilog.Events;
 using Serilog.Formatting;
@@ -50,18 +51,21 @@ namespace Atomex.Client.Desktop
             TemplateService = new TemplateService();
             ImageService = new ImageService();
             Clipboard = AvaloniaLocator.Current.GetService<IClipboard>();
-
+            
             // init logger
             Log.Logger = new LoggerConfiguration()
+#if DEBUG
                 .ReadFrom.Configuration(Configuration)
-                // .WriteTo.Sentry(o =>
-                // {
-                //     o.Dsn = new Dsn("https://793b3e5e430143be9f9c240d83b9ff3f@sentry.baking-bad.org/8");
-                //     // Debug and higher are stored as breadcrumbs (default is Information)
-                //     o.MinimumBreadcrumbLevel = LogEventLevel.Debug;
-                //     // Warning and higher is sent as event (default is Error)
-                //     o.MinimumEventLevel = LogEventLevel.Debug;
-                // })
+#else
+                .WriteTo.Sentry(o =>
+                {
+                    o.Dsn = new Dsn("https://793b3e5e430143be9f9c240d83b9ff3f@sentry.baking-bad.org/8");
+                    // Debug and higher are stored as breadcrumbs (default is Information)
+                    o.MinimumBreadcrumbLevel = LogEventLevel.Information;
+                    // Warning and higher is sent as event (default is Error)
+                    o.MinimumEventLevel = LogEventLevel.Error;
+                })
+#endif
                 .CreateLogger();
 
             var currenciesProvider = new CurrenciesProvider(CurrenciesConfiguration);
