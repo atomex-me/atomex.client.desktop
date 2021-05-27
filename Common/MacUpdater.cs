@@ -1,14 +1,13 @@
 using System;
-using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
-using Avalonia;
+using System.Xml;
 using NetSparkleUpdater;
-using NetSparkleUpdater.Downloaders;
 using NetSparkleUpdater.Interfaces;
 using Serilog;
 
@@ -16,51 +15,32 @@ namespace Atomex.Client.Desktop.Common
 {
     public class MacUpdater
     {
-        /// <summary>
-        /// Whether or not to check with the online server to verify download
-        /// file names.
-        /// </summary>
+        private string LaunchdFileName => "com.atomex.osx.plist";
+
+        private string LaunchdDirFilePath => Path.Combine(
+            $"{Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)}",
+            "Library/LaunchAgents",
+            LaunchdFileName);
+
+        private string AppName { get; set; } = "Atomex.app";
+
         public bool CheckServerFileName { get; set; } = true;
 
-        /// <summary>
-        /// The object responsable for downloading update files for your application
-        /// </summary>
         public IUpdateDownloader UpdateDownloader { get; set; }
 
-        /// <summary>
-        /// The object that verifies signatures (DSA, Ed25519, or otherwise) of downloaded items
-        /// </summary>
         public ISignatureVerifier SignatureVerifier { get; set; }
 
 
         private string _tmpDownloadFilePath;
 
-        /// <summary>
-        /// If set, downloads files to this path. If the folder doesn't already exist, creates
-        /// the folder at download time (and not before). 
-        /// Note that this variable is a path, not a full file name.
-        /// </summary>
         public string TmpDownloadFilePath
         {
             get { return _tmpDownloadFilePath; }
             set { _tmpDownloadFilePath = value?.Trim(); }
         }
 
-        /// <summary>
-        /// Defines if the application needs to be relaunched after executing the downloaded installer
-        /// </summary>
-        public bool RelaunchAfterUpdate { get; set; }
-
         private string _restartExecutableName;
 
-        /// <summary>
-        /// Executable name to use when restarting the software.
-        /// This is the name that will be used/started when the update has been installed.
-        /// This defaults to <see cref="Environment.CommandLine"/>.
-        /// Used in conjunction with RestartExecutablePath to restart the application --
-        /// cd "{RestartExecutablePath}"
-        /// "{RestartExecutableName}" is what is called to restart the app.
-        /// </summary>
         public string RestartExecutableName
         {
             get
@@ -88,14 +68,7 @@ namespace Atomex.Client.Desktop.Common
         }
 
         private string _restartExecutablePath;
-
-        /// <summary>
-        /// Path to the working directory for the current application.
-        /// This is the directory that the current executable sits in --
-        /// e.g. C:/Users/...Foo/. It will be used when restarting the
-        /// application on Windows or will be used on macOS/Linux for
-        /// overwriting files on an update.
-        /// </summary>
+        
         public string RestartExecutablePath
         {
             get
@@ -109,15 +82,7 @@ namespace Atomex.Client.Desktop.Common
             }
             set { _restartExecutablePath = value; }
         }
-
-        /// <summary>
-        /// Get the download path for a given app cast item.
-        /// If any directories need to be created, this function
-        /// will create those directories.
-        /// </summary>
-        /// <param name="item">The item that you want to generate a download path for</param>
-        /// <returns>The download path for an app cast item if item is not null and has valid download link
-        /// Otherwise returns null.</returns>
+        
         public async Task<string> GetDownloadPathForAppCastItem(AppCastItem item)
         {
             if (item != null && item.DownloadLink != null)
@@ -166,19 +131,7 @@ namespace Atomex.Client.Desktop.Common
             return null;
         }
 
-
-        /// <summary>
-        /// Run the provided app cast item update regardless of what else is going on.
-        /// Note that a more up to date download may be taking place, so if you don't
-        /// want to run a potentially out-of-date installer, don't use this. This should
-        /// only be used if your user wants to update before another update has been
-        /// installed AND the file is already downloaded.
-        /// This function will verify that the file exists and that the DSA 
-        /// signature is valid before running. It will also utilize the
-        /// PreparingToExit event to ensure that the application can close.
-        /// </summary>
-        /// <param name="item">AppCastItem to install</param>
-        /// <param name="installPath">Install path to the executable. If not provided, will ask the server for the download path.</param>
+        
         public async void InstallUpdate(AppCastItem item, string installPath = null)
         {
             var path = installPath != null && File.Exists(installPath)
@@ -204,15 +157,7 @@ namespace Atomex.Client.Desktop.Common
                 }
             }
         }
-
-
-        /// <summary>
-        /// Updates the application via the file at the given path. Figures out which command needs
-        /// to be run, sets up the application so that it will start the downloaded file once the
-        /// main application stops, and then waits to start the downloaded update.
-        /// </summary>
-        /// <param name="downloadFilePath">path to the downloaded installer/updater</param>
-        /// <returns>the awaitable <see cref="Task"/> for the application quitting</returns>
+        
         protected virtual async Task RunDownloadedInstaller(string downloadFilePath)
         {
             Log.Information("Running downloaded installer");
@@ -233,15 +178,21 @@ namespace Atomex.Client.Desktop.Common
 
             // generate the batch file                
             Log.Information("Generating batch in {0}", Path.GetFullPath(batchFilePath));
-            
 
-            var atomexAppInWorkDir = workingDir.IndexOf("Atomex.app");
             
+            var atomexAppInWorkDir = workingDir
+                .Split("/")
+                .ToList()
+                .FindIndex(s => s.Contains(".app"));
+
+            var binaryDir = workingDir;
+
             if (atomexAppInWorkDir != -1)
             {
-                workingDir = workingDir.Substring(0, atomexAppInWorkDir);
+                AppName = workingDir.Split("/")[atomexAppInWorkDir];
+                workingDir = workingDir.Substring(0, workingDir.IndexOf(AppName, StringComparison.Ordinal));
             }
-            
+
             using (FileStream stream = new FileStream(batchFilePath, FileMode.Create, FileAccess.ReadWrite,
                 FileShare.None, 4096, true))
             using (StreamWriter write = new StreamWriter(stream, new UTF8Encoding(false)))
@@ -272,19 +223,34 @@ namespace Atomex.Client.Desktop.Common
                 }
             }
             
+
+            Exec($"rm -f {LaunchdDirFilePath}");
+
+            XmlDocument xDoc = new XmlDocument();
+            xDoc.Load($"{binaryDir}{LaunchdFileName}");
+
+            // application .app path
+            xDoc
+                .DocumentElement!
+                .LastChild!
+                .LastChild!
+                .LastChild!
+                .InnerText = $"/usr/bin/open {workingDir}{AppName};launchctl unload {LaunchdDirFilePath}";
+            
+            xDoc.Save(LaunchdDirFilePath);
+
             Exec(batchFilePath);
 
-            // relaunch app
             var processInfo = new ProcessStartInfo
             {
-                Arguments = $"-n {workingDir}Atomex.app",
-                FileName = "open",
+                Arguments = $"load {LaunchdDirFilePath}",
+                FileName = "launchctl",
                 UseShellExecute = true
             };
 
-            var process = Process.Start(processInfo);
-            process!.WaitForExit();
-            
+            var proc = Process.Start(processInfo);
+            proc!.WaitForExit();
+
             Process.GetCurrentProcess().Kill();
         }
 
@@ -301,7 +267,7 @@ namespace Atomex.Client.Desktop.Common
 
             return false;
         }
-        
+
         public static bool IsZipValid(string path)
         {
             try
@@ -317,15 +283,7 @@ namespace Atomex.Client.Desktop.Common
                 return false;
             }
         }
-
-        /// <summary>
-        /// Checks to see if two extensions match (this is basically just a 
-        /// convenient string comparison). Both extensions should include the
-        /// initial . (full-stop/period) in the extension.
-        /// </summary>
-        /// <param name="extension">first extension to check</param>
-        /// <param name="otherExtension">other extension to check</param>
-        /// <returns>true if the extensions match; false otherwise</returns>
+        
         protected bool DoExtensionsMatch(string extension, string otherExtension)
         {
             return extension.Equals(otherExtension, StringComparison.CurrentCultureIgnoreCase);

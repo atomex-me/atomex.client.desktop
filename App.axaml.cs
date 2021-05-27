@@ -1,32 +1,24 @@
-using Avalonia;
-using Avalonia.Controls.ApplicationLifetimes;
-using Avalonia.Markup.Xaml;
-using Atomex.Client.Desktop.Dialogs.Views;
-using Atomex.Client.Desktop.Services;
-using Atomex.Client.Desktop.ViewModels;
-using Atomex.Client.Desktop.Views;
 using System;
-using System.Collections;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using Microsoft.Extensions.Configuration;
 using System.Linq;
-using System.Reactive.Linq;
 using System.Runtime.InteropServices;
-using Atomex.Client.Desktop.Common;
-using Serilog;
 using Atomex.Common.Configuration;
 using Atomex.Core;
 using Atomex.MarketData.Bitfinex;
 using Atomex.Subsystems;
+using Atomex.Client.Desktop.Dialogs.Views;
+using Atomex.Client.Desktop.Services;
+using Atomex.Client.Desktop.ViewModels;
+using Atomex.Client.Desktop.Views;
+using Avalonia;
 using Avalonia.Input.Platform;
-using Avalonia.Styling;
-using Nethereum.Contracts;
-using Sentry;
-using Sentry.Protocol;
+using Avalonia.Controls.ApplicationLifetimes;
+using Avalonia.Markup.Xaml;
+using Serilog;
 using Serilog.Core;
 using Serilog.Events;
 using Serilog.Formatting;
@@ -51,7 +43,7 @@ namespace Atomex.Client.Desktop
             TemplateService = new TemplateService();
             ImageService = new ImageService();
             Clipboard = AvaloniaLocator.Current.GetService<IClipboard>();
-            
+
             // init logger
             Log.Logger = new LoggerConfiguration()
 #if DEBUG
@@ -93,7 +85,6 @@ namespace Atomex.Client.Desktop
                 desktop.Exit += OnExit;
 
                 // var sink = new InMemorySink(mainWindowViewModel.LogEvent);
-                //
                 // Log.Logger = new LoggerConfiguration()
                 //     .WriteTo.Sink(sink)
                 //     .CreateLogger();
@@ -107,36 +98,14 @@ namespace Atomex.Client.Desktop
 
         void OnExit(object sender, ControlledApplicationLifetimeExitEventArgs e)
         {
-            if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime)
+            Log.Information("Application shutdown");
+            try
             {
-                if (e.ApplicationExitCode == 300)
-                {
-                    SingleApp.CloseAndSwitch();
-                    return;
-                }
-
                 AtomexApp.Stop();
-
-                // try { Updater.Stop(); }
-                // catch (TimeoutException) { Log.Error("Failed to stop the updater due to timeout"); }
-
-                // update has been requested
-                // if (e.ApplicationExitCode == 101)
-                // {
-                //     try
-                //     {
-                //         Updater.RunUpdate();
-                //         Log.Information("Update scheduled");
-                //     }
-                //     catch (Exception ex)
-                //     {
-                //         Log.Error(ex, "Failed to schedule update");
-                //     }
-                // }
-
-                Log.Information("Application shutdown");
-
-                SingleApp.Close();
+            }
+            catch (Exception)
+            {
+                Log.Error("Error stopping Atomex in OnExit");
             }
         }
 

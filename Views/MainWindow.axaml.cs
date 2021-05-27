@@ -23,9 +23,10 @@ using Serilog;
 using ILogger = NetSparkleUpdater.Interfaces.ILogger;
 using Timer = System.Timers.Timer;
 
+
 namespace Atomex.Client.Desktop.Views
 {
-    public class MyLogger : ILogger
+    public class SparkleLogger : ILogger
     {
         public void PrintMessage(string message, params object[] arguments)
         {
@@ -43,7 +44,7 @@ namespace Atomex.Client.Desktop.Views
         private SparkleUpdater _sparkle;
 
         private AppCastItem LastUpdate;
-        
+
         private MacUpdater MacUpdater;
 
         private MainWindowViewModel ctx;
@@ -53,12 +54,12 @@ namespace Atomex.Client.Desktop.Views
         {
             InitializeComponent();
             this.AttachDevTools();
-            
+
             this.PropertyChanged += (s, e) =>
             {
                 if (e.Property == Control.DataContextProperty)
                 {
-                    ctx = (MainWindowViewModel)e.NewValue!;
+                    ctx = (MainWindowViewModel) e.NewValue!;
 
                     ctx.OnUpdateAction = ManualUpdate_Click;
                 }
@@ -80,15 +81,15 @@ namespace Atomex.Client.Desktop.Views
 
             _sparkle = new SparkleUpdater(
                 "https://github.com/atomex-me/atomex.client.desktop/releases/latest/download/appcast.xml",
-                new Ed25519Checker(SecurityMode.OnlyVerifySoftwareDownloads, 
+                new Ed25519Checker(SecurityMode.OnlyVerifySoftwareDownloads,
                     "76FH2gIo7D5mpPPfnard5C9cVwq8TFaxpo/Wi2Iem/E="))
             {
                 UserInteractionMode = UserInteractionMode.DownloadNoInstall
             };
-            _sparkle.LogWriter = new MyLogger();
+            _sparkle.LogWriter = new SparkleLogger();
             _sparkle.SecurityProtocolType = System.Net.SecurityProtocolType.Tls12;
             _sparkle.StartLoop(false, false);
-            
+
             CheckForUpdates(null, null);
             var checkUpdateReadyTimer = new Timer(TimeSpan.FromMinutes(1).TotalMilliseconds);
             checkUpdateReadyTimer.AutoReset = true;
@@ -157,7 +158,7 @@ namespace Atomex.Client.Desktop.Views
                             {
                                 SignatureVerifier = _sparkle.SignatureVerifier,
                                 UpdateDownloader = _sparkle.UpdateDownloader
-                            };   
+                            };
                         }
                     }
                     catch (Exception e)

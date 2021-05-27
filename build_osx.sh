@@ -23,7 +23,7 @@ mkdir "$BASE_DIR/$APP_NAME/Contents/Resources"
 cp "$BASE_DIR/$INFO_PLIST" "$BASE_DIR/$APP_NAME/Contents/Info.plist"
 cp "$BASE_DIR/$ICON_FILE" "$BASE_DIR/$APP_NAME/Contents/Resources/logo.icns"
 cp -a "$BASE_DIR/$PUBLISH_OUTPUT_DIRECTORY" "$BASE_DIR/$APP_NAME/Contents/MacOS"
-
+cp "com.atomex.osx.plist" "$BASE_DIR/$APP_NAME/Contents/MacOS"
 
 # echo "[INFO] Signing Code"
 ENTITLEMENTS="AtomexEntitlements.entitlements"

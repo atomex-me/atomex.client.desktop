@@ -54,13 +54,8 @@ namespace Atomex.Client.Desktop.ViewModels
         {
             AtomexApp = app ?? throw new ArgumentNullException(nameof(app));
             MainWalletVM = new WalletMainViewModel(AtomexApp);
-
-            // InstalledVersion = App.Updater.InstalledVersion.ToString();
-
+            
             SubscribeToServices();
-
-            // todo: UPDATES
-            // SubscribeToUpdates(App.Updater);
 
             if (mainView != null)
             {
@@ -158,16 +153,6 @@ namespace Atomex.Client.Desktop.ViewModels
                 }
             }
         }
-
-        // private void SubscribeToUpdates(Updater updater)
-        // {
-        //     updater.UpdatesReady += OnUpdatesReadyEventHandler;
-        // }
-
-        // private void OnUpdatesReadyEventHandler(object sender, ReadyEventArgs e)
-        // {
-        //     UpdatesReady = true;
-        // }
 
         private void SubscribeToServices()
         {

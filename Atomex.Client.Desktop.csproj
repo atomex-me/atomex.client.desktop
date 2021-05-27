@@ -7,8 +7,8 @@
         <UseAppHost>true</UseAppHost>
         <RuntimeIdentifiers>osx-x64</RuntimeIdentifiers>
 
-        <AssemblyVersion>1.0.79</AssemblyVersion>
-        <Version>1.0.79</Version>
+        <AssemblyVersion>1.0.80</AssemblyVersion>
+        <Version>1.0.80</Version>
     </PropertyGroup>
     <ItemGroup>
         <AvaloniaResource Include="Assets\**" />
@@ -39,12 +39,16 @@
         <None Remove="config.debug.json" />
         <None Remove="config.json" />
         <None Remove="NetSparkle_Ed25519.pub" />
+        <None Remove="com.atomex.osx.plist" />
     </ItemGroup>
     <ItemGroup>
         <EmbeddedResource Include="config.debug.json">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </EmbeddedResource>
         <EmbeddedResource Include="config.json">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </EmbeddedResource>
+        <EmbeddedResource Include="com.atomex.osx.plist">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </EmbeddedResource>
     </ItemGroup>
