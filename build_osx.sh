@@ -6,6 +6,7 @@ ZIP_PATH="$DIST_FOLDER/Atomex.zip"
 PUBLISH_OUTPUT_DIRECTORY="bin/Release/net5.0/osx-x64/publish/."
 INFO_PLIST="Info.plist"
 ICON_FILE="logo.icns"
+LAUNCHD_FILE="com.atomex.osx.plist"
 
 dotnet clean -c Release
 dotnet restore
@@ -23,7 +24,7 @@ mkdir "$BASE_DIR/$APP_NAME/Contents/Resources"
 cp "$BASE_DIR/$INFO_PLIST" "$BASE_DIR/$APP_NAME/Contents/Info.plist"
 cp "$BASE_DIR/$ICON_FILE" "$BASE_DIR/$APP_NAME/Contents/Resources/logo.icns"
 cp -a "$BASE_DIR/$PUBLISH_OUTPUT_DIRECTORY" "$BASE_DIR/$APP_NAME/Contents/MacOS"
-cp "com.atomex.osx.plist" "$BASE_DIR/$APP_NAME/Contents/MacOS"
+cp "$BASE_DIR/$LAUNCHD_FILE" "$BASE_DIR/$APP_NAME/Contents/MacOS"
 
 # echo "[INFO] Signing Code"
 ENTITLEMENTS="AtomexEntitlements.entitlements"
