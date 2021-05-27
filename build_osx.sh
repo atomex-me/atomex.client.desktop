@@ -26,7 +26,7 @@ cp "$BASE_DIR/$ICON_FILE" "$BASE_DIR/$APP_NAME/Contents/Resources/logo.icns"
 cp -a "$BASE_DIR/$PUBLISH_OUTPUT_DIRECTORY" "$BASE_DIR/$APP_NAME/Contents/MacOS"
 cp "$BASE_DIR/$LAUNCHD_FILE" "$BASE_DIR/$APP_NAME/Contents/MacOS"
 
-# echo "[INFO] Signing Code"
+echo "[INFO] Signing Code"
 ENTITLEMENTS="AtomexEntitlements.entitlements"
 SIGNING_IDENTITY="Developer ID Application: ATOMEX OU (BJT6S7XYJV)" # matches Keychain Access certificate name
 
