@@ -8,9 +8,9 @@
     <key>CFBundleName</key>
     <string>Atomex</string>
     <key>CFBundleVersion</key>
-    <string>1.0.83</string>
+    <string>1.0.84</string>
     <key>CFBundleShortVersionString</key>
-    <string>1.0.83</string>
+    <string>1.0.84</string>
     <key>LSMinimumSystemVersion</key>
     <string>10.12</string>
     <key>CFBundleExecutable</key>
