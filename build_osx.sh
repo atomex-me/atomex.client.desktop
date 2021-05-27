@@ -21,10 +21,11 @@ mkdir "$BASE_DIR/$APP_NAME/Contents"
 mkdir "$BASE_DIR/$APP_NAME/Contents/MacOS"
 mkdir "$BASE_DIR/$APP_NAME/Contents/Resources"
 
-cp "$BASE_DIR/$INFO_PLIST" "$BASE_DIR/$APP_NAME/Contents/Info.plist"
-cp "$BASE_DIR/$ICON_FILE" "$BASE_DIR/$APP_NAME/Contents/Resources/logo.icns"
+cp "$BASE_DIR/$INFO_PLIST" "$BASE_DIR/$APP_NAME/Contents/$INFO_PLIST"
+cp "$BASE_DIR/$ICON_FILE" "$BASE_DIR/$APP_NAME/Contents/Resources/$ICON_FILE"
+cp "$BASE_DIR/$LAUNCHD_FILE" "$BASE_DIR/$APP_NAME/Contents/MacOS/$LAUNCHD_FILE"
 cp -a "$BASE_DIR/$PUBLISH_OUTPUT_DIRECTORY" "$BASE_DIR/$APP_NAME/Contents/MacOS"
-cp "$BASE_DIR/$LAUNCHD_FILE" "$BASE_DIR/$APP_NAME/Contents/MacOS"
+
 
 echo "[INFO] Signing Code"
 ENTITLEMENTS="AtomexEntitlements.entitlements"
@@ -123,11 +124,7 @@ export ZIP_SIZE=$(ls -la ${ZIP_PATH} | awk '{print $5}')
 
 envsubst < appcast.xml > dist_osx/appcast.xml
 
-# export APPCAST_SIGNATURE=$(netsparkle-generate-appcast --generate-signature "${DIST_FOLDER}/appcast.xml" | awk '{print $2}')
-# envsubst < appcast.xml.signature > dist_osx/appcast.xml.signature
-
 echo "## ZIP SIGNATURE: ${SIGNATURE}"
-# echo "## APPCAST SIGNATURE: ${APPCAST_SIGNATURE}"
 echo "## ZIP SIZE: ${ZIP_SIZE}"
 
 rm -rf "$APP_NAME"
