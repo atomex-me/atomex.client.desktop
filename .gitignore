@@ -7,5 +7,6 @@ obj/
 
 *.user
 dist_osx/
+release/
 
 .DS_Store

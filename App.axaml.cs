@@ -18,6 +18,7 @@ using Avalonia;
 using Avalonia.Input.Platform;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
+using Sentry;
 using Serilog;
 using Serilog.Core;
 using Serilog.Events;

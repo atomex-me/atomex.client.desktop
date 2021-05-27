@@ -38,7 +38,6 @@
     <ItemGroup>
         <None Remove="config.debug.json" />
         <None Remove="config.json" />
-        <None Remove="NetSparkle_Ed25519.pub" />
         <None Remove="com.atomex.osx.plist" />
     </ItemGroup>
     <ItemGroup>
