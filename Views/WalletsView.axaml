@@ -41,19 +41,8 @@
                                    TextWrapping="Wrap"
                                    Opacity="0.4" />
                     </StackPanel>
-                    <!-- <DataTemplate.Triggers> -->
-                    <!--     <DataTrigger Binding="{Binding ElementName=walletTabItem, Path=IsMouseOver}" Value="True"> -->
-                    <!--         <Setter TargetName="ContentControl" Property="Opacity" Value="1" /> -->
-                    <!--         <Setter TargetName="HeaderTextBlock" Property="Opacity" Value="1" /> -->
-                    <!--     </DataTrigger> -->
-                    <!--     <DataTrigger Binding="{Binding IsSelected}" Value="True"> -->
-                    <!--         <Setter TargetName="ContentControl" Property="Opacity" Value="1" /> -->
-                    <!--         <Setter TargetName="HeaderTextBlock" Property="Opacity" Value="1" /> -->
-                    <!--     </DataTrigger> -->
-                    <!-- </DataTemplate.Triggers> -->
                 </DataTemplate>
             </TabControl.ItemTemplate>
         </TabControl>
     </Grid>
-
 </UserControl>

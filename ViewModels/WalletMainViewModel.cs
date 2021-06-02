@@ -22,7 +22,7 @@ namespace Atomex.Client.Desktop.ViewModels
             ConversionViewModel = new ConversionViewModel(AtomexApp);
             WalletsViewModel = new WalletsViewModel(AtomexApp, SelectConversion);
             SettingsViewModel = new SettingsViewModel(AtomexApp);
-            WertViewModel = new WertViewModel();
+            WertViewModel = new WertViewModel(AtomexApp);
 
             SelectPortfolio();
             SubscribeToServices();

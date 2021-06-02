@@ -31,8 +31,6 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 {
     public class WalletViewModel : ViewModelBase
     {
-        private const int ConversionViewIndex = 2;
-
         private ObservableCollection<TransactionViewModel> _transactions;
 
         public ObservableCollection<TransactionViewModel> Transactions
@@ -41,7 +39,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             set
             {
                 _transactions = value;
-                this.RaisePropertyChanged(nameof(Transactions));
+                OnPropertyChanged(nameof(Transactions));
             }
         }
 
@@ -53,7 +51,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             set
             {
                 _currencyViewModel = value;
-                this.RaisePropertyChanged(nameof(CurrencyViewModel));
+                OnPropertyChanged(nameof(CurrencyViewModel));
             }
         }
 
@@ -79,9 +77,9 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             set
             {
                 _isSelected = value;
-                this.RaisePropertyChanged(nameof(IsSelected));
-                this.RaisePropertyChanged(nameof(Background));
-                this.RaisePropertyChanged(nameof(OpacityMask));
+                OnPropertyChanged(nameof(IsSelected));
+                OnPropertyChanged(nameof(Background));
+                OnPropertyChanged(nameof(OpacityMask));
             }
         }
 
@@ -93,7 +91,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             set
             {
                 _isBalanceUpdating = value;
-                this.RaisePropertyChanged(nameof(IsBalanceUpdating));
+                OnPropertyChanged(nameof(IsBalanceUpdating));
             }
         }
 

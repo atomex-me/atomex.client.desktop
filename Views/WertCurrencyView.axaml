@@ -1,0 +1,175 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             xmlns:vm="clr-namespace:Atomex.Client.Desktop.ViewModels"
+             xmlns:helpers="clr-namespace:Atomex.Client.Desktop.Helpers"
+             xmlns:controls="clr-namespace:Atomex.Client.Desktop.Controls"
+             x:Class="Atomex.Client.Desktop.Views.WertCurrencyView">
+    <Design.DataContext>
+        <vm:WertCurrencyViewModel />
+    </Design.DataContext>
+    <StackPanel Orientation="Vertical"
+                VerticalAlignment="Center"
+                Margin="0 -80 0 0">
+        <StackPanel Orientation="Horizontal"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Top">
+            <Border Width="90"
+                    Height="40"
+                    Background="{DynamicResource FieldHeaderBackgroundBrush}"
+                    CornerRadius="20 0 0 20">
+                <TextBlock Text="Address:"
+                           Margin="0 0 7 0"
+                           Foreground="{DynamicResource DefaultForegroundBrush}"
+                           FontFamily="{DynamicResource DefaultMediumFontFamily}"
+                           FontSize="13"
+                           VerticalAlignment="Center"
+                           HorizontalAlignment="Right" />
+            </Border>
+
+            <ComboBox Width="460"
+                      Height="40"
+                      Margin="0 5 0 5"
+                      Items="{Binding FromAddressList}"
+                      SelectedIndex="{Binding SelectedAddressIndex, Mode=TwoWay}"
+                      Background="{DynamicResource DefaultSubstrateBrush}"
+                      Foreground="{DynamicResource DefaultForegroundBrush}"
+                      helpers:ComboBoxHelper.CornerRadius="0 20 20 0"
+                      helpers:ComboBoxHelper.PopupPadding="1 1 20 0"
+                      helpers:ComboBoxHelper.IconColor="{DynamicResource CurrencyComboBoxIconBrush}">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock
+                                Text="(new)"
+                                Foreground="{DynamicResource NewAddressBrush}"
+                                FontSize="12"
+                                FontFamily="{DynamicResource DefaultFontFamily}"
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Center"
+                                IsVisible="{Binding IsFreeAddress}" />
+                            <TextBlock
+                                Margin="3 0 0 0"
+                                Text="{Binding Address}"
+                                Foreground="{DynamicResource DefaultForegroundBrush}"
+                                FontSize="12"
+                                FontFamily="{DynamicResource DefaultFontFamily}"
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Center" />
+                            <TextBlock
+                                Margin="10 0 0 0"
+                                Foreground="{DynamicResource AmountBrush}"
+                                FontSize="12"
+                                FontFamily="{DynamicResource DefaultFontFamily}"
+                                VerticalAlignment="Center">
+                                <TextBlock.Text>
+                                    <MultiBinding Converter="{StaticResource AmountToStringConverter}">
+                                        <Binding Path="AvailableBalance" Mode="OneWay" />
+                                        <Binding Path="CurrencyFormat" Mode="OneWay" />
+                                    </MultiBinding>
+                                </TextBlock.Text>
+                            </TextBlock>
+                        </StackPanel>
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
+        </StackPanel>
+
+        <StackPanel Orientation="Horizontal"
+                    HorizontalAlignment="Center"
+                    Margin="0 20 0 0">
+            <StackPanel Orientation="Horizontal"
+                        HorizontalAlignment="Left"
+                        Margin="0 0 8 0">
+                <Border Classes="FieldHeader"
+                        Width="60">
+                    <TextBlock Text="From:"
+                               Margin="0 0 7 0"
+                               Foreground="{DynamicResource DefaultForegroundBrush}"
+                               FontFamily="{DynamicResource DefaultMediumFontFamily}"
+                               FontSize="13"
+                               VerticalAlignment="Center"
+                               HorizontalAlignment="Right" />
+                </Border>
+
+                <TextBox Width="195"
+                         Height="40"
+                         Margin="0 5 0 5"
+                         FontSize="18"
+                         Background="{DynamicResource DefaultSubstrateBrush}"
+                         Foreground="{DynamicResource DefaultForegroundBrush}"
+                         Text="0.3333"
+                         helpers:TextBoxHelper.CornerRadius="0 20 20 0"
+                         helpers:AmountTextBoxHelper.CurrencyCode="USD"
+                         Classes="CustomTextBox AmountTextBox" />
+            </StackPanel>
+            
+            <Path x:Name="icon"
+                  Stretch="Uniform"
+                  UseLayoutRounding="False"
+                  Width="24"
+                  Height="24"
+                  Fill="{DynamicResource ConversionArrowBrush}"
+                  Data="{DynamicResource FontAwesome.ArrowAltCircleRightRegular}" />
+
+            <StackPanel Orientation="Horizontal"
+                        HorizontalAlignment="Right"
+                        Margin="8 0 0 0">
+                <Border Classes="FieldHeader"
+                        Width="60">
+                    <TextBlock Text="To:"
+                               Margin="0 0 7 0"
+                               Foreground="{DynamicResource DefaultForegroundBrush}"
+                               FontFamily="{DynamicResource DefaultMediumFontFamily}"
+                               FontSize="13"
+                               VerticalAlignment="Center"
+                               HorizontalAlignment="Right" />
+                </Border>
+
+                <TextBox Width="195"
+                         Height="40"
+                         Margin="0 5 0 5"
+                         FontSize="18"
+                         Background="{DynamicResource DefaultSubstrateBrush}"
+                         Foreground="{DynamicResource DefaultForegroundBrush}"
+                         Text="0.7777"
+                         helpers:TextBoxHelper.CornerRadius="0 20 20 0"
+                         helpers:AmountTextBoxHelper.CurrencyCode="BTC"
+                         Classes="CustomTextBox AmountTextBox" />
+            </StackPanel>
+        </StackPanel>
+        
+        <Border HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                Padding="10"
+                Background="{DynamicResource DefaultSubstrateBrush}"
+                Margin="0 20 0 0"
+                MinWidth="200"
+                CornerRadius="10">
+            <StackPanel Orientation="Horizontal"
+                        HorizontalAlignment="Center">
+                <TextBlock Margin="0 3"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center"
+                           Text="Estimated price:"
+                           Foreground="{DynamicResource DefaultAmountInBaseForegroundBrush}"
+                           FontFamily="{DynamicResource DefaultFontFamily}"/>
+                <TextBlock Foreground="{DynamicResource DefaultForegroundBrush}"
+                           FontFamily="{DynamicResource DefaultFontFamily}"
+                           Margin="3 0 0 0"
+                           HorizontalAlignment="Left"
+                           Text="38,454.44"
+                           VerticalAlignment="Center">
+                </TextBlock>
+            </StackPanel>
+        </Border>
+        
+        <controls:RoundedButton Width="150"
+                                Height="40"
+                                Margin="0 20 0 5"
+                                CornerRadius="20"
+                                Content="Buy" />
+    </StackPanel>
+</UserControl>

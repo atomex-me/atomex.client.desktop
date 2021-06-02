@@ -24,7 +24,6 @@ namespace Atomex.Client.Desktop.ViewModels.ReceiveViewModels
     public class ReceiveViewModel : ViewModelBase
     {
         private const int PixelsPerModule = 20;
-
         protected IAtomexApp App { get; }
 
         private List<CurrencyViewModel> _fromCurrencies;
@@ -128,8 +127,7 @@ namespace Atomex.Client.Desktop.ViewModels.ReceiveViewModels
             set
             {
                 _selectedAddress = value;
-                // this.RaisePropertyChanged(nameof(SelectedAddress));
-
+                
                 if (_selectedAddress != null)
                     _ = CreateQrCodeAsync();
 
