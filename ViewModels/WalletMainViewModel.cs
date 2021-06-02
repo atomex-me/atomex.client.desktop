@@ -22,6 +22,7 @@ namespace Atomex.Client.Desktop.ViewModels
             ConversionViewModel = new ConversionViewModel(AtomexApp);
             WalletsViewModel = new WalletsViewModel(AtomexApp, SelectConversion);
             SettingsViewModel = new SettingsViewModel(AtomexApp);
+            WertViewModel = new WertViewModel();
 
             SelectPortfolio();
             SubscribeToServices();
@@ -34,6 +35,7 @@ namespace Atomex.Client.Desktop.ViewModels
         public WalletsViewModel WalletsViewModel { get; set; }
         public ConversionViewModel ConversionViewModel { get; set; }
         public SettingsViewModel SettingsViewModel { get; set; }
+        public WertViewModel WertViewModel { get; set; }
         
         private ViewModelBase _content;
 
@@ -168,6 +170,7 @@ namespace Atomex.Client.Desktop.ViewModels
             this.RaisePropertyChanged(nameof(IsWalletsSectionActive));
             this.RaisePropertyChanged(nameof(IsConversionSectionActive));
             this.RaisePropertyChanged(nameof(IsSettingsSectionActive));
+            this.RaisePropertyChanged(nameof(IsWertSectionActive));
         }
 
 
@@ -198,11 +201,18 @@ namespace Atomex.Client.Desktop.ViewModels
             Content = SettingsViewModel;
             RefreshAllMenus();
         }
+        
+        public void SelectWert()
+        {
+            Content = WertViewModel;
+            RefreshAllMenus();
+        }
 
         public bool IsPortfolioSectionActive => Content.GetType() == typeof(PortfolioViewModel);
         public bool IsWalletsSectionActive => Content.GetType() == typeof(WalletsViewModel);
         public bool IsConversionSectionActive => Content.GetType() == typeof(ConversionViewModel);
         public bool IsSettingsSectionActive => Content.GetType() == typeof(SettingsViewModel);
+        public bool IsWertSectionActive => Content.GetType() == typeof(WertViewModel);
         
         public static string GetAssemblyFileVersion()
         {
