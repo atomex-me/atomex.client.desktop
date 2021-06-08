@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using Atomex.Client.Desktop.Common;
 using Atomex.Core;
@@ -166,6 +167,40 @@ namespace Atomex.Client.Desktop.ViewModels
         {
             get => _selectedAddress;
             set { _selectedAddress = value; }
+        }
+
+
+        protected string CurrencyFormat => CurrencyViewModel.CurrencyFormat;
+        protected string BaseCurrencyFormat => CurrencyViewModel.BaseCurrencyFormat;
+        
+        
+        protected decimal _fromAmount;
+
+        public decimal FromAmount
+        {
+            get => _fromAmount;
+            set { _fromAmount = value; }
+        }
+            
+        
+        public string FromAmountString
+        {
+            get => FromAmount.ToString(BaseCurrencyFormat, CultureInfo.InvariantCulture);
+            set
+            {
+                if (!decimal.TryParse(value, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture,
+                    out var fromAmount))
+                {
+                    if (fromAmount == 0)
+                        FromAmount = fromAmount;
+                    OnPropertyChanged(nameof(FromAmountString));
+                    return;
+                }
+
+
+                FromAmount = _fromAmount.TruncateByFormat(BaseCurrencyFormat);
+                OnPropertyChanged(nameof(FromAmountString));
+            }
         }
     }
 }

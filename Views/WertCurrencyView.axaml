@@ -100,7 +100,8 @@
                          FontSize="18"
                          Background="{DynamicResource DefaultSubstrateBrush}"
                          Foreground="{DynamicResource DefaultForegroundBrush}"
-                         Text="0.3333"
+                         Name="FromAmount"
+                         Text="{Binding FromAmountString, Mode=OneWay}"
                          helpers:TextBoxHelper.CornerRadius="0 20 20 0"
                          helpers:AmountTextBoxHelper.CurrencyCode="USD"
                          Classes="CustomTextBox AmountTextBox" />
@@ -136,7 +137,7 @@
                          Foreground="{DynamicResource DefaultForegroundBrush}"
                          Text="0.7777"
                          helpers:TextBoxHelper.CornerRadius="0 20 20 0"
-                         helpers:AmountTextBoxHelper.CurrencyCode="BTC"
+                         helpers:AmountTextBoxHelper.CurrencyCode="{Binding Currency.Name}"
                          Classes="CustomTextBox AmountTextBox" />
             </StackPanel>
         </StackPanel>
