@@ -686,8 +686,7 @@
                            VerticalAlignment="Bottom"
                            IsVisible="{Binding IsCriticalWarning}" />
             </StackPanel>
-
-            <!-- ConvertButtonStyle -->
+            
             <controls:RoundedButton Width="150"
                                     Height="40"
                                     Margin="0 10 0 5"
