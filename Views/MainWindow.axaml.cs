@@ -91,7 +91,7 @@ namespace Atomex.Client.Desktop.Views
             _sparkle.StartLoop(false, false);
 
             CheckForUpdates(null, null);
-            var checkUpdateReadyTimer = new Timer(TimeSpan.FromMinutes(1).TotalMilliseconds);
+            var checkUpdateReadyTimer = new Timer(TimeSpan.FromMinutes(5).TotalMilliseconds);
             checkUpdateReadyTimer.AutoReset = true;
             checkUpdateReadyTimer.Elapsed += CheckForUpdates;
             checkUpdateReadyTimer.Start();
