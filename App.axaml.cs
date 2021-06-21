@@ -151,7 +151,7 @@ namespace Atomex.Client.Desktop
                     Arguments = RuntimeInformation.IsOSPlatform(OSPlatform.OSX) ? $"{url}" : "",
                     CreateNoWindow = true,
                     UseShellExecute = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
-                })) ;
+                }));
             }
         }
 
