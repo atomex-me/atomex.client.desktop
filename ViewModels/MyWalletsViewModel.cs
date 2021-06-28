@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Windows.Input;
 using Atomex.Client.Desktop.Common;
 using Atomex.Common;
 using Atomex.Core;
+using Atomex.LiteDb;
 using Atomex.Subsystems;
 using Atomex.Wallet;
 using Atomex.Wallet.Abstract;
@@ -50,7 +52,14 @@ namespace Atomex.Client.Desktop.ViewModels
                     pathToAccount: info.Path,
                     password: password,
                     currenciesProvider: AtomexApp.CurrenciesProvider,
-                    clientType: ClientType.Unknown);
+                    clientType: ClientType.Unknown,
+                    migrationCompleteCallback: (MigrationActionType actionType) =>
+                    {
+                        if (actionType == MigrationActionType.XtzTransactionsDeleted)
+                        {
+                            TezosTransactionsDeleted();
+                        }
+                    });
             }, () => ShowContent(this));
 
             unlockViewModel.Unlocked += (sender, args) =>
@@ -67,6 +76,11 @@ namespace Atomex.Client.Desktop.ViewModels
 
             ShowContent?.Invoke(unlockViewModel);
         });
+
+        private void TezosTransactionsDeleted()
+        {
+
+        }
 
         private void DesignerMode()
         {

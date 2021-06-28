@@ -14,7 +14,7 @@ namespace Atomex.Client.Desktop.ViewModels
         private IAtomexApp App;
         private CancellationTokenSource cancellation;
 
-        public RestoreDialogViewModel(IAtomexApp app)
+        public RestoreDialogViewModel(IAtomexApp app, string[] currenies = null)
         {
             App = app ?? throw new ArgumentNullException(nameof(app));
             cancellation = new CancellationTokenSource();
