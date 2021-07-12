@@ -2,7 +2,7 @@ using System;
 using System.Windows.Input;
 using System.Linq;
 using Atomex.Client.Desktop.Common;
-using Atomex.Subsystems;
+using Atomex.Services;
 using Atomex.Wallet.Abstract;
 using ReactiveUI;
 

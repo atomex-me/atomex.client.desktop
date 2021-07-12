@@ -5,7 +5,7 @@ using Atomex.Client.Desktop.Api;
 using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.ViewModels.WalletViewModels;
 using Atomex.Core;
-using Atomex.Subsystems;
+using Atomex.Services;
 
 namespace Atomex.Client.Desktop.ViewModels
 {

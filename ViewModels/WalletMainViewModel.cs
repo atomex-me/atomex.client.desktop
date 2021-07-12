@@ -6,8 +6,8 @@ using Atomex.Client.Desktop.ViewModels.Abstract;
 using Atomex.Core;
 using Atomex.MarketData;
 using Atomex.MarketData.Abstract;
-using Atomex.Subsystems;
-using Atomex.Subsystems.Abstract;
+using Atomex.Services;
+using Atomex.Services.Abstract;
 using ReactiveUI;
 
 namespace Atomex.Client.Desktop.ViewModels

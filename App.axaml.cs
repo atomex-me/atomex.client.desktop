@@ -9,7 +9,7 @@ using System.Runtime.InteropServices;
 using Atomex.Common.Configuration;
 using Atomex.Core;
 using Atomex.MarketData.Bitfinex;
-using Atomex.Subsystems;
+using Atomex.Services;
 using Atomex.Client.Desktop.Dialogs.Views;
 using Atomex.Client.Desktop.Services;
 using Atomex.Client.Desktop.ViewModels;
@@ -61,7 +61,7 @@ namespace Atomex.Client.Desktop
 #endif
                 .CreateLogger();
 
-            var currenciesProvider = new CurrenciesProvider(CurrenciesConfiguration);
+            var currenciesProvider = new CurrenciesProvider(CurrenciesConfigurationString);
             var symbolsProvider = new SymbolsProvider(SymbolsConfiguration);
 
             // init Atomex client app
@@ -129,6 +129,19 @@ namespace Atomex.Client.Desktop
             .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
             .AddEmbeddedJsonFile(CoreAssembly, "currencies.json")
             .Build();
+
+        private static string CurrenciesConfigurationString
+        {
+            get
+            {
+                var resourceName = "currencies.json";
+                var resourceNames = CoreAssembly.GetManifestResourceNames();
+                var fullFileName = resourceNames.FirstOrDefault(n => n.EndsWith(resourceName));
+                var stream = CoreAssembly.GetManifestResourceStream(fullFileName!);
+                using StreamReader reader = new (stream!);
+                return reader.ReadToEnd();
+            }
+        }
 
         private static IConfiguration SymbolsConfiguration { get; } = new ConfigurationBuilder()
             .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)

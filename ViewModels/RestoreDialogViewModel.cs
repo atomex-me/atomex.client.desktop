@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -13,13 +14,17 @@ namespace Atomex.Client.Desktop.ViewModels
     {
         private IAtomexApp App;
         private CancellationTokenSource cancellation;
+        
+        private string restoringEntityTitle = "wallet";
+        public string Title => string.Format(CultureInfo.InvariantCulture, 
+            "Restoring {0} data from blockchain, please wait...", restoringEntityTitle);
 
         public RestoreDialogViewModel(IAtomexApp app, string[] currenies = null)
         {
             App = app ?? throw new ArgumentNullException(nameof(app));
             cancellation = new CancellationTokenSource();
 
-            ScanAllCurrenciesAsync();
+            ScanCurrenciesAsync(currenies);
         }
 
 
@@ -37,28 +42,46 @@ namespace Atomex.Client.Desktop.ViewModels
             Desktop.App.DialogService.CloseDialog();
         }));
 
-        private async void ScanAllCurrenciesAsync()
+        private async void ScanCurrenciesAsync(string[] currenciesArr)
         {
-            Log.Information("Starting Scan All Currencies");
             var currencies = App.Account.Currencies.ToList();
             var hdWalletScanner = new HdWalletScanner(App.Account);
+            
+            if (currenciesArr != null)
+            {
+                currencies = currencies
+                    .Where(curr => currenciesArr.Contains(curr.Name)).ToList();
+                
+                restoringEntityTitle = string.Join(", ", currencies.Select(c => c.Name).ToArray());
+                OnPropertyChanged(nameof(Title));
+            }
+            
+            Log.Information($"Starting Scan {restoringEntityTitle}");
 
             try
             {
-                await Task.Run(() =>
-                        Task.WhenAll(currencies.Select(currency =>
+                var primaryCurrencies = currencies.Where(curr => !curr.IsToken);
+                var tokenCurrencies = currencies.Where(curr => curr.IsToken);
+                
+                await Task.Run(() => 
+                        Task.WhenAll(primaryCurrencies.Select(currency =>
                             hdWalletScanner.ScanAsync(currency.Name, cancellationToken: cancellation.Token))),
                     cancellation.Token);
-                
-                Log.Information("Scan All Currencies done");
+
+                await Task.Run(() => 
+                        Task.WhenAll(tokenCurrencies.Select(currency =>
+                            hdWalletScanner.ScanAsync(currency.Name, cancellationToken: cancellation.Token))),
+                    cancellation.Token);
+
+                Log.Information($"Scan {restoringEntityTitle} done");
             }
             catch (OperationCanceledException)
             {
-                Log.Error("Scan all currencies cancelled exception");
+                Log.Error($"Scan {restoringEntityTitle} cancelled exception");
             }
             catch (Exception)
             {
-                Log.Error("Scan all currencies exception");
+                Log.Error($"Scan {restoringEntityTitle} exception");
             }
 
             if (Desktop.App.DialogService.CurrentlyShowed(this))

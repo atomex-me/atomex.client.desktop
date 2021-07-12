@@ -8,7 +8,7 @@ using Atomex.Client.Desktop.Controls;
 using Atomex.Client.Desktop.Common;
 using Atomex.Common;
 using ReactiveUI;
-using Atomex.Subsystems;
+using Atomex.Services;
 using Atomex.Wallet;
 using Serilog;
 
