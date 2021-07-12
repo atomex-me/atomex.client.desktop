@@ -4,7 +4,7 @@ using System.Windows.Input;
 using Atomex.Client.Desktop.Common;
 using Atomex.Common;
 using Atomex.Core;
-using Atomex.Subsystems;
+using Atomex.Services;
 using Atomex.Wallet;
 using Atomex.Wallet.Abstract;
 using ReactiveUI;

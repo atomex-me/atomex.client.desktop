@@ -9,7 +9,7 @@ using System.Runtime.InteropServices;
 using Atomex.Common.Configuration;
 using Atomex.Core;
 using Atomex.MarketData.Bitfinex;
-using Atomex.Subsystems;
+using Atomex.Services;
 using Atomex.Client.Desktop.Dialogs.Views;
 using Atomex.Client.Desktop.Services;
 using Atomex.Client.Desktop.ViewModels;

@@ -1,7 +1,7 @@
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
-using Atomex.Subsystems;
+using Atomex.Services;
 using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.ViewModels.Abstract;
 using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;

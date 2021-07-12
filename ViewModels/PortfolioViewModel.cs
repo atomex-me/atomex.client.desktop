@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using Atomex.Common;
-using Atomex.Subsystems;
+using Atomex.Services;
 using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.ViewModels.Abstract;
 using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
