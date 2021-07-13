@@ -35,6 +35,7 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
         public DateTime Time { get; set; }
         public DateTime LocalTime => Time.ToLocalTime();
         public string TxExplorerUri => $"{Currency.TxExplorerUri}{Id}";
+        public string Direction { get; set; }
         public bool CanBeRemoved { get; set; }
 
         private bool _isExpanded;
@@ -107,6 +108,16 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
             else
             {
                 Description = "Unknown transaction";
+            }
+            
+            if (Amount <= 0)
+            {
+                Direction = "To: ";
+            }
+
+            if (Amount > 0)
+            {
+                Direction = "From: ";
             }
         }
 

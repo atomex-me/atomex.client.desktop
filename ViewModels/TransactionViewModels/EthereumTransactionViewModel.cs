@@ -15,6 +15,7 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
         public bool IsInternal { get; set; }
         public string FromExplorerUri => $"{Currency.AddressExplorerUri}{From}";
         public string ToExplorerUri => $"{Currency.AddressExplorerUri}{To}";
+        public string Alias { get; set; }
 
         public EthereumTransactionViewModel()
         {
@@ -34,6 +35,16 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
             GasUsed = (decimal) tx.GasUsed;
             Fee = Ethereum.WeiToEth(tx.GasUsed * tx.GasPrice);
             IsInternal = tx.IsInternal;
+
+            if (Amount <= 0)
+            {
+                Alias = tx.To;
+            }
+
+            if (Amount > 0)
+            {
+                Alias = tx.From;
+            }
         }
 
         private static decimal GetAmount(EthereumTransaction tx)
