@@ -30,7 +30,7 @@
                            VerticalAlignment="Center" />
             </Border>
             
-            <TextBlock Text="Restoring wallet data from blockchain, please wait..."
+            <TextBlock Text="{Binding Title}"
                        Foreground="{DynamicResource DefaultForegroundBrush}"
                        FontFamily="{DynamicResource DefaultLightFontFamily}"
                        FontSize="15"

@@ -13,6 +13,7 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
         public bool IsInternal { get; set; }
         public string FromExplorerUri => $"{Currency.AddressExplorerUri}{From}";
         public string ToExplorerUri => $"{Currency.AddressExplorerUri}{To}";
+        public string Alias { get; set; }
 
         public TezosFA12TransactionViewModel()
         {
@@ -30,6 +31,23 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
             GasLimit = tx.GasLimit;
             Fee = Tezos.MtzToTz(tx.Fee);
             IsInternal = tx.IsInternal;
+            
+            if (!string.IsNullOrEmpty(tx.Alias))
+            {
+                Alias = tx.Alias;
+            }
+            else
+            {
+                if (Amount <= 0)
+                {
+                    Alias = tx.To;
+                }
+
+                if (Amount > 0)
+                {
+                    Alias = tx.From;
+                }
+            }
         }
 
         private static decimal GetAmount(TezosTransaction tx)

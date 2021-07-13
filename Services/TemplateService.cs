@@ -38,6 +38,13 @@ namespace Atomex.Client.Desktop.Services
         EthereumERC20TransactionDetailsTemplate
     }
 
+    public enum TxDescriptionTemplate
+    {
+        BtcBasedDescriptionTemplate,
+        XtzAdditionalDescriptionTemplate,
+        EthAdditionalDescriptionTemplate,
+    }
+
     public enum SwapStateTemplate
     {
         SwapCanceledTemplate,
@@ -60,6 +67,7 @@ namespace Atomex.Client.Desktop.Services
             LoadTemplates(typeof(TxStateTemplate));
             LoadTemplates(typeof(TxDetailsTemplate));
             LoadTemplates(typeof(SwapStateTemplate));
+            LoadTemplates(typeof(TxDescriptionTemplate));
         }
         
         public DataTemplate GetTxTypeTemplate(TxTypeTemplate templateType)
@@ -88,6 +96,13 @@ namespace Atomex.Client.Desktop.Services
             return Templates.TryGetValue(templateType.ToString(), out var template)
                 ? template
                 : Templates[SwapStateTemplate.SwapUnsettledTemplate.ToString()];
+        }
+        
+        public DataTemplate GetTxDescriptionTemplate(TxDescriptionTemplate templateType)
+        {
+            return Templates.TryGetValue(templateType.ToString(), out var template)
+                ? template
+                : Templates[TxDescriptionTemplate.BtcBasedDescriptionTemplate.ToString()];
         }
 
         private void LoadTemplates(Type enumType)

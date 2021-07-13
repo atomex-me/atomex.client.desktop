@@ -82,6 +82,9 @@ namespace Atomex.Client.Desktop.ViewModels
                 if (_hasAccount)
                 {
                     ShowContent(MainWalletVM);
+                    
+                    var currencies = AtomexApp.Account.Currencies.ToList();
+                    var a = 5;
 
                     if (AccountRestored)
                     {
