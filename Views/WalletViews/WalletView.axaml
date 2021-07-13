@@ -255,10 +255,9 @@
                                    FontFamily="{DynamicResource DefaultFontFamily}"
                                    FontSize="15"
                                    VerticalAlignment="Center"
-                                   IsEnabled="{Binding IsBalanceUpdating}">
-                        </TextBlock>
+                                   IsEnabled="{Binding IsBalanceUpdating}" />
                     </StackPanel>
-                    
+
                     <Border>
                         <Button Classes="ChildViewCloseButtonLight"
                                 Width="24"
@@ -275,9 +274,10 @@
                 </Grid>
             </Border>
         </StackPanel>
-        
+
         <DataGrid x:Name="DgTransactions"
                   Margin="10"
+                  ColumnWidth="*"
                   AutoGenerateColumns="False"
                   IsReadOnly="True"
                   RowDetailsVisibilityMode="VisibleWhenSelected"
@@ -287,7 +287,7 @@
                   helpers:DataGridHelper.SortInfo="{Binding SortInfo}"
                   CanUserResizeColumns="True"
                   Grid.Row="1">
-            
+
             <DataGrid.RowDetailsTemplate>
                 <DataTemplate>
                     <styles:TypeTest>
@@ -297,9 +297,9 @@
                     </styles:TypeTest>
                 </DataTemplate>
             </DataGrid.RowDetailsTemplate>
-            
+
             <DataGrid.Columns>
-                <DataGridTemplateColumn Header="TYPE" CanUserSort="True">
+                <DataGridTemplateColumn Header="TYPE" CanUserSort="True" MinWidth="65" MaxWidth="65">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <styles:TypeTest>
@@ -310,14 +310,23 @@
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
-                <DataGridTextColumn Header="DESCRIPTION"
-                                    CanUserSort="False"
-                                    Binding="{Binding Description}"
-                                    Width="*" />
-                <DataGridTemplateColumn Header="AMOUNT" MinWidth="100" CanUserSort="True">
+
+                <DataGridTemplateColumn Header="DESCRIPTION" CanUserSort="False">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <styles:TypeTest>
+                                <styles:TypeTest.DataTemplate>
+                                    <controls:TransactionDescriptionDataTemplateSelector />
+                                </styles:TypeTest.DataTemplate>
+                            </styles:TypeTest>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+                <DataGridTemplateColumn Header="AMOUNT" CanUserSort="True" MinWidth="112" MaxWidth="112">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate DataType="{x:Type txViewModels:TransactionViewModel}">
-                            <StackPanel Orientation="Horizontal" Margin="3 0 3 0">
+                            <StackPanel Classes="DGTemplateContainer" Orientation="Horizontal">
                                 <TextBlock FontFamily="{DynamicResource DefaultFontFamily}"
                                            VerticalAlignment="Center"
                                            HorizontalAlignment="Left"
@@ -346,7 +355,7 @@
                                         </ia:DataTriggerBehavior>
                                     </i:Interaction.Behaviors>
                                 </TextBlock>
-                                
+
                                 <TextBlock Text="{Binding CurrencyCode}"
                                            FontFamily="{DynamicResource DefaultFontFamily}"
                                            FontSize="8"
@@ -358,7 +367,7 @@
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
 
-                <DataGridTemplateColumn Header="STATE" CanUserSort="True" MinWidth="82">
+                <DataGridTemplateColumn Header="STATE" CanUserSort="True" MinWidth="90" MaxWidth="90">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <styles:TypeTest>
@@ -367,13 +376,17 @@
                                 </styles:TypeTest.DataTemplate>
                             </styles:TypeTest>
                         </DataTemplate>
-
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
-                <DataGridTextColumn Header="TIME"
-                                    MinWidth="158"
-                                    CanUserSort="True"
-                                    Binding="{Binding LocalTime, Converter={StaticResource DateTimeToTxTimeConverter}}" />
+
+                <DataGridTemplateColumn Header="TIME" CanUserSort="True" MinWidth="165" MaxWidth="165">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate DataType="{x:Type txViewModels:TransactionViewModel}">
+                            <TextBlock Classes="DGTemplateContainer"
+                                       Text="{Binding LocalTime, Converter={StaticResource DateTimeToTxTimeConverter}}" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
             </DataGrid.Columns>
         </DataGrid>
     </Grid>

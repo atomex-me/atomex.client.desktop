@@ -1,15 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Security.Cryptography;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using Atomex.Blockchain.Tezos;
 using Atomex.Blockchain.Tezos.Internal;
-using Atomex.Client.Desktop.Common;
-using Atomex.Client.Desktop.Controls;
-using Atomex.Client.Desktop.ViewModels.Abstract;
-using Atomex.Client.Desktop.ViewModels.WalletViewModels;
-using Atomex.Common;
 using Atomex.Core;
 using Atomex.Wallet;
 using Avalonia.Media.Imaging;

@@ -8,9 +8,7 @@
         <DataTemplate x:Key="UnknownStateTemplate" DataType="viewModels:TransactionViewModel">
             <Border Background="{StaticResource UnknownBrush}"
                     CornerRadius="5"
-                    Margin="3 0 3 0"
-
-                    HorizontalAlignment="Center">
+                    Classes="DGTemplateContainer">
                 <TextBlock Foreground="White"
                            Text="{Binding State}"
                            FontSize="11"
@@ -21,9 +19,7 @@
         <DataTemplate x:Key="PendingStateTemplate" DataType="viewModels:TransactionViewModel">
             <Border Background="{StaticResource PendingBrush}"
                     CornerRadius="5"
-                    Margin="3 0 3 0"
-
-                    HorizontalAlignment="Center">
+                    Classes="DGTemplateContainer">
                 <TextBlock Foreground="White"
                            Text="{Binding State}"
                            FontSize="11"
@@ -34,9 +30,7 @@
         <DataTemplate x:Key="ConfirmedStateTemplate" DataType="viewModels:TransactionViewModel">
             <Border Background="{StaticResource ConfirmedBrush}"
                     CornerRadius="5"
-                    Margin="3 0 3 0"
-
-                    HorizontalAlignment="Center">
+                    Classes="DGTemplateContainer">
                 <TextBlock Foreground="White"
                            Text="{Binding State}"
                            FontSize="11"
@@ -47,9 +41,7 @@
         <DataTemplate x:Key="UnconfirmedStateTemplate" DataType="viewModels:TransactionViewModel">
             <Border Background="{StaticResource UnconfirmedBrush}"
                     CornerRadius="5"
-                    Margin="3 0 3 0"
-
-                    HorizontalAlignment="Center">
+                    Classes="DGTemplateContainer">
                 <TextBlock Foreground="White"
                            Text="{Binding State}"
                            FontSize="11"
@@ -60,9 +52,7 @@
         <DataTemplate x:Key="FailedStateTemplate" DataType="viewModels:TransactionViewModel">
             <Border Background="{StaticResource FailedBrush}"
                     CornerRadius="5"
-                    Margin="3 0 3 0"
-
-                    HorizontalAlignment="Center">
+                    Classes="DGTemplateContainer">
                 <TextBlock Foreground="White"
                            Text="{Binding State}"
                            FontSize="11"
@@ -126,6 +116,47 @@
         <DataTemplate x:Key="EthereumERC20TransactionDetailsTemplate"
                       DataType="viewModels:EthereumERC20TransactionViewModel">
             <views:EthereumTransactionDetailsView />
+        </DataTemplate>
+
+
+        <DataTemplate x:Key="BtcBasedDescriptionTemplate" DataType="viewModels:TransactionViewModel">
+            <Border Classes="DGTemplateContainer">
+                <TextBlock Text="{Binding Description}" />
+            </Border>
+        </DataTemplate>
+
+        <DataTemplate x:Key="EthAdditionalDescriptionTemplate" DataType="viewModels:EthereumTransactionViewModel">
+            <StackPanel Orientation="Vertical"
+                        Classes="DGTemplateContainer"
+                        Margin="0 5 0 5">
+                <TextBlock Text="{Binding Description}"
+                           Margin="0 0 0 2"/>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="{Binding Direction}" 
+                               FontSize="12" 
+                               Foreground="Gray"/>
+                    <TextBlock Text="{Binding Alias}" 
+                               FontSize="12" 
+                               Foreground="{StaticResource NegativeAmountBrush}"/>
+                </StackPanel>
+            </StackPanel>
+        </DataTemplate>
+        
+        <DataTemplate x:Key="XtzAdditionalDescriptionTemplate" DataType="viewModels:TezosTransactionViewModel">
+            <StackPanel Orientation="Vertical"
+                        Classes="DGTemplateContainer"
+                        Margin="0 5 0 5">
+                <TextBlock Text="{Binding Description}"
+                           Margin="0 0 0 2"/>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="{Binding Direction}" 
+                               FontSize="12" 
+                               Foreground="Gray"/>
+                    <TextBlock Text="{Binding Alias}" 
+                               FontSize="12" 
+                               Foreground="{StaticResource NegativeAmountBrush}"/>
+                </StackPanel>
+            </StackPanel>
         </DataTemplate>
     </Styles.Resources>
 
@@ -193,5 +224,10 @@
                 </KeyFrame>
             </Animation>
         </Style.Animations>
+    </Style>
+    
+    <Style Selector=":is(Control).DGTemplateContainer">
+        <Setter Property="Margin" Value="10 0 0 0" />
+        <Setter Property="HorizontalAlignment" Value="Left" />
     </Style>
 </Styles>
