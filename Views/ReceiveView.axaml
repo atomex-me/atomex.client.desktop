@@ -7,7 +7,7 @@
              xmlns:vm="clr-namespace:Atomex.Client.Desktop.ViewModels.ReceiveViewModels"
              xmlns:controls="clr-namespace:Atomex.Client.Desktop.Controls"
              xmlns:helpers="clr-namespace:Atomex.Client.Desktop.Helpers"
-             Width="630"
+             Width="700"
              Height="400">
 
     <Design.DataContext>
@@ -28,15 +28,63 @@
                                VerticalAlignment="Center" />
                 </Border>
                 
-                <ComboBox Width="500"
-                          MinHeight="68"
-                          Classes="CurrencyComboBox"
-                          HorizontalAlignment="Center"
-                          Margin="0 5 0 5"
-                          Items="{Binding FromCurrencies}"
-                          SelectedIndex="{Binding CurrencyIndex, Mode=TwoWay}"
-                          helpers:ComboBoxHelper.CornerRadius="20"
-                          helpers:ComboBoxHelper.IconColor="{DynamicResource CurrencyComboBoxIconBrush}" />
+                <Border Width="570"
+                        MinHeight="68"
+                        Margin="0 5 0 5"
+                        CornerRadius="20"
+                        Background="{DynamicResource DefaultBackgroundBrush}">
+                    <Grid Margin="10"
+                          VerticalAlignment="Center">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="48"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="26"/>
+                            <RowDefinition Height="22"/>
+                        </Grid.RowDefinitions>
+
+                        <Image Width="48"
+                               Height="48"
+                               Source="{Binding CurrencyViewModel.LargeIconPath}"
+                               UseLayoutRounding="True"
+                               Grid.Column="0"
+                               Grid.RowSpan="2"/>
+
+                        <TextBlock Text="{Binding CurrencyViewModel.Header, Converter={StaticResource StringToUpperCaseConverter}}"
+                                   FontFamily="{DynamicResource DefaultBoldFontFamily}"
+                                   FontWeight="Bold"
+                                   FontSize="16"
+                                   Foreground="{DynamicResource DefaultForegroundBrush}"
+                                   Margin="7 0 0 0"
+                                   VerticalAlignment="Bottom"
+                                   Grid.Column="1"
+                                   Grid.Row="0"/>
+
+                        <StackPanel Orientation="Horizontal"
+                                    VerticalAlignment="Top"
+                                    Grid.Column="1"
+                                    Grid.Row="1">
+                            <TextBlock FontFamily="{DynamicResource DefaultFontFamily}"
+                                       FontSize="13"
+                                       Foreground="{DynamicResource DefaultForegroundBrush}"
+                                       Margin="7 0 0 0">
+                                <TextBlock.Text>
+                                    <MultiBinding Converter="{StaticResource AmountToStringConverter}">
+                                        <Binding Path="CurrencyViewModel.TotalAmount" Mode="OneWay"/>
+                                        <Binding Path="CurrencyViewModel.CurrencyFormat" Mode="OneWay"/>
+                                    </MultiBinding>
+                                </TextBlock.Text>
+                            </TextBlock>
+                            <TextBlock Text="{Binding CurrencyViewModel.CurrencyCode}"
+                                       FontFamily="{DynamicResource DefaultFontFamily}"
+                                       FontSize="9"
+                                       Foreground="{DynamicResource DefaultForegroundBrush}"
+                                       Margin="4 3 0 0" />
+                        </StackPanel>
+                    </Grid>
+                </Border>
 
                 <StackPanel Orientation="Horizontal"
                             HorizontalAlignment="Center"
@@ -54,7 +102,7 @@
                                    HorizontalAlignment="Right" />
                     </Border>
                     
-                    <ComboBox Width="410"
+                    <ComboBox Width="480"
                               Height="40"
                               Margin="0 5 0 5"
                               Items="{Binding FromAddressList}"
