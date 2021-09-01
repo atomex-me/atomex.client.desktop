@@ -13,6 +13,7 @@ using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
 using Atomex.Client.Desktop.ViewModels.SendViewModels;
 using Atomex.Common;
 using Atomex.Core;
+using Atomex.Wallet.Abstract;
 using ReactiveUI;
 
 namespace Atomex.Client.Desktop.ViewModels
@@ -25,8 +26,8 @@ namespace Atomex.Client.Desktop.ViewModels
         private static TimeSpan SwapCheckInterval = TimeSpan.FromSeconds(3);
 
         private IAtomexApp App { get; }
-        public Currency FromCurrency { get; set; }
-        public Currency ToCurrency { get; set; }
+        public CurrencyConfig FromCurrency { get; set; }
+        public CurrencyConfig ToCurrency { get; set; }
         public CurrencyViewModel FromCurrencyViewModel { get; set; }
         public CurrencyViewModel ToCurrencyViewModel { get; set; }
         public string PriceFormat { get; set; }
@@ -135,18 +136,23 @@ namespace Atomex.Client.Desktop.ViewModels
             try
             {
                 var account = App.Account;
+                var currencyAccount = account
+                    .GetCurrencyAccount<ILegacyCurrencyAccount>(FromCurrency.Name);
 
-                var fromWallets = (await account
-                        .GetUnspentAddressesAsync(
-                            toAddress: null,
-                            currency: FromCurrency.Name,
-                            amount: Amount,
-                            fee: 0,
-                            feePrice: await FromCurrency.GetDefaultFeePriceAsync(),
-                            feeUsagePolicy: FeeUsagePolicy.EstimatedFee,
-                            addressUsagePolicy: AddressUsagePolicy.UseMinimalBalanceFirst,
-                            transactionType: BlockchainTransactionType.SwapPayment))
+                var fromWallets = (await currencyAccount
+                    .GetUnspentAddressesAsync(
+                        toAddress: null,
+                        amount: Amount,
+                        fee: 0,
+                        feePrice: await FromCurrency.GetDefaultFeePriceAsync(),
+                        feeUsagePolicy: FeeUsagePolicy.EstimatedFee,
+                        addressUsagePolicy: AddressUsagePolicy.UseMinimalBalanceFirst,
+                        transactionType: BlockchainTransactionType.SwapPayment))
                     .ToList();
+
+                foreach (var fromWallet in fromWallets)
+                    if (fromWallet.Currency != FromCurrency.Name)
+                        fromWallet.Currency = FromCurrency.Name;
 
                 if (Amount == 0)
                     return new Error(Errors.SwapError, Resources.CvZeroAmount);
@@ -159,10 +165,10 @@ namespace Atomex.Client.Desktop.ViewModels
                     .SymbolByCurrencies(FromCurrency, ToCurrency);
 
                 var baseCurrency = App.Account.Currencies.GetByName(symbol.Base);
-                var side = symbol.OrderSideForBuyCurrency(ToCurrency);
-                var terminal = App.Terminal;
-                var price = EstimatedPrice;
-                var orderPrice = EstimatedOrderPrice;
+                var side         = symbol.OrderSideForBuyCurrency(ToCurrency);
+                var terminal     = App.Terminal;
+                var price        = EstimatedPrice;
+                var orderPrice   = EstimatedOrderPrice;
 
                 if (price == 0)
                     return new Error(Errors.NoLiquidity, Resources.CvNoLiquidity);
@@ -171,23 +177,21 @@ namespace Atomex.Client.Desktop.ViewModels
 
                 if (qty < symbol.MinimumQty)
                 {
-                    var minimumAmount =
-                        AmountHelper.QtyToAmount(side, symbol.MinimumQty, price, FromCurrency.DigitsMultiplier);
-                    var message = string.Format(CultureInfo.InvariantCulture, Resources.CvMinimumAllowedQtyWarning,
-                        minimumAmount, FromCurrency.Name);
+                    var minimumAmount = AmountHelper.QtyToAmount(side, symbol.MinimumQty, price, FromCurrency.DigitsMultiplier);
+                    var message = string.Format(CultureInfo.InvariantCulture, Resources.CvMinimumAllowedQtyWarning, minimumAmount, FromCurrency.Name);
 
                     return new Error(Errors.SwapError, message);
                 }
 
                 var order = new Order
                 {
-                    Symbol = symbol.Name,
-                    TimeStamp = DateTime.UtcNow,
-                    Price = orderPrice,
-                    Qty = qty,
-                    Side = side,
-                    Type = OrderType.FillOrKill,
-                    FromWallets = fromWallets.ToList(),
+                    Symbol          = symbol.Name,
+                    TimeStamp       = DateTime.UtcNow,
+                    Price           = orderPrice,
+                    Qty             = qty,
+                    Side            = side,
+                    Type            = OrderType.FillOrKill,
+                    FromWallets     = fromWallets.ToList(),
                     MakerNetworkFee = EstimatedMakerNetworkFee
                 };
 
@@ -213,7 +217,7 @@ namespace Atomex.Client.Desktop.ViewModels
                     if (currentOrder.Status == OrderStatus.PartiallyFilled || currentOrder.Status == OrderStatus.Filled)
                     {
                         var swap = (await terminal.Account
-                                .GetSwapsAsync())
+                            .GetSwapsAsync())
                             .FirstOrDefault(s => s.OrderId == currentOrder.Id);
 
                         if (swap == null)
@@ -234,16 +238,10 @@ namespace Atomex.Client.Desktop.ViewModels
             catch (Exception e)
             {
                 Log.Error(e, "Conversion error");
-
+            
                 return new Error(Errors.SwapError, Resources.CvConversionError);
             }
         }
-
-        // private void BackToConfirmation()
-        // {
-        //     DialogViewer.Back(Dialogs.Convert); // to sending view
-        //     DialogViewer.Back(Dialogs.Convert); // to confirmation view
-        // }
 
         private void DesignerMode()
         {

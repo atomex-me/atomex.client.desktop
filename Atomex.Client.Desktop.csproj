@@ -116,10 +116,6 @@
             <DependentUpon>TezosWalletView.axaml</DependentUpon>
             <SubType>Code</SubType>
         </Compile>
-        <Compile Update="Views\ReceiveViews\ReceiveView.axaml.cs">
-            <DependentUpon>ReceiveView.axaml</DependentUpon>
-            <SubType>Code</SubType>
-        </Compile>
         <Compile Update="Views\SendViews\SendView.axaml.cs">
             <DependentUpon>SendView.axaml</DependentUpon>
             <SubType>Code</SubType>
@@ -173,6 +169,10 @@
         </Compile>
         <Compile Update="Views\DelegateConfirmationView.axaml.cs">
           <DependentUpon>DelegateConfirmationView.axaml</DependentUpon>
+        </Compile>
+        <Compile Update="Views\ReceiveView.axaml.cs">
+          <DependentUpon>ReceiveView.axaml</DependentUpon>
+          <SubType>Code</SubType>
         </Compile>
     </ItemGroup>
     <ItemGroup>

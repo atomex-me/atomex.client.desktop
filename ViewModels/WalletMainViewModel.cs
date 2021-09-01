@@ -120,13 +120,13 @@ namespace Atomex.Client.Desktop.ViewModels
         
         private void SubscribeToServices()
         {
-            AtomexApp.TerminalChanged += OnTerminalChangedEventHandler;
+            AtomexApp.AtomexClientChanged += OnTerminalChangedEventHandler;
             AtomexApp.QuotesProvider.AvailabilityChanged += OnQuotesProviderAvailabilityChangedEventHandler;
         }
         
-        private void OnTerminalChangedEventHandler(object sender, TerminalChangedEventArgs args)
+        private void OnTerminalChangedEventHandler(object sender, AtomexClientChangedEventArgs args)
         {
-            var terminal = args.Terminal;
+            var terminal = args.AtomexClient;
             if (terminal?.Account == null)
                 return;
 
@@ -186,7 +186,7 @@ namespace Atomex.Client.Desktop.ViewModels
             RefreshAllMenus();
         }
         
-        public void SelectConversion(Currency? fromCurrency = null)
+        public void SelectConversion(CurrencyConfig? fromCurrency = null)
         {
             Content = ConversionViewModel;
             if (fromCurrency != null)

@@ -14,6 +14,7 @@ using Atomex.Client.Desktop.Dialogs.Views;
 using Atomex.Client.Desktop.Services;
 using Atomex.Client.Desktop.ViewModels;
 using Atomex.Client.Desktop.Views;
+using Atomex.Web;
 using Avalonia;
 using Avalonia.Input.Platform;
 using Avalonia.Controls.ApplicationLifetimes;
@@ -92,7 +93,7 @@ namespace Atomex.Client.Desktop
             }
 
             AtomexApp.Start();
-
+            
             base.OnFrameworkInitializationCompleted();
         }
 

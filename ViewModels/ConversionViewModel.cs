@@ -18,6 +18,8 @@ using Atomex.Client.Desktop.Properties;
 using Atomex.Client.Desktop.ViewModels.Abstract;
 using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
 using Atomex.Swaps.Helpers;
+using Atomex.Wallet.Abstract;
+using Avalonia;
 using Avalonia.Threading;
 using ReactiveUI;
 
@@ -106,9 +108,9 @@ namespace Atomex.Client.Desktop.ViewModels
             }
         }
 
-        protected Currency _fromCurrency;
+        protected CurrencyConfig _fromCurrency;
 
-        public virtual Currency FromCurrency
+        public virtual CurrencyConfig FromCurrency
         {
             get => _fromCurrency;
             set
@@ -151,9 +153,9 @@ namespace Atomex.Client.Desktop.ViewModels
             }
         }
 
-        private Currency _toCurrency;
+        private CurrencyConfig _toCurrency;
 
-        public Currency ToCurrency
+        public CurrencyConfig ToCurrency
         {
             get => _toCurrency;
             set
@@ -726,7 +728,7 @@ namespace Atomex.Client.Desktop.ViewModels
             ToCurrencyIndex = ToCurrencies.IndexOf(toCurrencyVm);
         });
 
-        public void SetFromCurrency(Currency fromCurrency)
+        public void SetFromCurrency(CurrencyConfig fromCurrency)
         {
             var fromCurrencyVm = FromCurrencies
                 .FirstOrDefault(c => c?.Currency?.Name == fromCurrency?.Name);
@@ -735,7 +737,7 @@ namespace Atomex.Client.Desktop.ViewModels
 
         private void SubscribeToServices()
         {
-            App.TerminalChanged += OnTerminalChangedEventHandler;
+            App.AtomexClientChanged += OnTerminalChangedEventHandler;
 
             if (App.HasQuotesProvider)
                 App.QuotesProvider.QuotesUpdated += OnBaseQuotesUpdatedEventHandler;
@@ -831,7 +833,8 @@ namespace Atomex.Client.Desktop.ViewModels
                 return;
 #endif
             var walletAddress = await App.Account
-                .GetRedeemAddressAsync(ToCurrency.Name);
+                .GetCurrencyAccount<ILegacyCurrencyAccount>(ToCurrency.Name)
+                .GetRedeemAddressAsync();
 
             _estimatedRedeemFee = await ToCurrency
                 .GetEstimatedRedeemFeeAsync(walletAddress, withRewardForRedeem: false);
@@ -844,18 +847,19 @@ namespace Atomex.Client.Desktop.ViewModels
                     walletAddress: walletAddress);
 
             _hasRewardForRedeem = _rewardForRedeem != 0;
-
+            
             await Dispatcher.UIThread.InvokeAsync(() =>
             {
                 OnPropertyChanged(nameof(EstimatedRedeemFee));
                 OnPropertyChanged(nameof(RewardForRedeem));
                 OnPropertyChanged(nameof(HasRewardForRedeem));
+
             }, DispatcherPriority.Background);
         }
 
-        private void OnTerminalChangedEventHandler(object sender, TerminalChangedEventArgs args)
+        private void OnTerminalChangedEventHandler(object sender, AtomexClientChangedEventArgs args)
         {
-            var terminal = args.Terminal;
+            var terminal = args.AtomexClient;
 
             if (terminal?.Account == null)
                 return;
@@ -870,7 +874,6 @@ namespace Atomex.Client.Desktop.ViewModels
 
             FromCurrencies = _currencyViewModels.ToList();
 
-
             var fromCurrencyVm = FromCurrencies
                 .FirstOrDefault(c => c.Currency.Name == "BTC");
             FromCurrencyIndex = FromCurrencies.IndexOf(fromCurrencyVm);
@@ -878,8 +881,7 @@ namespace Atomex.Client.Desktop.ViewModels
             var toCurrencyVm = ToCurrencies
                 .FirstOrDefault(c => c.Currency.Name == "LTC");
             ToCurrencyIndex = ToCurrencies.IndexOf(toCurrencyVm);
-
-
+            
             OnSwapEventHandler(this, null);
         }
 
@@ -1141,8 +1143,8 @@ namespace Atomex.Client.Desktop.ViewModels
 
         private void DesignerMode()
         {
-            var btc = DesignTime.Currencies.Get<Bitcoin>("BTC");
-            var ltc = DesignTime.Currencies.Get<Litecoin>("LTC");
+            var btc = DesignTime.Currencies.Get<BitcoinConfig>("BTC");
+            var ltc = DesignTime.Currencies.Get<LitecoinConfig>("LTC");
 
             _currencyViewModels = new List<CurrencyViewModel>
             {

@@ -56,10 +56,10 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         }
 
         protected IAtomexApp App { get; }
-        private Action<Currency> SetConversionTab { get;  }
+        private Action<CurrencyConfig> SetConversionTab { get;  }
 
         public string Header => CurrencyViewModel.Header;
-        public Currency Currency => CurrencyViewModel.Currency;
+        public CurrencyConfig Currency => CurrencyViewModel.Currency;
 
         public IBrush Background => IsSelected
             ? CurrencyViewModel.IconBrush
@@ -107,8 +107,8 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
         public WalletViewModel(
             IAtomexApp app,
-            Action<Currency> setConversionTab,
-            Currency currency)
+            Action<CurrencyConfig> setConversionTab,
+            CurrencyConfig currency)
         {
             App = app ?? throw new ArgumentNullException(nameof(app));
             SetConversionTab = setConversionTab ?? throw new ArgumentNullException(nameof(setConversionTab));
@@ -158,9 +158,9 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                     {
                         Transactions = new ObservableCollection<TransactionViewModel>(
                             transactions.Select(t => TransactionViewModelCreator
-                                    .CreateViewModel(t))
+                                    .CreateViewModel(t, Currency))
                                 .ToList()
-                                .SortList((t1, t2) => t2.LocalTime.CompareTo(t1.LocalTime))
+                                .SortList((t1, t2) => t2.Time.CompareTo(t1.Time))
                                 .ForEachDo(t =>
                                 {
                                     t.UpdateClicked += UpdateTransactonEventHandler;
@@ -213,7 +213,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
         private void OnReceiveClick()
         {
-            var receiveViewModel = ReceiveViewModelCreator.CreateViewModel(App, Currency);
+            var receiveViewModel = new ReceiveViewModel(App, Currency);
             Desktop.App.DialogService.Show(receiveViewModel);
         }
 
@@ -272,7 +272,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
             try
             {
-                var txId = $"{args.Transaction.Id}:{args.Transaction.Currency.Name}";
+                var txId = $"{args.Transaction.Id}:{args.Transaction.Currency}";
 
                 var isRemoved = await App.Account
                     .RemoveTransactionAsync(txId);

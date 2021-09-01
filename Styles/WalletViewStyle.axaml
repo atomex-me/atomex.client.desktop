@@ -149,11 +149,11 @@
                 <TextBlock Text="{Binding Description}"
                            Margin="0 0 0 2"/>
                 <StackPanel Orientation="Horizontal">
-                    <TextBlock Text="{Binding Direction}" 
-                               FontSize="12" 
+                    <TextBlock Text="{Binding Direction}"
+                               FontSize="12"
                                Foreground="Gray"/>
-                    <TextBlock Text="{Binding Alias}" 
-                               FontSize="12" 
+                    <TextBlock Text="{Binding Alias}"
+                               FontSize="12"
                                Foreground="{StaticResource NegativeAmountBrush}"/>
                 </StackPanel>
             </StackPanel>

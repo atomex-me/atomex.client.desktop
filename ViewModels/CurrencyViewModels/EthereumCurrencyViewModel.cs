@@ -7,7 +7,7 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
 {
     public class EthereumCurrencyViewModel : CurrencyViewModel
     {
-        public EthereumCurrencyViewModel(Currency currency)
+        public EthereumCurrencyViewModel(CurrencyConfig currency)
             : base(currency)
         {
             Header              = Currency.Description;

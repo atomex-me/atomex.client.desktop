@@ -1,8 +1,13 @@
 ﻿using System;
+using System.Linq;
 using System.Windows.Input;
+using Atomex.Blockchain.Tezos;
 using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.Controls;
 using Atomex.Core;
+using Atomex.TezosTokens;
+using Atomex.Wallet.Abstract;
+using Atomex.Wallet.Tezos;
 using ReactiveUI;
 using Serilog;
 
@@ -11,8 +16,8 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
     public class SendConfirmationViewModel : ViewModelBase
     {
         public ViewModelBase BackView;
-
-        public Currency Currency { get; set; }
+        public CurrencyConfig Currency { get; set; }
+        public string From { get; set; }
         public string To { get; set; }
         public string CurrencyFormat { get; set; }
         public string BaseCurrencyFormat { get; set; }
@@ -27,6 +32,9 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         public string BaseCurrencyCode { get; set; }
         public string FeeCurrencyCode { get; set; }
         public string FeeCurrencyFormat { get; set; }
+        public string TokenContract { get; set; }
+        public decimal TokenId { get; set; }
+        public string TokenType { get; set; }
 
         private ICommand _backCommand;
 
@@ -48,21 +56,67 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
         private async void Send()
         {
-            var account = App.AtomexApp.Account;
-
             try
             {
                 App.DialogService.Show(new SendingViewModel());
-                
-                var error = await account
-                    .SendAsync(Currency.Name, To, Amount, Fee, FeePrice, UseDeafultFee);
+
+                Error error;
+
+                if (From != null && TokenContract != null) // tezos token sending
+                {
+                    var tokenAddress = await TezosTokensSendViewModel.GetTokenAddressAsync(
+                        account: App.AtomexApp.Account,
+                        address: From,
+                        tokenContract: TokenContract,
+                        tokenId: TokenId,
+                        tokenType: TokenType);
+
+                    if (tokenAddress.Currency == "FA12")
+                    {
+                        var currencyName = App.AtomexApp.Account.Currencies
+                            .FirstOrDefault(c => c is Fa12Config fa12 && fa12.TokenContractAddress == TokenContract)
+                            ?.Name ?? "FA12";
+
+                        var tokenAccount = App.AtomexApp.Account
+                            .GetTezosTokenAccount<Fa12Account>(currencyName, TokenContract, TokenId);
+
+                        error = await tokenAccount
+                            .SendAsync(new WalletAddress[] { tokenAddress }, To, Amount, Fee, FeePrice, UseDeafultFee);
+                    }
+                    else
+                    {
+                        var tokenAccount = App.AtomexApp.Account
+                            .GetTezosTokenAccount<Fa2Account>("FA2", TokenContract, TokenId);
+
+                        var decimals = tokenAddress.TokenBalance.Decimals;
+                        var amount = Amount * (decimal)Math.Pow(10, decimals);
+                        var fee = (int)Fee.ToMicroTez();
+
+                        error = await tokenAccount.SendAsync(
+                            from: From,
+                            to: To,
+                            amount: amount,
+                            tokenContract: TokenContract,
+                            tokenId: (int)TokenId,
+                            fee: fee,
+                            useDefaultFee: UseDeafultFee);
+                    }
+                }
+                else
+                {
+                    var account = App.AtomexApp.Account
+                        .GetCurrencyAccount<ILegacyCurrencyAccount>(Currency.Name);
+
+                    error = await account
+                        .SendAsync(To, Amount, Fee, FeePrice, UseDeafultFee);
+                }
 
                 if (error != null)
                 {
                     App.DialogService.Show(MessageViewModel.Error(
                         text: error.Description,
-                        backAction: () => Desktop.App.DialogService.Show(this)));
-                    
+                        backAction: () => App.DialogService.Show(this)));
+
                     return;
                 }
 

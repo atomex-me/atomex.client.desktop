@@ -14,7 +14,7 @@ namespace Atomex.Client.Desktop.ViewModels
     public class WalletsViewModel : ViewModelBase
     {
         private IAtomexApp App { get; }
-        private Action<Currency> SetConversionTab { get; }
+        private Action<CurrencyConfig> SetConversionTab { get; }
 
         private ObservableCollection<WalletViewModel> _wallets;
 
@@ -55,7 +55,7 @@ namespace Atomex.Client.Desktop.ViewModels
 #endif
         }
 
-        public WalletsViewModel(IAtomexApp app,  Action<Currency> setConversionTab)
+        public WalletsViewModel(IAtomexApp app,  Action<CurrencyConfig> setConversionTab)
         {
             App = app ?? throw new ArgumentNullException(nameof(app));
             SetConversionTab = setConversionTab;
@@ -65,14 +65,14 @@ namespace Atomex.Client.Desktop.ViewModels
 
         private void SubscribeToServices()
         {
-            App.TerminalChanged += OnTerminalChangedEventHandler;
+            App.AtomexClientChanged += OnTerminalChangedEventHandler;
         }
 
-        private void OnTerminalChangedEventHandler(object sender, TerminalChangedEventArgs e)
+        private void OnTerminalChangedEventHandler(object sender, AtomexClientChangedEventArgs e)
         {
-            Wallets = e.Terminal?.Account != null
+            Wallets = e.AtomexClient?.Account != null
                 ? new ObservableCollection<WalletViewModel>(
-                    e.Terminal.Account.Currencies.Select(currency => WalletViewModelCreator.CreateViewModel(
+                    e.AtomexClient.Account.Currencies.Select(currency => WalletViewModelCreator.CreateViewModel(
                         app: App,
                         setConversionTab: SetConversionTab,
                         currency: currency)))

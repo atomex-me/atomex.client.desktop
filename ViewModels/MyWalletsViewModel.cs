@@ -34,7 +34,7 @@ namespace Atomex.Client.Desktop.ViewModels
         {
             AtomexApp = app ?? throw new ArgumentNullException(nameof(app));
             Wallets = WalletInfo.AvailableWallets();
-            AtomexApp.TerminalChanged += OnTerminalChangedEventHandler;
+            AtomexApp.AtomexClientChanged += OnTerminalChangedEventHandler;
 
             ShowContent += showContent;
         }
@@ -74,7 +74,7 @@ namespace Atomex.Client.Desktop.ViewModels
                     symbolsProvider: AtomexApp.SymbolsProvider,
                     quotesProvider: AtomexApp.QuotesProvider);
 
-                AtomexApp.UseTerminal(atomexClient, restart: true);
+                AtomexApp.UseAtomexClient(atomexClient, restart: true);
             };
 
 
@@ -87,13 +87,13 @@ namespace Atomex.Client.Desktop.ViewModels
             App.DialogService.Show(new RestoreDialogViewModel(AtomexApp, xtzCurrencies));
         }
 
-        private void OnTerminalChangedEventHandler(object sender, TerminalChangedEventArgs args)
+        private void OnTerminalChangedEventHandler(object sender, AtomexClientChangedEventArgs args)
         {
-            var terminal = args.Terminal;
+            var terminal = args.AtomexClient;
 
             if (terminal?.Account == null)
             {
-                AtomexApp.TerminalChanged -= OnTerminalChangedEventHandler;
+                AtomexApp.AtomexClientChanged -= OnTerminalChangedEventHandler;
                 return;
             }
 

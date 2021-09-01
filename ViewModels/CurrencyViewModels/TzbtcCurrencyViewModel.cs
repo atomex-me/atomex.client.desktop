@@ -8,7 +8,7 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
 {
     public class TzbtcCurrencyViewModel : CurrencyViewModel
     {
-        public TzbtcCurrencyViewModel(Currency currency)
+        public TzbtcCurrencyViewModel(CurrencyConfig currency)
             : base(currency)
         {
             Header              = Currency.Description;

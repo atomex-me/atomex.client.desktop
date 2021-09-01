@@ -24,11 +24,11 @@ namespace Atomex.Client.Desktop.Controls
 
             switch (tx.Currency)
             {
-                case BitcoinBasedCurrency:
+                case BitcoinBasedConfig:
                     return App.TemplateService.GetTxDescriptionTemplate(TxDescriptionTemplate.BtcBasedDescriptionTemplate);
-                case Tezos:
+                case TezosConfig:
                     return App.TemplateService.GetTxDescriptionTemplate(TxDescriptionTemplate.XtzAdditionalDescriptionTemplate);
-                case Ethereum:
+                case EthereumConfig:
                     return App.TemplateService.GetTxDescriptionTemplate(TxDescriptionTemplate.EthAdditionalDescriptionTemplate);
                 default:
                     return App.TemplateService.GetTxDescriptionTemplate(TxDescriptionTemplate.BtcBasedDescriptionTemplate);
