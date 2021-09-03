@@ -34,7 +34,6 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         }
 
         private int _currencyIndex;
-
         public int CurrencyIndex
         {
             get => _currencyIndex;
@@ -379,8 +378,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 .FirstOrDefault(c => c.Currency.Name == currency.Name);
 
             CurrencyIndex = FromCurrencies.IndexOf(CurrencyVM);
-
-
+            
             UseDefaultFee = true; // use default fee by default
 
             SubscribeToServices();

@@ -37,6 +37,19 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 OnPropertyChanged(nameof(FromAddresses));
             }
         }
+        
+        private int _fromIndex;
+        public int FromIndex
+        {
+            get => _fromIndex;
+            set
+            {
+                _fromIndex = value;
+                OnPropertyChanged(nameof(FromIndex));
+
+                From = FromAddresses.ElementAt(_fromIndex).Address;
+            }
+        }
 
         private string _from;
         public string From
@@ -119,16 +132,23 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             get => _isAmountUpdating;
             set { _isAmountUpdating = value; OnPropertyChanged(nameof(IsAmountUpdating)); }
         }
-
+        
         public string AmountString
         {
             get => Amount.ToString(CurrencyFormat, CultureInfo.InvariantCulture);
             set
             {
-                if (!decimal.TryParse(value, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out var amount))
+                if (!decimal.TryParse(value, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture,
+                    out var amount))
+                {
+                    if (amount == 0)
+                        Amount = amount;
+                    OnPropertyChanged(nameof(AmountString));
                     return;
+                }
 
                 Amount = amount.TruncateByFormat(CurrencyFormat);
+                OnPropertyChanged(nameof(AmountString));
             }
         }
 
@@ -152,9 +172,15 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             set
             {
                 if (!decimal.TryParse(value, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out var fee))
+                {
+                    if (fee == 0)
+                        Fee = fee;
+                    OnPropertyChanged(nameof(FeeString));
                     return;
+                }
 
                 Fee = fee.TruncateByFormat(FeeCurrencyFormat);
+                OnPropertyChanged(nameof(FeeString));
             }
         }
 
@@ -619,8 +645,13 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             }
 
             OnPropertyChanged(nameof(FromAddresses));
-
-            From = tempFrom;
+            
+            // From = tempFrom;
+            
+            var walletAddressViewModel = FromAddresses
+                .FirstOrDefault(a => a.Address == tempFrom);
+            
+            FromIndex = FromAddresses.IndexOf(walletAddressViewModel);
         }
 
         private async void UpdateCurrencyCode()
