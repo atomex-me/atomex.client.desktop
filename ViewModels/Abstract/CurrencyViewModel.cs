@@ -155,7 +155,7 @@ namespace Atomex.Client.Desktop.ViewModels.Abstract
             return $"{PathToImages}/{imageName}";
         }
         
-        public IBitmap GetBitmap(string uri)
+        public static IBitmap GetBitmap(string uri)
         {
             var assets = AvaloniaLocator.Current.GetService<IAssetLoader>();
             var bitmap = new Bitmap(assets.Open(new Uri(uri)));

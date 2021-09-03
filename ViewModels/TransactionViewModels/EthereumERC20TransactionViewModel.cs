@@ -17,6 +17,7 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
         public bool IsInternal { get; set; }
         public string FromExplorerUri => $"{Currency.AddressExplorerUri}{From}";
         public string ToExplorerUri => $"{Currency.AddressExplorerUri}{To}";
+        public string Alias { get; set; }
 
         public EthereumERC20TransactionViewModel()
         {
@@ -37,6 +38,16 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
             GasLimit   = (decimal)tx.GasLimit;
             GasUsed    = (decimal)tx.GasUsed;
             IsInternal = tx.IsInternal;
+            
+            if (Amount <= 0)
+            {
+                Alias = tx.To;
+            }
+
+            if (Amount > 0)
+            {
+                Alias = tx.From;
+            }
         }
 
         public static decimal GetAmount(

@@ -113,11 +113,11 @@
                       DataType="viewModels:EthereumTransactionViewModel">
             <views:EthereumTransactionDetailsView />
         </DataTemplate>
+        
         <DataTemplate x:Key="EthereumERC20TransactionDetailsTemplate"
                       DataType="viewModels:EthereumERC20TransactionViewModel">
             <views:EthereumTransactionDetailsView />
         </DataTemplate>
-
 
         <DataTemplate x:Key="BtcBasedDescriptionTemplate" DataType="viewModels:TransactionViewModel">
             <Border Classes="DGTemplateContainer">

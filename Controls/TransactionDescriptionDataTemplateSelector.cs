@@ -19,6 +19,9 @@ namespace Atomex.Client.Desktop.Controls
 
         private static DataTemplate? GetTemplate(object data)
         {
+            if (data is TezosTokenTransferViewModel)
+                return App.TemplateService.GetTxDescriptionTemplate(TxDescriptionTemplate.XtzAdditionalDescriptionTemplate);
+
             if (!(data is TransactionViewModel tx))
                 return null;
 

@@ -36,6 +36,9 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
         public string TxExplorerUri => $"{_tezosConfig.TxExplorerUri}{Id}";
         public string FromExplorerUri => $"{_tezosConfig.AddressExplorerUri}{From}";
         public string ToExplorerUri => $"{_tezosConfig.AddressExplorerUri}{To}";
+        
+        public string Alias { get; set; }
+        public string Direction { get; set; }
 
 
         private bool _isExpanded;
@@ -74,6 +77,33 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
                 netAmount: Amount,
                 amountDigits: tx.Token.Decimals,
                 currencyCode: tx.Token.Symbol);
+            
+            if (!string.IsNullOrEmpty(tx.Alias))
+            {
+                Alias = tx.Alias;
+            }
+            else
+            {
+                if (Amount <= 0)
+                {
+                    Alias = tx.To;
+                }
+
+                if (Amount > 0)
+                {
+                    Alias = tx.From;
+                }
+            }
+            
+            if (Amount <= 0)
+            {
+                Direction = "To: ";
+            }
+
+            if (Amount > 0)
+            {
+                Direction = "From: ";
+            }
         }
 
         private ICommand _openTxInExplorerCommand;

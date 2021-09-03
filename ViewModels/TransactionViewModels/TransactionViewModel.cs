@@ -36,6 +36,7 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
         public DateTime LocalTime => Time.ToLocalTime();
         public string TxExplorerUri => $"{Currency.TxExplorerUri}{Id}";
         public bool CanBeRemoved { get; set; }
+        public string Direction { get; set; }
 
         private bool _isExpanded;
         public bool IsExpanded
@@ -83,6 +84,16 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
                 netAmount: netAmount,
                 amountDigits: currencyConfig.Digits,
                 currencyCode: currencyConfig.Name);
+            
+            if (Amount <= 0)
+            {
+                Direction = "To: ";
+            }
+
+            if (Amount > 0)
+            {
+                Direction = "From: ";
+            }
         }
 
         private ICommand _openTxInExplorerCommand;

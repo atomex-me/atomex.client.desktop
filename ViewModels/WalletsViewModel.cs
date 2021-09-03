@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using Atomex.Services;
@@ -16,9 +17,9 @@ namespace Atomex.Client.Desktop.ViewModels
         private IAtomexApp App { get; }
         private Action<CurrencyConfig> SetConversionTab { get; }
 
-        private ObservableCollection<WalletViewModel> _wallets;
+        private ObservableCollection<IWalletViewModel> _wallets;
 
-        public ObservableCollection<WalletViewModel> Wallets
+        public ObservableCollection<IWalletViewModel> Wallets
         {
             get => _wallets;
             set
@@ -28,9 +29,9 @@ namespace Atomex.Client.Desktop.ViewModels
             }
         }
 
-        private WalletViewModel _selected;
+        private IWalletViewModel _selected;
 
-        public WalletViewModel Selected
+        public IWalletViewModel Selected
         {
             get => _selected;
             set
@@ -70,14 +71,24 @@ namespace Atomex.Client.Desktop.ViewModels
 
         private void OnTerminalChangedEventHandler(object sender, AtomexClientChangedEventArgs e)
         {
-            Wallets = e.AtomexClient?.Account != null
-                ? new ObservableCollection<WalletViewModel>(
-                    e.AtomexClient.Account.Currencies.Select(currency => WalletViewModelCreator.CreateViewModel(
+            var walletsViewModels = new List<IWalletViewModel>();
+
+            if (e.AtomexClient?.Account != null)
+            {
+                var currenciesViewModels = e.AtomexClient.Account.Currencies
+                    .Select(currency => WalletViewModelCreator.CreateViewModel(
                         app: App,
                         setConversionTab: SetConversionTab,
-                        currency: currency)))
-                : new ObservableCollection<WalletViewModel>();
+                        currency: currency));
 
+                walletsViewModels.AddRange(currenciesViewModels);
+
+                walletsViewModels.Add(new TezosTokensWalletViewModel(
+                    app: App,
+                    setConversionTab: SetConversionTab));
+            }
+
+            Wallets  = new ObservableCollection<IWalletViewModel>(walletsViewModels);
             Selected = Wallets.FirstOrDefault();
         }
 

@@ -731,7 +731,7 @@ namespace Atomex.Client.Desktop.ViewModels
         public void SetFromCurrency(CurrencyConfig fromCurrency)
         {
             var fromCurrencyVm = FromCurrencies
-                .FirstOrDefault(c => c?.Currency?.Name == fromCurrency?.Name);
+                .FirstOrDefault(c => c.Currency?.Name == fromCurrency?.Name);
             FromCurrencyIndex = FromCurrencies.IndexOf(fromCurrencyVm);
         }
 
