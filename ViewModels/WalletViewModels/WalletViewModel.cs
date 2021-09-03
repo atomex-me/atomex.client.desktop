@@ -352,13 +352,13 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             DGSelectedIndex = cellIndex;
         }
 
-        private string _sortInfo;
+        protected string _sortInfo;
         public string SortInfo
         {
             get => _sortInfo;
             set
             {
-                SortType newSortType = SortType.Desc;
+                SortType newSortType = SortType.Asc;
                 if (!String.IsNullOrEmpty(_sortInfo))
                 {
                     var lastSortType = _sortInfo.Split(Convert.ToChar("/"))[1];
@@ -378,7 +378,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             }
         }
 
-        private void SortTransactions(string columnName, SortType sortType)
+        protected virtual void SortTransactions(string columnName, SortType sortType)
         {
             DGSelectedIndex = -1;
             if (columnName.ToLower() == "time" && sortType == SortType.Asc)

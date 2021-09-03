@@ -522,6 +522,9 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
             SelectedTabIndex = tokenContract.IsFa2 ? 0 : 1;
             OnPropertyChanged(nameof(SelectedTabIndex));
+
+            _sortInfo = null;
+            OnPropertyChanged(nameof(SortInfo));
         }
         
         protected override void OnSendClick()
@@ -638,6 +641,56 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             Desktop.App.DialogService.Show(addressesViewModel);
         }
 
+        protected override void SortTransactions(string columnName, SortType sortType)
+        {
+            DGSelectedIndex = -1;
+            if (columnName.ToLower() == "time" && sortType == SortType.Asc)
+            {
+                Transfers = new ObservableCollection<TezosTokenTransferViewModel>(Transfers.OrderBy(tx => tx.LocalTime));
+            }
+
+            if (columnName.ToLower() == "time" && sortType == SortType.Desc)
+            {
+                Transfers =
+                    new ObservableCollection<TezosTokenTransferViewModel>(Transfers.OrderByDescending(tx => tx.LocalTime));
+            }
+
+            if (columnName.ToLower() == "amount" && sortType == SortType.Asc)
+            {
+                Transfers = new ObservableCollection<TezosTokenTransferViewModel>(Transfers.OrderBy(tx => tx.Amount));
+            }
+
+            if (columnName.ToLower() == "amount" && sortType == SortType.Desc)
+            {
+                Transfers =
+                    new ObservableCollection<TezosTokenTransferViewModel>(Transfers.OrderByDescending(tx => tx.Amount));
+            }
+
+            if (columnName.ToLower() == "state" && sortType == SortType.Asc)
+            {
+                Transfers = new ObservableCollection<TezosTokenTransferViewModel>(Transfers.OrderBy(tx => tx.State));
+            }
+
+            if (columnName.ToLower() == "state" && sortType == SortType.Desc)
+            {
+                Transfers =
+                    new ObservableCollection<TezosTokenTransferViewModel>(Transfers.OrderByDescending(tx => tx.State));
+            }
+
+            if (columnName.ToLower() == "type" && sortType == SortType.Asc)
+            {
+                Transfers = new ObservableCollection<TezosTokenTransferViewModel>(Transfers.OrderBy(tx => tx.Type));
+            }
+
+            if (columnName.ToLower() == "type" && sortType == SortType.Desc)
+            {
+                Transfers =
+                    new ObservableCollection<TezosTokenTransferViewModel>(Transfers.OrderByDescending(tx => tx.Type));
+            }
+            
+            OnPropertyChanged(nameof(Transfers));
+        }
+        
         private void DesignerMode()
         {
             TokensContracts = new ObservableCollection<TezosTokenContractViewModel>
