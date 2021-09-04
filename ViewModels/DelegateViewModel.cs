@@ -401,7 +401,7 @@ namespace Atomex.Client.Desktop.ViewModels
                         })
                         .ToList();
 
-                    bakers.ForEach(bakerVM => Desktop.App.ImageService.LoadImage(bakerVM.Logo));
+                    bakers.ForEach(bakerVM => Desktop.App.ImageService.LoadImageFromUrl(bakerVM.Logo));
                 });
             }
             catch (Exception e)

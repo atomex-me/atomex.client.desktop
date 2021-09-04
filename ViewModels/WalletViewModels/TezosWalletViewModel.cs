@@ -131,7 +131,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                     
                     _ = Task.Run(() =>
                     {
-                        Desktop.App.ImageService.LoadImage(baker.Logo);
+                        _ = Desktop.App.ImageService.LoadImageFromUrl(baker.Logo);
                     });
                 }
 

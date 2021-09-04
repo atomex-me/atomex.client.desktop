@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Globalization;
 using System.Linq;
@@ -12,11 +13,9 @@ using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using System.Windows.Input;
 using Avalonia.Threading;
-
 using Serilog;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-
 using Atomex.Blockchain.Tezos;
 using Atomex.Common;
 using Atomex.Client.Desktop.Common;
@@ -44,64 +43,56 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         public string Address { get; set; }
 
         private bool _isExpanded;
+
         public bool IsExpanded
         {
             get => _isExpanded;
             set
             {
-                _isExpanded = value; OnPropertyChanged(nameof(IsExpanded));
+                _isExpanded = value;
+                OnPropertyChanged(nameof(IsExpanded));
             }
         }
 
-        // public BitmapImage TokenPreview
-        // {
-        //     get
-        //     {
-        //         if (_isPreviewDownloading)
-        //             return null;
-        //
-        //         foreach (var url in GetTokenPreviewUrls())
-        //         {
-        //             var previewBytesFromCache = FileCache.Get(url, TimeSpan.FromHours(48));
-        //
-        //             if (previewBytesFromCache == null)
-        //             {
-        //                 // start async download
-        //                 _ = Task.Run(async () =>
-        //                 {
-        //                     await FromUrlAsync(url)
-        //                         .ConfigureAwait(false);
-        //                 });
-        //
-        //                 return null;
-        //             }
-        //
-        //             // skip url without content
-        //             if (!previewBytesFromCache.Any())
-        //                 continue;
-        //
-        //             using var previewStream = new MemoryStream(previewBytesFromCache);
-        //
-        //             var preview = new BitmapImage();
-        //
-        //             preview.BeginInit();
-        //             preview.CacheOption = BitmapCacheOption.OnLoad;
-        //             preview.StreamSource = previewStream;
-        //             preview.EndInit();
-        //
-        //             return preview;
-        //         }
-        //
-        //
-        //         return null;
-        //     }
-        // }
+        public IBitmap TokenPreview
+        {
+            get
+            {
+                if (_isPreviewDownloading)
+                    return null;
+
+                foreach (var url in GetTokenPreviewUrls())
+                {
+                    if (!App.ImageService.GetImageLoaded(url))
+                    {
+                        // start async download
+                        _ = Task.Run(async () =>
+                        {
+                            _isPreviewDownloading = true;
+                            await App.ImageService.LoadImageFromUrl(url, async () =>
+                                {
+                                    _isPreviewDownloading = false;
+                                    await Dispatcher.UIThread.InvokeAsync(() => { OnPropertyChanged(nameof(TokenPreview)); });
+                                })
+                                .ConfigureAwait(false);
+                        });
+
+                        return null;
+                    }
+
+                    return App.ImageService.GetImage(url);
+                }
+
+                return null;
+            }
+        }
 
         public string Balance => TokenBalance.Balance != "1"
             ? $"{TokenBalance.GetTokenBalance().ToString(CultureInfo.InvariantCulture)}  {TokenBalance.Symbol}"
             : "";
 
         private ICommand _openInBrowser;
+
         public ICommand OpenInBrowser => _openInBrowser ??= ReactiveCommand.Create(() =>
         {
             var assetUrl = AssetUrl;
@@ -118,49 +109,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             ? $"http://ipfs.io/ipfs/{RemoveIpfsPrefix(TokenBalance.ArtifactUri)}"
             : null;
 
-        private async Task FromUrlAsync(string url)
-        {
-            _isPreviewDownloading = true;
-
-            try
-            {
-                var response = await HttpHelper.HttpClient
-                    .GetAsync(url)
-                    .ConfigureAwait(false);
-
-                if (response.IsSuccessStatusCode)
-                {
-                    var previewBytes = await response.Content
-                        .ReadAsByteArrayAsync()
-                        .ConfigureAwait(false);
-
-                    // FileCache.Set(url, previewBytes);
-                }
-                else if (response.StatusCode == HttpStatusCode.BadGateway ||
-                         response.StatusCode == HttpStatusCode.GatewayTimeout ||
-                         response.StatusCode == HttpStatusCode.InternalServerError ||
-                         response.StatusCode == HttpStatusCode.ServiceUnavailable)
-                {
-                    // FileCache.Set(url, new byte[0]);
-                }
-                else
-                {
-                    // FileCache.Set(url, new byte[0]);
-                }
-            }
-            catch
-            {
-                // FileCache.Set(url, new byte[0]);
-            }
-
-            _isPreviewDownloading = false;
-
-            await Dispatcher.UIThread.InvokeAsync(() =>
-                {
-                    // OnPropertyChanged(nameof(TokenPreview));
-                });
-        }
-
+        
         public IEnumerable<string> GetTokenPreviewUrls()
         {
             yield return $"https://d38roug276qjor.cloudfront.net/{TokenBalance.Contract}/{TokenBalance.TokenId}.png";
@@ -183,28 +132,28 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         public Action<TezosTokenViewModel> SendCallback;
 
         private ICommand _send;
-        public ICommand Send => _send ??= ReactiveCommand.Create(() =>
-        {
-            SendCallback?.Invoke(this);
-        });
+        public ICommand Send => _send ??= ReactiveCommand.Create(() => { SendCallback?.Invoke(this); });
 
         public string AddressExplorerUri => TezosConfig != null
             ? $"{TezosConfig.AddressExplorerUri}{Address}"
             : "";
 
         private ICommand _openAddressInExplorerCommand;
-        public ICommand OpenAddressInExplorerCommand => _openAddressInExplorerCommand ??= ReactiveCommand.Create<string>((address) =>
-        {
-            if (TezosConfig == null)
-                return;
 
-            if (Uri.TryCreate($"{TezosConfig.AddressExplorerUri}{address}", UriKind.Absolute, out var uri))
-                Process.Start(uri.ToString());
-            else
-                Log.Error("Invalid uri for address explorer");
-        });
+        public ICommand OpenAddressInExplorerCommand => _openAddressInExplorerCommand ??=
+            ReactiveCommand.Create<string>((address) =>
+            {
+                if (TezosConfig == null)
+                    return;
+
+                if (Uri.TryCreate($"{TezosConfig.AddressExplorerUri}{address}", UriKind.Absolute, out var uri))
+                    Process.Start(uri.ToString());
+                else
+                    Log.Error("Invalid uri for address explorer");
+            });
 
         private ICommand _copyAddressCommand;
+
         public ICommand CopyAddressCommand => _copyAddressCommand ??= ReactiveCommand.Create<string>((s) =>
         {
             try
@@ -222,12 +171,43 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
     {
         public TokenContract Contract { get; set; }
         public string IconUrl => $"https://services.tzkt.io/v1/avatars/{Contract.Address}";
+        public Action PreviewLoadedCallback { get; set; }
+        private bool _isPreviewDownloading;
+        public IBitmap IconPreview
+        {
+            get
+            {
+                if (_isPreviewDownloading)
+                    return null;
+                
+                if (!App.ImageService.GetImageLoaded(IconUrl))
+                {
+                    // start async download
+                    _ = Task.Run(async () =>
+                    {
+                        _isPreviewDownloading = true;
+                        await App.ImageService.LoadImageFromUrl(IconUrl, async () =>
+                            {
+                                _isPreviewDownloading = false;
+                                await Dispatcher.UIThread.InvokeAsync(() => { OnPropertyChanged(nameof(IconPreview)); });
+                            })
+                            .ConfigureAwait(false);
+                    });
+
+                    return null;
+                }
+
+                return App.ImageService.GetImage(IconUrl);
+            }
+        }
+
         public bool IsFa12 => Contract.GetContractType() == "FA12";
         public bool IsFa2 => Contract.GetContractType() == "FA2";
 
         private bool _isTriedToGetFromTzkt;
 
         private string _name;
+
         public string Name
         {
             get
@@ -247,7 +227,6 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         }
 
         public bool HasName => !string.IsNullOrEmpty(_name);
-
         private async Task TryGetAliasAsync()
         {
             try
@@ -271,10 +250,11 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                     _name = alias;
 
                 await Dispatcher.UIThread.InvokeAsync(() =>
-                    {
-                        OnPropertyChanged(nameof(Name));
-                        OnPropertyChanged(nameof(HasName));
-                    });
+                {
+                    OnPropertyChanged(nameof(Name));
+                    OnPropertyChanged(nameof(HasName));
+                    PreviewLoadedCallback?.Invoke();
+                });
             }
             catch (Exception e)
             {
@@ -293,6 +273,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         public ObservableCollection<TezosTokenTransferViewModel> Transfers { get; set; }
 
         private TezosTokenContractViewModel _tokenContract;
+
         public TezosTokenContractViewModel TokenContract
         {
             get => _tokenContract;
@@ -317,7 +298,38 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         public bool IsFa2 => TokenContract?.IsFa2 ?? false;
         public string TokenContractAddress => TokenContract?.Contract?.Address ?? "";
         public string TokenContractName => TokenContract?.Name ?? "";
+        
         public string TokenContractIconUrl => TokenContract?.IconUrl;
+        
+        private bool _isPreviewDownloading;
+        public IBitmap TokenContractIconPreview
+        {
+            get
+            {
+                if (_isPreviewDownloading)
+                    return null;
+                
+                if (!Desktop.App.ImageService.GetImageLoaded(TokenContractIconUrl))
+                {
+                    // start async download
+                    _ = Task.Run(async () =>
+                    {
+                        _isPreviewDownloading = true;
+                        await Desktop.App.ImageService.LoadImageFromUrl(TokenContractIconUrl, async () =>
+                            {
+                                _isPreviewDownloading = false;
+                                await Dispatcher.UIThread.InvokeAsync(() => { OnPropertyChanged(nameof(TokenContractIconPreview)); });
+                            })
+                            .ConfigureAwait(false);
+                    });
+
+                    return null;
+                }
+
+                return Desktop.App.ImageService.GetImage(TokenContractIconUrl);
+            }
+        }
+
         public bool IsConvertable => App.Account.Currencies
             .Any(c => c is Fa12Config fa12 && fa12.TokenContractAddress == TokenContractAddress);
 
@@ -353,7 +365,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
         protected override void SubscribeToServices()
         {
-            App.AtomexClientChanged    += OnAtomexClientChanged;
+            App.AtomexClientChanged += OnAtomexClientChanged;
             App.Account.BalanceUpdated += OnBalanceUpdatedEventHandler;
         }
 
@@ -376,11 +388,8 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             {
                 if (Currencies.IsTezosToken(args.Currency))
                 {
-                    await Dispatcher.UIThread.InvokeAsync(async () =>
-                    {
-                        await ReloadTokenContractsAsync();
-
-                    }, DispatcherPriority.Background);
+                    await Dispatcher.UIThread.InvokeAsync(async () => { await ReloadTokenContractsAsync(); },
+                        DispatcherPriority.Background);
                 }
             }
             catch (Exception e)
@@ -392,10 +401,14 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         private async Task ReloadTokenContractsAsync()
         {
             var tokensContractsViewModels = (await App.Account
-                .GetCurrencyAccount<TezosAccount>(TezosConfig.Xtz)
-                .DataRepository
-                .GetTezosTokenContractsAsync())
-                .Select(c => new TezosTokenContractViewModel { Contract = c });
+                    .GetCurrencyAccount<TezosAccount>(TezosConfig.Xtz)
+                    .DataRepository
+                    .GetTezosTokenContractsAsync())
+                .Select(c => new TezosTokenContractViewModel
+                {
+                    Contract = c,
+                    PreviewLoadedCallback = () => OnPropertyChanged(nameof(TokenContractName))
+                });
 
             if (TokensContracts != null)
             {
@@ -434,7 +447,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         {
             if (tokenContract == null)
             {
-                Tokens    = new ObservableCollection<TezosTokenViewModel>();
+                Tokens = new ObservableCollection<TezosTokenViewModel>();
                 Transfers = new ObservableCollection<TezosTokenTransferViewModel>();
 
                 OnPropertyChanged(nameof(Tokens));
@@ -462,8 +475,8 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
                 var tezosTokenConfig = App.Account.Currencies
                     .FirstOrDefault(c => Currencies.IsTezosToken(c.Name) &&
-                        c is Fa12Config fa12Config &&
-                        fa12Config.TokenContractAddress == tokenContract.Contract.Address);
+                                         c is Fa12Config fa12Config &&
+                                         fa12Config.TokenContractAddress == tokenContract.Contract.Address);
 
                 Balance = tokenAccount
                     .GetBalance()
@@ -482,8 +495,8 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                 OnPropertyChanged(nameof(BalanceCurrencyCode));
 
                 Transfers = new ObservableCollection<TezosTokenTransferViewModel>((await tokenAccount
-                    .DataRepository
-                    .GetTezosTokenTransfersAsync(tokenContract.Contract.Address, offset: 0, limit: int.MaxValue))
+                        .DataRepository
+                        .GetTezosTokenTransfersAsync(tokenContract.Contract.Address, offset: 0, limit: int.MaxValue))
                     .Select(t => new TezosTokenTransferViewModel(t, tezosConfig))
                     .ToList()
                     .SortList((t1, t2) => t2.Time.CompareTo(t1.Time)));
@@ -500,8 +513,8 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                     .GetTezosTokenAddressesByContractAsync(tokenContract.Contract.Address);
 
                 Transfers = new ObservableCollection<TezosTokenTransferViewModel>((await tezosAccount
-                    .DataRepository
-                    .GetTezosTokenTransfersAsync(tokenContract.Contract.Address,offset: 0, limit: int.MaxValue))
+                        .DataRepository
+                        .GetTezosTokenTransfersAsync(tokenContract.Contract.Address, offset: 0, limit: int.MaxValue))
                     .Select(t => new TezosTokenTransferViewModel(t, tezosConfig))
                     .ToList()
                     .SortList((t1, t2) => t2.Time.CompareTo(t1.Time)));
@@ -510,9 +523,9 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                     .Where(a => a.Balance != 0)
                     .Select(a => new TezosTokenViewModel
                     {
-                        TezosConfig  = tezosConfig,
+                        TezosConfig = tezosConfig,
                         TokenBalance = a.TokenBalance,
-                        Address      = a.Address,
+                        Address = a.Address,
                         SendCallback = SendCallback
                     }));
             }
@@ -522,11 +535,13 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
             SelectedTabIndex = tokenContract.IsFa2 ? 0 : 1;
             OnPropertyChanged(nameof(SelectedTabIndex));
+            
+            OnPropertyChanged(nameof(TokenContractIconPreview));
 
             _sortInfo = null;
             OnPropertyChanged(nameof(SortInfo));
         }
-        
+
         protected override void OnSendClick()
         {
             if (TokenContract?.Contract?.Address == null)
@@ -575,7 +590,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         {
             var currency = App.Account.Currencies
                 .FirstOrDefault(c => c is Fa12Config fa12 && fa12.TokenContractAddress == TokenContractAddress);
-            
+
             SetConversionTab?.Invoke(currency);
         }
 
@@ -587,7 +602,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             IsBalanceUpdating = true;
 
             _cancellation = new CancellationTokenSource();
-            
+
             var updatingModalVM = new TezosTokensScanDialogViewModel();
             updatingModalVM.OnCancel = () => _cancellation.Cancel();
             Desktop.App.DialogService.Show(updatingModalVM);
@@ -609,7 +624,6 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                         App.Account
                             .GetCurrencyAccount<TezosTokenAccount>(currency.Name)
                             .ReloadBalances();
-
             }
             catch (OperationCanceledException)
             {
@@ -635,7 +649,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                 app: App,
                 currency: tezosConfig,
                 tokenContract: TokenContract?.Contract?.Address);
-            
+
             Desktop.App.DialogService.Show(addressesViewModel);
         }
 
@@ -644,13 +658,15 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             DGSelectedIndex = -1;
             if (columnName.ToLower() == "time" && sortType == SortType.Asc)
             {
-                Transfers = new ObservableCollection<TezosTokenTransferViewModel>(Transfers.OrderBy(tx => tx.LocalTime));
+                Transfers =
+                    new ObservableCollection<TezosTokenTransferViewModel>(Transfers.OrderBy(tx => tx.LocalTime));
             }
 
             if (columnName.ToLower() == "time" && sortType == SortType.Desc)
             {
                 Transfers =
-                    new ObservableCollection<TezosTokenTransferViewModel>(Transfers.OrderByDescending(tx => tx.LocalTime));
+                    new ObservableCollection<TezosTokenTransferViewModel>(
+                        Transfers.OrderByDescending(tx => tx.LocalTime));
             }
 
             if (columnName.ToLower() == "amount" && sortType == SortType.Asc)
@@ -685,10 +701,10 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                 Transfers =
                     new ObservableCollection<TezosTokenTransferViewModel>(Transfers.OrderByDescending(tx => tx.Type));
             }
-            
+
             OnPropertyChanged(nameof(Transfers));
         }
-        
+
         private void DesignerMode()
         {
             TokensContracts = new ObservableCollection<TezosTokenContractViewModel>
@@ -697,56 +713,56 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                 {
                     Contract = new TokenContract
                     {
-                        Address     = "KT1K9gCRgaLRFKTErYt1wVxA3Frb9FjasjTV",
-                        Network     = "mainnet",
-                        Name        = "kUSD",
+                        Address = "KT1K9gCRgaLRFKTErYt1wVxA3Frb9FjasjTV",
+                        Network = "mainnet",
+                        Name = "kUSD",
                         Description = "FA1.2 Implementation of kUSD",
-                        Interfaces  = new List<string> { "TZIP-007-2021-01-29" }
+                        Interfaces = new List<string> {"TZIP-007-2021-01-29"}
                     }
                 },
                 new TezosTokenContractViewModel
                 {
                     Contract = new TokenContract
                     {
-                        Address     = "KT1PWx2mnDueood7fEmfbBDKx1D9BAnnXitn",
-                        Network     = "mainnet",
-                        Name        = "tzBTC",
+                        Address = "KT1PWx2mnDueood7fEmfbBDKx1D9BAnnXitn",
+                        Network = "mainnet",
+                        Name = "tzBTC",
                         Description = "Wrapped Bitcon",
-                        Interfaces  = new List<string> { "TZIP-7", "TZIP-16", "TZIP-20" }
+                        Interfaces = new List<string> {"TZIP-7", "TZIP-16", "TZIP-20"}
                     }
                 },
                 new TezosTokenContractViewModel
                 {
                     Contract = new TokenContract
                     {
-                        Address     = "KT1G1cCRNBgQ48mVDjopHjEmTN5Sbtar8nn9",
-                        Network     = "mainnet",
-                        Name        = "Hedgehoge",
+                        Address = "KT1G1cCRNBgQ48mVDjopHjEmTN5Sbtar8nn9",
+                        Network = "mainnet",
+                        Name = "Hedgehoge",
                         Description = "such cute, much hedge!",
-                        Interfaces  = new List<string> { "TZIP-007", "TZIP-016" }
+                        Interfaces = new List<string> {"TZIP-007", "TZIP-016"}
                     }
                 },
                 new TezosTokenContractViewModel
                 {
                     Contract = new TokenContract
                     {
-                        Address     = "KT1RJ6PbjHpwc3M5rw5s2Nbmefwbuwbdxton",
-                        Network     = "mainent",
-                        Name        = "hic et nunc NFTs",
+                        Address = "KT1RJ6PbjHpwc3M5rw5s2Nbmefwbuwbdxton",
+                        Network = "mainent",
+                        Name = "hic et nunc NFTs",
                         Description = "NFT token for digital assets.",
-                        Interfaces  = new List<string> { "TZIP-12" }
+                        Interfaces = new List<string> {"TZIP-12"}
                     }
                 }
             };
 
-            _tokenContract = null;// TokensContracts.First();
+            _tokenContract = null; // TokensContracts.First();
 
             var bcdApi = new BcdApi(new BcdApiSettings
             {
-                MaxSize       = 10,
+                MaxSize = 10,
                 MaxTokensSize = 50,
-                Network       = "mainnet",
-                Uri           = "https://api.better-call.dev/v1/"
+                Network = "mainnet",
+                Uri = "https://api.better-call.dev/v1/"
             });
 
             var address = "tz1YS2CmS5o24bDz9XNr84DSczBXuq4oGHxr";

@@ -78,7 +78,7 @@ namespace Atomex.Client.Desktop.ViewModels
 
         public ICommand CopyCommand => _copyCommand ??= ReactiveCommand.Create<string>((s) =>
         {
-            App.Clipboard.SetTextAsync(Address);
+            CopyToClipboard?.Invoke(s);
         });
 
         private ICommand _openInExplorerCommand;
