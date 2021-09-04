@@ -4,9 +4,7 @@ namespace Atomex.Client.Desktop.ViewModels.Abstract
 {
     public interface IConversionViewModel
     {
-        Currency FromCurrency { get; set; }
-        Currency ToCurrency { get; set; }
-
-        public void SetFromCurrency(Currency fromCurrency);
+        CurrencyConfig FromCurrency { get; set; }
+        CurrencyConfig ToCurrency { get; set; }
     }
 }

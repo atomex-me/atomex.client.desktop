@@ -137,7 +137,7 @@ namespace Atomex.Client.Desktop.ViewModels
             ReactiveCommand.Create<string>((id) =>
             {
                 if (Uri.TryCreate($"{BaseUrl}{Id}", UriKind.Absolute, out var uri))
-                    Process.Start(uri.ToString());
+                    App.OpenBrowser(uri.ToString());
                 else
                     Log.Error("Invalid uri for transaction explorer");
             }));

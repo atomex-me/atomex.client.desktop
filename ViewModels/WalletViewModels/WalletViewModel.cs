@@ -29,7 +29,7 @@ using Network = NBitcoin.Network;
 
 namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 {
-    public class WalletViewModel : ViewModelBase
+    public class WalletViewModel : ViewModelBase, IWalletViewModel
     {
         private ObservableCollection<TransactionViewModel> _transactions;
 
@@ -55,11 +55,11 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             }
         }
 
-        protected IAtomexApp App { get; }
-        private Action<Currency> SetConversionTab { get;  }
+        protected IAtomexApp App { get; set; }
+        protected Action<CurrencyConfig> SetConversionTab { get; set; }
 
         public string Header => CurrencyViewModel.Header;
-        public Currency Currency => CurrencyViewModel.Currency;
+        public CurrencyConfig Currency => CurrencyViewModel.Currency;
 
         public IBrush Background => IsSelected
             ? CurrencyViewModel.IconBrush
@@ -70,7 +70,6 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             : CurrencyViewModel.IconMaskBrush;
 
         private bool _isSelected;
-
         public bool IsSelected
         {
             get => _isSelected;
@@ -84,7 +83,6 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         }
 
         private bool _isBalanceUpdating;
-
         public bool IsBalanceUpdating
         {
             get => _isBalanceUpdating;
@@ -95,7 +93,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             }
         }
 
-        private CancellationTokenSource Cancellation { get; set; }
+        protected CancellationTokenSource _cancellation { get; set; }
 
         public WalletViewModel()
         {
@@ -107,12 +105,13 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
         public WalletViewModel(
             IAtomexApp app,
-            Action<Currency> setConversionTab,
-            Currency currency)
+            Action<CurrencyConfig> setConversionTab,
+            CurrencyConfig currency)
         {
             App = app ?? throw new ArgumentNullException(nameof(app));
             SetConversionTab = setConversionTab ?? throw new ArgumentNullException(nameof(setConversionTab));
-            CurrencyViewModel = CurrencyViewModelCreator.CreateViewModel(currency);
+            if (currency != null)
+                CurrencyViewModel = CurrencyViewModelCreator.CreateViewModel(currency);
 
             SubscribeToServices();
 
@@ -120,9 +119,10 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             _ = LoadTransactionsAsync();
         }
 
-        private void SubscribeToServices()
+        protected virtual void SubscribeToServices()
         {
             App.Account.BalanceUpdated += OnBalanceUpdatedEventHandler;
+            App.Account.UnconfirmedTransactionAdded += OnUnconfirmedTransactionAdded;
         }
 
         protected virtual async void OnBalanceUpdatedEventHandler(object sender, CurrencyEventArgs args)
@@ -140,8 +140,24 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                 Log.Error(e, "Account balance updated event handler error");
             }
         }
+        
+        private async void OnUnconfirmedTransactionAdded(object sender, TransactionEventArgs args)
+        {
+            try
+            {
+                if (Currency.Name == args.Transaction.Currency)
+                {
+                    // update transactions list
+                    await LoadTransactionsAsync();
+                }
+            }
+            catch (Exception e)
+            {
+                Log.Error(e, "Account unconfirmed transaction added event handler error");
+            }
+        }
 
-        protected async Task LoadTransactionsAsync()
+        protected virtual async Task LoadTransactionsAsync()
         {
             Log.Debug("LoadTransactionsAsync for {@currency}", Currency.Name);
 
@@ -158,9 +174,9 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                     {
                         Transactions = new ObservableCollection<TransactionViewModel>(
                             transactions.Select(t => TransactionViewModelCreator
-                                    .CreateViewModel(t))
+                                    .CreateViewModel(t, Currency))
                                 .ToList()
-                                .SortList((t1, t2) => t2.LocalTime.CompareTo(t1.LocalTime))
+                                .SortList((t1, t2) => t2.Time.CompareTo(t1.Time))
                                 .ForEachDo(t =>
                                 {
                                     t.UpdateClicked += UpdateTransactonEventHandler;
@@ -180,56 +196,48 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         }
 
         private ICommand _sendCommand;
-        public ICommand SendCommand => _sendCommand ??= (_sendCommand = ReactiveCommand.Create(OnSendClick));
+        public ICommand SendCommand => _sendCommand ??= ReactiveCommand.Create(OnSendClick);
 
         private ICommand _receiveCommand;
-
-        public ICommand ReceiveCommand =>
-            _receiveCommand ??= (_receiveCommand = ReactiveCommand.Create(OnReceiveClick));
+        public ICommand ReceiveCommand => _receiveCommand ??= ReactiveCommand.Create(OnReceiveClick);
 
         private ICommand _convertCommand;
-
-        public ICommand ConvertCommand =>
-            _convertCommand ??= (_convertCommand = ReactiveCommand.Create(OnConvertClick));
+        public ICommand ConvertCommand => _convertCommand ??= ReactiveCommand.Create(OnConvertClick);
 
         private ICommand _updateCommand;
-        public ICommand UpdateCommand => _updateCommand ??= (_updateCommand = ReactiveCommand.Create(OnUpdateClick));
+        public ICommand UpdateCommand => _updateCommand ??= ReactiveCommand.Create(OnUpdateClick);
 
         private ICommand _addressesCommand;
-
-        public ICommand AddressesCommand =>
-            _addressesCommand ??= (_addressesCommand = ReactiveCommand.Create(OnAddressesClick));
+        public ICommand AddressesCommand => _addressesCommand ??= ReactiveCommand.Create(OnAddressesClick);
 
         private ICommand _cancelUpdateCommand;
+        public ICommand CancelUpdateCommand => _cancelUpdateCommand ??= ReactiveCommand.Create(_cancellation.Cancel);
 
-        public ICommand CancelUpdateCommand => _cancelUpdateCommand ??=
-            (_cancelUpdateCommand = ReactiveCommand.Create(() => { Cancellation.Cancel(); }));
-
-        private void OnSendClick()
+        protected virtual void OnSendClick()
         {
             var sendViewModel = SendViewModelCreator.CreateViewModel(App, Currency);
             Desktop.App.DialogService.Show(sendViewModel);
         }
 
-        private void OnReceiveClick()
+        protected virtual void OnReceiveClick()
         {
-            var receiveViewModel = ReceiveViewModelCreator.CreateViewModel(App, Currency);
+            var receiveViewModel = new ReceiveViewModel(App, Currency);
             Desktop.App.DialogService.Show(receiveViewModel);
         }
 
-        private void OnConvertClick()
+        protected virtual void OnConvertClick()
         {
             SetConversionTab?.Invoke(Currency);
         }
 
-        protected async void OnUpdateClick()
+        protected virtual async void OnUpdateClick()
         {
             if (IsBalanceUpdating)
                 return;
 
             IsBalanceUpdating = true;
 
-            Cancellation = new CancellationTokenSource();
+            _cancellation = new CancellationTokenSource();
 
             try
             {
@@ -238,7 +246,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                 await scanner.ScanAsync(
                     currency: Currency.Name,
                     skipUsed: true,
-                    cancellationToken: Cancellation.Token);
+                    cancellationToken: _cancellation.Token);
 
                 await LoadTransactionsAsync();
             }
@@ -255,7 +263,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             IsBalanceUpdating = false;
         }
 
-        private void OnAddressesClick()
+        protected virtual void OnAddressesClick()
         {
             Desktop.App.DialogService.Show(new AddressesViewModel(App, Currency));
         }
@@ -272,7 +280,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
             try
             {
-                var txId = $"{args.Transaction.Id}:{args.Transaction.Currency.Name}";
+                var txId = $"{args.Transaction.Id}:{args.Transaction.Currency}";
 
                 var isRemoved = await App.Account
                     .RemoveTransactionAsync(txId);
@@ -288,42 +296,41 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
         protected virtual void DesignerMode()
         {
-            // var currencies = DesignTime.Currencies.ToList();
-            //
-            // CurrencyViewModel = CurrencyViewModelCreator.CreateViewModel(currencies[3], subscribeToUpdates: false);
-            // CurrencyViewModel.TotalAmount = 0.01012345m;
-            // CurrencyViewModel.TotalAmountInBase = 16.51m;
-            // CurrencyViewModel.AvailableAmount = 0.01010005m;
-            // CurrencyViewModel.AvailableAmountInBase = 16.00m;
-            // CurrencyViewModel.UnconfirmedAmount = 0.00002m;
-            // CurrencyViewModel.UnconfirmedAmountInBase = 0.5m;
-            //
-            // var transactions = new List<TransactionViewModel>
-            // {
-            //     new BitcoinBasedTransactionViewModel(new BitcoinBasedTransaction(DesignTime.Currencies.Get<Bitcoin>("BTC"), Transaction.Create(Network.TestNet)))
-            //     {
-            //         Description  = "Sent 0.00124 BTC",
-            //         Amount       = -0.00124m,
-            //         AmountFormat = CurrencyViewModel.CurrencyFormat,
-            //         CurrencyCode = CurrencyViewModel.CurrencyCode,
-            //         Time         = DateTime.Now,
-            //     },
-            //     new BitcoinBasedTransactionViewModel(new BitcoinBasedTransaction(DesignTime.Currencies.Get<Bitcoin>("BTC"), Transaction.Create(Network.TestNet)))
-            //     {
-            //         Description  = "Received 1.00666 BTC",
-            //         Amount       = 1.00666m,
-            //         AmountFormat = CurrencyViewModel.CurrencyFormat,
-            //         CurrencyCode = CurrencyViewModel.CurrencyCode,
-            //         Time         = DateTime.Now,
-            //     }
-            // };
-            //
-            // Transactions = new ObservableCollection<TransactionViewModel>(
-            //     transactions.SortList((t1, t2) => t2.Time.CompareTo(t1.Time)));
+            var currencies = DesignTime.Currencies.ToList();
+
+            CurrencyViewModel = CurrencyViewModelCreator.CreateViewModel(currencies[3], subscribeToUpdates: false);
+            CurrencyViewModel.TotalAmount             = 0.01012345m;
+            CurrencyViewModel.TotalAmountInBase       = 16.51m;
+            CurrencyViewModel.AvailableAmount         = 0.01010005m;
+            CurrencyViewModel.AvailableAmountInBase   = 16.00m;
+            CurrencyViewModel.UnconfirmedAmount       = 0.00002m;
+            CurrencyViewModel.UnconfirmedAmountInBase = 0.5m;
+
+            var transactions = new List<TransactionViewModel>
+            {
+                new BitcoinBasedTransactionViewModel(new BitcoinBasedTransaction("BTC", Transaction.Create(Network.TestNet)), DesignTime.Currencies.Get<BitcoinConfig>("BTC"))
+                {
+                    Description  = "Sent 0.00124 BTC",
+                    Amount       = -0.00124m,
+                    AmountFormat = CurrencyViewModel.CurrencyFormat,
+                    CurrencyCode = CurrencyViewModel.CurrencyCode,
+                    Time         = DateTime.Now,
+                },
+                new BitcoinBasedTransactionViewModel(new BitcoinBasedTransaction("BTC", Transaction.Create(Network.TestNet)), DesignTime.Currencies.Get<BitcoinConfig>("BTC"))
+                {
+                    Description  = "Received 1.00666 BTC",
+                    Amount       = 1.00666m,
+                    AmountFormat = CurrencyViewModel.CurrencyFormat,
+                    CurrencyCode = CurrencyViewModel.CurrencyCode,
+                    Time         = DateTime.Now,
+                }
+            };
+
+            Transactions = new ObservableCollection<TransactionViewModel>(
+                transactions.SortList((t1, t2) => t2.Time.CompareTo(t1.Time)));
         }
 
         private int _dgSelectedIndex = -1;
-
         public int DGSelectedIndex
         {
             get => _dgSelectedIndex;
@@ -345,14 +352,13 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             DGSelectedIndex = cellIndex;
         }
 
-        private string _sortInfo;
-
+        protected string _sortInfo;
         public string SortInfo
         {
             get => _sortInfo;
             set
             {
-                SortType newSortType = SortType.Desc;
+                SortType newSortType = SortType.Asc;
                 if (!String.IsNullOrEmpty(_sortInfo))
                 {
                     var lastSortType = _sortInfo.Split(Convert.ToChar("/"))[1];
@@ -372,7 +378,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             }
         }
 
-        private void SortTransactions(string columnName, SortType sortType)
+        protected virtual void SortTransactions(string columnName, SortType sortType)
         {
             DGSelectedIndex = -1;
             if (columnName.ToLower() == "time" && sortType == SortType.Asc)

@@ -16,8 +16,7 @@ namespace Atomex.Client.Desktop.ViewModels
     public class DelegateConfirmationViewModel : ViewModelBase
     {
         private IAtomexApp App { get; }
-        public Tezos Currency { get; set; }
-
+        public TezosConfig Currency { get; set; }
         public WalletAddress WalletAddress { get; set; }
         public bool UseDefaultFee { get; set; }
         public string From { get; set; }
@@ -80,7 +79,7 @@ namespace Atomex.Client.Desktop.ViewModels
                     From = WalletAddress.Address,
                     To = To,
                     Fee = Fee.ToMicroTez(),
-                    Currency = Currency,
+                    Currency = Currency.Name,
                     CreationTime = DateTime.UtcNow,
 
                     UseRun = true,
@@ -88,15 +87,18 @@ namespace Atomex.Client.Desktop.ViewModels
                     OperationType = OperationType.Delegation
                 };
 
-                using var securePublicKey = App.Account.Wallet
-                    .GetPublicKey(Currency, WalletAddress.KeyIndex);
+                using var securePublicKey = App.Account.Wallet.GetPublicKey(
+                    currency: Currency,
+                    keyIndex: WalletAddress.KeyIndex,
+                    keyType: WalletAddress.KeyType);
 
-                await tx.FillOperationsAsync(
+                var _ = await tx.FillOperationsAsync(
                     securePublicKey: securePublicKey,
-                    headOffset: Tezos.HeadOffset);
+                    tezosConfig: Currency,
+                    headOffset: TezosConfig.HeadOffset);
 
                 var signResult = await tx
-                    .SignAsync(keyStorage, WalletAddress, default);
+                    .SignAsync(keyStorage, WalletAddress, Currency);
 
                 if (!signResult)
                 {
@@ -123,8 +125,7 @@ namespace Atomex.Client.Desktop.ViewModels
 
                     return;
                 }
-
-
+                
                 Desktop.App.DialogService.Show(
                     MessageViewModel.Success(
                         text: $"Successful delegation!",
@@ -133,7 +134,7 @@ namespace Atomex.Client.Desktop.ViewModels
                         nextAction: () =>
                         {
                             Desktop.App.DialogService.CloseDialog();
-                            Console.WriteLine("Invoking ondelegate!");
+
                             _onDelegate?.Invoke();
                         }));
             }

@@ -8,7 +8,7 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
 {
     public class NYXCurrencyViewModel : CurrencyViewModel
     {
-        public NYXCurrencyViewModel(Currency currency)
+        public NYXCurrencyViewModel(CurrencyConfig currency)
             : base(currency)
         {
             Header              = Currency.Description;

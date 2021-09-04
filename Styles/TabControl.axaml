@@ -252,5 +252,4 @@
     <Style Selector="TabItem:selected /template/ Border#PART_LayoutRoot">
         <Setter Property="Background" Value="Transparent" />
     </Style>
-
 </Styles>

@@ -53,7 +53,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
         public DelegateViewModel DelegateVM { get; set; }
 
-        public TezosWalletViewModel(IAtomexApp app, Action<Currency> setConversionTab, Currency currency)
+        public TezosWalletViewModel(IAtomexApp app, Action<CurrencyConfig> setConversionTab, CurrencyConfig currency)
             : base(app, setConversionTab, currency)
         {
             Delegations = new List<Delegation>();
@@ -92,7 +92,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         {
             try
             {
-                var tezos = Currency as Tezos;
+                var tezos = Currency as TezosConfig;
 
                 var balance = await App.Account
                     .GetBalanceAsync(tezos.Name)
@@ -131,7 +131,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                     
                     _ = Task.Run(() =>
                     {
-                        Desktop.App.ImageService.LoadImage(baker.Logo);
+                        _ = Desktop.App.ImageService.LoadImageFromUrl(baker.Logo);
                     });
                 }
 

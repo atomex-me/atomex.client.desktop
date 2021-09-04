@@ -98,7 +98,7 @@ namespace Atomex.Client.Desktop.ViewModels
                 symbolsProvider: AtomexApp.SymbolsProvider,
                 quotesProvider: AtomexApp.QuotesProvider);
 
-            AtomexApp.UseTerminal(atomexClient, restart: true);
+            AtomexApp.UseAtomexClient(atomexClient, restart: true);
         }
         
         private void OnAccountRestored(IAccount account)
@@ -111,7 +111,7 @@ namespace Atomex.Client.Desktop.ViewModels
 
             MainWindowVM.AccountRestored = true;
 
-            AtomexApp.UseTerminal(atomexClient, restart: true);
+            AtomexApp.UseAtomexClient(atomexClient, restart: true);
         }
 
         private void DesignerMode()

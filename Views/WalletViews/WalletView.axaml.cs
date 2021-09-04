@@ -19,8 +19,7 @@ namespace Atomex.Client.Desktop.Views.WalletViews
             InitializeComponent();
 
             var dgTransactions = this.FindControl<DataGrid>("DgTransactions");
-
-
+            
             dgTransactions.CellPointerPressed += (sender, args) =>
             {
                 var cellIndex = args.Row.GetIndex();

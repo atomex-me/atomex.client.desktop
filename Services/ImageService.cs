@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Net;
+using System.Threading.Tasks;
+using Atomex.Common;
 using Avalonia;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
@@ -13,8 +15,7 @@ namespace Atomex.Client.Desktop.Services
     public class ImageService
     {
         public IDictionary<string, IBitmap> Images;
-
-
+        
         public ImageService()
         {
             Images = new Dictionary<string, IBitmap>();
@@ -24,25 +25,41 @@ namespace Atomex.Client.Desktop.Services
                 new Bitmap(assets.Open(new Uri("avares://Atomex.Client.Desktop/Resources/Images/logo_white.png")));
             Images.Add("default", defaultBitmap);
         }
-
-        public async void LoadImage(string url)
+        
+        public async Task LoadImageFromUrl(string url, Action successCallback = null)
         {
             try
             {
-                using WebClient wc = new();
-                await using Stream s = wc.OpenRead(url);
-                using System.Drawing.Bitmap bmp = new(s);
-                await using MemoryStream memory = new();
-                bmp.Save(memory, ImageFormat.Png);
-                memory.Position = 0;
-                Images[url] = new Bitmap(memory);
+                var response = await HttpHelper.HttpClient
+                    .GetAsync(url)
+                    .ConfigureAwait(false);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var previewBytes = await response.Content
+                        .ReadAsByteArrayAsync()
+                        .ConfigureAwait(false);
+                    
+                    Stream imgStream = new MemoryStream(previewBytes);
+                    using System.Drawing.Bitmap bmp = new(imgStream);
+                    await using MemoryStream memory = new();
+                    bmp.Save(memory, ImageFormat.Png);
+                    memory.Position = 0;
+                    Images[url] = new Bitmap(memory);
+                    
+                    successCallback?.Invoke();
+                }
             }
-            catch (Exception e)
+            catch
             {
-                Log.Error("Error during Loading Image");
+                Log.Error($"Error during loading image {url}");
             }
         }
 
+        public bool GetImageLoaded(string url)
+        {
+            return Images.TryGetValue(url, out _);
+        }
 
         public IBitmap GetImage(string url)
         {

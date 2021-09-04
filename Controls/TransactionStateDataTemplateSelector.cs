@@ -19,7 +19,7 @@ namespace Atomex.Client.Desktop.Controls
 
         private static DataTemplate? GetTemplate(object data)
         {
-            if (!(data is TransactionViewModel transaction))
+            if (!(data is ITransactionViewModel transaction))
                 return null;
 
             switch (transaction.State)
