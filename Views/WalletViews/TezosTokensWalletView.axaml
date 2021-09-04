@@ -12,6 +12,7 @@
              xmlns:helpers="clr-namespace:Atomex.Client.Desktop.Helpers"
              xmlns:i="using:Avalonia.Xaml.Interactivity"
              xmlns:ia="using:Avalonia.Xaml.Interactions.Core"
+             xmlns:iac="using:Avalonia.Xaml.Interactions.Custom"
              xmlns:transactionViews="clr-namespace:Atomex.Client.Desktop.Views.TransactionViews">
 
     <Design.DataContext>
@@ -55,7 +56,7 @@
                 </ControlTemplate>
             </Setter>
         </Style>
-
+        
         <Style Selector="ListBoxItem">
             <Setter Property="Padding" Value="0" />
             <Setter Property="Cursor" Value="Hand" />
@@ -96,23 +97,6 @@
         <Style Selector="TabItem.Tokens:selected /template/ Border#PART_LayoutRoot">
             <Setter Property="Background" Value="{DynamicResource DefaultSubstrateBrush}" />
             <Setter Property="TextBlock.Foreground" Value="{DynamicResource DefaultForegroundBrush}" />
-        </Style>
-
-        <Style>
-            <!-- <Style Selector="TabItem.Tokens /template/ ContentPresenter#PART_ContentPresenter"> -->
-            <!--     <Setter Property="Margin" Value="0" /> -->
-            <!-- </Style> -->
-            <!-- -->
-            <!-- <Style Selector="TabItem.Tokens /template/ Border#PART_SelectedPipe"> -->
-            <!--     <Setter Property="IsVisible" Value="false" /> -->
-            <!--     ~1~ <Setter Property="CornerRadius" Value="{DynamicResource ControlCornerRadius}" /> @1@ -->
-            <!-- </Style> -->
-            <!-- -->
-            <!-- -->
-            <!-- ~1~ Selected PointerOver state @1@ -->
-            <!-- <Style Selector="TabItem.Tokens:selected:pointerover /template/ Border#PART_LayoutRoot"> -->
-            <!--     <Setter Property="Background" Value="Transparent" /> -->
-            <!-- </Style> -->
         </Style>
     </UserControl.Styles>
 
@@ -345,9 +329,19 @@
                          VerticalAlignment="Stretch"
                          ScrollViewer.HorizontalScrollBarVisibility="Hidden"
                          Items="{Binding Tokens}">
+                    <i:Interaction.Behaviors>
+                        <iac:NthChildBehavior />
+                    </i:Interaction.Behaviors>
+                    <ListBox.Styles>
+                        <Style Selector="ListBoxItem.nth-odd-child">
+                            <Setter Property="Background" Value="{DynamicResource CustomDataGridAlternativeRowBackground}" />
+                        </Style>
+                        <Style Selector="ListBoxItem.nth-even-child">
+                            <Setter Property="Background" Value="{DynamicResource CustomDataGridRowBackground}" />
+                        </Style>
+                    </ListBox.Styles>
                     <ListBox.ItemTemplate>
                         <DataTemplate DataType="{x:Type vm:TezosTokenViewModel}">
-
                             <!-- MouseDown="TokenPreviewMouseDown" -->
                             <Grid Background="Transparent">
                                 <Grid.ColumnDefinitions>
