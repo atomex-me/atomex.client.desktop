@@ -105,13 +105,13 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
             IsBalanceUpdating = true;
 
-            Cancellation = new CancellationTokenSource();
+            _cancellation = new CancellationTokenSource();
 
             try
             {
                 await App.Account
                     .GetCurrencyAccount<Fa12Account>(Currency.Name)
-                    .UpdateBalanceAsync(Cancellation.Token);
+                    .UpdateBalanceAsync(_cancellation.Token);
             }
             catch (OperationCanceledException)
             {

@@ -586,12 +586,11 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
             IsBalanceUpdating = true;
 
-            Cancellation = new CancellationTokenSource();
+            _cancellation = new CancellationTokenSource();
             
-            // await _dialogViewer.ShowProgressAsync(
-            //     title: "Tokens balance updating...",
-            //     message: "Please wait!",
-            //     canceled: () => { _cancellation.Cancel(); });
+            var updatingModalVM = new TezosTokensScanDialogViewModel();
+            updatingModalVM.OnCancel = () => _cancellation.Cancel();
+            Desktop.App.DialogService.Show(updatingModalVM);
 
             try
             {
@@ -602,7 +601,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
                 await tezosTokensScanner.ScanAsync(
                     skipUsed: false,
-                    cancellationToken: Cancellation.Token);
+                    cancellationToken: _cancellation.Token);
 
                 // reload balances for all tezos tokens account
                 foreach (var currency in App.Account.Currencies)
@@ -622,8 +621,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                 // todo: message to user!?
             }
 
-            // _dialogViewer.HideProgress();
-
+            Desktop.App.DialogService.CloseDialog();
             IsBalanceUpdating = false;
         }
 

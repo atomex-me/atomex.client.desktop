@@ -93,7 +93,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             }
         }
 
-        protected CancellationTokenSource Cancellation { get; set; }
+        protected CancellationTokenSource _cancellation { get; set; }
 
         public WalletViewModel()
         {
@@ -211,7 +211,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         public ICommand AddressesCommand => _addressesCommand ??= ReactiveCommand.Create(OnAddressesClick);
 
         private ICommand _cancelUpdateCommand;
-        public ICommand CancelUpdateCommand => _cancelUpdateCommand ??= ReactiveCommand.Create(Cancellation.Cancel);
+        public ICommand CancelUpdateCommand => _cancelUpdateCommand ??= ReactiveCommand.Create(_cancellation.Cancel);
 
         protected virtual void OnSendClick()
         {
@@ -237,7 +237,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
             IsBalanceUpdating = true;
 
-            Cancellation = new CancellationTokenSource();
+            _cancellation = new CancellationTokenSource();
 
             try
             {
@@ -246,7 +246,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                 await scanner.ScanAsync(
                     currency: Currency.Name,
                     skipUsed: true,
-                    cancellationToken: Cancellation.Token);
+                    cancellationToken: _cancellation.Token);
 
                 await LoadTransactionsAsync();
             }
