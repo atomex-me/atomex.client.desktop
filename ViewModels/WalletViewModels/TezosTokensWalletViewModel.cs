@@ -539,7 +539,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                 tokenType: TokenContract.Contract.GetContractType(),
                 from: null);
 
-            Desktop.App.DialogService.Show(sendViewModel, customHeight: sendViewModel.IsFa2 ? 560 : 510);
+            Desktop.App.DialogService.Show(sendViewModel, customHeight: sendViewModel.IsFa2 ? 580 : 530);
         }
 
         private void SendCallback(TezosTokenViewModel tokenViewModel)
@@ -554,7 +554,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                 tokenType: TokenContract.Contract.GetContractType(),
                 from: tokenViewModel.Address);
 
-            Desktop.App.DialogService.Show(sendViewModel, customHeight: sendViewModel.IsFa2 ? 560 : 510);
+            Desktop.App.DialogService.Show(sendViewModel, customHeight: sendViewModel.IsFa2 ? 580 : 530);
         }
 
         protected override void OnReceiveClick()
