@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
@@ -13,6 +14,7 @@ using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
 using Atomex.Client.Desktop.ViewModels.SendViewModels;
 using Atomex.Common;
 using Atomex.Core;
+using Atomex.ViewModels;
 using Atomex.Wallet.Abstract;
 using ReactiveUI;
 
@@ -153,6 +155,12 @@ namespace Atomex.Client.Desktop.ViewModels
                 foreach (var fromWallet in fromWallets)
                     if (fromWallet.Currency != FromCurrency.Name)
                         fromWallet.Currency = FromCurrency.Name;
+                
+                // check balances
+                var errors = await BalanceChecker.CheckBalancesAsync(App.Account, fromWallets);
+
+                if (errors.Any())
+                    return new Error(Errors.SwapError, GetErrorsDescription(errors));
 
                 if (Amount == 0)
                     return new Error(Errors.SwapError, Resources.CvZeroAmount);
@@ -241,6 +249,18 @@ namespace Atomex.Client.Desktop.ViewModels
             
                 return new Error(Errors.SwapError, Resources.CvConversionError);
             }
+        }
+        
+        private string GetErrorsDescription(IEnumerable<BalanceError> errors)
+        {
+            var descriptions = errors.Select(e => e.Type switch
+            {
+                BalanceErrorType.FailedToGet      => $"Balance check for address {e.Address} failed",
+                BalanceErrorType.LessThanExpected => $"Balance for address {e.Address} is {e.ActualBalance.ToString(CultureInfo.InvariantCulture)} and less than local {e.LocalBalance.ToString(CultureInfo.InvariantCulture)}",
+                _                                 => $"Balance for address {e.Address} has changed and needs to be updated"
+            });
+
+            return string.Join(". ", descriptions) + ". Please update your balance and try again!";
         }
 
         private void DesignerMode()

@@ -225,7 +225,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         public bool IsFa12 => Contract.GetContractType() == "FA12";
         public bool IsFa2 => Contract.GetContractType() == "FA2";
 
-        private bool _isTriedToGetFromTzkt = false;
+        private bool _isTriedToGetFromTzkt;
 
         private string _name;
         public string Name
