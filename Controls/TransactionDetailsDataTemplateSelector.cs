@@ -45,18 +45,6 @@ namespace Atomex.Client.Desktop.Controls
                 case "WBTC":
                     return App.TemplateService.GetTxDetailsTemplate(
                         TxDetailsTemplate.EthereumERC20TransactionDetailsTemplate);
-                case "TZBTC":
-                    return App.TemplateService.GetTxDetailsTemplate(
-                        TxDetailsTemplate.TezosTransactionDetailsTemplate);
-                case "KUSD":
-                    return App.TemplateService.GetTxDetailsTemplate(
-                        TxDetailsTemplate.TezosTransactionDetailsTemplate);
-                case "NYX":
-                    return App.TemplateService.GetTxDetailsTemplate(
-                        TxDetailsTemplate.TezosTransactionDetailsTemplate);
-                case "FA2":
-                    return App.TemplateService.GetTxDetailsTemplate(
-                        TxDetailsTemplate.TezosTransactionDetailsTemplate);
 
                 default:
                     throw new ArgumentOutOfRangeException();

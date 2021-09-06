@@ -1,9 +1,8 @@
-﻿using System;
-using Avalonia.Media;
-using Atomex.Abstract;
+﻿using Atomex.Abstract;
 using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
 using Atomex.Common;
 using Atomex.Core;
+using Avalonia.Media;
 
 namespace Atomex.Client.Desktop.ViewModels
 {
@@ -15,11 +14,11 @@ namespace Atomex.Client.Desktop.ViewModels
             var purchasedCurrency = currencies.GetByName(swap.PurchasedCurrency);
 
             var fromCurrencyViewModel = CurrencyViewModelCreator.CreateViewModel(
-                currency: soldCurrency,
+                currencyConfig: soldCurrency,
                 subscribeToUpdates: false);
 
             var toCurrencyViewModel = CurrencyViewModelCreator.CreateViewModel(
-                currency: purchasedCurrency,
+                currencyConfig: purchasedCurrency,
                 subscribeToUpdates: false);
 
             var fromAmount = AmountHelper.QtyToAmount(swap.Side, swap.Qty, swap.Price, soldCurrency.DigitsMultiplier);

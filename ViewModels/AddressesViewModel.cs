@@ -8,9 +8,12 @@ using Serilog;
 using Atomex.Core;
 using Atomex.Client.Desktop.Common;
 using System.Diagnostics;
+using Atomex.Blockchain.Tezos.Internal;
 using Atomex.Client.Desktop.Controls;
 using Atomex.Wallet;
 using Atomex.Common;
+using Atomex.Cryptography;
+using Atomex.Wallet.Tezos;
 using Avalonia;
 using Avalonia.Input.Platform;
 using Avalonia.Threading;
@@ -21,6 +24,7 @@ namespace Atomex.Client.Desktop.ViewModels
     public class AddressInfo : ViewModelBase
     {
         public string Address { get; set; }
+        public string Type { get; set; }
         public string Path { get; set; }
 
         private string _balance;
@@ -34,11 +38,11 @@ namespace Atomex.Client.Desktop.ViewModels
                 OnPropertyChanged(nameof(Balance));
             }
         }
+        public string TokenBalance { get; set; }
 
         public Action<string> CopyToClipboard { get; set; }
         public Action<string> OpenInExplorer { get; set; }
         public Action<string> ExportKey { get; set; }
-
         public Action<string> UpdateAddress { get; set; }
 
         private bool _isUpdating;
@@ -74,7 +78,7 @@ namespace Atomex.Client.Desktop.ViewModels
 
         public ICommand CopyCommand => _copyCommand ??= ReactiveCommand.Create<string>((s) =>
         {
-            App.Clipboard.SetTextAsync(Address);
+            CopyToClipboard?.Invoke(s);
         });
 
         private ICommand _openInExplorerCommand;
@@ -95,12 +99,15 @@ namespace Atomex.Client.Desktop.ViewModels
     public class AddressesViewModel : ViewModelBase
     {
         private readonly IAtomexApp _app;
-        private Currency _currency;
+        private CurrencyConfig _currency;
+        private bool _isBalanceUpdating;
+        private readonly string _tokenContract;
 
         public ObservableCollection<AddressInfo> Addresses { get; set; }
+        
+        public bool HasTokens { get; set; }
 
         private string _warning;
-
         public string Warning
         {
             get => _warning;
@@ -122,51 +129,122 @@ namespace Atomex.Client.Desktop.ViewModels
 #endif
         }
 
-        public AddressesViewModel(IAtomexApp app, Currency currency)
+        public AddressesViewModel(
+            IAtomexApp app,
+            CurrencyConfig currency,
+            string tokenContract = null)
         {
-            _app = app ?? throw new ArgumentNullException(nameof(app));
-            _currency = currency ?? throw new ArgumentNullException(nameof(currency));
+            _app           = app ?? throw new ArgumentNullException(nameof(app));
+            _currency      = currency ?? throw new ArgumentNullException(nameof(currency));
+            _tokenContract = tokenContract;
 
-            Load();
+            ReloadAddresses();
         }
 
-        public async void Load()
+        public async void ReloadAddresses()
         {
             try
             {
-                var account = _app.Account.GetCurrencyAccount(_currency.Name);
+                var account = _app.Account
+                    .GetCurrencyAccount(_currency.Name);
 
-                var addresses = (await account.GetAddressesAsync())
+                var addresses = (await account
+                        .GetAddressesAsync())
                     .ToList();
 
                 addresses.Sort((a1, a2) =>
                 {
+                    var typeResult = a1.KeyType.CompareTo(a2.KeyType);
+
+                    if (typeResult != 0)
+                        return typeResult;
+
+                    var accountResult = a1.KeyIndex.Account.CompareTo(a2.KeyIndex.Account);
+
+                    if (accountResult != 0)
+                        return accountResult;
+
                     var chainResult = a1.KeyIndex.Chain.CompareTo(a2.KeyIndex.Chain);
 
-                    return chainResult == 0
-                        ? a1.KeyIndex.Index.CompareTo(a2.KeyIndex.Index)
-                        : chainResult;
+                    return chainResult != 0
+                        ? chainResult
+                        : a1.KeyIndex.Index.CompareTo(a2.KeyIndex.Index);
                 });
 
                 Addresses = new ObservableCollection<AddressInfo>(
-                    addresses.Select(a => new AddressInfo
+                    addresses.Select(a =>
                     {
-                        Address = a.Address,
-                        Path = $"m/44'/{_currency.Bip44Code}/0'/{a.KeyIndex.Chain}/{a.KeyIndex.Index}",
-                        Balance = a.Balance.ToString(CultureInfo.InvariantCulture),
-                        CopyToClipboard = CopyToClipboard,
-                        OpenInExplorer = OpenInExplorer,
-                        ExportKey = ExportKey,
-                        UpdateAddress = UpdateAddress
+                        var path = a.KeyType == CurrencyConfig.StandardKey && Currencies.IsTezosBased(_currency.Name)
+                            ? $"m/44'/{_currency.Bip44Code}'/{a.KeyIndex.Account}'/{a.KeyIndex.Chain}'"
+                            : $"m/44'/{_currency.Bip44Code}'/{a.KeyIndex.Account}'/{a.KeyIndex.Chain}/{a.KeyIndex.Index}";
+
+                        return new AddressInfo
+                        {
+                            Address         = a.Address,
+                            Type            = KeyTypeToString(a.KeyType),
+                            Path            = path,
+                            Balance         = $"{a.Balance.ToString(CultureInfo.InvariantCulture)} {_currency.Name}",
+                            CopyToClipboard = CopyToClipboard,
+                            OpenInExplorer  = OpenInExplorer,
+                            UpdateAddress   = UpdateAddress,
+                            ExportKey       = ExportKey
+                        };
                     }));
 
+                // token balances
+                if (_currency.Name == TezosConfig.Xtz && _tokenContract != null)
+                {
+                    HasTokens = true;
+
+                    var tezosAccount = account as TezosAccount;
+
+                    var addressesWithTokens = (await tezosAccount
+                            .DataRepository
+                            .GetTezosTokenAddressesByContractAsync(_tokenContract))
+                        .Where(w => w.Balance != 0)
+                        .GroupBy(w => w.Address);
+                        
+                    foreach (var addressWithTokens in addressesWithTokens)
+                    {
+                        var addressInfo = Addresses.FirstOrDefault(a => a.Address == addressWithTokens.Key);
+
+                        if (addressInfo == null)
+                            continue;
+
+                        if (addressWithTokens.Count() == 1)
+                        {
+                            var tokenAddress = addressWithTokens.First();
+
+                            addressInfo.TokenBalance = tokenAddress.Balance.ToString("F8", CultureInfo.InvariantCulture);
+
+                            var tokenCode = tokenAddress?.TokenBalance?.Symbol;
+
+                            if (tokenCode != null)
+                                addressInfo.TokenBalance += $" {tokenCode}";
+                        }
+                        else
+                        {
+                            addressInfo.TokenBalance = $"{addressWithTokens.Count()} TOKENS";
+                        }
+                    }
+                }
+
                 OnPropertyChanged(nameof(Addresses));
+                OnPropertyChanged(nameof(HasTokens));
             }
             catch (Exception e)
             {
                 Log.Error(e, "Error while load addresses.");
             }
         }
+        
+        private string KeyTypeToString(int keyType) =>
+            keyType switch
+            {
+                CurrencyConfig.StandardKey  => "Standard",
+                TezosConfig.Bip32Ed25519Key => "Atomex",
+                _ => throw new NotSupportedException($"Key type {keyType} not supported.")
+            };
 
         private void CopyToClipboard(string address)
         {
@@ -187,7 +265,7 @@ namespace Atomex.Client.Desktop.ViewModels
             try
             {
                 if (Uri.TryCreate($"{_currency.AddressExplorerUri}{address}", UriKind.Absolute, out var uri))
-                    Process.Start(uri.ToString());
+                    App.OpenBrowser(uri.ToString());
                 else
                     Log.Error("Invalid uri for address explorer");
             }
@@ -202,19 +280,38 @@ namespace Atomex.Client.Desktop.ViewModels
             try
             {
                 await new HdWalletScanner(_app.Account)
-                    .ScanAddressAsync(_currency.Name, address)
-                    .ConfigureAwait(false);
+                    .ScanAddressAsync(_currency.Name, address);
 
-                var balance = await _app.Account
-                    .GetAddressBalanceAsync(_currency.Name, address)
-                    .ConfigureAwait(false);
+                if (_currency.Name == TezosConfig.Xtz && _tokenContract != null)
+                {
+                    // update tezos token balance
+                    var tezosAccount = _app.Account
+                        .GetCurrencyAccount<TezosAccount>(TezosConfig.Xtz);
 
-                var targetAddr = Addresses.FirstOrDefault(a => a.Address == address);
-                targetAddr!.SetAddressUpdated.Execute(balance.Available.ToString(CultureInfo.InvariantCulture));
+                    await new TezosTokensScanner(tezosAccount)
+                        .ScanContractAsync(address, _tokenContract);
+
+                    // reload balances for all tezos tokens account
+                    foreach (var currency in _app.Account.Currencies)
+                        if (Currencies.IsTezosToken(currency.Name))
+                            _app.Account
+                                .GetCurrencyAccount<TezosTokenAccount>(currency.Name)
+                                .ReloadBalances();
+                }
+
+                ReloadAddresses();
+
+                // var targetAddr = Addresses.FirstOrDefault(a => a.Address == address);
+                // targetAddr!.SetAddressUpdated.Execute(balance.Available.ToString(CultureInfo.InvariantCulture));
+            }
+            catch (OperationCanceledException)
+            {
+                Log.Debug("Address balance update operation canceled");
             }
             catch (Exception e)
             {
-                Log.Error(e, "Update address error");
+                Log.Error(e, "AddressesViewModel.OnUpdateClick");
+                // todo: message to user!?
             }
         }
 
@@ -235,14 +332,37 @@ namespace Atomex.Client.Desktop.ViewModels
 
                             var hdWallet = _app.Account.Wallet as HdWallet;
 
-                            using var privateKey = hdWallet.KeyStorage
-                                .GetPrivateKey(_currency, walletAddress.KeyIndex);
+                            using var privateKey = hdWallet.KeyStorage.GetPrivateKey(
+                                currency: _currency,
+                                keyIndex: walletAddress.KeyIndex,
+                                keyType: walletAddress.KeyType);
 
                             using var unsecuredPrivateKey = privateKey.ToUnsecuredBytes();
 
-                            var hex = Hex.ToHexString(unsecuredPrivateKey.Data);
+                            if (Currencies.IsBitcoinBased(_currency.Name))
+                            {
+                                var btcBasedConfig = _currency as BitcoinBasedConfig;
 
-                            await App.Clipboard.SetTextAsync(hex);
+                                var wif = new NBitcoin.Key(unsecuredPrivateKey)
+                                    .GetWif(btcBasedConfig.Network)
+                                    .ToWif();
+
+                                _ = App.Clipboard.SetTextAsync(wif);
+                            }
+                            else if (Currencies.IsTezosBased(_currency.Name))
+                            {
+                                var base58 = unsecuredPrivateKey.Length == 32
+                                    ? Base58Check.Encode(unsecuredPrivateKey, Prefix.Edsk)
+                                    : Base58Check.Encode(unsecuredPrivateKey, Prefix.EdskSecretKey);
+
+                                _ = App.Clipboard.SetTextAsync(base58);
+                            }
+                            else
+                            {
+                                var hex = Hex.ToHexString(unsecuredPrivateKey.Data);
+
+                                _ = App.Clipboard.SetTextAsync(hex);
+                            }
 
                             App.DialogService.Show(MessageViewModel.Success(
                                 text: "Private key successfully copied to clipboard.",

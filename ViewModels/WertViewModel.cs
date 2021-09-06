@@ -33,15 +33,15 @@ namespace Atomex.Client.Desktop.ViewModels
             get => _selected;
             set
             {
-                if (_selected != null)
-                    _selected.IsSelected = false;
-
-                _selected = value;
-
-                if (_selected != null)
-                    _selected.IsSelected = true;
-
-                OnPropertyChanged(nameof(Wallets));
+                // if (_selected != null)
+                //     _selected.IsSelected = false;
+                //
+                // _selected = value;
+                //
+                // if (_selected != null)
+                //     _selected.IsSelected = true;
+                //
+                // OnPropertyChanged(nameof(Wallets));
             }
         }
 
@@ -62,21 +62,21 @@ namespace Atomex.Client.Desktop.ViewModels
 
         private void SubscribeToServices()
         {
-            App.TerminalChanged += OnTerminalChangedEventHandler;
+            App.AtomexClientChanged += OnTerminalChangedEventHandler;
         }
 
-        private void OnTerminalChangedEventHandler(object sender, TerminalChangedEventArgs e)
+        private void OnTerminalChangedEventHandler(object sender, AtomexClientChangedEventArgs e)
         {
             var wertApi = new WertApi(App);
             
-            Wallets = e.Terminal?.Account != null
-                ? new ObservableCollection<WertCurrencyViewModel>(
-                    e.Terminal.Account.Currencies
-                        .Where(currency => CurrenciesToBuy.Contains(currency.Name))
-                        .Select(currency => new WertCurrencyViewModel(currency, App, wertApi)))
-                : new ObservableCollection<WertCurrencyViewModel>();
+            // Wallets = e.AtomexClient?.Account != null
+            //     ? new ObservableCollection<WertCurrencyViewModel>(
+            //         e.Terminal.Account.Currencies
+            //             .Where(currency => CurrenciesToBuy.Contains(currency.Name))
+            //             .Select(currency => new WertCurrencyViewModel(currency, App, wertApi)))
+            //     : new ObservableCollection<WertCurrencyViewModel>();
 
-            Selected = Wallets.FirstOrDefault();
+            // Selected = Wallets.FirstOrDefault();
         }
 
         private void DesignerMode()

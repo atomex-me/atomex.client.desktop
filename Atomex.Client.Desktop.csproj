@@ -7,8 +7,8 @@
         <UseAppHost>true</UseAppHost>
         <RuntimeIdentifiers>osx-x64</RuntimeIdentifiers>
 
-        <AssemblyVersion>1.0.88</AssemblyVersion>
-        <Version>1.0.88</Version>
+        <AssemblyVersion>1.1.2</AssemblyVersion>
+        <Version>1.1.2</Version>
     </PropertyGroup>
     <ItemGroup>
         <AvaloniaResource Include="Assets\**" />
@@ -116,10 +116,6 @@
             <DependentUpon>TezosWalletView.axaml</DependentUpon>
             <SubType>Code</SubType>
         </Compile>
-        <Compile Update="Views\ReceiveViews\ReceiveView.axaml.cs">
-            <DependentUpon>ReceiveView.axaml</DependentUpon>
-            <SubType>Code</SubType>
-        </Compile>
         <Compile Update="Views\SendViews\SendView.axaml.cs">
             <DependentUpon>SendView.axaml</DependentUpon>
             <SubType>Code</SubType>
@@ -173,6 +169,10 @@
         </Compile>
         <Compile Update="Views\DelegateConfirmationView.axaml.cs">
           <DependentUpon>DelegateConfirmationView.axaml</DependentUpon>
+        </Compile>
+        <Compile Update="Views\ReceiveView.axaml.cs">
+          <DependentUpon>ReceiveView.axaml</DependentUpon>
+          <SubType>Code</SubType>
         </Compile>
     </ItemGroup>
     <ItemGroup>

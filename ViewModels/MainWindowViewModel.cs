@@ -159,12 +159,12 @@ namespace Atomex.Client.Desktop.ViewModels
 
         private void SubscribeToServices()
         {
-            AtomexApp.TerminalChanged += OnTerminalChangedEventHandler;
+            AtomexApp.AtomexClientChanged += OnTerminalChangedEventHandler;
         }
 
-        private void OnTerminalChangedEventHandler(object sender, TerminalChangedEventArgs args)
+        private void OnTerminalChangedEventHandler(object sender, AtomexClientChangedEventArgs args)
         {
-            var terminal = args.Terminal;
+            var terminal = args.AtomexClient;
 
             if (terminal?.Account == null)
             {
@@ -224,7 +224,7 @@ namespace Atomex.Client.Desktop.ViewModels
                     return;
                 }
 
-                AtomexApp.UseTerminal(null);
+                AtomexApp.UseAtomexClient(null);
                 _userIgnoreActiveSwaps = false;
 
                 ShowStart();

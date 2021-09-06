@@ -10,10 +10,10 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
     {
         public decimal AvailableAmountInChainCurrency { get; set; }
 
-        public TetherCurrencyViewModel(Currency currency)
+        public TetherCurrencyViewModel(CurrencyConfig currency)
             : base(currency)
         {
-            ChainCurrency       = new Ethereum();
+            ChainCurrency       = new EthereumConfig();
             Header              = Currency.Description;
             IconBrush           = new ImageBrush(GetBitmap(PathToImage("tether_90x90.png")));
             IconMaskBrush       = new ImageBrush(GetBitmap(PathToImage("tether_mask.png")));

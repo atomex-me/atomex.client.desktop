@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using Atomex.Services;
@@ -14,11 +15,11 @@ namespace Atomex.Client.Desktop.ViewModels
     public class WalletsViewModel : ViewModelBase
     {
         private IAtomexApp App { get; }
-        private Action<Currency> SetConversionTab { get; }
+        private Action<CurrencyConfig> SetConversionTab { get; }
 
-        private ObservableCollection<WalletViewModel> _wallets;
+        private ObservableCollection<IWalletViewModel> _wallets;
 
-        public ObservableCollection<WalletViewModel> Wallets
+        public ObservableCollection<IWalletViewModel> Wallets
         {
             get => _wallets;
             set
@@ -28,9 +29,9 @@ namespace Atomex.Client.Desktop.ViewModels
             }
         }
 
-        private WalletViewModel _selected;
+        private IWalletViewModel _selected;
 
-        public WalletViewModel Selected
+        public IWalletViewModel Selected
         {
             get => _selected;
             set
@@ -55,7 +56,7 @@ namespace Atomex.Client.Desktop.ViewModels
 #endif
         }
 
-        public WalletsViewModel(IAtomexApp app,  Action<Currency> setConversionTab)
+        public WalletsViewModel(IAtomexApp app,  Action<CurrencyConfig> setConversionTab)
         {
             App = app ?? throw new ArgumentNullException(nameof(app));
             SetConversionTab = setConversionTab;
@@ -65,19 +66,29 @@ namespace Atomex.Client.Desktop.ViewModels
 
         private void SubscribeToServices()
         {
-            App.TerminalChanged += OnTerminalChangedEventHandler;
+            App.AtomexClientChanged += OnTerminalChangedEventHandler;
         }
 
-        private void OnTerminalChangedEventHandler(object sender, TerminalChangedEventArgs e)
+        private void OnTerminalChangedEventHandler(object sender, AtomexClientChangedEventArgs e)
         {
-            Wallets = e.Terminal?.Account != null
-                ? new ObservableCollection<WalletViewModel>(
-                    e.Terminal.Account.Currencies.Select(currency => WalletViewModelCreator.CreateViewModel(
+            var walletsViewModels = new List<IWalletViewModel>();
+
+            if (e.AtomexClient?.Account != null)
+            {
+                var currenciesViewModels = e.AtomexClient.Account.Currencies
+                    .Select(currency => WalletViewModelCreator.CreateViewModel(
                         app: App,
                         setConversionTab: SetConversionTab,
-                        currency: currency)))
-                : new ObservableCollection<WalletViewModel>();
+                        currency: currency));
 
+                walletsViewModels.AddRange(currenciesViewModels);
+
+                walletsViewModels.Add(new TezosTokensWalletViewModel(
+                    app: App,
+                    setConversionTab: SetConversionTab));
+            }
+
+            Wallets  = new ObservableCollection<IWalletViewModel>(walletsViewModels);
             Selected = Wallets.FirstOrDefault();
         }
 

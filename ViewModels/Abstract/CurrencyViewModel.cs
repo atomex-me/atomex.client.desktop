@@ -23,8 +23,8 @@ namespace Atomex.Client.Desktop.ViewModels.Abstract
 
         public event EventHandler AmountUpdated;
 
-        public Currency Currency { get; set; }
-        public Currency ChainCurrency { get; set; }
+        public CurrencyConfig Currency { get; set; }
+        public CurrencyConfig ChainCurrency { get; set; }
         public string Header { get; set; }
         public Brush IconBrush { get; set; }
         public IBrush UnselectedIconBrush { get; set; }
@@ -65,7 +65,7 @@ namespace Atomex.Client.Desktop.ViewModels.Abstract
             }
         }
 
-        protected CurrencyViewModel(Currency currency)
+        protected CurrencyViewModel(CurrencyConfig currency)
         {
             Currency = currency ?? throw new ArgumentNullException(nameof(currency));
         }
@@ -155,7 +155,7 @@ namespace Atomex.Client.Desktop.ViewModels.Abstract
             return $"{PathToImages}/{imageName}";
         }
         
-        public IBitmap GetBitmap(string uri)
+        public static IBitmap GetBitmap(string uri)
         {
             var assets = AvaloniaLocator.Current.GetService<IAssetLoader>();
             var bitmap = new Bitmap(assets.Open(new Uri(uri)));

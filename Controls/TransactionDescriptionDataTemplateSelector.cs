@@ -19,16 +19,19 @@ namespace Atomex.Client.Desktop.Controls
 
         private static DataTemplate? GetTemplate(object data)
         {
+            if (data is TezosTokenTransferViewModel)
+                return App.TemplateService.GetTxDescriptionTemplate(TxDescriptionTemplate.XtzAdditionalDescriptionTemplate);
+
             if (!(data is TransactionViewModel tx))
                 return null;
 
             switch (tx.Currency)
             {
-                case BitcoinBasedCurrency:
+                case BitcoinBasedConfig:
                     return App.TemplateService.GetTxDescriptionTemplate(TxDescriptionTemplate.BtcBasedDescriptionTemplate);
-                case Tezos:
+                case TezosConfig:
                     return App.TemplateService.GetTxDescriptionTemplate(TxDescriptionTemplate.XtzAdditionalDescriptionTemplate);
-                case Ethereum:
+                case EthereumConfig:
                     return App.TemplateService.GetTxDescriptionTemplate(TxDescriptionTemplate.EthAdditionalDescriptionTemplate);
                 default:
                     return App.TemplateService.GetTxDescriptionTemplate(TxDescriptionTemplate.BtcBasedDescriptionTemplate);

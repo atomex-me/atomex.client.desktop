@@ -8,13 +8,14 @@ using Atomex.Client.Desktop.Controls;
 using Atomex.Client.Desktop.Properties;
 using Atomex.Core;
 using Atomex.MarketData.Abstract;
+using Atomex.Wallet.Abstract;
 using ReactiveUI;
 
 namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 {
     public class EthereumSendViewModel : SendViewModel
     {
-        public override Currency Currency
+        public override CurrencyConfig Currency
         {
             get => _currency;
             set
@@ -152,7 +153,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
         public EthereumSendViewModel(
             IAtomexApp app,
-            Currency currency)
+            CurrencyConfig currency)
             : base(app, currency)
         {
         }
@@ -170,10 +171,13 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
             try
             {
+                var account = App.Account
+                    .GetCurrencyAccount<ILegacyCurrencyAccount>(Currency.Name);
+
                 if (UseDefaultFee)
                 {
-                    var (maxAmount, maxFeeAmount, _) = await App.Account
-                        .EstimateMaxAmountToSendAsync(Currency.Name, To, BlockchainTransactionType.Output, 0, 0, false);
+                    var (maxAmount, _, _) = await account
+                        .EstimateMaxAmountToSendAsync(To, BlockchainTransactionType.Output, 0, 0, false);
 
                     _fee = Currency.GetDefaultFee();
                     OnPropertyChanged(nameof(GasString));
@@ -195,8 +199,8 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 }
                 else
                 {
-                    var (maxAmount, maxFeeAmount, _) = await App.Account
-                        .EstimateMaxAmountToSendAsync(Currency.Name, To, BlockchainTransactionType.Output, _fee, _feePrice, false);
+                    var (maxAmount, _, _) = await account
+                        .EstimateMaxAmountToSendAsync(To, BlockchainTransactionType.Output, _fee, _feePrice, false);
 
                     if (_amount > maxAmount)
                     {
@@ -249,8 +253,11 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
                 if (!UseDefaultFee)
                 {
-                    var (maxAmount, maxFee, _) = await App.Account
-                        .EstimateMaxAmountToSendAsync(Currency.Name, To, BlockchainTransactionType.Output, _fee, _feePrice, false);
+                    var account = App.Account
+                        .GetCurrencyAccount<ILegacyCurrencyAccount>(Currency.Name);
+
+                    var (maxAmount, _, _) = await account
+                        .EstimateMaxAmountToSendAsync(To, BlockchainTransactionType.Output, _fee, _feePrice, false);
 
                     if (_amount > maxAmount)
                     {
@@ -305,8 +312,11 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
                 if (!UseDefaultFee)
                 {
-                    var (maxAmount, maxFee, _) = await App.Account
-                        .EstimateMaxAmountToSendAsync(Currency.Name, To, BlockchainTransactionType.Output, _fee, _feePrice, false);
+                    var account = App.Account
+                        .GetCurrencyAccount<ILegacyCurrencyAccount>(Currency.Name);
+
+                    var (maxAmount, _, _) = await account
+                        .EstimateMaxAmountToSendAsync(To, BlockchainTransactionType.Output, _fee, _feePrice, false);
 
                     if (_amount > maxAmount)
                     {
@@ -334,10 +344,13 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
             try
             {
+                var account = App.Account
+                    .GetCurrencyAccount<ILegacyCurrencyAccount>(Currency.Name);
+
                 var feeAmount = totalFeeAmount > 0
                     ? totalFeeAmount
                     : Currency.GetFeeAmount(_fee, _feePrice) > 0
-                        ? await App.Account.EstimateFeeAsync(Currency.Name, To, _amount, BlockchainTransactionType.Output, _fee, _feePrice)
+                        ? await account.EstimateFeeAsync(To, _amount, BlockchainTransactionType.Output, _fee, _feePrice)
                         : 0;
 
                 if (feeAmount != null)
@@ -365,10 +378,13 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 if (availableAmount == 0)
                     return;
 
+                var account = App.Account
+                    .GetCurrencyAccount<ILegacyCurrencyAccount>(Currency.Name);
+
                 if (UseDefaultFee)
                 {
-                    var (maxAmount, maxFeeAmount, _) = await App.Account
-                        .EstimateMaxAmountToSendAsync(Currency.Name, To, BlockchainTransactionType.Output, 0, 0, false);
+                    var (maxAmount, maxFeeAmount, _) = await account
+                        .EstimateMaxAmountToSendAsync(To, BlockchainTransactionType.Output, 0, 0, false);
 
                     if (maxAmount > 0)
                         _amount = maxAmount;
@@ -397,8 +413,8 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                         }
                     }
 
-                    var (maxAmount, maxFeeAmount, _) = await App.Account
-                        .EstimateMaxAmountToSendAsync(Currency.Name, To, BlockchainTransactionType.Output, _fee, _feePrice, false);
+                    var (maxAmount, maxFeeAmount, _) = await account
+                        .EstimateMaxAmountToSendAsync(To, BlockchainTransactionType.Output, _fee, _feePrice, false);
 
                     _amount = maxAmount;
 

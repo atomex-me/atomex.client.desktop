@@ -11,7 +11,7 @@
         ExtendClientAreaChromeHints="NoChrome"
         ExtendClientAreaTitleBarHeightHint="-1"
         Name="MainWindow"
-        MinWidth="800"
+        MinWidth="880"
         MinHeight="700"
         Classes="MainWindow">
 

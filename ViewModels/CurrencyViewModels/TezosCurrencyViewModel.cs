@@ -8,12 +8,12 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
 {
     public class TezosCurrencyViewModel : CurrencyViewModel
     {
-        public TezosCurrencyViewModel(Currency currency)
+        public TezosCurrencyViewModel(CurrencyConfig currency)
             : base(currency)
         {
             Header              = Currency.Description;
-            IconBrush           = new ImageBrush(GetBitmap(PathToImage("tezos_90x90.png")));
-            IconMaskBrush       = new ImageBrush(GetBitmap(PathToImage("tezos_mask.png")));
+            IconBrush           = DefaultIconBrush;
+            IconMaskBrush       = DefaultIconMaskBrush;
             AccentColor         = Color.FromRgb(r: 44, g: 125, b: 247);
             AmountColor         = Color.FromRgb(r: 188, g: 212, b: 247);
             UnselectedIconBrush = Brushes.White;
@@ -21,5 +21,9 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
             LargeIconPath       = GetBitmap(PathToImage("tezos_90x90.png"));
             FeeName             = Resources.SvMiningFee;
         }
+        
+        public static Brush DefaultIconBrush  = new ImageBrush(GetBitmap(PathToImage("tezos_90x90.png")));
+        public static Brush DefaultIconMaskBrush = new ImageBrush(GetBitmap(PathToImage("tezos_mask.png")));
+        public static IBrush DefaultUnselectedIconBrush = Brushes.White;
     }
 }

@@ -16,7 +16,6 @@
 
     <Grid Width="560">
         <StackPanel Orientation="Vertical">
-
             <Border Margin="0 10 0 10"
                     Height="33"
                     VerticalAlignment="Top"

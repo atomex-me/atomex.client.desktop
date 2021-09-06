@@ -1,0 +1,297 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="Atomex.Client.Desktop.Views.ReceiveViews.ReceiveView"
+             xmlns:vm="clr-namespace:Atomex.Client.Desktop.ViewModels.ReceiveViewModels"
+             xmlns:controls="clr-namespace:Atomex.Client.Desktop.Controls"
+             xmlns:helpers="clr-namespace:Atomex.Client.Desktop.Helpers"
+             Width="700"
+             Height="400">
+
+    <Design.DataContext>
+        <vm:ReceiveViewModel />
+    </Design.DataContext>
+
+
+    <Border Classes="ChildViewBorder">
+        <Grid>
+            <StackPanel Orientation="Vertical">
+                <Border Margin="0 10 0 20"
+                        Height="33"
+                        Background="{DynamicResource ChildViewHeaderBackgroundBrush}">
+                    <TextBlock Text="Receive"
+                               Foreground="{DynamicResource ChildViewHeaderForegroundBrush}"
+                               FontFamily="{DynamicResource DefaultLightFontFamily}"
+                               FontSize="25"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center" />
+                </Border>
+
+                <Border Width="570"
+                        MinHeight="68"
+                        Margin="0 5 0 5"
+                        CornerRadius="20"
+                        Background="{DynamicResource DefaultBackgroundBrush}">
+                    <Grid Margin="10"
+                          VerticalAlignment="Center">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="48" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="26" />
+                            <RowDefinition Height="22" />
+                        </Grid.RowDefinitions>
+
+                        <Image Width="48"
+                               Height="48"
+                               Source="{Binding CurrencyViewModel.LargeIconPath}"
+                               UseLayoutRounding="True"
+                               Grid.Column="0"
+                               Grid.RowSpan="2" />
+
+                        <TextBlock
+                            Text="{Binding CurrencyViewModel.Header, Converter={StaticResource StringToUpperCaseConverter}}"
+                            FontFamily="{DynamicResource DefaultBoldFontFamily}"
+                            FontWeight="Bold"
+                            FontSize="16"
+                            Foreground="{DynamicResource DefaultForegroundBrush}"
+                            Margin="7 0 0 0"
+                            VerticalAlignment="Bottom"
+                            Grid.Column="1"
+                            Grid.Row="0" />
+
+                        <StackPanel Orientation="Horizontal"
+                                    VerticalAlignment="Top"
+                                    Grid.Column="1"
+                                    Grid.Row="1">
+                            <TextBlock FontFamily="{DynamicResource DefaultFontFamily}"
+                                       FontSize="13"
+                                       Foreground="{DynamicResource DefaultForegroundBrush}"
+                                       Margin="7 0 0 0">
+                                <TextBlock.Text>
+                                    <MultiBinding Converter="{StaticResource AmountToStringConverter}">
+                                        <Binding Path="CurrencyViewModel.TotalAmount" Mode="OneWay" />
+                                        <Binding Path="CurrencyViewModel.CurrencyFormat" Mode="OneWay" />
+                                    </MultiBinding>
+                                </TextBlock.Text>
+                            </TextBlock>
+                            <TextBlock Text="{Binding CurrencyViewModel.CurrencyCode}"
+                                       FontFamily="{DynamicResource DefaultFontFamily}"
+                                       FontSize="9"
+                                       Foreground="{DynamicResource DefaultForegroundBrush}"
+                                       Margin="4 3 0 0" />
+                        </StackPanel>
+                    </Grid>
+                </Border>
+
+                <StackPanel Orientation="Horizontal"
+                            HorizontalAlignment="Center"
+                            Margin="33 0 0 0">
+                    <Border Width="90"
+                            Height="50"
+                            Background="{DynamicResource FieldHeaderBackgroundBrush}"
+                            CornerRadius="20 0 0 20">
+                        <TextBlock Text="Address:"
+                                   Margin="0 0 7 0"
+                                   Foreground="{DynamicResource DefaultForegroundBrush}"
+                                   FontFamily="{DynamicResource DefaultMediumFontFamily}"
+                                   FontSize="13"
+                                   VerticalAlignment="Center"
+                                   HorizontalAlignment="Right" />
+                    </Border>
+
+                    <ComboBox Width="480"
+                              Height="50"
+                              Margin="0 5 0 5"
+                              Items="{Binding FromAddressList}"
+                              SelectedIndex="{Binding SelectedAddressIndex, Mode=TwoWay}"
+                              Background="{DynamicResource DefaultSubstrateBrush}"
+                              Foreground="{DynamicResource DefaultForegroundBrush}"
+                              helpers:ComboBoxHelper.CornerRadius="0 20 20 0"
+                              helpers:ComboBoxHelper.PopupPadding="1 1 20 0"
+                              helpers:ComboBoxHelper.IconColor="{DynamicResource CurrencyComboBoxIconBrush}">
+
+                        <ComboBox.Styles>
+                            <Style Selector="ComboBoxItem">
+                                <Setter Property="Padding" Value="11 8" />
+                                <Setter Property="Height" Value="50" />
+                            </Style>
+
+                            <Style Selector="ComboBox">
+                                <Setter Property="Padding" Value="11 8" />
+                            </Style>
+                        </ComboBox.Styles>
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <Grid VerticalAlignment="Stretch">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="*" />
+                                        <RowDefinition Height="*" />
+                                    </Grid.RowDefinitions>
+                                    <TextBlock
+                                        Grid.RowSpan="2"
+                                        Text="(new)"
+                                        Foreground="{DynamicResource NewAddressBrush}"
+                                        FontSize="12"
+                                        FontFamily="{DynamicResource DefaultFontFamily}"
+                                        HorizontalAlignment="Left"
+                                        VerticalAlignment="Center"
+                                        IsVisible="{Binding IsFreeAddress}" />
+                                    <TextBlock
+                                        Grid.Row="0"
+                                        Grid.Column="1"
+                                        Grid.RowSpan="2"
+                                        Margin="3 0 0 0"
+                                        Text="{Binding Address}"
+                                        Foreground="{DynamicResource DefaultForegroundBrush}"
+                                        FontSize="12"
+                                        FontFamily="{DynamicResource DefaultFontFamily}"
+                                        HorizontalAlignment="Left"
+                                        VerticalAlignment="Center" />
+
+                                    <StackPanel Orientation="Horizontal"
+                                                Grid.Row="0"
+                                                Grid.Column="2"
+                                                Grid.RowSpan="2"
+                                                HorizontalAlignment="Right"
+                                                IsVisible="{Binding !ShowTokenBalance}">
+                                        <TextBlock
+                                            Margin="10 0 0 0"
+                                            Foreground="{DynamicResource AmountBrush}"
+                                            FontSize="12"
+                                            FontFamily="{DynamicResource DefaultFontFamily}"
+                                            HorizontalAlignment="Right"
+                                            VerticalAlignment="Center">
+                                            <TextBlock.Text>
+                                                <MultiBinding Converter="{StaticResource AmountToStringConverter}">
+                                                    <Binding Path="AvailableBalance" Mode="OneWay" />
+                                                    <Binding Path="CurrencyFormat" Mode="OneWay" />
+                                                </MultiBinding>
+                                            </TextBlock.Text>
+                                        </TextBlock>
+
+                                        <TextBlock
+                                            Margin="3 0 0 0"
+                                            Text="{Binding CurrencyCode}"
+                                            Foreground="{DynamicResource AmountBrush}"
+                                            FontSize="11"
+                                            FontFamily="{DynamicResource DefaultFontFamily}"
+                                            VerticalAlignment="Center" />
+                                    </StackPanel>
+
+                                    <StackPanel Orientation="Horizontal"
+                                                Grid.Row="0"
+                                                Grid.Column="2"
+                                                Margin="0 0 0 2"
+                                                HorizontalAlignment="Right"
+                                                IsVisible="{Binding ShowTokenBalance}">
+                                        <TextBlock
+                                            Margin="10 0 0 0"
+                                            Foreground="{DynamicResource AmountBrush}"
+                                            FontSize="12"
+                                            FontFamily="{DynamicResource DefaultFontFamily}"
+                                            HorizontalAlignment="Right"
+                                            VerticalAlignment="Center">
+                                            <TextBlock.Text>
+                                                <MultiBinding Converter="{StaticResource AmountToStringConverter}">
+                                                    <Binding Path="AvailableBalance" Mode="OneWay" />
+                                                    <Binding Path="CurrencyFormat" Mode="OneWay" />
+                                                </MultiBinding>
+                                            </TextBlock.Text>
+                                        </TextBlock>
+
+                                        <TextBlock
+                                            Margin="3 0 0 0"
+                                            Text="{Binding CurrencyCode}"
+                                            Foreground="{DynamicResource AmountBrush}"
+                                            FontSize="11"
+                                            FontFamily="{DynamicResource DefaultFontFamily}"
+                                            VerticalAlignment="Center" />
+                                    </StackPanel>
+
+                                    <StackPanel Orientation="Horizontal"
+                                                Grid.Row="1"
+                                                Grid.Column="2"
+                                                Margin="0 2 0 0"
+                                                HorizontalAlignment="Right"
+                                                IsVisible="{Binding ShowTokenBalance}">
+                                        <TextBlock
+                                            Margin="10 0 0 0"
+                                            Foreground="{DynamicResource DefaultForegroundBrush}"
+                                            FontSize="12"
+                                            FontFamily="{DynamicResource DefaultFontFamily}"
+                                            HorizontalAlignment="Right"
+                                            VerticalAlignment="Center">
+                                            <TextBlock.Text>
+                                                <MultiBinding Converter="{StaticResource AmountToStringConverter}">
+                                                    <Binding Path="TokenBalance" Mode="OneWay" />
+                                                    <Binding Path="TokenFormat" Mode="OneWay" />
+                                                </MultiBinding>
+                                            </TextBlock.Text>
+                                        </TextBlock>
+
+                                        <TextBlock
+                                            Margin="3 0 0 0"
+                                            Text="{Binding TokenCode}"
+                                            Foreground="{DynamicResource DefaultForegroundBrush}"
+                                            FontSize="11"
+                                            FontFamily="{DynamicResource DefaultFontFamily}"
+                                            VerticalAlignment="Center" />
+                                    </StackPanel>
+
+                                </Grid>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+
+                    <Border ToolTip.Placement="AnchorAndGravity"
+                            ToolTip.VerticalOffset="-32"
+                            VerticalAlignment="Center"
+                            Cursor="Help">
+                        <controls:IconButton
+                            Classes="PathButtonStyle"
+                            VerticalAlignment="Center"
+                            Foreground="{DynamicResource IconButtonForegroundBrush}"
+                            MouseOverBrush="{DynamicResource IconButtonMouseOverBrush}"
+                            PressedBrush="{DynamicResource IconButtonPressedBrush}"
+                            Path="{DynamicResource Octicons.Clippy}"
+                            Margin="7 0 0 0"
+                            Width="25"
+                            Height="25"
+                            Command="{Binding CopyCommand}" />
+                        <ToolTip.Tip>
+                            <TextBlock x:Name="ToolTipTextBoxExchange"
+                                       Text="Copy to clipboard" />
+                        </ToolTip.Tip>
+                    </Border>
+                </StackPanel>
+
+                <TextBlock Text="{Binding Warning}"
+                           Foreground="{DynamicResource WarningForegroundBrush}"
+                           FontFamily="{DynamicResource DefaultLightFontFamily}"
+                           FontSize="13"
+                           Margin="20 5 20 0"
+                           TextWrapping="Wrap"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center" />
+
+                <Image Width="128"
+                       Margin="0 10 0 5"
+                       Source="{Binding QrCode}" />
+
+                <StackPanel Orientation="Horizontal"
+                            Margin="0 5 0 20" />
+            </StackPanel>
+        </Grid>
+    </Border>
+</UserControl>
