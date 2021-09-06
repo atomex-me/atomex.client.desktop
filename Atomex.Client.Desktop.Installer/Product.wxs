@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+	<?if $(var.Platform)=x64 ?>
+		<?define ProductCode = "{750CA85F-3BBB-46DA-AEA9-756391044ED5}" ?>
+	<?else?>
+		<?define ProductCode = "{FCCEFB34-1E84-42E4-8B80-7FD7EC8716B9}" ?>
+	<?endif?>
+	
+	<?define Manufacturer = "Atomex.me" ?>
+	<?define UpgradeCode = "2938733e-4104-443a-850b-3916f1f68430" ?>
+	<?define BuildVersion = "1.0.74" ?>
+	
+	<Product Id="$(var.ProductCode)"
+			 Name="!(loc.ProductName_$(var.Platform))"
+			 Language="1033"
+			 Version="$(var.BuildVersion)"
+			 Manufacturer="$(var.Manufacturer)"
+			 UpgradeCode="$(var.UpgradeCode)">
+		<Package
+			InstallerVersion="200"
+			Compressed="yes"
+			InstallScope="perUser"
+			Platform="$(var.Platform)"
+			Manufacturer="$(var.Manufacturer)"
+			Description="!(loc.Description)"
+			Comments="!(loc.Copyright)" />
+
+		<MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
+		
+		<MediaTemplate EmbedCab="yes" />
+
+		<Icon Id="icon.ico" SourceFile="$(var.Atomex.Client.Desktop)" />
+
+		<Feature Id="ProductFeature" Title="Atomex.Client.Desktop" Level="1">
+			<ComponentGroupRef Id="ProductComponents" />
+		</Feature>
+	</Product>
+</Wix>
