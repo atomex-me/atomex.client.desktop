@@ -1,11 +1,55 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
-	<Fragment>
-		<ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
-			<!-- TODO: Remove the comments around this Component element and the ComponentRef below in order to add resources to this installer. -->
-			<!-- <Component Id="ProductComponent"> -->
-			<!-- TODO: Insert files, registry keys, and other resources here. -->
-			<!-- </Component> -->
-		</ComponentGroup>
-	</Fragment>
+<!--	<Fragment>-->
+<!--		&lt;!&ndash; Product Components &ndash;&gt;-->
+<!--		<ComponentGroup Id="ProductComponents">-->
+<!--			&lt;!&ndash; Shortcut &ndash;&gt;-->
+<!--			<ComponentRef Id="MainAppShortcut" />-->
+<!--			&lt;!&ndash; Desktop Shortcut &ndash;&gt;-->
+<!--			<ComponentRef Id="ApplicationShortcutDesktop" />-->
+<!--		</ComponentGroup>-->
+<!--		-->
+<!--		&lt;!&ndash; Installed files &ndash;&gt;-->
+<!--		<DirectoryRef Id="INSTALLFOLDER" FileSource="..\bin\Release\net5.0\win-$(var.Platform)\publish\">-->
+<!--			&lt;!&ndash; Shortcut to main application &ndash;&gt;-->
+<!--			<Component Id="MainAppShortcut" Guid="{15F4D89B-83E9-441D-AC18-B4C403D25EC9}">-->
+<!--				<Shortcut Id="MainAppShortcut"-->
+<!--						  Name="!(loc.ProductName_$(var.Platform))"-->
+<!--						  Target="[INSTALLFOLDER]Atomex.Client.Desktop.exe"-->
+<!--						  Directory="InstallProgramMenuFolder"-->
+<!--						  WorkingDirectory="INSTALLFOLDER"-->
+<!--						  Icon="icon.ico"-->
+<!--                  />-->
+
+<!--				&lt;!&ndash; Our unique key for this component/shortcut &ndash;&gt;-->
+<!--				<RegistryValue Id="RegShortcutKey" Root="HKCU" Key="SOFTWARE\$(loc.ProductNameFolder)" Name="Shortcut" Value="1" Type="integer" KeyPath="yes" />-->
+
+<!--				&lt;!&ndash;Remove start menu items &ndash;&gt;-->
+<!--				<RemoveFolder Id="RemoveStartMenu" Directory="InstallProgramMenuFolder" On="uninstall" />-->
+<!--			</Component>-->
+<!--		</DirectoryRef>-->
+
+<!--		&lt;!&ndash; Desktop shortcut &ndash;&gt;-->
+<!--		<DirectoryRef Id="DesktopFolder">-->
+<!--			<Component Id="ApplicationShortcutDesktop" Guid="*">-->
+<!--				<Shortcut-->
+<!--				  Id="ApplicationDesktopShortcut"-->
+<!--				  Name="!(loc.ProductName_$(var.Platform))"-->
+<!--				  Description="!(loc.Description)"-->
+<!--				  Target="[INSTALLFOLDER]Atomex.Client.Desktop.exe"-->
+<!--				  WorkingDirectory="INSTALLFOLDER"-->
+<!--				  Icon="icon.ico" />-->
+<!--				<RemoveFolder-->
+<!--				  Id="DesktopFolder"-->
+<!--				  On="uninstall" />-->
+<!--				<RegistryValue-->
+<!--				  Root="HKCU"-->
+<!--				  Key="SOFTWARE\$(loc.ProductNameFolder)"-->
+<!--				  Name="DesktopShortcut"-->
+<!--				  Type="integer"-->
+<!--				  Value="1"-->
+<!--				  KeyPath="yes" />-->
+<!--			</Component>-->
+<!--		</DirectoryRef>-->
+<!--	</Fragment>-->
 </Wix>

@@ -1,11 +1,12 @@
-<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
     <PropertyGroup>
-        <OutputType>Exe</OutputType>
+        <OutputType>WinExe</OutputType>
         <TargetFramework>net5.0</TargetFramework>
         <Nullable>enable</Nullable>
         <DefaultItemExcludes>$(DefaultItemExcludes);atomex.client.core\**</DefaultItemExcludes>
         <UseAppHost>true</UseAppHost>
-        <RuntimeIdentifiers>osx-x64</RuntimeIdentifiers>
+
+		<ApplicationIcon>Resources/Images/logo_dark_256x256.ico</ApplicationIcon>
 
         <AssemblyVersion>1.1.2</AssemblyVersion>
         <Version>1.1.2</Version>
@@ -185,5 +186,8 @@
     </ItemGroup>
     <ItemGroup>
       <Content Include=".github\workflows\build_mac.yml" />
+    </ItemGroup>
+    <ItemGroup>
+      <UpToDateCheckInput Remove="Assets\avalonia-logo.ico" />
     </ItemGroup>
 </Project>

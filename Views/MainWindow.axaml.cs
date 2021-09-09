@@ -152,14 +152,15 @@ namespace Atomex.Client.Desktop.Views
                         ctx.UpdateVersion = LastUpdate.Version;
                         await _sparkle.InitAndBeginDownload(LastUpdate);
 
-                        if (MacUpdater == null)
+                        if (MacUpdater != null)
+                            return;
+                        
+                        MacUpdater = new MacUpdater
                         {
-                            MacUpdater = new MacUpdater
-                            {
-                                SignatureVerifier = _sparkle.SignatureVerifier,
-                                UpdateDownloader = _sparkle.UpdateDownloader
-                            };
-                        }
+                            SignatureVerifier = _sparkle.SignatureVerifier,
+                            UpdateDownloader = _sparkle.UpdateDownloader
+                        };
+                        
                     }
                     catch (Exception e)
                     {
