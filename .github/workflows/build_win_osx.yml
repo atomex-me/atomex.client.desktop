@@ -71,7 +71,13 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: atomex-win
-          path: dist_osx/
+          path: dist/
+          
+      - name: Create appcast file for Windows .msi installer
+        env:
+          SPARKLE_PRIVATE_KEY: ${{ secrets.SPARKLE_PRIVATE_KEY }}
+          SPARKLE_PUBLIC_KEY: ${{ secrets.SPARKLE_PUBLIC_KEY }}
+        run: ./create_msi_appcast.sh
 
       - uses: "marvinpinto/action-automatic-releases@latest"
         with:
@@ -80,4 +86,4 @@ jobs:
 #          automatic_release_tag: "${{ env.VER }}"
 #          prerelease: false
           prerelease: true
-          files: dist_osx/*
+          files: dist/*
