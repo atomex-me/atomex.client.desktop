@@ -186,6 +186,7 @@
     </ItemGroup>
     <ItemGroup>
       <Content Include=".github\workflows\build_mac.yml" />
+      <Content Include=".github\workflows\build_win.yml" />
     </ItemGroup>
     <ItemGroup>
       <UpToDateCheckInput Remove="Assets\avalonia-logo.ico" />
