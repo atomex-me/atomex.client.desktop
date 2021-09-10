@@ -84,6 +84,7 @@ jobs:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
           title: "${{ env.VER }}"
 #          automatic_release_tag: "${{ env.VER }}"
+          automatic_release_tag: "$1.1.2"
 #          prerelease: false
           prerelease: true
           files: dist/*
