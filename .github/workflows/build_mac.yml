@@ -1,12 +1,37 @@
-name: Build and Sign macOS
-on:
-  push:
-    tags:
-      - '*.*.*'
+name: Build and release Windows & MacOS
+
+on: push
+#on:
+#  push:
+#    tags:
+#      - '*.*.*'    
 
 jobs:
-  macos:
+  build_win:
+    runs-on: windows-latest
+    env:
+      ACTIONS_ALLOW_UNSECURE_COMMANDS: true
+    steps:
+      - uses: actions/checkout@master
+        with:
+          submodules: true
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v1.0.2
+      - name: Setup NuGet
+        uses: NuGet/setup-nuget@v1.0.2
+      - name: Restore NuGet Packages
+        run: nuget restore Atomex.Client.Desktop.sln
+      - name: Build
+        run: MSBuild Atomex.Client.Desktop.Installer/Atomex.Client.Desktop.Installer.wixproj /p:Configuration=Release /p:RuntimeIdentifiers=win-x64 /clp:ErrorsOnly
+      - name: Upload windows release artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: atomex-win
+          path: Atomex.Client.Desktop.Installer/Installs
+
+  build_macos:
     runs-on: macos-latest
+    needs: [build_win]
     steps:
       - uses: actions/checkout@v2
         with:
@@ -41,6 +66,12 @@ jobs:
         run: |
           npm install --global create-dmg
           ./build_osx.sh $MACOS_NOTARIZE_PWD
+
+      - name: Download Windows articact files
+        uses: actions/download-artifact@v2
+        with:
+          name: atomex-win
+          path: dist_osx/
 
       - uses: "marvinpinto/action-automatic-releases@latest"
         with:
