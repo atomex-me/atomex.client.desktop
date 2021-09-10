@@ -3,6 +3,7 @@
 .vs/
 
 bin/
+Installs/
 obj/
 
 *.user

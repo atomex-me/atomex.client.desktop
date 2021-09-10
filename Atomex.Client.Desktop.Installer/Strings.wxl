@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<WixLocalization Culture="en-us" xmlns="http://schemas.microsoft.com/wix/2006/localization">
-<!--	<String Id="ProductName_x86">Atomex Client (32bit)</String>-->
-<!--	<String Id="ProductName_x64">Atomex Client (64bit)</String>-->
-<!--	<String Id="ProductNameFolder">Atomex</String>-->
-<!--	<String Id="Description">Multicurrency HD wallet with built-in hybrid exchange based on atomic swap.</String>-->
-<!--	<String Id="Copyright">Copyright © 2021 Atomex OÜ</String>-->
-</WixLocalization>
