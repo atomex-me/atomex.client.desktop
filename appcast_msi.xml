@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" version="2.0">
+    <channel>
+        <title>Atomex</title>
+        <link>https://github.com/atomex-me/atomex.client.desktop/releases/latest/download/appcast_msi.xml</link>
+        <description>${DESCRIPTION}</description>
+        <language>en</language>
+        <item>
+            <title>Version ${MSI_VER}</title>
+            <pubDate>${PUB_DATE}</pubDate>
+            <enclosure url="https://github.com/atomex-me/atomex.client.desktop/releases/download/${MSI_VER}/Atomex.Client-${MSI_VER}.0-x64.msi"
+                       sparkle:version="${MSI_VER}"
+                       sparkle:os="macos"
+                       length="${MSI_SIZE}"
+                       type="application/octet-stream"
+                       sparkle:signature="${MSI_SIGNATURE}" />
+        </item>
+    </channel>
+</rss>
