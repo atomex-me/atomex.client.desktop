@@ -56,13 +56,14 @@ jobs:
           security unlock-keychain -p $MACOS_CERTIFICATE_PWD atomex.build.keychain
           security import certificate.p12 -k atomex.build.keychain -P $MACOS_CERTIFICATE_PWD -T /usr/bin/codesign
           security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k $MACOS_CERTIFICATE_PWD atomex.build.keychain
-          echo 'VER='$(xmllint --xpath "//Project/PropertyGroup/Version/text()" Atomex.Client.Desktop.csproj) >> $GITHUB_ENV
+          echo 'VER='$(xmllint --xpath "/*[local-name() = 'Project']/*[local-name() = 'PropertyGroup']/*[local-name() = 'Version']/text()" Atomex.Client.Desktop.csproj) >> $GITHUB_ENV
 
       - name: Run Macos build bash script
         env:
           MACOS_NOTARIZE_PWD: ${{ secrets.MACOS_NOTARIZE_PWD }}
           SPARKLE_PRIVATE_KEY: ${{ secrets.SPARKLE_PRIVATE_KEY }}
           SPARKLE_PUBLIC_KEY: ${{ secrets.SPARKLE_PUBLIC_KEY }}
+          VER: ${{ env.VER }}
         run: |
           npm install --global create-dmg
           ./build_osx.sh $MACOS_NOTARIZE_PWD
@@ -77,6 +78,7 @@ jobs:
         env:
           SPARKLE_PRIVATE_KEY: ${{ secrets.SPARKLE_PRIVATE_KEY }}
           SPARKLE_PUBLIC_KEY: ${{ secrets.SPARKLE_PUBLIC_KEY }}
+          VER: ${{ env.VER }}
         run: ./create_msi_appcast.sh
 
       - uses: "marvinpinto/action-automatic-releases@latest"

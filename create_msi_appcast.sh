@@ -2,8 +2,7 @@
 MSI_PATH=$(find dist/ -type f -name "*.msi")
 
 export PUB_DATE=$(date -u +"%a, %d %b %Y %T GMT")
-export MSI_VER=$(xmllint --xpath "//Project/PropertyGroup/Version/text()" Atomex.Client.Desktop.csproj)
-export DESCRIPTION="Atomex release ${MSI_VER} ${PUB_DATE}"
+export DESCRIPTION="Atomex release ${VER} ${PUB_DATE}"
 export MSI_SIGNATURE=$(netsparkle-generate-appcast --generate-signature ${MSI_PATH} | awk '{print $2}')
 export MSI_SIZE=$(ls -la ${MSI_PATH} | awk '{print $5}')
 
