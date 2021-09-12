@@ -10,7 +10,7 @@
             <pubDate>${PUB_DATE}</pubDate>
             <enclosure url="https://github.com/atomex-me/atomex.client.desktop/releases/download/${VER}/Atomex.Client-${VER}.0-x64.msi"
                        sparkle:version="${VER}"
-                       sparkle:os="macos"
+                       sparkle:os="windows"
                        length="${MSI_SIZE}"
                        type="application/octet-stream"
                        sparkle:signature="${MSI_SIGNATURE}" />

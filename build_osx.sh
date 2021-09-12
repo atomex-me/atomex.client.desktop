@@ -120,7 +120,9 @@ export DESCRIPTION="Atomex release ${VER} ${PUB_DATE}"
 export SIGNATURE=$(netsparkle-generate-appcast --generate-signature ${ZIP_PATH} | awk '{print $2}')
 export ZIP_SIZE=$(ls -la ${ZIP_PATH} | awk '{print $5}')
 
-envsubst < appcast.xml > $DIST_FOLDER/appcast.xml
+# todo: remove appcast xml while all clients updated
+envsubst < appcast_osx.xml > $DIST_FOLDER/appcast.xml
+envsubst < appcast_osx.xml > $DIST_FOLDER/appcast_osx.xml
 
 echo "## ZIP SIGNATURE: ${SIGNATURE}"
 echo "## ZIP SIZE: ${ZIP_SIZE}"

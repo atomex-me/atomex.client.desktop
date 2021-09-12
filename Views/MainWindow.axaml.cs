@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Globalization;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using Atomex.Client.Desktop.Controls;
 using Avalonia;
@@ -44,7 +45,7 @@ namespace Atomex.Client.Desktop.Views
         private SparkleUpdater _sparkle;
 
         private AppCastItem LastUpdate;
-
+        private bool IsOSX;
         private MacUpdater MacUpdater;
 
         private MainWindowViewModel ctx;
@@ -78,9 +79,13 @@ namespace Atomex.Client.Desktop.Views
                             _activityTimer.Start();
                         }
                     });
-
+            IsOSX = RuntimeInformation.IsOSPlatform(OSPlatform.OSX);
+            var appcastUrl = IsOSX
+                ? "https://github.com/atomex-me/atomex.client.desktop/releases/latest/download/appcast.xml"
+                : "https://pi.turborouter.keenetic.pro/seafile/f/5afafaeea70b4a3a8503/?dl=1";
+            
             _sparkle = new SparkleUpdater(
-                "https://github.com/atomex-me/atomex.client.desktop/releases/latest/download/appcast.xml",
+                appcastUrl,
                 new Ed25519Checker(SecurityMode.OnlyVerifySoftwareDownloads,
                     "76FH2gIo7D5mpPPfnard5C9cVwq8TFaxpo/Wi2Iem/E="))
             {
@@ -114,7 +119,14 @@ namespace Atomex.Client.Desktop.Views
         {
             if (LastUpdate != null)
             {
-                MacUpdater.InstallUpdate(LastUpdate);
+                if (IsOSX)
+                {
+                    MacUpdater.InstallUpdate(LastUpdate);
+                }
+                else
+                {
+                    _sparkle.InstallUpdate(LastUpdate);
+                }
             }
         }
 
@@ -151,16 +163,17 @@ namespace Atomex.Client.Desktop.Views
                         ctx.HasUpdates = true;
                         ctx.UpdateVersion = LastUpdate.Version;
                         await _sparkle.InitAndBeginDownload(LastUpdate);
+                        
+                        if (!IsOSX) return;
 
                         if (MacUpdater != null)
                             return;
-                        
+
                         MacUpdater = new MacUpdater
                         {
                             SignatureVerifier = _sparkle.SignatureVerifier,
                             UpdateDownloader = _sparkle.UpdateDownloader
                         };
-                        
                     }
                     catch (Exception e)
                     {
