@@ -15,6 +15,7 @@ using Avalonia.Markup.Xaml;
 using System.Timers;
 using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.ViewModels;
+using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Interactivity;
 using NetSparkleUpdater;
 using NetSparkleUpdater.Enums;
@@ -46,6 +47,7 @@ namespace Atomex.Client.Desktop.Views
 
         private AppCastItem LastUpdate;
         private bool IsOSX;
+        private string _updateDownloadPath;
         private MacUpdater MacUpdater;
 
         private MainWindowViewModel ctx;
@@ -91,21 +93,24 @@ namespace Atomex.Client.Desktop.Views
             {
                 UserInteractionMode = UserInteractionMode.DownloadNoInstall
             };
+            
             _sparkle.LogWriter = new SparkleLogger();
             _sparkle.SecurityProtocolType = System.Net.SecurityProtocolType.Tls12;
             _sparkle.StartLoop(false, false);
-
+            
             CheckForUpdates(null, null);
             var checkUpdateReadyTimer = new Timer(TimeSpan.FromMinutes(5).TotalMilliseconds);
             checkUpdateReadyTimer.AutoReset = true;
             checkUpdateReadyTimer.Elapsed += CheckForUpdates;
             checkUpdateReadyTimer.Start();
+            
 
             _sparkle.DownloadStarted += (item, path) => { Console.WriteLine($"Updating download started {path}"); };
             _sparkle.DownloadFinished += (item, path) =>
             {
-                Console.WriteLine($"Updating download finished ${path}");
+                Log.Information($"Updating download finished ${path}");
                 ctx.UpdateDownloadProgress = 100;
+                _updateDownloadPath = path;
             };
 
             _sparkle.DownloadMadeProgress += (sender, item, args) =>
@@ -125,7 +130,15 @@ namespace Atomex.Client.Desktop.Views
                 }
                 else
                 {
-                    _sparkle.InstallUpdate(LastUpdate);
+                    _sparkle.RelaunchAfterUpdate = true;
+                    _sparkle.CloseApplication += () =>
+                    {
+                        if (Application.Current.ApplicationLifetime is IControlledApplicationLifetime applicationLifetime)
+                        {
+                            applicationLifetime.Shutdown(0);
+                        }
+                    };
+                    _sparkle.InstallUpdate(LastUpdate, _updateDownloadPath);
                 }
             }
         }

@@ -25,8 +25,8 @@
         <PackageReference Include="Avalonia.ReactiveUI" Version="0.10.6" />
         <PackageReference Include="Avalonia.Xaml.Behaviors" Version="0.10.6.10" />
         <PackageReference Include="Deadpikle.AvaloniaProgressRing" Version="0.9.0" />
-        <PackageReference Include="NetSparkleUpdater.SparkleUpdater" Version="2.0.5" />
-        <PackageReference Include="NetSparkleUpdater.UI.Avalonia" Version="2.0.6" />
+        <PackageReference Include="NetSparkleUpdater.SparkleUpdater" Version="2.0.6" />
+        <PackageReference Include="NetSparkleUpdater.UI.Avalonia" Version="2.0.8" />
         <PackageReference Include="OxyPlot.Avalonia" Version="2.1.0-20201211.2" />
         <PackageReference Include="QRCoder" Version="1.4.1" />
         <PackageReference Include="runtime.osx.10.10-x64.CoreCompat.System.Drawing" Version="5.8.64" />
