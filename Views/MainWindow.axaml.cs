@@ -19,7 +19,6 @@ using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Interactivity;
 using NetSparkleUpdater;
 using NetSparkleUpdater.Enums;
-using NetSparkleUpdater.Interfaces;
 using NetSparkleUpdater.SignatureVerifiers;
 using Serilog;
 using ILogger = NetSparkleUpdater.Interfaces.ILogger;
@@ -43,16 +42,17 @@ namespace Atomex.Client.Desktop.Views
         public event CancelEventHandler MainViewClosing;
         public event EventHandler Inactivity;
 
+        private readonly string NETSPARKLE_PK = "76FH2gIo7D5mpPPfnard5C9cVwq8TFaxpo/Wi2Iem/E=";
         private SparkleUpdater _sparkle;
-
-        private AppCastItem LastUpdate;
-        private bool IsOSX;
+        private AppCastItem _lastUpdate;
+        private bool _isOsx;
+        private bool _isWin;
+        private string _appcastUrl;
         private string _updateDownloadPath;
-        private MacUpdater MacUpdater;
+        private IUpdater _atomexUpdater;
 
         private MainWindowViewModel ctx;
-
-
+        
         public MainWindow()
         {
             InitializeComponent();
@@ -81,29 +81,33 @@ namespace Atomex.Client.Desktop.Views
                             _activityTimer.Start();
                         }
                     });
-            IsOSX = RuntimeInformation.IsOSPlatform(OSPlatform.OSX);
-            var appcastUrl = IsOSX
-                ? "https://github.com/atomex-me/atomex.client.desktop/releases/latest/download/appcast.xml"
-                : "https://pi.turborouter.keenetic.pro/seafile/f/5afafaeea70b4a3a8503/?dl=1";
+            _isOsx = RuntimeInformation.IsOSPlatform(OSPlatform.OSX);
+            _isWin = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+
+            _appcastUrl =
+                "https://github.com/atomex-me/atomex.client.desktop/releases/latest/download/appcast_{0}.xml";
+
+            if (_isOsx) _appcastUrl = string.Format(_appcastUrl, "osx");
+            if (_isWin) _appcastUrl = string.Format(_appcastUrl, "win");
             
             _sparkle = new SparkleUpdater(
-                appcastUrl,
+                _appcastUrl,
                 new Ed25519Checker(SecurityMode.OnlyVerifySoftwareDownloads,
-                    "76FH2gIo7D5mpPPfnard5C9cVwq8TFaxpo/Wi2Iem/E="))
+                    NETSPARKLE_PK))
             {
                 UserInteractionMode = UserInteractionMode.DownloadNoInstall
             };
-            
+
             _sparkle.LogWriter = new SparkleLogger();
             _sparkle.SecurityProtocolType = System.Net.SecurityProtocolType.Tls12;
             _sparkle.StartLoop(false, false);
-            
+
             CheckForUpdates(null, null);
             var checkUpdateReadyTimer = new Timer(TimeSpan.FromMinutes(5).TotalMilliseconds);
             checkUpdateReadyTimer.AutoReset = true;
             checkUpdateReadyTimer.Elapsed += CheckForUpdates;
             checkUpdateReadyTimer.Start();
-            
+
 
             _sparkle.DownloadStarted += (item, path) => { Console.WriteLine($"Updating download started {path}"); };
             _sparkle.DownloadFinished += (item, path) =>
@@ -122,23 +126,17 @@ namespace Atomex.Client.Desktop.Views
 
         private void ManualUpdate_Click()
         {
-            if (LastUpdate != null)
+            if (_lastUpdate != null)
             {
-                if (IsOSX)
+                if (_isOsx)
                 {
-                    MacUpdater.InstallUpdate(LastUpdate);
+                    _atomexUpdater.InstallUpdate(_lastUpdate);
+                    return;
                 }
-                else
+
+                if (_isWin)
                 {
-                    _sparkle.RelaunchAfterUpdate = true;
-                    _sparkle.CloseApplication += () =>
-                    {
-                        if (Application.Current.ApplicationLifetime is IControlledApplicationLifetime applicationLifetime)
-                        {
-                            applicationLifetime.Shutdown(0);
-                        }
-                    };
-                    _sparkle.InstallUpdate(LastUpdate, _updateDownloadPath);
+                    _atomexUpdater.InstallUpdate(_lastUpdate, _updateDownloadPath);
                 }
             }
         }
@@ -172,21 +170,29 @@ namespace Atomex.Client.Desktop.Views
                 {
                     try
                     {
-                        LastUpdate = _updateInfo.Updates.Last();
+                        _lastUpdate = _updateInfo.Updates.Last();
                         ctx.HasUpdates = true;
-                        ctx.UpdateVersion = LastUpdate.Version;
-                        await _sparkle.InitAndBeginDownload(LastUpdate);
+                        ctx.UpdateVersion = _lastUpdate.Version;
+                        await _sparkle.InitAndBeginDownload(_lastUpdate);
                         
-                        if (!IsOSX) return;
-
-                        if (MacUpdater != null)
+                        if (_atomexUpdater != null)
                             return;
 
-                        MacUpdater = new MacUpdater
-                        {
-                            SignatureVerifier = _sparkle.SignatureVerifier,
-                            UpdateDownloader = _sparkle.UpdateDownloader
-                        };
+                        if (_isOsx)
+                            _atomexUpdater = new MacUpdater
+                            {
+                                SignatureVerifier = _sparkle.SignatureVerifier,
+                                UpdateDownloader = _sparkle.UpdateDownloader
+                            };
+                        
+                        if (_isWin)
+                            _atomexUpdater = new WindowsUpdater(_appcastUrl,
+                                new Ed25519Checker(SecurityMode.OnlyVerifySoftwareDownloads,
+                                    NETSPARKLE_PK))
+                            {
+                                SignatureVerifier = _sparkle.SignatureVerifier,
+                                UpdateDownloader = _sparkle.UpdateDownloader
+                            };
                     }
                     catch (Exception e)
                     {

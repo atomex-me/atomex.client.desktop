@@ -13,7 +13,7 @@ using Serilog;
 
 namespace Atomex.Client.Desktop.Common
 {
-    public class MacUpdater
+    public class MacUpdater : IUpdater
     {
         private string LaunchdFileName => "com.atomex.osx.plist";
 
@@ -282,11 +282,6 @@ namespace Atomex.Client.Desktop.Common
             {
                 return false;
             }
-        }
-        
-        protected bool DoExtensionsMatch(string extension, string otherExtension)
-        {
-            return extension.Equals(otherExtension, StringComparison.CurrentCultureIgnoreCase);
         }
 
         // Exec grabbed from https://stackoverflow.com/a/47918132/3938401

@@ -25,7 +25,7 @@
         <PackageReference Include="Avalonia.ReactiveUI" Version="0.10.6" />
         <PackageReference Include="Avalonia.Xaml.Behaviors" Version="0.10.6.10" />
         <PackageReference Include="Deadpikle.AvaloniaProgressRing" Version="0.9.0" />
-        <PackageReference Include="NetSparkleUpdater.SparkleUpdater" Version="2.0.6" />
+        <PackageReference Include="NetSparkleUpdater.SparkleUpdater" Version="2.0.7" />
         <PackageReference Include="NetSparkleUpdater.UI.Avalonia" Version="2.0.8" />
         <PackageReference Include="OxyPlot.Avalonia" Version="2.1.0-20201211.2" />
         <PackageReference Include="QRCoder" Version="1.4.1" />
@@ -180,14 +180,5 @@
         <ProjectReference Include="atomex.client.core\Atomex.Client.Core\Atomex.Client.Core.csproj">
             <GlobalPropertiesToRemove></GlobalPropertiesToRemove>
         </ProjectReference>
-    </ItemGroup>
-    <ItemGroup>
-      <Folder Include="dist_osx" />
-    </ItemGroup>
-    <ItemGroup>
-      <Content Include=".github\workflows\build_win_osx.yml" />
-    </ItemGroup>
-    <ItemGroup>
-      <UpToDateCheckInput Remove="Assets\avalonia-logo.ico" />
     </ItemGroup>
 </Project>
