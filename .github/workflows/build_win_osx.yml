@@ -1,10 +1,9 @@
 name: Build and release Windows & MacOS
 
-on: push
-#on:
-#  push:
-#    tags:
-#      - '*.*.*'    
+on:
+  push:
+    tags:
+      - '*.*.*'    
 
 jobs:
   build_win:
