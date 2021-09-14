@@ -84,7 +84,6 @@ jobs:
       - uses: "marvinpinto/action-automatic-releases@latest"
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
-#          automatic_release_tag: "${{ env.VER }}"
-          automatic_release_tag: "1.1.2"
+          automatic_release_tag: "${{ env.VER }}"
           prerelease: false
           files: dist/*
