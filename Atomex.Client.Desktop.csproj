@@ -1,11 +1,12 @@
-<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
     <PropertyGroup>
         <OutputType>WinExe</OutputType>
         <TargetFramework>net5.0</TargetFramework>
         <Nullable>enable</Nullable>
         <DefaultItemExcludes>$(DefaultItemExcludes);atomex.client.core\**</DefaultItemExcludes>
         <UseAppHost>true</UseAppHost>
-        <RuntimeIdentifiers>osx-x64</RuntimeIdentifiers>
+
+		<ApplicationIcon>Resources/Images/logo_dark_256x256.ico</ApplicationIcon>
 
         <AssemblyVersion>1.1.2</AssemblyVersion>
         <Version>1.1.2</Version>
@@ -24,8 +25,8 @@
         <PackageReference Include="Avalonia.ReactiveUI" Version="0.10.6" />
         <PackageReference Include="Avalonia.Xaml.Behaviors" Version="0.10.6.10" />
         <PackageReference Include="Deadpikle.AvaloniaProgressRing" Version="0.9.0" />
-        <PackageReference Include="NetSparkleUpdater.SparkleUpdater" Version="2.0.5" />
-        <PackageReference Include="NetSparkleUpdater.UI.Avalonia" Version="2.0.6" />
+        <PackageReference Include="NetSparkleUpdater.SparkleUpdater" Version="2.0.7" />
+        <PackageReference Include="NetSparkleUpdater.UI.Avalonia" Version="2.0.8" />
         <PackageReference Include="OxyPlot.Avalonia" Version="2.1.0-20201211.2" />
         <PackageReference Include="QRCoder" Version="1.4.1" />
         <PackageReference Include="runtime.osx.10.10-x64.CoreCompat.System.Drawing" Version="5.8.64" />
@@ -179,11 +180,5 @@
         <ProjectReference Include="atomex.client.core\Atomex.Client.Core\Atomex.Client.Core.csproj">
             <GlobalPropertiesToRemove></GlobalPropertiesToRemove>
         </ProjectReference>
-    </ItemGroup>
-    <ItemGroup>
-      <Folder Include="dist_osx" />
-    </ItemGroup>
-    <ItemGroup>
-      <Content Include=".github\workflows\build_mac.yml" />
     </ItemGroup>
 </Project>

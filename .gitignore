@@ -3,10 +3,11 @@
 .vs/
 
 bin/
+Installs/
 obj/
 
 *.user
-dist_osx/
+dist/
 release/
 
 .DS_Store

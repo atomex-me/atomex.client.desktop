@@ -1,6 +1,6 @@
 #!/bin/bash
 BASE_DIR=$PWD
-DIST_FOLDER="dist_osx"
+DIST_FOLDER="dist"
 APP_NAME="$DIST_FOLDER/Atomex.app"
 ZIP_PATH="$DIST_FOLDER/Atomex.zip"
 PUBLISH_OUTPUT_DIRECTORY="bin/Release/net5.0/osx-x64/publish/."
@@ -116,12 +116,13 @@ echo "## Stapling $dmg_file_name"
 xcrun stapler staple "$dmg_file_name"
 
 export PUB_DATE=$(date -u +"%a, %d %b %Y %T GMT")
-export VER=$(xmllint --xpath "//Project/PropertyGroup/Version/text()" Atomex.Client.Desktop.csproj)
 export DESCRIPTION="Atomex release ${VER} ${PUB_DATE}"
 export SIGNATURE=$(netsparkle-generate-appcast --generate-signature ${ZIP_PATH} | awk '{print $2}')
 export ZIP_SIZE=$(ls -la ${ZIP_PATH} | awk '{print $5}')
 
-envsubst < appcast.xml > dist_osx/appcast.xml
+# todo: remove appcast xml while all clients updated
+envsubst < appcast_osx.xml > $DIST_FOLDER/appcast.xml
+envsubst < appcast_osx.xml > $DIST_FOLDER/appcast_osx.xml
 
 echo "## ZIP SIGNATURE: ${SIGNATURE}"
 echo "## ZIP SIZE: ${ZIP_SIZE}"

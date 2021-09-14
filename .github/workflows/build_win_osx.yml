@@ -1,12 +1,36 @@
-name: Build and Sign macOS
+name: Build and release Windows & MacOS
+
 on:
   push:
     tags:
-      - '*.*.*'
+      - '*.*.*'    
 
 jobs:
-  macos:
+  build_win:
+    runs-on: windows-latest
+    env:
+      ACTIONS_ALLOW_UNSECURE_COMMANDS: true
+    steps:
+      - uses: actions/checkout@master
+        with:
+          submodules: true
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v1.0.2
+      - name: Setup NuGet
+        uses: NuGet/setup-nuget@v1.0.2
+      - name: Restore NuGet Packages
+        run: nuget restore Atomex.Client.Desktop.sln
+      - name: Build
+        run: MSBuild Atomex.Client.Desktop.Installer/Atomex.Client.Desktop.Installer.wixproj /p:Configuration=Release /p:RuntimeIdentifiers=win-x64 /clp:ErrorsOnly
+      - name: Upload windows release artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: atomex-win
+          path: Atomex.Client.Desktop.Installer/Installs
+
+  build_macos:
     runs-on: macos-latest
+    needs: [build_win]
     steps:
       - uses: actions/checkout@v2
         with:
@@ -31,21 +55,34 @@ jobs:
           security unlock-keychain -p $MACOS_CERTIFICATE_PWD atomex.build.keychain
           security import certificate.p12 -k atomex.build.keychain -P $MACOS_CERTIFICATE_PWD -T /usr/bin/codesign
           security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k $MACOS_CERTIFICATE_PWD atomex.build.keychain
-          echo 'VER='$(xmllint --xpath "//Project/PropertyGroup/Version/text()" Atomex.Client.Desktop.csproj) >> $GITHUB_ENV
+          echo 'VER='$(xmllint --xpath "/*[local-name() = 'Project']/*[local-name() = 'PropertyGroup']/*[local-name() = 'Version']/text()" Atomex.Client.Desktop.csproj) >> $GITHUB_ENV
 
       - name: Run Macos build bash script
         env:
           MACOS_NOTARIZE_PWD: ${{ secrets.MACOS_NOTARIZE_PWD }}
           SPARKLE_PRIVATE_KEY: ${{ secrets.SPARKLE_PRIVATE_KEY }}
           SPARKLE_PUBLIC_KEY: ${{ secrets.SPARKLE_PUBLIC_KEY }}
+          VER: ${{ env.VER }}
         run: |
           npm install --global create-dmg
           ./build_osx.sh $MACOS_NOTARIZE_PWD
 
+      - name: Download Windows articact files
+        uses: actions/download-artifact@v2
+        with:
+          name: atomex-win
+          path: dist/
+          
+      - name: Create appcast file for Windows .msi installer
+        env:
+          SPARKLE_PRIVATE_KEY: ${{ secrets.SPARKLE_PRIVATE_KEY }}
+          SPARKLE_PUBLIC_KEY: ${{ secrets.SPARKLE_PUBLIC_KEY }}
+          VER: ${{ env.VER }}
+        run: ./create_msi_appcast.sh
+
       - uses: "marvinpinto/action-automatic-releases@latest"
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
-          title: "${{ env.VER }}"
           automatic_release_tag: "${{ env.VER }}"
           prerelease: false
-          files: dist_osx/*
+          files: dist/*
