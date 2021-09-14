@@ -5,11 +5,10 @@
         <Nullable>enable</Nullable>
         <DefaultItemExcludes>$(DefaultItemExcludes);atomex.client.core\**</DefaultItemExcludes>
         <UseAppHost>true</UseAppHost>
+        <ApplicationIcon>Resources/Images/logo_dark_256x256.ico</ApplicationIcon>
 
-		<ApplicationIcon>Resources/Images/logo_dark_256x256.ico</ApplicationIcon>
-
-        <AssemblyVersion>1.1.3</AssemblyVersion>
-        <Version>1.1.3</Version>
+        <AssemblyVersion>1.1.4</AssemblyVersion>
+        <Version>1.1.4</Version>
     </PropertyGroup>
     <ItemGroup>
         <AvaloniaResource Include="Assets\**" />
