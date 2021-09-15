@@ -21,7 +21,7 @@ mkdir "$BASE_DIR/$APP_NAME/Contents"
 mkdir "$BASE_DIR/$APP_NAME/Contents/MacOS"
 mkdir "$BASE_DIR/$APP_NAME/Contents/Resources"
 
-cp "$BASE_DIR/$INFO_PLIST" "$BASE_DIR/$APP_NAME/Contents/$INFO_PLIST"
+envsubst < $INFO_PLIST > "$BASE_DIR/$APP_NAME/Contents/$INFO_PLIST"
 cp "$BASE_DIR/$ICON_FILE" "$BASE_DIR/$APP_NAME/Contents/Resources/$ICON_FILE"
 cp -a "$BASE_DIR/$PUBLISH_OUTPUT_DIRECTORY" "$BASE_DIR/$APP_NAME/Contents/MacOS"
 
