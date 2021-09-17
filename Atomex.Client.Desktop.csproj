@@ -7,8 +7,8 @@
         <UseAppHost>true</UseAppHost>
         <ApplicationIcon>Resources/Images/logo_dark_256x256.ico</ApplicationIcon>
 
-        <AssemblyVersion>1.1.42</AssemblyVersion>
-        <Version>1.1.42</Version>
+        <AssemblyVersion>1.1.43</AssemblyVersion>
+        <Version>1.1.43</Version>
     </PropertyGroup>
     <ItemGroup>
         <AvaloniaResource Include="Assets\**" />
