@@ -32,9 +32,7 @@ jobs:
           setx path "%path%;C:\Program Files (x86)\Windows Kits\10\bin\10.0.19041.0\x64"
 
       - name: Build Desktop app
-        run: |
-          rd /s /q ..\bin\Release\net5.0\win-x64
-          dotnet publish Atomex.Client.Desktop.csproj -c Release -r win-x64
+        run: dotnet publish Atomex.Client.Desktop.csproj -c Release -r win-x64
 
       - name: Sign builded artifacts
         run: |
