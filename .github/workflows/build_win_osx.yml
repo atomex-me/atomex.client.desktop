@@ -35,9 +35,9 @@ jobs:
 
       - name: Sign builded artifacts
         run: |
-          C:\Program Files (x86)\Windows Kits\10\bin\10.0.19041.0\x64\signtool.exe sign /f certificate\certificate.pfx /p '${{ secrets.WINDOWS_CERT_PFX_PASS }}' /t http://timestamp.comodoca.com/authenticode bin\Release\net5.0\win-x64\publish\Atomex.Client.Core.dll
-          C:\Program Files (x86)\Windows Kits\10\bin\10.0.19041.0\x64\signtool.exe sign /f certificate\certificate.pfx /p '${{ secrets.WINDOWS_CERT_PFX_PASS }}' /t http://timestamp.comodoca.com/authenticode bin\Release\net5.0\win-x64\publish\Atomex.Client.Desktop.dll
-          C:\Program Files (x86)\Windows Kits\10\bin\10.0.19041.0\x64\signtool.exe sign /f certificate\certificate.pfx /p '${{ secrets.WINDOWS_CERT_PFX_PASS }}' /t http://timestamp.comodoca.com/authenticode bin\Release\net5.0\win-x64\publish\Atomex.Client.Desktop.exe
+          & "C:\Program Files (x86)\Windows Kits\10\bin\10.0.19041.0\x64\signtool.exe" sign /f certificate\certificate.pfx /p '${{ secrets.WINDOWS_CERT_PFX_PASS }}' /t http://timestamp.comodoca.com/authenticode bin\Release\net5.0\win-x64\publish\Atomex.Client.Core.dll
+          & "C:\Program Files (x86)\Windows Kits\10\bin\10.0.19041.0\x64\signtool.exe" sign /f certificate\certificate.pfx /p '${{ secrets.WINDOWS_CERT_PFX_PASS }}' /t http://timestamp.comodoca.com/authenticode bin\Release\net5.0\win-x64\publish\Atomex.Client.Desktop.dll
+          & "C:\Program Files (x86)\Windows Kits\10\bin\10.0.19041.0\x64\signtool.exe" sign /f certificate\certificate.pfx /p '${{ secrets.WINDOWS_CERT_PFX_PASS }}' /t http://timestamp.comodoca.com/authenticode bin\Release\net5.0\win-x64\publish\Atomex.Client.Desktop.exe
           
       - name: Build Desktop app .msi installer
         run: MSBuild Atomex.Client.Desktop.Installer/Atomex.Client.Desktop.Installer.wixproj /p:Configuration=Release /p:RuntimeIdentifiers=win-x64 /clp:ErrorsOnly
