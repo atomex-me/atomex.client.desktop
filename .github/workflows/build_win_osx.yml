@@ -3,7 +3,7 @@ name: Build and release Windows & MacOS
 on:
   push:
     tags:
-      - '*.*.*'    
+      - '*.*.*'
 
 jobs:
   build_win:
@@ -14,14 +14,42 @@ jobs:
       - uses: actions/checkout@master
         with:
           submodules: true
+      - uses: GuillaumeFalourd/setup-windows10-sdk-action@v1
+        with:
+          sdk-version: 19041
       - name: Setup MSBuild
         uses: microsoft/setup-msbuild@v1.0.2
       - name: Setup NuGet
         uses: NuGet/setup-nuget@v1.0.2
       - name: Restore NuGet Packages
         run: nuget restore Atomex.Client.Desktop.sln
-      - name: Build
+
+      - name: Create Code Signing Certificate
+        run: |
+          New-Item -ItemType directory -Path certificate
+          Set-Content -Path certificate\certificate.txt -Value '${{ secrets.WINDOWS_CERT_PFX_BASE64 }}'
+          certutil -decode certificate\certificate.txt certificate\certificate.pfx
+          setx path "%path%;C:\Program Files (x86)\Windows Kits\10\bin\10.0.19041.0\x64"
+
+      - name: Build Desktop app
+        run: |
+          rd /s /q ..\bin\Release\net5.0\win-x64
+          dotnet publish Atomex.Client.Desktop.csproj -c Release -r win-x64
+
+      - name: Sign builded artifacts
+        run: |
+          signtool.exe sign /f certificate\certificate.pfx /p '${{ secrets.WINDOWS_CERT_PFX_PASS }}' /t http://timestamp.comodoca.com/authenticode bin\Release\net5.0\win-x64\publish\Atomex.Client.Core.dll
+          signtool.exe sign /f certificate\certificate.pfx /p '${{ secrets.WINDOWS_CERT_PFX_PASS }}' /t http://timestamp.comodoca.com/authenticode bin\Release\net5.0\win-x64\publish\Atomex.Client.Desktop.dll
+          signtool.exe sign /f certificate\certificate.pfx /p '${{ secrets.WINDOWS_CERT_PFX_PASS }}' /t http://timestamp.comodoca.com/authenticode bin\Release\net5.0\win-x64\publish\Atomex.Client.Desktop.exe
+          
+      - name: Build Desktop app .msi installer
         run: MSBuild Atomex.Client.Desktop.Installer/Atomex.Client.Desktop.Installer.wixproj /p:Configuration=Release /p:RuntimeIdentifiers=win-x64 /clp:ErrorsOnly
+        
+      - name: Sign MSI installer
+        run: |
+          $version=(git describe --tags --abbrev=0)
+          signtool.exe sign /f certificate\certificate.pfx /p '${{ secrets.WINDOWS_CERT_PFX_PASS }}' /t http://timestamp.comodoca.com/authenticode "Atomex.Client.Desktop.Installer\Installs\Atomex.Client-$version.0-x64.msi"
+          
       - name: Upload windows release artifacts
         uses: actions/upload-artifact@v2
         with:
@@ -30,7 +58,7 @@ jobs:
 
   build_macos:
     runs-on: macos-latest
-    needs: [build_win]
+    needs: [ build_win ]
     steps:
       - uses: actions/checkout@v2
         with:
@@ -72,7 +100,7 @@ jobs:
         with:
           name: atomex-win
           path: dist/
-          
+
       - name: Create appcast file for Windows .msi installer
         env:
           SPARKLE_PRIVATE_KEY: ${{ secrets.SPARKLE_PRIVATE_KEY }}

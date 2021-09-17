@@ -70,9 +70,10 @@
     <Error Text="The WiX Toolset v3.11 (or newer) build tools must be installed to build this project. To download the WiX Toolset, see http://wixtoolset.org/releases/" />
   </Target>
   <Target Name="BeforeBuild">
-    <Exec Command="rd /s /q ..\bin\$(Configuration)\net5.0\win-$(Platform)" />
-    <Exec Command="dotnet publish ..\Atomex.Client.Desktop.csproj -c $(Configuration) -r win-$(Platform)" />
-    <GetAssemblyIdentity AssemblyFiles="..\bin\$(Configuration)\net5.0\win-$(Platform)\Atomex.Client.Desktop.dll">
+<!--    If you want build .msi locally uncomment this two lines-->
+<!--    <Exec Command="rd /s /q ..\bin\$(Configuration)\net5.0\win-$(Platform)" />-->
+<!--    <Exec Command="dotnet publish ..\Atomex.Client.Desktop.csproj -c $(Configuration) -r win-$(Platform)" />-->
+    <GetAssemblyIdentity AssemblyFiles="..\bin\$(Configuration)\net5.0\win-$(Platform)\publish\Atomex.Client.Desktop.dll">
       <Output TaskParameter="Assemblies" ItemName="AssemblyVersion" />
     </GetAssemblyIdentity>
     <PropertyGroup>
@@ -80,18 +81,11 @@
     </PropertyGroup>
   </Target>
   <Target Name="AfterBuild">
-    <GetAssemblyIdentity AssemblyFiles="..\bin\$(Configuration)\net5.0\win-$(Platform)\Atomex.Client.Desktop.dll">
+    <GetAssemblyIdentity AssemblyFiles="..\bin\$(Configuration)\net5.0\win-$(Platform)\publish\Atomex.Client.Desktop.dll">
       <Output TaskParameter="Assemblies" ItemName="AssemblyVersion" />
     </GetAssemblyIdentity>
-
     <!-- Rename and move final MSI -->
     <Exec Command="if not exist Installs mkdir Installs" />
     <Exec Command="move bin\$(Configuration)\$(OutputName).msi Installs\Atomex.Client-%(AssemblyVersion.Version)-$(Platform).msi" />
   </Target>
-  <!--    <PropertyGroup>-->
-  <!--        <PreBuildEvent>if $(ConfigurationName) == Release start /wait "Atomex binaries signing" exsigner.exe sign -k $(SolutionDir)certificate_key.pfx -s "Atomex Client" $(SolutionDir)Atomex.Client.Desktop\bin\Release\Atomex.Client.Desktop.exe $(SolutionDir)Atomex.Client.Desktop\bin\Release\Atomex.Client.Core.dll</PreBuildEvent>-->
-  <!--    </PropertyGroup>-->
-  <!--    <PropertyGroup>-->
-  <!--        <PostBuildEvent>if $(ConfigurationName) == Release start /wait "Atomex msi signing" exsigner.exe sign -k $(SolutionDir)certificate_key.pfx -s "Atomex Client" !(TargetPath)</PostBuildEvent>-->
-  <!--    </PropertyGroup>-->
 </Project>

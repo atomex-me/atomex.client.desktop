@@ -11,3 +11,4 @@ dist/
 release/
 
 .DS_Store
+*.pfx
