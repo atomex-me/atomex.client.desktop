@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Net.Http;
 using System.Text;
 using System.Threading;
@@ -52,11 +53,16 @@ namespace Atomex.Client.Desktop.Api
             public decimal Amount { get; set; }
         }
 
-        public string BaseUrl => App.Account.Network == Atomex.Core.Network.MainNet
+        public string BaseUrl => App.Account.Network == Core.Network.MainNet
             ? "https://widget.wert.io/"
             : "https://sandbox.wert.io/";
 
         private string ConvertUrl => "api/v3/convert";
+
+        private string _partnerIdHeader => App.Account.Network == Core.Network.MainNet
+            ? "atomex"
+            : "01F298K3HP4DY326AH1NS3MM3M";
+        
         protected IAtomexApp App { get; }
 
         private const int MinDelayBetweenRequestMs = 1000;
@@ -85,10 +91,16 @@ namespace Atomex.Client.Desktop.Api
                 To = to,
                 Amount = amount
             });
+            
+            var headers = new HttpRequestHeaders
+            {
+                new KeyValuePair<string, IEnumerable<string>>("x-partner-id", new[] {_partnerIdHeader})
+            };
 
             return await HttpHelper.PostAsyncResult<WertConvertResponse>(
                     baseUri: BaseUrl,
                     requestUri: ConvertUrl,
+                    headers: headers,
                     content: new StringContent(requestContent, Encoding.UTF8, "application/json"),
                     responseHandler: (response, content) => JsonConvert.DeserializeObject<WertConvertResponse>(content),
                     cancellationToken: cancellationToken)

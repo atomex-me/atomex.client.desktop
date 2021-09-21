@@ -258,7 +258,7 @@
                     </StackPanel>
                 </controls:MenuButton>
 
-                <!--<controls:MenuButton
+                <controls:MenuButton
                     Background="Transparent"
                     Foreground="White"
                     IsSelected="{Binding IsWertSectionActive}"
@@ -285,7 +285,7 @@
                             </TextBlock>
                         </Panel>
                     </StackPanel>
-                </controls:MenuButton>-->
+                </controls:MenuButton>
             </StackPanel>
         </DockPanel>
 
