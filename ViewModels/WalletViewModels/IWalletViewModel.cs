@@ -8,5 +8,6 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         string Header { get; }
         bool IsSelected { get; set; }
         IBrush OpacityMask { get; }
+        double CurrencyOpacityValue { get; }
     }
 }

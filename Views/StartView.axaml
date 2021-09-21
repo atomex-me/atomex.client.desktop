@@ -13,9 +13,9 @@
     </Design.DataContext>
 
     <UserControl.Resources>
-        <ImageBrush x:Key="GithubBrush" Source="avares://Atomex.Client.Desktop/Resources/Images/github.png" />
-        <ImageBrush x:Key="TelegramBrush" Source="avares://Atomex.Client.Desktop/Resources/Images/telegram.png" />
-        <ImageBrush x:Key="TwitterBrush" Source="avares://Atomex.Client.Desktop/Resources/Images/twitter.png" />
+        <ImageBrush BitmapInterpolationMode="HighQuality" x:Key="GithubBrush" Source="avares://Atomex.Client.Desktop/Resources/Images/github.png" />
+        <ImageBrush BitmapInterpolationMode="HighQuality" x:Key="TelegramBrush" Source="avares://Atomex.Client.Desktop/Resources/Images/telegram.png" />
+        <ImageBrush BitmapInterpolationMode="HighQuality" x:Key="TwitterBrush" Source="avares://Atomex.Client.Desktop/Resources/Images/twitter.png" />
     </UserControl.Resources>
 
     <Border Classes="ChildViewBorderLight"
@@ -108,6 +108,7 @@
                                          Height="25"
                                          Margin="3 0 0 0"
                                          OpacityMask="{StaticResource TelegramBrush}"
+                                         
                                          Foreground="{DynamicResource SocialDefaultBrush}"
                                          MouseOverBrush="{DynamicResource SocialMouseOverBrush}"
                                          PressedBrush="{DynamicResource SocialDefaultBrush}"

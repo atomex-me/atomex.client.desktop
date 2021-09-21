@@ -2,6 +2,7 @@
 using Atomex.Core;
 using Avalonia.Media;
 using Atomex.Client.Desktop.ViewModels.Abstract;
+using Avalonia.Visuals.Media.Imaging;
 
 
 namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
@@ -21,9 +22,26 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
             LargeIconPath       = GetBitmap(PathToImage("tezos_90x90.png"));
             FeeName             = Resources.SvMiningFee;
         }
+        private static ImageBrush _defaultIconBrush  = new ImageBrush(GetBitmap(PathToImage("tezos_90x90.png")));
+        private static ImageBrush _defaultIconMaskBrush = new ImageBrush(GetBitmap(PathToImage("tezos_mask.png")));
+
+        public static Brush DefaultIconBrush {
+            get
+            {
+                _defaultIconBrush.BitmapInterpolationMode = BitmapInterpolationMode.HighQuality;
+                return _defaultIconBrush;
+            }
+        }
+
+        public static Brush DefaultIconMaskBrush
+        {
+            get
+            {
+                _defaultIconMaskBrush.BitmapInterpolationMode = BitmapInterpolationMode.HighQuality;
+                return _defaultIconMaskBrush;
+            }
+        }
         
-        public static Brush DefaultIconBrush  = new ImageBrush(GetBitmap(PathToImage("tezos_90x90.png")));
-        public static Brush DefaultIconMaskBrush = new ImageBrush(GetBitmap(PathToImage("tezos_mask.png")));
         public static IBrush DefaultUnselectedIconBrush = Brushes.White;
     }
 }

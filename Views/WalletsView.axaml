@@ -33,13 +33,14 @@
                                     OpacityMask="{Binding OpacityMask}" />
                         </ContentControl>
 
-                        <TextBlock x:Name="HeaderTextBlock" Text="{Binding Header}"
+                        <TextBlock x:Name="HeaderTextBlock"
+                                   Text="{Binding Header}"
                                    Foreground="{DynamicResource DefaultForegroundBrush}"
                                    FontFamily="{StaticResource AgencyFb}"
                                    FontSize="20"
                                    TextAlignment="Center"
                                    TextWrapping="Wrap"
-                                   Opacity="0.4" />
+                                   Opacity="{Binding CurrencyOpacityValue}" />
                     </StackPanel>
                 </DataTemplate>
             </TabControl.ItemTemplate>

@@ -79,9 +79,12 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                 OnPropertyChanged(nameof(IsSelected));
                 OnPropertyChanged(nameof(Background));
                 OnPropertyChanged(nameof(OpacityMask));
+                OnPropertyChanged(nameof(CurrencyOpacityValue));
             }
         }
-
+        
+        public double CurrencyOpacityValue => _isSelected ? 1 : 0.4;
+        
         private bool _isBalanceUpdating;
         public bool IsBalanceUpdating
         {
