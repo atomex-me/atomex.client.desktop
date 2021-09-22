@@ -90,7 +90,7 @@
 
 
         <Style Selector="Button.WindowControlBtn:pointerover /template/ ContentPresenter#PART_ContentPresenter">
-            <Setter Property="Background" Value="#44AAAAAA" />
+            <Setter Property="Background" Value="#44AAAA" />
         </Style>
         <Style
             Selector="Button.WindowControlBtn:not(:pointerover) /template/ ContentPresenter#PART_ContentPresenter">
