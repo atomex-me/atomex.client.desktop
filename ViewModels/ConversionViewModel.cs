@@ -104,7 +104,7 @@ namespace Atomex.Client.Desktop.ViewModels
                 _toCurrencyIndex = value;
                 OnPropertyChanged(nameof(ToCurrencyIndex));
 
-                ToCurrency = ToCurrencies.ElementAt(_toCurrencyIndex).Currency;
+                ToCurrency = ToCurrencies.ElementAtOrDefault(_toCurrencyIndex)?.Currency;
             }
         }
 
@@ -847,13 +847,12 @@ namespace Atomex.Client.Desktop.ViewModels
                     walletAddress: walletAddress);
 
             _hasRewardForRedeem = _rewardForRedeem != 0;
-            
+
             await Dispatcher.UIThread.InvokeAsync(() =>
             {
                 OnPropertyChanged(nameof(EstimatedRedeemFee));
                 OnPropertyChanged(nameof(RewardForRedeem));
                 OnPropertyChanged(nameof(HasRewardForRedeem));
-
             }, DispatcherPriority.Background);
         }
 
@@ -881,7 +880,7 @@ namespace Atomex.Client.Desktop.ViewModels
             var toCurrencyVm = ToCurrencies
                 .FirstOrDefault(c => c.Currency.Name == "LTC");
             ToCurrencyIndex = ToCurrencies.IndexOf(toCurrencyVm);
-            
+
             OnSwapEventHandler(this, null);
         }
 
@@ -992,10 +991,44 @@ namespace Atomex.Client.Desktop.ViewModels
             }
         }
 
+
+        private string GetSwapStateDescription(Swap swap)
+        {
+            string result = string.Empty;
+            if (swap.StateFlags.HasFlag(SwapStateFlags.HasSecretHash) &&
+                swap.Status.HasFlag(SwapStatus.Initiated) &&
+                swap.Status.HasFlag(SwapStatus.Accepted))
+            {
+                result = "INITIALIZATION: Orders matched, credentials exchanged.";
+            }
+
+            if (swap.StateFlags.HasFlag(SwapStateFlags.HasPartyPayment) &&
+                swap.StateFlags.HasFlag(SwapStateFlags.IsPartyPaymentConfirmed))
+            {
+                result = "INITIALIZATION: Counter party(MM) payment successfully completed.";
+            }
+
+            if (swap.StateFlags.HasFlag(SwapStateFlags.IsCanceled))
+            {
+                result = $"Cancelled on {result}";
+            }
+
+            return result;
+        }
+
+
         private async void OnSwapEventHandler(object sender, SwapEventArgs args)
         {
             try
             {
+                // if (args?.Swap != null)
+                // {
+                //     Log.Fatal($"OnSwapEventHandler {args.Swap}\n");
+                //     if (args?.ChangedFlag != null)
+                //         Log.Fatal($"ChangedFlag {args.ChangedFlag.ToString()}\n");
+                //     Log.Fatal("CURRENT SWAP STATE: {@state}", GetSwapStateDescription(args.Swap));
+                // }
+                
                 var swaps = await App.Account
                     .GetSwapsAsync();
 
@@ -1080,7 +1113,7 @@ namespace Atomex.Client.Desktop.ViewModels
                     AmountHelper.QtyToAmount(side, symbol.MinimumQty, price, FromCurrency.DigitsMultiplier);
                 var message = string.Format(CultureInfo.InvariantCulture, Resources.CvMinimumAllowedQtyWarning,
                     minimumAmount, FromCurrency.Name);
-                
+
                 Desktop.App.DialogService.Show(
                     MessageViewModel.Message(
                         title: Resources.CvWarning,
@@ -1095,7 +1128,7 @@ namespace Atomex.Client.Desktop.ViewModels
                 ToCurrency = ToCurrency,
                 FromCurrencyViewModel = FromCurrencyViewModel,
                 ToCurrencyViewModel = ToCurrencyViewModel,
-            
+
                 PriceFormat = PriceFormat,
                 CurrencyCode = CurrencyCode,
                 CurrencyFormat = CurrencyFormat,
@@ -1103,35 +1136,35 @@ namespace Atomex.Client.Desktop.ViewModels
                 TargetCurrencyFormat = TargetCurrencyFormat,
                 BaseCurrencyCode = BaseCurrencyCode,
                 BaseCurrencyFormat = BaseCurrencyFormat,
-            
+
                 FromFeeCurrencyCode = FromFeeCurrencyCode,
                 FromFeeCurrencyFormat = FromFeeCurrencyFormat,
                 TargetFeeCurrencyCode = TargetFeeCurrencyCode,
                 TargetFeeCurrencyFormat = TargetFeeCurrencyFormat,
-            
+
                 Amount = _amount,
                 AmountInBase = AmountInBase,
                 TargetAmount = TargetAmount,
                 TargetAmountInBase = TargetAmountInBase,
-            
+
                 EstimatedPrice = EstimatedPrice,
                 EstimatedOrderPrice = _estimatedOrderPrice,
                 EstimatedPaymentFee = EstimatedPaymentFee,
                 EstimatedRedeemFee = EstimatedRedeemFee,
                 EstimatedMakerNetworkFee = EstimatedMakerNetworkFee,
-                
+
                 EstimatedPaymentFeeInBase = EstimatedPaymentFeeInBase,
                 EstimatedRedeemFeeInBase = EstimatedRedeemFeeInBase,
                 EstimatedMakerNetworkFeeInBase = EstimatedMakerNetworkFeeInBase,
                 EstimatedTotalNetworkFeeInBase = EstimatedTotalNetworkFeeInBase,
-            
+
                 RewardForRedeem = RewardForRedeem,
                 RewardForRedeemInBase = RewardForRedeemInBase,
                 HasRewardForRedeem = HasRewardForRedeem
             };
-            
+
             viewModel.OnSuccess += OnSuccessConvertion;
-            
+
             Desktop.App.DialogService.Show(viewModel);
         }
 

@@ -214,7 +214,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         public ICommand AddressesCommand => _addressesCommand ??= ReactiveCommand.Create(OnAddressesClick);
 
         private ICommand _cancelUpdateCommand;
-        public ICommand CancelUpdateCommand => _cancelUpdateCommand ??= ReactiveCommand.Create(_cancellation.Cancel);
+        public ICommand CancelUpdateCommand => _cancelUpdateCommand ??= ReactiveCommand.Create(() => _cancellation.Cancel());
 
         protected virtual void OnSendClick()
         {

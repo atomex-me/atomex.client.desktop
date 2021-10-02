@@ -1,8 +1,10 @@
-﻿using Atomex.Abstract;
+﻿using System.Collections.Generic;
+using Atomex.Abstract;
 using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
 using Atomex.Common;
 using Atomex.Core;
 using Avalonia.Media;
+using Serilog;
 
 namespace Atomex.Client.Desktop.ViewModels
 {
@@ -28,6 +30,15 @@ namespace Atomex.Client.Desktop.ViewModels
             var quoteCurrency = swap.Symbol.QuoteCurrency() == swap.SoldCurrency
                 ? soldCurrency
                 : purchasedCurrency;
+            
+            IEnumerable<Atomex.ViewModels.Helpers.SwapDetailingInfo> detailingInfo = Atomex.ViewModels.Helpers
+                .GetSwapDetailingInfo(swap);
+
+            foreach (var swapDetailingInfo in detailingInfo)
+            {
+                Log.Fatal("SWAP: {@id}, DetailingInfo.Status {@s} Description {@d}",
+                    swap.Id, swapDetailingInfo.Status.ToString(), swapDetailingInfo.Description);
+            }
 
             return new SwapViewModel
             {
