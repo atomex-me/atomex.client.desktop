@@ -1,16 +1,21 @@
+using System;
+using System.Windows.Input;
+using Atomex.Core;
+using ReactiveUI;
+
 namespace Atomex.Client.Desktop.ViewModels
 {
     public class SwapDetailsViewModel : ViewModelBase
     {
-        private string _swapId;
-        public string SwapId
+        public Action? OnClose { get; set; }
+        public Swap Swap { get; set; }
+        public string SwapId => Swap.Id.ToString();
+        
+        
+        private ICommand? _closeCommand;
+        public ICommand CloseCommand => _closeCommand ??= (_closeCommand = ReactiveCommand.Create(() =>
         {
-            get => _swapId;
-            set
-            {
-                _swapId = value;
-                OnPropertyChanged(nameof(SwapId));
-            }
-        }
+            OnClose?.Invoke();
+        }));
     }
 }

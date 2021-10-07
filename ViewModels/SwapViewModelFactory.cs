@@ -11,7 +11,7 @@ namespace Atomex.Client.Desktop.ViewModels
 {
     public static class SwapViewModelFactory
     {
-        public static SwapViewModel CreateSwapViewModel(Swap swap, ICurrencies currencies)
+        public static SwapViewModel CreateSwapViewModel(Swap swap, ICurrencies currencies, Action onCloseSwap = null)
         {
             var soldCurrency = currencies.GetByName(swap.SoldCurrency);
             var purchasedCurrency = currencies.GetByName(swap.PurchasedCurrency);
@@ -46,6 +46,12 @@ namespace Atomex.Client.Desktop.ViewModels
                 }
             }
 
+            var detailsVM = new SwapDetailsViewModel
+            {
+                Swap = swap,
+                OnClose = onCloseSwap
+            };
+
             return new SwapViewModel
             {
                 Id = swap.Id.ToString(),
@@ -64,7 +70,9 @@ namespace Atomex.Client.Desktop.ViewModels
                 ToCurrencyCode = toCurrencyViewModel.CurrencyCode,
 
                 Price = swap.Price,
-                PriceFormat = $"F{quoteCurrency.Digits}"
+                PriceFormat = $"F{quoteCurrency.Digits}",
+                
+                Details = detailsVM
             };
         }
 

@@ -41,10 +41,8 @@ namespace Atomex.Client.Desktop.ViewModels
         public decimal Price { get; set; }
         public string PriceFormat { get; set; }
 
-        public void ShowDetails()
-        {
-            Log.Fatal($"Showing details for {Id}");
-        }
+        public SwapDetailsViewModel Details { get; set; }
+        
 
         public string State
         {

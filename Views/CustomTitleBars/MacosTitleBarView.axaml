@@ -271,8 +271,7 @@
                     <Path Width="11"
                           Height="11"
                           Stretch="Uniform"
-
-                          Data="M1169 1024l879 -879l-145 -145l-879 879l-879 -879l-145 145l879 879l-879 879l145 145l879 -879l879 879l145 -145z" />
+                          Data="{DynamicResource CloseCross}" />
                 </Button>
             </StackPanel>
         </DockPanel>

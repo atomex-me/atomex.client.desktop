@@ -8,6 +8,200 @@
     <Design.DataContext>
         <vm:SwapDetailsViewModel />
     </Design.DataContext>
-    
-   <TextBlock Text="{Binding SwapId}" />
+
+    <UserControl.Styles>
+        <Style
+            Selector="Button.CloseBtn:not(:pointerover) /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="Transparent" />
+        </Style>
+
+        <Style Selector="Button.CloseBtn > Path">
+            <Setter Property="Fill" Value="{DynamicResource DefaultForegroundBrush}" />
+        </Style>
+
+        <Style Selector="Svg.InProgress">
+            <Style.Animations>
+                <Animation Duration="0:0:2.5"
+                           IterationCount="INFINITE"
+                           FillMode="Forward"
+                           PlaybackDirection="Normal">
+                    <KeyFrame Cue="0%">
+                        <Setter Property="RotateTransform.Angle" Value="0" />
+                    </KeyFrame>
+                    <KeyFrame Cue="100%">
+                        <Setter Property="RotateTransform.Angle" Value="360" />
+                    </KeyFrame>
+                </Animation>
+            </Style.Animations>
+        </Style>
+    </UserControl.Styles>
+
+    <Border Background="{DynamicResource HamburgerMenuBackgroundBrush}">
+        <StackPanel Orientation="Vertical">
+            <Button Width="25"
+                    Height="25"
+                    Margin="12 12 0 0"
+                    BorderThickness="0"
+                    VerticalContentAlignment="Center"
+                    Padding="0"
+                    Command="{Binding CloseCommand}"
+                    Classes="CloseBtn">
+                <Path Width="11"
+                      Height="11"
+                      Stretch="Uniform"
+                      Data="{DynamicResource CloseCross}" />
+            </Button>
+
+            <Svg Path="/Resources/Icons/swap-completed.svg"
+                 Width="30"
+                 Margin="0 20 0 0" />
+
+            <Svg Path="/Resources/Icons/swap-cancelled.svg"
+                 Width="30"
+                 Margin="0 20 0 0" />
+
+            <Svg Path="/Resources/Icons/swap-inprogress.svg"
+                 Width="30"
+                 Margin="0 20 0 0" />
+
+            <Svg Path="/Resources/Icons/swap-arrows.svg"
+                 Width="30"
+                 Margin="0 20 0 0" />
+
+            <Svg Path="/Resources/Icons/swap-exchanging.svg"
+                 Classes="InProgress"
+                 Width="30"
+                 Margin="0 20 0 0" />
+
+            <Svg Path="/Resources/Icons/swap-line-inprogress.svg"
+                 Height="40"
+                 Margin="0 20 0 0" />
+
+            <Svg Path="/Resources/Icons/swap-line-success.svg"
+                 Height="40"
+                 Margin="0 20 0 0" />
+
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="40" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="76" />
+                    <RowDefinition Height="76" />
+                    <RowDefinition Height="76" />
+                </Grid.RowDefinitions>
+
+                <StackPanel
+                    Grid.Row="0"
+                    Grid.Column="0"
+                    Orientation="Vertical">
+                    <Svg Path="/Resources/Icons/swap-completed.svg"
+                         Width="17"
+                         HorizontalAlignment="Left" />
+
+                    <Svg Path="/Resources/Icons/swap-line-success.svg"
+                         Height="40"
+                         HorizontalAlignment="Left"
+                         Margin="8 10 0 10" />
+                </StackPanel>
+                <StackPanel
+                    Grid.Row="1"
+                    Grid.Column="0"
+                    Orientation="Vertical">
+                    <Svg Path="/Resources/Icons/swap-exchanging.svg"
+                         Width="17"
+                         HorizontalAlignment="Left" />
+
+                    <Svg Path="/Resources/Icons/swap-line-inprogress.svg"
+                         Height="40"
+                         HorizontalAlignment="Left"
+                         Margin="8 10 0 10" />
+                </StackPanel>
+                <StackPanel
+                    Grid.Row="2"
+                    Grid.Column="0"
+                    Orientation="Vertical">
+                    <Svg Path="/Resources/Icons/swap-empty.svg"
+                         Width="17"
+                         HorizontalAlignment="Left" />
+                </StackPanel>
+                
+                <StackPanel 
+                    Grid.Row="0"
+                    Grid.Column="1"
+                    Orientation="Vertical">
+                    <TextBlock Text="Initialization"
+                               Foreground="{DynamicResource ChildViewHeaderForegroundBrush}"
+                               FontFamily="{DynamicResource DefaultLightFontFamily}"
+                               FontSize="20"
+                               HorizontalAlignment="Left"
+                               VerticalAlignment="Center" />
+                    
+                    <TextBlock Text="Completed on March 9, 12:30pm"
+                               Margin="0 4 0 0"
+                               Foreground="DarkGray"
+                               FontFamily="{DynamicResource DefaultLightFontFamily}"
+                               FontSize="12"
+                               HorizontalAlignment="Left"
+                               VerticalAlignment="Center" />
+                </StackPanel>
+                <StackPanel 
+                    Grid.Row="1"
+                    Grid.Column="1"
+                    Orientation="Vertical">
+                    <TextBlock Text="Exchanging"
+                               Foreground="{DynamicResource ChildViewHeaderForegroundBrush}"
+                               FontFamily="{DynamicResource DefaultLightFontFamily}"
+                               FontSize="20"
+                               HorizontalAlignment="Left"
+                               VerticalAlignment="Center" />
+                    
+                    <TextBlock Text="XTZ payment tx broadcasted"
+                               Margin="0 4 0 0"
+                               Foreground="DarkGray"
+                               FontFamily="{DynamicResource DefaultLightFontFamily}"
+                               FontSize="12"
+                               HorizontalAlignment="Left"
+                               VerticalAlignment="Center" />
+                    <TextBlock Text="ETH payment tx confirmed"
+                               Margin="0 2 0 0"
+                               Foreground="DarkGray"
+                               FontFamily="{DynamicResource DefaultLightFontFamily}"
+                               FontSize="12"
+                               HorizontalAlignment="Left"
+                               VerticalAlignment="Center" />
+                </StackPanel>
+                <StackPanel 
+                    Grid.Row="2"
+                    Grid.Column="1"
+                    Orientation="Vertical">
+                    <TextBlock Text="Completion"
+                               Foreground="{DynamicResource ChildViewHeaderForegroundBrush}"
+                               FontFamily="{DynamicResource DefaultLightFontFamily}"
+                               FontSize="20"
+                               HorizontalAlignment="Left"
+                               VerticalAlignment="Center" />
+                    
+                    <TextBlock Text="ETH redeem confirmed"
+                               Margin="0 4 0 0"
+                               Foreground="DarkGray"
+                               FontFamily="{DynamicResource DefaultLightFontFamily}"
+                               FontSize="12"
+                               HorizontalAlignment="Left"
+                               VerticalAlignment="Center" />
+                    <TextBlock Text="XTZ redeem confirmed"
+                               Margin="0 2 0 0"
+                               Foreground="DarkGray"
+                               FontFamily="{DynamicResource DefaultLightFontFamily}"
+                               FontSize="12"
+                               HorizontalAlignment="Left"
+                               VerticalAlignment="Center" />
+                </StackPanel>
+            </Grid>
+
+            <TextBlock Text="{Binding SwapId}"
+                       Foreground="{DynamicResource DefaultForegroundBrush}" />
+        </StackPanel>
+    </Border>
 </UserControl>

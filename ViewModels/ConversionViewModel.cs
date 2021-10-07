@@ -673,11 +673,10 @@ namespace Atomex.Client.Desktop.ViewModels
         }
         
         public int ColumnSpan => DetailsVisible ? 1 : 2;
-        
         public bool DetailsVisible => DGSelectedIndex != -1;
+        private SwapDetailsViewModel? SwapDetails => DetailsVisible ? Swaps[DGSelectedIndex].Details : null;
 
-        private string? GetDetailingSwapId => DetailsVisible ? Swaps[DGSelectedIndex].Id : null;
-
+        // current selected swap in DataGrid
         private int _dgSelectedIndex = -1;
         public int DGSelectedIndex
         {
@@ -687,7 +686,6 @@ namespace Atomex.Client.Desktop.ViewModels
                 if (_dgSelectedIndex == value)
                 {
                     _dgSelectedIndex = -1;
-                    Desktop.App.SwapDetailsDialogService.CloseDialog();
                 }
                 else
                 {
@@ -697,14 +695,7 @@ namespace Atomex.Client.Desktop.ViewModels
                 OnPropertyChanged(nameof(DGSelectedIndex));
                 OnPropertyChanged(nameof(ColumnSpan));
                 OnPropertyChanged(nameof(DetailsVisible));
-                OnPropertyChanged(nameof(GetDetailingSwapId));
-                
-                // if (_dgSelectedIndex != -1)
-                //     Desktop.App.SwapDetailsDialogService.Show(
-                //         new SwapDetailsViewModel
-                //         {
-                //             SwapId = GetDetailingSwapId ?? String.Empty
-                //         });
+                OnPropertyChanged(nameof(SwapDetails));
             }
         }
 
@@ -1063,21 +1054,16 @@ namespace Atomex.Client.Desktop.ViewModels
         {
             try
             {
-                // if (args?.Swap != null)
-                // {
-                //     Log.Fatal($"OnSwapEventHandler {args.Swap}\n");
-                //     if (args?.ChangedFlag != null)
-                //         Log.Fatal($"ChangedFlag {args.ChangedFlag.ToString()}\n");
-                //     Log.Fatal("CURRENT SWAP STATE: {@state}", GetSwapStateDescription(args.Swap));
-                // }
-
                 var swaps = await App.Account
                     .GetSwapsAsync();
 
                 await Dispatcher.UIThread.InvokeAsync(() =>
                 {
                     var swapViewModels = swaps
-                        .Select(s => SwapViewModelFactory.CreateSwapViewModel(s, Currencies))
+                        .Select(s => SwapViewModelFactory.CreateSwapViewModel(s, Currencies, () =>
+                        {
+                            DGSelectedIndex = -1;
+                        }))
                         .ToList()
                         .SortList((s1, s2) => s2.Time.ToUniversalTime()
                             .CompareTo(s1.Time.ToUniversalTime()));

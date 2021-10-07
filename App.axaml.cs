@@ -31,7 +31,6 @@ namespace Atomex.Client.Desktop
     public class App : Application
     {
         public static IDialogService<ViewModelBase> DialogService;
-        public static IDialogService<ViewModelBase> SwapDetailsDialogService;
         public static TemplateService TemplateService;
         public static ImageService ImageService;
         public static IClipboard Clipboard;
@@ -80,7 +79,6 @@ namespace Atomex.Client.Desktop
             {
                 var mainWindow = new MainWindow();
                 DialogService = new DialogService<DialogServiceView>(mainWindow);
-                SwapDetailsDialogService = new DialogService<DialogServiceView>(mainWindow);
                 var mainWindowViewModel = new MainWindowViewModel(AtomexApp, mainWindow);
 
                 mainWindow.DataContext = mainWindowViewModel;
