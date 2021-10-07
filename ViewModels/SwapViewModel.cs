@@ -1,5 +1,6 @@
 ﻿using System;
 using Avalonia.Media;
+using Serilog;
 
 namespace Atomex.Client.Desktop.ViewModels
 {
@@ -39,6 +40,11 @@ namespace Atomex.Client.Desktop.ViewModels
 
         public decimal Price { get; set; }
         public string PriceFormat { get; set; }
+
+        public void ShowDetails()
+        {
+            Log.Fatal($"Showing details for {Id}");
+        }
 
         public string State
         {

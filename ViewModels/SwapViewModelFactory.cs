@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Atomex.Abstract;
 using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
 using Atomex.Common;
@@ -30,20 +31,25 @@ namespace Atomex.Client.Desktop.ViewModels
             var quoteCurrency = swap.Symbol.QuoteCurrency() == swap.SoldCurrency
                 ? soldCurrency
                 : purchasedCurrency;
-            
-            IEnumerable<Atomex.ViewModels.Helpers.SwapDetailingInfo> detailingInfo = Atomex.ViewModels.Helpers
-                .GetSwapDetailingInfo(swap);
 
-            foreach (var swapDetailingInfo in detailingInfo)
+            var compactState = CompactStateBySwap(swap);
+
+            if (DateTime.UtcNow - swap.TimeStamp < TimeSpan.FromMinutes(8))
             {
-                Log.Fatal("SWAP: {@id}, DetailingInfo.Status {@s} Description {@d}",
-                    swap.Id, swapDetailingInfo.Status.ToString(), swapDetailingInfo.Description);
+                IEnumerable<Atomex.ViewModels.Helpers.SwapDetailingInfo> detailingInfo = Atomex.ViewModels.Helpers
+                    .GetSwapDetailingInfo(swap);
+
+                foreach (var swapDetailingInfo in detailingInfo)
+                {
+                    Log.Fatal("SWAP: {@id}, DetailingInfo.Status {@s} Description {@d}",
+                        swap.Id, swapDetailingInfo.Status.ToString(), swapDetailingInfo.Description);
+                }
             }
 
             return new SwapViewModel
             {
                 Id = swap.Id.ToString(),
-                CompactState = CompactStateBySwap(swap),
+                CompactState = compactState,
                 Mode = ModeBySwap(swap),
                 Time = swap.TimeStamp,
 

@@ -671,6 +671,48 @@ namespace Atomex.Client.Desktop.ViewModels
                 OnPropertyChanged(nameof(IsNoLiquidity));
             }
         }
+        
+        public int ColumnSpan => DetailsVisible ? 1 : 2;
+        
+        public bool DetailsVisible => DGSelectedIndex != -1;
+
+        private string? GetDetailingSwapId => DetailsVisible ? Swaps[DGSelectedIndex].Id : null;
+
+        private int _dgSelectedIndex = -1;
+        public int DGSelectedIndex
+        {
+            get => _dgSelectedIndex;
+            set
+            {
+                if (_dgSelectedIndex == value)
+                {
+                    _dgSelectedIndex = -1;
+                    Desktop.App.SwapDetailsDialogService.CloseDialog();
+                }
+                else
+                {
+                    _dgSelectedIndex = value;
+                }
+                
+                OnPropertyChanged(nameof(DGSelectedIndex));
+                OnPropertyChanged(nameof(ColumnSpan));
+                OnPropertyChanged(nameof(DetailsVisible));
+                OnPropertyChanged(nameof(GetDetailingSwapId));
+                
+                // if (_dgSelectedIndex != -1)
+                //     Desktop.App.SwapDetailsDialogService.Show(
+                //         new SwapDetailsViewModel
+                //         {
+                //             SwapId = GetDetailingSwapId ?? String.Empty
+                //         });
+            }
+        }
+
+        public void CellPointerPressed(int cellIndex)
+        {
+            DGSelectedIndex = cellIndex;
+        }
+
 
         public ConversionViewModel()
         {
@@ -1028,7 +1070,7 @@ namespace Atomex.Client.Desktop.ViewModels
                 //         Log.Fatal($"ChangedFlag {args.ChangedFlag.ToString()}\n");
                 //     Log.Fatal("CURRENT SWAP STATE: {@state}", GetSwapStateDescription(args.Swap));
                 // }
-                
+
                 var swaps = await App.Account
                     .GetSwapsAsync();
 
