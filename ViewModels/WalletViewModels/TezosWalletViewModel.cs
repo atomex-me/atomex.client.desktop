@@ -117,10 +117,9 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                     if (string.IsNullOrEmpty(@delegate))
                         continue;
 
-
                     var baker = await BbApi
                         .GetBaker(@delegate, App.Account.Network)
-                        .ConfigureAwait(false);
+                        .ConfigureAwait(false) ?? new BakerData { Address = @delegate };
 
                     delegations.Add(new Delegation
                     {
@@ -128,11 +127,14 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                         Address = wa.Address,
                         Balance = wa.Balance
                     });
-                    
-                    _ = Task.Run(() =>
+
+                    if (!string.IsNullOrEmpty(baker.Logo))
                     {
-                        _ = Desktop.App.ImageService.LoadImageFromUrl(baker.Logo);
-                    });
+                        _ = Task.Run(() =>
+                        {
+                            _ = Desktop.App.ImageService.LoadImageFromUrl(baker.Logo);
+                        });
+                    }
                 }
 
                 await Dispatcher.UIThread.InvokeAsync(() =>
