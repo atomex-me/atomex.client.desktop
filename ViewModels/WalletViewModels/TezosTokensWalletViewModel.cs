@@ -180,6 +180,8 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                 if (_isPreviewDownloading)
                     return null;
                 
+
+
                 if (!App.ImageService.GetImageLoaded(IconUrl))
                 {
                     // start async download
@@ -308,7 +310,10 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             {
                 if (_isPreviewDownloading)
                     return null;
-                
+
+                if (TokenContractIconUrl == null)
+                    return null;
+
                 if (!Desktop.App.ImageService.GetImageLoaded(TokenContractIconUrl))
                 {
                     // start async download

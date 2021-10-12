@@ -90,7 +90,7 @@ namespace Atomex.Client.Desktop.Services
 
         public void Show(ViewModelBase viewModel, Action? closeAction = null, double? customHeight = null)
         {
-            using var source = new CancellationTokenSource();
+            //using var source = new CancellationTokenSource();
 
             _lastDialog = _dialogServiceViewModel.Content;
 
@@ -101,9 +101,9 @@ namespace Atomex.Client.Desktop.Services
 
             if (IsDialogOpened) return;
 
-            _dialogServiceView.ShowDialog(_owner)
-                .ContinueWith(t => source.Cancel(),
-                    TaskScheduler.FromCurrentSynchronizationContext());
+            _dialogServiceView.ShowDialog(_owner);
+                //.ContinueWith(t => source.Cancel(),
+                //    TaskScheduler.FromCurrentSynchronizationContext());
             IsDialogOpened = true;
 
             // Dispatcher.UIThread.MainLoop(source.Token);

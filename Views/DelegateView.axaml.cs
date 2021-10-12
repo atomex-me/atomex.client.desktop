@@ -22,7 +22,10 @@ namespace Atomex.Client.Desktop.Views
                 {
                     Dispatcher.UIThread.InvokeAsync(() =>
                     {
-                        ((DelegateViewModel) DataContext)!.FeeString = text;
+                        if (DataContext is DelegateViewModel viewModel)
+                        {
+                            viewModel.FeeString = text;
+                        }
                     });
                 });
         }
