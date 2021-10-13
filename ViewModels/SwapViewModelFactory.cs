@@ -48,7 +48,12 @@ namespace Atomex.Client.Desktop.ViewModels
 
             var detailsVM = new SwapDetailsViewModel
             {
-                Swap = swap,
+                SwapId = swap.Id.ToString(),
+                Price = swap.Price,
+                FromCurrencyViewModel = fromCurrencyViewModel,
+                ToCurrencyViewModel = toCurrencyViewModel,
+                FromAmount = fromAmount,
+                ToAmount = toAmount,
                 OnClose = onCloseSwap
             };
 
