@@ -46,8 +46,10 @@ namespace Atomex.Client.Desktop.ViewModels
                 }
             }
 
-            var detailsVM = new SwapDetailsViewModel
+            var detailsViewModel = new SwapDetailsViewModel
             {
+                DetailingInfo = Atomex.ViewModels.Helpers.GetSwapDetailingInfo(swap),
+                CompactState = compactState,
                 SwapId = swap.Id.ToString(),
                 Price = swap.Price,
                 FromCurrencyViewModel = fromCurrencyViewModel,
@@ -77,7 +79,7 @@ namespace Atomex.Client.Desktop.ViewModels
                 Price = swap.Price,
                 PriceFormat = $"F{quoteCurrency.Digits}",
                 
-                Details = detailsVM
+                Details = detailsViewModel
             };
         }
 
