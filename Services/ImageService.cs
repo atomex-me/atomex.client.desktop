@@ -58,12 +58,12 @@ namespace Atomex.Client.Desktop.Services
 
         public bool GetImageLoaded(string url)
         {
-            return Images.TryGetValue(url, out _);
+            return url != null && Images.TryGetValue(url, out _);
         }
 
         public IBitmap GetImage(string url)
         {
-            return Images.TryGetValue(url, out var image)
+            return url != null && Images.TryGetValue(url, out var image)
                 ? image
                 : Images["default"];
         }

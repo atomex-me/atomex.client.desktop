@@ -26,7 +26,8 @@ namespace Atomex.Client.Desktop.Views
                 {
                     Dispatcher.UIThread.InvokeAsync(() =>
                     {
-                        ((WertCurrencyViewModel) DataContext)!.FromAmountString = text;
+                        if (DataContext is WertCurrencyViewModel viewModel)
+                            viewModel.FromAmountString = text;
                     });
                 });
             
@@ -37,22 +38,29 @@ namespace Atomex.Client.Desktop.Views
                 {
                     Dispatcher.UIThread.InvokeAsync(() =>
                     {
-                        ((WertCurrencyViewModel) DataContext)!.ToAmountString = text;
+                        if (DataContext is WertCurrencyViewModel viewModel)
+                            viewModel.ToAmountString = text;
                     });
                 });
             
-            fromAmountTextBox.AddHandler(KeyDownEvent, fromAmountKeyDown, RoutingStrategies.Tunnel);
+            fromAmountTextBox.AddHandler(KeyDownEvent, fromAmountKeyDown!, RoutingStrategies.Tunnel);
             void fromAmountKeyDown(object sender, KeyEventArgs e)
             {
-                ((WertCurrencyViewModel) DataContext)!.FromAmountChangedFromKeyboard = true;
-                ((WertCurrencyViewModel) DataContext)!.StartAsyncRatesCheck(WertCurrencyViewModel.Side.From);
+                if (DataContext is WertCurrencyViewModel viewModel)
+                {
+                    viewModel.FromAmountChangedFromKeyboard = true;
+                    viewModel.StartAsyncRatesCheck(WertCurrencyViewModel.Side.From);
+                }
             }
             
-            toAmountTextBox.AddHandler(KeyDownEvent, toAmountKeyDown, RoutingStrategies.Tunnel);
+            toAmountTextBox.AddHandler(KeyDownEvent, toAmountKeyDown!, RoutingStrategies.Tunnel);
             void toAmountKeyDown(object sender, KeyEventArgs e)
             {
-                ((WertCurrencyViewModel) DataContext)!.ToAmountChangedFromKeyboard = true;
-                ((WertCurrencyViewModel) DataContext)!.StartAsyncRatesCheck(WertCurrencyViewModel.Side.To);
+                if (DataContext is WertCurrencyViewModel viewModel)
+                {
+                    viewModel.ToAmountChangedFromKeyboard = true;
+                    viewModel.StartAsyncRatesCheck(WertCurrencyViewModel.Side.To);
+                }
             }
         }
 

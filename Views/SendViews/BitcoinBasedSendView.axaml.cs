@@ -23,7 +23,8 @@ namespace Atomex.Client.Desktop.Views.SendViews
                 {
                     Dispatcher.UIThread.InvokeAsync(() =>
                     {
-                        ((BitcoinBasedSendViewModel) DataContext)!.AmountString = text;
+                        if (DataContext is BitcoinBasedSendViewModel sendViewModel)
+                            sendViewModel.AmountString = text;
                     });
                 });
             
@@ -33,7 +34,8 @@ namespace Atomex.Client.Desktop.Views.SendViews
                 {
                     Dispatcher.UIThread.InvokeAsync(() =>
                     {
-                        ((BitcoinBasedSendViewModel) DataContext)!.FeeString = text;
+                        if (DataContext is BitcoinBasedSendViewModel sendViewModel)
+                            sendViewModel.FeeString = text;
                     });
                 });
         }

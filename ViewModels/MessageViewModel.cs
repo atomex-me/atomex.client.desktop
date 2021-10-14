@@ -1,13 +1,10 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Windows.Input;
-using Atomex.Client.Desktop.ViewModels;
-using Atomex.Client.Desktop.Common;
-using Atomex.Client.Desktop.Properties;
-using Avalonia;
-using Avalonia.Input.Platform;
+
 using ReactiveUI;
 using Serilog;
+
+using Atomex.Client.Desktop.Properties;
 
 namespace Atomex.Client.Desktop.ViewModels
 {
@@ -28,10 +25,10 @@ namespace Atomex.Client.Desktop.ViewModels
 
 
         private ICommand _backCommand;
-        public ICommand BackCommand => _backCommand ??= (_backCommand = ReactiveCommand.Create(_backAction));
+        public ICommand BackCommand => _backCommand ??= (_backCommand = ReactiveCommand.Create(() => { _backAction(); }));
 
         private ICommand _nextCommand;
-        public ICommand NextCommand => _nextCommand ??= (_nextCommand = ReactiveCommand.Create(_nextAction));
+        public ICommand NextCommand => _nextCommand ??= (_nextCommand = ReactiveCommand.Create(() => { _nextAction(); }));
 
         public MessageViewModel()
         {

@@ -23,7 +23,8 @@ namespace Atomex.Client.Desktop.Views
                 {
                     Dispatcher.UIThread.InvokeAsync(() =>
                     {
-                        ((ConversionViewModel) DataContext)!.AmountString = text;
+                        if (DataContext is ConversionViewModel viewModel)
+                            viewModel.AmountString = text;
                     });
                 });
             

@@ -103,8 +103,9 @@ namespace Atomex.Client.Desktop.ViewModels
             {
                 _toCurrencyIndex = value;
                 OnPropertyChanged(nameof(ToCurrencyIndex));
-
-                ToCurrency = ToCurrencies.ElementAtOrDefault(_toCurrencyIndex)?.Currency;
+                
+                if (_toCurrencyIndex >= 0 && _toCurrencyIndex < ToCurrencies.Count)
+                    ToCurrency = ToCurrencies.ElementAt(_toCurrencyIndex).Currency;
             }
         }
 

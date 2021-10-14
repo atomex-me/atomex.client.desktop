@@ -24,7 +24,8 @@ namespace Atomex.Client.Desktop.Views.SendViews
                 {
                     Dispatcher.UIThread.InvokeAsync(() =>
                     {
-                        ((EthereumSendViewModel) DataContext)!.AmountString = text;
+                        if (DataContext is EthereumSendViewModel sendViewModel)
+                            sendViewModel.AmountString = text;
                     });
                 });
             
@@ -34,7 +35,8 @@ namespace Atomex.Client.Desktop.Views.SendViews
                 {
                     Dispatcher.UIThread.InvokeAsync(() =>
                     {
-                        ((EthereumSendViewModel) DataContext)!.FeePriceString = text;
+                        if (DataContext is EthereumSendViewModel sendViewModel)
+                            sendViewModel.FeePriceString = text;
                     });
                 });
             
@@ -44,7 +46,8 @@ namespace Atomex.Client.Desktop.Views.SendViews
                 {
                     Dispatcher.UIThread.InvokeAsync(() =>
                     {
-                        ((EthereumSendViewModel) DataContext)!.GasString = text;
+                        if (DataContext is EthereumSendViewModel sendViewModel)
+                            sendViewModel.GasString = text;
                     });
                 });
         }

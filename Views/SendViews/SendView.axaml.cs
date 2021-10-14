@@ -23,7 +23,8 @@ namespace Atomex.Client.Desktop.Views.SendViews
                 {
                     Dispatcher.UIThread.InvokeAsync(() =>
                     {
-                        ((SendViewModel) DataContext)!.AmountString = text;
+                        if (DataContext is SendViewModel sendViewModel)
+                            sendViewModel.AmountString = text;
                     });
                 });
             
@@ -33,7 +34,8 @@ namespace Atomex.Client.Desktop.Views.SendViews
                 {
                     Dispatcher.UIThread.InvokeAsync(() =>
                     {
-                        ((SendViewModel) DataContext)!.FeeString = text;
+                        if (DataContext is SendViewModel sendViewModel)
+                            sendViewModel.FeeString = text;
                     });
                 });
         }
