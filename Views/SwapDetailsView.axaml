@@ -478,7 +478,9 @@
                                        HorizontalAlignment="Left"
                                        VerticalAlignment="Center" />
 
-                            <WrapPanel>
+                            <WrapPanel
+                                IsVisible="{Binding ExchangingFirstStepDescription,
+                                Converter={StaticResource StringNotEmptyConverter}}">
                                 <TextBlock Text="{Binding ExchangingFirstStepDescription}"
                                            TextWrapping="Wrap"
                                            Margin="0 4 4 0"
@@ -491,7 +493,8 @@
                                 <Border ToolTip.Placement="AnchorAndGravity"
                                         ToolTip.VerticalOffset="-42"
                                         VerticalAlignment="Bottom"
-                                        IsVisible="{Binding ExchangingFirstStepLink, Converter={StaticResource StringNotEmptyConverter}}">
+                                        IsVisible="{Binding ExchangingFirstStepLink,
+                                        Converter={StaticResource StringNotEmptyConverter}}">
                                     <Button Content="Open in explorer"
                                             HorizontalAlignment="Left"
                                             VerticalAlignment="Center"
@@ -503,7 +506,9 @@
                                     </ToolTip.Tip>
                                 </Border>
                             </WrapPanel>
-                            <WrapPanel>
+                            <WrapPanel
+                                IsVisible="{Binding ExchangingSecondStepDescription,
+                                Converter={StaticResource StringNotEmptyConverter}}">
                                 <TextBlock Text="{Binding ExchangingSecondStepDescription}"
                                            TextWrapping="Wrap"
                                            Margin="0 4 4 0"
@@ -516,7 +521,8 @@
                                 <Border ToolTip.Placement="AnchorAndGravity"
                                         ToolTip.VerticalOffset="-42"
                                         VerticalAlignment="Bottom"
-                                        IsVisible="{Binding ExchangingSecondStepLink, Converter={StaticResource StringNotEmptyConverter}}">
+                                        IsVisible="{Binding ExchangingSecondStepLink,
+                                        Converter={StaticResource StringNotEmptyConverter}}">
                                     <Button Content="Open in explorer"
                                             HorizontalAlignment="Left"
                                             VerticalAlignment="Center"
@@ -540,7 +546,9 @@
                                        HorizontalAlignment="Left"
                                        VerticalAlignment="Center" />
 
-                            <WrapPanel>
+                            <WrapPanel
+                                IsVisible="{Binding CompletionFirstStepDescription,
+                                Converter={StaticResource StringNotEmptyConverter}}">
                                 <TextBlock Text="{Binding CompletionFirstStepDescription}"
                                            TextWrapping="Wrap"
                                            Margin="0 4 4 0"
@@ -553,7 +561,8 @@
                                 <Border ToolTip.Placement="AnchorAndGravity"
                                         ToolTip.VerticalOffset="-42"
                                         VerticalAlignment="Bottom"
-                                        IsVisible="{Binding CompletionFirstStepLink, Converter={StaticResource StringNotEmptyConverter}}">
+                                        IsVisible="{Binding CompletionFirstStepLink,
+                                        Converter={StaticResource StringNotEmptyConverter}}">
 
                                     <Button Content="Open in explorer"
                                             HorizontalAlignment="Left"
@@ -566,7 +575,9 @@
                                     </ToolTip.Tip>
                                 </Border>
                             </WrapPanel>
-                            <WrapPanel>
+                            <WrapPanel
+                                IsVisible="{Binding CompletionSecondStepDescription,
+                                Converter={StaticResource StringNotEmptyConverter}}">
                                 <TextBlock Text="{Binding CompletionSecondStepDescription}"
                                            TextWrapping="Wrap"
                                            Margin="0 4 4 0"
@@ -579,7 +590,8 @@
                                 <Border ToolTip.Placement="AnchorAndGravity"
                                         ToolTip.VerticalOffset="-42"
                                         VerticalAlignment="Bottom"
-                                        IsVisible="{Binding CompletionSecondStepLink, Converter={StaticResource StringNotEmptyConverter}}">
+                                        IsVisible="{Binding CompletionSecondStepLink,
+                                        Converter={StaticResource StringNotEmptyConverter}}">
 
                                     <Button Content="Open in explorer"
                                             HorizontalAlignment="Left"

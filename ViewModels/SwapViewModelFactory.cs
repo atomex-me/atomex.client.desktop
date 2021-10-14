@@ -36,7 +36,7 @@ namespace Atomex.Client.Desktop.ViewModels
 
             var detailsViewModel = new SwapDetailsViewModel
             {
-                DetailingInfo = Atomex.ViewModels.Helpers.GetSwapDetailingInfo(swap),
+                DetailingInfo = Atomex.ViewModels.Helpers.GetSwapDetailingInfo(swap, App.AtomexApp.Account),
                 CompactState = compactState,
                 SwapId = swap.Id.ToString(),
                 Price = swap.Price,

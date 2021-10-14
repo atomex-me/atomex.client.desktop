@@ -71,7 +71,7 @@ namespace Atomex.Client.Desktop.ViewModels
             return DetailingInfo.Any(info => info.Status == status)
                 ? DetailingInfo
                     .Where(info => info.Status == status)
-                    .ElementAt(number)
+                    .ElementAtOrDefault(number)
                 : null;
         }
 
