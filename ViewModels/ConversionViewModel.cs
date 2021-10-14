@@ -1069,6 +1069,8 @@ namespace Atomex.Client.Desktop.ViewModels
                             .CompareTo(s1.Time.ToUniversalTime()));
 
                     Swaps = new ObservableCollection<SwapViewModel>(swapViewModels);
+                    if (DetailsVisible)
+                        OnPropertyChanged(nameof(SwapDetails));
                 }, DispatcherPriority.Background);
             }
             catch (Exception e)

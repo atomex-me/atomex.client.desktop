@@ -6,6 +6,7 @@
              xmlns:vm="clr-namespace:Atomex.Client.Desktop.ViewModels"
              xmlns:i="using:Avalonia.Xaml.Interactivity"
              xmlns:ia="using:Avalonia.Xaml.Interactions.Core"
+             xmlns:iac="using:Avalonia.Xaml.Interactions.Custom"
              x:Class="Atomex.Client.Desktop.Views.SwapDetailsView">
     <Design.DataContext>
         <vm:SwapDetailsViewModel />
@@ -278,9 +279,9 @@
                                                                  PropertyName="Path"
                                                                  Value="/Resources/Icons/swap-exchanging.svg" />
 
-                                        <ia:ChangePropertyAction TargetObject="{Binding #InitializationIcon}"
-                                                                 PropertyName="Classes"
-                                                                 Value="InProgress" />
+                                        <iac:AddClassAction StyledElement="{Binding #InitializationIcon}"
+                                                            ClassName="InProgress"
+                                                            RemoveIfExists="True" />
                                     </ia:DataTriggerBehavior>
                                     <ia:DataTriggerBehavior Binding="{Binding InitializationStepStatus}"
                                                             ComparisonCondition="Equal"
@@ -288,6 +289,8 @@
                                         <ia:ChangePropertyAction TargetObject="{Binding #InitializationIcon}"
                                                                  PropertyName="Path"
                                                                  Value="/Resources/Icons/swap-completed.svg" />
+                                        <iac:RemoveClassAction StyledElement="{Binding #InitializationIcon}"
+                                                               ClassName="InProgress" />
                                     </ia:DataTriggerBehavior>
                                     <ia:DataTriggerBehavior Binding="{Binding InitializationStepStatus}"
                                                             ComparisonCondition="Equal"
@@ -295,14 +298,33 @@
                                         <ia:ChangePropertyAction TargetObject="{Binding #InitializationIcon}"
                                                                  PropertyName="Path"
                                                                  Value="/Resources/Icons/swap-cancelled.svg" />
+                                        <iac:RemoveClassAction StyledElement="{Binding #InitializationIcon}"
+                                                           ClassName="InProgress" />
                                     </ia:DataTriggerBehavior>
                                 </i:Interaction.Behaviors>
                             </Svg>
 
-                            <Svg Path="/Resources/Icons/swap-line-success.svg"
+                            <Svg Name="FirstProgressLine"
                                  Height="40"
                                  HorizontalAlignment="Left"
-                                 Margin="8 10 0 10" />
+                                 Margin="8 10 0 10">
+                                <i:Interaction.Behaviors>
+                                    <ia:DataTriggerBehavior Binding="{Binding InitializationStepStatus}"
+                                                            ComparisonCondition="NotEqual"
+                                                            Value="{Binding CompletedState}">
+                                        <ia:ChangePropertyAction TargetObject="{Binding #FirstProgressLine}"
+                                                                 PropertyName="Path"
+                                                                 Value="/Resources/Icons/swap-line-inprogress.svg" />
+                                    </ia:DataTriggerBehavior>
+                                    <ia:DataTriggerBehavior Binding="{Binding InitializationStepStatus}"
+                                                            ComparisonCondition="Equal"
+                                                            Value="{Binding CompletedState}">
+                                        <ia:ChangePropertyAction TargetObject="{Binding #FirstProgressLine}"
+                                                                 PropertyName="Path"
+                                                                 Value="/Resources/Icons/swap-line-success.svg" />
+                                    </ia:DataTriggerBehavior>
+                                </i:Interaction.Behaviors>
+                            </Svg>
                         </StackPanel>
                         <StackPanel
                             Grid.Row="1"
@@ -326,9 +348,9 @@
                                                                  PropertyName="Path"
                                                                  Value="/Resources/Icons/swap-exchanging.svg" />
 
-                                        <ia:ChangePropertyAction TargetObject="{Binding #ExchangingIcon}"
-                                                                 PropertyName="Classes"
-                                                                 Value="InProgress" />
+                                        <iac:AddClassAction StyledElement="{Binding #ExchangingIcon}"
+                                                            ClassName="InProgress"
+                                                            RemoveIfExists="True" />
                                     </ia:DataTriggerBehavior>
                                     <ia:DataTriggerBehavior Binding="{Binding ExchangingStepStatus}"
                                                             ComparisonCondition="Equal"
@@ -336,6 +358,8 @@
                                         <ia:ChangePropertyAction TargetObject="{Binding #ExchangingIcon}"
                                                                  PropertyName="Path"
                                                                  Value="/Resources/Icons/swap-completed.svg" />
+                                        <iac:RemoveClassAction StyledElement="{Binding #ExchangingIcon}"
+                                                               ClassName="InProgress" />
                                     </ia:DataTriggerBehavior>
                                     <ia:DataTriggerBehavior Binding="{Binding ExchangingStepStatus}"
                                                             ComparisonCondition="Equal"
@@ -343,14 +367,34 @@
                                         <ia:ChangePropertyAction TargetObject="{Binding #ExchangingIcon}"
                                                                  PropertyName="Path"
                                                                  Value="/Resources/Icons/swap-cancelled.svg" />
+                                        <iac:RemoveClassAction StyledElement="{Binding #ExchangingIcon}"
+                                                           ClassName="InProgress" />
                                     </ia:DataTriggerBehavior>
                                 </i:Interaction.Behaviors>
                             </Svg>
 
-                            <Svg Path="/Resources/Icons/swap-line-inprogress.svg"
+                            <Svg Name="SecondProgressLine"
                                  Height="40"
                                  HorizontalAlignment="Left"
-                                 Margin="8 10 0 10" />
+                                 Margin="8 10 0 10">
+
+                                <i:Interaction.Behaviors>
+                                    <ia:DataTriggerBehavior Binding="{Binding ExchangingStepStatus}"
+                                                            ComparisonCondition="NotEqual"
+                                                            Value="{Binding CompletedState}">
+                                        <ia:ChangePropertyAction TargetObject="{Binding #SecondProgressLine}"
+                                                                 PropertyName="Path"
+                                                                 Value="/Resources/Icons/swap-line-inprogress.svg" />
+                                    </ia:DataTriggerBehavior>
+                                    <ia:DataTriggerBehavior Binding="{Binding ExchangingStepStatus}"
+                                                            ComparisonCondition="Equal"
+                                                            Value="{Binding CompletedState}">
+                                        <ia:ChangePropertyAction TargetObject="{Binding #SecondProgressLine}"
+                                                                 PropertyName="Path"
+                                                                 Value="/Resources/Icons/swap-line-success.svg" />
+                                    </ia:DataTriggerBehavior>
+                                </i:Interaction.Behaviors>
+                            </Svg>
                         </StackPanel>
                         <StackPanel
                             Grid.Row="2"
@@ -374,9 +418,9 @@
                                                                  PropertyName="Path"
                                                                  Value="/Resources/Icons/swap-exchanging.svg" />
 
-                                        <ia:ChangePropertyAction TargetObject="{Binding #CompletionIcon}"
-                                                                 PropertyName="Classes"
-                                                                 Value="InProgress" />
+                                        <iac:AddClassAction StyledElement="{Binding #CompletionIcon}"
+                                                        ClassName="InProgress"
+                                                        RemoveIfExists="True" />
                                     </ia:DataTriggerBehavior>
                                     <ia:DataTriggerBehavior Binding="{Binding CompletionStepStatus}"
                                                             ComparisonCondition="Equal"
@@ -384,6 +428,8 @@
                                         <ia:ChangePropertyAction TargetObject="{Binding #CompletionIcon}"
                                                                  PropertyName="Path"
                                                                  Value="/Resources/Icons/swap-completed.svg" />
+                                        <iac:RemoveClassAction StyledElement="{Binding #CompletionIcon}"
+                                                           ClassName="InProgress" />
                                     </ia:DataTriggerBehavior>
                                     <ia:DataTriggerBehavior Binding="{Binding CompletionStepStatus}"
                                                             ComparisonCondition="Equal"
@@ -391,6 +437,8 @@
                                         <ia:ChangePropertyAction TargetObject="{Binding #CompletionIcon}"
                                                                  PropertyName="Path"
                                                                  Value="/Resources/Icons/swap-cancelled.svg" />
+                                        <iac:RemoveClassAction StyledElement="{Binding #CompletionIcon}"
+                                                           ClassName="InProgress" />
                                     </ia:DataTriggerBehavior>
                                 </i:Interaction.Behaviors>
                             </Svg>
