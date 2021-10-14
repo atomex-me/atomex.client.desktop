@@ -7,6 +7,7 @@
              xmlns:i="using:Avalonia.Xaml.Interactivity"
              xmlns:ia="using:Avalonia.Xaml.Interactions.Core"
              xmlns:iac="using:Avalonia.Xaml.Interactions.Custom"
+             xmlns:converters="clr-namespace:Atomex.Client.Desktop.Converters"
              x:Class="Atomex.Client.Desktop.Views.SwapDetailsView">
     <Design.DataContext>
         <vm:SwapDetailsViewModel />
@@ -15,6 +16,8 @@
     <UserControl.Resources>
         <SolidColorBrush x:Key="PrimaryTextColor" Color="{DynamicResource DefaultForegroundColor}" />
         <SolidColorBrush x:Key="SecondaryTextColor" Color="DarkGray" />
+
+        <converters:StringNotEmptyConverter x:Key="StringNotEmptyConverter" />
     </UserControl.Resources>
 
     <UserControl.Styles>
@@ -148,7 +151,7 @@
                        HorizontalAlignment="Center"
                        VerticalAlignment="Center" />
 
-            <TextBlock Text="Do not close the app until the swap is completed "
+            <TextBlock Text="Do not close the app until the swap is completed"
                        Foreground="{DynamicResource DarkRed}"
                        FontFamily="{DynamicResource DefaultLightFontFamily}"
                        FontSize="15"
@@ -180,7 +183,7 @@
                     Grid.RowSpan="2"
                     VerticalAlignment="Center"
                     Path="/Resources/Icons/swap-arrows.svg"
-                    Width="18" />
+                    Width="24" />
 
                 <Image Source="{Binding ToCurrencyViewModel.LargeIconPath}"
                        Width="40"
@@ -237,7 +240,7 @@
                 </TextBlock>
             </Grid>
 
-            <TabControl Padding="40 30 40 0">
+            <TabControl Padding="15 30 0 0">
                 <TabItem Margin="0 0 23 0">
                     <TabItem.Header>
                         <TextBlock VerticalAlignment="Center"
@@ -252,9 +255,9 @@
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
                         <Grid.RowDefinitions>
-                            <RowDefinition Height="76" />
-                            <RowDefinition Height="76" />
-                            <RowDefinition Height="76" />
+                            <RowDefinition Height="96" />
+                            <RowDefinition Height="96" />
+                            <RowDefinition Height="96" />
                         </Grid.RowDefinitions>
 
                         <StackPanel
@@ -299,13 +302,13 @@
                                                                  PropertyName="Path"
                                                                  Value="/Resources/Icons/swap-cancelled.svg" />
                                         <iac:RemoveClassAction StyledElement="{Binding #InitializationIcon}"
-                                                           ClassName="InProgress" />
+                                                               ClassName="InProgress" />
                                     </ia:DataTriggerBehavior>
                                 </i:Interaction.Behaviors>
                             </Svg>
 
                             <Svg Name="FirstProgressLine"
-                                 Height="40"
+                                 Height="60"
                                  HorizontalAlignment="Left"
                                  Margin="8 10 0 10">
                                 <i:Interaction.Behaviors>
@@ -368,13 +371,13 @@
                                                                  PropertyName="Path"
                                                                  Value="/Resources/Icons/swap-cancelled.svg" />
                                         <iac:RemoveClassAction StyledElement="{Binding #ExchangingIcon}"
-                                                           ClassName="InProgress" />
+                                                               ClassName="InProgress" />
                                     </ia:DataTriggerBehavior>
                                 </i:Interaction.Behaviors>
                             </Svg>
 
                             <Svg Name="SecondProgressLine"
-                                 Height="40"
+                                 Height="60"
                                  HorizontalAlignment="Left"
                                  Margin="8 10 0 10">
 
@@ -419,8 +422,8 @@
                                                                  Value="/Resources/Icons/swap-exchanging.svg" />
 
                                         <iac:AddClassAction StyledElement="{Binding #CompletionIcon}"
-                                                        ClassName="InProgress"
-                                                        RemoveIfExists="True" />
+                                                            ClassName="InProgress"
+                                                            RemoveIfExists="True" />
                                     </ia:DataTriggerBehavior>
                                     <ia:DataTriggerBehavior Binding="{Binding CompletionStepStatus}"
                                                             ComparisonCondition="Equal"
@@ -429,7 +432,7 @@
                                                                  PropertyName="Path"
                                                                  Value="/Resources/Icons/swap-completed.svg" />
                                         <iac:RemoveClassAction StyledElement="{Binding #CompletionIcon}"
-                                                           ClassName="InProgress" />
+                                                               ClassName="InProgress" />
                                     </ia:DataTriggerBehavior>
                                     <ia:DataTriggerBehavior Binding="{Binding CompletionStepStatus}"
                                                             ComparisonCondition="Equal"
@@ -438,7 +441,7 @@
                                                                  PropertyName="Path"
                                                                  Value="/Resources/Icons/swap-cancelled.svg" />
                                         <iac:RemoveClassAction StyledElement="{Binding #CompletionIcon}"
-                                                           ClassName="InProgress" />
+                                                               ClassName="InProgress" />
                                     </ia:DataTriggerBehavior>
                                 </i:Interaction.Behaviors>
                             </Svg>
@@ -455,7 +458,8 @@
                                        HorizontalAlignment="Left"
                                        VerticalAlignment="Center" />
 
-                            <TextBlock Text="Completed on March 9, 12:30pm"
+                            <TextBlock Text="{Binding InitializationStepDescription}"
+                                       TextWrapping="Wrap"
                                        Margin="0 4 0 0"
                                        Foreground="{StaticResource SecondaryTextColor}"
                                        FontFamily="{DynamicResource DefaultLightFontFamily}"
@@ -474,20 +478,56 @@
                                        HorizontalAlignment="Left"
                                        VerticalAlignment="Center" />
 
-                            <TextBlock Text="XTZ payment tx broadcasted"
-                                       Margin="0 4 0 0"
-                                       Foreground="{StaticResource SecondaryTextColor}"
-                                       FontFamily="{DynamicResource DefaultLightFontFamily}"
-                                       FontSize="12"
-                                       HorizontalAlignment="Left"
-                                       VerticalAlignment="Center" />
-                            <TextBlock Text="ETH payment tx confirmed"
-                                       Margin="0 2 0 0"
-                                       Foreground="{StaticResource SecondaryTextColor}"
-                                       FontFamily="{DynamicResource DefaultLightFontFamily}"
-                                       FontSize="12"
-                                       HorizontalAlignment="Left"
-                                       VerticalAlignment="Center" />
+                            <WrapPanel>
+                                <TextBlock Text="{Binding ExchangingFirstStepDescription}"
+                                           TextWrapping="Wrap"
+                                           Margin="0 4 4 0"
+                                           Foreground="{StaticResource SecondaryTextColor}"
+                                           FontFamily="{DynamicResource DefaultLightFontFamily}"
+                                           FontSize="12"
+                                           HorizontalAlignment="Left"
+                                           VerticalAlignment="Center" />
+
+                                <Border ToolTip.Placement="AnchorAndGravity"
+                                        ToolTip.VerticalOffset="-42"
+                                        VerticalAlignment="Bottom"
+                                        IsVisible="{Binding ExchangingFirstStepLink, Converter={StaticResource StringNotEmptyConverter}}">
+                                    <Button Content="Open in explorer"
+                                            HorizontalAlignment="Left"
+                                            VerticalAlignment="Center"
+                                            Command="{Binding OpenTxInExplorerCommand}"
+                                            CommandParameter="{Binding ExchangingFirstStepLink}"
+                                            Classes="ExplorerLinkButton" />
+                                    <ToolTip.Tip>
+                                        <TextBlock Text="{Binding ExchangingFirstStepLink}" />
+                                    </ToolTip.Tip>
+                                </Border>
+                            </WrapPanel>
+                            <WrapPanel>
+                                <TextBlock Text="{Binding ExchangingSecondStepDescription}"
+                                           TextWrapping="Wrap"
+                                           Margin="0 4 4 0"
+                                           Foreground="{StaticResource SecondaryTextColor}"
+                                           FontFamily="{DynamicResource DefaultLightFontFamily}"
+                                           FontSize="12"
+                                           HorizontalAlignment="Left"
+                                           VerticalAlignment="Center" />
+
+                                <Border ToolTip.Placement="AnchorAndGravity"
+                                        ToolTip.VerticalOffset="-42"
+                                        VerticalAlignment="Bottom"
+                                        IsVisible="{Binding ExchangingSecondStepLink, Converter={StaticResource StringNotEmptyConverter}}">
+                                    <Button Content="Open in explorer"
+                                            HorizontalAlignment="Left"
+                                            VerticalAlignment="Center"
+                                            Command="{Binding OpenTxInExplorerCommand}"
+                                            CommandParameter="{Binding ExchangingSecondStepLink}"
+                                            Classes="ExplorerLinkButton" />
+                                    <ToolTip.Tip>
+                                        <TextBlock Text="{Binding ExchangingSecondStepLink}" />
+                                    </ToolTip.Tip>
+                                </Border>
+                            </WrapPanel>
                         </StackPanel>
                         <StackPanel
                             Grid.Row="2"
@@ -500,20 +540,58 @@
                                        HorizontalAlignment="Left"
                                        VerticalAlignment="Center" />
 
-                            <TextBlock Text="ETH redeem confirmed"
-                                       Margin="0 4 0 0"
-                                       Foreground="{StaticResource SecondaryTextColor}"
-                                       FontFamily="{DynamicResource DefaultLightFontFamily}"
-                                       FontSize="12"
-                                       HorizontalAlignment="Left"
-                                       VerticalAlignment="Center" />
-                            <TextBlock Text="XTZ redeem confirmed"
-                                       Margin="0 2 0 0"
-                                       Foreground="{StaticResource SecondaryTextColor}"
-                                       FontFamily="{DynamicResource DefaultLightFontFamily}"
-                                       FontSize="12"
-                                       HorizontalAlignment="Left"
-                                       VerticalAlignment="Center" />
+                            <WrapPanel>
+                                <TextBlock Text="{Binding CompletionFirstStepDescription}"
+                                           TextWrapping="Wrap"
+                                           Margin="0 4 4 0"
+                                           Foreground="{StaticResource SecondaryTextColor}"
+                                           FontFamily="{DynamicResource DefaultLightFontFamily}"
+                                           FontSize="12"
+                                           HorizontalAlignment="Left"
+                                           VerticalAlignment="Center" />
+
+                                <Border ToolTip.Placement="AnchorAndGravity"
+                                        ToolTip.VerticalOffset="-42"
+                                        VerticalAlignment="Bottom"
+                                        IsVisible="{Binding CompletionFirstStepLink, Converter={StaticResource StringNotEmptyConverter}}">
+
+                                    <Button Content="Open in explorer"
+                                            HorizontalAlignment="Left"
+                                            VerticalAlignment="Center"
+                                            Command="{Binding OpenTxInExplorerCommand}"
+                                            CommandParameter="{Binding CompletionFirstStepLink}"
+                                            Classes="ExplorerLinkButton" />
+                                    <ToolTip.Tip>
+                                        <TextBlock Text="{Binding CompletionFirstStepLink}" />
+                                    </ToolTip.Tip>
+                                </Border>
+                            </WrapPanel>
+                            <WrapPanel>
+                                <TextBlock Text="{Binding CompletionSecondStepDescription}"
+                                           TextWrapping="Wrap"
+                                           Margin="0 4 4 0"
+                                           Foreground="{StaticResource SecondaryTextColor}"
+                                           FontFamily="{DynamicResource DefaultLightFontFamily}"
+                                           FontSize="12"
+                                           HorizontalAlignment="Left"
+                                           VerticalAlignment="Center" />
+
+                                <Border ToolTip.Placement="AnchorAndGravity"
+                                        ToolTip.VerticalOffset="-42"
+                                        VerticalAlignment="Bottom"
+                                        IsVisible="{Binding CompletionSecondStepLink, Converter={StaticResource StringNotEmptyConverter}}">
+
+                                    <Button Content="Open in explorer"
+                                            HorizontalAlignment="Left"
+                                            VerticalAlignment="Center"
+                                            Command="{Binding OpenTxInExplorerCommand}"
+                                            CommandParameter="{Binding CompletionSecondStepLink}"
+                                            Classes="ExplorerLinkButton" />
+                                    <ToolTip.Tip>
+                                        <TextBlock Text="{Binding CompletionSecondStepLink}" />
+                                    </ToolTip.Tip>
+                                </Border>
+                            </WrapPanel>
                         </StackPanel>
                     </Grid>
                 </TabItem>
@@ -538,6 +616,7 @@
                                    FontSize="15" />
 
                         <TextBlock Grid.Column="1"
+                                   Margin="0 0 15 0"
                                    Text="{Binding Price}"
                                    Foreground="{StaticResource PrimaryTextColor}"
                                    FontFamily="{DynamicResource DefaultFontFamily}"

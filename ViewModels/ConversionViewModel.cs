@@ -675,7 +675,7 @@ namespace Atomex.Client.Desktop.ViewModels
         
         public int ColumnSpan => DetailsVisible ? 1 : 2;
         public bool DetailsVisible => DGSelectedIndex != -1;
-        private SwapDetailsViewModel? SwapDetails => DetailsVisible ? Swaps[DGSelectedIndex].Details : null;
+        private SwapDetailsViewModel? SwapDetailsViewModel => DetailsVisible ? Swaps[DGSelectedIndex].Details : null;
 
         // current selected swap in DataGrid
         private int _dgSelectedIndex = -1;
@@ -696,7 +696,7 @@ namespace Atomex.Client.Desktop.ViewModels
                 OnPropertyChanged(nameof(DGSelectedIndex));
                 OnPropertyChanged(nameof(ColumnSpan));
                 OnPropertyChanged(nameof(DetailsVisible));
-                OnPropertyChanged(nameof(SwapDetails));
+                OnPropertyChanged(nameof(SwapDetailsViewModel));
             }
         }
 
@@ -1024,33 +1024,8 @@ namespace Atomex.Client.Desktop.ViewModels
                 Log.Error(e, "Quotes updated event handler error");
             }
         }
-
-
-        private string GetSwapStateDescription(Swap swap)
-        {
-            string result = string.Empty;
-            if (swap.StateFlags.HasFlag(SwapStateFlags.HasSecretHash) &&
-                swap.Status.HasFlag(SwapStatus.Initiated) &&
-                swap.Status.HasFlag(SwapStatus.Accepted))
-            {
-                result = "INITIALIZATION: Orders matched, credentials exchanged.";
-            }
-
-            if (swap.StateFlags.HasFlag(SwapStateFlags.HasPartyPayment) &&
-                swap.StateFlags.HasFlag(SwapStateFlags.IsPartyPaymentConfirmed))
-            {
-                result = "INITIALIZATION: Counter party(MM) payment successfully completed.";
-            }
-
-            if (swap.StateFlags.HasFlag(SwapStateFlags.IsCanceled))
-            {
-                result = $"Cancelled on {result}";
-            }
-
-            return result;
-        }
-
-
+        
+        
         private async void OnSwapEventHandler(object sender, SwapEventArgs args)
         {
             try
@@ -1069,9 +1044,13 @@ namespace Atomex.Client.Desktop.ViewModels
                         .SortList((s1, s2) => s2.Time.ToUniversalTime()
                             .CompareTo(s1.Time.ToUniversalTime()));
 
+                    if (Swaps?.Count < swapViewModels?.Count)
+                        DGSelectedIndex = 0;
+
                     Swaps = new ObservableCollection<SwapViewModel>(swapViewModels);
+
                     if (DetailsVisible)
-                        OnPropertyChanged(nameof(SwapDetails));
+                        OnPropertyChanged(nameof(SwapDetailsViewModel));
                 }, DispatcherPriority.Background);
             }
             catch (Exception e)

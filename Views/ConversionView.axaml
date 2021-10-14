@@ -40,7 +40,7 @@
 
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="340" />
+            <ColumnDefinition Width="360" />
         </Grid.ColumnDefinitions>
 
         <StackPanel Orientation="Vertical"
@@ -780,12 +780,12 @@
                                     Binding="{Binding LocalTime, Converter={StaticResource DateTimeToTxTimeConverter}}" />
             </DataGrid.Columns>
         </DataGrid>
-        
+
         <ContentControl
             Grid.Row="0"
             Grid.Column="1"
             Grid.RowSpan="2"
             IsVisible="{Binding DetailsVisible}"
-            Content="{Binding SwapDetails}" />
+            Content="{Binding SwapDetailsViewModel}" />
     </Grid>
 </UserControl>

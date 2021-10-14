@@ -43,6 +43,37 @@ namespace Atomex.Client.Desktop.ViewModels
             OnClose?.Invoke();
         });
 
+        public string? InitializationStepDescription =>
+            GetStatusDescription(Atomex.ViewModels.Helpers.SwapDetailingStatus.Initialization, 0)?.Description;
+        public string? ExchangingFirstStepDescription =>
+            GetStatusDescription(Atomex.ViewModels.Helpers.SwapDetailingStatus.Exchanging, 0)?.Description;
+        public string? ExchangingSecondStepDescription =>
+            GetStatusDescription(Atomex.ViewModels.Helpers.SwapDetailingStatus.Exchanging, 1)?.Description;
+        public string? CompletionFirstStepDescription =>
+            GetStatusDescription(Atomex.ViewModels.Helpers.SwapDetailingStatus.Completion, 0)?.Description;
+        public string? CompletionSecondStepDescription =>
+            GetStatusDescription(Atomex.ViewModels.Helpers.SwapDetailingStatus.Completion, 1)?.Description;
+        
+
+        public string? ExchangingFirstStepLink =>
+            GetStatusDescription(Atomex.ViewModels.Helpers.SwapDetailingStatus.Exchanging, 0)?.ExplorerLink;
+        public string? ExchangingSecondStepLink =>
+            GetStatusDescription(Atomex.ViewModels.Helpers.SwapDetailingStatus.Exchanging, 1)?.ExplorerLink;
+        public string? CompletionFirstStepLink =>
+            GetStatusDescription(Atomex.ViewModels.Helpers.SwapDetailingStatus.Completion, 0)?.ExplorerLink;
+        public string? CompletionSecondStepLink =>
+            GetStatusDescription(Atomex.ViewModels.Helpers.SwapDetailingStatus.Completion, 1)?.ExplorerLink;
+
+
+        private Atomex.ViewModels.Helpers.SwapDetailingInfo? GetStatusDescription(
+            Atomex.ViewModels.Helpers.SwapDetailingStatus status, int number)
+        {
+            return DetailingInfo.Any(info => info.Status == status)
+                ? DetailingInfo
+                    .Where(info => info.Status == status)
+                    .ElementAt(number)
+                : null;
+        }
 
         public SwapDetailedStepState InitializationStepStatus =>
             GetSwapDetailedStepState(Atomex.ViewModels.Helpers.SwapDetailingStatus.Initialization);
@@ -78,5 +109,8 @@ namespace Atomex.Client.Desktop.ViewModels
                 ? SwapDetailedStepState.InProgress
                 : SwapDetailedStepState.ToBeDone;
         }
+        
+        private ICommand? _openTxInExplorerCommand;
+        public ICommand OpenTxInExplorerCommand => _openTxInExplorerCommand ??= ReactiveCommand.Create<string>(App.OpenBrowser);
     }
 }

@@ -34,18 +34,6 @@ namespace Atomex.Client.Desktop.ViewModels
 
             var compactState = CompactStateBySwap(swap);
 
-            if (DateTime.UtcNow - swap.TimeStamp < TimeSpan.FromMinutes(8))
-            {
-                IEnumerable<Atomex.ViewModels.Helpers.SwapDetailingInfo> detailingInfo = Atomex.ViewModels.Helpers
-                    .GetSwapDetailingInfo(swap);
-
-                foreach (var swapDetailingInfo in detailingInfo)
-                {
-                    Log.Fatal("SWAP: {@id}, DetailingInfo.Status {@s} Description {@d}",
-                        swap.Id, swapDetailingInfo.Status.ToString(), swapDetailingInfo.Description);
-                }
-            }
-
             var detailsViewModel = new SwapDetailsViewModel
             {
                 DetailingInfo = Atomex.ViewModels.Helpers.GetSwapDetailingInfo(swap),
