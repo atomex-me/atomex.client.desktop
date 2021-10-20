@@ -1,0 +1,279 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="Atomex.Client.Desktop.Views.CustomTitleBars.WindowsTitleBarView"
+             xmlns:vm="clr-namespace:Atomex.Client.Desktop.ViewModels"
+             DockPanel.Dock="Top"
+             Height="30">
+
+    <Design.DataContext>
+        <vm:MainWindowViewModel />
+    </Design.DataContext>
+
+    <UserControl.Styles>
+        <Style Selector="Button.TitleBarCommandBtn:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="TextBlock.Foreground" Value="{DynamicResource DefaultForegroundBrush}" />
+        </Style>
+        <Style Selector="Button.TitleBarCommandBtn:not(:pointerover) /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="TextBlock.Foreground" Value="{DynamicResource MainWindowTitleBarForeground}" />
+        </Style>
+
+        <Style Selector="Button.TitleBarCommandBtn:pointerover Path">
+            <Setter Property="Fill" Value="{DynamicResource DefaultForegroundBrush}" />
+        </Style>
+        <Style Selector="Button.TitleBarCommandBtn:not(:pointerover) Path">
+            <Setter Property="Fill" Value="{DynamicResource MainWindowTitleBarForeground}" />
+        </Style>
+
+
+        <Style
+            Selector="Button.TitleBarCommandBtn.UpdateBtn:not(:pointerover) /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="TextBlock.Foreground" Value="{DynamicResource DefaultUpdateForegroundBrush}" />
+        </Style>
+
+        <Style
+            Selector="Button.TitleBarCommandBtn.UpdateBtn:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="TextBlock.Foreground" Value="{DynamicResource DefaultUpdateForegroundBrush}" />
+        </Style>
+
+        <Style Selector="Button.TitleBarCommandBtn.UpdateBtn:pointerover Path">
+            <Setter Property="Fill" Value="{DynamicResource DefaultUpdateForegroundBrush}" />
+        </Style>
+
+        <Style Selector="Button.TitleBarCommandBtn.UpdateBtn:not(:pointerover) Path">
+            <Setter Property="Fill" Value="{DynamicResource DefaultUpdateForegroundBrush}" />
+        </Style>
+
+        <Style Selector="Button.TitleBarCommandBtn.UpdateBtn">
+            <Style.Animations>
+                <Animation Duration="0:0:2.5"
+                           IterationCount="INFINITE"
+                           FillMode="Forward"
+                           PlaybackDirection="Normal">
+                    <KeyFrame Cue="0%">
+                        <Setter Property="Opacity" Value="1" />
+                    </KeyFrame>
+                    <KeyFrame Cue="50%">
+                        <Setter Property="Opacity" Value="0.1" />
+                    </KeyFrame>
+
+                    <KeyFrame Cue="100%">
+                        <Setter Property="Opacity" Value="1" />
+                    </KeyFrame>
+                </Animation>
+            </Style.Animations>
+        </Style>
+        
+        <Style Selector="Button.TitleBarCommandBtn.UpdateBtn.NoAnimation">
+            <Style.Animations>
+                <Animation Duration="0:0:10"
+                           IterationCount="INFINITE"
+                           FillMode="Forward"
+                           PlaybackDirection="Normal">
+                    <KeyFrame Cue="0%">
+                        <Setter Property="Opacity" Value="1" />
+                    </KeyFrame>
+                    <KeyFrame Cue="50%">
+                        <Setter Property="Opacity" Value="1" />
+                    </KeyFrame>
+
+                    <KeyFrame Cue="100%">
+                        <Setter Property="Opacity" Value="1" />
+                    </KeyFrame>
+                </Animation>
+            </Style.Animations>
+        </Style>
+
+
+        <Style Selector="Button.WindowControlBtn:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="#44AAAAAA" />
+        </Style>
+        <Style
+            Selector="Button.WindowControlBtn:not(:pointerover) /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="Transparent" />
+        </Style>
+
+        <Style Selector="Button.WindowControlBtn:not(:pointerover) > Path">
+            <Setter Property="Fill" Value="{DynamicResource MainWindowTitleBarForeground}" />
+        </Style>
+
+        <Style Selector="Button.WindowControlBtn:pointerover > Path">
+            <Setter Property="Fill" Value="{DynamicResource DefaultForegroundBrush}" />
+        </Style>
+    </UserControl.Styles>
+
+    <Grid>
+        <DockPanel Background="{DynamicResource MainWindowTitleBrush}"
+                   IsHitTestVisible="False"
+                   Name="TitleBarBackground" />
+        <DockPanel>
+            <StackPanel
+                Orientation="Horizontal"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Center"
+                IsHitTestVisible="False"
+                Name="TitleAndWindowIconWrapper">
+                <Image Source="avares://Atomex.Client.Desktop/Resources/Images/logo_dark_256x256.ico"
+                       Height="30"
+                       IsHitTestVisible="False"
+                       Width="30" />
+                <TextBlock Text="atomex"
+                           Margin="6 0 0 0"
+                           FontSize="16"
+                           FontFamily="{DynamicResource MainTitleFontFamily}"
+                           IsHitTestVisible="False"
+                           VerticalAlignment="Center"
+                           Foreground="{DynamicResource DefaultForegroundBrush}" />
+            </StackPanel>
+
+            <StackPanel
+                HorizontalAlignment="Right"
+                Orientation="Horizontal"
+                Spacing="0">
+                <StackPanel Orientation="Horizontal" 
+                            IsVisible="{Binding UpdatesReady}">
+                    <Button Command="{Binding UpdateCommand}"
+                            Classes="TitleBarCommandBtn UpdateBtn">
+
+                        <StackPanel Orientation="Horizontal">
+                            <Path Stretch="Uniform"
+                                  Margin="0 0 4 0"
+                                  UseLayoutRounding="False"
+                                  Width="16"
+                                  Height="16"
+                                  Data="{DynamicResource Unicons.Sync}" />
+                            <TextBlock FontFamily="{DynamicResource DefaultFontFamily}"
+                                       VerticalAlignment="Center"
+                                       FontSize="14"
+                                       IsVisible="{Binding !UpdateStarted}"
+                                       Text="Update Atomex to" />
+                            <TextBlock FontFamily="{DynamicResource DefaultFontFamily}"
+                                       VerticalAlignment="Center"
+                                       FontSize="14"
+                                       IsVisible="{Binding UpdateStarted}"
+                                       Text="Updating, please wait..." />
+                            <TextBlock FontFamily="{DynamicResource DefaultFontFamily}"
+                                       VerticalAlignment="Center"
+                                       FontSize="14"
+                                       IsVisible="{Binding !UpdateStarted}"
+                                       Margin="3 0 0 0"
+                                       Text="{Binding UpdateVersion}" />
+                        </StackPanel>
+                    </Button>
+                    <Rectangle Margin="0 8"
+                               VerticalAlignment="Stretch"
+                               Fill="{DynamicResource StatusBarVersionForeground}"
+                               Width="1" />
+                </StackPanel>
+                
+                <StackPanel Orientation="Horizontal" 
+                            IsVisible="{Binding IsDownloadingUpdate}">
+                    <Button Classes="TitleBarCommandBtn UpdateBtn">
+
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock FontFamily="{DynamicResource DefaultFontFamily}"
+                                       VerticalAlignment="Center"
+                                       FontSize="14"
+                                       Text="Downloading update" />
+                            <TextBlock FontFamily="{DynamicResource DefaultFontFamily}"
+                                       Margin="3 0 0 0"
+                                       VerticalAlignment="Center"
+                                       FontSize="14"
+                                       Text="{Binding UpdateVersion}" />
+                            <TextBlock FontFamily="{DynamicResource DefaultFontFamily}"
+                                       VerticalAlignment="Center"
+                                       FontSize="14"
+                                       Text=":" />
+                            <TextBlock FontFamily="{DynamicResource DefaultFontFamily}"
+                                       Margin="3 0 0 0"
+                                       VerticalAlignment="Center"
+                                       FontSize="14"
+                                       Text="{Binding UpdateDownloadProgress}" />
+                            <TextBlock FontFamily="{DynamicResource DefaultFontFamily}"
+                                       VerticalAlignment="Center"
+                                       FontSize="14"
+                                       Text="%" />
+                        </StackPanel>
+                    </Button>
+                    <Rectangle Margin="0 8"
+                               VerticalAlignment="Stretch"
+                               Fill="{DynamicResource StatusBarVersionForeground}"
+                               Width="1" />
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" IsVisible="{Binding HasAccount}">
+                    <Button Command="{Binding SignOutCommand}"
+                            Classes="TitleBarCommandBtn">
+
+                        <StackPanel Orientation="Horizontal">
+                            <Path Stretch="Uniform"
+                                  Margin="0 0 4 0"
+                                  UseLayoutRounding="False"
+                                  Width="16"
+                                  Height="16"
+                                  Data="{DynamicResource Unicons.SignOutAlt}" />
+                            <TextBlock FontFamily="{DynamicResource DefaultFontFamily}"
+                                       VerticalAlignment="Center"
+                                       FontSize="14"
+                                       Text="SignOut" />
+                        </StackPanel>
+                    </Button>
+                    <Rectangle Margin="0 8"
+                               VerticalAlignment="Stretch"
+                               Fill="{DynamicResource StatusBarVersionForeground}"
+                               Width="1" />
+                </StackPanel>
+
+                <Button Width="46"
+                        Height="34"
+                        VerticalContentAlignment="Bottom"
+                        HorizontalContentAlignment="Center"
+                        BorderThickness="0"
+                        Padding="0 0 0 12"
+                        Name="MinimizeButton"
+                        Classes="WindowControlBtn">
+
+                    <Path
+                        Width="11"
+                        Height="1"
+                        Stretch="Uniform"
+                        Data="M2048 1229v-205h-2048v205h2048z" />
+                </Button>
+
+                <Button Width="46"
+                        Height="34"
+                        VerticalContentAlignment="Center"
+                        HorizontalContentAlignment="Center"
+                        BorderThickness="0"
+                        Padding="0"
+                        Name="MaximizeButton"
+                        Classes="WindowControlBtn">
+
+                    <Path Width="11"
+                          Height="11"
+                          Stretch="Uniform"
+                          Name="MaximizeIcon"
+                          Data="M2048 2048v-2048h-2048v2048h2048zM1843 1843h-1638v-1638h1638v1638z" />
+                </Button>
+
+                <Button Width="46"
+                        Height="34"
+                        BorderThickness="0"
+                        VerticalContentAlignment="Center"
+                        Padding="0"
+                        Name="CloseButton"
+                        Classes="WindowControlBtn">
+
+                    <Path Width="11"
+                          Height="11"
+                          Stretch="Uniform"
+                          Data="{DynamicResource CloseCross}" />
+                </Button>
+            </StackPanel>
+        </DockPanel>
+    </Grid>
+</UserControl>

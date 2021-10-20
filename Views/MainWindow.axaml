@@ -23,6 +23,7 @@
     <DockPanel HorizontalAlignment="Stretch"
                VerticalAlignment="Stretch">
         <titlebars:MacosTitleBarView IsSeamless="False"></titlebars:MacosTitleBarView>
+        <titlebars:WindowsTitleBarView IsSeamless="False"></titlebars:WindowsTitleBarView>
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition />

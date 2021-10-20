@@ -43,6 +43,26 @@ namespace Atomex.Client.Desktop.ViewModels
             OnClose?.Invoke();
         });
 
+        public string SwapCompactStateTitle => CompactState switch
+        {
+            SwapCompactState.InProgress => "Swap in Progress",
+            SwapCompactState.Completed => "Swap Completed",
+            SwapCompactState.Canceled => "Swap Cancelled",
+            SwapCompactState.Refunded => "Funds Refunded",
+            SwapCompactState.Unsettled => "Funds Unsettled",
+            _ => string.Empty
+        };
+
+        public string SwapCompactStateDescription => CompactState switch
+        {
+            SwapCompactState.InProgress => "Do not close the Atomex app until the swap is completed",
+            SwapCompactState.Completed => "You can close Atomex app now",
+            SwapCompactState.Canceled => "Swap was cancelled",
+            SwapCompactState.Refunded => "Lock time has passed",
+            SwapCompactState.Unsettled => "You did not have time to redeem the funds, please contact Atomex support",
+            _ => string.Empty
+        };
+
         public string? InitializationStepDescription =>
             GetStatusDescription(Atomex.ViewModels.Helpers.SwapDetailingStatus.Initialization, 0)?.Description;
         public string? ExchangingFirstStepDescription =>
@@ -53,7 +73,7 @@ namespace Atomex.Client.Desktop.ViewModels
             GetStatusDescription(Atomex.ViewModels.Helpers.SwapDetailingStatus.Completion, 0)?.Description;
         public string? CompletionSecondStepDescription =>
             GetStatusDescription(Atomex.ViewModels.Helpers.SwapDetailingStatus.Completion, 1)?.Description;
-        
+
 
         public string? ExchangingFirstStepLink =>
             GetStatusDescription(Atomex.ViewModels.Helpers.SwapDetailingStatus.Exchanging, 0)?.ExplorerLink;
@@ -77,10 +97,8 @@ namespace Atomex.Client.Desktop.ViewModels
 
         public SwapDetailedStepState InitializationStepStatus =>
             GetSwapDetailedStepState(Atomex.ViewModels.Helpers.SwapDetailingStatus.Initialization);
-
         public SwapDetailedStepState ExchangingStepStatus =>
             GetSwapDetailedStepState(Atomex.ViewModels.Helpers.SwapDetailingStatus.Exchanging);
-
         public SwapDetailedStepState CompletionStepStatus =>
             GetSwapDetailedStepState(Atomex.ViewModels.Helpers.SwapDetailingStatus.Completion);
 
@@ -89,15 +107,15 @@ namespace Atomex.Client.Desktop.ViewModels
         public static SwapDetailedStepState CompletedState => SwapDetailedStepState.Completed;
         public static SwapDetailedStepState FailedState => SwapDetailedStepState.Failed;
 
+        public static SwapCompactState InProgress => SwapCompactState.InProgress;
+        public static SwapCompactState Completed => SwapCompactState.Completed;
+        public static SwapCompactState Cancelled => SwapCompactState.Canceled;
+        public static SwapCompactState Refunded => SwapCompactState.Refunded;
+        public static SwapCompactState Unsettled => SwapCompactState.Unsettled;
+
         private SwapDetailedStepState GetSwapDetailedStepState(Atomex.ViewModels.Helpers.SwapDetailingStatus status)
         {
-            switch (CompactState)
-            {
-                case SwapCompactState.Completed:
-                    return SwapDetailedStepState.Completed;
-                case SwapCompactState.Canceled or SwapCompactState.Unsettled:
-                    return SwapDetailedStepState.Failed;
-            }
+            if (CompactState == SwapCompactState.Completed) return SwapDetailedStepState.Completed;
 
             if (DetailingInfo
                     .Where(info => info.Status == status)
@@ -105,12 +123,20 @@ namespace Atomex.Client.Desktop.ViewModels
                     .Find(info => info.IsCompleted) != null
             ) return SwapDetailedStepState.Completed;
 
-            return DetailingInfo.Any(info => info.Status == status)
+            var result = DetailingInfo.Any(info => info.Status == status)
                 ? SwapDetailedStepState.InProgress
                 : SwapDetailedStepState.ToBeDone;
+
+            if (result is SwapDetailedStepState.InProgress or SwapDetailedStepState.ToBeDone &&
+                CompactState is SwapCompactState.Canceled or SwapCompactState.Unsettled or SwapCompactState.Refunded)
+                result = SwapDetailedStepState.Failed;
+
+            return result;
         }
-        
+
         private ICommand? _openTxInExplorerCommand;
-        public ICommand OpenTxInExplorerCommand => _openTxInExplorerCommand ??= ReactiveCommand.Create<string>(App.OpenBrowser);
+
+        public ICommand OpenTxInExplorerCommand =>
+            _openTxInExplorerCommand ??= ReactiveCommand.Create<string>(App.OpenBrowser);
     }
 }

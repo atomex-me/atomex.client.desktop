@@ -176,6 +176,10 @@
           <DependentUpon>ReceiveView.axaml</DependentUpon>
           <SubType>Code</SubType>
         </Compile>
+        <Compile Update="Views\CustomTitleBars\WindowsTitleBarView.axaml.cs">
+          <DependentUpon>WindowsTitleBarView.axaml</DependentUpon>
+          <SubType>Code</SubType>
+        </Compile>
     </ItemGroup>
     <ItemGroup>
         <ProjectReference Include="atomex.client.core\Atomex.Client.Core\Atomex.Client.Core.csproj">

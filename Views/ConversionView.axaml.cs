@@ -44,10 +44,5 @@ namespace Atomex.Client.Desktop.Views
         {
             AvaloniaXamlLoader.Load(this);
         }
-
-        private void DgConversions_OnSelectionChanged(object? sender, SelectionChangedEventArgs e)
-        {
-            Log.Fatal(e.ToString());
-        }
     }
 }

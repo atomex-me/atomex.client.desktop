@@ -684,14 +684,7 @@ namespace Atomex.Client.Desktop.ViewModels
             get => _dgSelectedIndex;
             set
             {
-                if (_dgSelectedIndex == value)
-                {
-                    _dgSelectedIndex = -1;
-                }
-                else
-                {
-                    _dgSelectedIndex = value;
-                }
+                _dgSelectedIndex = value;
                 
                 OnPropertyChanged(nameof(DGSelectedIndex));
                 OnPropertyChanged(nameof(ColumnSpan));
@@ -895,7 +888,10 @@ namespace Atomex.Client.Desktop.ViewModels
             var terminal = args.AtomexClient;
 
             if (terminal?.Account == null)
+            {
+                DGSelectedIndex = -1;
                 return;
+            }
 
             terminal.QuotesUpdated += OnQuotesUpdatedEventHandler;
             terminal.SwapUpdated += OnSwapEventHandler;
@@ -1044,10 +1040,11 @@ namespace Atomex.Client.Desktop.ViewModels
                         .SortList((s1, s2) => s2.Time.ToUniversalTime()
                             .CompareTo(s1.Time.ToUniversalTime()));
 
-                    if (Swaps?.Count < swapViewModels?.Count)
-                        DGSelectedIndex = 0;
-
+                    var previousSwapsCount = Swaps?.Count;
                     Swaps = new ObservableCollection<SwapViewModel>(swapViewModels);
+                    
+                    if (previousSwapsCount < swapViewModels?.Count && !DetailsVisible)
+                        DGSelectedIndex = 0;
 
                     if (DetailsVisible)
                         OnPropertyChanged(nameof(SwapDetailsViewModel));

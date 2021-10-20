@@ -139,25 +139,141 @@
                       Data="{DynamicResource CloseCross}" />
             </Button>
 
-            <Svg Path="/Resources/Icons/swap-inprogress.svg"
+            <Svg Name="SwapStatusIcon"
                  Width="30"
-                 Margin="0 20 0 0" />
+                 Margin="0 20 0 0">
+                <i:Interaction.Behaviors>
+                    <ia:DataTriggerBehavior Binding="{Binding CompactState}"
+                                            ComparisonCondition="Equal"
+                                            Value="{Binding InProgress}">
+                        <ia:ChangePropertyAction TargetObject="{Binding #SwapStatusIcon}"
+                                                 PropertyName="Path"
+                                                 Value="/Resources/Icons/swap-inprogress.svg" />
+                    </ia:DataTriggerBehavior>
+                    <ia:DataTriggerBehavior Binding="{Binding CompactState}"
+                                            ComparisonCondition="Equal"
+                                            Value="{Binding Completed}">
+                        <ia:ChangePropertyAction TargetObject="{Binding #SwapStatusIcon}"
+                                                 PropertyName="Path"
+                                                 Value="/Resources/Icons/swap-completed.svg" />
+                    </ia:DataTriggerBehavior>
+                    <ia:DataTriggerBehavior Binding="{Binding CompactState}"
+                                            ComparisonCondition="Equal"
+                                            Value="{Binding Cancelled}">
+                        <ia:ChangePropertyAction TargetObject="{Binding #SwapStatusIcon}"
+                                                 PropertyName="Path"
+                                                 Value="/Resources/Icons/swap-cancelled.svg" />
+                    </ia:DataTriggerBehavior>
+                    <ia:DataTriggerBehavior Binding="{Binding CompactState}"
+                                            ComparisonCondition="Equal"
+                                            Value="{Binding Refunded}">
+                        <ia:ChangePropertyAction TargetObject="{Binding #SwapStatusIcon}"
+                                                 PropertyName="Path"
+                                                 Value="/Resources/Icons/swap-cancelled.svg" />
+                    </ia:DataTriggerBehavior>
+                    <ia:DataTriggerBehavior Binding="{Binding CompactState}"
+                                            ComparisonCondition="Equal"
+                                            Value="{Binding Unsettled}">
+                        <ia:ChangePropertyAction TargetObject="{Binding #SwapStatusIcon}"
+                                                 PropertyName="Path"
+                                                 Value="/Resources/Icons/swap-cancelled.svg" />
+                    </ia:DataTriggerBehavior>
+                </i:Interaction.Behaviors>
+            </Svg>
 
-            <TextBlock Text="Swap in progress"
-                       Foreground="{StaticResource PrimaryTextColor}"
+            <TextBlock Name="SwapCompactStateTitle"
+                       Text="{Binding SwapCompactStateTitle}"
                        FontFamily="{DynamicResource DefaultLightFontFamily}"
+                       TextAlignment="Center"
                        FontSize="25"
                        Margin="0 14 0 0"
                        HorizontalAlignment="Center"
-                       VerticalAlignment="Center" />
+                       VerticalAlignment="Center">
+                <i:Interaction.Behaviors>
+                    <ia:DataTriggerBehavior Binding="{Binding CompactState}"
+                                            ComparisonCondition="Equal"
+                                            Value="{Binding InProgress}">
+                        <ia:ChangePropertyAction TargetObject="{Binding #SwapCompactStateTitle}"
+                                                 PropertyName="Foreground"
+                                                 Value="{StaticResource PrimaryTextColor}" />
+                    </ia:DataTriggerBehavior>
+                    <ia:DataTriggerBehavior Binding="{Binding CompactState}"
+                                            ComparisonCondition="Equal"
+                                            Value="{Binding Completed}">
+                        <ia:ChangePropertyAction TargetObject="{Binding #SwapCompactStateTitle}"
+                                                 PropertyName="Foreground"
+                                                 Value="{StaticResource Emerald}" />
+                    </ia:DataTriggerBehavior>
+                    <ia:DataTriggerBehavior Binding="{Binding CompactState}"
+                                            ComparisonCondition="Equal"
+                                            Value="{Binding Cancelled}">
+                        <ia:ChangePropertyAction TargetObject="{Binding #SwapCompactStateTitle}"
+                                                 PropertyName="Foreground"
+                                                 Value="{StaticResource DarkRed}" />
+                    </ia:DataTriggerBehavior>
+                    <ia:DataTriggerBehavior Binding="{Binding CompactState}"
+                                            ComparisonCondition="Equal"
+                                            Value="{Binding Refunded}">
+                        <ia:ChangePropertyAction TargetObject="{Binding #SwapCompactStateTitle}"
+                                                 PropertyName="Foreground"
+                                                 Value="{StaticResource DarkRed}" />
+                    </ia:DataTriggerBehavior>
+                    <ia:DataTriggerBehavior Binding="{Binding CompactState}"
+                                            ComparisonCondition="Equal"
+                                            Value="{Binding Unsettled}">
+                        <ia:ChangePropertyAction TargetObject="{Binding #SwapCompactStateTitle}"
+                                                 PropertyName="Foreground"
+                                                 Value="{StaticResource DarkRed}" />
+                    </ia:DataTriggerBehavior>
+                </i:Interaction.Behaviors>
+            </TextBlock>
 
-            <TextBlock Text="Do not close the app until the swap is completed"
-                       Foreground="{DynamicResource DarkRed}"
+            <TextBlock Name="SwapCompactStateDescription"
+                       Text="{Binding SwapCompactStateDescription}"
                        FontFamily="{DynamicResource DefaultLightFontFamily}"
+                       TextAlignment="Center"
                        FontSize="15"
                        Margin="0 6 0 0"
                        TextWrapping="Wrap"
-                       HorizontalAlignment="Center" />
+                       HorizontalAlignment="Center">
+                <i:Interaction.Behaviors>
+                    <ia:DataTriggerBehavior Binding="{Binding CompactState}"
+                                            ComparisonCondition="Equal"
+                                            Value="{Binding InProgress}">
+                        <ia:ChangePropertyAction TargetObject="{Binding #SwapCompactStateDescription}"
+                                                 PropertyName="Foreground"
+                                                 Value="{StaticResource DarkRed}" />
+                    </ia:DataTriggerBehavior>
+                    <ia:DataTriggerBehavior Binding="{Binding CompactState}"
+                                            ComparisonCondition="Equal"
+                                            Value="{Binding Completed}">
+                        <ia:ChangePropertyAction TargetObject="{Binding #SwapCompactStateDescription}"
+                                                 PropertyName="IsVisible"
+                                                 Value="false" />
+                    </ia:DataTriggerBehavior>
+                    <ia:DataTriggerBehavior Binding="{Binding CompactState}"
+                                            ComparisonCondition="Equal"
+                                            Value="{Binding Cancelled}">
+                        <ia:ChangePropertyAction TargetObject="{Binding #SwapCompactStateDescription}"
+                                                 PropertyName="IsVisible"
+                                                 Value="false" />
+                    </ia:DataTriggerBehavior>
+                    <ia:DataTriggerBehavior Binding="{Binding CompactState}"
+                                            ComparisonCondition="Equal"
+                                            Value="{Binding Refunded}">
+                        <ia:ChangePropertyAction TargetObject="{Binding #SwapCompactStateDescription}"
+                                                 PropertyName="Foreground"
+                                                 Value="{StaticResource SecondaryTextColor}" />
+                    </ia:DataTriggerBehavior>
+                    <ia:DataTriggerBehavior Binding="{Binding CompactState}"
+                                            ComparisonCondition="Equal"
+                                            Value="{Binding Unsettled}">
+                        <ia:ChangePropertyAction TargetObject="{Binding #SwapCompactStateDescription}"
+                                                 PropertyName="Foreground"
+                                                 Value="{StaticResource SecondaryTextColor}" />
+                    </ia:DataTriggerBehavior>
+                </i:Interaction.Behaviors>
+            </TextBlock>
 
             <Grid Margin="0 32 0 40">
                 <Grid.ColumnDefinitions>
@@ -251,7 +367,7 @@
                     </TabItem.Header>
                     <Grid>
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="40" />
+                            <ColumnDefinition Width="32" />
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
                         <Grid.RowDefinitions>
@@ -300,7 +416,7 @@
                                                             Value="{Binding FailedState}">
                                         <ia:ChangePropertyAction TargetObject="{Binding #InitializationIcon}"
                                                                  PropertyName="Path"
-                                                                 Value="/Resources/Icons/swap-cancelled.svg" />
+                                                                 Value="/Resources/Icons/swap-failed.svg" />
                                         <iac:RemoveClassAction StyledElement="{Binding #InitializationIcon}"
                                                                ClassName="InProgress" />
                                     </ia:DataTriggerBehavior>
@@ -369,7 +485,7 @@
                                                             Value="{Binding FailedState}">
                                         <ia:ChangePropertyAction TargetObject="{Binding #ExchangingIcon}"
                                                                  PropertyName="Path"
-                                                                 Value="/Resources/Icons/swap-cancelled.svg" />
+                                                                 Value="/Resources/Icons/swap-failed.svg" />
                                         <iac:RemoveClassAction StyledElement="{Binding #ExchangingIcon}"
                                                                ClassName="InProgress" />
                                     </ia:DataTriggerBehavior>
@@ -439,7 +555,7 @@
                                                             Value="{Binding FailedState}">
                                         <ia:ChangePropertyAction TargetObject="{Binding #CompletionIcon}"
                                                                  PropertyName="Path"
-                                                                 Value="/Resources/Icons/swap-cancelled.svg" />
+                                                                 Value="/Resources/Icons/swap-failed.svg" />
                                         <iac:RemoveClassAction StyledElement="{Binding #CompletionIcon}"
                                                                ClassName="InProgress" />
                                     </ia:DataTriggerBehavior>
