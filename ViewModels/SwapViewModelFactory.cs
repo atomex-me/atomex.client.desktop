@@ -1,14 +1,17 @@
-﻿using Atomex.Abstract;
+﻿using System;
+using System.Collections.Generic;
+using Atomex.Abstract;
 using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
 using Atomex.Common;
 using Atomex.Core;
 using Avalonia.Media;
+using Serilog;
 
 namespace Atomex.Client.Desktop.ViewModels
 {
     public static class SwapViewModelFactory
     {
-        public static SwapViewModel CreateSwapViewModel(Swap swap, ICurrencies currencies)
+        public static SwapViewModel CreateSwapViewModel(Swap swap, ICurrencies currencies, Action onCloseSwap = null)
         {
             var soldCurrency = currencies.GetByName(swap.SoldCurrency);
             var purchasedCurrency = currencies.GetByName(swap.PurchasedCurrency);
@@ -29,10 +32,26 @@ namespace Atomex.Client.Desktop.ViewModels
                 ? soldCurrency
                 : purchasedCurrency;
 
+            var compactState = CompactStateBySwap(swap);
+
+            var detailsViewModel = new SwapDetailsViewModel
+            {
+                DetailingInfo = Atomex.ViewModels.Helpers.GetSwapDetailingInfo(swap, App.AtomexApp.Account),
+                CompactState = compactState,
+                SwapId = swap.Id.ToString(),
+                Price = swap.Price,
+                TimeStamp = swap.TimeStamp.ToLocalTime(),
+                FromCurrencyViewModel = fromCurrencyViewModel,
+                ToCurrencyViewModel = toCurrencyViewModel,
+                FromAmount = fromAmount,
+                ToAmount = toAmount,
+                OnClose = onCloseSwap
+            };
+
             return new SwapViewModel
             {
                 Id = swap.Id.ToString(),
-                CompactState = CompactStateBySwap(swap),
+                CompactState = compactState,
                 Mode = ModeBySwap(swap),
                 Time = swap.TimeStamp,
 
@@ -47,7 +66,9 @@ namespace Atomex.Client.Desktop.ViewModels
                 ToCurrencyCode = toCurrencyViewModel.CurrencyCode,
 
                 Price = swap.Price,
-                PriceFormat = $"F{quoteCurrency.Digits}"
+                PriceFormat = $"F{quoteCurrency.Digits}",
+                
+                Details = detailsViewModel
             };
         }
 

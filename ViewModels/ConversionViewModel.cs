@@ -103,7 +103,7 @@ namespace Atomex.Client.Desktop.ViewModels
             {
                 _toCurrencyIndex = value;
                 OnPropertyChanged(nameof(ToCurrencyIndex));
-
+                
                 if (_toCurrencyIndex >= 0 && _toCurrencyIndex < ToCurrencies.Count)
                     ToCurrency = ToCurrencies.ElementAt(_toCurrencyIndex).Currency;
             }
@@ -672,6 +672,32 @@ namespace Atomex.Client.Desktop.ViewModels
                 OnPropertyChanged(nameof(IsNoLiquidity));
             }
         }
+        
+        public int ColumnSpan => DetailsVisible ? 1 : 2;
+        public bool DetailsVisible => DGSelectedIndex != -1;
+        private SwapDetailsViewModel? SwapDetailsViewModel => DetailsVisible ? Swaps[DGSelectedIndex].Details : null;
+
+        // current selected swap in DataGrid
+        private int _dgSelectedIndex = -1;
+        public int DGSelectedIndex
+        {
+            get => _dgSelectedIndex;
+            set
+            {
+                _dgSelectedIndex = value;
+                
+                OnPropertyChanged(nameof(DGSelectedIndex));
+                OnPropertyChanged(nameof(ColumnSpan));
+                OnPropertyChanged(nameof(DetailsVisible));
+                OnPropertyChanged(nameof(SwapDetailsViewModel));
+            }
+        }
+
+        public void CellPointerPressed(int cellIndex)
+        {
+            DGSelectedIndex = cellIndex;
+        }
+
 
         public ConversionViewModel()
         {
@@ -848,13 +874,12 @@ namespace Atomex.Client.Desktop.ViewModels
                     walletAddress: walletAddress);
 
             _hasRewardForRedeem = _rewardForRedeem != 0;
-            
+
             await Dispatcher.UIThread.InvokeAsync(() =>
             {
                 OnPropertyChanged(nameof(EstimatedRedeemFee));
                 OnPropertyChanged(nameof(RewardForRedeem));
                 OnPropertyChanged(nameof(HasRewardForRedeem));
-
             }, DispatcherPriority.Background);
         }
 
@@ -863,7 +888,10 @@ namespace Atomex.Client.Desktop.ViewModels
             var terminal = args.AtomexClient;
 
             if (terminal?.Account == null)
+            {
+                DGSelectedIndex = -1;
                 return;
+            }
 
             terminal.QuotesUpdated += OnQuotesUpdatedEventHandler;
             terminal.SwapUpdated += OnSwapEventHandler;
@@ -882,7 +910,7 @@ namespace Atomex.Client.Desktop.ViewModels
             var toCurrencyVm = ToCurrencies
                 .FirstOrDefault(c => c.Currency.Name == "LTC");
             ToCurrencyIndex = ToCurrencies.IndexOf(toCurrencyVm);
-            
+
             OnSwapEventHandler(this, null);
         }
 
@@ -992,7 +1020,8 @@ namespace Atomex.Client.Desktop.ViewModels
                 Log.Error(e, "Quotes updated event handler error");
             }
         }
-
+        
+        
         private async void OnSwapEventHandler(object sender, SwapEventArgs args)
         {
             try
@@ -1003,12 +1032,22 @@ namespace Atomex.Client.Desktop.ViewModels
                 await Dispatcher.UIThread.InvokeAsync(() =>
                 {
                     var swapViewModels = swaps
-                        .Select(s => SwapViewModelFactory.CreateSwapViewModel(s, Currencies))
+                        .Select(s => SwapViewModelFactory.CreateSwapViewModel(s, Currencies, () =>
+                        {
+                            DGSelectedIndex = -1;
+                        }))
                         .ToList()
                         .SortList((s1, s2) => s2.Time.ToUniversalTime()
                             .CompareTo(s1.Time.ToUniversalTime()));
 
+                    var previousSwapsCount = Swaps?.Count;
                     Swaps = new ObservableCollection<SwapViewModel>(swapViewModels);
+                    
+                    if (previousSwapsCount < swapViewModels?.Count && !DetailsVisible)
+                        DGSelectedIndex = 0;
+
+                    if (DetailsVisible)
+                        OnPropertyChanged(nameof(SwapDetailsViewModel));
                 }, DispatcherPriority.Background);
             }
             catch (Exception e)
@@ -1081,7 +1120,7 @@ namespace Atomex.Client.Desktop.ViewModels
                     AmountHelper.QtyToAmount(side, symbol.MinimumQty, price, FromCurrency.DigitsMultiplier);
                 var message = string.Format(CultureInfo.InvariantCulture, Resources.CvMinimumAllowedQtyWarning,
                     minimumAmount, FromCurrency.Name);
-                
+
                 Desktop.App.DialogService.Show(
                     MessageViewModel.Message(
                         title: Resources.CvWarning,
@@ -1096,7 +1135,7 @@ namespace Atomex.Client.Desktop.ViewModels
                 ToCurrency = ToCurrency,
                 FromCurrencyViewModel = FromCurrencyViewModel,
                 ToCurrencyViewModel = ToCurrencyViewModel,
-            
+
                 PriceFormat = PriceFormat,
                 CurrencyCode = CurrencyCode,
                 CurrencyFormat = CurrencyFormat,
@@ -1104,35 +1143,35 @@ namespace Atomex.Client.Desktop.ViewModels
                 TargetCurrencyFormat = TargetCurrencyFormat,
                 BaseCurrencyCode = BaseCurrencyCode,
                 BaseCurrencyFormat = BaseCurrencyFormat,
-            
+
                 FromFeeCurrencyCode = FromFeeCurrencyCode,
                 FromFeeCurrencyFormat = FromFeeCurrencyFormat,
                 TargetFeeCurrencyCode = TargetFeeCurrencyCode,
                 TargetFeeCurrencyFormat = TargetFeeCurrencyFormat,
-            
+
                 Amount = _amount,
                 AmountInBase = AmountInBase,
                 TargetAmount = TargetAmount,
                 TargetAmountInBase = TargetAmountInBase,
-            
+
                 EstimatedPrice = EstimatedPrice,
                 EstimatedOrderPrice = _estimatedOrderPrice,
                 EstimatedPaymentFee = EstimatedPaymentFee,
                 EstimatedRedeemFee = EstimatedRedeemFee,
                 EstimatedMakerNetworkFee = EstimatedMakerNetworkFee,
-                
+
                 EstimatedPaymentFeeInBase = EstimatedPaymentFeeInBase,
                 EstimatedRedeemFeeInBase = EstimatedRedeemFeeInBase,
                 EstimatedMakerNetworkFeeInBase = EstimatedMakerNetworkFeeInBase,
                 EstimatedTotalNetworkFeeInBase = EstimatedTotalNetworkFeeInBase,
-            
+
                 RewardForRedeem = RewardForRedeem,
                 RewardForRedeemInBase = RewardForRedeemInBase,
                 HasRewardForRedeem = HasRewardForRedeem
             };
-            
+
             viewModel.OnSuccess += OnSuccessConvertion;
-            
+
             Desktop.App.DialogService.Show(viewModel);
         }
 

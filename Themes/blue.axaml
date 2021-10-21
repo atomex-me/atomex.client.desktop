@@ -36,6 +36,8 @@
     <Color x:Key="DefaultProgressRingColor">#1183b5</Color>
     <Color x:Key="DefaultMenuItemMouseOverColor">#0f4d6d</Color>
     <Color x:Key="CriticalWarningColor">#ef6a41</Color>
+    <Color x:Key="DarkRed">#E1457C</Color>
+    <Color x:Key="Emerald">#48C3AD</Color>
     
     <Color x:Key="MahApps.Colors.Gray1">#FF333333</Color>
     <Color x:Key="MahApps.Colors.Gray2">#FF7F7F7F</Color>

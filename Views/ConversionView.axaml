@@ -9,6 +9,7 @@
              xmlns:controls="clr-namespace:Atomex.Client.Desktop.Controls"
              xmlns:converters="clr-namespace:Atomex.Client.Desktop.Converters"
              xmlns:styles="clr-namespace:Atomex.Client.Desktop.Styles"
+             xmlns:views="clr-namespace:Atomex.Client.Desktop.Views"
              xmlns:i="using:Avalonia.Xaml.Interactivity"
              xmlns:ia="using:Avalonia.Xaml.Interactions.Core">
 
@@ -37,7 +38,14 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="360" />
+        </Grid.ColumnDefinitions>
+
         <StackPanel Orientation="Vertical"
+                    Grid.ColumnSpan="{Binding ColumnSpan}"
+                    Grid.Column="0"
                     Grid.Row="0">
             <Grid HorizontalAlignment="Stretch"
                   Margin="0 15 0 0">
@@ -686,7 +694,7 @@
                            VerticalAlignment="Bottom"
                            IsVisible="{Binding IsCriticalWarning}" />
             </StackPanel>
-            
+
             <controls:RoundedButton Width="150"
                                     Height="40"
                                     Margin="0 10 0 5"
@@ -700,10 +708,13 @@
                   Margin="10"
                   AutoGenerateColumns="False"
                   IsReadOnly="True"
+                  Cursor="Hand"
                   RowDetailsVisibilityMode="VisibleWhenSelected"
                   SelectionMode="Single"
                   Items="{Binding Swaps}"
                   CanUserResizeColumns="True"
+                  Grid.ColumnSpan="{Binding ColumnSpan}"
+                  Grid.Column="0"
                   Grid.Row="1">
 
             <DataGrid.Columns>
@@ -769,5 +780,12 @@
                                     Binding="{Binding LocalTime, Converter={StaticResource DateTimeToTxTimeConverter}}" />
             </DataGrid.Columns>
         </DataGrid>
+
+        <ContentControl
+            Grid.Row="0"
+            Grid.Column="1"
+            Grid.RowSpan="2"
+            IsVisible="{Binding DetailsVisible}"
+            Content="{Binding SwapDetailsViewModel}" />
     </Grid>
 </UserControl>

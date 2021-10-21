@@ -14,6 +14,7 @@
         <AvaloniaResource Include="Assets\**" />
         <AvaloniaResource Include="Resources\*" />
         <AvaloniaResource Include="Resources\Fonts\*" />
+        <AvaloniaResource Include="Resources\Icons\*" />
         <AvaloniaResource Include="Resources\Images\*" />
     </ItemGroup>
     <ItemGroup>
@@ -23,6 +24,7 @@
         <PackageReference Include="Avalonia.Diagnostics" Version="0.10.6" />
         <PackageReference Include="Avalonia.ReactiveUI" Version="0.10.6" />
         <PackageReference Include="Avalonia.Xaml.Behaviors" Version="0.10.6.10" />
+        <PackageReference Include="Avalonia.Svg.Skia" Version="0.10.6" />
         <PackageReference Include="Deadpikle.AvaloniaProgressRing" Version="0.9.0" />
         <PackageReference Include="NetSparkleUpdater.SparkleUpdater" Version="2.0.7" />
         <PackageReference Include="NetSparkleUpdater.UI.Avalonia" Version="2.0.8" />
@@ -172,6 +174,10 @@
         </Compile>
         <Compile Update="Views\ReceiveView.axaml.cs">
           <DependentUpon>ReceiveView.axaml</DependentUpon>
+          <SubType>Code</SubType>
+        </Compile>
+        <Compile Update="Views\CustomTitleBars\WindowsTitleBarView.axaml.cs">
+          <DependentUpon>WindowsTitleBarView.axaml</DependentUpon>
           <SubType>Code</SubType>
         </Compile>
     </ItemGroup>

@@ -7,7 +7,7 @@ using Avalonia.Markup.Xaml;
 
 namespace Atomex.Client.Desktop.Views.CustomTitleBars
 {
-    public class MacosTitleBarView : UserControl
+    public class WindowsTitleBarView : UserControl
     {
         private Button closeButton;
         private Button minimizeButton;
@@ -33,10 +33,10 @@ namespace Atomex.Client.Desktop.Views.CustomTitleBars
             }
         }
 
-        public MacosTitleBarView()
+        public WindowsTitleBarView()
         {
             this.InitializeComponent();
-            if (!RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
                 this.IsVisible = false;
             }

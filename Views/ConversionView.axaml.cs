@@ -5,6 +5,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 using Avalonia.Threading;
+using Serilog;
 
 namespace Atomex.Client.Desktop.Views
 {
@@ -26,6 +27,17 @@ namespace Atomex.Client.Desktop.Views
                             viewModel.AmountString = text;
                     });
                 });
+            
+            var dgConversions = this.FindControl<DataGrid>("DgConversions");
+            
+            dgConversions.CellPointerPressed += (sender, args) =>
+            {
+                var cellIndex = args.Row.GetIndex();
+                Dispatcher.UIThread.InvokeAsync(() =>
+                {
+                    ((ConversionViewModel) DataContext!).CellPointerPressed(cellIndex);
+                });
+            };
         }
 
         private void InitializeComponent()
