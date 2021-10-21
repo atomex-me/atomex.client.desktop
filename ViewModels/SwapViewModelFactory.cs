@@ -40,6 +40,7 @@ namespace Atomex.Client.Desktop.ViewModels
                 CompactState = compactState,
                 SwapId = swap.Id.ToString(),
                 Price = swap.Price,
+                TimeStamp = swap.TimeStamp.ToLocalTime(),
                 FromCurrencyViewModel = fromCurrencyViewModel,
                 ToCurrencyViewModel = toCurrencyViewModel,
                 FromAmount = fromAmount,

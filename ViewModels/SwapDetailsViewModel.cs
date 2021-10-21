@@ -25,6 +25,7 @@ namespace Atomex.Client.Desktop.ViewModels
         public SwapCompactState CompactState { get; set; }
         public string SwapId { get; set; }
         public decimal Price { get; set; }
+        public DateTime TimeStamp { get; set; }
         public CurrencyViewModel FromCurrencyViewModel { get; set; }
         public CurrencyViewModel ToCurrencyViewModel { get; set; }
         public decimal FromAmount { get; set; }
