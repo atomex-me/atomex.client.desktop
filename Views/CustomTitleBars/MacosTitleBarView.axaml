@@ -5,13 +5,25 @@
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="Atomex.Client.Desktop.Views.CustomTitleBars.MacosTitleBarView"
              xmlns:vm="clr-namespace:Atomex.Client.Desktop.ViewModels"
+             xmlns:i="using:Avalonia.Xaml.Interactivity"
+             xmlns:ia="using:Avalonia.Xaml.Interactions.Core"
              DockPanel.Dock="Top"
              Height="30">
 
     <Design.DataContext>
         <vm:MainWindowViewModel />
     </Design.DataContext>
-
+    
+    <UserControl.Resources>
+        <SolidColorBrush x:Key="CloseControlBtnBackground" Color="#FF5D55" />
+        <SolidColorBrush x:Key="MinimizeControlBtnBackground" Color="#FFBC2E" />
+        <SolidColorBrush x:Key="MaximizeControlBtnBackground" Color="#28C83E" />
+        <SolidColorBrush x:Key="InactiveControlBtnBackground" Color="#585B5D" />
+        
+        <SolidColorBrush x:Key="CloseControlBtnForeground" Color="#4C0102" />
+        <SolidColorBrush x:Key="MinimizeControlBtnForeground" Color="#985712" />
+        <SolidColorBrush x:Key="MaximizeControlBtnForeground" Color="#0A630C" />
+    </UserControl.Resources>
     <UserControl.Styles>
         <Style Selector="Button.TitleBarCommandBtn:pointerover /template/ ContentPresenter#PART_ContentPresenter">
             <Setter Property="Background" Value="Transparent" />
@@ -67,7 +79,7 @@
                 </Animation>
             </Style.Animations>
         </Style>
-        
+
         <Style Selector="Button.TitleBarCommandBtn.UpdateBtn.NoAnimation">
             <Style.Animations>
                 <Animation Duration="0:0:10"
@@ -87,23 +99,6 @@
                 </Animation>
             </Style.Animations>
         </Style>
-
-
-        <Style Selector="Button.WindowControlBtn:pointerover /template/ ContentPresenter#PART_ContentPresenter">
-            <Setter Property="Background" Value="#44AAAAAA" />
-        </Style>
-        <Style
-            Selector="Button.WindowControlBtn:not(:pointerover) /template/ ContentPresenter#PART_ContentPresenter">
-            <Setter Property="Background" Value="Transparent" />
-        </Style>
-
-        <Style Selector="Button.WindowControlBtn:not(:pointerover) > Path">
-            <Setter Property="Fill" Value="{DynamicResource MainWindowTitleBarForeground}" />
-        </Style>
-
-        <Style Selector="Button.WindowControlBtn:pointerover > Path">
-            <Setter Property="Fill" Value="{DynamicResource DefaultForegroundBrush}" />
-        </Style>
     </UserControl.Styles>
 
     <Grid>
@@ -112,29 +107,12 @@
                    Name="TitleBarBackground" />
         <DockPanel>
             <StackPanel
+                DockPanel.Dock="Right"
                 Orientation="Horizontal"
-                HorizontalAlignment="Left"
-                VerticalAlignment="Center"
-                IsHitTestVisible="False"
-                Name="TitleAndWindowIconWrapper">
-                <Image Source="avares://Atomex.Client.Desktop/Resources/Images/logo_dark_256x256.ico"
-                       Height="30"
-                       IsHitTestVisible="False"
-                       Width="30" />
-                <TextBlock Text="atomex"
-                           Margin="6 0 0 0"
-                           FontSize="16"
-                           FontFamily="{DynamicResource MainTitleFontFamily}"
-                           IsHitTestVisible="False"
-                           VerticalAlignment="Center"
-                           Foreground="{DynamicResource DefaultForegroundBrush}" />
-            </StackPanel>
-
-            <StackPanel
                 HorizontalAlignment="Right"
-                Orientation="Horizontal"
-                Spacing="0">
-                <StackPanel Orientation="Horizontal" 
+                VerticalAlignment="Center"
+                Name="TitleAndWindowIconWrapper">
+                <StackPanel Orientation="Horizontal"
                             IsVisible="{Binding UpdatesReady}">
                     <Button Command="{Binding UpdateCommand}"
                             Classes="TitleBarCommandBtn UpdateBtn">
@@ -169,11 +147,10 @@
                                Fill="{DynamicResource StatusBarVersionForeground}"
                                Width="1" />
                 </StackPanel>
-                
-                <StackPanel Orientation="Horizontal" 
+
+                <StackPanel Orientation="Horizontal"
                             IsVisible="{Binding IsDownloadingUpdate}">
                     <Button Classes="TitleBarCommandBtn UpdateBtn">
-
                         <StackPanel Orientation="Horizontal">
                             <TextBlock FontFamily="{DynamicResource DefaultFontFamily}"
                                        VerticalAlignment="Center"
@@ -228,50 +205,161 @@
                                Width="1" />
                 </StackPanel>
 
-                <Button Width="46"
-                        Height="34"
-                        VerticalContentAlignment="Bottom"
-                        HorizontalContentAlignment="Center"
-                        BorderThickness="0"
-                        Padding="0 0 0 12"
-                        Name="MinimizeButton"
-                        Classes="WindowControlBtn">
+                <TextBlock Text="atomex"
+                           Margin="8 0 6 0"
+                           FontSize="16"
+                           FontFamily="{DynamicResource MainTitleFontFamily}"
+                           IsHitTestVisible="False"
+                           VerticalAlignment="Center"
+                           Foreground="{DynamicResource DefaultForegroundBrush}" />
+                <Image Source="avares://Atomex.Client.Desktop/Resources/Images/logo_dark_256x256.ico"
+                       Height="30"
+                       IsHitTestVisible="False"
+                       Width="30" />
+            </StackPanel>
 
-                    <Path
-                        Width="11"
-                        Height="1"
-                        Stretch="Uniform"
-                        Data="M2048 1229v-205h-2048v205h2048z" />
+            <StackPanel
+                HorizontalAlignment="Left"
+                Orientation="Horizontal"
+                Spacing="7"
+                Margin="7,0,0,0"
+                Background="Transparent">
+                <StackPanel.Styles>
+                    <Style Selector="StackPanel:pointerover Path">
+                        <Setter Property="IsVisible" Value="true" />
+                    </Style>
+                    <Style Selector="StackPanel:not(:pointerover) Path">
+                        <Setter Property="IsVisible" Value="false" />
+                    </Style>
+                    
+                    <Style Selector="StackPanel Button">
+                        <Setter Property="Cursor" Value="Arrow" />
+                    </Style>
+                    <Style Selector="StackPanel:pointerover Button#CloseButton /template/ ContentPresenter#PART_ContentPresenter">
+                        <Setter Property="Background" Value="{StaticResource CloseControlBtnBackground}" />
+                    </Style>
+                    <Style Selector="StackPanel:pointerover Button#MinimizeButton /template/ ContentPresenter#PART_ContentPresenter">
+                        <Setter Property="Background" Value="{StaticResource MinimizeControlBtnBackground}" />
+                    </Style>
+                    <Style Selector="StackPanel:pointerover Button#MaximizeButton /template/ ContentPresenter#PART_ContentPresenter">
+                        <Setter Property="Background" Value="{StaticResource MaximizeControlBtnBackground}" />
+                    </Style>
+                    
+                    <Style Selector="Button#CloseButton:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+                        <Setter Property="Background" Value="{StaticResource CloseControlBtnBackground}" />
+                    </Style>
+                    <Style Selector="Button#MinimizeButton:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+                        <Setter Property="Background" Value="{StaticResource MinimizeControlBtnBackground}" />
+                    </Style>
+                    <Style Selector="Button#MaximizeButton:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+                        <Setter Property="Background" Value="{StaticResource MaximizeControlBtnBackground}" />
+                    </Style>
+                </StackPanel.Styles>
+                
+                <Button Name="CloseButton"
+                        HorizontalContentAlignment="Center"
+                        VerticalContentAlignment="Center"
+                        VerticalAlignment="Center"
+                        Background="{StaticResource CloseControlBtnBackground}"
+                        Width="13"
+                        Height="13">
+                    <Button.Resources>
+                        <CornerRadius x:Key="ControlCornerRadius">12</CornerRadius>
+                    </Button.Resources>
+                    <i:Interaction.Behaviors>
+                        <ia:DataTriggerBehavior Binding="{Binding $parent[Window].IsActive}"
+                                                ComparisonCondition="Equal"
+                                                Value="true">
+                            <ia:ChangePropertyAction TargetObject="{Binding #CloseButton}"
+                                                     PropertyName="Background"
+                                                     Value="{StaticResource CloseControlBtnBackground}" />
+                        </ia:DataTriggerBehavior>
+                        <ia:DataTriggerBehavior Binding="{Binding $parent[Window].IsActive}"
+                                                ComparisonCondition="NotEqual"
+                                                Value="true">
+                            <ia:ChangePropertyAction TargetObject="{Binding #CloseButton}"
+                                                     PropertyName="Background"
+                                                     Value="{StaticResource InactiveControlBtnBackground}" />
+                        </ia:DataTriggerBehavior>
+                    </i:Interaction.Behaviors>
+
+                    <Path Data="M 0,3 l 5,5 M 0,8 l 5,-5"
+                          Stroke="{StaticResource CloseControlBtnForeground}"
+                          StrokeThickness="1"
+                          Width="10"
+                          Height="10" />
                 </Button>
 
-                <Button Width="46"
-                        Height="34"
-                        VerticalContentAlignment="Center"
+                <Button Name="MinimizeButton"
                         HorizontalContentAlignment="Center"
-                        BorderThickness="0"
-                        Padding="0"
-                        Name="MaximizeButton"
-                        Classes="WindowControlBtn">
-
-                    <Path Width="11"
-                          Height="11"
-                          Stretch="Uniform"
-                          Name="MaximizeIcon"
-                          Data="M2048 2048v-2048h-2048v2048h2048zM1843 1843h-1638v-1638h1638v1638z" />
+                        VerticalContentAlignment="Center"
+                        VerticalAlignment="Center"
+                        Background="{StaticResource MinimizeControlBtnBackground}"
+                        Width="13"
+                        Height="13">
+                    <Button.Resources>
+                        <CornerRadius x:Key="ControlCornerRadius">12</CornerRadius>
+                    </Button.Resources>
+                    <i:Interaction.Behaviors>
+                        <ia:DataTriggerBehavior Binding="{Binding $parent[Window].IsActive}"
+                                                ComparisonCondition="Equal"
+                                                Value="true">
+                            <ia:ChangePropertyAction TargetObject="{Binding #MinimizeButton}"
+                                                     PropertyName="Background"
+                                                     Value="{StaticResource MinimizeControlBtnBackground}" />
+                        </ia:DataTriggerBehavior>
+                        <ia:DataTriggerBehavior Binding="{Binding $parent[Window].IsActive}"
+                                                ComparisonCondition="NotEqual"
+                                                Value="true">
+                            <ia:ChangePropertyAction TargetObject="{Binding #MinimizeButton}"
+                                                     PropertyName="Background"
+                                                     Value="{StaticResource InactiveControlBtnBackground}" />
+                        </ia:DataTriggerBehavior>
+                    </i:Interaction.Behaviors>
+                    
+                    <Path Data="M 1.4,1 l 7.5,0"
+                          Stroke="{StaticResource MinimizeControlBtnForeground}"
+                          StrokeThickness="1"
+                          Width="15"
+                          Height="1" />
                 </Button>
 
-                <Button Width="46"
-                        Height="34"
-                        BorderThickness="0"
+                <Button Name="MaximizeButton"
+                        HorizontalContentAlignment="Center"
                         VerticalContentAlignment="Center"
+                        VerticalAlignment="Center"
+                        Background="{StaticResource MaximizeControlBtnBackground}"
                         Padding="0"
-                        Name="CloseButton"
-                        Classes="WindowControlBtn">
+                        Width="13"
+                        Height="13">
+                    <Button.Resources>
+                        <CornerRadius x:Key="ControlCornerRadius">12</CornerRadius>
+                    </Button.Resources>
 
-                    <Path Width="11"
-                          Height="11"
-                          Stretch="Uniform"
-                          Data="{DynamicResource CloseCross}" />
+                    <i:Interaction.Behaviors>
+                        <ia:DataTriggerBehavior Binding="{Binding $parent[Window].IsActive}"
+                                                ComparisonCondition="Equal"
+                                                Value="true">
+                            <ia:ChangePropertyAction TargetObject="{Binding #MaximizeButton}"
+                                                     PropertyName="Background"
+                                                     Value="{StaticResource MaximizeControlBtnBackground}" />
+                        </ia:DataTriggerBehavior>
+                        <ia:DataTriggerBehavior Binding="{Binding $parent[Window].IsActive}"
+                                                ComparisonCondition="NotEqual"
+                                                Value="true">
+                            <ia:ChangePropertyAction TargetObject="{Binding #MaximizeButton}"
+                                                     PropertyName="Background"
+                                                     Value="{StaticResource InactiveControlBtnBackground}" />
+                        </ia:DataTriggerBehavior>
+                    </i:Interaction.Behaviors>
+                    
+                    <Path Data="M 1.4,1.4 l 0,5 l 5,-5 l -5,0 M 7.6,7.6 l -5,0 l 5,-5 l 0,5"
+                          Fill="{StaticResource MaximizeControlBtnForeground}"
+                          StrokeThickness="0"
+                          VerticalAlignment="Center"
+                          HorizontalAlignment="Center"
+                          Width="9"
+                          Height="9" />
                 </Button>
             </StackPanel>
         </DockPanel>
