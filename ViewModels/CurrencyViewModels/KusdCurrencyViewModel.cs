@@ -12,8 +12,8 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
         public KusdCurrencyViewModel(CurrencyConfig currency)
             : base(currency)
         {
-            var iconBrush = new ImageBrush(GetBitmap(PathToImage("tezos_90x90.png")));
-            var iconMaskBrush = new ImageBrush(GetBitmap(PathToImage("tezos_mask.png")));
+            var iconBrush = new ImageBrush(GetBitmap(PathToImage("kusd_90x90.png")));
+            var iconMaskBrush = new ImageBrush(GetBitmap(PathToImage("kusd_mask.png")));
             iconBrush.BitmapInterpolationMode = BitmapInterpolationMode.HighQuality;
             iconMaskBrush.BitmapInterpolationMode = BitmapInterpolationMode.HighQuality;
             
