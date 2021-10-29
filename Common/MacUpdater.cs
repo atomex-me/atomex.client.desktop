@@ -6,7 +6,6 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
-using System.Xml;
 using NetSparkleUpdater;
 using NetSparkleUpdater.Interfaces;
 using Serilog;
@@ -68,7 +67,7 @@ namespace Atomex.Client.Desktop.Common
         }
 
         private string _restartExecutablePath;
-        
+
         public string RestartExecutablePath
         {
             get
@@ -82,7 +81,7 @@ namespace Atomex.Client.Desktop.Common
             }
             set { _restartExecutablePath = value; }
         }
-        
+
         public async Task<string> GetDownloadPathForAppCastItem(AppCastItem item)
         {
             if (item != null && item.DownloadLink != null)
@@ -131,7 +130,7 @@ namespace Atomex.Client.Desktop.Common
             return null;
         }
 
-        
+
         public async void InstallUpdate(AppCastItem item, string installPath = null)
         {
             var path = installPath != null && File.Exists(installPath)
@@ -157,7 +156,7 @@ namespace Atomex.Client.Desktop.Common
                 }
             }
         }
-        
+
         protected virtual async Task RunDownloadedInstaller(string downloadFilePath)
         {
             Log.Information("Running downloaded installer");
@@ -179,7 +178,7 @@ namespace Atomex.Client.Desktop.Common
             // generate the batch file                
             Log.Information("Generating batch in {0}", Path.GetFullPath(batchFilePath));
 
-            
+
             var atomexAppInWorkDir = workingDir
                 .Split("/")
                 .ToList()
@@ -222,34 +221,47 @@ namespace Atomex.Client.Desktop.Common
                     Exec($"chmod +x {batchFilePath}"); // this could probably be made async at some point
                 }
             }
-            
 
             Exec($"rm -f {LaunchdDirFilePath}");
 
-            XmlDocument xDoc = new XmlDocument();
-            xDoc.Load($"{binaryDir}{LaunchdFileName}");
-
-            // application .app path
-            xDoc
-                .DocumentElement!
-                .LastChild!
-                .LastChild!
-                .LastChild!
-                .InnerText = $"/usr/bin/open {workingDir}{AppName};launchctl unload {LaunchdDirFilePath}";
-            
-            xDoc.Save(LaunchdDirFilePath);
+            await using (FileStream stream = new FileStream(LaunchdDirFilePath, FileMode.Create, FileAccess.ReadWrite,
+                FileShare.None, 4096, true))
+            await using (StreamWriter write = new StreamWriter(stream, new UTF8Encoding(false)))
+            {
+                var output = $@"<?xml version=""1.0"" encoding=""UTF-8""?>
+<!DOCTYPE plist PUBLIC ""-//Apple//DTD PLIST 1.0//EN"" ""http://www.apple.com/DTDs/PropertyList-1.0.dtd"">
+<plist version=""1.0"">
+    <dict>
+        <key>Label</key>
+        <string>Atomex launcher</string>
+        <key>RunAtLoad</key>
+        <false/>
+        <key>StartInterval</key>
+        <integer>2</integer>
+        <key>ProgramArguments</key>
+        <array>
+            <string>/bin/bash</string>
+            <string>-c</string>
+            <string>/usr/bin/open {workingDir}{AppName};launchctl unload -w {LaunchdDirFilePath}</string>
+        </array>
+   </dict>
+</plist>
+";
+                await write.WriteAsync(output);
+                write.Close();
+            }
 
             Exec(batchFilePath);
 
             var processInfo = new ProcessStartInfo
             {
-                Arguments = $"load {LaunchdDirFilePath}",
+                Arguments = $"load -w {LaunchdDirFilePath}",
                 FileName = "launchctl",
                 UseShellExecute = true
             };
 
             var proc = Process.Start(processInfo);
-            proc!.WaitForExit();
+            await proc!.WaitForExitAsync();
 
             Process.GetCurrentProcess().Kill();
         }

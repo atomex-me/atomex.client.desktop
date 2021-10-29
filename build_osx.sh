@@ -6,7 +6,6 @@ ZIP_PATH="$DIST_FOLDER/Atomex.zip"
 PUBLISH_OUTPUT_DIRECTORY="bin/Release/net5.0/osx-x64/publish/."
 INFO_PLIST="Info.plist"
 ICON_FILE="logo.icns"
-LAUNCHD_FILE="com.atomex.osx.plist"
 
 dotnet clean -c Release
 dotnet restore
