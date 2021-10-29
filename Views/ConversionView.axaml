@@ -220,9 +220,9 @@
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition />
-                        <ColumnDefinition Width="110" />
+                        <ColumnDefinition Width="90" />
                         <ColumnDefinition Width="24" />
-                        <ColumnDefinition Width="110" />
+                        <ColumnDefinition Width="90" />
                         <ColumnDefinition />
                     </Grid.ColumnDefinitions>
                     <Grid.RowDefinitions>
@@ -275,8 +275,8 @@
                     </StackPanel>
 
                     <Image Source="{Binding FromCurrencyViewModel.LargeIconPath}"
-                           Width="90"
-                           Height="90"
+                           Width="70"
+                           Height="70"
                            Grid.Column="1"
                            Grid.Row="1"
                            Grid.RowSpan="2" />
@@ -294,8 +294,8 @@
 
 
                     <Image Source="{Binding ToCurrencyViewModel.LargeIconPath}"
-                           Width="90"
-                           Height="90"
+                           Width="70"
+                           Height="70"
                            Grid.Column="3"
                            Grid.Row="1"
                            Grid.RowSpan="2" />
