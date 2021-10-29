@@ -18,6 +18,7 @@
         <SolidColorBrush x:Key="SecondaryTextColor" Color="DarkGray" />
 
         <converters:StringNotEmptyConverter x:Key="StringNotEmptyConverter" />
+        <converters:StringIsEmptyConverter x:Key="StringIsEmptyConverter" />
         <converters:DateTimeToTxTimeConverter x:Key="DateTimeToTxTimeConverter" />
     </UserControl.Resources>
 
@@ -121,6 +122,32 @@
         <!-- Selected PointerOver state -->
         <Style Selector="TabItem:selected:pointerover /template/ Border#PART_LayoutRoot">
             <Setter Property="TextBlock.Foreground" Value="{StaticResource PrimaryTextColor}" />
+        </Style>
+
+        <Style Selector="Button.ExplorerLinkBtn.Icon">
+            <Setter Property="FontFamily" Value="{DynamicResource DefaultFontFamily}" />
+            <Setter Property="BorderThickness" Value="0" />
+        </Style>
+
+        <Style Selector="Button.ExplorerLinkBtn.Icon:pointerover">
+            <Setter Property="Foreground" Value="{DynamicResource ExplorerLinkButtonMouseOverBrush}" />
+        </Style>
+
+        <Style Selector="Button.ExplorerLinkBtn.Icon:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="TextBlock.Foreground" Value="{DynamicResource ExplorerLinkButtonMouseOverBrush}" />
+        </Style>
+        <Style
+            Selector="Button.ExplorerLinkBtn.Icon:not(:pointerover) /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="TextBlock.Foreground" Value="{DynamicResource ExplorerLinkButtonForegroundBrush}" />
+        </Style>
+
+        <Style Selector="Button.ExplorerLinkBtn.Icon:pointerover Path">
+            <Setter Property="Fill" Value="{DynamicResource ExplorerLinkButtonMouseOverBrush}" />
+        </Style>
+        <Style Selector="Button.ExplorerLinkBtn.Icon:not(:pointerover) Path">
+            <Setter Property="Fill" Value="{DynamicResource ExplorerLinkButtonForegroundBrush}" />
         </Style>
     </UserControl.Styles>
 
@@ -575,9 +602,20 @@
                                        HorizontalAlignment="Left"
                                        VerticalAlignment="Center" />
 
-                            <TextBlock Text="{Binding InitializationStepDescription}"
+                            <TextBlock Text="{Binding InitializationFirstStepDescription}"
                                        TextWrapping="Wrap"
                                        Margin="0 4 0 0"
+                                       Foreground="{StaticResource SecondaryTextColor}"
+                                       FontFamily="{DynamicResource DefaultLightFontFamily}"
+                                       FontSize="12"
+                                       HorizontalAlignment="Left"
+                                       VerticalAlignment="Center" />
+
+                            <TextBlock Text="{Binding InitializationSecondStepDescription}"
+                                       IsVisible="{Binding InitializationSecondStepDescription,
+                                       Converter={StaticResource StringNotEmptyConverter}}"
+                                       TextWrapping="Wrap"
+                                       Margin="0 2 0 0"
                                        Foreground="{StaticResource SecondaryTextColor}"
                                        FontFamily="{DynamicResource DefaultLightFontFamily}"
                                        FontSize="12"
@@ -610,18 +648,44 @@
                                 <Border ToolTip.Placement="AnchorAndGravity"
                                         ToolTip.VerticalOffset="-42"
                                         VerticalAlignment="Bottom"
-                                        IsVisible="{Binding ExchangingFirstStepLink,
+                                        Margin="0 2 0 0"
+                                        IsVisible="{Binding ExchangingFirstStepLinkUrl,
                                         Converter={StaticResource StringNotEmptyConverter}}">
-                                    <Button Content="Open in explorer"
-                                            HorizontalAlignment="Left"
-                                            VerticalAlignment="Center"
+
+                                    <Button HorizontalAlignment="Left"
+                                            VerticalAlignment="Bottom"
+                                            Padding="0"
                                             Command="{Binding OpenTxInExplorerCommand}"
-                                            CommandParameter="{Binding ExchangingFirstStepLink}"
-                                            Classes="ExplorerLinkButton" />
+                                            CommandParameter="{Binding ExchangingFirstStepLinkUrl}"
+                                            Classes="ExplorerLinkBtn Icon">
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock FontFamily="{DynamicResource DefaultFontFamily}"
+                                                       VerticalAlignment="Bottom"
+                                                       FontSize="12"
+                                                       Text="{Binding ExchangingFirstStepLinkText}" />
+                                            <Path Stretch="Uniform"
+                                                  Margin="5 0 0 0"
+                                                  VerticalAlignment="Top"
+                                                  Height="11"
+                                                  Data="{DynamicResource LinkIcon}" />
+                                        </StackPanel>
+                                    </Button>
+
                                     <ToolTip.Tip>
-                                        <TextBlock Text="{Binding ExchangingFirstStepLink}" />
+                                        <TextBlock Text="{Binding ExchangingFirstStepLinkUrl}" />
                                     </ToolTip.Tip>
                                 </Border>
+
+                                <TextBlock Text="{Binding ExchangingFirstStepLinkText}"
+                                           IsVisible="{Binding ExchangingFirstStepLinkUrl,
+                                           Converter={StaticResource StringIsEmptyConverter}}"
+                                           TextWrapping="Wrap"
+                                           Margin="0 2 0 0"
+                                           Foreground="{StaticResource SecondaryTextColor}"
+                                           FontFamily="{DynamicResource DefaultLightFontFamily}"
+                                           FontSize="12"
+                                           HorizontalAlignment="Left"
+                                           VerticalAlignment="Center" />
                             </WrapPanel>
                             <WrapPanel
                                 IsVisible="{Binding ExchangingSecondStepDescription,
@@ -638,18 +702,41 @@
                                 <Border ToolTip.Placement="AnchorAndGravity"
                                         ToolTip.VerticalOffset="-42"
                                         VerticalAlignment="Bottom"
-                                        IsVisible="{Binding ExchangingSecondStepLink,
+                                        Margin="0 2 0 0"
+                                        IsVisible="{Binding ExchangingSecondStepLinkUrl,
                                         Converter={StaticResource StringNotEmptyConverter}}">
-                                    <Button Content="Open in explorer"
-                                            HorizontalAlignment="Left"
-                                            VerticalAlignment="Center"
+                                    <Button HorizontalAlignment="Left"
+                                            VerticalAlignment="Bottom"
+                                            Padding="0"
                                             Command="{Binding OpenTxInExplorerCommand}"
-                                            CommandParameter="{Binding ExchangingSecondStepLink}"
-                                            Classes="ExplorerLinkButton" />
+                                            CommandParameter="{Binding ExchangingSecondStepLinkUrl}"
+                                            Classes="ExplorerLinkBtn Icon">
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock FontFamily="{DynamicResource DefaultFontFamily}"
+                                                       VerticalAlignment="Bottom"
+                                                       FontSize="12"
+                                                       Text="{Binding ExchangingSecondStepLinkText}" />
+                                            <Path Stretch="Uniform"
+                                                  Margin="5 0 0 0"
+                                                  VerticalAlignment="Top"
+                                                  Height="11"
+                                                  Data="{DynamicResource LinkIcon}" />
+                                        </StackPanel>
+                                    </Button>
                                     <ToolTip.Tip>
-                                        <TextBlock Text="{Binding ExchangingSecondStepLink}" />
+                                        <TextBlock Text="{Binding ExchangingSecondStepLinkUrl}" />
                                     </ToolTip.Tip>
                                 </Border>
+                                <TextBlock Text="{Binding ExchangingSecondStepLinkText}"
+                                           IsVisible="{Binding ExchangingSecondStepLinkUrl,
+                                           Converter={StaticResource StringIsEmptyConverter}}"
+                                           TextWrapping="Wrap"
+                                           Margin="0 2 0 0"
+                                           Foreground="{StaticResource SecondaryTextColor}"
+                                           FontFamily="{DynamicResource DefaultLightFontFamily}"
+                                           FontSize="12"
+                                           HorizontalAlignment="Left"
+                                           VerticalAlignment="Center" />
                             </WrapPanel>
                         </StackPanel>
                         <StackPanel
@@ -678,19 +765,43 @@
                                 <Border ToolTip.Placement="AnchorAndGravity"
                                         ToolTip.VerticalOffset="-42"
                                         VerticalAlignment="Bottom"
-                                        IsVisible="{Binding CompletionFirstStepLink,
+                                        Margin="0 2 0 0"
+                                        IsVisible="{Binding CompletionFirstStepLinkUrl,
                                         Converter={StaticResource StringNotEmptyConverter}}">
 
-                                    <Button Content="Open in explorer"
-                                            HorizontalAlignment="Left"
-                                            VerticalAlignment="Center"
+                                    <Button HorizontalAlignment="Left"
+                                            VerticalAlignment="Bottom"
+                                            Padding="0"
                                             Command="{Binding OpenTxInExplorerCommand}"
-                                            CommandParameter="{Binding CompletionFirstStepLink}"
-                                            Classes="ExplorerLinkButton" />
+                                            CommandParameter="{Binding CompletionFirstStepLinkUrl}"
+                                            Classes="ExplorerLinkBtn Icon">
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock FontFamily="{DynamicResource DefaultFontFamily}"
+                                                       VerticalAlignment="Bottom"
+                                                       FontSize="12"
+                                                       Text="{Binding CompletionFirstStepLinkText}" />
+                                            <Path Stretch="Uniform"
+                                                  Margin="5 0 0 0"
+                                                  VerticalAlignment="Top"
+                                                  Height="11"
+                                                  Data="{DynamicResource LinkIcon}" />
+                                        </StackPanel>
+                                    </Button>
                                     <ToolTip.Tip>
-                                        <TextBlock Text="{Binding CompletionFirstStepLink}" />
+                                        <TextBlock Text="{Binding CompletionFirstStepLinkUrl}" />
                                     </ToolTip.Tip>
                                 </Border>
+
+                                <TextBlock Text="{Binding CompletionFirstStepLinkText}"
+                                           IsVisible="{Binding CompletionFirstStepLinkUrl,
+                                           Converter={StaticResource StringIsEmptyConverter}}"
+                                           TextWrapping="Wrap"
+                                           Margin="0 2 0 0"
+                                           Foreground="{StaticResource SecondaryTextColor}"
+                                           FontFamily="{DynamicResource DefaultLightFontFamily}"
+                                           FontSize="12"
+                                           HorizontalAlignment="Left"
+                                           VerticalAlignment="Center" />
                             </WrapPanel>
                             <WrapPanel
                                 IsVisible="{Binding CompletionSecondStepDescription,
@@ -707,19 +818,43 @@
                                 <Border ToolTip.Placement="AnchorAndGravity"
                                         ToolTip.VerticalOffset="-42"
                                         VerticalAlignment="Bottom"
-                                        IsVisible="{Binding CompletionSecondStepLink,
+                                        Margin="0 2 0 0"
+                                        IsVisible="{Binding CompletionSecondStepLinkUrl,
                                         Converter={StaticResource StringNotEmptyConverter}}">
 
-                                    <Button Content="Open in explorer"
-                                            HorizontalAlignment="Left"
-                                            VerticalAlignment="Center"
+                                    <Button HorizontalAlignment="Left"
+                                            VerticalAlignment="Bottom"
+                                            Padding="0"
                                             Command="{Binding OpenTxInExplorerCommand}"
-                                            CommandParameter="{Binding CompletionSecondStepLink}"
-                                            Classes="ExplorerLinkButton" />
+                                            CommandParameter="{Binding CompletionSecondStepLinkUrl}"
+                                            Classes="ExplorerLinkBtn Icon">
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock FontFamily="{DynamicResource DefaultFontFamily}"
+                                                       VerticalAlignment="Bottom"
+                                                       FontSize="12"
+                                                       Text="{Binding CompletionSecondStepLinkText}" />
+                                            <Path Stretch="Uniform"
+                                                  Margin="5 0 0 0"
+                                                  VerticalAlignment="Top"
+                                                  Height="11"
+                                                  Data="{DynamicResource LinkIcon}" />
+                                        </StackPanel>
+                                    </Button>
                                     <ToolTip.Tip>
-                                        <TextBlock Text="{Binding CompletionSecondStepLink}" />
+                                        <TextBlock Text="{Binding CompletionSecondStepLinkUrl}" />
                                     </ToolTip.Tip>
                                 </Border>
+
+                                <TextBlock Text="{Binding CompletionSecondStepLinkText}"
+                                           IsVisible="{Binding CompletionSecondStepLinkUrl,
+                                           Converter={StaticResource StringIsEmptyConverter}}"
+                                           TextWrapping="Wrap"
+                                           Margin="0 2 0 0"
+                                           Foreground="{StaticResource SecondaryTextColor}"
+                                           FontFamily="{DynamicResource DefaultLightFontFamily}"
+                                           FontSize="12"
+                                           HorizontalAlignment="Left"
+                                           VerticalAlignment="Center" />
                             </WrapPanel>
                         </StackPanel>
                     </Grid>
@@ -757,7 +892,7 @@
                                    FontFamily="{DynamicResource DefaultFontFamily}"
                                    HorizontalAlignment="Right"
                                    FontSize="15" />
-                        
+
                         <TextBlock Grid.Column="0"
                                    Grid.Row="1"
                                    Text="Date:"
