@@ -1043,7 +1043,7 @@ namespace Atomex.Client.Desktop.ViewModels
                     var previousSwapsCount = Swaps?.Count;
                     Swaps = new ObservableCollection<SwapViewModel>(swapViewModels);
                     
-                    if (previousSwapsCount < swapViewModels?.Count && !DetailsVisible)
+                    if (previousSwapsCount < swapViewModels?.Count)
                         DGSelectedIndex = 0;
 
                     if (DetailsVisible)

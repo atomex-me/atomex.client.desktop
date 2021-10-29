@@ -64,8 +64,10 @@ namespace Atomex.Client.Desktop.ViewModels
             _ => string.Empty
         };
 
-        public string? InitializationStepDescription =>
+        public string? InitializationFirstStepDescription =>
             GetStatusDescription(Atomex.ViewModels.Helpers.SwapDetailingStatus.Initialization, 0)?.Description;
+        public string? InitializationSecondStepDescription =>
+            GetStatusDescription(Atomex.ViewModels.Helpers.SwapDetailingStatus.Initialization, 1)?.Description;
         public string? ExchangingFirstStepDescription =>
             GetStatusDescription(Atomex.ViewModels.Helpers.SwapDetailingStatus.Exchanging, 0)?.Description;
         public string? ExchangingSecondStepDescription =>
@@ -75,15 +77,23 @@ namespace Atomex.Client.Desktop.ViewModels
         public string? CompletionSecondStepDescription =>
             GetStatusDescription(Atomex.ViewModels.Helpers.SwapDetailingStatus.Completion, 1)?.Description;
 
-
-        public string? ExchangingFirstStepLink =>
-            GetStatusDescription(Atomex.ViewModels.Helpers.SwapDetailingStatus.Exchanging, 0)?.ExplorerLink;
-        public string? ExchangingSecondStepLink =>
-            GetStatusDescription(Atomex.ViewModels.Helpers.SwapDetailingStatus.Exchanging, 1)?.ExplorerLink;
-        public string? CompletionFirstStepLink =>
-            GetStatusDescription(Atomex.ViewModels.Helpers.SwapDetailingStatus.Completion, 0)?.ExplorerLink;
-        public string? CompletionSecondStepLink =>
-            GetStatusDescription(Atomex.ViewModels.Helpers.SwapDetailingStatus.Completion, 1)?.ExplorerLink;
+        public string? ExchangingFirstStepLinkText =>
+            GetStatusDescription(Atomex.ViewModels.Helpers.SwapDetailingStatus.Exchanging, 0)?.ExplorerLink?.Text;
+        public string? ExchangingSecondStepLinkText =>
+            GetStatusDescription(Atomex.ViewModels.Helpers.SwapDetailingStatus.Exchanging, 1)?.ExplorerLink?.Text;
+        public string? CompletionFirstStepLinkText =>
+            GetStatusDescription(Atomex.ViewModels.Helpers.SwapDetailingStatus.Completion, 0)?.ExplorerLink?.Text;
+        public string? CompletionSecondStepLinkText =>
+            GetStatusDescription(Atomex.ViewModels.Helpers.SwapDetailingStatus.Completion, 1)?.ExplorerLink?.Text;
+        
+        public string? ExchangingFirstStepLinkUrl =>
+            GetStatusDescription(Atomex.ViewModels.Helpers.SwapDetailingStatus.Exchanging, 0)?.ExplorerLink?.Url;
+        public string? ExchangingSecondStepLinkUrl =>
+            GetStatusDescription(Atomex.ViewModels.Helpers.SwapDetailingStatus.Exchanging, 1)?.ExplorerLink?.Url;
+        public string? CompletionFirstStepLinkUrl =>
+            GetStatusDescription(Atomex.ViewModels.Helpers.SwapDetailingStatus.Completion, 0)?.ExplorerLink?.Url;
+        public string? CompletionSecondStepLinkUrl =>
+            GetStatusDescription(Atomex.ViewModels.Helpers.SwapDetailingStatus.Completion, 1)?.ExplorerLink?.Url;
 
 
         private Atomex.ViewModels.Helpers.SwapDetailingInfo? GetStatusDescription(
