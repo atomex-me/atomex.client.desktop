@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using Atomex.Client.Desktop.Controls;
@@ -321,6 +322,8 @@ namespace Atomex.Client.Desktop.ViewModels
 
             ShowContent(unlockViewModel);
         }
+        
+        public bool IsLinux { get; } = RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
 
         private void DesignerMode()
         {

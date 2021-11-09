@@ -3,6 +3,7 @@
         <OutputType>WinExe</OutputType>
         <TargetFramework>net5.0</TargetFramework>
         <Nullable>enable</Nullable>
+        <InvariantGlobalization>true</InvariantGlobalization>
         <DefaultItemExcludes>$(DefaultItemExcludes);atomex.client.core\**</DefaultItemExcludes>
         <UseAppHost>true</UseAppHost>
         <ApplicationIcon>Resources/Images/logo_dark_256x256.ico</ApplicationIcon>
@@ -174,6 +175,10 @@
         </Compile>
         <Compile Update="Views\CustomTitleBars\WindowsTitleBarView.axaml.cs">
           <DependentUpon>WindowsTitleBarView.axaml</DependentUpon>
+          <SubType>Code</SubType>
+        </Compile>
+        <Compile Update="Views\LinuxUpdateControls.axaml.cs">
+          <DependentUpon>LinuxUpdateControls.axaml</DependentUpon>
           <SubType>Code</SubType>
         </Compile>
     </ItemGroup>

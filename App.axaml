@@ -43,6 +43,7 @@
         <StyleInclude Source="/Styles/SwapViewStyle.axaml" />
         <StyleInclude Source="/Styles/CurrencyComboBoxStyle.axaml" />
         <StyleInclude Source="/Styles/ToggleSwitchStyle.axaml" />
+        <StyleInclude Source="/Styles/CustomTitlebarStyle.axaml" />
         <StyleInclude Source="/Styles/TypeTest.axaml" />
     </Application.Styles>
 </Application>

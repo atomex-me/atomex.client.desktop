@@ -1,6 +1,7 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="using:Atomex.Client.Desktop.ViewModels"
+        xmlns:views="using:Atomex.Client.Desktop.Views"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
@@ -22,24 +23,18 @@
 
     <DockPanel HorizontalAlignment="Stretch"
                VerticalAlignment="Stretch">
-        <titlebars:MacosTitleBarView IsSeamless="False"></titlebars:MacosTitleBarView>
-        <titlebars:WindowsTitleBarView IsSeamless="False"></titlebars:WindowsTitleBarView>
-        <Grid>
-            <Grid.RowDefinitions>
-                <RowDefinition />
-                <RowDefinition Height="Auto" />
-                <RowDefinition />
-            </Grid.RowDefinitions>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition />
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition />
-            </Grid.ColumnDefinitions>
-        
+        <titlebars:MacosTitleBarView IsSeamless="False" />
+        <titlebars:WindowsTitleBarView IsSeamless="False" />
+
+        <views:LinuxUpdateControls IsVisible="{Binding IsLinux}"
+                                   DockPanel.Dock="Top"
+                                   Margin="0 0 0 -30"
+                                   ZIndex="1" />
+
+        <Grid RowDefinitions="*,Auto,*" ColumnDefinitions="*,Auto,*">
             <ContentControl Grid.Column="1"
                             Grid.Row="1"
                             Content="{Binding Content}" />
         </Grid>
     </DockPanel>
-
 </Window>
