@@ -1,24 +1,22 @@
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Atomex.Core;
-using Atomex.Client.Desktop.Common;
-using Atomex.Client.Desktop.ViewModels.Abstract;
-using Atomex.Common;
-using QRCoder;
 using System;
+using System.Collections.Generic;
 using System.Drawing.Imaging;
 using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Input;
-using Serilog;
-using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
-using Atomex.Wallet.Abstract;
-using Avalonia;
-using Avalonia.Input.Platform;
+
 using Avalonia.Media.Imaging;
-using Avalonia.Platform;
 using Avalonia.Threading;
+using QRCoder;
 using ReactiveUI;
+using Serilog;
+
+using Atomex.Client.Desktop.Common;
+using Atomex.Client.Desktop.ViewModels.Abstract;
+using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
+using Atomex.Common;
+using Atomex.Core;
 
 namespace Atomex.Client.Desktop.ViewModels.ReceiveViewModels
 {

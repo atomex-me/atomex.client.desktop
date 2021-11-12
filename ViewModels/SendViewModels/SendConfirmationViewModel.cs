@@ -1,15 +1,15 @@
 ﻿using System;
 using System.Linq;
 using System.Windows.Input;
-using Atomex.Blockchain.Tezos;
-using Atomex.Client.Desktop.Common;
-using Atomex.Client.Desktop.Controls;
-using Atomex.Core;
-using Atomex.TezosTokens;
-using Atomex.Wallet.Abstract;
-using Atomex.Wallet.Tezos;
+
 using ReactiveUI;
 using Serilog;
+
+using Atomex.Blockchain.Tezos;
+using Atomex.Client.Desktop.Common;
+using Atomex.Core;
+using Atomex.TezosTokens;
+using Atomex.Wallet.Tezos;
 
 namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 {
@@ -40,7 +40,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
         public ICommand BackCommand => _backCommand ??= (_backCommand = ReactiveCommand.Create(() =>
         {
-            Desktop.App.DialogService.Show(BackView);
+            App.DialogService.Show(BackView);
         }));
 
         private ICommand _nextCommand;

@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
 using Atomex.Blockchain.Abstract;
+using Atomex.Blockchain.BitcoinBased;
 using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.Properties;
 using Atomex.Core;
@@ -13,6 +15,8 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 {
     public class BitcoinBasedSendViewModel : SendViewModel
     {
+        public IEnumerable<BitcoinBasedTxOutput> Outputs { get; set; }
+
         protected decimal _feeRate;
         public decimal FeeRate
         {
@@ -49,11 +53,16 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             {
                 if (UseDefaultFee)
                 {
-                    var account = App.Account
-                        .GetCurrencyAccount<ILegacyCurrencyAccount>(Currency.Name);
+                    if (App.Account.GetCurrencyAccount(Currency.Name) is not IEstimatable account)
+                        return; // todo: error?
 
-                    var (maxAmount, _, _) = await account
-                        .EstimateMaxAmountToSendAsync(to: To, type: BlockchainTransactionType.Output);
+                    var (maxAmount, _, _) = await account.EstimateMaxAmountToSendAsync(
+                        from: new FromOutputs(Outputs),
+                        to: _to,
+                        type: BlockchainTransactionType.Output,
+                        fee: 0,
+                        feePrice: 0,
+                        reserve: false);
 
                     if (_amount > maxAmount)
                     {
@@ -63,7 +72,11 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     }
 
                     var estimatedFeeAmount = _amount != 0
-                        ? await account.EstimateFeeAsync(To, _amount, BlockchainTransactionType.Output)
+                        ? await account.EstimateFeeAsync(
+                            from: new FromOutputs(Outputs),
+                            to: To,
+                            amount: _amount,
+                            type: BlockchainTransactionType.Output)
                         : 0;
 
                     OnPropertyChanged(nameof(AmountString));
@@ -174,11 +187,16 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
                 if (UseDefaultFee) // auto fee
                 {
-                    var account = App.Account
-                        .GetCurrencyAccount<ILegacyCurrencyAccount>(Currency.Name);
+                    if (App.Account.GetCurrencyAccount(Currency.Name) is not IEstimatable account)
+                        return; // todo: error?
 
-                    var (maxAmount, maxFeeAmount, _) = await account
-                        .EstimateMaxAmountToSendAsync(To, BlockchainTransactionType.Output);
+                    var (maxAmount, maxFeeAmount, _) = await account.EstimateMaxAmountToSendAsync(
+                        from: new FromOutputs(Outputs),
+                        to: _to,
+                        type: BlockchainTransactionType.Output,
+                        fee: 0,
+                        feePrice: 0,
+                        reserve: false);
 
                     if (maxAmount > 0)
                         _amount = maxAmount;
@@ -234,15 +252,15 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             }
         }
 
-        private async Task<int?> EstimateTxSizeAsync(
-            decimal amount,
-            decimal fee,
-            CancellationToken cancellationToken = default)
-        {
-            return await App.Account
-                .GetCurrencyAccount<BitcoinBasedAccount>(Currency.Name)
-                .EstimateTxSizeAsync(amount, fee, cancellationToken);
-        }
+        //private async Task<int?> EstimateTxSizeAsync(
+        //    decimal amount,
+        //    decimal fee,
+        //    CancellationToken cancellationToken = default)
+        //{
+        //    return await App.Account
+        //        .GetCurrencyAccount<BitcoinBasedAccount>(Currency.Name)
+        //        .EstimateTxSizeAsync(amount, fee, cancellationToken);
+        //}
 
         private void BitcoinBasedDesignerMode()
         {

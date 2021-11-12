@@ -5,7 +5,11 @@ using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
+
+using Avalonia.Threading;
+using ReactiveUI;
 using Serilog;
+
 using Atomex.Abstract;
 using Atomex.Common;
 using Atomex.Core;
@@ -18,10 +22,6 @@ using Atomex.Client.Desktop.Properties;
 using Atomex.Client.Desktop.ViewModels.Abstract;
 using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
 using Atomex.Swaps.Helpers;
-using Atomex.Wallet.Abstract;
-using Avalonia;
-using Avalonia.Threading;
-using ReactiveUI;
 
 namespace Atomex.Client.Desktop.ViewModels
 {
