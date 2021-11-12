@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Globalization;
 using System.Linq;
+
 using Atomex.Blockchain.Abstract;
 using Atomex.Client.Desktop.Properties;
 using Atomex.Core;
@@ -95,14 +96,19 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
             try
             {
-                var account = App.Account
-                    .GetCurrencyAccount<ILegacyCurrencyAccount>(Currency.Name);
+                if (App.Account.GetCurrencyAccount(Currency.Name) is not IEstimatable account)
+                    return; // todo: error?
+
+                var (maxAmount, _, _) = await account.EstimateMaxAmountToSendAsync(
+                    from: new FromAddress(From),
+                    to: _to,
+                    type: BlockchainTransactionType.Output,
+                    fee: UseDefaultFee ? 0 : _fee,
+                    feePrice: UseDefaultFee ? 0 : _feePrice,
+                    reserve: false);
 
                 if (UseDefaultFee)
                 {
-                    var (maxAmount, _, _) = await account
-                        .EstimateMaxAmountToSendAsync(To, BlockchainTransactionType.Output, 0, 0, false);
-
                     _fee = Currency.GetDefaultFee();
                     OnPropertyChanged(nameof(GasString));
 
@@ -127,9 +133,6 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 }
                 else
                 {
-                    var (maxAmount, _, _) = await account
-                        .EstimateMaxAmountToSendAsync(To, BlockchainTransactionType.Output, _fee, _feePrice, false);
-
                     if (_amount > maxAmount)
                     {
                         if (_amount <= availableAmount)
@@ -185,11 +188,16 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
                 if (!UseDefaultFee)
                 {
-                    var account = App.Account
-                        .GetCurrencyAccount<ILegacyCurrencyAccount>(Currency.Name);
+                    if (App.Account.GetCurrencyAccount(Currency.Name) is not IEstimatable account)
+                        return; // todo: error?
 
-                    var (maxAmount, _, _) = await account
-                        .EstimateMaxAmountToSendAsync(To, BlockchainTransactionType.Output, _fee, _feePrice, false);
+                    var (maxAmount, _, _) = await account.EstimateMaxAmountToSendAsync(
+                        from: new FromAddress(From),
+                        to: _to,
+                        type: BlockchainTransactionType.Output,
+                        fee: _fee,
+                        feePrice: _feePrice,
+                        reserve: false);
 
                     if (_amount > maxAmount)
                     {
@@ -250,11 +258,16 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
                 if (!UseDefaultFee)
                 {
-                    var account = App.Account
-                        .GetCurrencyAccount<ILegacyCurrencyAccount>(Currency.Name);
+                    if (App.Account.GetCurrencyAccount(Currency.Name) is not IEstimatable account)
+                        return; // todo: error?
 
-                    var (maxAmount, _, _) = await account
-                        .EstimateMaxAmountToSendAsync(To, BlockchainTransactionType.Output, _fee, _feePrice, false);
+                    var (maxAmount, _, _) = await account.EstimateMaxAmountToSendAsync(
+                        from: new FromAddress(From),
+                        to: _to,
+                        type: BlockchainTransactionType.Output,
+                        fee: _fee,
+                        feePrice: _feePrice,
+                        reserve: false);
 
                     if (_amount > maxAmount)
                     {
@@ -298,13 +311,18 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 if (availableAmount == 0)
                     return;
 
-                var account = App.Account
-                    .GetCurrencyAccount<ILegacyCurrencyAccount>(Currency.Name);
+                if (App.Account.GetCurrencyAccount(Currency.Name) is not IEstimatable account)
+                    return; // todo: error?
 
                 if (UseDefaultFee)
                 {
-                    var (maxAmount, maxFeeAmount, _) = await account
-                        .EstimateMaxAmountToSendAsync(To, BlockchainTransactionType.Output, 0, 0, false);
+                    var (maxAmount, maxFeeAmount, _) = await account.EstimateMaxAmountToSendAsync(
+                        from: new FromAddress(From),
+                        to: _to,
+                        type: BlockchainTransactionType.Output,
+                        fee: 0,
+                        feePrice: 0,
+                        reserve: false);
 
                     if (maxAmount > 0)
                         _amount = maxAmount;
@@ -335,8 +353,13 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                         }
                     }
 
-                    var (maxAmount, maxFeeAmount, _) = await account
-                        .EstimateMaxAmountToSendAsync(To, BlockchainTransactionType.Output, _fee, _feePrice, false);
+                    var (maxAmount, maxFeeAmount, _) = await account.EstimateMaxAmountToSendAsync(
+                        from: new FromAddress(From),
+                        to: _to,
+                        type: BlockchainTransactionType.Output,
+                        fee: _fee,
+                        feePrice: _feePrice,
+                        reserve: false);
 
                     _amount = maxAmount;
 
@@ -359,7 +382,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
         protected override void OnQuotesUpdatedEventHandler(object sender, EventArgs args)
         {
-            if (!(sender is ICurrencyQuotesProvider quotesProvider))
+            if (sender is not ICurrencyQuotesProvider quotesProvider)
                 return;
 
             var quote = quotesProvider.GetQuote(CurrencyCode, BaseCurrencyCode);

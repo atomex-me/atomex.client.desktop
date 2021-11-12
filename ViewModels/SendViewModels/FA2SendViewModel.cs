@@ -17,4 +17,3 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         }
     }
 }
-
