@@ -18,10 +18,8 @@
     <Application.Styles>
         <FluentTheme Mode="Light" />
         
-        <StyleInclude Source="/Styles/DialogHostCustomStyle.axaml" />
         <StyleInclude Source="avares://AvaloniaProgressRing/Styles/ProgressRing.xaml"/>
         <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml" />
-        <!-- Add the line below to get OxyPlot UI theme applied. -->
         <StyleInclude Source="resm:OxyPlot.Avalonia.Themes.Default.xaml?assembly=OxyPlot.Avalonia" />
         <StyleInclude Source="/Styles/Styles.axaml" />
         <StyleInclude Source="/Styles/MainWindowStyle.axaml" />
@@ -46,6 +44,6 @@
         <StyleInclude Source="/Styles/ToggleSwitchStyle.axaml" />
         <StyleInclude Source="/Styles/CustomTitlebarStyle.axaml" />
         <StyleInclude Source="/Styles/TypeTest.axaml" />
-
+        <StyleInclude Source="/Styles/DialogHostCustomStyle.axaml" />
     </Application.Styles>
 </Application>

@@ -5,11 +5,10 @@
         <CornerRadius x:Key="DialogCornerRadius">10</CornerRadius>
         <BoxShadows x:Key="DialogBoxShadow">2 2 12 3 Black</BoxShadows>
     </Styles.Resources>
-
+    
 
     <Style Selector="Border.ChildViewBorder">
         <Setter Property="CornerRadius" Value="{DynamicResource DialogCornerRadius}" />
-        <Setter Property="BoxShadow" Value="{DynamicResource DialogBoxShadow}" />
         <Setter Property="Background" Value="{DynamicResource ChildViewBackgroundBrush}" />
     </Style>
 

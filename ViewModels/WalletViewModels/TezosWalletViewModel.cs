@@ -162,19 +162,9 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         //private ICommand _undelegateCommand;
         //public ICommand UndelegateCommand => _undelegateCommand ?? (_undelegateCommand = new Command(OnUndelegateClick));
 
-        private async void OnDelegateClick()
+        private void OnDelegateClick()
         {
             _ = DialogHost.DialogHost.Show(DelegateVM);
-            await Task.Delay(2000);
-            var receiveViewModel = new ReceiveViewModel(App, Currency);
-            DialogHost.DialogHost.GetDialogSession("MainDialogHost")?.Close(false);
-            _ = DialogHost.DialogHost.Show(receiveViewModel, Desktop.App.MainDialogHostIdentifier);
-            await Task.Delay(2000);
-            DialogHost.DialogHost.GetDialogSession("MainDialogHost")?.Close(false);
-            _ = DialogHost.DialogHost.Show(DelegateVM);
-            await Task.Delay(2000);
-            DialogHost.DialogHost.GetDialogSession("MainDialogHost")?.Close(false);
-            _ = DialogHost.DialogHost.Show(receiveViewModel, Desktop.App.MainDialogHostIdentifier);
         }
 
         //private void OnUndelegateClick()

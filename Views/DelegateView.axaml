@@ -19,211 +19,213 @@
         <converters:TezosDelegationCurrencyFormatConverter x:Key="TezosDelegationCurrencyFormatConverter" />
     </UserControl.Resources>
 
-    <Grid Width="600">
-        <StackPanel Orientation="Vertical"
-                    IsEnabled="{Binding !DelegationCheck}">
+    <Border Classes="ChildViewBorder">
+        <Grid Width="600">
+            <StackPanel Orientation="Vertical"
+                        IsEnabled="{Binding !DelegationCheck}">
 
-            <Border Margin="0 10 0 10"
-                    Height="33"
-                    VerticalAlignment="Top"
-                    HorizontalAlignment="Stretch"
-                    Background="{DynamicResource ChildViewHeaderBackgroundBrush}">
-                <TextBlock Text="Delegate"
-                           Foreground="{DynamicResource ChildViewHeaderForegroundBrush}"
+                <Border Margin="0 10 0 10"
+                        Height="33"
+                        VerticalAlignment="Top"
+                        HorizontalAlignment="Stretch"
+                        Background="{DynamicResource ChildViewHeaderBackgroundBrush}">
+                    <TextBlock Text="Delegate"
+                               Foreground="{DynamicResource ChildViewHeaderForegroundBrush}"
+                               FontFamily="{DynamicResource DefaultLightFontFamily}"
+                               FontSize="25"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center" />
+                </Border>
+
+                <TextBlock Text="Delegating to a bakery."
+                           Foreground="{DynamicResource DefaultForegroundBrush}"
                            FontFamily="{DynamicResource DefaultLightFontFamily}"
-                           FontSize="25"
-                           HorizontalAlignment="Center"
-                           VerticalAlignment="Center" />
-            </Border>
+                           FontSize="15"
+                           Margin="40 20 40 15"
+                           TextWrapping="Wrap"
+                           HorizontalAlignment="Center" />
 
-            <TextBlock Text="Delegating to a bakery."
-                       Foreground="{DynamicResource DefaultForegroundBrush}"
-                       FontFamily="{DynamicResource DefaultLightFontFamily}"
-                       FontSize="15"
-                       Margin="40 20 40 15"
-                       TextWrapping="Wrap"
-                       HorizontalAlignment="Center" />
+                <TextBlock Text="Loading bakers, please wait..."
+                           IsVisible="{Binding BakersLoading}"
+                           Foreground="{DynamicResource DefaultForegroundBrush}"
+                           FontFamily="{DynamicResource DefaultLightFontFamily}"
+                           FontSize="15"
+                           Margin="40 20 40 40"
+                           TextWrapping="Wrap"
+                           HorizontalAlignment="Center" />
 
-            <TextBlock Text="Loading bakers, please wait..."
-                       IsVisible="{Binding BakersLoading}"
-                       Foreground="{DynamicResource DefaultForegroundBrush}"
-                       FontFamily="{DynamicResource DefaultLightFontFamily}"
-                       FontSize="15"
-                       Margin="40 20 40 40"
-                       TextWrapping="Wrap"
-                       HorizontalAlignment="Center" />
-
-            <ComboBox IsVisible="{Binding !BakersLoading}"
-                      Width="510"
-                      MinHeight="68"
-                      HorizontalAlignment="Center"
-                      Margin="0 5 0 5"
-                      Items="{Binding FromBakersList}"
-                      SelectedItem="{Binding BakerViewModel}"
-                      VirtualizationMode="Simple"
-                      helpers:ComboBoxHelper.CornerRadius="20"
-                      Classes="BakersComboBox" />
-
-            <StackPanel Orientation="Horizontal"
-                        HorizontalAlignment="Center">
-                <Border Classes="FieldHeader">
-                    <TextBlock Text="To Address:"
-                               Margin="0 0 7 0"
-                               Foreground="{DynamicResource DefaultForegroundBrush}"
-                               FontFamily="{DynamicResource DefaultMediumFontFamily}"
-                               FontSize="13"
-                               VerticalAlignment="Center"
-                               HorizontalAlignment="Right" />
-                </Border>
-                <TextBox Width="410"
-                         Height="40"
-                         Margin="0 5 0 5"
-                         Text="{Binding Address, Mode=TwoWay}"
-                         Background="{DynamicResource DefaultSubstrateBrush}"
-                         Foreground="{DynamicResource DefaultForegroundBrush}"
-                         helpers:TextBoxHelper.CornerRadius="0 20 20 0"
-                         FontFamily="Roboto"
-                         Classes="CustomTextBox AmountTextBox" />
-            </StackPanel>
-
-            <StackPanel Orientation="Horizontal"
-                        HorizontalAlignment="Center">
-                <Border Classes="FieldHeader">
-                    <TextBlock Text="From Address:"
-                               Margin="0 0 7 0"
-                               Foreground="{DynamicResource DefaultForegroundBrush}"
-                               FontFamily="{DynamicResource DefaultMediumFontFamily}"
-                               FontSize="13"
-                               VerticalAlignment="Center"
-                               HorizontalAlignment="Right" />
-                </Border>
-                <ComboBox Width="410"
-                          Height="40"
+                <ComboBox IsVisible="{Binding !BakersLoading}"
+                          Width="510"
+                          MinHeight="68"
+                          HorizontalAlignment="Center"
                           Margin="0 5 0 5"
-                          Padding="10 6 0 6"
-                          Classes="CurrencyComboBox"
-                          Items="{Binding FromAddressList}"
-                          SelectedIndex="{Binding WalletAddressIndex, Mode=TwoWay}"
-                          Background="{DynamicResource DefaultSubstrateBrush}"
-                          Foreground="{DynamicResource DefaultForegroundBrush}"
-                          helpers:ComboBoxHelper.CornerRadius="0 20 20 0">
-                    <ComboBox.ItemTemplate>
-                        <DataTemplate DataType="{x:Type vm:WalletAddressViewModel}">
+                          Items="{Binding FromBakersList}"
+                          SelectedItem="{Binding BakerViewModel}"
+                          VirtualizationMode="Simple"
+                          helpers:ComboBoxHelper.CornerRadius="20"
+                          Classes="BakersComboBox" />
 
-                            <DockPanel>
-                                <TextBlock
-                                    DockPanel.Dock="Right"
-                                    Margin="10 0 0 0"
-                                    Text="{Binding AvailableBalance, Converter={StaticResource TezosDelegationCurrencyFormatConverter}}"
-                                    Foreground="{DynamicResource AmountBrush}"
-                                    FontSize="12"
-                                    FontFamily="{DynamicResource DefaultFontFamily}"
-                                    VerticalAlignment="Center" />
-                                <TextBlock
-                                    Text="{Binding Address}"
-                                    Foreground="{DynamicResource DefaultForegroundBrush}"
-                                    FontSize="12"
-                                    FontFamily="{DynamicResource DefaultFontFamily}"
-                                    HorizontalAlignment="Left"
-                                    VerticalAlignment="Center" />
-                            </DockPanel>
-                            <!-- <StackPanel Orientation="Horizontal"> -->
-                            <!-- -->
-                            <!-- </StackPanel> -->
-                        </DataTemplate>
-                    </ComboBox.ItemTemplate>
-                </ComboBox>
+                <StackPanel Orientation="Horizontal"
+                            HorizontalAlignment="Center">
+                    <Border Classes="FieldHeader">
+                        <TextBlock Text="To Address:"
+                                   Margin="0 0 7 0"
+                                   Foreground="{DynamicResource DefaultForegroundBrush}"
+                                   FontFamily="{DynamicResource DefaultMediumFontFamily}"
+                                   FontSize="13"
+                                   VerticalAlignment="Center"
+                                   HorizontalAlignment="Right" />
+                    </Border>
+                    <TextBox Width="410"
+                             Height="40"
+                             Margin="0 5 0 5"
+                             Text="{Binding Address, Mode=TwoWay}"
+                             Background="{DynamicResource DefaultSubstrateBrush}"
+                             Foreground="{DynamicResource DefaultForegroundBrush}"
+                             helpers:TextBoxHelper.CornerRadius="0 20 20 0"
+                             FontFamily="Roboto"
+                             Classes="CustomTextBox AmountTextBox" />
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal"
+                            HorizontalAlignment="Center">
+                    <Border Classes="FieldHeader">
+                        <TextBlock Text="From Address:"
+                                   Margin="0 0 7 0"
+                                   Foreground="{DynamicResource DefaultForegroundBrush}"
+                                   FontFamily="{DynamicResource DefaultMediumFontFamily}"
+                                   FontSize="13"
+                                   VerticalAlignment="Center"
+                                   HorizontalAlignment="Right" />
+                    </Border>
+                    <ComboBox Width="410"
+                              Height="40"
+                              Margin="0 5 0 5"
+                              Padding="10 6 0 6"
+                              Classes="CurrencyComboBox"
+                              Items="{Binding FromAddressList}"
+                              SelectedIndex="{Binding WalletAddressIndex, Mode=TwoWay}"
+                              Background="{DynamicResource DefaultSubstrateBrush}"
+                              Foreground="{DynamicResource DefaultForegroundBrush}"
+                              helpers:ComboBoxHelper.CornerRadius="0 20 20 0">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate DataType="{x:Type vm:WalletAddressViewModel}">
+
+                                <DockPanel>
+                                    <TextBlock
+                                        DockPanel.Dock="Right"
+                                        Margin="10 0 0 0"
+                                        Text="{Binding AvailableBalance, Converter={StaticResource TezosDelegationCurrencyFormatConverter}}"
+                                        Foreground="{DynamicResource AmountBrush}"
+                                        FontSize="12"
+                                        FontFamily="{DynamicResource DefaultFontFamily}"
+                                        VerticalAlignment="Center" />
+                                    <TextBlock
+                                        Text="{Binding Address}"
+                                        Foreground="{DynamicResource DefaultForegroundBrush}"
+                                        FontSize="12"
+                                        FontFamily="{DynamicResource DefaultFontFamily}"
+                                        HorizontalAlignment="Left"
+                                        VerticalAlignment="Center" />
+                                </DockPanel>
+                                <!-- <StackPanel Orientation="Horizontal"> -->
+                                <!-- -->
+                                <!-- </StackPanel> -->
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal"
+                            HorizontalAlignment="Center" />
+
+                <StackPanel Orientation="Horizontal"
+                            HorizontalAlignment="Center"
+                            IsEnabled="{Binding !UseDefaultFee}"
+                            Classes="BaseDisabledStyle">
+
+                    <Border Classes="FieldHeader">
+                        <TextBlock Text="Fee:"
+                                   Margin="0 0 7 0"
+                                   Foreground="{DynamicResource DefaultForegroundBrush}"
+                                   FontFamily="{DynamicResource DefaultMediumFontFamily}"
+                                   FontSize="13"
+                                   VerticalAlignment="Center"
+                                   HorizontalAlignment="Right" />
+                    </Border>
+
+                    <TextBox Width="410"
+                             Height="40"
+                             Margin="0 5 0 5"
+                             FontSize="18"
+                             Background="{DynamicResource DefaultSubstrateBrush}"
+                             Foreground="{DynamicResource DefaultForegroundBrush}"
+                             Text="{Binding FeeString, Mode=OneWay}"
+                             Name="FeeString"
+                             helpers:TextBoxHelper.CornerRadius="0 20 20 0"
+                             helpers:AmountTextBoxHelper.CurrencyCode="{Binding FeeCurrencyCode}"
+                             helpers:AmountTextBoxHelper.BaseCurrencyCode="{Binding BaseCurrencyCode}"
+                             Classes="CustomTextBox AmountTextBox">
+                        <helpers:AmountTextBoxHelper.AmountInBase>
+                            <MultiBinding Converter="{StaticResource AmountToStringConverter}">
+                                <Binding Path="FeeInBase" Mode="OneWay" />
+                                <Binding Path="BaseCurrencyFormat" Mode="OneWay" />
+                            </MultiBinding>
+                        </helpers:AmountTextBoxHelper.AmountInBase>
+
+                        <!-- todo: -->
+                        <!-- <i:Interaction.Behaviors> -->
+                        <!--     <behaviors:TextBoxInputBehavior InputMode="DecimalInput" -->
+                        <!--                                     UseInvariantCulture="True" -->
+                        <!--                                     JustPositiveDecimalInput="True"/> -->
+                        <!-- </i:Interaction.Behaviors> -->
+                    </TextBox>
+                </StackPanel>
+
+                <ToggleSwitch HorizontalAlignment="Center"
+                              OffContent="Use default fee"
+                              OnContent="Use default fee"
+                              BorderBrush="{DynamicResource DefaultForegroundBrush}"
+                              FontFamily="{DynamicResource DefaultLightFontFamily}"
+                              Foreground="{DynamicResource DefaultForegroundBrush}"
+                              FontSize="13"
+                              Margin="10"
+                              IsChecked="{Binding UseDefaultFee, Mode=TwoWay}" />
+
+                <TextBlock Text="{Binding Warning}"
+                           Foreground="{DynamicResource WarningForegroundBrush}"
+                           FontFamily="{DynamicResource DefaultLightFontFamily}"
+                           FontSize="13"
+                           Margin="20 5 20 0"
+                           TextWrapping="Wrap"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Bottom" />
+
+                <StackPanel Orientation="Horizontal"
+                            HorizontalAlignment="Center"
+                            Margin="0 20 0 20">
+                    <controls:RoundedButton Width="100"
+                                            Height="40"
+                                            Margin="0 0 3 0"
+                                            CornerRadius="20 0 0 20"
+                                            Content="Cancel"
+                                            Command="{Binding BackCommand}" />
+                    <controls:RoundedButton Width="100"
+                                            Height="40"
+                                            CornerRadius="0 20 20 0"
+                                            Content="Delegate"
+                                            Command="{Binding NextCommand}" />
+                </StackPanel>
             </StackPanel>
 
-            <StackPanel Orientation="Horizontal"
-                        HorizontalAlignment="Center" />
+            <Border Background="{DynamicResource DefaultSubstrateBrush}"
+                    IsVisible="{Binding DelegationCheck}" />
 
-            <StackPanel Orientation="Horizontal"
-                        HorizontalAlignment="Center"
-                        IsEnabled="{Binding !UseDefaultFee}"
-                        Classes="BaseDisabledStyle">
-
-                <Border Classes="FieldHeader">
-                    <TextBlock Text="Fee:"
-                               Margin="0 0 7 0"
-                               Foreground="{DynamicResource DefaultForegroundBrush}"
-                               FontFamily="{DynamicResource DefaultMediumFontFamily}"
-                               FontSize="13"
-                               VerticalAlignment="Center"
-                               HorizontalAlignment="Right" />
-                </Border>
-
-                <TextBox Width="410"
-                         Height="40"
-                         Margin="0 5 0 5"
-                         FontSize="18"
-                         Background="{DynamicResource DefaultSubstrateBrush}"
-                         Foreground="{DynamicResource DefaultForegroundBrush}"
-                         Text="{Binding FeeString, Mode=OneWay}"
-                         Name="FeeString"
-                         helpers:TextBoxHelper.CornerRadius="0 20 20 0"
-                         helpers:AmountTextBoxHelper.CurrencyCode="{Binding FeeCurrencyCode}"
-                         helpers:AmountTextBoxHelper.BaseCurrencyCode="{Binding BaseCurrencyCode}"
-                         Classes="CustomTextBox AmountTextBox">
-                    <helpers:AmountTextBoxHelper.AmountInBase>
-                        <MultiBinding Converter="{StaticResource AmountToStringConverter}">
-                            <Binding Path="FeeInBase" Mode="OneWay" />
-                            <Binding Path="BaseCurrencyFormat" Mode="OneWay" />
-                        </MultiBinding>
-                    </helpers:AmountTextBoxHelper.AmountInBase>
-
-                    <!-- todo: -->
-                    <!-- <i:Interaction.Behaviors> -->
-                    <!--     <behaviors:TextBoxInputBehavior InputMode="DecimalInput" -->
-                    <!--                                     UseInvariantCulture="True" -->
-                    <!--                                     JustPositiveDecimalInput="True"/> -->
-                    <!-- </i:Interaction.Behaviors> -->
-                </TextBox>
-            </StackPanel>
-
-            <ToggleSwitch HorizontalAlignment="Center"
-                          OffContent="Use default fee"
-                          OnContent="Use default fee"
-                          BorderBrush="{DynamicResource DefaultForegroundBrush}"
-                          FontFamily="{DynamicResource DefaultLightFontFamily}"
-                          Foreground="{DynamicResource DefaultForegroundBrush}"
-                          FontSize="13"
-                          Margin="10"
-                          IsChecked="{Binding UseDefaultFee, Mode=TwoWay}" />
-
-            <TextBlock Text="{Binding Warning}"
-                       Foreground="{DynamicResource WarningForegroundBrush}"
-                       FontFamily="{DynamicResource DefaultLightFontFamily}"
-                       FontSize="13"
-                       Margin="20 5 20 0"
-                       TextWrapping="Wrap"
-                       HorizontalAlignment="Center"
-                       VerticalAlignment="Bottom" />
-
-            <StackPanel Orientation="Horizontal"
-                        HorizontalAlignment="Center"
-                        Margin="0 20 0 20">
-                <controls:RoundedButton Width="100"
-                                        Height="40"
-                                        Margin="0 0 3 0"
-                                        CornerRadius="20 0 0 20"
-                                        Content="Cancel"
-                                        Command="{Binding BackCommand}" />
-                <controls:RoundedButton Width="100"
-                                        Height="40"
-                                        CornerRadius="0 20 20 0"
-                                        Content="Delegate"
-                                        Command="{Binding NextCommand}" />
-            </StackPanel>
-        </StackPanel>
-
-        <Border Background="{DynamicResource DefaultSubstrateBrush}"
-                IsVisible="{Binding DelegationCheck}" />
-
-        <mah:ProgressRing Width="80"
-                          Height="80"
-                          Foreground="{DynamicResource DefaultProgressRingBrush}"
-                          IsActive="{Binding DelegationCheck}"
-                          IsVisible="{Binding DelegationCheck}" />
-    </Grid>
+            <mah:ProgressRing Width="80"
+                              Height="80"
+                              Foreground="{DynamicResource DefaultProgressRingBrush}"
+                              IsActive="{Binding DelegationCheck}"
+                              IsVisible="{Binding DelegationCheck}" />
+        </Grid>
+    </Border>
 </UserControl>
