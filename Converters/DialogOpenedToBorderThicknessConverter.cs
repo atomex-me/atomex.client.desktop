@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Globalization;
 using System.Runtime.InteropServices;
+
 using Avalonia.Data.Converters;
 using Atomex.Client.Desktop.Common;
 using Avalonia;
@@ -15,9 +16,7 @@ namespace Atomex.Client.Desktop.Converters
         {
             if (value is bool opened)
             {
-                return opened && RuntimeInformation.IsOSPlatform(OSPlatform.Linux)
-                    ? new Thickness(0)
-                    : new Thickness(0, 0, 1, 3);
+                return opened ? new Thickness(0) : new Thickness(0, 0, 1, 3);
             }
 
             return value;
