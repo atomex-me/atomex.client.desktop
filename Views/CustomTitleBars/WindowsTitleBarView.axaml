@@ -14,24 +14,20 @@
     
     <Grid>
         <DockPanel Background="{DynamicResource MainWindowTitleBrush}"
-                   IsHitTestVisible="False"
                    Name="TitleBarBackground" />
         <DockPanel>
             <StackPanel
                 Orientation="Horizontal"
                 HorizontalAlignment="Left"
                 VerticalAlignment="Center"
-                IsHitTestVisible="False"
                 Name="TitleAndWindowIconWrapper">
                 <Image Source="avares://Atomex.Client.Desktop/Resources/Images/logo_dark_256x256.ico"
                        Height="30"
-                       IsHitTestVisible="False"
                        Width="30" />
                 <TextBlock Text="atomex"
                            Margin="6 0 0 0"
                            FontSize="16"
                            FontFamily="{DynamicResource MainTitleFontFamily}"
-                           IsHitTestVisible="False"
                            VerticalAlignment="Center"
                            Foreground="{DynamicResource DefaultForegroundBrush}" />
             </StackPanel>
