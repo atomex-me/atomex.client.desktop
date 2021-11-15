@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 using Atomex.Blockchain.Tezos;
 using Atomex.Blockchain.Tezos.Internal;
+using Atomex.Client.Desktop.ViewModels.ReceiveViewModels;
 using Atomex.Core;
 using Atomex.Wallet;
 using Avalonia.Media.Imaging;
@@ -161,9 +162,19 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         //private ICommand _undelegateCommand;
         //public ICommand UndelegateCommand => _undelegateCommand ?? (_undelegateCommand = new Command(OnUndelegateClick));
 
-        private void OnDelegateClick()
+        private async void OnDelegateClick()
         {
-            Desktop.App.DialogService.Show(DelegateVM);
+            _ = DialogHost.DialogHost.Show(DelegateVM);
+            await Task.Delay(2000);
+            var receiveViewModel = new ReceiveViewModel(App, Currency);
+            DialogHost.DialogHost.GetDialogSession("MainDialogHost")?.Close(false);
+            _ = DialogHost.DialogHost.Show(receiveViewModel, Desktop.App.MainDialogHostIdentifier);
+            await Task.Delay(2000);
+            DialogHost.DialogHost.GetDialogSession("MainDialogHost")?.Close(false);
+            _ = DialogHost.DialogHost.Show(DelegateVM);
+            await Task.Delay(2000);
+            DialogHost.DialogHost.GetDialogSession("MainDialogHost")?.Close(false);
+            _ = DialogHost.DialogHost.Show(receiveViewModel, Desktop.App.MainDialogHostIdentifier);
         }
 
         //private void OnUndelegateClick()

@@ -25,6 +25,7 @@ using Avalonia.Threading;
 using NBitcoin;
 using ReactiveUI;
 using Serilog;
+using DialogHost;
 using Network = NBitcoin.Network;
 
 namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
@@ -228,7 +229,9 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         protected virtual void OnReceiveClick()
         {
             var receiveViewModel = new ReceiveViewModel(App, Currency);
-            Desktop.App.DialogService.Show(receiveViewModel);
+            DialogHost.DialogHost.Show(receiveViewModel, Desktop.App.MainDialogHostIdentifier);
+            
+            // Desktop.App.DialogService.Show(receiveViewModel);
         }
 
         protected virtual void OnConvertClick()
