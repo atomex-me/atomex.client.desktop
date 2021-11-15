@@ -103,7 +103,7 @@ namespace Atomex.Client.Desktop.ViewModels
             {
                 _toCurrencyIndex = value;
                 OnPropertyChanged(nameof(ToCurrencyIndex));
-                
+
                 if (_toCurrencyIndex >= 0 && _toCurrencyIndex < ToCurrencies.Count)
                     ToCurrency = ToCurrencies.ElementAt(_toCurrencyIndex).Currency;
             }
@@ -672,20 +672,21 @@ namespace Atomex.Client.Desktop.ViewModels
                 OnPropertyChanged(nameof(IsNoLiquidity));
             }
         }
-        
+
         public int ColumnSpan => DetailsVisible ? 1 : 2;
         public bool DetailsVisible => DGSelectedIndex != -1;
         private SwapDetailsViewModel? SwapDetailsViewModel => DetailsVisible ? Swaps[DGSelectedIndex].Details : null;
 
         // current selected swap in DataGrid
         private int _dgSelectedIndex = -1;
+
         public int DGSelectedIndex
         {
             get => _dgSelectedIndex;
             set
             {
                 _dgSelectedIndex = value;
-                
+
                 OnPropertyChanged(nameof(DGSelectedIndex));
                 OnPropertyChanged(nameof(ColumnSpan));
                 OnPropertyChanged(nameof(DetailsVisible));
@@ -1020,8 +1021,8 @@ namespace Atomex.Client.Desktop.ViewModels
                 Log.Error(e, "Quotes updated event handler error");
             }
         }
-        
-        
+
+
         private async void OnSwapEventHandler(object sender, SwapEventArgs args)
         {
             try
@@ -1032,17 +1033,15 @@ namespace Atomex.Client.Desktop.ViewModels
                 await Dispatcher.UIThread.InvokeAsync(() =>
                 {
                     var swapViewModels = swaps
-                        .Select(s => SwapViewModelFactory.CreateSwapViewModel(s, Currencies, () =>
-                        {
-                            DGSelectedIndex = -1;
-                        }))
+                        .Select(s =>
+                            SwapViewModelFactory.CreateSwapViewModel(s, Currencies, () => { DGSelectedIndex = -1; }))
                         .ToList()
                         .SortList((s1, s2) => s2.Time.ToUniversalTime()
                             .CompareTo(s1.Time.ToUniversalTime()));
 
                     var previousSwapsCount = Swaps?.Count;
                     Swaps = new ObservableCollection<SwapViewModel>(swapViewModels);
-                    
+
                     if (previousSwapsCount < swapViewModels?.Count)
                         DGSelectedIndex = 0;
 
@@ -1060,52 +1059,58 @@ namespace Atomex.Client.Desktop.ViewModels
         {
             if (_amount == 0)
             {
-                Desktop.App.DialogService.Show(
+                _ = DialogHost.DialogHost.Show(
                     MessageViewModel.Message(
                         title: Resources.CvWarning,
                         text: Resources.CvZeroAmount,
-                        backAction: () => Desktop.App.DialogService.CloseDialog())
-                );
+                        backAction: () =>
+                            DialogHost.DialogHost.GetDialogSession(Desktop.App.MainDialogHostIdentifier)?.Close()),
+                    Desktop.App.MainDialogHostIdentifier);
                 return;
             }
 
             if (!IsAmountValid)
             {
-                Desktop.App.DialogService.Show(
+                _ = DialogHost.DialogHost.Show(
                     MessageViewModel.Message(
                         title: Resources.CvWarning,
                         text: Resources.CvBigAmount,
-                        backAction: () => Desktop.App.DialogService.CloseDialog()));
+                        backAction: () =>
+                            DialogHost.DialogHost.GetDialogSession(Desktop.App.MainDialogHostIdentifier)?.Close()),
+                    Desktop.App.MainDialogHostIdentifier);
                 return;
             }
 
             if (EstimatedPrice == 0)
             {
-                Desktop.App.DialogService.Show(
+                _ = DialogHost.DialogHost.Show(
                     MessageViewModel.Message(
                         title: Resources.CvWarning,
                         text: Resources.CvNoLiquidity,
-                        backAction: () => Desktop.App.DialogService.CloseDialog()));
+                        backAction: () =>
+                            DialogHost.DialogHost.GetDialogSession(Desktop.App.MainDialogHostIdentifier)?.Close()));
                 return;
             }
 
             if (!App.Terminal.IsServiceConnected(TerminalService.All))
             {
-                Desktop.App.DialogService.Show(
+                _ = DialogHost.DialogHost.Show(
                     MessageViewModel.Message(
                         title: Resources.CvWarning,
                         text: Resources.CvServicesUnavailable,
-                        backAction: () => Desktop.App.DialogService.CloseDialog()));
+                        backAction: () =>
+                            DialogHost.DialogHost.GetDialogSession(Desktop.App.MainDialogHostIdentifier)?.Close()));
                 return;
             }
 
             var symbol = Symbols.SymbolByCurrencies(FromCurrency, ToCurrency);
             if (symbol == null)
             {
-                Desktop.App.DialogService.Show(
+                _ = DialogHost.DialogHost.Show(
                     MessageViewModel.Error(
                         text: Resources.CvNotSupportedSymbol,
-                        backAction: () => Desktop.App.DialogService.CloseDialog()));
+                        backAction: () =>
+                            DialogHost.DialogHost.GetDialogSession(Desktop.App.MainDialogHostIdentifier)?.Close()));
                 return;
             }
 
@@ -1121,11 +1126,12 @@ namespace Atomex.Client.Desktop.ViewModels
                 var message = string.Format(CultureInfo.InvariantCulture, Resources.CvMinimumAllowedQtyWarning,
                     minimumAmount, FromCurrency.Name);
 
-                Desktop.App.DialogService.Show(
+                _ = DialogHost.DialogHost.Show(
                     MessageViewModel.Message(
                         title: Resources.CvWarning,
                         text: message,
-                        backAction: () => Desktop.App.DialogService.CloseDialog()));
+                        backAction: () =>
+                            DialogHost.DialogHost.GetDialogSession(Desktop.App.MainDialogHostIdentifier)?.Close()));
                 return;
             }
 
@@ -1172,7 +1178,7 @@ namespace Atomex.Client.Desktop.ViewModels
 
             viewModel.OnSuccess += OnSuccessConvertion;
 
-            Desktop.App.DialogService.Show(viewModel);
+            _ = DialogHost.DialogHost.Show(viewModel, Desktop.App.MainDialogHostIdentifier);
         }
 
         private void OnSuccessConvertion(object sender, EventArgs e)

@@ -67,7 +67,7 @@ namespace Atomex.Client.Desktop.ViewModels
 
         public ICommand BackCommand => _backCommand ??= ReactiveCommand.Create(() =>
         {
-            Desktop.App.DialogService.CloseDialog();
+            DialogHost.DialogHost.GetDialogSession(Desktop.App.MainDialogHostIdentifier)?.Close();
         });
 
         private ICommand _nextCommand;
@@ -89,7 +89,8 @@ namespace Atomex.Client.Desktop.ViewModels
         {
             try
             {
-                Desktop.App.DialogService.Show(new SendingViewModel());
+                DialogHost.DialogHost.GetDialogSession(Desktop.App.MainDialogHostIdentifier)?.Close();
+                _ = DialogHost.DialogHost.Show(new SendingViewModel(), Desktop.App.MainDialogHostIdentifier);
 
                 var error = await ConvertAsync();
 
@@ -97,37 +98,50 @@ namespace Atomex.Client.Desktop.ViewModels
                 {
                     if (error.Code == Errors.PriceHasChanged)
                     {
-                        Desktop.App.DialogService.Show(MessageViewModel.Message(
+                        _ = DialogHost.DialogHost.Show(MessageViewModel.Message(
                             title: Resources.SvFailed,
                             text: error.Description,
-                            backAction: () => Desktop.App.DialogService.Show(this)));
+                            backAction: () =>
+                            {
+                                DialogHost.DialogHost.GetDialogSession(Desktop.App.MainDialogHostIdentifier)?.Close();
+                                _ = DialogHost.DialogHost.Show(this, Desktop.App.MainDialogHostIdentifier);
+                            }), Desktop.App.MainDialogHostIdentifier);
                     }
                     else
                     {
-                        Desktop.App.DialogService.Show(MessageViewModel.Error(
+                        _ = DialogHost.DialogHost.Show(MessageViewModel.Error(
                             text: error.Description,
-                            backAction: () => Desktop.App.DialogService.Show(this)));
+                            backAction: () =>
+                            {
+                                DialogHost.DialogHost.GetDialogSession(Desktop.App.MainDialogHostIdentifier)?.Close();
+                                _ = DialogHost.DialogHost.Show(this, Desktop.App.MainDialogHostIdentifier);
+                            }), Desktop.App.MainDialogHostIdentifier);
                     }
                 
                     return;
                 }
                 
-                Desktop.App.DialogService.Show(MessageViewModel.Success(
+                DialogHost.DialogHost.GetDialogSession(Desktop.App.MainDialogHostIdentifier)?.Close();
+                _ = DialogHost.DialogHost.Show(MessageViewModel.Success(
                     text: Resources.SvOrderMatched,
                     nextAction: () =>
                     {
-                        Desktop.App.DialogService.CloseDialog();
+                        DialogHost.DialogHost.GetDialogSession(Desktop.App.MainDialogHostIdentifier)?.Close();
                     }
-                ), () =>
-                {
-                    OnSuccess?.Invoke(this, EventArgs.Empty);
-                }, 230);
+                ), Desktop.App.MainDialogHostIdentifier);
+                
+                OnSuccess?.Invoke(this, EventArgs.Empty);
             }
             catch (Exception e)
             {
-                Desktop.App.DialogService.Show(MessageViewModel.Error(
+                DialogHost.DialogHost.GetDialogSession(Desktop.App.MainDialogHostIdentifier)?.Close();
+                _ = DialogHost.DialogHost.Show(MessageViewModel.Error(
                     text: "An error has occurred while sending swap.",
-                    backAction: () => Desktop.App.DialogService.Show(this)));
+                    backAction: () =>
+                    {
+                        DialogHost.DialogHost.GetDialogSession(Desktop.App.MainDialogHostIdentifier)?.Close();
+                        _ = DialogHost.DialogHost.Show(this, Desktop.App.MainDialogHostIdentifier);
+                    }), Desktop.App.MainDialogHostIdentifier);
 
                 Log.Error(e, "Swap error.");
             }

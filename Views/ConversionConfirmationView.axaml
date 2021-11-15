@@ -8,252 +8,253 @@
              xmlns:controls="clr-namespace:Atomex.Client.Desktop.Controls"
              Height="380"
              Width="560">
-    
+
     <Design.DataContext>
         <vm:ConversionConfirmationViewModel />
     </Design.DataContext>
-    
-      <UserControl.Styles>
-          <Style Selector="TextBlock.AmountTextBlock">
-            <Setter Property="FontFamily" Value="{DynamicResource DefaultMediumFontFamily}"/>
-            <Setter Property="FontSize" Value="15"/>
-            <Setter Property="Foreground" Value="{DynamicResource DefaultAmountForegroundBrush}"/>
+
+    <UserControl.Styles>
+        <Style Selector="TextBlock.AmountTextBlock">
+            <Setter Property="FontFamily" Value="{DynamicResource DefaultMediumFontFamily}" />
+            <Setter Property="FontSize" Value="15" />
+            <Setter Property="Foreground" Value="{DynamicResource DefaultAmountForegroundBrush}" />
         </Style>
 
         <Style Selector="TextBlock.AmountInBaseTextBlock">
-            <Setter Property="FontFamily" Value="{DynamicResource DefaultMediumFontFamily}"/>
-            <Setter Property="FontSize" Value="15"/>
-            <Setter Property="Foreground" Value="{DynamicResource DefaultAmountInBaseForegroundBrush}"/>
+            <Setter Property="FontFamily" Value="{DynamicResource DefaultMediumFontFamily}" />
+            <Setter Property="FontSize" Value="15" />
+            <Setter Property="Foreground" Value="{DynamicResource DefaultAmountInBaseForegroundBrush}" />
         </Style>
     </UserControl.Styles>
 
-    <StackPanel Orientation="Vertical"
-                Width="560">
+    <Border Classes="ChildViewBorder">
+        <StackPanel Orientation="Vertical"
+                    Width="560">
+            <Border Margin="0 10 0 10"
+                    Height="33"
+                    VerticalAlignment="Top"
+                    HorizontalAlignment="Stretch"
+                    Background="{DynamicResource ChildViewHeaderBackgroundBrush}">
+                <TextBlock Text="Send confirmation"
+                           Foreground="{DynamicResource ChildViewHeaderForegroundBrush}"
+                           FontFamily="{DynamicResource DefaultLightFontFamily}"
+                           FontSize="25"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center" />
+            </Border>
 
-        <Border Margin="0 10 0 10"
-                Height="33"
-                VerticalAlignment="Top"
-                HorizontalAlignment="Stretch"
-                Background="{DynamicResource ChildViewHeaderBackgroundBrush}">
-            <TextBlock Text="Send confirmation"
-                       Foreground="{DynamicResource ChildViewHeaderForegroundBrush}"
+            <TextBlock Text="Do you really want to convert:"
+                       Margin="20"
+                       FontSize="15"
                        FontFamily="{DynamicResource DefaultLightFontFamily}"
-                       FontSize="25"
                        HorizontalAlignment="Center"
-                VerticalAlignment="Center"/>
-        </Border>
+                       Foreground="{DynamicResource DefaultForegroundBrush}" />
 
-        <TextBlock Text="Do you really want to convert:"
-                   Margin="20"
-                   FontSize="15"
-                   FontFamily="{DynamicResource DefaultLightFontFamily}"
-                   HorizontalAlignment="Center"
-                   Foreground="{DynamicResource DefaultForegroundBrush}"/>
+            <Border Margin="0 5"
+                    Background="{DynamicResource DefaultSubstrateBrush}">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition />
+                        <ColumnDefinition Width="110" />
+                        <ColumnDefinition Width="24" />
+                        <ColumnDefinition Width="110" />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="15" />
+                        <RowDefinition />
+                        <RowDefinition />
+                        <RowDefinition Height="15" />
+                    </Grid.RowDefinitions>
 
-        <Border Margin="0 5"
-                Background="{DynamicResource DefaultSubstrateBrush}">
-            <Grid>
+                    <StackPanel Orientation="Horizontal"
+                                HorizontalAlignment="Right"
+                                Margin="0 0 0 0"
+                                Grid.Column="0"
+                                Grid.Row="1">
+                        <TextBlock Foreground="{DynamicResource DefaultForegroundBrush}"
+                                   FontSize="18"
+                                   FontFamily="{DynamicResource DefaultFontFamily}"
+                                   VerticalAlignment="Bottom">
+                            <TextBlock.Text>
+                                <MultiBinding Converter="{StaticResource AmountToStringConverter}">
+                                    <Binding Path="Amount" Mode="TwoWay" />
+                                    <Binding Path="CurrencyFormat" Mode="OneWay" />
+                                </MultiBinding>
+                            </TextBlock.Text>
+                        </TextBlock>
+                        <TextBlock Margin="4 0 0 2"
+                                   Foreground="{DynamicResource DefaultForegroundBrush}"
+                                   Text="{Binding CurrencyCode}"
+                                   FontFamily="{DynamicResource DefaultFontFamily}"
+                                   VerticalAlignment="Bottom" />
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal"
+                                HorizontalAlignment="Right"
+                                Margin="0 0 0 0"
+                                Grid.Column="0"
+                                Grid.Row="2">
+                        <TextBlock Foreground="{DynamicResource DefaultAmountInBaseForegroundBrush}"
+                                   FontSize="18"
+                                   FontFamily="{DynamicResource DefaultFontFamily}"
+                                   VerticalAlignment="Top">
+                            <TextBlock.Text>
+                                <MultiBinding Converter="{StaticResource AmountToStringConverter}">
+                                    <Binding Path="AmountInBase" Mode="TwoWay" />
+                                    <Binding Path="BaseCurrencyFormat" Mode="OneWay" />
+                                </MultiBinding>
+                            </TextBlock.Text>
+                        </TextBlock>
+                        <TextBlock Margin="4 3 0 0"
+                                   Foreground="{DynamicResource DefaultAmountInBaseForegroundBrush}"
+                                   Text="{Binding BaseCurrencyCode}"
+                                   FontFamily="{DynamicResource DefaultFontFamily}"
+                                   VerticalAlignment="Top" />
+                    </StackPanel>
+
+                    <Image Source="{Binding FromCurrencyViewModel.LargeIconPath}"
+                           Width="90"
+                           Height="90"
+                           Grid.Column="1"
+                           Grid.Row="1"
+                           Grid.RowSpan="2" />
+
+                    <Path Fill="LightGray"
+                          Stretch="Uniform"
+                          Data="{DynamicResource FontAwesome.ArrowAltCircleRightRegular}"
+                          UseLayoutRounding="False"
+                          VerticalAlignment="Center"
+                          Grid.Column="2"
+                          Grid.Row="1"
+                          Grid.RowSpan="2" />
+
+                    <Image Source="{Binding ToCurrencyViewModel.LargeIconPath}"
+                           Width="90"
+                           Height="90"
+                           Grid.Column="3"
+                           Grid.Row="1"
+                           Grid.RowSpan="2" />
+
+                    <StackPanel Orientation="Horizontal"
+                                HorizontalAlignment="Left"
+                                Margin="0 0 0 0"
+                                Grid.Column="4"
+                                Grid.Row="1">
+                        <TextBlock Foreground="{DynamicResource DefaultForegroundBrush}"
+                                   FontSize="18"
+                                   FontFamily="{DynamicResource DefaultFontFamily}"
+                                   VerticalAlignment="Bottom">
+                            <TextBlock.Text>
+                                <MultiBinding Converter="{StaticResource AmountToStringConverter}">
+                                    <Binding Path="TargetAmount" Mode="TwoWay" />
+                                    <Binding Path="TargetCurrencyFormat" Mode="OneWay" />
+                                </MultiBinding>
+                            </TextBlock.Text>
+                        </TextBlock>
+                        <TextBlock Margin="4 0 0 2"
+                                   Foreground="{DynamicResource DefaultForegroundBrush}"
+                                   Text="{Binding TargetCurrencyCode}"
+                                   FontFamily="{DynamicResource DefaultFontFamily}"
+                                   VerticalAlignment="Bottom" />
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal"
+                                HorizontalAlignment="Left"
+                                Margin="0 0 0 0"
+                                Grid.Column="4"
+                                Grid.Row="2">
+                        <TextBlock Foreground="{DynamicResource DefaultAmountInBaseForegroundBrush}"
+                                   FontSize="18"
+                                   FontFamily="{DynamicResource DefaultFontFamily}"
+                                   VerticalAlignment="Top">
+                            <TextBlock.Text>
+                                <MultiBinding Converter="{StaticResource AmountToStringConverter}">
+                                    <Binding Path="TargetAmountInBase" Mode="TwoWay" />
+                                    <Binding Path="BaseCurrencyFormat" Mode="OneWay" />
+                                </MultiBinding>
+                            </TextBlock.Text>
+                        </TextBlock>
+                        <TextBlock Margin="4 3 0 0"
+                                   Foreground="{DynamicResource DefaultAmountInBaseForegroundBrush}"
+                                   Text="{Binding BaseCurrencyCode}"
+                                   FontFamily="{DynamicResource DefaultFontFamily}"
+                                   VerticalAlignment="Top" />
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <Grid Margin="20 10 20 0"
+                  HorizontalAlignment="Center">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition/>
-                    <ColumnDefinition Width="110"/>
-                    <ColumnDefinition Width="24"/>
-                    <ColumnDefinition Width="110"/>
-                    <ColumnDefinition/>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="15"/>
-                    <RowDefinition/>
-                    <RowDefinition/>
-                    <RowDefinition Height="15"/>
+                    <RowDefinition />
+                    <RowDefinition />
                 </Grid.RowDefinitions>
 
+                <TextBlock Text="with price:"
+                           FontSize="15"
+                           FontFamily="{DynamicResource DefaultLightFontFamily}"
+                           Foreground="{DynamicResource DefaultForegroundBrush}"
+                           HorizontalAlignment="Right"
+                           Grid.Column="0"
+                           Grid.Row="0" />
+
                 <StackPanel Orientation="Horizontal"
-                            HorizontalAlignment="Right"
-                            Margin="0 0 0 0"
-                            Grid.Column="0"
+                            Grid.Column="1"
+                            Grid.Row="0">
+                    <TextBlock Margin="5 0 0 0"
+                               Classes="AmountTextBlock">
+                        <TextBlock.Text>
+                            <MultiBinding Converter="{StaticResource AmountToStringConverter}">
+                                <Binding Path="EstimatedPrice" Mode="OneWay" />
+                                <Binding Path="PriceFormat" Mode="OneWay" />
+                            </MultiBinding>
+                        </TextBlock.Text>
+                    </TextBlock>
+                </StackPanel>
+
+                <TextBlock Text="with total network fees:"
+                           FontSize="15"
+                           FontFamily="{DynamicResource DefaultLightFontFamily}"
+                           Foreground="{DynamicResource DefaultForegroundBrush}"
+                           HorizontalAlignment="Right"
+                           Grid.Column="0"
+                           Grid.Row="1" />
+
+                <StackPanel Orientation="Horizontal"
+                            Grid.Column="1"
                             Grid.Row="1">
-                    <TextBlock Foreground="{DynamicResource DefaultForegroundBrush}"
-                               FontSize="18"
-                               FontFamily="{DynamicResource DefaultFontFamily}"
-                               VerticalAlignment="Bottom">
+                    <TextBlock Margin="5 0 0 0"
+                               Classes="AmountInBaseTextBlock">
                         <TextBlock.Text>
                             <MultiBinding Converter="{StaticResource AmountToStringConverter}">
-                                <Binding Path="Amount" Mode="TwoWay"/>
-                                <Binding Path="CurrencyFormat" Mode="OneWay"/>
+                                <Binding Path="EstimatedTotalNetworkFeeInBase" Mode="OneWay" />
+                                <Binding Path="BaseCurrencyFormat" Mode="OneWay" />
                             </MultiBinding>
                         </TextBlock.Text>
                     </TextBlock>
-                    <TextBlock Margin="4 0 0 2"
-                               Foreground="{DynamicResource DefaultForegroundBrush}"
-                               Text="{Binding CurrencyCode}"
-                               FontFamily="{DynamicResource DefaultFontFamily}"
-                               VerticalAlignment="Bottom"/>
-                </StackPanel>
-
-                <StackPanel Orientation="Horizontal"
-                            HorizontalAlignment="Right"
-                            Margin="0 0 0 0"
-                            Grid.Column="0"
-                            Grid.Row="2">
-                    <TextBlock Foreground="{DynamicResource DefaultAmountInBaseForegroundBrush}"
-                               FontSize="18"
-                               FontFamily="{DynamicResource DefaultFontFamily}"
-                               VerticalAlignment="Top">
-                        <TextBlock.Text>
-                            <MultiBinding Converter="{StaticResource AmountToStringConverter}">
-                                <Binding Path="AmountInBase" Mode="TwoWay"/>
-                                <Binding Path="BaseCurrencyFormat" Mode="OneWay"/>
-                            </MultiBinding>
-                        </TextBlock.Text>
-                    </TextBlock>
-                    <TextBlock Margin="4 3 0 0"
-                               Foreground="{DynamicResource DefaultAmountInBaseForegroundBrush}"
-                               Text="{Binding BaseCurrencyCode}"
-                               FontFamily="{DynamicResource DefaultFontFamily}"
-                               VerticalAlignment="Top"/>
-                </StackPanel>
-
-                <Image Source="{Binding FromCurrencyViewModel.LargeIconPath}"
-                       Width="90"
-                       Height="90"
-                       Grid.Column="1"
-                       Grid.Row="1"
-                       Grid.RowSpan="2"/>
-
-                <Path Fill="LightGray"
-                      Stretch="Uniform"
-                      Data="{DynamicResource FontAwesome.ArrowAltCircleRightRegular}"
-                      UseLayoutRounding="False"
-                      VerticalAlignment="Center"
-                      Grid.Column="2"
-                      Grid.Row="1"
-                      Grid.RowSpan="2"/>
-
-                <Image Source="{Binding ToCurrencyViewModel.LargeIconPath}"
-                       Width="90"
-                       Height="90"
-                       Grid.Column="3"
-                       Grid.Row="1"
-                       Grid.RowSpan="2"/>
-
-                <StackPanel Orientation="Horizontal"
-                            HorizontalAlignment="Left"
-                            Margin="0 0 0 0"
-                            Grid.Column="4"
-                            Grid.Row="1">
-                    <TextBlock Foreground="{DynamicResource DefaultForegroundBrush}"
-                               FontSize="18"
-                               FontFamily="{DynamicResource DefaultFontFamily}"
-                               VerticalAlignment="Bottom">
-                        <TextBlock.Text>
-                            <MultiBinding Converter="{StaticResource AmountToStringConverter}">
-                                <Binding Path="TargetAmount" Mode="TwoWay"/>
-                                <Binding Path="TargetCurrencyFormat" Mode="OneWay"/>
-                            </MultiBinding>
-                        </TextBlock.Text>
-                    </TextBlock>
-                    <TextBlock Margin="4 0 0 2"
-                               Foreground="{DynamicResource DefaultForegroundBrush}"
-                               Text="{Binding TargetCurrencyCode}"
-                               FontFamily="{DynamicResource DefaultFontFamily}"
-                               VerticalAlignment="Bottom"/>
-                </StackPanel>
-
-                <StackPanel Orientation="Horizontal"
-                            HorizontalAlignment="Left"
-                            Margin="0 0 0 0"
-                            Grid.Column="4"
-                            Grid.Row="2">
-                    <TextBlock Foreground="{DynamicResource DefaultAmountInBaseForegroundBrush}"
-                               FontSize="18"
-                               FontFamily="{DynamicResource DefaultFontFamily}"
-                               VerticalAlignment="Top">
-                        <TextBlock.Text>
-                            <MultiBinding Converter="{StaticResource AmountToStringConverter}">
-                                <Binding Path="TargetAmountInBase" Mode="TwoWay"/>
-                                <Binding Path="BaseCurrencyFormat" Mode="OneWay"/>
-                            </MultiBinding>
-                        </TextBlock.Text>
-                    </TextBlock>
-                    <TextBlock Margin="4 3 0 0"
-                               Foreground="{DynamicResource DefaultAmountInBaseForegroundBrush}"
-                               Text="{Binding BaseCurrencyCode}"
-                               FontFamily="{DynamicResource DefaultFontFamily}"
-                               VerticalAlignment="Top"/>
                 </StackPanel>
             </Grid>
-        </Border>
-
-        <Grid Margin="20 10 20 0"
-              HorizontalAlignment="Center">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="Auto"/>
-            </Grid.ColumnDefinitions>
-            <Grid.RowDefinitions>
-                <RowDefinition/>
-                <RowDefinition/>
-            </Grid.RowDefinitions>
-
-            <TextBlock Text="with price:"
-                       FontSize="15"
-                       FontFamily="{DynamicResource DefaultLightFontFamily}"
-                       Foreground="{DynamicResource DefaultForegroundBrush}"
-                       HorizontalAlignment="Right"
-                       Grid.Column="0"
-                       Grid.Row="0"/>
 
             <StackPanel Orientation="Horizontal"
-                        Grid.Column="1"
-                        Grid.Row="0">
-                <TextBlock Margin="5 0 0 0"
-                           Classes="AmountTextBlock">
-                    <TextBlock.Text>
-                        <MultiBinding Converter="{StaticResource AmountToStringConverter}">
-                            <Binding Path="EstimatedPrice" Mode="OneWay"/>
-                            <Binding Path="PriceFormat" Mode="OneWay"/>
-                        </MultiBinding>
-                    </TextBlock.Text>
-                </TextBlock>
+                        HorizontalAlignment="Center"
+                        Margin="0 20 0 20">
+                <controls:RoundedButton Width="100"
+                                        Height="40"
+                                        Margin="0 0 3 0"
+                                        CornerRadius="20 0 0 20"
+                                        Content="No"
+                                        Command="{Binding BackCommand}" />
+                <controls:RoundedButton Width="100"
+                                        Height="40"
+                                        CornerRadius="0 20 20 0"
+                                        Content="Yes"
+                                        Command="{Binding NextCommand}" />
             </StackPanel>
-
-            <TextBlock Text="with total network fees:"
-                       FontSize="15"
-                       FontFamily="{DynamicResource DefaultLightFontFamily}"
-                       Foreground="{DynamicResource DefaultForegroundBrush}"
-                       HorizontalAlignment="Right"
-                       Grid.Column="0"
-                       Grid.Row="1"/>
-
-            <StackPanel Orientation="Horizontal"
-                        Grid.Column="1"
-                        Grid.Row="1">
-                <TextBlock Margin="5 0 0 0"
-                           Classes="AmountInBaseTextBlock">
-                    <TextBlock.Text>
-                        <MultiBinding Converter="{StaticResource AmountToStringConverter}">
-                            <Binding Path="EstimatedTotalNetworkFeeInBase" Mode="OneWay"/>
-                            <Binding Path="BaseCurrencyFormat" Mode="OneWay"/>
-                        </MultiBinding>
-                    </TextBlock.Text>
-                </TextBlock>
-            </StackPanel>
-        </Grid>
-
-        <StackPanel Orientation="Horizontal"
-                    HorizontalAlignment="Center"
-                    Margin="0 20 0 20">
-            <controls:RoundedButton Width="100"
-                                    Height="40"
-                                    Margin="0 0 3 0"
-                                    CornerRadius="20 0 0 20"
-                                    Content="No"
-                                    Command="{Binding BackCommand}"/>
-            <controls:RoundedButton Width="100"
-                                    Height="40"
-                                    CornerRadius="0 20 20 0"
-                                    Content="Yes"
-                                    Command="{Binding NextCommand}"/>
         </StackPanel>
-    </StackPanel>
+    </Border>
 </UserControl>
