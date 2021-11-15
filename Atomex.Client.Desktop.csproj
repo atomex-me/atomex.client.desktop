@@ -3,10 +3,14 @@
         <OutputType>WinExe</OutputType>
         <TargetFramework>net5.0</TargetFramework>
         <Nullable>enable</Nullable>
-        <InvariantGlobalization>true</InvariantGlobalization>
         <DefaultItemExcludes>$(DefaultItemExcludes);atomex.client.core\**</DefaultItemExcludes>
         <UseAppHost>true</UseAppHost>
-        <ApplicationIcon>Resources/Images/logo_dark_256x256.ico</ApplicationIcon>
+
+<!--        <ApplicationIcon>Resources/Images/atomex_logo_256x256.png</ApplicationIcon>-->
+        <ApplicationIcon Label="Resources/Images/atomex_logo_256x256.png" Condition=" '$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Linux)))' ">
+        </ApplicationIcon>
+        <ApplicationIcon Label="Resources/Images/logo_dark_256x256.ico" Condition=" '$(OS)' == 'Windows_NT' ">
+        </ApplicationIcon>
 
         <AssemblyVersion>1.1.54</AssemblyVersion>
         <Version>1.1.54</Version>
