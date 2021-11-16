@@ -312,7 +312,7 @@ namespace Atomex.Client.Desktop.ViewModels
                     currenciesProvider: AtomexApp.CurrenciesProvider,
                     clientType: ClientType.Unknown);
             }, async () => await SignOut());
-            
+
             var wasClosed = false;
             Dispatcher.UIThread.InvokeAsync(() =>
             {
