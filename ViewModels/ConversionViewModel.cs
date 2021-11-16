@@ -1064,7 +1064,7 @@ namespace Atomex.Client.Desktop.ViewModels
                         title: Resources.CvWarning,
                         text: Resources.CvZeroAmount,
                         backAction: () => Desktop.App.DialogService.Close()));
-                        return;
+                return;
             }
 
             if (!IsAmountValid)
@@ -1074,7 +1074,7 @@ namespace Atomex.Client.Desktop.ViewModels
                         title: Resources.CvWarning,
                         text: Resources.CvBigAmount,
                         backAction: () => Desktop.App.DialogService.Close()));
-                        
+
                 return;
             }
 
@@ -1085,7 +1085,7 @@ namespace Atomex.Client.Desktop.ViewModels
                         title: Resources.CvWarning,
                         text: Resources.CvNoLiquidity,
                         backAction: () => Desktop.App.DialogService.Close()));
-                        
+
                 return;
             }
 
@@ -1096,7 +1096,7 @@ namespace Atomex.Client.Desktop.ViewModels
                         title: Resources.CvWarning,
                         text: Resources.CvServicesUnavailable,
                         backAction: () => Desktop.App.DialogService.Close()));
-                        
+
                 return;
             }
 
@@ -1127,7 +1127,8 @@ namespace Atomex.Client.Desktop.ViewModels
                         title: Resources.CvWarning,
                         text: message,
                         backAction: () => Desktop.App.DialogService.Close()));
-                        return;
+                
+                return;
             }
 
             var viewModel = new ConversionConfirmationViewModel(App)
