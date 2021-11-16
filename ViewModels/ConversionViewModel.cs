@@ -303,10 +303,10 @@ namespace Atomex.Client.Desktop.ViewModels
                 {
                     if (amount == 0)
                         _amount = amount;
+
                     OnPropertyChanged(nameof(AmountString));
                     return;
                 }
-
 
                 _amount = amount.TruncateByFormat(CurrencyFormat);
 
@@ -880,6 +880,7 @@ namespace Atomex.Client.Desktop.ViewModels
                 OnPropertyChanged(nameof(EstimatedRedeemFee));
                 OnPropertyChanged(nameof(RewardForRedeem));
                 OnPropertyChanged(nameof(HasRewardForRedeem));
+
             }, DispatcherPriority.Background);
         }
 
@@ -1002,7 +1003,6 @@ namespace Atomex.Client.Desktop.ViewModels
                 _estimatedMaxAmount = swapPriceEstimation.MaxAmount;
                 _isNoLiquidity = swapPriceEstimation.IsNoLiquidity;
 
-
                 await Dispatcher.UIThread.InvokeAsync(() =>
                 {
                     OnPropertyChanged(nameof(EstimatedPrice));
@@ -1013,6 +1013,7 @@ namespace Atomex.Client.Desktop.ViewModels
                     OnPropertyChanged(nameof(TargetAmount));
 
                     UpdateTargetAmountInBase(App.QuotesProvider);
+
                 }, DispatcherPriority.Background);
             }
             catch (Exception e)
@@ -1020,7 +1021,6 @@ namespace Atomex.Client.Desktop.ViewModels
                 Log.Error(e, "Quotes updated event handler error");
             }
         }
-        
         
         private async void OnSwapEventHandler(object sender, SwapEventArgs args)
         {
@@ -1048,6 +1048,7 @@ namespace Atomex.Client.Desktop.ViewModels
 
                     if (DetailsVisible)
                         OnPropertyChanged(nameof(SwapDetailsViewModel));
+
                 }, DispatcherPriority.Background);
             }
             catch (Exception e)
