@@ -313,8 +313,12 @@ namespace Atomex.Client.Desktop.ViewModels
                     clientType: ClientType.Unknown);
             }, async () => await SignOut());
 
-            var wasClosed = App.DialogService.Close();
-
+            var wasClosed = false;
+            Dispatcher.UIThread.InvokeAsync(() =>
+            {
+                wasClosed = App.DialogService.Close();;
+            });
+            
             unlockViewModel.Unlocked += (s, a) =>
             {
                 ShowContent(MainWalletVM);

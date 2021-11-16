@@ -49,7 +49,8 @@ namespace Atomex.Client.Desktop.Services
         public void ShowPrevious()
         {
             if (_isDialogOpened) return;
-            _ = DialogHost.DialogHost.Show(_dialogServiceViewModel.Content, MainDialogHostIdentifier);
+            _ = DialogHost.DialogHost.Show(_dialogServiceViewModel, MainDialogHostIdentifier);
+            _isDialogOpened = true;
             ReRender();
         }
 
@@ -57,11 +58,7 @@ namespace Atomex.Client.Desktop.Services
         public void Show(ViewModelBase viewModel)
         {
             _dialogServiceViewModel.Content = viewModel;
-            if (_isDialogOpened) return;
-            
-            _ = DialogHost.DialogHost.Show(_dialogServiceViewModel, MainDialogHostIdentifier);
-            ReRender();
-            _isDialogOpened = true;
+            ShowPrevious();
         }
     }
 }
