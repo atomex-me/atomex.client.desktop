@@ -11,6 +11,7 @@ using Atomex.Common;
 using ReactiveUI;
 using Atomex.Services;
 using Atomex.Wallet;
+using Avalonia.Threading;
 using Serilog;
 
 
@@ -225,9 +226,14 @@ namespace Atomex.Client.Desktop.ViewModels
                     return;
                 }
 
+                _ = Dispatcher.UIThread.InvokeAsync(() =>
+                {
+                    App.DialogService.Close();
+                });
+
                 AtomexApp.UseAtomexClient(null);
                 _userIgnoreActiveSwaps = false;
-
+                
                 ShowStart();
             }
             catch (Exception e)
