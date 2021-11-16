@@ -50,7 +50,7 @@
                                    VerticalAlignment="Center"
                                    HorizontalAlignment="Right" />
                     </Border>
-
+                    
                     <ComboBox Width="450"
                               Height="50"
                               Margin="0 5 0 5"
@@ -286,7 +286,7 @@
                                    VerticalAlignment="Center"
                                    HorizontalAlignment="Right" />
                     </Border>
-
+                    
                     <TextBox Width="388"
                              Height="40"
                              Margin="0 5 0 5"
@@ -329,7 +329,7 @@
                                    VerticalAlignment="Center"
                                    HorizontalAlignment="Right" />
                     </Border>
-
+                    
                     <TextBox Width="450"
                              Height="40"
                              Margin="0 5 0 5"

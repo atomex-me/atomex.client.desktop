@@ -30,7 +30,6 @@
     <Border Classes="ChildViewBorder">
         <StackPanel Orientation="Vertical"
                     Width="590">
-
             <Border Margin="0 10 0 10"
                     Height="33"
                     VerticalAlignment="Top"

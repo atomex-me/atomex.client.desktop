@@ -1059,7 +1059,7 @@ namespace Atomex.Client.Desktop.ViewModels
         {
             if (_amount == 0)
             {
-                _ = DialogHost.DialogHost.Show(
+                Desktop.App.DialogService.Show(
                     MessageViewModel.Message(
                         title: Resources.CvWarning,
                         text: Resources.CvZeroAmount,
@@ -1069,45 +1069,45 @@ namespace Atomex.Client.Desktop.ViewModels
 
             if (!IsAmountValid)
             {
-                _ = DialogHost.DialogHost.Show(
+                Desktop.App.DialogService.Show(
                     MessageViewModel.Message(
                         title: Resources.CvWarning,
                         text: Resources.CvBigAmount,
                         backAction: () => Desktop.App.DialogService.Close()));
-
+                        
                 return;
             }
 
             if (EstimatedPrice == 0)
             {
-                _ = DialogHost.DialogHost.Show(
+                Desktop.App.DialogService.Show(
                     MessageViewModel.Message(
                         title: Resources.CvWarning,
                         text: Resources.CvNoLiquidity,
                         backAction: () => Desktop.App.DialogService.Close()));
-
+                        
                 return;
             }
 
             if (!App.Terminal.IsServiceConnected(TerminalService.All))
             {
-                _ = DialogHost.DialogHost.Show(
+                Desktop.App.DialogService.Show(
                     MessageViewModel.Message(
                         title: Resources.CvWarning,
                         text: Resources.CvServicesUnavailable,
                         backAction: () => Desktop.App.DialogService.Close()));
-
+                        
                 return;
             }
 
             var symbol = Symbols.SymbolByCurrencies(FromCurrency, ToCurrency);
             if (symbol == null)
             {
-                _ = DialogHost.DialogHost.Show(
+                Desktop.App.DialogService.Show(
                     MessageViewModel.Error(
                         text: Resources.CvNotSupportedSymbol,
                         backAction: () => Desktop.App.DialogService.Close()));
-                        return;
+                return;
             }
 
             var side = symbol.OrderSideForBuyCurrency(ToCurrency);
@@ -1122,7 +1122,7 @@ namespace Atomex.Client.Desktop.ViewModels
                 var message = string.Format(CultureInfo.InvariantCulture, Resources.CvMinimumAllowedQtyWarning,
                     minimumAmount, FromCurrency.Name);
 
-                _ = DialogHost.DialogHost.Show(
+                Desktop.App.DialogService.Show(
                     MessageViewModel.Message(
                         title: Resources.CvWarning,
                         text: message,
@@ -1172,7 +1172,7 @@ namespace Atomex.Client.Desktop.ViewModels
             };
 
             viewModel.OnSuccess += OnSuccessConvertion;
-            
+
             Desktop.App.DialogService.Show(viewModel);
         }
 

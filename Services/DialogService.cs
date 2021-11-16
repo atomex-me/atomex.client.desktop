@@ -17,6 +17,7 @@ namespace Atomex.Client.Desktop.Services
         private readonly bool _isLinux;
         private readonly DialogServiceViewModel _dialogServiceViewModel;
 
+
         public DialogService(Window owner, bool isLinux)
         {
             _owner = owner;
@@ -33,7 +34,7 @@ namespace Atomex.Client.Desktop.Services
             await Dispatcher.UIThread.InvokeAsync(() => _owner.Opacity = opacity);
         }
 
-
+        
         public bool Close()
         {
             var result = _isDialogOpened;

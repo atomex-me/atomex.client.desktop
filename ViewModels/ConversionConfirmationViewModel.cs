@@ -88,8 +88,7 @@ namespace Atomex.Client.Desktop.ViewModels
         {
             try
             {
-                DialogHost.DialogHost.GetDialogSession(Desktop.App.MainDialogHostIdentifier)?.Close();
-                _ = DialogHost.DialogHost.Show(new SendingViewModel(), Desktop.App.MainDialogHostIdentifier);
+                Desktop.App.DialogService.Show(new SendingViewModel());
 
                 var error = await ConvertAsync();
 
@@ -97,31 +96,22 @@ namespace Atomex.Client.Desktop.ViewModels
                 {
                     if (error.Code == Errors.PriceHasChanged)
                     {
-                        _ = DialogHost.DialogHost.Show(MessageViewModel.Message(
+                        Desktop.App.DialogService.Show(MessageViewModel.Message(
                             title: Resources.SvFailed,
                             text: error.Description,
-                            backAction: () =>
-                            {
-                                DialogHost.DialogHost.GetDialogSession(Desktop.App.MainDialogHostIdentifier)?.Close();
-                                _ = DialogHost.DialogHost.Show(this, Desktop.App.MainDialogHostIdentifier);
-                            }), Desktop.App.MainDialogHostIdentifier);
+                            backAction: () => Desktop.App.DialogService.Show(this)));
                     }
                     else
                     {
-                        _ = DialogHost.DialogHost.Show(MessageViewModel.Error(
+                        Desktop.App.DialogService.Show(MessageViewModel.Error(
                             text: error.Description,
-                            backAction: () =>
-                            {
-                                DialogHost.DialogHost.GetDialogSession(Desktop.App.MainDialogHostIdentifier)?.Close();
-                                _ = DialogHost.DialogHost.Show(this, Desktop.App.MainDialogHostIdentifier);
-                            }), Desktop.App.MainDialogHostIdentifier);
+                            backAction: () => Desktop.App.DialogService.Show(this)));
                     }
 
                     return;
                 }
                 
-                DialogHost.DialogHost.GetDialogSession(Desktop.App.MainDialogHostIdentifier)?.Close();
-                _ = DialogHost.DialogHost.Show(MessageViewModel.Success(
+                Desktop.App.DialogService.Show(MessageViewModel.Success(
                     text: Resources.SvOrderMatched,
                     nextAction: () => Desktop.App.DialogService.Close()));
 
@@ -129,14 +119,9 @@ namespace Atomex.Client.Desktop.ViewModels
             }
             catch (Exception e)
             {
-                DialogHost.DialogHost.GetDialogSession(Desktop.App.MainDialogHostIdentifier)?.Close();
-                _ = DialogHost.DialogHost.Show(MessageViewModel.Error(
+                Desktop.App.DialogService.Show(MessageViewModel.Error(
                     text: "An error has occurred while sending swap.",
-                    backAction: () =>
-                    {
-                        DialogHost.DialogHost.GetDialogSession(Desktop.App.MainDialogHostIdentifier)?.Close();
-                        _ = DialogHost.DialogHost.Show(this, Desktop.App.MainDialogHostIdentifier);
-                    }), Desktop.App.MainDialogHostIdentifier);
+                    backAction: () => Desktop.App.DialogService.Show(this)));
 
                 Log.Error(e, "Swap error.");
             }
