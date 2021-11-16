@@ -93,7 +93,7 @@ namespace Atomex.Client.Desktop.Views.CustomTitleBars
                 await Task.Delay(50);
             }
 
-            hostWindow.ExtendClientAreaTitleBarHeightHint = 44;
+            hostWindow.ExtendClientAreaTitleBarHeightHint = 30;
             hostWindow.GetObservable(Window.WindowStateProperty).Subscribe(s =>
             {
                 if (s != WindowState.Maximized)
