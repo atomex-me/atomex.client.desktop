@@ -4,10 +4,12 @@ using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
+
+using ReactiveUI;
 using Serilog;
+
 using Atomex.Blockchain.Abstract;
 using Atomex.Client.Desktop.Common;
-using Atomex.Client.Desktop.Controls;
 using Atomex.Client.Desktop.Properties;
 using Atomex.Client.Desktop.ViewModels.Abstract;
 using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
@@ -15,8 +17,6 @@ using Atomex.Client.Desktop.ViewModels.SendViewModels;
 using Atomex.Common;
 using Atomex.Core;
 using Atomex.ViewModels;
-using Atomex.Wallet.Abstract;
-using ReactiveUI;
 
 namespace Atomex.Client.Desktop.ViewModels
 {
@@ -251,7 +251,7 @@ namespace Atomex.Client.Desktop.ViewModels
             }
         }
         
-        private string GetErrorsDescription(IEnumerable<BalanceError> errors)
+        private static string GetErrorsDescription(IEnumerable<BalanceError> errors)
         {
             var descriptions = errors.Select(e => e.Type switch
             {

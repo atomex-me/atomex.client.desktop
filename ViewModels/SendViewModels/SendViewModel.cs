@@ -102,6 +102,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             {
                 _to = value;
                 OnPropertyChanged(nameof(To));
+
                 Warning = string.Empty;
             }
         }
@@ -155,7 +156,6 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     OnPropertyChanged(nameof(AmountString));
                     return;
                 }
-
 
                 Amount = amount.TruncateByFormat(CurrencyFormat);
                 OnPropertyChanged(nameof(AmountString));
@@ -336,21 +336,21 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
             var confirmationViewModel = new SendConfirmationViewModel
             {
-                Currency = Currency,
-                To = To,
-                Amount = Amount,
-                AmountInBase = AmountInBase,
-                BaseCurrencyCode = BaseCurrencyCode,
+                Currency           = Currency,
+                To                 = To,
+                Amount             = Amount,
+                AmountInBase       = AmountInBase,
+                BaseCurrencyCode   = BaseCurrencyCode,
                 BaseCurrencyFormat = BaseCurrencyFormat,
-                Fee = Fee,
-                UseDeafultFee = UseDefaultFee,
-                FeeInBase = FeeInBase,
-                CurrencyCode = CurrencyCode,
-                CurrencyFormat = CurrencyFormat,
+                Fee                = Fee,
+                UseDeafultFee      = UseDefaultFee,
+                FeeInBase          = FeeInBase,
+                CurrencyCode       = CurrencyCode,
+                CurrencyFormat     = CurrencyFormat,
             
-                FeeCurrencyCode = FeeCurrencyCode,
-                FeeCurrencyFormat = FeeCurrencyFormat,
-                BackView = this
+                FeeCurrencyCode    = FeeCurrencyCode,
+                FeeCurrencyFormat  = FeeCurrencyFormat,
+                BackView           = this
             };
             
             Desktop.App.DialogService.Show(confirmationViewModel);
@@ -406,7 +406,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             var quote = quotesProvider.GetQuote(CurrencyCode, BaseCurrencyCode);
 
             AmountInBase = Amount * (quote?.Bid ?? 0m);
-            FeeInBase = Fee * (quote?.Bid ?? 0m);
+            FeeInBase    = Fee * (quote?.Bid ?? 0m);
         }
 
         private void DesignerMode()
@@ -415,12 +415,12 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 .Select(c => CurrencyViewModelCreator.CreateViewModel(c, subscribeToUpdates: false))
                 .ToList();
 
-            _currency = FromCurrencies[0].Currency;
-            _to = "1BvBMSEYstWetqTFn5Au4m4GFg7xJaNVN2";
-            _amount = 0.00001234m;
+            _currency     = FromCurrencies[0].Currency;
+            _to           = "1BvBMSEYstWetqTFn5Au4m4GFg7xJaNVN2";
+            _amount       = 0.00001234m;
             _amountInBase = 10.23m;
-            _fee = 0.0001m;
-            _feeInBase = 8.43m;
+            _fee          = 0.0001m;
+            _feeInBase    = 8.43m;
         }
     }
 }

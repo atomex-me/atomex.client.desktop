@@ -16,7 +16,6 @@ using Atomex.Client.Desktop.ViewModels.Abstract;
 using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
 using Atomex.Common;
 using Atomex.Cryptography;
-using Atomex.Wallet.Abstract;
 
 namespace Atomex.Client.Desktop.ViewModels
 {
