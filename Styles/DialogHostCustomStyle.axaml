@@ -6,7 +6,6 @@
         <converters:DialogOverlayerMarginConverter x:Key="DialogOverlayerMarginConverter" />
     </Styles.Resources>
 
-
     <Style Selector="dialogHost|DialogHost">
         <Setter Property="HorizontalAlignment" Value="Stretch" />
         <Setter Property="VerticalAlignment" Value="Stretch" />
