@@ -5,7 +5,12 @@
         <Nullable>enable</Nullable>
         <DefaultItemExcludes>$(DefaultItemExcludes);atomex.client.core\**</DefaultItemExcludes>
         <UseAppHost>true</UseAppHost>
-        <ApplicationIcon>Resources/Images/logo_dark_256x256.ico</ApplicationIcon>
+
+<!--        <ApplicationIcon>Resources/Images/atomex_logo_256x256.png</ApplicationIcon>-->
+        <ApplicationIcon Label="Resources/Images/atomex_logo_256x256.png" Condition=" '$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Linux)))' ">
+        </ApplicationIcon>
+        <ApplicationIcon Label="Resources/Images/logo_dark_256x256.ico" Condition=" '$(OS)' == 'Windows_NT' ">
+        </ApplicationIcon>
 
         <AssemblyVersion>1.1.54</AssemblyVersion>
         <Version>1.1.54</Version>
@@ -174,6 +179,10 @@
         </Compile>
         <Compile Update="Views\CustomTitleBars\WindowsTitleBarView.axaml.cs">
           <DependentUpon>WindowsTitleBarView.axaml</DependentUpon>
+          <SubType>Code</SubType>
+        </Compile>
+        <Compile Update="Views\LinuxUpdateControls.axaml.cs">
+          <DependentUpon>LinuxUpdateControls.axaml</DependentUpon>
           <SubType>Code</SubType>
         </Compile>
     </ItemGroup>

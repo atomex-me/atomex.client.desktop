@@ -1,0 +1,111 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="Atomex.Client.Desktop.Views.LinuxUpdateControls"
+             xmlns:vm="clr-namespace:Atomex.Client.Desktop.ViewModels">
+
+    <Design.DataContext>
+        <vm:MainWindowViewModel />
+    </Design.DataContext>
+
+    <StackPanel
+        HorizontalAlignment="Right"
+        Orientation="Horizontal"
+        VerticalAlignment="Top"
+        Spacing="0">
+        
+        <StackPanel Orientation="Horizontal"
+                    IsVisible="{Binding UpdatesReady}">
+            <Button Command="{Binding UpdateCommand}"
+                    Classes="TitleBarCommandBtn UpdateBtn">
+
+                <StackPanel Orientation="Horizontal">
+                    <Path Stretch="Uniform"
+                          Margin="0 0 4 0"
+                          UseLayoutRounding="False"
+                          Width="16"
+                          Height="16"
+                          Data="{DynamicResource Unicons.Sync}" />
+                    <TextBlock FontFamily="{DynamicResource DefaultFontFamily}"
+                               VerticalAlignment="Center"
+                               FontSize="14"
+                               IsVisible="{Binding !UpdateStarted}"
+                               Text="Update Atomex to" />
+                    <TextBlock FontFamily="{DynamicResource DefaultFontFamily}"
+                               VerticalAlignment="Center"
+                               FontSize="14"
+                               IsVisible="{Binding UpdateStarted}"
+                               Text="Updating, please wait..." />
+                    <TextBlock FontFamily="{DynamicResource DefaultFontFamily}"
+                               VerticalAlignment="Center"
+                               FontSize="14"
+                               IsVisible="{Binding !UpdateStarted}"
+                               Margin="3 0 0 0"
+                               Text="{Binding UpdateVersion}" />
+                </StackPanel>
+            </Button>
+            <Rectangle Margin="0 8"
+                       IsVisible="{Binding HasAccount}"
+                       VerticalAlignment="Stretch"
+                       Fill="{DynamicResource StatusBarVersionForeground}"
+                       Width="1" />
+        </StackPanel>
+        
+        <StackPanel Orientation="Horizontal"
+                    IsVisible="{Binding IsDownloadingUpdate}">
+            <Button Classes="TitleBarCommandBtn UpdateBtn">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock FontFamily="{DynamicResource DefaultFontFamily}"
+                               VerticalAlignment="Center"
+                               FontSize="14"
+                               Text="Downloading update" />
+                    <TextBlock FontFamily="{DynamicResource DefaultFontFamily}"
+                               Margin="3 0 0 0"
+                               VerticalAlignment="Center"
+                               FontSize="14"
+                               Text="{Binding UpdateVersion}" />
+                    <TextBlock FontFamily="{DynamicResource DefaultFontFamily}"
+                               VerticalAlignment="Center"
+                               FontSize="14"
+                               Text=":" />
+                    <TextBlock FontFamily="{DynamicResource DefaultFontFamily}"
+                               Margin="3 0 0 0"
+                               VerticalAlignment="Center"
+                               FontSize="14"
+                               Text="{Binding UpdateDownloadProgress}" />
+                    <TextBlock FontFamily="{DynamicResource DefaultFontFamily}"
+                               VerticalAlignment="Center"
+                               FontSize="14"
+                               Text="%" />
+                </StackPanel>
+            </Button>
+            <Rectangle Margin="0 8"
+                       IsVisible="{Binding HasAccount}"
+                       VerticalAlignment="Stretch"
+                       Fill="{DynamicResource StatusBarVersionForeground}"
+                       Width="1" />
+        </StackPanel>
+
+        <StackPanel Orientation="Horizontal"
+                    IsVisible="{Binding HasAccount}">
+            <Button Command="{Binding SignOutCommand}"
+                    Classes="TitleBarCommandBtn">
+
+                <StackPanel Orientation="Horizontal">
+                    <Path Stretch="Uniform"
+                          Margin="0 0 4 0"
+                          UseLayoutRounding="False"
+                          Width="16"
+                          Height="16"
+                          Data="{DynamicResource Unicons.SignOutAlt}" />
+                    <TextBlock FontFamily="{DynamicResource DefaultFontFamily}"
+                               VerticalAlignment="Center"
+                               FontSize="14"
+                               Text="SignOut" />
+                </StackPanel>
+            </Button>
+        </StackPanel>
+    </StackPanel>
+</UserControl>

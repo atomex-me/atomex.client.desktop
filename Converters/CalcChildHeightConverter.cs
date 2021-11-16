@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Globalization;
+using System.Runtime.InteropServices;
 using Avalonia.Data.Converters;
 
 namespace Atomex.Client.Desktop.Converters
@@ -12,7 +13,7 @@ namespace Atomex.Client.Desktop.Converters
 
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value is double val)
+            if (value is double val && !RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
                 return val - TITLEBAR_HEIGHT;
 
             return value;
