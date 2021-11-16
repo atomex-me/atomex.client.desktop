@@ -17,6 +17,7 @@ using Atomex.Client.Desktop.ViewModels.Abstract;
 using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
 using Atomex.Common;
 using Atomex.Core;
+using Atomex.Wallet.Abstract;
 
 namespace Atomex.Client.Desktop.ViewModels.ReceiveViewModels
 {
@@ -40,10 +41,10 @@ namespace Atomex.Client.Desktop.ViewModels.ReceiveViewModels
 #endif
                     // get all addresses with tokens (if exists)
                     var tokenAddresses = Currencies.HasTokens(_currency.Name)
-                        ? _app.Account
-                            .GetCurrencyAccount<ILegacyCurrencyAccount>(_currency.Name)
-                            .GetUnspentTokenAddressesAsync()
-                            .WaitForResult()
+                        ? (_app.Account
+                            .GetCurrencyAccount(_currency.Name) as IHasTokens)
+                            ?.GetUnspentTokenAddressesAsync()
+                            .WaitForResult() ?? new List<WalletAddress>()
                         : new List<WalletAddress>();
 
                     // get all active addresses
