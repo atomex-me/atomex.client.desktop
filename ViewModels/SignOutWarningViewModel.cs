@@ -13,7 +13,7 @@ namespace Atomex.Client.Desktop.ViewModels
 
         public ICommand OkCommand => _okCommand ??= (_okCommand = ReactiveCommand.Create(() =>
         {
-            Desktop.App.DialogService.CloseDialog();
+            Desktop.App.DialogService.Close();
         }));
 
         private ICommand _ignoreCommand;
@@ -21,7 +21,7 @@ namespace Atomex.Client.Desktop.ViewModels
         public ICommand IgnoreCommand => _ignoreCommand ??= (_ignoreCommand = ReactiveCommand.Create(() =>
         {
             OnIgnoreCommand?.Invoke();
-            Desktop.App.DialogService.CloseDialog();
+            Desktop.App.DialogService.Close();
         }));
 
         public Action OnIgnoreCommand { get; set; }

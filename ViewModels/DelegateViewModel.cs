@@ -258,7 +258,7 @@ namespace Atomex.Client.Desktop.ViewModels
 
         public ICommand BackCommand => _backCommand ??= ReactiveCommand.Create(() =>
         {
-            Desktop.App.DialogService.CloseDialog();
+            Desktop.App.DialogService.Close();
         });
 
         private bool _delegationCheck;

@@ -307,7 +307,7 @@ namespace Atomex.Client.Desktop.ViewModels
                     clientType: ClientType.Unknown);
             }, async () => await SignOut());
 
-            var wasClosed = App.DialogService.CloseDialog();
+            var wasClosed = App.DialogService.Close();
 
             unlockViewModel.Unlocked += (s, a) =>
             {
@@ -324,6 +324,11 @@ namespace Atomex.Client.Desktop.ViewModels
         }
         
         public bool IsLinux { get; } = RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
+
+        public void CloseDialog()
+        {
+            App.DialogService.Close();
+        }
 
         private void DesignerMode()
         {

@@ -11,6 +11,11 @@
         <Setter Property="CornerRadius" Value="{DynamicResource DialogCornerRadius}" />
         <Setter Property="Background" Value="{DynamicResource ChildViewBackgroundBrush}" />
     </Style>
+    
+    <Style Selector="Border.ChildViewBorder.CreateWallet">
+        <Setter Property="BoxShadow" Value="{DynamicResource DialogBoxShadow}" />
+    </Style>
+
 
     <Style Selector="Border.ChildViewBorderLight">
         <Setter Property="CornerRadius" Value="10" />

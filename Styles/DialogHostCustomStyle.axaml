@@ -50,9 +50,7 @@
                                         Margin="0 5 2 0"
                                         HorizontalAlignment="Right"
                                         VerticalAlignment="Top"
-                                        Command="{Binding RelativeSource={RelativeSource FindAncestor,
-                                            AncestorType={x:Type dialogHost:DialogHost}},
-                                        Path=CloseDialogCommand}" />
+                                        Command="{Binding CloseDialog}" />
                             </Canvas>
                             <ContentPresenter Name="PART_ContentPresenter"
                                               Background="{TemplateBinding Background}"

@@ -31,7 +31,6 @@ namespace Atomex.Client.Desktop
     public class App : Application
     {
         public static DialogService DialogService;
-        public static string MainDialogHostIdentifier => DialogService.MainDialogHostIdentifier;
         public static TemplateService TemplateService;
         public static ImageService ImageService;
         public static IClipboard Clipboard;

@@ -66,7 +66,7 @@ namespace Atomex.Client.Desktop.ViewModels
 
         public ICommand BackCommand => _backCommand ??= ReactiveCommand.Create(() =>
         {
-            Desktop.App.DialogService.CloseDialog();
+            Desktop.App.DialogService.Close();
         });
 
         private ICommand _nextCommand;
@@ -113,7 +113,7 @@ namespace Atomex.Client.Desktop.ViewModels
                 
                 Desktop.App.DialogService.Show(MessageViewModel.Success(
                     text: Resources.SvOrderMatched,
-                    nextAction: () => Desktop.App.DialogService.CloseDialog()));
+                    nextAction: () => Desktop.App.DialogService.Close()));
 
                 OnSuccess?.Invoke(this, EventArgs.Empty);
             }

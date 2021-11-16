@@ -640,7 +640,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                 // todo: message to user!?
             }
 
-            Desktop.App.DialogService.CloseDialog();
+            Desktop.App.DialogService.Close();
             IsBalanceUpdating = false;
         }
 

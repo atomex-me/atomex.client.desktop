@@ -1,36 +1,11 @@
-﻿<Window xmlns="https://github.com/avaloniaui"
+﻿<UserControl xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         x:Class="Atomex.Client.Desktop.Dialogs.Views.DialogServiceView"
-        Name="Dialog"
-        CanResize="True"
-        ShowInTaskbar="False"
-        SystemDecorations="None"
-        TransparencyLevelHint="Transparent"
-        Background="Transparent"
-        WindowStartupLocation="CenterOwner">
+        xmlns:vm="clr-namespace:Atomex.Client.Desktop.Dialogs.ViewModels">
+    
+    <Design.DataContext>
+        <vm:DialogServiceViewModel />
+    </Design.DataContext>
 
-    <Border
-        Background="{DynamicResource ChildViewBackgroundBrush}"
-        CornerRadius="{DynamicResource DialogCornerRadius}"
-        BoxShadow="{DynamicResource DialogBoxShadow}"
-        Margin="12">
-
-        <Grid>
-            <Canvas ZIndex="1">
-                <Button Classes="ChildViewCloseButtonLight"
-                        Canvas.Right="-13"
-                        Canvas.Top="-17"
-                        Width="24"
-                        Height="24"
-                        Margin="0 5 2 0"
-                        HorizontalAlignment="Right"
-                        VerticalAlignment="Top"
-                        Command="{Binding NoCommand}"
-                        CommandParameter="{Binding #Dialog}" />
-            </Canvas>
-            <DockPanel>
-                <ContentControl Content="{Binding Content}" />
-            </DockPanel>
-        </Grid>
-    </Border>
-</Window>
+    <ContentControl Content="{Binding Content}" />
+</UserControl>

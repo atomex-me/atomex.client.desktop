@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using Atomex.Client.Desktop.Dialogs.ViewModels;
 using Avalonia.Controls;
 using Atomex.Client.Desktop.ViewModels;
 using Avalonia.Threading;
@@ -10,16 +11,17 @@ namespace Atomex.Client.Desktop.Services
 {
     public sealed class DialogService
     {
-        public static string MainDialogHostIdentifier => "MainDialogHost";
+        private static string MainDialogHostIdentifier => "MainDialogHost";
         private readonly Window _owner;
         private bool _isDialogOpened;
         private readonly bool _isLinux;
-        private ViewModelBase _lastDialogViewModel;
+        private readonly DialogServiceViewModel _dialogServiceViewModel;
 
         public DialogService(Window owner, bool isLinux)
         {
             _owner = owner;
             _isLinux = isLinux;
+            _dialogServiceViewModel = new DialogServiceViewModel();
         }
 
         private async void ReRender()
@@ -32,7 +34,7 @@ namespace Atomex.Client.Desktop.Services
         }
 
 
-        public bool CloseDialog()
+        public bool Close()
         {
             var result = _isDialogOpened;
             if (_isDialogOpened)
@@ -46,20 +48,18 @@ namespace Atomex.Client.Desktop.Services
 
         public void ShowPrevious()
         {
-            if (_isDialogOpened)
-                DialogHost.DialogHost.GetDialogSession(MainDialogHostIdentifier)?.Close();
-            _ = DialogHost.DialogHost.Show(_lastDialogViewModel, MainDialogHostIdentifier);
+            if (_isDialogOpened) return;
+            _ = DialogHost.DialogHost.Show(_dialogServiceViewModel.Content, MainDialogHostIdentifier);
             ReRender();
         }
 
 
         public void Show(ViewModelBase viewModel)
         {
-            _lastDialogViewModel = viewModel;
-
-            if (_isDialogOpened)
-                DialogHost.DialogHost.GetDialogSession(MainDialogHostIdentifier)?.Close();
-            _ = DialogHost.DialogHost.Show(viewModel, MainDialogHostIdentifier);
+            _dialogServiceViewModel.Content = viewModel;
+            if (_isDialogOpened) return;
+            
+            _ = DialogHost.DialogHost.Show(_dialogServiceViewModel, MainDialogHostIdentifier);
             ReRender();
             _isDialogOpened = true;
         }

@@ -1063,7 +1063,7 @@ namespace Atomex.Client.Desktop.ViewModels
                     MessageViewModel.Message(
                         title: Resources.CvWarning,
                         text: Resources.CvZeroAmount,
-                        backAction: () => Desktop.App.DialogService.CloseDialog()));
+                        backAction: () => Desktop.App.DialogService.Close()));
                 return;
             }
 
@@ -1073,7 +1073,7 @@ namespace Atomex.Client.Desktop.ViewModels
                     MessageViewModel.Message(
                         title: Resources.CvWarning,
                         text: Resources.CvBigAmount,
-                        backAction: () => Desktop.App.DialogService.CloseDialog()));
+                        backAction: () => Desktop.App.DialogService.Close()));
                 return;
             }
 
@@ -1083,7 +1083,7 @@ namespace Atomex.Client.Desktop.ViewModels
                     MessageViewModel.Message(
                         title: Resources.CvWarning,
                         text: Resources.CvNoLiquidity,
-                        backAction: () => Desktop.App.DialogService.CloseDialog()));
+                        backAction: () => Desktop.App.DialogService.Close()));
                 return;
             }
 
@@ -1093,7 +1093,7 @@ namespace Atomex.Client.Desktop.ViewModels
                     MessageViewModel.Message(
                         title: Resources.CvWarning,
                         text: Resources.CvServicesUnavailable,
-                        backAction: () => Desktop.App.DialogService.CloseDialog()));
+                        backAction: () => Desktop.App.DialogService.Close()));
                 return;
             }
 
@@ -1103,7 +1103,7 @@ namespace Atomex.Client.Desktop.ViewModels
                 Desktop.App.DialogService.Show(
                     MessageViewModel.Error(
                         text: Resources.CvNotSupportedSymbol,
-                        backAction: () => Desktop.App.DialogService.CloseDialog()));
+                        backAction: () => Desktop.App.DialogService.Close()));
                 return;
             }
 
@@ -1123,7 +1123,7 @@ namespace Atomex.Client.Desktop.ViewModels
                     MessageViewModel.Message(
                         title: Resources.CvWarning,
                         text: message,
-                        backAction: () => Desktop.App.DialogService.CloseDialog()));
+                        backAction: () => Desktop.App.DialogService.Close()));
                 return;
             }
 

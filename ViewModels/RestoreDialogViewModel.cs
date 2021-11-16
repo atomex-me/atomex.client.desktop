@@ -39,7 +39,7 @@ namespace Atomex.Client.Desktop.ViewModels
 
         public ICommand HideCommand => _hideCommand ??= (_hideCommand = ReactiveCommand.Create(() =>
         {
-            Desktop.App.DialogService.CloseDialog();
+            Desktop.App.DialogService.Close();
         }));
 
         private async void ScanCurrenciesAsync(string[] currenciesArr)
@@ -84,7 +84,7 @@ namespace Atomex.Client.Desktop.ViewModels
                 Log.Error($"Scan {restoringEntityTitle} exception");
             }
             
-            Desktop.App.DialogService.CloseDialog();
+            Desktop.App.DialogService.Close();
         }
     }
 }

@@ -133,7 +133,7 @@ namespace Atomex.Client.Desktop.ViewModels
                         result.Value,
                         nextAction: () =>
                         {
-                            Desktop.App.DialogService.CloseDialog();
+                            Desktop.App.DialogService.Close();
 
                             _onDelegate?.Invoke();
                         }));
