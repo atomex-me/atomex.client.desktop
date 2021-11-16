@@ -7,20 +7,15 @@ using Avalonia;
 
 namespace Atomex.Client.Desktop.Converters
 {
-    public class DialogOpenedToBorderThicknessConverter : IValueConverter
+    public class DialogOverlayerMarginConverter : IValueConverter
     {
         #region IValueConverter Members
 
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value is bool opened)
-            {
-                return opened && RuntimeInformation.IsOSPlatform(OSPlatform.Linux)
+            return  RuntimeInformation.IsOSPlatform(OSPlatform.Linux)
                     ? new Thickness(0)
-                    : new Thickness(0, 0, 1, 3);
-            }
-
-            return value;
+                    : new Thickness(0, 30, 0, 0);
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

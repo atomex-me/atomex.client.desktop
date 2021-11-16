@@ -1,6 +1,10 @@
 ﻿<Styles xmlns="https://github.com/avaloniaui"
         xmlns:x='http://schemas.microsoft.com/winfx/2006/xaml'
-        xmlns:dialogHost="clr-namespace:DialogHost;assembly=DialogHost.Avalonia">
+        xmlns:dialogHost="clr-namespace:DialogHost;assembly=DialogHost.Avalonia"
+        xmlns:converters="clr-namespace:Atomex.Client.Desktop.Converters">
+    <Styles.Resources>
+        <converters:DialogOverlayerMarginConverter x:Key="DialogOverlayerMarginConverter" />
+    </Styles.Resources>
 
     <Style Selector="dialogHost|DialogHost">
         <Setter Property="HorizontalAlignment" Value="Stretch" />
@@ -18,6 +22,7 @@
                                       VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}" />
                     <Grid Name="PART_ContentCoverGrid"
                           Background="{TemplateBinding OverlayBackground}"
+                          Margin="{Binding Converter={StaticResource DialogOverlayerMarginConverter}}"
                           Focusable="False">
                         <Grid.Styles>
                             <Style Selector="Grid#PART_ContentCoverGrid[Opacity=0]">
