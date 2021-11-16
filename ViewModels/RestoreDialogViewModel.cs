@@ -83,10 +83,8 @@ namespace Atomex.Client.Desktop.ViewModels
             {
                 Log.Error($"Scan {restoringEntityTitle} exception");
             }
-
-            if (Desktop.App.DialogService.CurrentlyShowed(this))
-                Desktop.App.DialogService.CloseDialog();
             
+            Desktop.App.DialogService.CloseDialog();
         }
     }
 }

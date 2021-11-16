@@ -125,7 +125,7 @@ namespace Atomex.Client.Desktop.ViewModels
 
                     return;
                 }
-                
+
                 Desktop.App.DialogService.Show(
                     MessageViewModel.Success(
                         text: $"Successful delegation!",
@@ -156,7 +156,7 @@ namespace Atomex.Client.Desktop.ViewModels
 
         private void BackToConfirmation()
         {
-            Desktop.App.DialogService.Show(this, customHeight: IsAmountLessThanMin ? 370 : 240);
+            Desktop.App.DialogService.Show(this);
         }
 
         private void DesignerMode()

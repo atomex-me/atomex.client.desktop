@@ -164,7 +164,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
         private void OnDelegateClick()
         {
-            _ = DialogHost.DialogHost.Show(DelegateVM, Desktop.App.MainDialogHostIdentifier);
+            Desktop.App.DialogService.Show(DelegateVM);
         }
 
         //private void OnUndelegateClick()

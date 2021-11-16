@@ -1059,58 +1059,51 @@ namespace Atomex.Client.Desktop.ViewModels
         {
             if (_amount == 0)
             {
-                _ = DialogHost.DialogHost.Show(
+                Desktop.App.DialogService.Show(
                     MessageViewModel.Message(
                         title: Resources.CvWarning,
                         text: Resources.CvZeroAmount,
-                        backAction: () =>
-                            DialogHost.DialogHost.GetDialogSession(Desktop.App.MainDialogHostIdentifier)?.Close()),
-                    Desktop.App.MainDialogHostIdentifier);
+                        backAction: () => Desktop.App.DialogService.CloseDialog()));
                 return;
             }
 
             if (!IsAmountValid)
             {
-                _ = DialogHost.DialogHost.Show(
+                Desktop.App.DialogService.Show(
                     MessageViewModel.Message(
                         title: Resources.CvWarning,
                         text: Resources.CvBigAmount,
-                        backAction: () =>
-                            DialogHost.DialogHost.GetDialogSession(Desktop.App.MainDialogHostIdentifier)?.Close()),
-                    Desktop.App.MainDialogHostIdentifier);
+                        backAction: () => Desktop.App.DialogService.CloseDialog()));
                 return;
             }
 
             if (EstimatedPrice == 0)
             {
-                _ = DialogHost.DialogHost.Show(
+                Desktop.App.DialogService.Show(
                     MessageViewModel.Message(
                         title: Resources.CvWarning,
                         text: Resources.CvNoLiquidity,
-                        backAction: () =>
-                            DialogHost.DialogHost.GetDialogSession(Desktop.App.MainDialogHostIdentifier)?.Close()));
+                        backAction: () => Desktop.App.DialogService.CloseDialog()));
                 return;
             }
 
             if (!App.Terminal.IsServiceConnected(TerminalService.All))
             {
-                _ = DialogHost.DialogHost.Show(
+                Desktop.App.DialogService.Show(
                     MessageViewModel.Message(
                         title: Resources.CvWarning,
                         text: Resources.CvServicesUnavailable,
-                        backAction: () =>
-                            DialogHost.DialogHost.GetDialogSession(Desktop.App.MainDialogHostIdentifier)?.Close()));
+                        backAction: () => Desktop.App.DialogService.CloseDialog()));
                 return;
             }
 
             var symbol = Symbols.SymbolByCurrencies(FromCurrency, ToCurrency);
             if (symbol == null)
             {
-                _ = DialogHost.DialogHost.Show(
+                Desktop.App.DialogService.Show(
                     MessageViewModel.Error(
                         text: Resources.CvNotSupportedSymbol,
-                        backAction: () =>
-                            DialogHost.DialogHost.GetDialogSession(Desktop.App.MainDialogHostIdentifier)?.Close()));
+                        backAction: () => Desktop.App.DialogService.CloseDialog()));
                 return;
             }
 
@@ -1126,12 +1119,11 @@ namespace Atomex.Client.Desktop.ViewModels
                 var message = string.Format(CultureInfo.InvariantCulture, Resources.CvMinimumAllowedQtyWarning,
                     minimumAmount, FromCurrency.Name);
 
-                _ = DialogHost.DialogHost.Show(
+                Desktop.App.DialogService.Show(
                     MessageViewModel.Message(
                         title: Resources.CvWarning,
                         text: message,
-                        backAction: () =>
-                            DialogHost.DialogHost.GetDialogSession(Desktop.App.MainDialogHostIdentifier)?.Close()));
+                        backAction: () => Desktop.App.DialogService.CloseDialog()));
                 return;
             }
 
@@ -1178,7 +1170,7 @@ namespace Atomex.Client.Desktop.ViewModels
 
             viewModel.OnSuccess += OnSuccessConvertion;
 
-            _ = DialogHost.DialogHost.Show(viewModel, Desktop.App.MainDialogHostIdentifier);
+            Desktop.App.DialogService.Show(viewModel);
         }
 
         private void OnSuccessConvertion(object sender, EventArgs e)

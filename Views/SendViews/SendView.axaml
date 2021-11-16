@@ -19,173 +19,175 @@
         <vm:SendViewModel />
     </Design.DataContext>
 
-    <Grid Width="560">
-        <StackPanel Orientation="Vertical">
-            <Border Margin="0 10 0 10"
-                    Height="33"
-                    VerticalAlignment="Top"
-                    HorizontalAlignment="Stretch"
-                    Background="{DynamicResource ChildViewHeaderBackgroundBrush}">
-                <TextBlock Text="Send"
-                           Foreground="{DynamicResource ChildViewHeaderForegroundBrush}"
+    <Border Classes="ChildViewBorder">
+        <Grid Width="560">
+            <StackPanel Orientation="Vertical">
+                <Border Margin="0 10 0 10"
+                        Height="33"
+                        VerticalAlignment="Top"
+                        HorizontalAlignment="Stretch"
+                        Background="{DynamicResource ChildViewHeaderBackgroundBrush}">
+                    <TextBlock Text="Send"
+                               Foreground="{DynamicResource ChildViewHeaderForegroundBrush}"
+                               FontFamily="{DynamicResource DefaultLightFontFamily}"
+                               FontSize="25"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center" />
+                </Border>
+
+                <TextBlock Text="Instantly sending of currency."
+                           Foreground="{DynamicResource DefaultForegroundBrush}"
                            FontFamily="{DynamicResource DefaultLightFontFamily}"
-                           FontSize="25"
+                           FontSize="15"
+                           Margin="40 20 40 15"
+                           TextWrapping="Wrap"
+                           HorizontalAlignment="Center" />
+
+                <ComboBox
+                    Classes="CurrencyComboBox"
+                    Width="480"
+                    MinHeight="68"
+                    Margin="0 5 0 5"
+                    HorizontalAlignment="Center"
+                    Items="{Binding FromCurrencies}"
+                    SelectedIndex="{Binding CurrencyIndex}"
+                    helpers:ComboBoxHelper.CornerRadius="20" />
+
+                <StackPanel Orientation="Horizontal"
+                            HorizontalAlignment="Center">
+
+                    <Border Classes="FieldHeader">
+                        <TextBlock Text="To Address:"
+                                   Margin="0 0 7 0"
+                                   Foreground="{DynamicResource DefaultForegroundBrush}"
+                                   FontFamily="{DynamicResource DefaultMediumFontFamily}"
+                                   FontSize="13"
+                                   VerticalAlignment="Center"
+                                   HorizontalAlignment="Right" />
+                    </Border>
+                    <TextBox Classes="CustomTextBox AmountTextBox"
+                             Width="380"
+                             Height="40"
+                             Margin="0 5 0 5"
+                             helpers:TextBoxHelper.CornerRadius="0 20 20 0"
+                             Text="{Binding To, Mode=TwoWay}"
+                             Background="{DynamicResource DefaultSubstrateBrush}"
+                             Foreground="{DynamicResource DefaultForegroundBrush}" />
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal"
+                            HorizontalAlignment="Center">
+
+                    <Border Classes="FieldHeader">
+                        <TextBlock Text="Amount:"
+                                   Margin="0 0 7 0"
+                                   Foreground="{DynamicResource DefaultForegroundBrush}"
+                                   FontFamily="{DynamicResource DefaultMediumFontFamily}"
+                                   FontSize="13"
+                                   VerticalAlignment="Center"
+                                   HorizontalAlignment="Right" />
+                    </Border>
+
+
+                    <TextBox Classes="CustomTextBox AmountTextBox"
+                             Width="318"
+                             Height="40"
+                             Margin="0 5 0 5"
+                             FontSize="18"
+                             Background="{DynamicResource DefaultSubstrateBrush}"
+                             Foreground="{DynamicResource DefaultForegroundBrush}"
+                             helpers:TextBoxHelper.CornerRadius="0"
+                             helpers:AmountTextBoxHelper.CurrencyCode="{Binding CurrencyCode}"
+                             helpers:AmountTextBoxHelper.BaseCurrencyCode="{Binding BaseCurrencyCode}"
+                             Text="{Binding AmountString, Mode=OneWay}"
+                             Name="AmountString">
+
+                        <helpers:AmountTextBoxHelper.AmountInBase>
+                            <MultiBinding Converter="{StaticResource AmountToStringConverter}">
+                                <Binding Path="AmountInBase" Mode="OneWay" />
+                                <Binding Path="BaseCurrencyFormat" Mode="OneWay" />
+                            </MultiBinding>
+                        </helpers:AmountTextBoxHelper.AmountInBase>
+                    </TextBox>
+                    <controls:RoundedButton Width="60"
+                                            Height="40"
+                                            Margin="2 0 0 0"
+                                            CornerRadius="0 20 20 0"
+                                            Content="Max"
+                                            Command="{Binding MaxCommand}" />
+                </StackPanel>
+
+                <StackPanel Classes="BaseDisabledStyle"
+                            Orientation="Horizontal"
+                            HorizontalAlignment="Center"
+                            IsEnabled="{Binding !UseDefaultFee}">
+
+                    <Border Classes="FieldHeader">
+                        <TextBlock Text="Fee:"
+                                   Margin="0 0 7 0"
+                                   Foreground="{DynamicResource DefaultForegroundBrush}"
+                                   FontFamily="{DynamicResource DefaultMediumFontFamily}"
+                                   FontSize="13"
+                                   VerticalAlignment="Center"
+                                   HorizontalAlignment="Right" />
+                    </Border>
+
+                    <TextBox Classes="CustomTextBox AmountTextBox"
+                             Width="380"
+                             Height="40"
+                             Margin="0 5 0 5"
+                             FontSize="18"
+                             helpers:TextBoxHelper.CornerRadius="0 20 20 0"
+                             helpers:AmountTextBoxHelper.CurrencyCode="{Binding FeeCurrencyCode}"
+                             helpers:AmountTextBoxHelper.BaseCurrencyCode="{Binding BaseCurrencyCode}"
+                             Background="{DynamicResource DefaultSubstrateBrush}"
+                             Foreground="{DynamicResource DefaultForegroundBrush}"
+                             Text="{Binding FeeString, Mode=OneWay}"
+                             Name="FeeString">
+                        <helpers:AmountTextBoxHelper.AmountInBase>
+                            <MultiBinding Converter="{StaticResource AmountToStringConverter}">
+                                <Binding Path="FeeInBase" Mode="OneWay" />
+                                <Binding Path="BaseCurrencyFormat" Mode="OneWay" />
+                            </MultiBinding>
+                        </helpers:AmountTextBoxHelper.AmountInBase>
+                    </TextBox>
+                </StackPanel>
+
+                <ToggleSwitch HorizontalAlignment="Center"
+                              OffContent="Use default fee"
+                              OnContent="Use default fee"
+                              BorderBrush="{DynamicResource DefaultForegroundBrush}"
+                              FontFamily="{DynamicResource DefaultLightFontFamily}"
+                              Foreground="{DynamicResource DefaultForegroundBrush}"
+                              FontSize="13"
+                              Margin="10"
+                              IsChecked="{Binding UseDefaultFee, Mode=TwoWay}" />
+
+                <TextBlock Text="{Binding Warning}"
+                           Foreground="{DynamicResource WarningForegroundBrush}"
+                           FontFamily="{DynamicResource DefaultLightFontFamily}"
+                           FontSize="13"
+                           Margin="20 5 20 0"
+                           TextWrapping="Wrap"
                            HorizontalAlignment="Center"
-                           VerticalAlignment="Center" />
-            </Border>
+                           VerticalAlignment="Bottom" />
 
-            <TextBlock Text="Instantly sending of currency."
-                       Foreground="{DynamicResource DefaultForegroundBrush}"
-                       FontFamily="{DynamicResource DefaultLightFontFamily}"
-                       FontSize="15"
-                       Margin="40 20 40 15"
-                       TextWrapping="Wrap"
-                       HorizontalAlignment="Center" />
-
-            <ComboBox
-                Classes="CurrencyComboBox"
-                Width="480"
-                MinHeight="68"
-                Margin="0 5 0 5"
-                HorizontalAlignment="Center"
-                Items="{Binding FromCurrencies}"
-                SelectedIndex="{Binding CurrencyIndex}"
-                helpers:ComboBoxHelper.CornerRadius="20" />
-
-            <StackPanel Orientation="Horizontal"
-                        HorizontalAlignment="Center">
-
-                <Border Classes="FieldHeader">
-                    <TextBlock Text="To Address:"
-                               Margin="0 0 7 0"
-                               Foreground="{DynamicResource DefaultForegroundBrush}"
-                               FontFamily="{DynamicResource DefaultMediumFontFamily}"
-                               FontSize="13"
-                               VerticalAlignment="Center"
-                               HorizontalAlignment="Right" />
-                </Border>
-                <TextBox Classes="CustomTextBox AmountTextBox"
-                         Width="380"
-                         Height="40"
-                         Margin="0 5 0 5"
-                         helpers:TextBoxHelper.CornerRadius="0 20 20 0"
-                         Text="{Binding To, Mode=TwoWay}"
-                         Background="{DynamicResource DefaultSubstrateBrush}"
-                         Foreground="{DynamicResource DefaultForegroundBrush}" />
+                <StackPanel Orientation="Horizontal"
+                            HorizontalAlignment="Center"
+                            Margin="0 20 0 20">
+                    <controls:RoundedButton Width="100"
+                                            Height="40"
+                                            Margin="0 0 3 0"
+                                            CornerRadius="20 0 0 20"
+                                            Content="Cancel"
+                                            Command="{Binding BackCommand}" />
+                    <controls:RoundedButton Width="100"
+                                            Height="40"
+                                            CornerRadius="0 20 20 0"
+                                            Content="Send"
+                                            Command="{Binding NextCommand}" />
+                </StackPanel>
             </StackPanel>
-
-            <StackPanel Orientation="Horizontal"
-                        HorizontalAlignment="Center">
-
-                <Border Classes="FieldHeader">
-                    <TextBlock Text="Amount:"
-                               Margin="0 0 7 0"
-                               Foreground="{DynamicResource DefaultForegroundBrush}"
-                               FontFamily="{DynamicResource DefaultMediumFontFamily}"
-                               FontSize="13"
-                               VerticalAlignment="Center"
-                               HorizontalAlignment="Right" />
-                </Border>
-
-
-                <TextBox Classes="CustomTextBox AmountTextBox"
-                         Width="318"
-                         Height="40"
-                         Margin="0 5 0 5"
-                         FontSize="18"
-                         Background="{DynamicResource DefaultSubstrateBrush}"
-                         Foreground="{DynamicResource DefaultForegroundBrush}"
-                         helpers:TextBoxHelper.CornerRadius="0"
-                         helpers:AmountTextBoxHelper.CurrencyCode="{Binding CurrencyCode}"
-                         helpers:AmountTextBoxHelper.BaseCurrencyCode="{Binding BaseCurrencyCode}"
-                         Text="{Binding AmountString, Mode=OneWay}"
-                         Name="AmountString">
-                    
-                    <helpers:AmountTextBoxHelper.AmountInBase>
-                        <MultiBinding Converter="{StaticResource AmountToStringConverter}">
-                            <Binding Path="AmountInBase" Mode="OneWay" />
-                            <Binding Path="BaseCurrencyFormat" Mode="OneWay" />
-                        </MultiBinding>
-                    </helpers:AmountTextBoxHelper.AmountInBase>
-                </TextBox>
-                <controls:RoundedButton Width="60"
-                                        Height="40"
-                                        Margin="2 0 0 0"
-                                        CornerRadius="0 20 20 0"
-                                        Content="Max"
-                                        Command="{Binding MaxCommand}" />
-            </StackPanel>
-            
-            <StackPanel Classes="BaseDisabledStyle"
-                        Orientation="Horizontal"
-                        HorizontalAlignment="Center"
-                        IsEnabled="{Binding !UseDefaultFee}">
-                
-                <Border Classes="FieldHeader">
-                    <TextBlock Text="Fee:"
-                               Margin="0 0 7 0"
-                               Foreground="{DynamicResource DefaultForegroundBrush}"
-                               FontFamily="{DynamicResource DefaultMediumFontFamily}"
-                               FontSize="13"
-                               VerticalAlignment="Center"
-                               HorizontalAlignment="Right" />
-                </Border>
-
-                <TextBox Classes="CustomTextBox AmountTextBox"
-                         Width="380"
-                         Height="40"
-                         Margin="0 5 0 5"
-                         FontSize="18"
-                         helpers:TextBoxHelper.CornerRadius="0 20 20 0"
-                         helpers:AmountTextBoxHelper.CurrencyCode="{Binding FeeCurrencyCode}"
-                         helpers:AmountTextBoxHelper.BaseCurrencyCode="{Binding BaseCurrencyCode}"
-                         Background="{DynamicResource DefaultSubstrateBrush}"
-                         Foreground="{DynamicResource DefaultForegroundBrush}"
-                         Text="{Binding FeeString, Mode=OneWay}"
-                         Name="FeeString">
-                    <helpers:AmountTextBoxHelper.AmountInBase>
-                        <MultiBinding Converter="{StaticResource AmountToStringConverter}">
-                            <Binding Path="FeeInBase" Mode="OneWay" />
-                            <Binding Path="BaseCurrencyFormat" Mode="OneWay" />
-                        </MultiBinding>
-                    </helpers:AmountTextBoxHelper.AmountInBase>
-                </TextBox>
-            </StackPanel>
-
-            <ToggleSwitch HorizontalAlignment="Center"
-                          OffContent="Use default fee"
-                          OnContent="Use default fee"
-                          BorderBrush="{DynamicResource DefaultForegroundBrush}"
-                          FontFamily="{DynamicResource DefaultLightFontFamily}"
-                          Foreground="{DynamicResource DefaultForegroundBrush}"
-                          FontSize="13"
-                          Margin="10"
-                          IsChecked="{Binding UseDefaultFee, Mode=TwoWay}" />
-
-            <TextBlock Text="{Binding Warning}"
-                       Foreground="{DynamicResource WarningForegroundBrush}"
-                       FontFamily="{DynamicResource DefaultLightFontFamily}"
-                       FontSize="13"
-                       Margin="20 5 20 0"
-                       TextWrapping="Wrap"
-                       HorizontalAlignment="Center"
-                       VerticalAlignment="Bottom" />
-
-            <StackPanel Orientation="Horizontal"
-                        HorizontalAlignment="Center"
-                        Margin="0 20 0 20">
-                <controls:RoundedButton Width="100"
-                                        Height="40"
-                                        Margin="0 0 3 0"
-                                        CornerRadius="20 0 0 20"
-                                        Content="Cancel"
-                                        Command="{Binding BackCommand}" />
-                <controls:RoundedButton Width="100"
-                                        Height="40"
-                                        CornerRadius="0 20 20 0"
-                                        Content="Send"
-                                        Command="{Binding NextCommand}" />
-            </StackPanel>
-        </StackPanel>
-    </Grid>
+        </Grid>
+    </Border>
 </UserControl>
