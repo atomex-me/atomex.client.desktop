@@ -7,14 +7,14 @@
              xmlns:helpers="clr-namespace:Atomex.Client.Desktop.Helpers"
              xmlns:vm="clr-namespace:Atomex.Client.Desktop.ViewModels.SendViewModels"
              xmlns:controls="clr-namespace:Atomex.Client.Desktop.Controls"
-             Width="640">
+             Width="670">
 
     <Design.DataContext>
         <vm:TezosTokensSendViewModel />
     </Design.DataContext>
 
     <Border Classes="ChildViewBorder">
-        <Grid Width="640">
+        <Grid Width="670">
             <StackPanel Orientation="Vertical">
                 <Border Margin="0 10 0 10"
                         Height="33"
@@ -51,7 +51,7 @@
                                    HorizontalAlignment="Right" />
                     </Border>
 
-                    <ComboBox Width="420"
+                    <ComboBox Width="450"
                               Height="50"
                               Margin="0 5 0 5"
                               Items="{Binding FromAddresses}"
@@ -217,7 +217,7 @@
                                    VerticalAlignment="Center"
                                    HorizontalAlignment="Right" />
                     </Border>
-                    <TextBox Width="420"
+                    <TextBox Width="450"
                              Height="40"
                              Margin="0 5 0 5"
                              Text="{Binding TokenContract, Mode=TwoWay}"
@@ -242,7 +242,7 @@
                                    VerticalAlignment="Center"
                                    HorizontalAlignment="Right" />
                     </Border>
-                    <TextBox Width="420"
+                    <TextBox Width="450"
                              Height="40"
                              Margin="0 5 0 5"
                              Text="{Binding TokenId, Mode=TwoWay}"
@@ -264,7 +264,7 @@
                                    VerticalAlignment="Center"
                                    HorizontalAlignment="Right" />
                     </Border>
-                    <TextBox Width="420"
+                    <TextBox Width="450"
                              Height="40"
                              Margin="0 5 0 5"
                              Text="{Binding To, Mode=TwoWay}"
@@ -287,7 +287,7 @@
                                    HorizontalAlignment="Right" />
                     </Border>
 
-                    <TextBox Width="358"
+                    <TextBox Width="388"
                              Height="40"
                              Margin="0 5 0 5"
                              FontSize="18"
@@ -330,7 +330,7 @@
                                    HorizontalAlignment="Right" />
                     </Border>
 
-                    <TextBox Width="420"
+                    <TextBox Width="450"
                              Height="40"
                              Margin="0 5 0 5"
                              FontSize="18"

@@ -60,9 +60,6 @@
         <Compile Update="Dialogs\Views\DialogServiceView.axaml.cs">
             <DependentUpon>UnsavedChangesDialogView.axaml</DependentUpon>
         </Compile>
-        <Compile Update="Views\SecondDialogView.axaml.cs">
-            <DependentUpon>SecondDialogView.axaml</DependentUpon>
-        </Compile>
         <Compile Update="Views\StartView.axaml.cs">
             <DependentUpon>StartView.axaml</DependentUpon>
         </Compile>

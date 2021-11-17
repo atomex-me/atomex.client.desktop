@@ -45,7 +45,7 @@
         </Style>
     </UserControl.Styles>
 
-    <Border Width="930">
+    <Border Width="930" Classes="ChildViewBorder">
         <Grid>
             <StackPanel Orientation="Vertical">
                 <Border Margin="0 10 0 20"
