@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Globalization;
+using System.Threading;
+using System.Threading.Tasks;
 
 using Atomex.Blockchain.Abstract;
 using Atomex.Client.Desktop.Properties;
@@ -276,6 +278,35 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
             AmountInBase = Amount * (quote?.Bid ?? 0m);
             FeeInBase = Fee * (xtzQuote?.Bid ?? 0m);
+        }
+
+        protected override async Task<Error> Send(
+            SendConfirmationViewModel confirmationViewModel,
+            CancellationToken cancellationToken = default)
+        {
+            var tokenAddress = await GetTokenAddressAsync(
+                account: App.AtomexApp.Account,
+                address: From,
+                tokenContract: confirmationViewModel.TokenContract,
+                tokenId: confirmationViewModel.TokenId,
+                tokenType: confirmationViewModel.TokenType);
+
+            var currencyName = App.AtomexApp.Account.Currencies
+                .FirstOrDefault(c => c is Fa12Config fa12 && fa12.TokenContractAddress == confirmationViewModel.TokenContract)
+                ?.Name ?? "FA12";
+
+            var tokenAccount = App.AtomexApp.Account.GetTezosTokenAccount<Fa12Account>(
+                currency: currencyName,
+                tokenContract: confirmationViewModel.TokenContract,
+                tokenId: confirmationViewModel.TokenId);
+
+            return await tokenAccount.SendAsync(
+                from: tokenAddress.Address,
+                to: confirmationViewModel.To,
+                amount: confirmationViewModel.Amount,
+                fee: confirmationViewModel.Fee,
+                useDefaultFee: confirmationViewModel.UseDeafultFee);
+            
         }
     }
 }

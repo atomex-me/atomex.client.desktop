@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Globalization;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 using Atomex.Blockchain.Abstract;
 using Atomex.Client.Desktop.Common;
@@ -8,6 +10,7 @@ using Atomex.Client.Desktop.Properties;
 using Atomex.Core;
 using Atomex.MarketData.Abstract;
 using Atomex.Wallet.Abstract;
+using Atomex.Wallet.Ethereum;
 
 namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 {
@@ -500,22 +503,24 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
             var confirmationViewModel = new SendConfirmationViewModel
             {
-                Currency = Currency,
-                To = To,
-                Amount = Amount,
-                AmountInBase = AmountInBase,
-                BaseCurrencyCode = BaseCurrencyCode,
+                Currency           = Currency,
+                From               = From,
+                To                 = To,
+                Amount             = Amount,
+                AmountInBase       = AmountInBase,
+                BaseCurrencyCode   = BaseCurrencyCode,
                 BaseCurrencyFormat = BaseCurrencyFormat,
-                Fee = Fee,
-                UseDeafultFee = UseDefaultFee,
-                FeeInBase = FeeInBase,
-                FeePrice = FeePrice,
-                CurrencyCode = CurrencyCode,
-                CurrencyFormat = CurrencyFormat,
+                Fee                = Fee,
+                UseDeafultFee      = UseDefaultFee,
+                FeeInBase          = FeeInBase,
+                FeePrice           = FeePrice,
+                CurrencyCode       = CurrencyCode,
+                CurrencyFormat     = CurrencyFormat,
             
-                FeeCurrencyCode = FeeCurrencyCode,
+                FeeCurrencyCode   = FeeCurrencyCode,
                 FeeCurrencyFormat = FeeCurrencyFormat,
-                BackView = this
+                BackView          = this,
+                SendCallback      = Send
             };
             
             Desktop.App.DialogService.Show(confirmationViewModel);
@@ -530,6 +535,22 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
             AmountInBase = Amount * (quote?.Bid ?? 0m);
             FeeInBase = Currency.GetFeeAmount(Fee, FeePrice) * (quote?.Bid ?? 0m);
+        }
+
+        protected override Task<Error> Send(
+            SendConfirmationViewModel confirmationViewModel,
+            CancellationToken cancellationToken = default)
+        {
+            var account = App.Account.GetCurrencyAccount<EthereumAccount>(Currency.Name);
+
+            return account.SendAsync(
+                from: confirmationViewModel.From,
+                to: confirmationViewModel.To,
+                amount: confirmationViewModel.Amount,
+                gasLimit: confirmationViewModel.Fee,
+                gasPrice: confirmationViewModel.FeePrice,
+                useDefaultFee: confirmationViewModel.UseDeafultFee,
+                cancellationToken: cancellationToken);
         }
     }
 }

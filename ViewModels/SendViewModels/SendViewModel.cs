@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Threading.Tasks;
+using System.Threading;
 using System.Windows.Input;
 
 using ReactiveUI;
@@ -350,7 +352,8 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             
                 FeeCurrencyCode    = FeeCurrencyCode,
                 FeeCurrencyFormat  = FeeCurrencyFormat,
-                BackView           = this
+                BackView           = this,
+                SendCallback       = Send
             };
             
             Desktop.App.DialogService.Show(confirmationViewModel);
@@ -408,6 +411,10 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             AmountInBase = Amount * (quote?.Bid ?? 0m);
             FeeInBase    = Fee * (quote?.Bid ?? 0m);
         }
+
+        protected abstract Task<Error> Send(
+            SendConfirmationViewModel confirmationViewModel,
+            CancellationToken cancellationToken = default);
 
         private void DesignerMode()
         {

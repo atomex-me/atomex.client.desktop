@@ -1,9 +1,12 @@
 ﻿using System;
+using System.Threading;
+using System.Threading.Tasks;
 
 using Atomex.Blockchain.Abstract;
 using Atomex.Client.Desktop.Properties;
 using Atomex.Core;
 using Atomex.Wallet.Abstract;
+using Atomex.Wallet.Tezos;
 
 namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 {
@@ -254,6 +257,21 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             {
                 IsAmountUpdating = false;
             }
+        }
+
+        protected override Task<Error> Send(
+            SendConfirmationViewModel confirmationViewModel,
+            CancellationToken cancellationToken = default)
+        {
+            var account = App.Account.GetCurrencyAccount<TezosAccount>(Currency.Name);
+
+            return account.SendAsync(
+                from: From,
+                to: confirmationViewModel.To,
+                amount: confirmationViewModel.Amount,
+                fee: confirmationViewModel.Fee,
+                useDefaultFee: confirmationViewModel.UseDeafultFee,
+                cancellationToken: cancellationToken);
         }
     }
 }

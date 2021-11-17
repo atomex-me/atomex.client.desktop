@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 using Atomex.Blockchain.Abstract;
 using Atomex.Blockchain.BitcoinBased;
@@ -223,6 +225,21 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             {
                 IsAmountUpdating = false;
             }
+        }
+
+        protected override Task<Error> Send(
+            SendConfirmationViewModel confirmationViewModel,
+            CancellationToken cancellationToken = default)
+        {
+            var account = App.Account.GetCurrencyAccount<BitcoinBasedAccount>(Currency.Name);
+
+            return account.SendAsync(
+                from: Outputs.ToList(),
+                to: confirmationViewModel.To,
+                amount: confirmationViewModel.Amount,
+                fee: confirmationViewModel.Fee,
+                dustUsagePolicy: DustUsagePolicy.AddToFee,
+                cancellationToken: cancellationToken);
         }
 
         private void DesignerMode()
