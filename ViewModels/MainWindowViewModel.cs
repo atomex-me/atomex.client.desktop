@@ -11,6 +11,7 @@ using Atomex.Common;
 using ReactiveUI;
 using Atomex.Services;
 using Atomex.Wallet;
+using Avalonia.Threading;
 using Serilog;
 
 
@@ -225,9 +226,14 @@ namespace Atomex.Client.Desktop.ViewModels
                     return;
                 }
 
+                _ = Dispatcher.UIThread.InvokeAsync(() =>
+                {
+                    App.DialogService.Close();
+                });
+
                 AtomexApp.UseAtomexClient(null);
                 _userIgnoreActiveSwaps = false;
-
+                
                 ShowStart();
             }
             catch (Exception e)
@@ -307,8 +313,12 @@ namespace Atomex.Client.Desktop.ViewModels
                     clientType: ClientType.Unknown);
             }, async () => await SignOut());
 
-            var wasClosed = App.DialogService.CloseDialog();
-
+            var wasClosed = false;
+            Dispatcher.UIThread.InvokeAsync(() =>
+            {
+                wasClosed = App.DialogService.Close();;
+            });
+            
             unlockViewModel.Unlocked += (s, a) =>
             {
                 ShowContent(MainWalletVM);
@@ -324,6 +334,11 @@ namespace Atomex.Client.Desktop.ViewModels
         }
         
         public bool IsLinux { get; } = RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
+
+        public void CloseDialog()
+        {
+            App.DialogService.Close();
+        }
 
         private void DesignerMode()
         {

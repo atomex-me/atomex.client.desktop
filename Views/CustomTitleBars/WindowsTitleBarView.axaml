@@ -25,14 +25,14 @@
                 Name="TitleAndWindowIconWrapper">
                 <Image Source="avares://Atomex.Client.Desktop/Resources/Images/logo_dark_256x256.ico"
                        Height="30"
-                       IsHitTestVisible="False"
-                       Width="30" />
+                       Width="30"
+                       IsHitTestVisible="False" />
                 <TextBlock Text="atomex"
                            Margin="6 0 0 0"
                            FontSize="16"
                            FontFamily="{DynamicResource MainTitleFontFamily}"
-                           IsHitTestVisible="False"
                            VerticalAlignment="Center"
+                           IsHitTestVisible="False"
                            Foreground="{DynamicResource DefaultForegroundBrush}" />
             </StackPanel>
 

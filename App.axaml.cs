@@ -30,7 +30,7 @@ namespace Atomex.Client.Desktop
 {
     public class App : Application
     {
-        public static IDialogService<ViewModelBase> DialogService;
+        public static DialogService DialogService;
         public static TemplateService TemplateService;
         public static ImageService ImageService;
         public static IClipboard Clipboard;
@@ -78,7 +78,8 @@ namespace Atomex.Client.Desktop
             if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
             {
                 var mainWindow = new MainWindow();
-                DialogService = new DialogService<DialogServiceView>(mainWindow);
+                DialogService =
+                    new DialogService(mainWindow, RuntimeInformation.IsOSPlatform(OSPlatform.Linux));
                 var mainWindowViewModel = new MainWindowViewModel(AtomexApp, mainWindow);
 
                 mainWindow.DataContext = mainWindowViewModel;

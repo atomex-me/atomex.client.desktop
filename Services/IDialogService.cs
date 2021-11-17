@@ -13,5 +13,7 @@ namespace Atomex.Client.Desktop.Services
         void ShowPrevious();
 
         bool CloseDialog();
+        
+        void ReRender();
     }
 }

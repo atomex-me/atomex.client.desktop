@@ -25,6 +25,7 @@ using Avalonia.Threading;
 using NBitcoin;
 using ReactiveUI;
 using Serilog;
+using DialogHost;
 using Network = NBitcoin.Network;
 
 namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
