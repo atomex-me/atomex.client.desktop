@@ -6,12 +6,8 @@ using System.Windows.Input;
 using ReactiveUI;
 using Serilog;
 
-using Atomex.Blockchain.Tezos;
 using Atomex.Client.Desktop.Common;
 using Atomex.Core;
-using Atomex.TezosTokens;
-using Atomex.Wallet.Tezos;
-
 
 namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 {
@@ -66,55 +62,6 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
                 var error = await SendCallback.Invoke(this, CancellationToken.None);
 
-                //if (From != null && TokenContract != null) // tezos token sending
-                //{
-                //    var tokenAddress = await TezosTokensSendViewModel.GetTokenAddressAsync(
-                //        account: App.AtomexApp.Account,
-                //        address: From,
-                //        tokenContract: TokenContract,
-                //        tokenId: TokenId,
-                //        tokenType: TokenType);
-
-                //    if (tokenAddress.Currency == "FA12")
-                //    {
-                //        var currencyName = App.AtomexApp.Account.Currencies
-                //            .FirstOrDefault(c => c is Fa12Config fa12 && fa12.TokenContractAddress == TokenContract)
-                //            ?.Name ?? "FA12";
-
-                //        var tokenAccount = App.AtomexApp.Account
-                //            .GetTezosTokenAccount<Fa12Account>(currencyName, TokenContract, TokenId);
-
-                //        error = await tokenAccount
-                //            .SendAsync(new WalletAddress[] { tokenAddress }, To, Amount, Fee, FeePrice, UseDeafultFee);
-                //    }
-                //    else
-                //    {
-                //        var tokenAccount = App.AtomexApp.Account
-                //            .GetTezosTokenAccount<Fa2Account>("FA2", TokenContract, TokenId);
-
-                //        var decimals = tokenAddress.TokenBalance.Decimals;
-                //        var amount = Amount * (decimal)Math.Pow(10, decimals);
-                //        var fee = (int)Fee.ToMicroTez();
-
-                //        error = await tokenAccount.SendAsync(
-                //            from: From,
-                //            to: To,
-                //            amount: amount,
-                //            tokenContract: TokenContract,
-                //            tokenId: (int)TokenId,
-                //            fee: fee,
-                //            useDefaultFee: UseDeafultFee);
-                //    }
-                //}
-                //else
-                //{
-                //    var account = App.AtomexApp.Account
-                //        .GetCurrencyAccount<ILegacyCurrencyAccount>(Currency.Name);
-
-                //    error = await account
-                //        .SendAsync(To, Amount, Fee, FeePrice, UseDeafultFee);
-                //}
-
                 if (error != null)
                 {
                     App.DialogService.Show(MessageViewModel.Error(
@@ -140,12 +87,12 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
         private void DesignerMode()
         {
-            To = "1BvBMSEYstWetqTFn5Au4m4GFg7xJaNVN2";
-            Amount = 0.00001234m;
-            AmountInBase = 10.23m;
-            Fee = 0.0001m;
-            FeePrice = 1m;
-            FeeInBase = 8.43m;
+            To            = "1BvBMSEYstWetqTFn5Au4m4GFg7xJaNVN2";
+            Amount        = 0.00001234m;
+            AmountInBase  = 10.23m;
+            Fee           = 0.0001m;
+            FeePrice      = 1m;
+            FeeInBase     = 8.43m;
             UseDeafultFee = true;
         }
     }

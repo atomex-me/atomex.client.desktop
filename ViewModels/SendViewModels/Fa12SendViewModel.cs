@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Globalization;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -7,7 +8,9 @@ using Atomex.Blockchain.Abstract;
 using Atomex.Client.Desktop.Properties;
 using Atomex.Core;
 using Atomex.MarketData.Abstract;
+using Atomex.TezosTokens;
 using Atomex.Wallet.Abstract;
+using Atomex.Wallet.Tezos;
 
 namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 {
@@ -284,29 +287,33 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             SendConfirmationViewModel confirmationViewModel,
             CancellationToken cancellationToken = default)
         {
-            var tokenAddress = await GetTokenAddressAsync(
-                account: App.AtomexApp.Account,
-                address: From,
-                tokenContract: confirmationViewModel.TokenContract,
-                tokenId: confirmationViewModel.TokenId,
-                tokenType: confirmationViewModel.TokenType);
+            var tokenConfig = (Fa12Config)Currency;
+            var tokenContract = tokenConfig.TokenContractAddress;
+            var tokenId = 0;
+            var tokenType = "FA12";
 
-            var currencyName = App.AtomexApp.Account.Currencies
-                .FirstOrDefault(c => c is Fa12Config fa12 && fa12.TokenContractAddress == confirmationViewModel.TokenContract)
+            var tokenAddress = await TezosTokensSendViewModel.GetTokenAddressAsync(
+                account: App.Account,
+                address: From,
+                tokenContract: tokenContract,
+                tokenId: tokenId,
+                tokenType: tokenType);
+
+            var currencyName = App.Account.Currencies
+                .FirstOrDefault(c => c is Fa12Config fa12 && fa12.TokenContractAddress == tokenContract)
                 ?.Name ?? "FA12";
 
-            var tokenAccount = App.AtomexApp.Account.GetTezosTokenAccount<Fa12Account>(
+            var tokenAccount = App.Account.GetTezosTokenAccount<Fa12Account>(
                 currency: currencyName,
-                tokenContract: confirmationViewModel.TokenContract,
-                tokenId: confirmationViewModel.TokenId);
+                tokenContract: tokenContract,
+                tokenId: tokenId);
 
             return await tokenAccount.SendAsync(
                 from: tokenAddress.Address,
                 to: confirmationViewModel.To,
                 amount: confirmationViewModel.Amount,
                 fee: confirmationViewModel.Fee,
-                useDefaultFee: confirmationViewModel.UseDeafultFee);
-            
+                useDefaultFee: confirmationViewModel.UseDeafultFee);   
         }
     }
 }
