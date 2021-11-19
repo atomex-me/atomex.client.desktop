@@ -105,6 +105,7 @@ namespace Atomex.Client.Desktop
             try
             {
                 AtomexApp.Stop();
+                Environment.Exit(0);
             }
             catch (Exception)
             {

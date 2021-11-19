@@ -1,14 +1,10 @@
-using System;
 using System.IO;
-using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Threading;
 using NetSparkleUpdater;
-using NetSparkleUpdater.Enums;
 using NetSparkleUpdater.Interfaces;
-using NetSparkleUpdater.SignatureVerifiers;
-using Serilog;
+
 
 namespace Atomex.Client.Desktop.Common
 {

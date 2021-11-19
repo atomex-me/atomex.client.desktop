@@ -81,7 +81,7 @@ namespace Atomex.Client.Desktop.Common
 
                 if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
                     return
-                        $"{Environment.GetFolderPath(Environment.SpecialFolder.Personal)}/.atomex.client.desktop/{DefaultWalletsDirectory}";
+                        $"{Environment.GetFolderPath(Environment.SpecialFolder.Personal)}/.local/share/atomex.client.desktop/{DefaultWalletsDirectory}";
 
                 return $"{AppDomain.CurrentDomain.BaseDirectory}{DefaultWalletsDirectory}";
             }

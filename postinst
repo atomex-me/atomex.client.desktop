@@ -1,0 +1,5 @@
+#!/bin/bash
+
+update-mime-database /usr/share/mime || true
+update-desktop-database /usr/share/applications || true
+xdg-desktop-menu install /usr/share/applications/avalonia-atomex.desktop

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" version="2.0">
+    <channel>
+        <title>Atomex</title>
+        <link>https://github.com/atomex-me/atomex.client.desktop/releases/latest/download/appcast_linux.xml</link>
+        <description>${DESCRIPTION}</description>
+        <language>en</language>
+        <item>
+            <title>Version ${VERSION}</title>
+            <pubDate>${PUB_DATE}</pubDate>
+            <enclosure url="https://github.com/atomex-me/atomex.client.desktop/releases/download/${VERSION}/Atomex_${VERSION}_amd64.deb"
+                       sparkle:version="${VERSION}"
+                       sparkle:os="linux"
+                       length="${DEB_SIZE}"
+                       type="application/octet-stream"
+                       sparkle:signature="${DEB_SIGNATURE}" />
+        </item>
+    </channel>
+</rss>
