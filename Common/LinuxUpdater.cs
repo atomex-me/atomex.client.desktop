@@ -14,7 +14,7 @@ namespace Atomex.Client.Desktop.Common
 {
     public class LinuxUpdater : IUpdater
     {
-        public bool CheckServerFileName { get; set; } = true;
+        private bool CheckServerFileName { get; set; } = true;
 
         public IUpdateDownloader UpdateDownloader { get; set; }
 
@@ -23,57 +23,13 @@ namespace Atomex.Client.Desktop.Common
 
         private string _tmpDownloadFilePath;
 
-        public string TmpDownloadFilePath
+        private string TmpDownloadFilePath
         {
             get { return _tmpDownloadFilePath; }
             set { _tmpDownloadFilePath = value?.Trim(); }
         }
 
-        private string _restartExecutableName;
-
-        public string RestartExecutableName
-        {
-            get
-            {
-                if (!string.IsNullOrWhiteSpace(_restartExecutableName))
-                {
-                    return _restartExecutableName;
-                }
-#if NETCORE
-                try
-                {
-                    return Path.GetFileName(System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName);
-                } 
-                catch (Exception e)
-                {
-                    LogWriter?.PrintMessage("Unable to get executable name: " + e.Message);
-                }
-#endif
-                // we cannot just use Path.GetFileName because on .NET Framework it can fail with
-                // invalid chars in the path, so we do some crazy things to get the file name anotehr way
-                var cmdLine = Environment.CommandLine.Trim().TrimStart('"').TrimEnd('"');
-                return cmdLine.Substring(cmdLine.LastIndexOf(Path.DirectorySeparatorChar) + 1).Trim();
-            }
-            set { _restartExecutableName = value; }
-        }
-
-        private string _restartExecutablePath;
-
-        public string RestartExecutablePath
-        {
-            get
-            {
-                if (!string.IsNullOrWhiteSpace(_restartExecutablePath))
-                {
-                    return _restartExecutablePath;
-                }
-
-                return Utilities.GetFullBaseDirectory();
-            }
-            set { _restartExecutablePath = value; }
-        }
-
-        public async Task<string> GetDownloadPathForAppCastItem(AppCastItem item)
+        private async Task<string> GetDownloadPathForAppCastItem(AppCastItem item)
         {
             if (item != null && item.DownloadLink != null)
             {
@@ -221,7 +177,7 @@ Group={userName}
 WantedBy=graphical.target"" >> /usr/lib/systemd/system/atomex.service
 
 sudo systemctl daemon-reload";
-                
+
                 var restartCommand = "sudo systemctl start atomex.service";
 
                 var output = $@"#!/bin/bash
