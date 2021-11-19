@@ -64,8 +64,11 @@ jobs:
         uses: actions/setup-dotnet@v1
         with:
           dotnet-version: 5.0.403
-        
+
       - name: Run Linux build script
+        env:
+          SPARKLE_PRIVATE_KEY: ${{ secrets.SPARKLE_PRIVATE_KEY }}
+          SPARKLE_PUBLIC_KEY: ${{ secrets.SPARKLE_PUBLIC_KEY }}
         run: ./build_linux.sh
 
       - name: Upload Linux release artifacts
