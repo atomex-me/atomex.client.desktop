@@ -22,13 +22,13 @@ namespace Atomex.Client.Desktop.Common
 
 
         private string _tmpDownloadFilePath;
-
+        
         private string TmpDownloadFilePath
         {
             get { return _tmpDownloadFilePath; }
             set { _tmpDownloadFilePath = value?.Trim(); }
         }
-
+        
         private async Task<string> GetDownloadPathForAppCastItem(AppCastItem item)
         {
             if (item != null && item.DownloadLink != null)
