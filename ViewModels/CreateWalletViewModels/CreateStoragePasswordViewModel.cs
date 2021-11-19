@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.InteropServices;
 using System.Security;
 using System.Threading.Tasks;
 using System.Windows.Input;
@@ -120,11 +121,16 @@ namespace Atomex.Client.Desktop.ViewModels.CreateWalletViewModels
 
                     Wallet.SaveToFile(Wallet.PathToWallet, PasswordVM.SecurePass);
 
+                    var clientType = ClientType.Unknown;
+                    if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) clientType = ClientType.AvaloniaWindows;
+                    if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX)) clientType = ClientType.AvaloniaMac;
+                    if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux)) clientType = ClientType.AvaloniaLinux;
+
                     var acc = new Account(
                         Wallet,
                         PasswordVM.SecurePass,
                         App.CurrenciesProvider,
-                        ClientType.Unknown);
+                        clientType);
 
                     PasswordVM.StringPass = string.Empty;
                     PasswordConfirmationVM.StringPass = string.Empty;
