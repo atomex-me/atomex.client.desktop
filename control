@@ -1,0 +1,9 @@
+Package: atomexdesktop
+Version: ${VERSION}
+License: GPL-3
+Vendor: Atomex OÜ <hello@atomex.me>
+Architecture: amd64
+Maintainer: Konstantin <johnysalvesen@gmail.com>
+Homepage: https://atomex.me
+Description:
+  Multicurrency HD wallet with built-in hybrid atomic swap exchange

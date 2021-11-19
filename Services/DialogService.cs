@@ -33,7 +33,6 @@ namespace Atomex.Client.Desktop.Services
             await Dispatcher.UIThread.InvokeAsync(() => _owner.Opacity = opacity);
         }
 
-
         public bool Close()
         {
             var result = _isDialogOpened;
@@ -51,6 +50,7 @@ namespace Atomex.Client.Desktop.Services
             if (_isDialogOpened) return;
             _ = DialogHost.DialogHost.Show(_dialogServiceViewModel, MainDialogHostIdentifier);
             _isDialogOpened = true;
+
             ReRender();
         }
 

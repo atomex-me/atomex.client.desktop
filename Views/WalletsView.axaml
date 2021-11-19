@@ -2,6 +2,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:converters="clr-namespace:Atomex.Client.Desktop.Converters"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="Atomex.Client.Desktop.Views.WalletsView"
              xmlns:vm="clr-namespace:Atomex.Client.Desktop.ViewModels">
@@ -10,12 +11,18 @@
         <vm:WalletsViewModel />
     </Design.DataContext>
 
-    <Grid>
+    <UserControl.Resources>
+        <converters:WalletsViewMarginConverter x:Key="WalletsViewMarginConverter" />
+    </UserControl.Resources>
+
+    <Grid
+        Margin="{Binding $parent[Window].DataContext.IsLinux,
+        Converter={StaticResource WalletsViewMarginConverter}}">
         <TabControl Name="Wallets"
                     Items="{Binding Wallets}"
                     SelectedItem="{Binding Selected}"
                     Margin="0 5 0 0">
-            
+
             <TabControl.ItemTemplate>
                 <DataTemplate>
                     <StackPanel x:Name="walletTabItem" Orientation="Vertical" Background="Transparent">
