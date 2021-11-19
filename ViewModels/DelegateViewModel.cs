@@ -258,7 +258,7 @@ namespace Atomex.Client.Desktop.ViewModels
 
         public ICommand BackCommand => _backCommand ??= ReactiveCommand.Create(() =>
         {
-            Desktop.App.DialogService.CloseDialog();
+            Desktop.App.DialogService.Close();
         });
 
         private bool _delegationCheck;
@@ -340,7 +340,7 @@ namespace Atomex.Client.Desktop.ViewModels
                         CurrencyFormat      = _tezosConfig.FeeFormat
                     };
                     
-                    Desktop.App.DialogService.Show(confirmationViewModel, customHeight: isAmountLessThanMin ? 370 : 240);
+                    Desktop.App.DialogService.Show(confirmationViewModel);
                 }
             }
             finally

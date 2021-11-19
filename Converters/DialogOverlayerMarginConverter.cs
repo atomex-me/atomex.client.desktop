@@ -2,21 +2,20 @@
 using System.Globalization;
 using System.Runtime.InteropServices;
 using Avalonia.Data.Converters;
+using Atomex.Client.Desktop.Common;
+using Avalonia;
 
 namespace Atomex.Client.Desktop.Converters
 {
-    public class CalcChildHeightConverter : IValueConverter
+    public class DialogOverlayerMarginConverter : IValueConverter
     {
         #region IValueConverter Members
 
-        private const double TITLEBAR_HEIGHT = 30;
-
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value is double val && !RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-                return val - TITLEBAR_HEIGHT;
-
-            return value;
+            return  RuntimeInformation.IsOSPlatform(OSPlatform.Linux)
+                    ? new Thickness(0)
+                    : new Thickness(0, 30, 0, 0);
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

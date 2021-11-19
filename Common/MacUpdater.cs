@@ -201,7 +201,7 @@ namespace Atomex.Client.Desktop.Common
                     if (IsZipDownload(downloadFilePath)) // .zip on macOS or .tar.gz on Linux
                     {
                         var tarCommand = isMacOS
-                            ? $"tar -x -f {downloadFilePath} -C \"{workingDir}\""
+                            ? $"tar -x -f {downloadFilePath} -C \"{workingDir}{AppName}\" --strip-components=1"
                             : $"tar -xf {downloadFilePath} -C \"{workingDir}\" --overwrite";
 
                         var rmCommand = $"rm {downloadFilePath}";
@@ -242,7 +242,7 @@ namespace Atomex.Client.Desktop.Common
         <array>
             <string>/bin/bash</string>
             <string>-c</string>
-            <string>/usr/bin/open {workingDir}{AppName};launchctl unload -w {LaunchdDirFilePath}</string>
+            <string>/usr/bin/open ""{workingDir}{AppName}"";launchctl unload -w {LaunchdDirFilePath}</string>
         </array>
    </dict>
 </plist>

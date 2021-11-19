@@ -10,7 +10,7 @@
     <Design.DataContext>
         <vm:DelegateConfirmationViewModel />
     </Design.DataContext>
-    
+
     <UserControl.Styles>
         <Style Selector="TextBlock.AmountTextBlock">
             <Setter Property="FontFamily" Value="{DynamicResource DefaultMediumFontFamily}" />
@@ -25,155 +25,157 @@
         </Style>
     </UserControl.Styles>
 
-    <StackPanel Orientation="Vertical"
-                Width="560">
+    <Border Classes="ChildViewBorder">
+        <StackPanel Orientation="Vertical"
+                    Width="560">
 
-        <Border Margin="0 10 0 10"
-                Height="33"
-                VerticalAlignment="Top"
-                HorizontalAlignment="Stretch"
-                Background="{DynamicResource ChildViewHeaderBackgroundBrush}">
-            <TextBlock Text="Delegation confirmation"
-                       Foreground="{DynamicResource ChildViewHeaderForegroundBrush}"
+            <Border Margin="0 10 0 10"
+                    Height="33"
+                    VerticalAlignment="Top"
+                    HorizontalAlignment="Stretch"
+                    Background="{DynamicResource ChildViewHeaderBackgroundBrush}">
+                <TextBlock Text="Delegation confirmation"
+                           Foreground="{DynamicResource ChildViewHeaderForegroundBrush}"
+                           FontFamily="{DynamicResource DefaultLightFontFamily}"
+                           FontSize="25"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center" />
+            </Border>
+
+            <TextBlock Text="Do you really want to delegate:"
+                       Margin="20 20 20 20"
+                       FontSize="15"
                        FontFamily="{DynamicResource DefaultLightFontFamily}"
-                       FontSize="25"
                        HorizontalAlignment="Center"
-                       VerticalAlignment="Center" />
-        </Border>
+                       Foreground="{DynamicResource DefaultForegroundBrush}" />
 
-        <TextBlock Text="Do you really want to delegate:"
-                   Margin="20 20 20 20"
-                   FontSize="15"
-                   FontFamily="{DynamicResource DefaultLightFontFamily}"
-                   HorizontalAlignment="Center"
-                   Foreground="{DynamicResource DefaultForegroundBrush}" />
+            <Grid Margin="20 0 20 0"
+                  HorizontalAlignment="Center">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
 
-        <Grid Margin="20 0 20 0"
-              HorizontalAlignment="Center">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="Auto" />
-            </Grid.ColumnDefinitions>
-            <Grid.RowDefinitions>
-                <RowDefinition />
-                <RowDefinition />
-                <RowDefinition />
-            </Grid.RowDefinitions>
-
-            <TextBlock Text="from address:"
-                       FontSize="15"
-                       FontFamily="{DynamicResource DefaultLightFontFamily}"
-                       Foreground="{DynamicResource DefaultForegroundBrush}"
-                       HorizontalAlignment="Right"
-                       Grid.Column="0"
-                       Grid.Row="0" />
-            <TextBlock Text="{Binding From}"
-                       Margin="5 0 0 0"
-                       TextWrapping="Wrap"
-                       FontSize="15"
-                       FontFamily="{DynamicResource DefaultMediumFontFamily}"
-                       Foreground="{DynamicResource DefaultAddressForegroundBrush}"
-                       Grid.Column="1"
-                       Grid.Row="0" />
-
-            <TextBlock Text="to address:"
-                       FontSize="15"
-                       FontFamily="{DynamicResource DefaultLightFontFamily}"
-                       Foreground="{DynamicResource DefaultForegroundBrush}"
-                       HorizontalAlignment="Right"
-                       Grid.Column="0"
-                       Grid.Row="1" />
-            <TextBlock Text="{Binding To}"
-                       Margin="5 0 0 0"
-                       TextWrapping="Wrap"
-                       FontSize="15"
-                       FontFamily="{DynamicResource DefaultMediumFontFamily}"
-                       Foreground="{DynamicResource DefaultAddressForegroundBrush}"
-                       Grid.Column="1"
-                       Grid.Row="1" />
-
-            <TextBlock Text="with commission:"
-                       FontSize="15"
-                       FontFamily="{DynamicResource DefaultLightFontFamily}"
-                       Foreground="{DynamicResource DefaultForegroundBrush}"
-                       HorizontalAlignment="Right"
-                       Grid.Column="0"
-                       Grid.Row="2" />
-            <StackPanel Orientation="Horizontal"
-                        Grid.Column="1"
-                        Grid.Row="2">
-                <TextBlock Margin="5 0 0 0"
-                           Classes="AmountTextBlock">
-                    <TextBlock.Text>
-                        <MultiBinding Converter="{StaticResource AmountToStringConverter}">
-                            <Binding Path="Fee" Mode="OneWay" />
-                            <Binding Path="CurrencyFormat" Mode="OneWay" />
-                        </MultiBinding>
-                    </TextBlock.Text>
-                </TextBlock>
-                <TextBlock Text="{Binding CurrencyCode}"
-                           Margin="3 0 0 1"
-                           FontSize="11"
-                           VerticalAlignment="Bottom"
-                           Classes="AmountTextBlock" />
-                <TextBlock Text="("
+                <TextBlock Text="from address:"
+                           FontSize="15"
+                           FontFamily="{DynamicResource DefaultLightFontFamily}"
+                           Foreground="{DynamicResource DefaultForegroundBrush}"
+                           HorizontalAlignment="Right"
+                           Grid.Column="0"
+                           Grid.Row="0" />
+                <TextBlock Text="{Binding From}"
                            Margin="5 0 0 0"
-                           Classes="AmountInBaseTextBlock" />
-                <TextBlock Classes="AmountInBaseTextBlock">
-                    <TextBlock.Text>
-                        <MultiBinding Converter="{StaticResource AmountToStringConverter}">
-                            <Binding Path="FeeInBase" Mode="OneWay" />
-                            <Binding Path="BaseCurrencyFormat" Mode="OneWay" />
-                        </MultiBinding>
-                    </TextBlock.Text>
-                </TextBlock>
-                <TextBlock Text="{Binding BaseCurrencyCode}"
-                           Margin="3 0 0 1"
-                           FontSize="11"
-                           VerticalAlignment="Bottom"
-                           Classes="AmountInBaseTextBlock" />
-                <TextBlock Text=")"
-                           Classes="AmountInBaseTextBlock" />
+                           TextWrapping="Wrap"
+                           FontSize="15"
+                           FontFamily="{DynamicResource DefaultMediumFontFamily}"
+                           Foreground="{DynamicResource DefaultAddressForegroundBrush}"
+                           Grid.Column="1"
+                           Grid.Row="0" />
+
+                <TextBlock Text="to address:"
+                           FontSize="15"
+                           FontFamily="{DynamicResource DefaultLightFontFamily}"
+                           Foreground="{DynamicResource DefaultForegroundBrush}"
+                           HorizontalAlignment="Right"
+                           Grid.Column="0"
+                           Grid.Row="1" />
+                <TextBlock Text="{Binding To}"
+                           Margin="5 0 0 0"
+                           TextWrapping="Wrap"
+                           FontSize="15"
+                           FontFamily="{DynamicResource DefaultMediumFontFamily}"
+                           Foreground="{DynamicResource DefaultAddressForegroundBrush}"
+                           Grid.Column="1"
+                           Grid.Row="1" />
+
+                <TextBlock Text="with commission:"
+                           FontSize="15"
+                           FontFamily="{DynamicResource DefaultLightFontFamily}"
+                           Foreground="{DynamicResource DefaultForegroundBrush}"
+                           HorizontalAlignment="Right"
+                           Grid.Column="0"
+                           Grid.Row="2" />
+                <StackPanel Orientation="Horizontal"
+                            Grid.Column="1"
+                            Grid.Row="2">
+                    <TextBlock Margin="5 0 0 0"
+                               Classes="AmountTextBlock">
+                        <TextBlock.Text>
+                            <MultiBinding Converter="{StaticResource AmountToStringConverter}">
+                                <Binding Path="Fee" Mode="OneWay" />
+                                <Binding Path="CurrencyFormat" Mode="OneWay" />
+                            </MultiBinding>
+                        </TextBlock.Text>
+                    </TextBlock>
+                    <TextBlock Text="{Binding CurrencyCode}"
+                               Margin="3 0 0 1"
+                               FontSize="11"
+                               VerticalAlignment="Bottom"
+                               Classes="AmountTextBlock" />
+                    <TextBlock Text="("
+                               Margin="5 0 0 0"
+                               Classes="AmountInBaseTextBlock" />
+                    <TextBlock Classes="AmountInBaseTextBlock">
+                        <TextBlock.Text>
+                            <MultiBinding Converter="{StaticResource AmountToStringConverter}">
+                                <Binding Path="FeeInBase" Mode="OneWay" />
+                                <Binding Path="BaseCurrencyFormat" Mode="OneWay" />
+                            </MultiBinding>
+                        </TextBlock.Text>
+                    </TextBlock>
+                    <TextBlock Text="{Binding BaseCurrencyCode}"
+                               Margin="3 0 0 1"
+                               FontSize="11"
+                               VerticalAlignment="Bottom"
+                               Classes="AmountInBaseTextBlock" />
+                    <TextBlock Text=")"
+                               Classes="AmountInBaseTextBlock" />
+                </StackPanel>
+            </Grid>
+
+
+            <TextBlock
+                TextWrapping="Wrap"
+                Text="ATTENTION!"
+                Margin="20 20 0 0"
+                Classes="AmountTextBlock"
+                Foreground="LightCoral"
+                TextAlignment="Center"
+                FontSize="20"
+                FontFamily="{DynamicResource DefaultLightFontFamily}"
+                HorizontalAlignment="Center"
+                IsVisible="{Binding IsAmountLessThanMin}" />
+
+            <TextBlock
+                TextWrapping="Wrap"
+                Text="According to the policy of the selected baker, you will not receive any rewards, as the balance of your wallet is less than the minimum amount of delegation. We recommend you to choose another baker."
+                Margin="20 0 20 20"
+                Classes="AmountTextBlock"
+                Foreground="LightCoral"
+                FontFamily="{DynamicResource DefaultLightFontFamily}"
+                HorizontalAlignment="Center"
+                IsVisible="{Binding IsAmountLessThanMin}" />
+
+            <StackPanel Orientation="Horizontal"
+                        HorizontalAlignment="Center"
+                        Margin="0 20 0 20">
+                <controls:RoundedButton Width="100"
+                                        Height="40"
+                                        Margin="0 0 3 0"
+                                        CornerRadius="20 0 0 20"
+                                        Content="No"
+                                        Command="{Binding BackCommand}" />
+                <controls:RoundedButton Width="100"
+                                        Height="40"
+                                        CornerRadius="0 20 20 0"
+                                        Content="Yes"
+                                        Command="{Binding NextCommand}" />
             </StackPanel>
-        </Grid>
-
-
-        <TextBlock
-            TextWrapping="Wrap"
-            Text="ATTENTION!"
-            Margin="20 20 0 0"
-            Classes="AmountTextBlock"
-            Foreground="LightCoral"
-            TextAlignment="Center"
-            FontSize="20"
-            FontFamily="{DynamicResource DefaultLightFontFamily}"
-            HorizontalAlignment="Center"
-            IsVisible="{Binding IsAmountLessThanMin}" />
-
-        <TextBlock
-            TextWrapping="Wrap"
-            Text="According to the policy of the selected baker, you will not receive any rewards, as the balance of your wallet is less than the minimum amount of delegation. We recommend you to choose another baker."
-            Margin="20 0 20 20"
-            Classes="AmountTextBlock"
-            Foreground="LightCoral"
-            FontFamily="{DynamicResource DefaultLightFontFamily}"
-            HorizontalAlignment="Center"
-            IsVisible="{Binding IsAmountLessThanMin}" />
-
-        <StackPanel Orientation="Horizontal"
-                    HorizontalAlignment="Center"
-                    Margin="0 20 0 20">
-            <controls:RoundedButton Width="100"
-                                    Height="40"
-                                    Margin="0 0 3 0"
-                                    CornerRadius="20 0 0 20"
-                                    Content="No"
-                                    Command="{Binding BackCommand}" />
-            <controls:RoundedButton Width="100"
-                                    Height="40"
-                                    CornerRadius="0 20 20 0"
-                                    Content="Yes"
-                                    Command="{Binding NextCommand}" />
         </StackPanel>
-    </StackPanel>
+    </Border>
 </UserControl>

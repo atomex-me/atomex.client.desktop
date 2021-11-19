@@ -15,7 +15,7 @@
         <vm:CreateWalletViewModel />
     </Design.DataContext>
 
-    <Border Classes="ChildViewBorder"
+    <Border Classes="ChildViewBorder CreateWallet"
             Width="600"
             Height="460">
         <Grid>

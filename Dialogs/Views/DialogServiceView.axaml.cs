@@ -2,18 +2,16 @@
 using Avalonia.Markup.Xaml;
 using Avalonia.ReactiveUI;
 using System;
+using Avalonia.Controls;
 using ReactiveUI;
 
 namespace Atomex.Client.Desktop.Dialogs.Views
 {
-    public class DialogServiceView : ReactiveWindow<ReactiveObject>
+    public class DialogServiceView : UserControl
     {
         public DialogServiceView()
         {
             InitializeComponent();
-
-            this.AttachDevTools();
-
         }
 
         private void InitializeComponent()

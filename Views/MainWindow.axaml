@@ -1,8 +1,10 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="using:Atomex.Client.Desktop.ViewModels"
+        xmlns:views="using:Atomex.Client.Desktop.Views"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:dialogHost="clr-namespace:DialogHost;assembly=DialogHost.Avalonia"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="Atomex.Client.Desktop.Views.MainWindow"
         Icon="/Resources/Images/logo_dark_256x256.ico"
@@ -19,27 +21,32 @@
     <Design.DataContext>
         <vm:MainWindowViewModel />
     </Design.DataContext>
+    
+    <dialogHost:DialogHost Identifier="MainDialogHost">
+        <DockPanel HorizontalAlignment="Stretch"
+                   VerticalAlignment="Stretch">
+            <titlebars:MacosTitleBarView IsSeamless="False" />
+            <titlebars:WindowsTitleBarView IsSeamless="False" />
+            <views:LinuxUpdateControls IsVisible="{Binding IsLinux}"
+                                       DockPanel.Dock="Top"
+                                       Margin="0 0 0 -30"
+                                       ZIndex="1" />
 
-    <DockPanel HorizontalAlignment="Stretch"
-               VerticalAlignment="Stretch">
-        <titlebars:MacosTitleBarView IsSeamless="False"></titlebars:MacosTitleBarView>
-        <titlebars:WindowsTitleBarView IsSeamless="False"></titlebars:WindowsTitleBarView>
-        <Grid>
-            <Grid.RowDefinitions>
-                <RowDefinition />
-                <RowDefinition Height="Auto" />
-                <RowDefinition />
-            </Grid.RowDefinitions>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition />
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition />
-            </Grid.ColumnDefinitions>
-        
-            <ContentControl Grid.Column="1"
-                            Grid.Row="1"
-                            Content="{Binding Content}" />
-        </Grid>
-    </DockPanel>
+    <dialogHost:DialogHost Identifier="MainDialogHost">
+        <DockPanel HorizontalAlignment="Stretch"
+                   VerticalAlignment="Stretch">
+            <titlebars:MacosTitleBarView IsSeamless="False" />
+            <titlebars:WindowsTitleBarView IsSeamless="False" />
+            <views:LinuxUpdateControls IsVisible="{Binding IsLinux}"
+                                       DockPanel.Dock="Top"
+                                       Margin="0 0 0 -30"
+                                       ZIndex="1" />
 
+            <Grid RowDefinitions="*,Auto,*" ColumnDefinitions="*,Auto,*">
+                <ContentControl Grid.Column="1"
+                                Grid.Row="1"
+                                Content="{Binding Content}" />
+            </Grid>
+        </DockPanel>
+    </dialogHost:DialogHost>
 </Window>

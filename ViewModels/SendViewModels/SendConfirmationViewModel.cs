@@ -73,7 +73,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
                 App.DialogService.Show(MessageViewModel.Success(
                     text: "Sending was successful",
-                    nextAction: () => { App.DialogService.CloseDialog(); }));
+                    nextAction: () => { App.DialogService.Close(); }));
             }
             catch (Exception e)
             {

@@ -5,58 +5,24 @@
         <CornerRadius x:Key="DialogCornerRadius">10</CornerRadius>
         <BoxShadows x:Key="DialogBoxShadow">2 2 12 3 Black</BoxShadows>
     </Styles.Resources>
-
+    
 
     <Style Selector="Border.ChildViewBorder">
         <Setter Property="CornerRadius" Value="{DynamicResource DialogCornerRadius}" />
-        <Setter Property="BoxShadow" Value="{DynamicResource DialogBoxShadow}" />
         <Setter Property="Background" Value="{DynamicResource ChildViewBackgroundBrush}" />
     </Style>
+    
+    <Style Selector="Border.ChildViewBorder.CreateWallet">
+        <Setter Property="BoxShadow" Value="{DynamicResource DialogBoxShadow}" />
+    </Style>
+
 
     <Style Selector="Border.ChildViewBorderLight">
         <Setter Property="CornerRadius" Value="10" />
         <Setter Property="BoxShadow" Value="{DynamicResource DialogBoxShadow}" />
         <Setter Property="Background" Value="{DynamicResource ChildViewBackgroundBrushLight}" />
     </Style>
-
-
-    <!-- todo: Modal Close button -->
-
-    <!-- <Style x:Key="ChildViewCloseButton" TargetType="Button"> -->
-    <!--     <Setter Property="Template"> -->
-    <!--         <Setter.Value> -->
-    <!--             <ControlTemplate TargetType="Button"> -->
-    <!--                 <Border Background="{DynamicResource AlmostTransparentBrush}"> -->
-    <!--                     <Path x:Name="icon" -->
-    <!--                           Stretch="Uniform" -->
-    <!--                           SnapsToDevicePixels="False" -->
-    <!--                           UseLayoutRounding="False" -->
-    <!--                           Width="{TemplateBinding Width}" -->
-    <!--                           Height="{TemplateBinding Height}" -->
-    <!--                           Fill="{DynamicResource ChildViewCloseButtonBrush}" -->
-    <!--                           Data="{DynamicResource JavIcons.CloseCircleF}" /> -->
-    <!--                 </Border> -->
-    <!--                 <ControlTemplate.Triggers> -->
-    <!--                     <Trigger Property="IsMouseOver" Value="True"> -->
-    <!--                         <Setter TargetName="icon" -->
-    <!--                                 Property="Fill" -->
-    <!--                                 Value="{DynamicResource ChildViewCloseButtonMouseOverBrush}" /> -->
-    <!--                     </Trigger> -->
-    <!--                     <Trigger Property="IsDefaulted" Value="True"> -->
-    <!--                         <Setter TargetName="icon" -->
-    <!--                                 Property="Fill" -->
-    <!--                                 Value="{DynamicResource ChildViewCloseButtonBrush}" /> -->
-    <!--                     </Trigger> -->
-    <!--                     <Trigger Property="IsPressed" Value="True"> -->
-    <!--                         <Setter TargetName="icon" -->
-    <!--                                 Property="Fill" -->
-    <!--                                 Value="{DynamicResource ChildViewCloseButtonPressedBrush}" /> -->
-    <!--                     </Trigger> -->
-    <!--                 </ControlTemplate.Triggers> -->
-    <!--             </ControlTemplate> -->
-    <!--         </Setter.Value> -->
-    <!--     </Setter> -->
-    <!-- </Style> -->
+    
 
     <Style Selector="Button.ChildViewCloseButtonLight">
         <Setter Property="Template">

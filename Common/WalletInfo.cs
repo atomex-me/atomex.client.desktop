@@ -71,9 +71,20 @@ namespace Atomex.Client.Desktop.Common
         }
 
 
-        public static string CurrentWalletDirectory =>
-            RuntimeInformation.IsOSPlatform(OSPlatform.OSX)
-                ? $"{Environment.GetFolderPath(Environment.SpecialFolder.Personal)}/Library/Application Support/com.atomex.osx/{DefaultWalletsDirectory}"
-                : $"{AppDomain.CurrentDomain.BaseDirectory}{DefaultWalletsDirectory}";
+        public static string CurrentWalletDirectory
+        {
+            get
+            {
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+                    return
+                        $"{Environment.GetFolderPath(Environment.SpecialFolder.Personal)}/Library/Application Support/com.atomex.osx/{DefaultWalletsDirectory}";
+
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+                    return
+                        $"{Environment.GetFolderPath(Environment.SpecialFolder.Personal)}/.local/share/atomex.client.desktop/{DefaultWalletsDirectory}";
+
+                return $"{AppDomain.CurrentDomain.BaseDirectory}{DefaultWalletsDirectory}";
+            }
+        }
     }
 }

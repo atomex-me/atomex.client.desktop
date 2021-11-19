@@ -47,12 +47,13 @@ namespace Atomex.Client.Desktop.Views
         private AppCastItem _lastUpdate;
         private bool _isOsx;
         private bool _isWin;
+        private bool _isLinux;
         private string _appcastUrl;
         private string _updateDownloadPath;
         private IUpdater _atomexUpdater;
 
         private MainWindowViewModel ctx;
-        
+
         public MainWindow()
         {
             InitializeComponent();
@@ -83,13 +84,15 @@ namespace Atomex.Client.Desktop.Views
                     });
             _isOsx = RuntimeInformation.IsOSPlatform(OSPlatform.OSX);
             _isWin = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+            _isLinux = RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
 
             _appcastUrl =
                 "https://github.com/atomex-me/atomex.client.desktop/releases/latest/download/appcast_{0}.xml";
 
             if (_isOsx) _appcastUrl = string.Format(_appcastUrl, "osx");
             if (_isWin) _appcastUrl = string.Format(_appcastUrl, "win");
-            
+            if (_isLinux) _appcastUrl = string.Format(_appcastUrl, "linux");
+
             _sparkle = new SparkleUpdater(
                 _appcastUrl,
                 new Ed25519Checker(SecurityMode.OnlyVerifySoftwareDownloads,
@@ -134,7 +137,7 @@ namespace Atomex.Client.Desktop.Views
                     return;
                 }
 
-                if (_isWin)
+                if (_isWin || _isLinux)
                 {
                     _atomexUpdater.InstallUpdate(_lastUpdate, _updateDownloadPath);
                 }
@@ -174,7 +177,7 @@ namespace Atomex.Client.Desktop.Views
                         ctx.HasUpdates = true;
                         ctx.UpdateVersion = _lastUpdate.Version;
                         await _sparkle.InitAndBeginDownload(_lastUpdate);
-                        
+
                         if (_atomexUpdater != null)
                             return;
 
@@ -184,11 +187,18 @@ namespace Atomex.Client.Desktop.Views
                                 SignatureVerifier = _sparkle.SignatureVerifier,
                                 UpdateDownloader = _sparkle.UpdateDownloader
                             };
-                        
+
                         if (_isWin)
                             _atomexUpdater = new WindowsUpdater(_appcastUrl,
                                 new Ed25519Checker(SecurityMode.OnlyVerifySoftwareDownloads,
                                     NETSPARKLE_PK))
+                            {
+                                SignatureVerifier = _sparkle.SignatureVerifier,
+                                UpdateDownloader = _sparkle.UpdateDownloader
+                            };
+
+                        if (_isLinux)
+                            _atomexUpdater = new LinuxUpdater()
                             {
                                 SignatureVerifier = _sparkle.SignatureVerifier,
                                 UpdateDownloader = _sparkle.UpdateDownloader

@@ -67,7 +67,7 @@ namespace Atomex.Client.Desktop.ViewModels
 
         public ICommand BackCommand => _backCommand ??= ReactiveCommand.Create(() =>
         {
-            Desktop.App.DialogService.CloseDialog();
+            Desktop.App.DialogService.Close();
         });
 
         private ICommand _nextCommand;
@@ -108,20 +108,15 @@ namespace Atomex.Client.Desktop.ViewModels
                             text: error.Description,
                             backAction: () => Desktop.App.DialogService.Show(this)));
                     }
-                
+
                     return;
                 }
                 
                 Desktop.App.DialogService.Show(MessageViewModel.Success(
                     text: Resources.SvOrderMatched,
-                    nextAction: () =>
-                    {
-                        Desktop.App.DialogService.CloseDialog();
-                    }
-                ), () =>
-                {
-                    OnSuccess?.Invoke(this, EventArgs.Empty);
-                }, 230);
+                    nextAction: () => Desktop.App.DialogService.Close()));
+
+                OnSuccess?.Invoke(this, EventArgs.Empty);
             }
             catch (Exception e)
             {
@@ -142,20 +137,20 @@ namespace Atomex.Client.Desktop.ViewModels
                     .GetCurrencyAccount<ILegacyCurrencyAccount>(FromCurrency.Name);
 
                 var fromWallets = (await currencyAccount
-                    .GetUnspentAddressesAsync(
-                        toAddress: null,
-                        amount: Amount,
-                        fee: 0,
-                        feePrice: await FromCurrency.GetDefaultFeePriceAsync(),
-                        feeUsagePolicy: FeeUsagePolicy.EstimatedFee,
-                        addressUsagePolicy: AddressUsagePolicy.UseMinimalBalanceFirst,
-                        transactionType: BlockchainTransactionType.SwapPayment))
+                        .GetUnspentAddressesAsync(
+                            toAddress: null,
+                            amount: Amount,
+                            fee: 0,
+                            feePrice: await FromCurrency.GetDefaultFeePriceAsync(),
+                            feeUsagePolicy: FeeUsagePolicy.EstimatedFee,
+                            addressUsagePolicy: AddressUsagePolicy.UseMinimalBalanceFirst,
+                            transactionType: BlockchainTransactionType.SwapPayment))
                     .ToList();
 
                 foreach (var fromWallet in fromWallets)
                     if (fromWallet.Currency != FromCurrency.Name)
                         fromWallet.Currency = FromCurrency.Name;
-                
+
                 // check balances
                 var errors = await BalanceChecker.CheckBalancesAsync(App.Account, fromWallets);
 
@@ -173,10 +168,10 @@ namespace Atomex.Client.Desktop.ViewModels
                     .SymbolByCurrencies(FromCurrency, ToCurrency);
 
                 var baseCurrency = App.Account.Currencies.GetByName(symbol.Base);
-                var side         = symbol.OrderSideForBuyCurrency(ToCurrency);
-                var terminal     = App.Terminal;
-                var price        = EstimatedPrice;
-                var orderPrice   = EstimatedOrderPrice;
+                var side = symbol.OrderSideForBuyCurrency(ToCurrency);
+                var terminal = App.Terminal;
+                var price = EstimatedPrice;
+                var orderPrice = EstimatedOrderPrice;
 
                 if (price == 0)
                     return new Error(Errors.NoLiquidity, Resources.CvNoLiquidity);
@@ -185,21 +180,23 @@ namespace Atomex.Client.Desktop.ViewModels
 
                 if (qty < symbol.MinimumQty)
                 {
-                    var minimumAmount = AmountHelper.QtyToAmount(side, symbol.MinimumQty, price, FromCurrency.DigitsMultiplier);
-                    var message = string.Format(CultureInfo.InvariantCulture, Resources.CvMinimumAllowedQtyWarning, minimumAmount, FromCurrency.Name);
+                    var minimumAmount =
+                        AmountHelper.QtyToAmount(side, symbol.MinimumQty, price, FromCurrency.DigitsMultiplier);
+                    var message = string.Format(CultureInfo.InvariantCulture, Resources.CvMinimumAllowedQtyWarning,
+                        minimumAmount, FromCurrency.Name);
 
                     return new Error(Errors.SwapError, message);
                 }
 
                 var order = new Order
                 {
-                    Symbol          = symbol.Name,
-                    TimeStamp       = DateTime.UtcNow,
-                    Price           = orderPrice,
-                    Qty             = qty,
-                    Side            = side,
-                    Type            = OrderType.FillOrKill,
-                    FromWallets     = fromWallets.ToList(),
+                    Symbol = symbol.Name,
+                    TimeStamp = DateTime.UtcNow,
+                    Price = orderPrice,
+                    Qty = qty,
+                    Side = side,
+                    Type = OrderType.FillOrKill,
+                    FromWallets = fromWallets.ToList(),
                     MakerNetworkFee = EstimatedMakerNetworkFee
                 };
 
@@ -225,7 +222,7 @@ namespace Atomex.Client.Desktop.ViewModels
                     if (currentOrder.Status == OrderStatus.PartiallyFilled || currentOrder.Status == OrderStatus.Filled)
                     {
                         var swap = (await terminal.Account
-                            .GetSwapsAsync())
+                                .GetSwapsAsync())
                             .FirstOrDefault(s => s.OrderId == currentOrder.Id);
 
                         if (swap == null)
@@ -246,7 +243,7 @@ namespace Atomex.Client.Desktop.ViewModels
             catch (Exception e)
             {
                 Log.Error(e, "Conversion error");
-            
+
                 return new Error(Errors.SwapError, Resources.CvConversionError);
             }
         }
@@ -255,9 +252,10 @@ namespace Atomex.Client.Desktop.ViewModels
         {
             var descriptions = errors.Select(e => e.Type switch
             {
-                BalanceErrorType.FailedToGet      => $"Balance check for address {e.Address} failed",
-                BalanceErrorType.LessThanExpected => $"Balance for address {e.Address} is {e.ActualBalance.ToString(CultureInfo.InvariantCulture)} and less than local {e.LocalBalance.ToString(CultureInfo.InvariantCulture)}",
-                _                                 => $"Balance for address {e.Address} has changed and needs to be updated"
+                BalanceErrorType.FailedToGet => $"Balance check for address {e.Address} failed",
+                BalanceErrorType.LessThanExpected =>
+                    $"Balance for address {e.Address} is {e.ActualBalance.ToString(CultureInfo.InvariantCulture)} and less than local {e.LocalBalance.ToString(CultureInfo.InvariantCulture)}",
+                _ => $"Balance for address {e.Address} has changed and needs to be updated"
             });
 
             return string.Join(". ", descriptions) + ". Please update your balance and try again!";

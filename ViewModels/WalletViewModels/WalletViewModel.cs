@@ -7,10 +7,7 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 using Atomex.Blockchain;
 using Atomex.Blockchain.BitcoinBased;
-using Atomex.Client.Desktop.ViewModels;
 using Atomex.Client.Desktop.Common;
-using Atomex.Client.Desktop.Controls;
-using Atomex.Client.Desktop.Dialogs.ViewModels;
 using Atomex.Client.Desktop.ViewModels.Abstract;
 using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
 using Atomex.Client.Desktop.ViewModels.ReceiveViewModels;
@@ -19,12 +16,12 @@ using Atomex.Client.Desktop.ViewModels.TransactionViewModels;
 using Atomex.Common;
 using Atomex.Core;
 using Atomex.Wallet;
-using Avalonia.Controls;
 using Avalonia.Media;
 using Avalonia.Threading;
 using NBitcoin;
 using ReactiveUI;
 using Serilog;
+using DialogHost;
 using Network = NBitcoin.Network;
 
 namespace Atomex.Client.Desktop.ViewModels.WalletViewModels

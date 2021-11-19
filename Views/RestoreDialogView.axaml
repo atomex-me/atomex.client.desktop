@@ -14,63 +14,65 @@
         <vm:RestoreDialogViewModel />
     </Design.DataContext>
 
-    <Grid Width="560">
-        <StackPanel Orientation="Vertical">
-            <Border Margin="0 10 0 10"
-                    Height="33"
-                    VerticalAlignment="Top"
-                    HorizontalAlignment="Stretch"
-                    Background="{DynamicResource ChildViewHeaderBackgroundBrush}">
-                <TextBlock Text="Restoring"
-                           Foreground="{DynamicResource ChildViewHeaderForegroundBrush}"
+    <Border Classes="ChildViewBorder">
+        <Grid Width="560">
+            <StackPanel Orientation="Vertical">
+                <Border Margin="0 10 0 10"
+                        Height="33"
+                        VerticalAlignment="Top"
+                        HorizontalAlignment="Stretch"
+                        Background="{DynamicResource ChildViewHeaderBackgroundBrush}">
+                    <TextBlock Text="Restoring"
+                               Foreground="{DynamicResource ChildViewHeaderForegroundBrush}"
+                               FontFamily="{DynamicResource DefaultLightFontFamily}"
+                               FontSize="25"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center" />
+                </Border>
+
+                <TextBlock Text="{Binding Title}"
+                           Foreground="{DynamicResource DefaultForegroundBrush}"
                            FontFamily="{DynamicResource DefaultLightFontFamily}"
-                           FontSize="25"
-                           HorizontalAlignment="Center"
-                           VerticalAlignment="Center" />
-            </Border>
-            
-            <TextBlock Text="{Binding Title}"
-                       Foreground="{DynamicResource DefaultForegroundBrush}"
-                       FontFamily="{DynamicResource DefaultLightFontFamily}"
-                       FontSize="15"
-                       Margin="40 20"
-                       TextWrapping="Wrap"
-                       HorizontalAlignment="Center" />
+                           FontSize="15"
+                           Margin="40 20"
+                           TextWrapping="Wrap"
+                           HorizontalAlignment="Center" />
 
-            <Grid>
-                <mah:ProgressRing Width="50"
-                                  Height="50"
-                                  Foreground="{DynamicResource DefaultProgressRingBrush}"
-                                  Margin="0 10" />
-            </Grid>
+                <Grid>
+                    <mah:ProgressRing Width="50"
+                                      Height="50"
+                                      Foreground="{DynamicResource DefaultProgressRingBrush}"
+                                      Margin="0 10" />
+                </Grid>
 
 
-            <StackPanel Orientation="Horizontal"
-                        HorizontalAlignment="Center"
-                        Margin="0 20 0 20">
-                <Border>
-                    <controls:RoundedButton Width="100"
-                                            Height="40"
-                                            Margin="0 0 3 0"
-                                            CornerRadius="20 0 0 20"
-                                            Content="Hide"
-                                            Command="{Binding HideCommand}" />
-                    <ToolTip.Tip>
-                        <TextBlock Text="Close this window and continue restoring in background."/> 
-                    </ToolTip.Tip>
-                </Border>
+                <StackPanel Orientation="Horizontal"
+                            HorizontalAlignment="Center"
+                            Margin="0 20 0 20">
+                    <Border>
+                        <controls:RoundedButton Width="100"
+                                                Height="40"
+                                                Margin="0 0 3 0"
+                                                CornerRadius="20 0 0 20"
+                                                Content="Hide"
+                                                Command="{Binding HideCommand}" />
+                        <ToolTip.Tip>
+                            <TextBlock Text="Close this window and continue restoring in background." />
+                        </ToolTip.Tip>
+                    </Border>
 
-                <Border>
-                    <controls:RoundedButton Width="100"
-                                            Height="40"
-                                            CornerRadius="0 20 20 0"
-                                            Content="Cancel"
-                                            Command="{Binding CancelCommand}" />
-                    <ToolTip.Tip>
-                        <TextBlock Text="Close this window and stop restoring data."/> 
-                    </ToolTip.Tip>
-                </Border>
+                    <Border>
+                        <controls:RoundedButton Width="100"
+                                                Height="40"
+                                                CornerRadius="0 20 20 0"
+                                                Content="Cancel"
+                                                Command="{Binding CancelCommand}" />
+                        <ToolTip.Tip>
+                            <TextBlock Text="Close this window and stop restoring data." />
+                        </ToolTip.Tip>
+                    </Border>
+                </StackPanel>
             </StackPanel>
-        </StackPanel>
-    </Grid>
+        </Grid>
+    </Border>
 </UserControl>

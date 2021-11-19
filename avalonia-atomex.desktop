@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=Atomex
+Exec=/opt/Atomex.Client.Desktop/Atomex.Client.Desktop
+StartupWMClass=Atomex.Client.Desktop
+Icon=avalonia-atomex
+Terminal=false
+Type=Application
+X-Desktop-File-Install-Version=0.24

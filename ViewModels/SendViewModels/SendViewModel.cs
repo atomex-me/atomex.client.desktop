@@ -294,7 +294,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
         public ICommand BackCommand => _backCommand ??= (_backCommand = ReactiveCommand.Create(() =>
         {
-            Desktop.App.DialogService.CloseDialog();
+            Desktop.App.DialogService.Close();
         }));
 
         private ICommand _nextCommand;

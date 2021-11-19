@@ -30,7 +30,7 @@ namespace Atomex.Client.Desktop
 {
     public class App : Application
     {
-        public static IDialogService<ViewModelBase> DialogService;
+        public static DialogService DialogService;
         public static TemplateService TemplateService;
         public static ImageService ImageService;
         public static IClipboard Clipboard;
@@ -78,7 +78,8 @@ namespace Atomex.Client.Desktop
             if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
             {
                 var mainWindow = new MainWindow();
-                DialogService = new DialogService<DialogServiceView>(mainWindow);
+                DialogService =
+                    new DialogService(mainWindow, RuntimeInformation.IsOSPlatform(OSPlatform.Linux));
                 var mainWindowViewModel = new MainWindowViewModel(AtomexApp, mainWindow);
 
                 mainWindow.DataContext = mainWindowViewModel;
@@ -93,7 +94,7 @@ namespace Atomex.Client.Desktop
             }
 
             AtomexApp.Start();
-            
+
             base.OnFrameworkInitializationCompleted();
         }
 
@@ -104,6 +105,7 @@ namespace Atomex.Client.Desktop
             try
             {
                 AtomexApp.Stop();
+                Environment.Exit(0);
             }
             catch (Exception)
             {
@@ -139,7 +141,7 @@ namespace Atomex.Client.Desktop
                 var resourceNames = CoreAssembly.GetManifestResourceNames();
                 var fullFileName = resourceNames.FirstOrDefault(n => n.EndsWith(resourceName));
                 var stream = CoreAssembly.GetManifestResourceStream(fullFileName!);
-                using StreamReader reader = new (stream!);
+                using StreamReader reader = new(stream!);
                 return reader.ReadToEnd();
             }
         }
@@ -165,7 +167,7 @@ namespace Atomex.Client.Desktop
                     Arguments = RuntimeInformation.IsOSPlatform(OSPlatform.OSX) ? $"{url}" : "",
                     CreateNoWindow = true,
                     UseShellExecute = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
-                }));
+                })) ;
             }
         }
 

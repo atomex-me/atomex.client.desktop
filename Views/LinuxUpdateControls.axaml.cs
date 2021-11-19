@@ -1,11 +1,13 @@
+using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Primitives;
 using Avalonia.Markup.Xaml;
 
 namespace Atomex.Client.Desktop.Views
 {
-    public class SecondDialogView : UserControl
+    public class LinuxUpdateControls : UserControl
     {
-        public SecondDialogView()
+        public LinuxUpdateControls()
         {
             InitializeComponent();
         }
