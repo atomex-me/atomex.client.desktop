@@ -1127,7 +1127,7 @@ namespace Atomex.Client.Desktop.ViewModels
                         title: Resources.CvWarning,
                         text: message,
                         backAction: () => Desktop.App.DialogService.Close()));
-                
+
                 return;
             }
 

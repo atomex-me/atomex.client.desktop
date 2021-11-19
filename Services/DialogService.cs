@@ -32,7 +32,7 @@ namespace Atomex.Client.Desktop.Services
             await Task.Delay(50);
             await Dispatcher.UIThread.InvokeAsync(() => _owner.Opacity = opacity);
         }
-        
+
         public bool Close()
         {
             var result = _isDialogOpened;
