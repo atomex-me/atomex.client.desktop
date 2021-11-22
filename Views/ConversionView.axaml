@@ -204,6 +204,7 @@
                             Margin="5 0 0 0"
                             Width="12"
                             Height="12"
+                            Cursor="Help"
                             Foreground="{DynamicResource DefaultAmountInBaseForegroundBrush}"
                             Path="{DynamicResource FontAwesome.QuestionCircleSolid}"
                             Classes="PathButtonStyle" />
@@ -430,6 +431,7 @@
                                         Height="12"
                                         Foreground="{DynamicResource DefaultAmountInBaseForegroundBrush}"
                                         Path="{DynamicResource FontAwesome.QuestionCircleSolid}"
+                                        Cursor="Help"
                                         Classes="PathButtonStyle" />
                                     <ToolTip.Tip>
                                         <StackPanel Orientation="Vertical">

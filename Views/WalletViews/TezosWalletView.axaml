@@ -117,6 +117,7 @@
                                             ToolTip.VerticalOffset="-32">
                                         <Path Data="{DynamicResource FontAwesome.QuestionCircleSolid}"
                                               Fill="{DynamicResource UnconfirmedAmountBrush}"
+                                              Cursor="Help"
                                               Width="21"
                                               Height="21"
                                               Stretch="Uniform" />

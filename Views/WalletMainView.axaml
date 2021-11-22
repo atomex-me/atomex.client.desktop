@@ -37,6 +37,7 @@
 
                     <TextBlock Text="Exchange"
                                x:Name="ExchangeTextBox"
+                               Padding="0 0 0 1"
                                FontSize="11" />
                     <ToolTip.Tip>
                         <TextBlock x:Name="ToolTipTextBoxExchange"
@@ -79,6 +80,7 @@
 
                     <TextBlock Text="Market Data"
                                x:Name="MarketTextBox"
+                               Padding="0 0 0 1"
                                FontSize="11" />
                     <ToolTip.Tip>
                         <TextBlock x:Name="ToolTipTextBoxMarket"
@@ -121,6 +123,7 @@
 
                     <TextBlock Text="Rates Provider"
                                x:Name="RatesTextBox"
+                               Padding="0 0 0 1"
                                FontSize="11" />
                     <ToolTip.Tip>
                         <TextBlock x:Name="ToolTipTextBoxRates"
