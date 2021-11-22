@@ -5,11 +5,16 @@
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="Atomex.Client.Desktop.Views.TransactionViews.TezosTokenTransferDetailsView"
              xmlns:vm="clr-namespace:Atomex.Client.Desktop.ViewModels.TransactionViewModels"
+             xmlns:converters="clr-namespace:Atomex.Client.Desktop.Converters"
              xmlns:controls="clr-namespace:Atomex.Client.Desktop.Controls">
     
     <Design.DataContext>
         <vm:TezosTransactionViewModel />
     </Design.DataContext>
+    
+    <UserControl.Resources>
+        <converters:DateTimeToTxDetailsConverter x:Key="DateTimeToTxDetailsConverter" />
+    </UserControl.Resources>
     
     <Grid Background="{DynamicResource TransactionDetailsBackgroundBrush}">
         <Grid Margin="10">
@@ -78,7 +83,7 @@
                        VerticalAlignment="Center"
                        Grid.Column="0"
                        Grid.Row="1"/>
-            <TextBlock Text="{Binding LocalTime, StringFormat=dd MMM yyyy\, HH:mm:ss.fff}"
+            <TextBlock Text="{Binding LocalTime, Converter={StaticResource DateTimeToTxDetailsConverter}}"
                        FontFamily="{DynamicResource DefaultFontFamily}"
                        Foreground="{DynamicResource DefaultForegroundBrush}"
                        VerticalAlignment="Center"
