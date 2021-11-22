@@ -285,10 +285,7 @@ namespace Atomex.Client.Desktop.ViewModels
 
             var hasActiveSwaps = await HasActiveSwapsAsync();
 
-            if (hasActiveSwaps)
-                return true;
-
-            return false;
+            return hasActiveSwaps;
         }
 
         private void InactivityHandler(object sender, EventArgs args)
