@@ -22,6 +22,7 @@ using Atomex.Client.Desktop.Properties;
 using Atomex.Client.Desktop.ViewModels.Abstract;
 using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
 using Atomex.Swaps.Helpers;
+using Atomex.Wallet.Abstract;
 
 namespace Atomex.Client.Desktop.ViewModels
 {
@@ -53,6 +54,12 @@ namespace Atomex.Client.Desktop.ViewModels
                 return App.Account.Currencies;
             }
         }
+
+
+        private IFromSource FromSource { get; set; }
+        private string To { get; set; }
+        private string RedeemAdderss { get; set; }
+
 
         private List<CurrencyViewModel> _currencyViewModels;
 
@@ -726,6 +733,8 @@ namespace Atomex.Client.Desktop.ViewModels
             {
                 var swapParams = await Atomex.ViewModels.Helpers
                     .EstimateSwapPaymentParamsAsync(
+                        from: FromSource,
+                        to: To,
                         amount: EstimatedMaxAmount,
                         fromCurrency: FromCurrency,
                         toCurrency: ToCurrency,
@@ -760,6 +769,7 @@ namespace Atomex.Client.Desktop.ViewModels
         {
             var fromCurrencyVm = FromCurrencies
                 .FirstOrDefault(c => c.Currency?.Name == fromCurrency?.Name);
+
             FromCurrencyIndex = FromCurrencies.IndexOf(fromCurrencyVm);
         }
 
@@ -782,6 +792,8 @@ namespace Atomex.Client.Desktop.ViewModels
                 // estimate max payment amount and max fee
                 var swapParams = await Atomex.ViewModels.Helpers
                     .EstimateSwapPaymentParamsAsync(
+                        from: FromSource,
+                        to: To,
                         amount: value,
                         fromCurrency: FromCurrency,
                         toCurrency: ToCurrency,
@@ -860,9 +872,16 @@ namespace Atomex.Client.Desktop.ViewModels
             if (Env.IsInDesignerMode())
                 return;
 #endif
+            //var walletAddress = await App.Account
+            //    .GetCurrencyAccount<ILegacyCurrencyAccount>(ToCurrency.Name)
+            //    .GetRedeemAddressAsync();
+
+            //if (RedeemAdderss == null)
+            //    return;
+
             var walletAddress = await App.Account
-                .GetCurrencyAccount<ILegacyCurrencyAccount>(ToCurrency.Name)
-                .GetRedeemAddressAsync();
+                .GetCurrencyAccount(ToCurrency.Name)
+                .GetAddressAsync(RedeemAdderss);
 
             _estimatedRedeemFee = await ToCurrency
                 .GetEstimatedRedeemFeeAsync(walletAddress, withRewardForRedeem: false);

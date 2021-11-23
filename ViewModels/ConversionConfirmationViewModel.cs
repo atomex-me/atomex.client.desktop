@@ -8,7 +8,6 @@ using System.Windows.Input;
 using ReactiveUI;
 using Serilog;
 
-using Atomex.Blockchain.Abstract;
 using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.Properties;
 using Atomex.Client.Desktop.ViewModels.Abstract;
@@ -17,6 +16,7 @@ using Atomex.Client.Desktop.ViewModels.SendViewModels;
 using Atomex.Common;
 using Atomex.Core;
 using Atomex.ViewModels;
+using Atomex.Wallet.Abstract;
 
 namespace Atomex.Client.Desktop.ViewModels
 {
@@ -24,10 +24,14 @@ namespace Atomex.Client.Desktop.ViewModels
     {
         public event EventHandler OnSuccess;
 
-        private static TimeSpan SwapTimeout = TimeSpan.FromSeconds(60);
-        private static TimeSpan SwapCheckInterval = TimeSpan.FromSeconds(3);
+        private static readonly TimeSpan SwapTimeout = TimeSpan.FromSeconds(60);
+        private static readonly TimeSpan SwapCheckInterval = TimeSpan.FromSeconds(3);
 
         private IAtomexApp App { get; }
+        public IFromSource From { get; }
+        public string To { get; }
+        public string RedeemAddress { get; }
+
         public CurrencyConfig FromCurrency { get; set; }
         public CurrencyConfig ToCurrency { get; set; }
         public CurrencyViewModel FromCurrencyViewModel { get; set; }
@@ -133,19 +137,8 @@ namespace Atomex.Client.Desktop.ViewModels
             try
             {
                 var account = App.Account;
-                var currencyAccount = account
-                    .GetCurrencyAccount<ILegacyCurrencyAccount>(FromCurrency.Name);
 
-                var fromWallets = (await currencyAccount
-                        .GetUnspentAddressesAsync(
-                            toAddress: null,
-                            amount: Amount,
-                            fee: 0,
-                            feePrice: await FromCurrency.GetDefaultFeePriceAsync(),
-                            feeUsagePolicy: FeeUsagePolicy.EstimatedFee,
-                            addressUsagePolicy: AddressUsagePolicy.UseMinimalBalanceFirst,
-                            transactionType: BlockchainTransactionType.SwapPayment))
-                    .ToList();
+                var fromWallets = await GetFromAddressesAsync();
 
                 foreach (var fromWallet in fromWallets)
                     if (fromWallet.Currency != FromCurrency.Name)
@@ -168,10 +161,10 @@ namespace Atomex.Client.Desktop.ViewModels
                     .SymbolByCurrencies(FromCurrency, ToCurrency);
 
                 var baseCurrency = App.Account.Currencies.GetByName(symbol.Base);
-                var side = symbol.OrderSideForBuyCurrency(ToCurrency);
-                var terminal = App.Terminal;
-                var price = EstimatedPrice;
-                var orderPrice = EstimatedOrderPrice;
+                var side         = symbol.OrderSideForBuyCurrency(ToCurrency);
+                var terminal     = App.Terminal;
+                var price        = EstimatedPrice;
+                var orderPrice   = EstimatedOrderPrice;
 
                 if (price == 0)
                     return new Error(Errors.NoLiquidity, Resources.CvNoLiquidity);
@@ -248,6 +241,29 @@ namespace Atomex.Client.Desktop.ViewModels
             }
         }
         
+        private async Task<IEnumerable<WalletAddress>> GetFromAddressesAsync()
+        {
+            if (From is FromAddress fromAddress)
+            {
+                var walletAddress = await App.Account
+                    .GetAddressAsync(FromCurrency.Name, fromAddress.Address);
+
+                return new WalletAddress[] { walletAddress };
+            }
+            else if (From is FromOutputs fromOutputs)
+            {
+                var config = (BitcoinBasedConfig)FromCurrency;
+
+                return await Task.WhenAll(fromOutputs.Outputs
+                    .Select(o => o.DestinationAddress(config.Network))
+                    .Distinct()
+                    .Select(async a => await App.Account.GetAddressAsync(FromCurrency.Name, a)));
+  
+            }
+
+            throw new NotSupportedException("Not supported type of From field");
+        }
+
         private static string GetErrorsDescription(IEnumerable<BalanceError> errors)
         {
             var descriptions = errors.Select(e => e.Type switch
@@ -265,31 +281,31 @@ namespace Atomex.Client.Desktop.ViewModels
         {
             var currencies = DesignTime.Currencies.ToList();
 
-            FromCurrency = currencies[0];
-            ToCurrency = currencies[1];
+            FromCurrency          = currencies[0];
+            ToCurrency            = currencies[1];
             FromCurrencyViewModel = CurrencyViewModelCreator.CreateViewModel(FromCurrency, false);
-            ToCurrencyViewModel = CurrencyViewModelCreator.CreateViewModel(ToCurrency, false);
+            ToCurrencyViewModel   = CurrencyViewModelCreator.CreateViewModel(ToCurrency, false);
 
-            PriceFormat = $"F{FromCurrency.Digits}";
-            CurrencyCode = FromCurrencyViewModel.CurrencyCode;
-            CurrencyFormat = FromCurrencyViewModel.CurrencyFormat;
-            TargetCurrencyCode = ToCurrencyViewModel.CurrencyCode;
+            PriceFormat          = $"F{FromCurrency.Digits}";
+            CurrencyCode         = FromCurrencyViewModel.CurrencyCode;
+            CurrencyFormat       = FromCurrencyViewModel.CurrencyFormat;
+            TargetCurrencyCode   = ToCurrencyViewModel.CurrencyCode;
             TargetCurrencyFormat = ToCurrencyViewModel.CurrencyFormat;
-            BaseCurrencyCode = FromCurrencyViewModel.BaseCurrencyCode;
-            BaseCurrencyFormat = FromCurrencyViewModel.BaseCurrencyFormat;
+            BaseCurrencyCode     = FromCurrencyViewModel.BaseCurrencyCode;
+            BaseCurrencyFormat   = FromCurrencyViewModel.BaseCurrencyFormat;
 
             EstimatedPrice = 0.003m;
 
-            Amount = 0.00001234m;
+            Amount       = 0.00001234m;
             AmountInBase = 10.23m;
 
-            TargetAmount = Amount / EstimatedPrice;
+            TargetAmount       = Amount / EstimatedPrice;
             TargetAmountInBase = AmountInBase;
 
-            EstimatedPaymentFee = 0.0001904m;
+            EstimatedPaymentFee       = 0.0001904m;
             EstimatedPaymentFeeInBase = 0.22m;
 
-            EstimatedRedeemFee = 0.001m;
+            EstimatedRedeemFee       = 0.001m;
             EstimatedRedeemFeeInBase = 0.11m;
         }
     }
