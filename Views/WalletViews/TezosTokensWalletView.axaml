@@ -333,22 +333,9 @@
                     <ListBox.ItemTemplate>
                         <DataTemplate DataType="{x:Type vm:TezosTokenViewModel}">
                             <!-- MouseDown="TokenPreviewMouseDown" -->
-                            <Grid Background="Transparent">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="60" />
-                                    <ColumnDefinition Width="Auto" />
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="30" />
-                                    <ColumnDefinition Width="50" />
-                                    <ColumnDefinition Width="10" />
-                                </Grid.ColumnDefinitions>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="11" />
-                                    <RowDefinition Height="19" />
-                                    <RowDefinition Height="19" />
-                                    <RowDefinition Height="11" />
-                                    <RowDefinition Height="Auto" />
-                                </Grid.RowDefinitions>
+                            <Grid Background="Transparent"
+                                  ColumnDefinitions="60,Auto,*,30,50,10"
+                                  RowDefinitions="11,19,19,11,Auto">
 
                                 <Ellipse Margin="5"
                                          Grid.Column="0"

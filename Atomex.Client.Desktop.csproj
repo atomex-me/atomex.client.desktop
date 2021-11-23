@@ -1,14 +1,14 @@
 <Project Sdk="Microsoft.NET.Sdk" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
     <PropertyGroup>
-        <OutputType>WinExe</OutputType>
+        <OutputType>Exe</OutputType>
         <TargetFramework>net5.0</TargetFramework>
         <Nullable>enable</Nullable>
         <DefaultItemExcludes>$(DefaultItemExcludes);atomex.client.core\**</DefaultItemExcludes>
         <UseAppHost>true</UseAppHost>
         <ApplicationIcon>Resources/Images/logo_dark_256x256.ico</ApplicationIcon>
 
-        <AssemblyVersion>1.1.53</AssemblyVersion>
-        <Version>1.1.53</Version>
+        <AssemblyVersion>1.1.56</AssemblyVersion>
+        <Version>1.1.56</Version>
     </PropertyGroup>
     <ItemGroup>
         <AvaloniaResource Include="Assets\**"/>

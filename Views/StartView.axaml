@@ -13,9 +13,12 @@
     </Design.DataContext>
 
     <UserControl.Resources>
-        <ImageBrush BitmapInterpolationMode="HighQuality" x:Key="GithubBrush" Source="avares://Atomex.Client.Desktop/Resources/Images/github.png" />
-        <ImageBrush BitmapInterpolationMode="HighQuality" x:Key="TelegramBrush" Source="avares://Atomex.Client.Desktop/Resources/Images/telegram.png" />
-        <ImageBrush BitmapInterpolationMode="HighQuality" x:Key="TwitterBrush" Source="avares://Atomex.Client.Desktop/Resources/Images/twitter.png" />
+        <ImageBrush BitmapInterpolationMode="HighQuality" x:Key="GithubBrush"
+                    Source="avares://Atomex.Client.Desktop/Resources/Images/github.png" />
+        <ImageBrush BitmapInterpolationMode="HighQuality" x:Key="TelegramBrush"
+                    Source="avares://Atomex.Client.Desktop/Resources/Images/telegram.png" />
+        <ImageBrush BitmapInterpolationMode="HighQuality" x:Key="TwitterBrush"
+                    Source="avares://Atomex.Client.Desktop/Resources/Images/twitter.png" />
     </UserControl.Resources>
 
     <Border Classes="ChildViewBorderLight"
@@ -97,30 +100,51 @@
                             Orientation="Horizontal"
                             VerticalAlignment="Bottom"
                             HorizontalAlignment="Center">
-                    <controls:IconButton Width="25"
-                                         Height="25"
-                                         OpacityMask="{StaticResource TwitterBrush}"
-                                         Foreground="{DynamicResource SocialDefaultBrush}"
-                                         MouseOverBrush="{DynamicResource SocialMouseOverBrush}"
-                                         PressedBrush="{DynamicResource SocialDefaultBrush}"
-                                         Command="{Binding TwitterCommand}" />
-                    <controls:IconButton Width="25"
-                                         Height="25"
-                                         Margin="3 0 0 0"
-                                         OpacityMask="{StaticResource TelegramBrush}"
-                                         
-                                         Foreground="{DynamicResource SocialDefaultBrush}"
-                                         MouseOverBrush="{DynamicResource SocialMouseOverBrush}"
-                                         PressedBrush="{DynamicResource SocialDefaultBrush}"
-                                         Command="{Binding TelegramCommand}" />
-                    <controls:IconButton Width="25"
-                                         Height="25"
-                                         Margin="4 0 0 0"
-                                         OpacityMask="{StaticResource GithubBrush}"
-                                         Foreground="{DynamicResource SocialDefaultBrush}"
-                                         MouseOverBrush="{DynamicResource SocialMouseOverBrush}"
-                                         PressedBrush="{DynamicResource SocialDefaultBrush}"
-                                         Command="{Binding GithubCommand}" />
+                    <Border
+                        ToolTip.Placement="AnchorAndGravity"
+                        ToolTip.VerticalOffset="-32">
+                        <controls:IconButton Width="25"
+                                             Height="25"
+                                             OpacityMask="{StaticResource TwitterBrush}"
+                                             Foreground="{DynamicResource SocialDefaultBrush}"
+                                             MouseOverBrush="{DynamicResource SocialMouseOverBrush}"
+                                             PressedBrush="{DynamicResource SocialDefaultBrush}"
+                                             Command="{Binding TwitterCommand}" />
+                        <ToolTip.Tip>
+                            <TextBlock Text="Twitter" />
+                        </ToolTip.Tip>
+                    </Border>
+                    <Border
+                        ToolTip.Placement="AnchorAndGravity"
+                        ToolTip.VerticalOffset="-32">
+                        <controls:IconButton Width="25"
+                                             Height="25"
+                                             Margin="3 0 0 0"
+                                             OpacityMask="{StaticResource TelegramBrush}"
+                                             Foreground="{DynamicResource SocialDefaultBrush}"
+                                             MouseOverBrush="{DynamicResource SocialMouseOverBrush}"
+                                             PressedBrush="{DynamicResource SocialDefaultBrush}"
+                                             Command="{Binding TelegramCommand}" />
+                        <ToolTip.Tip>
+                            <TextBlock Text="Telegram" />
+                        </ToolTip.Tip>
+                    </Border>
+
+                    <Border
+                        ToolTip.Placement="AnchorAndGravity"
+                        ToolTip.VerticalOffset="-32">
+                        <controls:IconButton Width="25"
+                                             Height="25"
+                                             Margin="4 0 0 0"
+                                             OpacityMask="{StaticResource GithubBrush}"
+                                             Foreground="{DynamicResource SocialDefaultBrush}"
+                                             MouseOverBrush="{DynamicResource SocialMouseOverBrush}"
+                                             PressedBrush="{DynamicResource SocialDefaultBrush}"
+                                             Command="{Binding GithubCommand}" />
+                        <ToolTip.Tip>
+                            <TextBlock Text="Github" />
+                        </ToolTip.Tip>
+                    </Border>
                 </StackPanel>
 
                 <TextBlock Foreground="{DynamicResource CopyrightForegroundBrush}"

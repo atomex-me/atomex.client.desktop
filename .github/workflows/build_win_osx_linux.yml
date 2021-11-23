@@ -52,10 +52,34 @@ jobs:
         with:
           name: atomex-win
           path: Atomex.Client.Desktop.Installer/Installs
+          
+  build_linux:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+        with:
+          submodules: true
+          
+      - name: Setup .NET Core
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 5.0.403
+
+      - name: Run Linux build script
+        env:
+          SPARKLE_PRIVATE_KEY: ${{ secrets.SPARKLE_PRIVATE_KEY }}
+          SPARKLE_PUBLIC_KEY: ${{ secrets.SPARKLE_PUBLIC_KEY }}
+        run: ./build_linux.sh
+
+      - name: Upload Linux release artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: atomex-linux
+          path: dist/*
 
   build_macos:
     runs-on: macos-latest
-    needs: [ build_win ]
+    needs: [ build_win, build_linux ]
     steps:
       - uses: actions/checkout@v2
         with:
@@ -104,6 +128,12 @@ jobs:
           SPARKLE_PUBLIC_KEY: ${{ secrets.SPARKLE_PUBLIC_KEY }}
           VER: ${{ env.VER }}
         run: ./create_msi_appcast.sh
+        
+      - name: Download Linux release files
+        uses: actions/download-artifact@v2
+        with:
+          name: atomex-linux
+          path: dist/
 
       - uses: "marvinpinto/action-automatic-releases@latest"
         with:

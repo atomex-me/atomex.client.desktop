@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Windows.Input;
 using Atomex.Client.Desktop.Common;
 using Atomex.Common;
@@ -52,11 +53,16 @@ namespace Atomex.Client.Desktop.ViewModels
 
             var unlockViewModel = new UnlockViewModel(info.Name, password =>
             {
+                var clientType = ClientType.Unknown;
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) clientType = ClientType.AvaloniaWindows;
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX)) clientType = ClientType.AvaloniaMac;
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux)) clientType = ClientType.AvaloniaLinux;
+                
                 account = Account.LoadFromFile(
                     pathToAccount: info.Path,
                     password: password,
                     currenciesProvider: AtomexApp.CurrenciesProvider,
-                    clientType: ClientType.Unknown,
+                    clientType: clientType,
                     migrationCompleteCallback: (MigrationActionType actionType) =>
                     {
                         if (actionType == MigrationActionType.XtzTransactionsDeleted)

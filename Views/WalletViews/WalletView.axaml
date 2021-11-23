@@ -117,6 +117,7 @@
 
                                     <Border Grid.Column="0"
                                             Grid.Row="0"
+                                            Cursor="Help"
                                             ToolTip.Placement="AnchorAndGravity"
                                             ToolTip.VerticalOffset="-32">
                                         <Path Data="{DynamicResource FontAwesome.QuestionCircleSolid}"

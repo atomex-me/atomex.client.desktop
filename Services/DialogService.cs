@@ -36,13 +36,16 @@ namespace Atomex.Client.Desktop.Services
         public bool Close()
         {
             var result = _isDialogOpened;
-            if (_isDialogOpened)
-            {
-                DialogHost.DialogHost.GetDialogSession(MainDialogHostIdentifier)?.Close();
-                _isDialogOpened = false;
-            }
+            if (!_isDialogOpened) return result;
+            DialogHost.DialogHost.GetDialogSession(MainDialogHostIdentifier)?.Close();
+            _isDialogOpened = false;
 
             return result;
+        }
+
+        public bool IsCurrentlyShowing(ViewModelBase vm)
+        {
+            return _dialogServiceViewModel.Content.GetType() == vm.GetType();
         }
 
         public void ShowPrevious()

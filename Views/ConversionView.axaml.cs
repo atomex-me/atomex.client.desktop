@@ -19,6 +19,7 @@ namespace Atomex.Client.Desktop.Views
 
             amountStringTextBox.GetObservable(TextBox.TextProperty)
                 .Throttle(TimeSpan.FromMilliseconds(1))
+                .Where(text => text != null)
                 .Subscribe(text =>
                 {
                     Dispatcher.UIThread.InvokeAsync(() =>

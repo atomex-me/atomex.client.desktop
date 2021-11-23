@@ -32,16 +32,6 @@
                                        Margin="0 0 0 -30"
                                        ZIndex="1" />
 
-    <dialogHost:DialogHost Identifier="MainDialogHost">
-        <DockPanel HorizontalAlignment="Stretch"
-                   VerticalAlignment="Stretch">
-            <titlebars:MacosTitleBarView IsSeamless="False" />
-            <titlebars:WindowsTitleBarView IsSeamless="False" />
-            <views:LinuxUpdateControls IsVisible="{Binding IsLinux}"
-                                       DockPanel.Dock="Top"
-                                       Margin="0 0 0 -30"
-                                       ZIndex="1" />
-
             <Grid RowDefinitions="*,Auto,*" ColumnDefinitions="*,Auto,*">
                 <ContentControl Grid.Column="1"
                                 Grid.Row="1"
