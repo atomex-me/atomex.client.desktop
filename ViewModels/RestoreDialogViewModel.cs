@@ -41,6 +41,7 @@ namespace Atomex.Client.Desktop.ViewModels
 
         public ICommand HideCommand => _hideCommand ??= (_hideCommand = ReactiveCommand.Create(() =>
         {
+            Desktop.App.DialogService.Show(null);
             Desktop.App.DialogService.Close();
         }));
 
@@ -111,6 +112,9 @@ namespace Atomex.Client.Desktop.ViewModels
                 Log.Error($"Scan {restoringEntityTitle} exception");
             }
 
+            if (!Desktop.App.DialogService.IsCurrentlyShowing(this)) return;
+            
+            Desktop.App.DialogService.Show(null);
             Desktop.App.DialogService.Close();
         }
     }
