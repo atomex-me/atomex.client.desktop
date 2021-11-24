@@ -13,6 +13,7 @@ namespace Atomex.Client.Desktop.ViewModels
 {
     public class RestoreDialogViewModel : ViewModelBase
     {
+        public Action? OnRestored;
         private IAtomexApp App;
         private CancellationTokenSource cancellation;
 
@@ -101,6 +102,7 @@ namespace Atomex.Client.Desktop.ViewModels
                                 hdWalletScanner.ScanAsync(currency.Name, cancellationToken: cancellation.Token))),
                     cancellation.Token);
 
+                OnRestored?.Invoke();
                 Log.Information($"Scan {restoringEntityTitle} done");
             }
             catch (OperationCanceledException)
