@@ -88,10 +88,7 @@ namespace Atomex.Client.Desktop.ViewModels
                     {
                         var restoreViewModel = new RestoreDialogViewModel(AtomexApp)
                         {
-                            OnRestored = () =>
-                            {
-                                AccountRestored = false;
-                            }
+                            OnRestored = () => AccountRestored = false
                         };
 
                         App.DialogService.Show(restoreViewModel);
@@ -282,7 +279,7 @@ namespace Atomex.Client.Desktop.ViewModels
                 if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) clientType = ClientType.AvaloniaWindows;
                 if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX)) clientType = ClientType.AvaloniaMac;
                 if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux)) clientType = ClientType.AvaloniaLinux;
-                
+
                 var _ = Account.LoadFromFile(
                     pathToAccount: pathToAccount,
                     password: password,
@@ -293,9 +290,10 @@ namespace Atomex.Client.Desktop.ViewModels
             var wasClosed = false;
             Dispatcher.UIThread.InvokeAsync(() =>
             {
-                wasClosed = App.DialogService.Close();;
+                wasClosed = App.DialogService.Close();
+                ;
             });
-            
+
             _unlockViewModel.Unlocked = () =>
             {
                 ShowContent(MainWalletVM);
@@ -325,13 +323,13 @@ namespace Atomex.Client.Desktop.ViewModels
         private void StartLookingForUserMessages(TimeSpan delayInterval)
         {
             var userId = Atomex.ViewModels.Helpers.GetUserId(AtomexApp.Account);
-            
+
             _ = Task.Run(async () =>
             {
                 while (_hasAccount)
                 {
                     if (AccountRestored) continue;
-                    
+
                     var messages = await Atomex.ViewModels.Helpers.GetUserMessages(userId);
 
                     foreach (var message in messages.Where(message => !message.IsReaded))
@@ -343,7 +341,7 @@ namespace Atomex.Client.Desktop.ViewModels
                                 _ = Dispatcher.UIThread.InvokeAsync(() =>
                                 {
                                     ShowContent(MainWalletVM);
-                                    
+
                                     App.DialogService.Show(
                                         MessageViewModel.Success(
                                             title: Resources.CvWarning,
@@ -371,6 +369,7 @@ namespace Atomex.Client.Desktop.ViewModels
                                         }));
                             });
                         }
+
                         break;
                     }
 
