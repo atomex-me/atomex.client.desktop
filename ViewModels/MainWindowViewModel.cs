@@ -338,10 +338,9 @@ namespace Atomex.Client.Desktop.ViewModels
                         {
                             _unlockViewModel.Unlocked = () =>
                             {
+                                ShowContent(MainWalletVM);
                                 _ = Dispatcher.UIThread.InvokeAsync(() =>
                                 {
-                                    ShowContent(MainWalletVM);
-
                                     App.DialogService.Show(
                                         MessageViewModel.Success(
                                             title: Resources.CvWarning,
