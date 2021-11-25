@@ -336,6 +336,7 @@ namespace Atomex.Client.Desktop.ViewModels
                     {
                         if (Content is UnlockViewModel)
                         {
+                            _unlockViewModel.Unlocked = null;
                             _unlockViewModel.Unlocked = () =>
                             {
                                 ShowContent(MainWalletVM);
