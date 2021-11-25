@@ -177,7 +177,7 @@ namespace Atomex.Client.Desktop.ViewModels
                     {
                         OnQuotesUpdatedEventHandler(App.Terminal, null);
                         OnBaseQuotesUpdatedEventHandler(App.QuotesProvider, EventArgs.Empty);
-                        
+
                         _ = UpdateAmountAsync(_amount, updateUi: true);
                     });
 #if DEBUG
