@@ -29,6 +29,7 @@ namespace Atomex.Client.Desktop.ViewModels
     public class ConversionViewModel : ViewModelBase, IConversionViewModel
     {
         private readonly IAtomexApp _app;
+        private List<CurrencyViewModel> _currencyViewModels;
 
         private ISymbols Symbols
         {
@@ -42,7 +43,6 @@ namespace Atomex.Client.Desktop.ViewModels
                     .GetSymbols(_app.Account.Network);
             }
         }
-
         private ICurrencies Currencies
         {
             get
@@ -55,237 +55,215 @@ namespace Atomex.Client.Desktop.ViewModels
             }
         }
 
-
         private IFromSource FromSource { get; set; }
         private ObservableCollection<WalletAddressViewModel> ToAddresses { get; set; }
         private string To { get; set; }
         private string RedeemAddress { get; set; }
 
-        private List<CurrencyViewModel> _currencyViewModels;
+
 
         private List<CurrencyViewModel> _fromCurrencies;
         public List<CurrencyViewModel> FromCurrencies
         {
             get => _fromCurrencies;
-            private set
-            {
-                _fromCurrencies = value;
-                OnPropertyChanged(nameof(FromCurrencies));
-            }
+            set => this.RaiseAndSetIfChanged(ref _fromCurrencies, value);
         }
 
         private List<CurrencyViewModel> _toCurrencies;
         public List<CurrencyViewModel> ToCurrencies
         {
             get => _toCurrencies;
-            private set
-            {
-                _toCurrencies = value;
-                OnPropertyChanged(nameof(ToCurrencies));
-            }
+            set => this.RaiseAndSetIfChanged(ref _toCurrencies, value);
         }
 
         private int _fromCurrencyIndex;
         public int FromCurrencyIndex
         {
             get => _fromCurrencyIndex;
-            set
-            {
-                _fromCurrencyIndex = value;
-                OnPropertyChanged(nameof(FromCurrencyIndex));
+            set => this.RaiseAndSetIfChanged(ref _fromCurrencyIndex, value);
+            //set
+            //{
+            //    _fromCurrencyIndex = value;
+            //    OnPropertyChanged(nameof(FromCurrencyIndex));
 
-                FromCurrency = FromCurrencies.ElementAt(_fromCurrencyIndex).Currency;
-            }
+            //    FromCurrency = FromCurrencies.ElementAt(_fromCurrencyIndex).Currency;
+            //}
         }
 
         private int _toCurrencyIndex;
         public int ToCurrencyIndex
         {
             get => _toCurrencyIndex;
-            set
-            {
-                _toCurrencyIndex = value;
-                OnPropertyChanged(nameof(ToCurrencyIndex));
+            set => this.RaiseAndSetIfChanged(ref _toCurrencyIndex, value);
+            //set
+            //{
+            //    _toCurrencyIndex = value;
+            //    OnPropertyChanged(nameof(ToCurrencyIndex));
 
-                if (_toCurrencyIndex >= 0 && _toCurrencyIndex < ToCurrencies.Count)
-                    ToCurrency = ToCurrencies.ElementAt(_toCurrencyIndex).Currency;
-            }
+            //    if (_toCurrencyIndex >= 0 && _toCurrencyIndex < ToCurrencies.Count)
+            //        ToCurrency = ToCurrencies.ElementAt(_toCurrencyIndex).Currency;
+            //}
         }
 
         protected CurrencyConfig _fromCurrency;
         public CurrencyConfig FromCurrency
         {
             get => _fromCurrency;
-            set
-            {
-                _fromCurrency = FromCurrencies
-                    .FirstOrDefault(c => c.Currency.Name == value?.Name)
-                    ?.Currency;
+            set => this.RaiseAndSetIfChanged(ref _fromCurrency, value);
+            //set
+            //{
+            //    _fromCurrency = FromCurrencies
+            //        .FirstOrDefault(c => c.Currency.Name == value?.Name)
+            //        ?.Currency;
 
-                OnPropertyChanged(nameof(FromCurrency));
+            //    OnPropertyChanged(nameof(FromCurrency));
 
-                if (_fromCurrency == null)
-                    return;
+            //    if (_fromCurrency == null)
+            //        return;
 
-                var oldToCurrency = ToCurrency;
+            //    var oldToCurrency = ToCurrency;
 
-                ToCurrencies = _currencyViewModels
-                    .Where(c => Symbols.SymbolByCurrencies(c.Currency, _fromCurrency) != null)
-                    .ToList();
+            //    ToCurrencies = _currencyViewModels
+            //        .Where(c => Symbols.SymbolByCurrencies(c.Currency, _fromCurrency) != null)
+            //        .ToList();
 
-                if (oldToCurrency != null &&
-                    oldToCurrency.Name != _fromCurrency.Name &&
-                    ToCurrencies.FirstOrDefault(c => c.Currency.Name == oldToCurrency.Name) != null)
-                {
-                    var ToCurrencyVM = ToCurrencies
-                        .FirstOrDefault(c => c.Currency.Name == oldToCurrency.Name);
-                    ToCurrencyIndex = ToCurrencies.IndexOf(ToCurrencyVM);
-                }
-                else
-                {
-                    var ToCurrencyVM = ToCurrencies
-                        .First();
-                    ToCurrencyIndex = ToCurrencies.IndexOf(ToCurrencyVM);
-                }
+            //    if (oldToCurrency != null &&
+            //        oldToCurrency.Name != _fromCurrency.Name &&
+            //        ToCurrencies.FirstOrDefault(c => c.Currency.Name == oldToCurrency.Name) != null)
+            //    {
+            //        var ToCurrencyVM = ToCurrencies
+            //            .FirstOrDefault(c => c.Currency.Name == oldToCurrency.Name);
+            //        ToCurrencyIndex = ToCurrencies.IndexOf(ToCurrencyVM);
+            //    }
+            //    else
+            //    {
+            //        var ToCurrencyVM = ToCurrencies
+            //            .First();
+            //        ToCurrencyIndex = ToCurrencies.IndexOf(ToCurrencyVM);
+            //    }
 
-                FromCurrencyViewModel = _currencyViewModels
-                    .First(c => c.Currency.Name == _fromCurrency.Name);
+            //    FromCurrencyViewModel = _currencyViewModels
+            //        .First(c => c.Currency.Name == _fromCurrency.Name);
 
-                _amount = 0;
-                _ = UpdateAmountAsync(_amount, updateUi: true);
-            }
+            //    _amount = 0;
+            //    _ = UpdateAmountAsync(_amount, updateUi: true);
+            //}
         }
 
         private CurrencyConfig _toCurrency;
         public CurrencyConfig ToCurrency
         {
             get => _toCurrency;
-            set
-            {
-                _toCurrency = value;
-                OnPropertyChanged(nameof(ToCurrency));
+            set => this.RaiseAndSetIfChanged(ref _toCurrency, value);
+            //            set
+            //            {
+            //                _toCurrency = value;
+            //                OnPropertyChanged(nameof(ToCurrency));
 
-                if (_toCurrency == null)
-                    return;
+            //                if (_toCurrency == null)
+            //                    return;
 
-                ToCurrencyViewModel = _currencyViewModels.First(c => c.Currency.Name == _toCurrency.Name);
+            //                ToCurrencyViewModel = _currencyViewModels.First(c => c.Currency.Name == _toCurrency.Name);
 
-                //ToAddresses = await App.Account.GetCurrencyAccount(ToCurrency.Name).GetAddressesAsync();
+            //                //ToAddresses = await App.Account.GetCurrencyAccount(ToCurrency.Name).GetAddressesAsync();
 
-#if DEBUG
-                if (!Env.IsInDesignerMode())
-                {
-#endif
-                    _ = Task.Run(async () =>
-                    {
-                        await UpdateRedeemAndRewardFeesAsync();
-                        OnQuotesUpdatedEventHandler(_app.Terminal, null);
-                        OnBaseQuotesUpdatedEventHandler(_app.QuotesProvider, EventArgs.Empty);
-                    });
-#if DEBUG
-                }
-#endif
-            }
+            //#if DEBUG
+            //                if (!Env.IsInDesignerMode())
+            //                {
+            //#endif
+            //                    _ = Task.Run(async () =>
+            //                    {
+            //                        await UpdateRedeemAndRewardFeesAsync();
+            //                        OnQuotesUpdatedEventHandler(_app.Terminal, null);
+            //                        OnBaseQuotesUpdatedEventHandler(_app.QuotesProvider, EventArgs.Empty);
+            //                    });
+            //#if DEBUG
+            //                }
+            //#endif
+            //            }
         }
 
         private CurrencyViewModel _fromCurrencyViewModel;
         public CurrencyViewModel FromCurrencyViewModel
         {
             get => _fromCurrencyViewModel;
-            set
-            {
-                _fromCurrencyViewModel = value;
-                OnPropertyChanged(nameof(FromCurrencyViewModel));
+            set => this.RaiseAndSetIfChanged(ref _fromCurrencyViewModel, value);
+            //set
+            //{
+            //    _fromCurrencyViewModel = value;
+            //    OnPropertyChanged(nameof(FromCurrencyViewModel));
 
-                CurrencyFormat = _fromCurrencyViewModel?.CurrencyFormat;
-                CurrencyCode = _fromCurrencyViewModel?.CurrencyCode;
+            //    CurrencyFormat = _fromCurrencyViewModel?.CurrencyFormat;
+            //    CurrencyCode = _fromCurrencyViewModel?.CurrencyCode;
 
-                FromFeeCurrencyCode = _fromCurrencyViewModel?.FeeCurrencyCode;
-                FromFeeCurrencyFormat = _fromCurrencyViewModel?.FeeCurrencyFormat;
+            //    FromFeeCurrencyCode = _fromCurrencyViewModel?.FeeCurrencyCode;
+            //    FromFeeCurrencyFormat = _fromCurrencyViewModel?.FeeCurrencyFormat;
 
-                BaseCurrencyFormat = _fromCurrencyViewModel?.BaseCurrencyFormat;
-                BaseCurrencyCode = _fromCurrencyViewModel?.BaseCurrencyCode;
+            //    BaseCurrencyFormat = _fromCurrencyViewModel?.BaseCurrencyFormat;
+            //    BaseCurrencyCode = _fromCurrencyViewModel?.BaseCurrencyCode;
 
-                var symbol = Symbols.SymbolByCurrencies(FromCurrency, ToCurrency);
-                if (symbol != null)
-                {
-                    var quoteCurrency = Currencies.GetByName(symbol.Quote);
+            //    var symbol = Symbols.SymbolByCurrencies(FromCurrency, ToCurrency);
+            //    if (symbol != null)
+            //    {
+            //        var quoteCurrency = Currencies.GetByName(symbol.Quote);
 
-                    PriceFormat = quoteCurrency.Format;
-                }
-            }
+            //        PriceFormat = quoteCurrency.Format;
+            //    }
+            //}
         }
 
         private CurrencyViewModel _toCurrencyViewModel;
         public CurrencyViewModel ToCurrencyViewModel
         {
             get => _toCurrencyViewModel;
-            set
-            {
-                _toCurrencyViewModel = value;
-                OnPropertyChanged(nameof(ToCurrencyViewModel));
+            set => this.RaiseAndSetIfChanged(ref _toCurrencyViewModel, value);
+            //set
+            //{
+            //    _toCurrencyViewModel = value;
+            //    OnPropertyChanged(nameof(ToCurrencyViewModel));
 
-                TargetCurrencyFormat = _toCurrencyViewModel?.CurrencyFormat;
-                TargetCurrencyCode = _toCurrencyViewModel?.CurrencyCode;
+            //    TargetCurrencyFormat = _toCurrencyViewModel?.CurrencyFormat;
+            //    TargetCurrencyCode = _toCurrencyViewModel?.CurrencyCode;
 
-                TargetFeeCurrencyCode = _toCurrencyViewModel?.FeeCurrencyCode;
-                TargetFeeCurrencyFormat = _toCurrencyViewModel?.FeeCurrencyFormat;
+            //    TargetFeeCurrencyCode = _toCurrencyViewModel?.FeeCurrencyCode;
+            //    TargetFeeCurrencyFormat = _toCurrencyViewModel?.FeeCurrencyFormat;
 
-                var symbol = Symbols.SymbolByCurrencies(FromCurrency, ToCurrency);
-                if (symbol != null)
-                {
-                    var quoteCurrency = Currencies.GetByName(symbol.Quote);
+            //    var symbol = Symbols.SymbolByCurrencies(FromCurrency, ToCurrency);
+            //    if (symbol != null)
+            //    {
+            //        var quoteCurrency = Currencies.GetByName(symbol.Quote);
 
-                    PriceFormat = quoteCurrency.Format;
-                }
-            }
+            //        PriceFormat = quoteCurrency.Format;
+            //    }
+            //}
         }
 
         private string _priceFormat;
         public string PriceFormat
         {
             get => _priceFormat;
-            set
-            {
-                _priceFormat = value;
-                OnPropertyChanged(nameof(PriceFormat));
-            }
+            set => this.RaiseAndSetIfChanged(ref _priceFormat, value);
         }
 
         private string _currencyFormat;
         public string CurrencyFormat
         {
             get => _currencyFormat;
-            set
-            {
-                if (value == null)
-                    return;
-
-                _currencyFormat = value;
-                OnPropertyChanged(CurrencyFormat);
-            }
+            set => this.RaiseAndSetIfChanged(ref _currencyFormat, value);
         }
 
         private string _targetCurrencyFormat;
         public string TargetCurrencyFormat
         {
             get => _targetCurrencyFormat;
-            set
-            {
-                _targetCurrencyFormat = value;
-                OnPropertyChanged(TargetCurrencyFormat);
-            }
+            set => this.RaiseAndSetIfChanged(ref _targetCurrencyFormat, value);
         }
 
         private string _baseCurrencyFormat;
         public string BaseCurrencyFormat
         {
             get => _baseCurrencyFormat;
-            set
-            {
-                _baseCurrencyFormat = value;
-                OnPropertyChanged(nameof(BaseCurrencyFormat));
-            }
+            set => this.RaiseAndSetIfChanged(ref _baseCurrencyFormat, value);
         }
 
         protected decimal _amount;
@@ -323,132 +301,84 @@ namespace Atomex.Client.Desktop.ViewModels
         public decimal AmountInBase
         {
             get => _amountInBase;
-            set
-            {
-                _amountInBase = value;
-                OnPropertyChanged(nameof(AmountInBase));
-            }
+            set => this.RaiseAndSetIfChanged(ref _amountInBase, value);
         }
 
         private bool _isAmountUpdating;
         public bool IsAmountUpdating
         {
             get => _isAmountUpdating;
-            set
-            {
-                _isAmountUpdating = value;
-                OnPropertyChanged(nameof(IsAmountUpdating));
-            }
+            set => this.RaiseAndSetIfChanged(ref _isAmountUpdating, value);
         }
 
         private bool _isAmountValid = true;
         public bool IsAmountValid
         {
             get => _isAmountValid;
-            set
-            {
-                _isAmountValid = value;
-                OnPropertyChanged(nameof(IsAmountValid));
-            }
+            set => this.RaiseAndSetIfChanged(ref _isAmountValid, value);
         }
 
         private decimal _targetAmount;
         public decimal TargetAmount
         {
             get => _targetAmount;
-            set
-            {
-                _targetAmount = value;
-                OnPropertyChanged(nameof(TargetAmount));
-            }
+            set => this.RaiseAndSetIfChanged(ref _targetAmount, value);
         }
 
         private decimal _targetAmountInBase;
         public decimal TargetAmountInBase
         {
             get => _targetAmountInBase;
-            set
-            {
-                _targetAmountInBase = value;
-                OnPropertyChanged(nameof(TargetAmountInBase));
-            }
+            set => this.RaiseAndSetIfChanged(ref _targetAmountInBase, value);
         }
 
         private string _currencyCode;
         public string CurrencyCode
         {
             get => _currencyCode;
-            set
-            {
-                _currencyCode = value;
-                OnPropertyChanged(nameof(CurrencyCode));
-            }
+            set => this.RaiseAndSetIfChanged(ref _currencyCode, value);
         }
 
         private string _fromFeeCurrencyFormat;
         public string FromFeeCurrencyFormat
         {
             get => _fromFeeCurrencyFormat;
-            set
-            {
-                _fromFeeCurrencyFormat = value;
-                OnPropertyChanged(nameof(FromFeeCurrencyFormat));
-            }
+            set => this.RaiseAndSetIfChanged(ref _fromFeeCurrencyFormat, value);
         }
 
         private string _fromFeeCurrencyCode;
         public string FromFeeCurrencyCode
         {
             get => _fromFeeCurrencyCode;
-            set
-            {
-                _fromFeeCurrencyCode = value;
-                OnPropertyChanged(nameof(FromFeeCurrencyCode));
-            }
+            set => this.RaiseAndSetIfChanged(ref _fromFeeCurrencyCode, value);
         }
 
         private string _targetCurrencyCode;
         public string TargetCurrencyCode
         {
             get => _targetCurrencyCode;
-            set
-            {
-                _targetCurrencyCode = value;
-                OnPropertyChanged(nameof(TargetCurrencyCode));
-            }
+            set => this.RaiseAndSetIfChanged(ref _targetCurrencyCode, value);
         }
 
         private string _targetFeeCurrencyCode;
         public string TargetFeeCurrencyCode
         {
             get => _targetFeeCurrencyCode;
-            set
-            {
-                _targetFeeCurrencyCode = value;
-                OnPropertyChanged(nameof(TargetFeeCurrencyCode));
-            }
+            set => this.RaiseAndSetIfChanged(ref _targetFeeCurrencyCode, value);
         }
 
         private string _targetFeeCurrencyFormat;
         public string TargetFeeCurrencyFormat
         {
             get => _targetFeeCurrencyFormat;
-            set
-            {
-                _targetFeeCurrencyFormat = value;
-                OnPropertyChanged(nameof(TargetFeeCurrencyFormat));
-            }
+            set => this.RaiseAndSetIfChanged(ref _targetFeeCurrencyFormat, value);
         }
 
         private string _baseCurrencyCode;
         public string BaseCurrencyCode
         {
             get => _baseCurrencyCode;
-            set
-            {
-                _baseCurrencyCode = value;
-                OnPropertyChanged(nameof(BaseCurrencyCode));
-            }
+            set => this.RaiseAndSetIfChanged(ref _baseCurrencyCode, value);
         }
 
         private decimal _estimatedOrderPrice;
@@ -457,187 +387,119 @@ namespace Atomex.Client.Desktop.ViewModels
         public decimal EstimatedPrice
         {
             get => _estimatedPrice;
-            set
-            {
-                _estimatedPrice = value;
-                OnPropertyChanged(nameof(EstimatedPrice));
-            }
+            set => this.RaiseAndSetIfChanged(ref _estimatedPrice, value);
         }
 
         private decimal _estimatedMaxAmount;
         public decimal EstimatedMaxAmount
         {
             get => _estimatedMaxAmount;
-            set
-            {
-                _estimatedMaxAmount = value;
-                OnPropertyChanged(nameof(EstimatedMaxAmount));
-            }
+            set => this.RaiseAndSetIfChanged(ref _estimatedMaxAmount, value);
         }
 
         private decimal _estimatedMakerNetworkFee;
         public decimal EstimatedMakerNetworkFee
         {
             get => _estimatedMakerNetworkFee;
-            set
-            {
-                _estimatedMakerNetworkFee = value;
-                OnPropertyChanged(nameof(EstimatedMakerNetworkFee));
-            }
+            set => this.RaiseAndSetIfChanged(ref _estimatedMakerNetworkFee, value);
         }
 
         private decimal _estimatedMakerNetworkFeeInBase;
         public decimal EstimatedMakerNetworkFeeInBase
         {
             get => _estimatedMakerNetworkFeeInBase;
-            set
-            {
-                _estimatedMakerNetworkFeeInBase = value;
-                OnPropertyChanged(nameof(EstimatedMakerNetworkFeeInBase));
-            }
+            set => this.RaiseAndSetIfChanged(ref _estimatedMakerNetworkFeeInBase, value);
         }
 
         protected decimal _estimatedPaymentFee;
         public decimal EstimatedPaymentFee
         {
             get => _estimatedPaymentFee;
-            set
-            {
-                _estimatedPaymentFee = value;
-                OnPropertyChanged(nameof(EstimatedPaymentFee));
-            }
+            set => this.RaiseAndSetIfChanged(ref _estimatedPaymentFee, value);
         }
 
         private decimal _estimatedPaymentFeeInBase;
         public decimal EstimatedPaymentFeeInBase
         {
             get => _estimatedPaymentFeeInBase;
-            set
-            {
-                _estimatedPaymentFeeInBase = value;
-                OnPropertyChanged(nameof(EstimatedPaymentFeeInBase));
-            }
+            set => this.RaiseAndSetIfChanged(ref _estimatedPaymentFeeInBase, value);
         }
 
         private decimal _estimatedRedeemFee;
         public decimal EstimatedRedeemFee
         {
             get => _estimatedRedeemFee;
-            set
-            {
-                _estimatedRedeemFee = value;
-                OnPropertyChanged(nameof(EstimatedRedeemFee));
-            }
+            set => this.RaiseAndSetIfChanged(ref _estimatedRedeemFee, value);
         }
 
         private decimal _estimatedRedeemFeeInBase;
         public decimal EstimatedRedeemFeeInBase
         {
             get => _estimatedRedeemFeeInBase;
-            set
-            {
-                _estimatedRedeemFeeInBase = value;
-                OnPropertyChanged(nameof(EstimatedRedeemFeeInBase));
-            }
+            set => this.RaiseAndSetIfChanged(ref _estimatedRedeemFeeInBase, value);
         }
 
         private decimal _estimatedTotalNetworkFeeInBase;
         public decimal EstimatedTotalNetworkFeeInBase
         {
             get => _estimatedTotalNetworkFeeInBase;
-            set
-            {
-                _estimatedTotalNetworkFeeInBase = value;
-                OnPropertyChanged(nameof(EstimatedTotalNetworkFeeInBase));
-            }
+            set => this.RaiseAndSetIfChanged(ref _estimatedTotalNetworkFeeInBase, value);
         }
 
         private decimal _rewardForRedeem;
         public decimal RewardForRedeem
         {
             get => _rewardForRedeem;
-            set
-            {
-                _rewardForRedeem = value;
-                OnPropertyChanged(nameof(RewardForRedeem));
-            }
+            set => this.RaiseAndSetIfChanged(ref _rewardForRedeem, value);
         }
 
         private decimal _rewardForRedeemInBase;
         public decimal RewardForRedeemInBase
         {
             get => _rewardForRedeemInBase;
-            set
-            {
-                _rewardForRedeemInBase = value;
-                OnPropertyChanged(nameof(RewardForRedeemInBase));
-            }
+            set => this.RaiseAndSetIfChanged(ref _rewardForRedeemInBase, value);
         }
 
         private bool _hasRewardForRedeem;
         public bool HasRewardForRedeem
         {
             get => _hasRewardForRedeem;
-            set
-            {
-                _hasRewardForRedeem = value;
-                OnPropertyChanged(nameof(HasRewardForRedeem));
-            }
+            set => this.RaiseAndSetIfChanged(ref _hasRewardForRedeem, value);
         }
 
         protected string _warning;
         public string Warning
         {
             get => _warning;
-            set
-            {
-                _warning = value;
-                OnPropertyChanged(nameof(Warning));
-            }
+            set => this.RaiseAndSetIfChanged(ref _warning, value);
         }
 
         protected bool _isCriticalWarning;
         public bool IsCriticalWarning
         {
             get => _isCriticalWarning;
-            set
-            {
-                _isCriticalWarning = value;
-                OnPropertyChanged(nameof(IsCriticalWarning));
-            }
+            set => this.RaiseAndSetIfChanged(ref _isCriticalWarning, value);
         }
 
         private bool _canConvert = true;
         public bool CanConvert
         {
             get => _canConvert;
-            set
-            {
-                _canConvert = value;
-                OnPropertyChanged(nameof(CanConvert));
-            }
+            set => this.RaiseAndSetIfChanged(ref _canConvert, value);
         }
 
         private ObservableCollection<SwapViewModel> _swaps;
         public ObservableCollection<SwapViewModel> Swaps
         {
             get => _swaps;
-            set
-            {
-                _swaps = value;
-                OnPropertyChanged(nameof(Swaps));
-            }
+            set => this.RaiseAndSetIfChanged(ref _swaps, value);
         }
 
         private bool _isNoLiquidity;
         public bool IsNoLiquidity
         {
             get => _isNoLiquidity;
-            set
-            {
-                _isNoLiquidity = value;
-                OnPropertyChanged(nameof(IsNoLiquidity));
-            }
+            set => this.RaiseAndSetIfChanged(ref _isNoLiquidity, value);
         }
 
         public int ColumnSpan => DetailsVisible ? 1 : 2;
