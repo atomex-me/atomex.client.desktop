@@ -237,6 +237,8 @@ namespace Atomex.Client.Desktop.ViewModels
 
                     PriceFormat = quoteCurrency.Format;
                 }
+                
+                _ = UpdateAmountAsync(_amount, updateUi: true);
             }
         }
 
