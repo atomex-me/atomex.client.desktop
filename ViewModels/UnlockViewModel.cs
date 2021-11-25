@@ -64,7 +64,10 @@ namespace Atomex.Client.Desktop.ViewModels
             GoBack += goBack;
 
             PasswordVM = new PasswordControlViewModel(
-                () => { InvalidPassword = false; }, placeholder: "Password...", isSmall: true);
+                () => { InvalidPassword = false; }, placeholder: "Password...", isSmall: true)
+            {
+                IsFocused = true
+            };
         }
 
         private async void OnUnlockClick()

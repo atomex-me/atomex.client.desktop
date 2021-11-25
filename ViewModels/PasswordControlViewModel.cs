@@ -45,6 +45,8 @@ namespace Atomex.Client.Desktop.ViewModels
         private readonly Action OnPasswordChanged;
         public string Placeholder { get; set; }
         public bool IsSmall { get; set; }
+
+        public bool IsFocused { get; set; }
         public int SelectionStart { get; set; }
         public int SelectionEnd { get; set; }
         private string _stringPass = string.Empty;
