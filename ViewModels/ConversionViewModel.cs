@@ -175,9 +175,10 @@ namespace Atomex.Client.Desktop.ViewModels
 #endif
                     _ = Task.Run(async () =>
                     {
-                        await UpdateRedeemAndRewardFeesAsync();
                         OnQuotesUpdatedEventHandler(App.Terminal, null);
                         OnBaseQuotesUpdatedEventHandler(App.QuotesProvider, EventArgs.Empty);
+                        
+                        _ = UpdateAmountAsync(_amount, updateUi: true);
                     });
 #if DEBUG
                 }
@@ -237,8 +238,6 @@ namespace Atomex.Client.Desktop.ViewModels
 
                     PriceFormat = quoteCurrency.Format;
                 }
-                
-                _ = UpdateAmountAsync(_amount, updateUi: true);
             }
         }
 
