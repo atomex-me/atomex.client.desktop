@@ -1,14 +1,13 @@
 using System;
 using System.Diagnostics;
-using System.Threading.Tasks;
-using Atomex.Client.Desktop.Dialogs.ViewModels;
-using Atomex.Client.Desktop.ViewModels.Abstract;
+
+using ReactiveUI;
+
 using Atomex.Core;
 using Atomex.MarketData;
 using Atomex.MarketData.Abstract;
 using Atomex.Services;
 using Atomex.Services.Abstract;
-using ReactiveUI;
 
 namespace Atomex.Client.Desktop.ViewModels
 {
@@ -136,7 +135,7 @@ namespace Atomex.Client.Desktop.ViewModels
         
         private void OnTerminalServiceStateChangedEventHandler(object sender, TerminalServiceEventArgs args)
         {
-            if (!(sender is IAtomexClient terminal))
+            if (sender is not IAtomexClient terminal)
                 return;
             
             IsExchangeConnected = terminal.IsServiceConnected(TerminalService.Exchange);
@@ -152,7 +151,7 @@ namespace Atomex.Client.Desktop.ViewModels
         
         private void OnQuotesProviderAvailabilityChangedEventHandler(object sender, EventArgs args)
         {
-            if (!(sender is ICurrencyQuotesProvider provider))
+            if (sender is not ICurrencyQuotesProvider provider)
                 return;
             
             IsQuotesProviderAvailable = provider.IsAvailable;

@@ -22,15 +22,13 @@ using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.Properties;
 using Atomex.Client.Desktop.ViewModels.Abstract;
 using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
-using Atomex.Swaps.Helpers;
 using Atomex.Wallet.Abstract;
 
 namespace Atomex.Client.Desktop.ViewModels
 {
-    public class ConversionViewModel : ViewModelBase, IConversionViewModel
+    public class ConversionViewModel : ViewModelBase
     {
         private readonly IAtomexApp _app;
-        private List<CurrencyViewModel> _currencyViewModels;
 
         private ISymbols Symbols
         {
@@ -61,8 +59,6 @@ namespace Atomex.Client.Desktop.ViewModels
         private string To { get; set; }
         private string RedeemAddress { get; set; }
 
-
-
         private List<CurrencyViewModel> _fromCurrencies;
         public List<CurrencyViewModel> FromCurrencies
         {
@@ -70,191 +66,34 @@ namespace Atomex.Client.Desktop.ViewModels
             set => this.RaiseAndSetIfChanged(ref _fromCurrencies, value);
         }
 
-        private List<CurrencyViewModel> _toCurrencies;
-        public List<CurrencyViewModel> ToCurrencies
-        {
-            get => _toCurrencies;
-            set => this.RaiseAndSetIfChanged(ref _toCurrencies, value);
-        }
-
-        private int _fromCurrencyIndex;
-        public int FromCurrencyIndex
-        {
-            get => _fromCurrencyIndex;
-            set => this.RaiseAndSetIfChanged(ref _fromCurrencyIndex, value);
-            //set
-            //{
-            //    _fromCurrencyIndex = value;
-            //    OnPropertyChanged(nameof(FromCurrencyIndex));
-
-            //    FromCurrency = FromCurrencies.ElementAt(_fromCurrencyIndex).Currency;
-            //}
-        }
-
-        private int _toCurrencyIndex;
-        public int ToCurrencyIndex
-        {
-            get => _toCurrencyIndex;
-            set => this.RaiseAndSetIfChanged(ref _toCurrencyIndex, value);
-            //set
-            //{
-            //    _toCurrencyIndex = value;
-            //    OnPropertyChanged(nameof(ToCurrencyIndex));
-
-            //    if (_toCurrencyIndex >= 0 && _toCurrencyIndex < ToCurrencies.Count)
-            //        ToCurrency = ToCurrencies.ElementAt(_toCurrencyIndex).Currency;
-            //}
-        }
-
-        protected CurrencyConfig _fromCurrency;
-        public CurrencyConfig FromCurrency
-        {
-            get => _fromCurrency;
-            set => this.RaiseAndSetIfChanged(ref _fromCurrency, value);
-            //set
-            //{
-            //    _fromCurrency = FromCurrencies
-            //        .FirstOrDefault(c => c.Currency.Name == value?.Name)
-            //        ?.Currency;
-
-            //    OnPropertyChanged(nameof(FromCurrency));
-
-            //    if (_fromCurrency == null)
-            //        return;
-
-            //    var oldToCurrency = ToCurrency;
-
-            //    ToCurrencies = _currencyViewModels
-            //        .Where(c => Symbols.SymbolByCurrencies(c.Currency, _fromCurrency) != null)
-            //        .ToList();
-
-            //    if (oldToCurrency != null &&
-            //        oldToCurrency.Name != _fromCurrency.Name &&
-            //        ToCurrencies.FirstOrDefault(c => c.Currency.Name == oldToCurrency.Name) != null)
-            //    {
-            //        var ToCurrencyVM = ToCurrencies
-            //            .FirstOrDefault(c => c.Currency.Name == oldToCurrency.Name);
-            //        ToCurrencyIndex = ToCurrencies.IndexOf(ToCurrencyVM);
-            //    }
-            //    else
-            //    {
-            //        var ToCurrencyVM = ToCurrencies
-            //            .First();
-            //        ToCurrencyIndex = ToCurrencies.IndexOf(ToCurrencyVM);
-            //    }
-
-            //    FromCurrencyViewModel = _currencyViewModels
-            //        .First(c => c.Currency.Name == _fromCurrency.Name);
-
-            //    _amount = 0;
-            //    _ = UpdateAmountAsync(_amount, updateUi: true);
-            //}
-        }
-
-        private CurrencyConfig _toCurrency;
-        public CurrencyConfig ToCurrency
-        {
-            get => _toCurrency;
-            set => this.RaiseAndSetIfChanged(ref _toCurrency, value);
-            //            set
-            //            {
-            //                _toCurrency = value;
-            //                OnPropertyChanged(nameof(ToCurrency));
-
-            //                if (_toCurrency == null)
-            //                    return;
-
-            //                ToCurrencyViewModel = _currencyViewModels.First(c => c.Currency.Name == _toCurrency.Name);
-
-            //                //ToAddresses = await App.Account.GetCurrencyAccount(ToCurrency.Name).GetAddressesAsync();
-
-            //#if DEBUG
-            //                if (!Env.IsInDesignerMode())
-            //                {
-            //#endif
-            //                    _ = Task.Run(async () =>
-            //                    {
-            //                        await UpdateRedeemAndRewardFeesAsync();
-            //                        OnQuotesUpdatedEventHandler(_app.Terminal, null);
-            //                        OnBaseQuotesUpdatedEventHandler(_app.QuotesProvider, EventArgs.Empty);
-            //                    });
-            //#if DEBUG
-            //                }
-            //#endif
-            //            }
-        }
+        private ObservableAsPropertyHelper<List<CurrencyViewModel>> _toCurrencies;
+        public List<CurrencyViewModel> ToCurrencies => _toCurrencies.Value;
 
         private CurrencyViewModel _fromCurrencyViewModel;
         public CurrencyViewModel FromCurrencyViewModel
         {
             get => _fromCurrencyViewModel;
             set => this.RaiseAndSetIfChanged(ref _fromCurrencyViewModel, value);
-            //set
-            //{
-            //    _fromCurrencyViewModel = value;
-            //    OnPropertyChanged(nameof(FromCurrencyViewModel));
-
-            //    CurrencyFormat = _fromCurrencyViewModel?.CurrencyFormat;
-            //    CurrencyCode = _fromCurrencyViewModel?.CurrencyCode;
-
-            //    FromFeeCurrencyCode = _fromCurrencyViewModel?.FeeCurrencyCode;
-            //    FromFeeCurrencyFormat = _fromCurrencyViewModel?.FeeCurrencyFormat;
-
-            //    BaseCurrencyFormat = _fromCurrencyViewModel?.BaseCurrencyFormat;
-            //    BaseCurrencyCode = _fromCurrencyViewModel?.BaseCurrencyCode;
-
-            //    var symbol = Symbols.SymbolByCurrencies(FromCurrency, ToCurrency);
-            //    if (symbol != null)
-            //    {
-            //        var quoteCurrency = Currencies.GetByName(symbol.Quote);
-
-            //        PriceFormat = quoteCurrency.Format;
-            //    }
-            //}
         }
+
+        private CurrencyConfig? FromCurrency => FromCurrencyViewModel?.Currency;
 
         private CurrencyViewModel _toCurrencyViewModel;
         public CurrencyViewModel ToCurrencyViewModel
         {
             get => _toCurrencyViewModel;
             set => this.RaiseAndSetIfChanged(ref _toCurrencyViewModel, value);
-            //set
-            //{
-            //    _toCurrencyViewModel = value;
-            //    OnPropertyChanged(nameof(ToCurrencyViewModel));
-
-            //    TargetCurrencyFormat = _toCurrencyViewModel?.CurrencyFormat;
-            //    TargetCurrencyCode = _toCurrencyViewModel?.CurrencyCode;
-
-            //    TargetFeeCurrencyCode = _toCurrencyViewModel?.FeeCurrencyCode;
-            //    TargetFeeCurrencyFormat = _toCurrencyViewModel?.FeeCurrencyFormat;
-
-            //    var symbol = Symbols.SymbolByCurrencies(FromCurrency, ToCurrency);
-            //    if (symbol != null)
-            //    {
-            //        var quoteCurrency = Currencies.GetByName(symbol.Quote);
-
-            //        PriceFormat = quoteCurrency.Format;
-            //    }
-            //}
         }
+
+        private CurrencyConfig? ToCurrency => ToCurrencyViewModel?.Currency;
 
         private readonly ObservableAsPropertyHelper<string> _priceFormat;
         public string PriceFormat => _priceFormat.Value;
 
-        private readonly ObservableAsPropertyHelper<string> _currencyFormat;
-        public string CurrencyFormat => _currencyFormat.Value;
-
-        private readonly ObservableAsPropertyHelper<string> _targetCurrencyFormat;
-        public string TargetCurrencyFormat => _targetCurrencyFormat.Value;
-
-        private readonly ObservableAsPropertyHelper<string> _baseCurrencyFormat;
-        public string BaseCurrencyFormat => _baseCurrencyFormat.Value;
-
         protected decimal _amount;
         public string AmountString
         {
-            get => _amount.ToString(CurrencyFormat, CultureInfo.InvariantCulture);
+            get => _amount.ToString(FromCurrencyViewModel.CurrencyFormat, CultureInfo.InvariantCulture);
             set
             {
                 if (!decimal.TryParse(value, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture,
@@ -267,7 +106,7 @@ namespace Atomex.Client.Desktop.ViewModels
                     return;
                 }
 
-                _amount = amount.TruncateByFormat(CurrencyFormat);
+                _amount = amount.TruncateByFormat(FromCurrencyViewModel.CurrencyFormat);
 
                 if (_amount > long.MaxValue)
                     _amount = long.MaxValue;
@@ -276,10 +115,6 @@ namespace Atomex.Client.Desktop.ViewModels
 
                 _ = UpdateAmountAsync(_amount, updateUi: false);
             }
-        }
-        public string FromAmountString
-        {
-            get => _amount.ToString(CurrencyFormat, CultureInfo.InvariantCulture);
         }
 
         private decimal _amountInBase;
@@ -316,31 +151,6 @@ namespace Atomex.Client.Desktop.ViewModels
             get => _targetAmountInBase;
             set => this.RaiseAndSetIfChanged(ref _targetAmountInBase, value);
         }
-
-        private string _currencyCode;
-        public string CurrencyCode
-        {
-            get => _currencyCode;
-            set => this.RaiseAndSetIfChanged(ref _currencyCode, value);
-        }
-
-        private readonly ObservableAsPropertyHelper<string> _fromFeeCurrencyFormat;
-        public string FromFeeCurrencyFormat => _fromFeeCurrencyFormat.Value;
-
-        private readonly ObservableAsPropertyHelper<string> _fromFeeCurrencyCode;
-        public string FromFeeCurrencyCode => _fromFeeCurrencyCode.Value;
-
-        private readonly ObservableAsPropertyHelper<string> _targetCurrencyCode;
-        public string TargetCurrencyCode => _targetCurrencyCode.Value;
-
-        private readonly ObservableAsPropertyHelper<string> _targetFeeCurrencyCode;
-        public string TargetFeeCurrencyCode => _targetFeeCurrencyCode.Value;
-
-        private readonly ObservableAsPropertyHelper<string> _targetFeeCurrencyFormat;
-        public string TargetFeeCurrencyFormat => _targetFeeCurrencyFormat.Value;
-
-        private readonly ObservableAsPropertyHelper<string> _baseCurrencyCode;
-        public string BaseCurrencyCode => _baseCurrencyCode.Value;
 
         private decimal _estimatedOrderPrice;
 
@@ -500,11 +310,31 @@ namespace Atomex.Client.Desktop.ViewModels
         {
             _app = app ?? throw new ArgumentNullException(nameof(app));
 
-            _currencyFormat = this.WhenAnyValue(vm => vm.FromCurrencyViewModel)
-                .Select(vm => vm.CurrencyFormat)
-                .ToProperty(this, vm => vm.CurrencyFormat);
+            // ToCurrencies
+            _toCurrencies = this
+                .WhenAnyValue(vm => vm.FromCurrencyViewModel)
+                .WhereNotNull()
+                .Select(vm => FromCurrencies
+                    .Where(fc => Symbols.SymbolByCurrencies(fc.Currency, vm.Currency) != null)
+                    .ToList())
+                .ToProperty(this, nameof(ToCurrencies));
 
+            // PriceFormat
+            _priceFormat = this
+                .WhenAnyValue(vm => vm.FromCurrencyViewModel, vm => vm.ToCurrencyViewModel)
+                .WhereAllNotNull()
+                .Select(t =>
+                {
+                    var symbol = Symbols.SymbolByCurrencies(t.Item1.Currency, t.Item2.Currency); 
+                    return symbol != null ? Currencies.GetByName(symbol.Quote).Format : null;
+                })
+                .WhereNotNull()
+                .ToProperty(this, nameof(PriceFormat));
 
+            // Currencies changes => reset amount
+            this.WhenAnyValue(vm => vm.FromCurrencyViewModel, vm => vm.ToCurrencyViewModel)
+                .WhereAllNotNull()
+                .Subscribe(t => { _ = UpdateAmountAsync(value: 0, updateUi: true); });
 
             SubscribeToServices();
         }
@@ -540,21 +370,25 @@ namespace Atomex.Client.Desktop.ViewModels
         private ICommand _swapCurrenciesCommand;
         public ICommand SwapCurrenciesCommand => _swapCurrenciesCommand ??= ReactiveCommand.Create(() =>
         {
-            var temp = _fromCurrency;
+            if (FromCurrencyViewModel == null || ToCurrencyViewModel == null)
+                return;
 
-            var fromCurrencyVm = FromCurrencies.FirstOrDefault(c => c.Currency.Name == _toCurrency.Name);
-            FromCurrencyIndex = FromCurrencies.IndexOf(fromCurrencyVm);
+            var previousFromCurrency = FromCurrencyViewModel;
+            FromCurrencyViewModel = ToCurrencyViewModel;
 
-            var toCurrencyVm = ToCurrencies.FirstOrDefault(c => c.Currency.Name == temp.Name);
-            ToCurrencyIndex = ToCurrencies.IndexOf(toCurrencyVm);
+            _toCurrencies.
+
+            ToCurrencyViewModel = previousFromCurrency;
         });
 
         public void SetFromCurrency(CurrencyConfig fromCurrency)
         {
-            var fromCurrencyVm = FromCurrencies
-                .FirstOrDefault(c => c.Currency?.Name == fromCurrency?.Name);
+            // TODO
 
-            FromCurrencyIndex = FromCurrencies.IndexOf(fromCurrencyVm);
+            //var fromCurrencyVm = FromCurrencies
+            //    .FirstOrDefault(c => c.Currency?.Name == fromCurrency?.Name);
+
+            //FromCurrencyIndex = FromCurrencies.IndexOf(fromCurrencyVm);
         }
 
         private void SubscribeToServices()
@@ -605,13 +439,13 @@ namespace Atomex.Client.Desktop.ViewModels
                 _estimatedPaymentFee = swapParams.PaymentFee;
                 _estimatedMakerNetworkFee = swapParams.MakerNetworkFee;
 
-                OnPropertyChanged(nameof(CurrencyFormat));
-                OnPropertyChanged(nameof(TargetCurrencyFormat));
+                //OnPropertyChanged(nameof(CurrencyFormat));
+                //OnPropertyChanged(nameof(TargetCurrencyFormat));
                 OnPropertyChanged(nameof(EstimatedPaymentFee));
                 OnPropertyChanged(nameof(EstimatedMakerNetworkFee));
-                OnPropertyChanged(nameof(FromAmountString));
+                //OnPropertyChanged(nameof(FromAmountString));
 
-                IsAmountValid = _amount <= swapParams.Amount.TruncateByFormat(CurrencyFormat);
+                IsAmountValid = _amount <= swapParams.Amount.TruncateByFormat(FromCurrencyViewModel.CurrencyFormat);
 
                 if (updateUi)
                     OnPropertyChanged(nameof(AmountString));
@@ -639,13 +473,13 @@ namespace Atomex.Client.Desktop.ViewModels
             if (provider == null)
                 throw new ArgumentNullException(nameof(provider));
 
-            if (TargetCurrencyCode == null)
+            if (ToCurrencyViewModel.CurrencyCode == null)
                 return;
 
-            if (BaseCurrencyCode == null)
+            if (FromCurrencyViewModel.BaseCurrencyCode == null)
                 return;
 
-            var quote = provider.GetQuote(TargetCurrencyCode, BaseCurrencyCode);
+            var quote = provider.GetQuote(ToCurrencyViewModel.CurrencyCode, FromCurrencyViewModel.BaseCurrencyCode);
 
             TargetAmountInBase = _targetAmount * (quote?.Bid ?? 0m);
         }
@@ -663,32 +497,34 @@ namespace Atomex.Client.Desktop.ViewModels
             //if (RedeemAdderss == null)
             //    return;
 
-            var walletAddress = await _app.Account
-                .GetCurrencyAccount(ToCurrency.Name)
-                .GetAddressAsync(RedeemAddress);
+            // TODO
 
-            _estimatedRedeemFee = await ToCurrency
-                .GetEstimatedRedeemFeeAsync(walletAddress, withRewardForRedeem: false);
+            //var walletAddress = await _app.Account
+            //    .GetCurrencyAccount(ToCurrency.Name)
+            //    .GetAddressAsync(RedeemAddress);
 
-            _rewardForRedeem = await RewardForRedeemHelper
-                .EstimateAsync(
-                    account: _app.Account,
-                    quotesProvider: _app.QuotesProvider,
-                    feeCurrencyQuotesProvider: symbol => _app.Terminal?.GetOrderBook(symbol)?.TopOfBook(),
-                    walletAddress: walletAddress);
+            //_estimatedRedeemFee = await ToCurrency
+            //    .GetEstimatedRedeemFeeAsync(walletAddress, withRewardForRedeem: false);
 
-            _hasRewardForRedeem = _rewardForRedeem != 0;
+            //_rewardForRedeem = await RewardForRedeemHelper
+            //    .EstimateAsync(
+            //        account: _app.Account,
+            //        quotesProvider: _app.QuotesProvider,
+            //        feeCurrencyQuotesProvider: symbol => _app.Terminal?.GetOrderBook(symbol)?.TopOfBook(),
+            //        walletAddress: walletAddress);
 
-            await Dispatcher.UIThread.InvokeAsync(() =>
-            {
-                OnPropertyChanged(nameof(EstimatedRedeemFee));
-                OnPropertyChanged(nameof(RewardForRedeem));
-                OnPropertyChanged(nameof(HasRewardForRedeem));
+            //_hasRewardForRedeem = _rewardForRedeem != 0;
 
-            }, DispatcherPriority.Background);
+            //await Dispatcher.UIThread.InvokeAsync(() =>
+            //{
+            //    OnPropertyChanged(nameof(EstimatedRedeemFee));
+            //    OnPropertyChanged(nameof(RewardForRedeem));
+            //    OnPropertyChanged(nameof(HasRewardForRedeem));
+
+            //}, DispatcherPriority.Background);
         }
 
-        private void OnTerminalChangedEventHandler(object sender, AtomexClientChangedEventArgs args)
+        private void OnTerminalChangedEventHandler(object? sender, AtomexClientChangedEventArgs args)
         {
             var terminal = args.AtomexClient;
 
@@ -701,42 +537,39 @@ namespace Atomex.Client.Desktop.ViewModels
             terminal.QuotesUpdated += OnQuotesUpdatedEventHandler;
             terminal.SwapUpdated += OnSwapEventHandler;
 
-            _currencyViewModels = terminal.Account.Currencies
+            FromCurrencies = terminal.Account.Currencies
                 .Where(c => c.IsSwapAvailable)
                 .Select(CurrencyViewModelCreator.CreateViewModel)
                 .ToList();
 
-            FromCurrencies = _currencyViewModels.ToList();
+            FromCurrencyViewModel = FromCurrencies.First(c => c.Currency.Name == "BTC");
+            ToCurrencyViewModel = ToCurrencies.First(c => c.Currency.Name == "LTC");
 
-            var fromCurrencyVm = FromCurrencies
-                .FirstOrDefault(c => c.Currency.Name == "BTC");
-            FromCurrencyIndex = FromCurrencies.IndexOf(fromCurrencyVm);
-
-            var toCurrencyVm = ToCurrencies
-                .FirstOrDefault(c => c.Currency.Name == "LTC");
-            ToCurrencyIndex = ToCurrencies.IndexOf(toCurrencyVm);
-
-            OnSwapEventHandler(this, null);
+            OnSwapEventHandler(this, args: null);
         }
 
-        protected async void OnBaseQuotesUpdatedEventHandler(object sender, EventArgs args)
+        protected async void OnBaseQuotesUpdatedEventHandler(object? sender, EventArgs args)
         {
             if (sender is not ICurrencyQuotesProvider provider)
                 return;
 
-            if (_currencyCode == null || _targetCurrencyCode == null || _baseCurrencyCode == null)
+            if (FromCurrencyViewModel == null ||
+                FromCurrencyViewModel.CurrencyCode == null ||
+                FromCurrencyViewModel.BaseCurrencyCode == null ||
+                ToCurrencyViewModel == null ||
+                ToCurrencyViewModel.CurrencyCode == null)
                 return;
 
-            var fromCurrencyPrice = provider.GetQuote(_currencyCode, BaseCurrencyCode)?.Bid ?? 0m;
+            var fromCurrencyPrice = provider.GetQuote(FromCurrencyViewModel.CurrencyCode, FromCurrencyViewModel.BaseCurrencyCode)?.Bid ?? 0m;
             _amountInBase = _amount * fromCurrencyPrice;
 
-            var fromCurrencyFeePrice = provider.GetQuote(FromCurrency.FeeCurrencyName, BaseCurrencyCode)?.Bid ?? 0m;
+            var fromCurrencyFeePrice = provider.GetQuote(FromCurrency.FeeCurrencyName, FromCurrencyViewModel.BaseCurrencyCode)?.Bid ?? 0m;
             _estimatedPaymentFeeInBase = _estimatedPaymentFee * fromCurrencyFeePrice;
 
-            var toCurrencyFeePrice = provider.GetQuote(ToCurrency.FeeCurrencyName, BaseCurrencyCode)?.Bid ?? 0m;
+            var toCurrencyFeePrice = provider.GetQuote(ToCurrency.FeeCurrencyName, FromCurrencyViewModel.BaseCurrencyCode)?.Bid ?? 0m;
             _estimatedRedeemFeeInBase = _estimatedRedeemFee * toCurrencyFeePrice;
 
-            var toCurrencyPrice = provider.GetQuote(TargetCurrencyCode, BaseCurrencyCode)?.Bid ?? 0m;
+            var toCurrencyPrice = provider.GetQuote(ToCurrencyViewModel.CurrencyCode, FromCurrencyViewModel.BaseCurrencyCode)?.Bid ?? 0m;
             _rewardForRedeemInBase = _rewardForRedeem * toCurrencyPrice;
 
             _estimatedMakerNetworkFeeInBase = _estimatedMakerNetworkFee * fromCurrencyPrice;
@@ -787,7 +620,7 @@ namespace Atomex.Client.Desktop.ViewModels
             }, DispatcherPriority.Background);
         }
 
-        protected async void OnQuotesUpdatedEventHandler(object sender, MarketDataEventArgs args)
+        protected async void OnQuotesUpdatedEventHandler(object? sender, MarketDataEventArgs args)
         {
             try
             {
@@ -814,7 +647,7 @@ namespace Atomex.Client.Desktop.ViewModels
                     OnPropertyChanged(nameof(EstimatedMaxAmount));
                     OnPropertyChanged(nameof(PriceFormat));
                     OnPropertyChanged(nameof(IsNoLiquidity));
-                    OnPropertyChanged(nameof(TargetCurrencyFormat));
+                    //OnPropertyChanged(nameof(TargetCurrencyFormat));
                     OnPropertyChanged(nameof(TargetAmount));
 
                     UpdateTargetAmountInBase(_app.QuotesProvider);
@@ -827,7 +660,7 @@ namespace Atomex.Client.Desktop.ViewModels
             }
         }
 
-        private async void OnSwapEventHandler(object sender, SwapEventArgs args)
+        private async void OnSwapEventHandler(object? sender, SwapEventArgs? args)
         {
             try
             {
@@ -879,7 +712,6 @@ namespace Atomex.Client.Desktop.ViewModels
                         title: Resources.CvWarning,
                         text: Resources.CvBigAmount,
                         backAction: () => App.DialogService.Close()));
-
                 return;
             }
 
@@ -890,7 +722,6 @@ namespace Atomex.Client.Desktop.ViewModels
                         title: Resources.CvWarning,
                         text: Resources.CvNoLiquidity,
                         backAction: () => App.DialogService.Close()));
-
                 return;
             }
 
@@ -901,7 +732,6 @@ namespace Atomex.Client.Desktop.ViewModels
                         title: Resources.CvWarning,
                         text: Resources.CvServicesUnavailable,
                         backAction: () => App.DialogService.Close()));
-
                 return;
             }
 
@@ -938,23 +768,9 @@ namespace Atomex.Client.Desktop.ViewModels
 
             var viewModel = new ConversionConfirmationViewModel(_app)
             {
-                FromCurrency = FromCurrency,
-                ToCurrency = ToCurrency,
                 FromCurrencyViewModel = FromCurrencyViewModel,
                 ToCurrencyViewModel = ToCurrencyViewModel,
-
                 PriceFormat = PriceFormat,
-                CurrencyCode = CurrencyCode,
-                CurrencyFormat = CurrencyFormat,
-                TargetCurrencyCode = TargetCurrencyCode,
-                TargetCurrencyFormat = TargetCurrencyFormat,
-                BaseCurrencyCode = BaseCurrencyCode,
-                BaseCurrencyFormat = BaseCurrencyFormat,
-
-                FromFeeCurrencyCode = FromFeeCurrencyCode,
-                FromFeeCurrencyFormat = FromFeeCurrencyFormat,
-                TargetFeeCurrencyCode = TargetFeeCurrencyCode,
-                TargetFeeCurrencyFormat = TargetFeeCurrencyFormat,
 
                 Amount = _amount,
                 AmountInBase = AmountInBase,
@@ -993,37 +809,33 @@ namespace Atomex.Client.Desktop.ViewModels
             var btc = DesignTime.Currencies.Get<BitcoinConfig>("BTC");
             var ltc = DesignTime.Currencies.Get<LitecoinConfig>("LTC");
 
-            _currencyViewModels = new List<CurrencyViewModel>
+            var currencyViewModels = new List<CurrencyViewModel>
             {
                 CurrencyViewModelCreator.CreateViewModel(btc, subscribeToUpdates: false),
                 CurrencyViewModelCreator.CreateViewModel(ltc, subscribeToUpdates: false)
             };
 
-            _fromCurrencies = _currencyViewModels;
-            _toCurrencies = _currencyViewModels;
-            _fromCurrency = btc;
-            _toCurrency = ltc;
-
-            FromCurrencyViewModel = _currencyViewModels.FirstOrDefault(c => c.Currency.Name == _fromCurrency.Name);
-            ToCurrencyViewModel = _currencyViewModels.FirstOrDefault(c => c.Currency.Name == _toCurrency.Name);
+            FromCurrencies = currencyViewModels;
+            FromCurrencyViewModel = currencyViewModels.FirstOrDefault(c => c.Currency.Name == btc.Name);
+            ToCurrencyViewModel = currencyViewModels.FirstOrDefault(c => c.Currency.Name == ltc.Name);
 
             var swapViewModels = new List<SwapViewModel>()
             {
                 SwapViewModelFactory.CreateSwapViewModel(new Swap
                     {
-                        Symbol = "LTC/BTC",
-                        Price = 0.0000888m,
-                        Qty = 0.001000m,
-                        Side = Side.Buy,
+                        Symbol    = "LTC/BTC",
+                        Price     = 0.0000888m,
+                        Qty       = 0.001000m,
+                        Side      = Side.Buy,
                         TimeStamp = DateTime.UtcNow
                     },
                     DesignTime.Currencies),
                 SwapViewModelFactory.CreateSwapViewModel(new Swap
                     {
-                        Symbol = "LTC/BTC",
-                        Price = 0.0100808m,
-                        Qty = 0.0043000m,
-                        Side = Side.Sell,
+                        Symbol    = "LTC/BTC",
+                        Price     = 0.0100808m,
+                        Qty       = 0.0043000m,
+                        Side      = Side.Sell,
                         TimeStamp = DateTime.UtcNow
                     },
                     DesignTime.Currencies)
