@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Reactive.Linq;
 using System.Windows.Input;
 
 using Avalonia.Threading;
@@ -238,33 +239,17 @@ namespace Atomex.Client.Desktop.ViewModels
             //}
         }
 
-        private string _priceFormat;
-        public string PriceFormat
-        {
-            get => _priceFormat;
-            set => this.RaiseAndSetIfChanged(ref _priceFormat, value);
-        }
+        private readonly ObservableAsPropertyHelper<string> _priceFormat;
+        public string PriceFormat => _priceFormat.Value;
 
-        private string _currencyFormat;
-        public string CurrencyFormat
-        {
-            get => _currencyFormat;
-            set => this.RaiseAndSetIfChanged(ref _currencyFormat, value);
-        }
+        private readonly ObservableAsPropertyHelper<string> _currencyFormat;
+        public string CurrencyFormat => _currencyFormat.Value;
 
-        private string _targetCurrencyFormat;
-        public string TargetCurrencyFormat
-        {
-            get => _targetCurrencyFormat;
-            set => this.RaiseAndSetIfChanged(ref _targetCurrencyFormat, value);
-        }
+        private readonly ObservableAsPropertyHelper<string> _targetCurrencyFormat;
+        public string TargetCurrencyFormat => _targetCurrencyFormat.Value;
 
-        private string _baseCurrencyFormat;
-        public string BaseCurrencyFormat
-        {
-            get => _baseCurrencyFormat;
-            set => this.RaiseAndSetIfChanged(ref _baseCurrencyFormat, value);
-        }
+        private readonly ObservableAsPropertyHelper<string> _baseCurrencyFormat;
+        public string BaseCurrencyFormat => _baseCurrencyFormat.Value;
 
         protected decimal _amount;
         public string AmountString
@@ -339,47 +324,23 @@ namespace Atomex.Client.Desktop.ViewModels
             set => this.RaiseAndSetIfChanged(ref _currencyCode, value);
         }
 
-        private string _fromFeeCurrencyFormat;
-        public string FromFeeCurrencyFormat
-        {
-            get => _fromFeeCurrencyFormat;
-            set => this.RaiseAndSetIfChanged(ref _fromFeeCurrencyFormat, value);
-        }
+        private readonly ObservableAsPropertyHelper<string> _fromFeeCurrencyFormat;
+        public string FromFeeCurrencyFormat => _fromFeeCurrencyFormat.Value;
 
-        private string _fromFeeCurrencyCode;
-        public string FromFeeCurrencyCode
-        {
-            get => _fromFeeCurrencyCode;
-            set => this.RaiseAndSetIfChanged(ref _fromFeeCurrencyCode, value);
-        }
+        private readonly ObservableAsPropertyHelper<string> _fromFeeCurrencyCode;
+        public string FromFeeCurrencyCode => _fromFeeCurrencyCode.Value;
 
-        private string _targetCurrencyCode;
-        public string TargetCurrencyCode
-        {
-            get => _targetCurrencyCode;
-            set => this.RaiseAndSetIfChanged(ref _targetCurrencyCode, value);
-        }
+        private readonly ObservableAsPropertyHelper<string> _targetCurrencyCode;
+        public string TargetCurrencyCode => _targetCurrencyCode.Value;
 
-        private string _targetFeeCurrencyCode;
-        public string TargetFeeCurrencyCode
-        {
-            get => _targetFeeCurrencyCode;
-            set => this.RaiseAndSetIfChanged(ref _targetFeeCurrencyCode, value);
-        }
+        private readonly ObservableAsPropertyHelper<string> _targetFeeCurrencyCode;
+        public string TargetFeeCurrencyCode => _targetFeeCurrencyCode.Value;
 
-        private string _targetFeeCurrencyFormat;
-        public string TargetFeeCurrencyFormat
-        {
-            get => _targetFeeCurrencyFormat;
-            set => this.RaiseAndSetIfChanged(ref _targetFeeCurrencyFormat, value);
-        }
+        private readonly ObservableAsPropertyHelper<string> _targetFeeCurrencyFormat;
+        public string TargetFeeCurrencyFormat => _targetFeeCurrencyFormat.Value;
 
-        private string _baseCurrencyCode;
-        public string BaseCurrencyCode
-        {
-            get => _baseCurrencyCode;
-            set => this.RaiseAndSetIfChanged(ref _baseCurrencyCode, value);
-        }
+        private readonly ObservableAsPropertyHelper<string> _baseCurrencyCode;
+        public string BaseCurrencyCode => _baseCurrencyCode.Value;
 
         private decimal _estimatedOrderPrice;
 
@@ -538,6 +499,12 @@ namespace Atomex.Client.Desktop.ViewModels
         public ConversionViewModel(IAtomexApp app)
         {
             _app = app ?? throw new ArgumentNullException(nameof(app));
+
+            _currencyFormat = this.WhenAnyValue(vm => vm.FromCurrencyViewModel)
+                .Select(vm => vm.CurrencyFormat)
+                .ToProperty(this, vm => vm.CurrencyFormat);
+
+
 
             SubscribeToServices();
         }
@@ -760,16 +727,16 @@ namespace Atomex.Client.Desktop.ViewModels
             if (_currencyCode == null || _targetCurrencyCode == null || _baseCurrencyCode == null)
                 return;
 
-            var fromCurrencyPrice = provider.GetQuote(_currencyCode, _baseCurrencyCode)?.Bid ?? 0m;
+            var fromCurrencyPrice = provider.GetQuote(_currencyCode, BaseCurrencyCode)?.Bid ?? 0m;
             _amountInBase = _amount * fromCurrencyPrice;
 
-            var fromCurrencyFeePrice = provider.GetQuote(FromCurrency.FeeCurrencyName, _baseCurrencyCode)?.Bid ?? 0m;
+            var fromCurrencyFeePrice = provider.GetQuote(FromCurrency.FeeCurrencyName, BaseCurrencyCode)?.Bid ?? 0m;
             _estimatedPaymentFeeInBase = _estimatedPaymentFee * fromCurrencyFeePrice;
 
-            var toCurrencyFeePrice = provider.GetQuote(ToCurrency.FeeCurrencyName, _baseCurrencyCode)?.Bid ?? 0m;
+            var toCurrencyFeePrice = provider.GetQuote(ToCurrency.FeeCurrencyName, BaseCurrencyCode)?.Bid ?? 0m;
             _estimatedRedeemFeeInBase = _estimatedRedeemFee * toCurrencyFeePrice;
 
-            var toCurrencyPrice = provider.GetQuote(TargetCurrencyCode, _baseCurrencyCode)?.Bid ?? 0m;
+            var toCurrencyPrice = provider.GetQuote(TargetCurrencyCode, BaseCurrencyCode)?.Bid ?? 0m;
             _rewardForRedeemInBase = _rewardForRedeem * toCurrencyPrice;
 
             _estimatedMakerNetworkFeeInBase = _estimatedMakerNetworkFee * fromCurrencyPrice;
