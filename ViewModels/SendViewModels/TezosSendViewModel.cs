@@ -39,8 +39,6 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
             try
             {
-                var defaultFeePrice = await Currency.GetDefaultFeePriceAsync();
-
                 if (App.Account.GetCurrencyAccount(Currency.Name) is not IEstimatable account)
                     return; // todo: error?
 
@@ -71,16 +69,14 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
                     OnPropertyChanged(nameof(AmountString));
 
-                    _fee = Currency.GetFeeFromFeeAmount(estimatedFeeAmount ?? Currency.GetDefaultFee(), defaultFeePrice);
+                    _fee = estimatedFeeAmount ?? Currency.GetDefaultFee();
                     OnPropertyChanged(nameof(FeeString));
                 }
                 else
                 {
                     var availableAmount = maxAmount + maxFeeAmount;
 
-                    var feeAmount = Currency.GetFeeAmount(_fee, defaultFeePrice);
-
-                    if (_amount > maxAmount || _amount + feeAmount > availableAmount)
+                    if (_amount > maxAmount || _amount + _fee > availableAmount)
                     {
                         Warning = Resources.CvInsufficientFunds;
                         IsAmountUpdating = false;
@@ -113,11 +109,9 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
             try
             {
-                var defaultFeePrice = await Currency.GetDefaultFeePriceAsync();
-
                 if (_amount == 0)
                 {
-                    if (Currency.GetFeeAmount(_fee, defaultFeePrice) > CurrencyViewModel.AvailableAmount)
+                    if (_fee > CurrencyViewModel.AvailableAmount)
                         Warning = Resources.CvInsufficientFunds;
 
                     return;
@@ -149,15 +143,13 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                         ? CurrencyViewModel.AvailableAmount
                         : maxAmount + maxFeeAmount;
 
-                    var feeAmount = Currency.GetFeeAmount(_fee, defaultFeePrice);
-
-                    if (_amount + feeAmount > availableAmount)
+                    if (_amount + _fee > availableAmount)
                     {
                         Warning = Resources.CvInsufficientFunds;
                         IsAmountUpdating = false;
                         return;
                     }
-                    else if (estimatedFeeAmount == null || feeAmount < estimatedFeeAmount.Value)
+                    else if (estimatedFeeAmount == null || _fee < estimatedFeeAmount.Value)
                     {
                         Warning = Resources.CvLowFees;
                     }
@@ -187,9 +179,6 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 if (CurrencyViewModel.AvailableAmount == 0)
                     return;
 
-                var defaultFeePrice = await Currency
-                    .GetDefaultFeePriceAsync();
-
                 if (App.Account.GetCurrencyAccount(Currency.Name) is not IEstimatable account)
                     return; // todo: error?
 
@@ -208,18 +197,16 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
                     OnPropertyChanged(nameof(AmountString));
 
-                    _fee = Currency.GetFeeFromFeeAmount(maxFeeAmount, defaultFeePrice);
+                    _fee = maxFeeAmount;
                     OnPropertyChanged(nameof(FeeString));
                 }
                 else
                 {
                     var availableAmount = maxAmount + maxFeeAmount;
 
-                    var feeAmount = Currency.GetFeeAmount(_fee, defaultFeePrice);
-
-                    if (availableAmount - feeAmount > 0)
+                    if (availableAmount - _fee > 0)
                     {
-                        _amount = availableAmount - feeAmount;
+                        _amount = availableAmount - _fee;
 
                         var estimatedFeeAmount = _amount != 0
                             ? await account.EstimateFeeAsync(
@@ -229,7 +216,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                                 type: BlockchainTransactionType.Output)
                             : 0;
 
-                        if (estimatedFeeAmount == null || feeAmount < estimatedFeeAmount.Value)
+                        if (estimatedFeeAmount == null || _fee < estimatedFeeAmount.Value)
                         {
                             Warning = Resources.CvLowFees;
                             if (_fee == 0)

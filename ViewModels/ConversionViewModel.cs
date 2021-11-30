@@ -66,8 +66,12 @@ namespace Atomex.Client.Desktop.ViewModels
             set => this.RaiseAndSetIfChanged(ref _fromCurrencies, value);
         }
 
-        private ObservableAsPropertyHelper<List<CurrencyViewModel>> _toCurrencies;
-        public List<CurrencyViewModel> ToCurrencies => _toCurrencies.Value;
+        private List<CurrencyViewModel> _toCurrencies;
+        public List<CurrencyViewModel> ToCurrencies
+        {
+            get => _toCurrencies;
+            set => this.RaiseAndSetIfChanged(ref _toCurrencies, value);
+        }
 
         private CurrencyViewModel _fromCurrencyViewModel;
         public CurrencyViewModel FromCurrencyViewModel
@@ -310,14 +314,15 @@ namespace Atomex.Client.Desktop.ViewModels
         {
             _app = app ?? throw new ArgumentNullException(nameof(app));
 
-            // ToCurrencies
-            _toCurrencies = this
-                .WhenAnyValue(vm => vm.FromCurrencyViewModel)
+            // "From" currency changed => Update "To" currencies list
+            this.WhenAnyValue(vm => vm.FromCurrencyViewModel)
                 .WhereNotNull()
-                .Select(vm => FromCurrencies
-                    .Where(fc => Symbols.SymbolByCurrencies(fc.Currency, vm.Currency) != null)
-                    .ToList())
-                .ToProperty(this, nameof(ToCurrencies));
+                .Subscribe(c =>
+                {
+                    ToCurrencies = FromCurrencies
+                        .Where(fc => Symbols.SymbolByCurrencies(fc.Currency, c.Currency) != null)
+                        .ToList();
+                });
 
             // PriceFormat
             _priceFormat = this
@@ -375,9 +380,6 @@ namespace Atomex.Client.Desktop.ViewModels
 
             var previousFromCurrency = FromCurrencyViewModel;
             FromCurrencyViewModel = ToCurrencyViewModel;
-
-            _toCurrencies.
-
             ToCurrencyViewModel = previousFromCurrency;
         });
 

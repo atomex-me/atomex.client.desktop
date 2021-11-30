@@ -89,9 +89,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
                     OnPropertyChanged(nameof(AmountString));
 
-                    var defaultFeePrice = await Currency.GetDefaultFeePriceAsync();
-
-                    _fee = Currency.GetFeeFromFeeAmount(estimatedFeeAmount ?? Currency.GetDefaultFee(), defaultFeePrice);
+                    _fee = estimatedFeeAmount ?? Currency.GetDefaultFee();
                     OnPropertyChanged(nameof(FeeString));
                 }
                 else
@@ -135,9 +133,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             {
                 if (_amount == 0)
                 {
-                    var defaultFeePrice = await Currency.GetDefaultFeePriceAsync();
-
-                    if (Currency.GetFeeAmount(_fee, defaultFeePrice) > CurrencyViewModel.AvailableAmount)
+                    if (_fee > CurrencyViewModel.AvailableAmount)
                         Warning = Resources.CvInsufficientFunds;
 
                     return;
@@ -158,10 +154,6 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                         feePrice: 0,
                         reserve: false);
 
-                    var defaultFeePrice = await Currency.GetDefaultFeePriceAsync();
-
-                    var feeAmount = Currency.GetFeeAmount(_fee, defaultFeePrice);
-
                     var estimatedFeeAmount = _amount != 0
                         ? await account.EstimateFeeAsync(
                             from: new FromAddress(From),
@@ -179,12 +171,12 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
                         return;
                     }
-                    else if (estimatedFeeAmount == null || feeAmount < estimatedFeeAmount.Value)
+                    else if (estimatedFeeAmount == null || _fee < estimatedFeeAmount.Value)
                     {
                         Warning = Resources.CvLowFees;
                     }
 
-                    if (feeAmount > maxAvailableFee)
+                    if (_fee > maxAvailableFee)
                         Warning = string.Format(CultureInfo.InvariantCulture, Resources.CvInsufficientChainFunds, Currency.FeeCurrencyName);
 
                     OnPropertyChanged(nameof(FeeString));
@@ -214,8 +206,6 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 if (availableAmount == 0)
                     return;
 
-                var defaultFeePrice = await Currency.GetDefaultFeePriceAsync();
-
                 if (App.Account.GetCurrencyAccount(Currency.Name) is not IEstimatable account)
                     return; // todo: error?
 
@@ -236,13 +226,11 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
                     OnPropertyChanged(nameof(AmountString));
 
-                    _fee = Currency.GetFeeFromFeeAmount(maxFeeAmount, defaultFeePrice);
+                    _fee = maxFeeAmount;
                     OnPropertyChanged(nameof(FeeString));
                 }
                 else
                 {
-                    var feeAmount = Currency.GetFeeAmount(_fee, defaultFeePrice);
-
                     if (_fee < maxFeeAmount)
                     {
                         Warning = Resources.CvLowFees;
@@ -256,7 +244,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
                     _amount = maxAmount;
 
-                    if (maxAmount < availableAmount || feeAmount > maxFeeAmount)
+                    if (maxAmount < availableAmount || _fee > maxFeeAmount)
                         Warning = string.Format(CultureInfo.InvariantCulture, Resources.CvInsufficientChainFunds, Currency.FeeCurrencyName);
 
                     OnPropertyChanged(nameof(AmountString));
