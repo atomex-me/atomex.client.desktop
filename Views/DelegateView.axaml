@@ -53,7 +53,7 @@
                            Margin="40 20 40 40"
                            TextWrapping="Wrap"
                            HorizontalAlignment="Center" />
-
+                
                 <ComboBox IsVisible="{Binding !BakersLoading}"
                           Width="510"
                           MinHeight="68"
@@ -61,7 +61,6 @@
                           Margin="0 5 0 5"
                           Items="{Binding FromBakersList}"
                           SelectedItem="{Binding BakerViewModel}"
-                          VirtualizationMode="Simple"
                           helpers:ComboBoxHelper.CornerRadius="20"
                           Classes="BakersComboBox" />
 
