@@ -12,3 +12,4 @@ release/
 
 .DS_Store
 *.pfx
+FodyWeavers.*
