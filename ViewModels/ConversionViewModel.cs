@@ -23,6 +23,7 @@ using Atomex.Client.Desktop.Properties;
 using Atomex.Client.Desktop.ViewModels.Abstract;
 using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
 using Atomex.Wallet.Abstract;
+using ReactiveUI.Fody.Helpers;
 
 namespace Atomex.Client.Desktop.ViewModels
 {
@@ -59,42 +60,26 @@ namespace Atomex.Client.Desktop.ViewModels
         private string To { get; set; }
         private string RedeemAddress { get; set; }
 
-        private List<CurrencyViewModel> _fromCurrencies;
-        public List<CurrencyViewModel> FromCurrencies
-        {
-            get => _fromCurrencies;
-            set => this.RaiseAndSetIfChanged(ref _fromCurrencies, value);
-        }
+        [Reactive]
+        public List<CurrencyViewModel> FromCurrencies { get; set; }
 
-        private List<CurrencyViewModel> _toCurrencies;
-        public List<CurrencyViewModel> ToCurrencies
-        {
-            get => _toCurrencies;
-            set => this.RaiseAndSetIfChanged(ref _toCurrencies, value);
-        }
+        [Reactive]
+        public List<CurrencyViewModel> ToCurrencies { get; set; }
 
-        private CurrencyViewModel _fromCurrencyViewModel;
-        public CurrencyViewModel FromCurrencyViewModel
-        {
-            get => _fromCurrencyViewModel;
-            set => this.RaiseAndSetIfChanged(ref _fromCurrencyViewModel, value);
-        }
+        [Reactive]
+        public CurrencyViewModel FromCurrencyViewModel { get; set; }
 
         private CurrencyConfig? FromCurrency => FromCurrencyViewModel?.Currency;
 
-        private CurrencyViewModel _toCurrencyViewModel;
-        public CurrencyViewModel ToCurrencyViewModel
-        {
-            get => _toCurrencyViewModel;
-            set => this.RaiseAndSetIfChanged(ref _toCurrencyViewModel, value);
-        }
+        [Reactive]
+        public CurrencyViewModel ToCurrencyViewModel { get; set; }
 
         private CurrencyConfig? ToCurrency => ToCurrencyViewModel?.Currency;
 
-        private readonly ObservableAsPropertyHelper<string> _priceFormat;
-        public string PriceFormat => _priceFormat.Value;
+        [ObservableAsProperty]
+        public string PriceFormat { get; }
 
-        protected decimal _amount;
+        private decimal _amount;
         public string AmountString
         {
             get => _amount.ToString(FromCurrencyViewModel?.CurrencyFormat ?? "0.0", CultureInfo.InvariantCulture);
@@ -120,161 +105,73 @@ namespace Atomex.Client.Desktop.ViewModels
             }
         }
 
-        private decimal _amountInBase;
-        public decimal AmountInBase
-        {
-            get => _amountInBase;
-            set => this.RaiseAndSetIfChanged(ref _amountInBase, value);
-        }
+        [Reactive]
+        public decimal AmountInBase { get; set; }
 
-        private bool _isAmountUpdating;
-        public bool IsAmountUpdating
-        {
-            get => _isAmountUpdating;
-            set => this.RaiseAndSetIfChanged(ref _isAmountUpdating, value);
-        }
+        [Reactive]
+        public bool IsAmountUpdating { get; set; }
 
-        private bool _isAmountValid = true;
-        public bool IsAmountValid
-        {
-            get => _isAmountValid;
-            set => this.RaiseAndSetIfChanged(ref _isAmountValid, value);
-        }
+        [Reactive]
+        public bool IsAmountValid { get; set; }
 
-        private decimal _targetAmount;
-        public decimal TargetAmount
-        {
-            get => _targetAmount;
-            set => this.RaiseAndSetIfChanged(ref _targetAmount, value);
-        }
+        [Reactive]
+        public decimal TargetAmount { get; set; }
 
-        private decimal _targetAmountInBase;
-        public decimal TargetAmountInBase
-        {
-            get => _targetAmountInBase;
-            set => this.RaiseAndSetIfChanged(ref _targetAmountInBase, value);
-        }
+        [Reactive]
+        public decimal TargetAmountInBase { get; set; }
 
         private decimal _estimatedOrderPrice;
 
-        private decimal _estimatedPrice;
-        public decimal EstimatedPrice
-        {
-            get => _estimatedPrice;
-            set => this.RaiseAndSetIfChanged(ref _estimatedPrice, value);
-        }
+        [Reactive]
+        public decimal EstimatedPrice { get; set; }
 
-        private decimal _estimatedMaxAmount;
-        public decimal EstimatedMaxAmount
-        {
-            get => _estimatedMaxAmount;
-            set => this.RaiseAndSetIfChanged(ref _estimatedMaxAmount, value);
-        }
+        [Reactive]
+        public decimal EstimatedMaxAmount { get; set; }
 
-        private decimal _estimatedMakerNetworkFee;
-        public decimal EstimatedMakerNetworkFee
-        {
-            get => _estimatedMakerNetworkFee;
-            set => this.RaiseAndSetIfChanged(ref _estimatedMakerNetworkFee, value);
-        }
+        [Reactive]
+        public decimal EstimatedMakerNetworkFee { get; set; }
 
-        private decimal _estimatedMakerNetworkFeeInBase;
-        public decimal EstimatedMakerNetworkFeeInBase
-        {
-            get => _estimatedMakerNetworkFeeInBase;
-            set => this.RaiseAndSetIfChanged(ref _estimatedMakerNetworkFeeInBase, value);
-        }
+        [Reactive]
+        public decimal EstimatedMakerNetworkFeeInBase { get; set; }
 
-        protected decimal _estimatedPaymentFee;
-        public decimal EstimatedPaymentFee
-        {
-            get => _estimatedPaymentFee;
-            set => this.RaiseAndSetIfChanged(ref _estimatedPaymentFee, value);
-        }
+        [Reactive]
+        public decimal EstimatedPaymentFee { get; set; }
 
-        private decimal _estimatedPaymentFeeInBase;
-        public decimal EstimatedPaymentFeeInBase
-        {
-            get => _estimatedPaymentFeeInBase;
-            set => this.RaiseAndSetIfChanged(ref _estimatedPaymentFeeInBase, value);
-        }
+        [Reactive]
+        public decimal EstimatedPaymentFeeInBase { get; set; }
 
-        private decimal _estimatedRedeemFee;
-        public decimal EstimatedRedeemFee
-        {
-            get => _estimatedRedeemFee;
-            set => this.RaiseAndSetIfChanged(ref _estimatedRedeemFee, value);
-        }
+        [Reactive]
+        public decimal EstimatedRedeemFee { get; set; }
 
-        private decimal _estimatedRedeemFeeInBase;
-        public decimal EstimatedRedeemFeeInBase
-        {
-            get => _estimatedRedeemFeeInBase;
-            set => this.RaiseAndSetIfChanged(ref _estimatedRedeemFeeInBase, value);
-        }
+        [Reactive]
+        public decimal EstimatedRedeemFeeInBase { get; set; }
 
-        private decimal _estimatedTotalNetworkFeeInBase;
-        public decimal EstimatedTotalNetworkFeeInBase
-        {
-            get => _estimatedTotalNetworkFeeInBase;
-            set => this.RaiseAndSetIfChanged(ref _estimatedTotalNetworkFeeInBase, value);
-        }
+        [Reactive]
+        public decimal EstimatedTotalNetworkFeeInBase { get; set; }
 
-        private decimal _rewardForRedeem;
-        public decimal RewardForRedeem
-        {
-            get => _rewardForRedeem;
-            set => this.RaiseAndSetIfChanged(ref _rewardForRedeem, value);
-        }
+        [Reactive]
+        public decimal RewardForRedeem { get; set; }
 
-        private decimal _rewardForRedeemInBase;
-        public decimal RewardForRedeemInBase
-        {
-            get => _rewardForRedeemInBase;
-            set => this.RaiseAndSetIfChanged(ref _rewardForRedeemInBase, value);
-        }
+        [Reactive]
+        public decimal RewardForRedeemInBase { get; set; }
 
-        private bool _hasRewardForRedeem;
-        public bool HasRewardForRedeem
-        {
-            get => _hasRewardForRedeem;
-            set => this.RaiseAndSetIfChanged(ref _hasRewardForRedeem, value);
-        }
+        [Reactive]
+        public bool HasRewardForRedeem { get; set; }
 
-        protected string _warning;
-        public string Warning
-        {
-            get => _warning;
-            set => this.RaiseAndSetIfChanged(ref _warning, value);
-        }
+        [Reactive]
+        public string Warning { get; set; }
 
-        protected bool _isCriticalWarning;
-        public bool IsCriticalWarning
-        {
-            get => _isCriticalWarning;
-            set => this.RaiseAndSetIfChanged(ref _isCriticalWarning, value);
-        }
+        [Reactive]
+        public bool IsCriticalWarning { get; set; }
 
-        private bool _canConvert = true;
-        public bool CanConvert
-        {
-            get => _canConvert;
-            set => this.RaiseAndSetIfChanged(ref _canConvert, value);
-        }
+        [Reactive]
+        public bool CanConvert { get; set; }
 
-        private ObservableCollection<SwapViewModel> _swaps;
-        public ObservableCollection<SwapViewModel> Swaps
-        {
-            get => _swaps;
-            set => this.RaiseAndSetIfChanged(ref _swaps, value);
-        }
+        [Reactive]
+        public ObservableCollection<SwapViewModel> Swaps { get; set; }
 
-        private bool _isNoLiquidity;
-        public bool IsNoLiquidity
-        {
-            get => _isNoLiquidity;
-            set => this.RaiseAndSetIfChanged(ref _isNoLiquidity, value);
-        }
+        [Reactive]
+        public bool IsNoLiquidity { get; set; }
 
         public int ColumnSpan => DetailsVisible ? 1 : 2;
         public bool DetailsVisible => DGSelectedIndex != -1;
@@ -312,6 +209,8 @@ namespace Atomex.Client.Desktop.ViewModels
         public ConversionViewModel(IAtomexApp app)
         {
             _app = app ?? throw new ArgumentNullException(nameof(app));
+            IsAmountValid = true;
+            CanConvert = true;
 
             // "From" currency changed => Update "To" currencies list
             this.WhenAnyValue(vm => vm.FromCurrencyViewModel)
@@ -324,7 +223,7 @@ namespace Atomex.Client.Desktop.ViewModels
                 });
 
             // "From" or "To" currencies changed => update PriceFormat
-            _priceFormat = this
+            this
                 .WhenAnyValue(vm => vm.FromCurrencyViewModel, vm => vm.ToCurrencyViewModel)
                 .WhereAllNotNull()
                 .Select(t =>
@@ -333,7 +232,7 @@ namespace Atomex.Client.Desktop.ViewModels
                     return symbol != null ? Currencies.GetByName(symbol.Quote).Format : null;
                 })
                 .WhereNotNull()
-                .ToProperty(this, nameof(PriceFormat));
+                .ToPropertyEx(this, vm => vm.PriceFormat);
 
             // "From" currency changed => estimate swap params with zero amount
             this.WhenAnyValue(vm => vm.FromCurrencyViewModel)
@@ -482,8 +381,8 @@ namespace Atomex.Client.Desktop.ViewModels
                     Warning = string.Empty;
                 }
 
-                _estimatedPaymentFee = swapParams.PaymentFee;
-                _estimatedMakerNetworkFee = swapParams.MakerNetworkFee;
+                EstimatedPaymentFee = swapParams.PaymentFee;
+                EstimatedMakerNetworkFee = swapParams.MakerNetworkFee;
 
                 //OnPropertyChanged(nameof(CurrencyFormat));
                 //OnPropertyChanged(nameof(TargetCurrencyFormat));
