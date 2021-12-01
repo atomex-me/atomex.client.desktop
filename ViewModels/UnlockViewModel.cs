@@ -12,7 +12,7 @@ namespace Atomex.Client.Desktop.ViewModels
 {
     public class UnlockViewModel : ViewModelBase
     {
-        public event EventHandler Unlocked;
+        public Action? Unlocked;
         public event EventHandler<ErrorEventArgs> Error;
         public PasswordControlViewModel PasswordVM { get; set; }
         public string WalletName { get; set; }
@@ -64,7 +64,10 @@ namespace Atomex.Client.Desktop.ViewModels
             GoBack += goBack;
 
             PasswordVM = new PasswordControlViewModel(
-                () => { InvalidPassword = false; }, placeholder: "Password...", isSmall: true);
+                () => { InvalidPassword = false; }, placeholder: "Password...", isSmall: true)
+            {
+                IsFocused = true
+            };
         }
 
         private async void OnUnlockClick()
@@ -102,7 +105,7 @@ namespace Atomex.Client.Desktop.ViewModels
 
             PasswordVM.StringPass = string.Empty;
 
-            Unlocked?.Invoke(this, EventArgs.Empty);
+            Unlocked?.Invoke();
         }
 
         private Action GoBack;

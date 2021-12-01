@@ -72,7 +72,7 @@ namespace Atomex.Client.Desktop.ViewModels
                     });
             }, () => ShowContent(this));
 
-            unlockViewModel.Unlocked += (sender, args) =>
+            unlockViewModel.Unlocked = () =>
             {
                 var atomexClient = new WebSocketAtomexClient(
                     configuration: App.Configuration,

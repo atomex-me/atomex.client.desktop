@@ -98,6 +98,15 @@ namespace Atomex.Client.Desktop.ViewModels
                 nextTitle: Resources.SvOk,
                 backAction: null,
                 nextAction: nextAction);
+        
+        public static MessageViewModel Success(string title, string text, Action nextAction) =>
+            new MessageViewModel(
+                title: title,
+                text: text,
+                backTitle: null,
+                nextTitle: Resources.SvOk,
+                backAction: null,
+                nextAction: nextAction);
 
         public static MessageViewModel Message(string title, string text, Action backAction) =>
             new MessageViewModel(

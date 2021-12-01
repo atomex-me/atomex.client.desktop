@@ -1,5 +1,4 @@
 ﻿using System;
-using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -7,6 +6,7 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 using Atomex.Client.Desktop.Controls;
 using Atomex.Client.Desktop.Common;
+using Atomex.Client.Desktop.Properties;
 using Atomex.Common;
 using ReactiveUI;
 using Atomex.Services;
@@ -27,7 +27,7 @@ namespace Atomex.Client.Desktop.ViewModels
             }
         }
 
-        public void ShowStart()
+        private void ShowStart()
         {
             ShowContent(new StartViewModel(ShowContent, ShowStart, AtomexApp, this));
         }
@@ -56,21 +56,20 @@ namespace Atomex.Client.Desktop.ViewModels
         {
             AtomexApp = app ?? throw new ArgumentNullException(nameof(app));
             MainWalletVM = new WalletMainViewModel(AtomexApp);
-            
+
             SubscribeToServices();
 
             if (mainView != null)
             {
                 MainView = mainView;
-                MainView.MainViewClosing += (sender, args) => Closing(args);
                 MainView.Inactivity += InactivityHandler;
             }
 
             ShowStart();
         }
 
-        public static IAtomexApp AtomexApp { get; private set; }
-        public IMainView MainView { get; set; }
+        private static IAtomexApp AtomexApp { get; set; }
+        private IMainView MainView { get; set; }
 
 
         private bool _hasAccount;
@@ -84,14 +83,15 @@ namespace Atomex.Client.Desktop.ViewModels
                 if (_hasAccount)
                 {
                     ShowContent(MainWalletVM);
-                    
-                    var currencies = AtomexApp.Account.Currencies.ToList();
-                    var a = 5;
 
                     if (AccountRestored)
                     {
-                        App.DialogService.Show(new RestoreDialogViewModel(AtomexApp));
-                        AccountRestored = false;
+                        var restoreViewModel = new RestoreDialogViewModel(AtomexApp)
+                        {
+                            OnRestored = () => AccountRestored = false
+                        };
+
+                        App.DialogService.Show(restoreViewModel);
                     }
                 }
 
@@ -100,9 +100,7 @@ namespace Atomex.Client.Desktop.ViewModels
         }
 
         public bool AccountRestored { get; set; }
-
         private bool _updatesReady;
-
         public bool UpdatesReady => HasUpdates && UpdateDownloadProgress == 100;
         public bool IsDownloadingUpdate => HasUpdates && UpdateDownloadProgress > 0 && UpdateDownloadProgress < 100;
 
@@ -182,6 +180,8 @@ namespace Atomex.Client.Desktop.ViewModels
             // auto sign out after timeout
             if (MainView != null && account.UserSettings.AutoSignOut)
                 MainView.StartInactivityControl(TimeSpan.FromMinutes(account.UserSettings.PeriodOfInactivityInMin));
+
+            StartLookingForUserMessages(TimeSpan.FromSeconds(90));
         }
 
 
@@ -201,6 +201,8 @@ namespace Atomex.Client.Desktop.ViewModels
         public ICommand SignOutCommand => _signOutCommand ??= ReactiveCommand.Create(() => SignOut());
 
         private bool _userIgnoreActiveSwaps { get; set; }
+
+        private UnlockViewModel _unlockViewModel { get; set; }
 
         private async Task SignOut(bool withAppUpdate = false)
         {
@@ -226,47 +228,17 @@ namespace Atomex.Client.Desktop.ViewModels
                     return;
                 }
 
-                _ = Dispatcher.UIThread.InvokeAsync(() =>
-                {
-                    App.DialogService.Close();
-                });
+                _ = Dispatcher.UIThread.InvokeAsync(() => { App.DialogService.Close(); });
 
                 AtomexApp.UseAtomexClient(null);
                 _userIgnoreActiveSwaps = false;
-                
+
                 ShowStart();
             }
             catch (Exception e)
             {
                 Log.Error(e, "Sign Out error");
             }
-        }
-
-        private bool _forcedClose;
-
-        private async void Closing(CancelEventArgs args)
-        {
-            // if (AtomexApp.Account == null || _forcedClose)
-            //     return;
-            //
-            // args.Cancel = true;
-            //
-            // try
-            // {
-            //     await Task.Yield();
-            //
-            //     var cancel = await WhetherToCancelClosingAsync();
-            //
-            //     if (!cancel)
-            //     {
-            //         _forcedClose = true;
-            //         MainView.Close();
-            //     }
-            // }
-            // catch (Exception e)
-            // {
-            //     Log.Error(e, "Closing error");
-            // }
         }
 
         private async Task<bool> HasActiveSwapsAsync()
@@ -301,13 +273,13 @@ namespace Atomex.Client.Desktop.ViewModels
 
             var accountName = new DirectoryInfo(accountDirectory).Name;
 
-            var unlockViewModel = new UnlockViewModel(accountName, password =>
+            _unlockViewModel = new UnlockViewModel(accountName, password =>
             {
                 var clientType = ClientType.Unknown;
                 if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) clientType = ClientType.AvaloniaWindows;
                 if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX)) clientType = ClientType.AvaloniaMac;
                 if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux)) clientType = ClientType.AvaloniaLinux;
-                
+
                 var _ = Account.LoadFromFile(
                     pathToAccount: pathToAccount,
                     password: password,
@@ -318,10 +290,11 @@ namespace Atomex.Client.Desktop.ViewModels
             var wasClosed = false;
             Dispatcher.UIThread.InvokeAsync(() =>
             {
-                wasClosed = App.DialogService.Close();;
+                wasClosed = App.DialogService.Close();
+                ;
             });
-            
-            unlockViewModel.Unlocked += (s, a) =>
+
+            _unlockViewModel.Unlocked = () =>
             {
                 ShowContent(MainWalletVM);
 
@@ -332,9 +305,9 @@ namespace Atomex.Client.Desktop.ViewModels
             };
 
 
-            ShowContent(unlockViewModel);
+            ShowContent(_unlockViewModel);
         }
-        
+
         public bool IsLinux { get; } = RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
 
         public void CloseDialog()
@@ -345,6 +318,64 @@ namespace Atomex.Client.Desktop.ViewModels
         private void DesignerMode()
         {
             HasAccount = true;
+        }
+
+        private void StartLookingForUserMessages(TimeSpan delayInterval)
+        {
+            var userId = Atomex.ViewModels.Helpers.GetUserId(AtomexApp.Account);
+
+            _ = Task.Run(async () =>
+            {
+                while (_hasAccount)
+                {
+                    if (AccountRestored) continue;
+
+                    var messages = await Atomex.ViewModels.Helpers.GetUserMessages(userId);
+
+                    foreach (var message in messages.Where(message => !message.IsReaded))
+                    {
+                        if (Content is UnlockViewModel)
+                        {
+                            _unlockViewModel.Unlocked = null;
+                            _unlockViewModel.Unlocked = () =>
+                            {
+                                ShowContent(MainWalletVM);
+                                _ = Dispatcher.UIThread.InvokeAsync(() =>
+                                {
+                                    App.DialogService.Show(
+                                        MessageViewModel.Success(
+                                            title: Resources.CvWarning,
+                                            text: message.Message,
+                                            nextAction: async () =>
+                                            {
+                                                await Atomex.ViewModels.Helpers.MarkUserMessageReaded(message.Id);
+                                                App.DialogService.Close();
+                                            }));
+                                });
+                            };
+                        }
+                        else
+                        {
+                            _ = Dispatcher.UIThread.InvokeAsync(() =>
+                            {
+                                App.DialogService.Show(
+                                    MessageViewModel.Success(
+                                        title: Resources.CvWarning,
+                                        text: message.Message,
+                                        nextAction: async () =>
+                                        {
+                                            await Atomex.ViewModels.Helpers.MarkUserMessageReaded(message.Id);
+                                            App.DialogService.Close();
+                                        }));
+                            });
+                        }
+
+                        break;
+                    }
+
+                    await Task.Delay(delayInterval);
+                }
+            });
         }
     }
 }
