@@ -374,22 +374,12 @@ namespace Atomex.Client.Desktop.ViewModels
                 }
 
                 EstimatedPaymentFee = swapParams.PaymentFee;
+                EstimatedRedeemFee = swapParams.RedeemFee;
+                RewardForRedeem = swapParams.RewardForRedeem;
                 EstimatedMakerNetworkFee = swapParams.MakerNetworkFee;
                 
                 if (FromCurrencyViewModel?.CurrencyFormat != null)
                     IsAmountValid = _amount <= swapParams.Amount.TruncateByFormat(FromCurrencyViewModel.CurrencyFormat);
-
-                await UpdateRedeemAndRewardFeesAsync();
-
-#if DEBUG
-                if (!Env.IsInDesignerMode())
-                {
-#endif
-                    OnQuotesUpdatedEventHandler(_app.Terminal, null);
-                    OnBaseQuotesUpdatedEventHandler(_app.QuotesProvider, EventArgs.Empty);
-#if DEBUG
-                }
-#endif
             }
             finally
             {
@@ -458,46 +448,6 @@ namespace Atomex.Client.Desktop.ViewModels
                 (!HasRewardForRedeem ? EstimatedRedeemFeeInBase : 0) +
                 EstimatedMakerNetworkFeeInBase +
                 (HasRewardForRedeem ? RewardForRedeemInBase : 0);
-
-        protected async Task UpdateRedeemAndRewardFeesAsync()
-        {
-#if DEBUG
-            if (Env.IsInDesignerMode())
-                return;
-#endif
-            //var walletAddress = await App.Account
-            //    .GetCurrencyAccount<ILegacyCurrencyAccount>(ToCurrency.Name)
-            //    .GetRedeemAddressAsync();
-
-            //if (RedeemAdderss == null)
-            //    return;
-
-            // TODO
-
-            //var walletAddress = await _app.Account
-            //    .GetCurrencyAccount(ToCurrency.Name)
-            //    .GetAddressAsync(RedeemAddress);
-
-            //_estimatedRedeemFee = await ToCurrency
-            //    .GetEstimatedRedeemFeeAsync(walletAddress, withRewardForRedeem: false);
-
-            //_rewardForRedeem = await RewardForRedeemHelper
-            //    .EstimateAsync(
-            //        account: _app.Account,
-            //        quotesProvider: _app.QuotesProvider,
-            //        feeCurrencyQuotesProvider: symbol => _app.Terminal?.GetOrderBook(symbol)?.TopOfBook(),
-            //        walletAddress: walletAddress);
-
-            //_hasRewardForRedeem = _rewardForRedeem != 0;
-
-            //await Dispatcher.UIThread.InvokeAsync(() =>
-            //{
-            //    OnPropertyChanged(nameof(EstimatedRedeemFee));
-            //    OnPropertyChanged(nameof(RewardForRedeem));
-            //    OnPropertyChanged(nameof(HasRewardForRedeem));
-
-            //}, DispatcherPriority.Background);
-        }
 
         private void OnTerminalChangedEventHandler(object? sender, AtomexClientChangedEventArgs args)
         {
