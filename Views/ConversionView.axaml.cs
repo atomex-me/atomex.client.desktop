@@ -1,11 +1,12 @@
 using System;
 using System.Reactive.Linq;
-using Atomex.Client.Desktop.ViewModels;
+
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 using Avalonia.Threading;
-using Serilog;
+
+using Atomex.Client.Desktop.ViewModels;
 
 namespace Atomex.Client.Desktop.Views
 {
@@ -36,7 +37,8 @@ namespace Atomex.Client.Desktop.Views
                 var cellIndex = args.Row.GetIndex();
                 Dispatcher.UIThread.InvokeAsync(() =>
                 {
-                    ((ConversionViewModel) DataContext!).CellPointerPressed(cellIndex);
+                    if (DataContext is ConversionViewModel viewModel)
+                        viewModel.CellPointerPressed(cellIndex);
                 });
             };
         }

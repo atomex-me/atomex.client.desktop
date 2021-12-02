@@ -69,12 +69,8 @@ namespace Atomex.Client.Desktop.ViewModels
         [Reactive]
         public CurrencyViewModel FromCurrencyViewModel { get; set; }
 
-        private CurrencyConfig? FromCurrency => FromCurrencyViewModel?.Currency;
-
         [Reactive]
         public CurrencyViewModel ToCurrencyViewModel { get; set; }
-
-        private CurrencyConfig? ToCurrency => ToCurrencyViewModel?.Currency;
 
         [ObservableAsProperty]
         public string PriceFormat { get; }
@@ -223,8 +219,7 @@ namespace Atomex.Client.Desktop.ViewModels
                 });
 
             // "From" or "To" currencies changed => update PriceFormat
-            this
-                .WhenAnyValue(vm => vm.FromCurrencyViewModel, vm => vm.ToCurrencyViewModel)
+            this.WhenAnyValue(vm => vm.FromCurrencyViewModel, vm => vm.ToCurrencyViewModel)
                 .WhereAllNotNull()
                 .Select(t =>
                 {
@@ -297,8 +292,8 @@ namespace Atomex.Client.Desktop.ViewModels
                         from: FromSource,
                         to: To,
                         amount: EstimatedMaxAmount,
-                        fromCurrency: FromCurrency,
-                        toCurrency: ToCurrency,
+                        fromCurrency: FromCurrencyViewModel?.Currency,
+                        toCurrency: ToCurrencyViewModel?.Currency,
                         account: _app.Account,
                         atomexClient: _app.Terminal,
                         symbolsProvider: _app.SymbolsProvider);
@@ -356,8 +351,8 @@ namespace Atomex.Client.Desktop.ViewModels
                         from: FromSource,
                         to: To,
                         amount: amount,
-                        fromCurrency: FromCurrency,
-                        toCurrency: ToCurrency,
+                        fromCurrency: FromCurrencyViewModel?.Currency,
+                        toCurrency: ToCurrencyViewModel?.Currency,
                         account: _app.Account,
                         atomexClient: _app.Terminal,
                         symbolsProvider: _app.SymbolsProvider);
@@ -372,7 +367,7 @@ namespace Atomex.Client.Desktop.ViewModels
                         Errors.InsufficientChainFunds => string.Format(
                             CultureInfo.InvariantCulture,
                             Resources.CvInsufficientChainFunds,
-                            FromCurrency.FeeCurrencyName),
+                            FromCurrencyViewModel?.Currency.FeeCurrencyName),
                         _ => Resources.CvError
                     };
                 }
@@ -442,14 +437,14 @@ namespace Atomex.Client.Desktop.ViewModels
 
         private void UpdateEstimatedPaymentFeeInBase() => EstimatedPaymentFeeInBase = TryGetAmountInBase(
             amount: EstimatedPaymentFee,
-            currency: FromCurrency?.FeeCurrencyName,
+            currency: FromCurrencyViewModel?.Currency?.FeeCurrencyName,
             baseCurrency: FromCurrencyViewModel?.BaseCurrencyCode,
             provider: _app.QuotesProvider,
             defaultAmountInBase: EstimatedPaymentFeeInBase);
 
         private void UpdateEstimatedRedeemFeeInBase() => EstimatedRedeemFeeInBase = TryGetAmountInBase(
             amount: EstimatedRedeemFee,
-            currency: ToCurrency?.FeeCurrencyName,
+            currency: ToCurrencyViewModel?.Currency?.FeeCurrencyName,
             baseCurrency: FromCurrencyViewModel?.BaseCurrencyCode,
             provider: _app.QuotesProvider,
             defaultAmountInBase: EstimatedRedeemFeeInBase);
@@ -582,8 +577,8 @@ namespace Atomex.Client.Desktop.ViewModels
             {
                 var swapPriceEstimation = await Atomex.ViewModels.Helpers.EstimateSwapPriceAsync(
                     amount: _amount,
-                    fromCurrency: FromCurrency,
-                    toCurrency: ToCurrency,
+                    fromCurrency: FromCurrencyViewModel?.Currency,
+                    toCurrency: ToCurrencyViewModel?.Currency,
                     account: _app.Account,
                     atomexClient: _app.Terminal,
                     symbolsProvider: _app.SymbolsProvider);
@@ -685,7 +680,7 @@ namespace Atomex.Client.Desktop.ViewModels
                 return;
             }
 
-            var symbol = Symbols.SymbolByCurrencies(FromCurrency, ToCurrency);
+            var symbol = Symbols.SymbolByCurrencies(FromCurrencyViewModel.Currency, ToCurrencyViewModel.Currency);
             if (symbol == null)
             {
                 App.DialogService.Show(
@@ -695,7 +690,7 @@ namespace Atomex.Client.Desktop.ViewModels
                 return;
             }
 
-            var side         = symbol.OrderSideForBuyCurrency(ToCurrency);
+            var side         = symbol.OrderSideForBuyCurrency(ToCurrencyViewModel.Currency);
             var price        = EstimatedPrice;
             var baseCurrency = Currencies.GetByName(symbol.Base);
 
@@ -711,13 +706,13 @@ namespace Atomex.Client.Desktop.ViewModels
                     side: side,
                     qty: symbol.MinimumQty,
                     price: price,
-                    digitsMultiplier: FromCurrency.DigitsMultiplier);
+                    digitsMultiplier: FromCurrencyViewModel.Currency.DigitsMultiplier);
 
                 var message = string.Format(
                     CultureInfo.InvariantCulture,
                     Resources.CvMinimumAllowedQtyWarning,
                     minimumAmount,
-                    FromCurrency.Name);
+                    FromCurrencyViewModel.Currency.Name);
 
                 App.DialogService.Show(
                     MessageViewModel.Message(
@@ -808,7 +803,7 @@ namespace Atomex.Client.Desktop.ViewModels
             Warning = string.Format(
                 CultureInfo.InvariantCulture,
                 Resources.CvInsufficientChainFunds,
-                FromCurrency?.FeeCurrencyName);
+                FromCurrencyViewModel.Currency.FeeCurrencyName);
         }
     }
 }
