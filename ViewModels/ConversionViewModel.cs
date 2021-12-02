@@ -232,11 +232,11 @@ namespace Atomex.Client.Desktop.ViewModels
             // "From" currency changed => estimate swap params with zero amount
             this.WhenAnyValue(vm => vm.FromCurrencyViewModel)
                 .WhereNotNull()
-                .Subscribe(t => { _ = EstimateSwapParamsAsync(amount: 0, updateUi: true); });
+                .Subscribe(t => { _ = EstimateSwapParamsAsync(amount: 0); });
 
             // Amount changed => estimate swap params with new amount
             this.WhenAnyValue(vm => vm.AmountString)
-                .Subscribe(a => { _ = EstimateSwapParamsAsync(amount: _amount, updateUi: true); });
+                .Subscribe(a => { _ = EstimateSwapParamsAsync(amount: _amount); });
 
             // Amount changed => update AmountInBase
             this.WhenAnyValue(vm => vm.AmountString)
@@ -292,11 +292,13 @@ namespace Atomex.Client.Desktop.ViewModels
                         from: FromSource,
                         to: To,
                         amount: EstimatedMaxAmount,
+                        redeemFromAddress: RedeemAddress,
                         fromCurrency: FromCurrencyViewModel?.Currency,
                         toCurrency: ToCurrencyViewModel?.Currency,
                         account: _app.Account,
                         atomexClient: _app.Terminal,
-                        symbolsProvider: _app.SymbolsProvider);
+                        symbolsProvider: _app.SymbolsProvider,
+                        quotesProvider: _app.QuotesProvider);
 
                 AmountString = Math.Min(swapParams.Amount, EstimatedMaxAmount).ToString();
             }
@@ -319,12 +321,7 @@ namespace Atomex.Client.Desktop.ViewModels
 
         public void SetFromCurrency(CurrencyConfig fromCurrency)
         {
-            // TODO
-
-            //var fromCurrencyVm = FromCurrencies
-            //    .FirstOrDefault(c => c.Currency?.Name == fromCurrency?.Name);
-
-            //FromCurrencyIndex = FromCurrencies.IndexOf(fromCurrencyVm);
+            FromCurrencyViewModel = FromCurrencies.FirstOrDefault(vm => vm.Currency.Name == fromCurrency.Name);
         }
 
         private void SubscribeToServices()
@@ -335,9 +332,7 @@ namespace Atomex.Client.Desktop.ViewModels
                 _app.QuotesProvider.QuotesUpdated += OnBaseQuotesUpdatedEventHandler;
         }
 
-        protected virtual async Task EstimateSwapParamsAsync(
-            decimal amount,
-            bool updateUi = false)
+        protected virtual async Task EstimateSwapParamsAsync(decimal amount)
         {
             Warning = string.Empty;
 
@@ -351,11 +346,13 @@ namespace Atomex.Client.Desktop.ViewModels
                         from: FromSource,
                         to: To,
                         amount: amount,
+                        redeemFromAddress: RedeemAddress,
                         fromCurrency: FromCurrencyViewModel?.Currency,
                         toCurrency: ToCurrencyViewModel?.Currency,
                         account: _app.Account,
                         atomexClient: _app.Terminal,
-                        symbolsProvider: _app.SymbolsProvider);
+                        symbolsProvider: _app.SymbolsProvider,
+                        quotesProvider: _app.QuotesProvider);
 
                 IsCriticalWarning = false;
 
@@ -378,16 +375,9 @@ namespace Atomex.Client.Desktop.ViewModels
 
                 EstimatedPaymentFee = swapParams.PaymentFee;
                 EstimatedMakerNetworkFee = swapParams.MakerNetworkFee;
-
-                //OnPropertyChanged(nameof(CurrencyFormat));
-                //OnPropertyChanged(nameof(TargetCurrencyFormat));
-                OnPropertyChanged(nameof(EstimatedPaymentFee));
-                OnPropertyChanged(nameof(EstimatedMakerNetworkFee));
                 
                 if (FromCurrencyViewModel?.CurrencyFormat != null)
                     IsAmountValid = _amount <= swapParams.Amount.TruncateByFormat(FromCurrencyViewModel.CurrencyFormat);
-
-                if (updateUi)
 
                 await UpdateRedeemAndRewardFeesAsync();
 
@@ -758,7 +748,7 @@ namespace Atomex.Client.Desktop.ViewModels
         private void OnSuccessConvertion(object sender, EventArgs e)
         {
             _amount = Math.Min(_amount, EstimatedMaxAmount); // recalculate amount
-            _ = EstimateSwapParamsAsync(_amount, updateUi: true);
+            _ = EstimateSwapParamsAsync(_amount);
         }
 
         private void DesignerMode()
