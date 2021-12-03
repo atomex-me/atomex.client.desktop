@@ -64,6 +64,10 @@ namespace Atomex.Client.Desktop.ViewModels.CreateWalletViewModels
             }
         }
 
+        public CreateStoragePasswordViewModel()
+        {
+        }
+
         public CreateStoragePasswordViewModel(
             IAtomexApp app)
         {
