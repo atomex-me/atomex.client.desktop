@@ -8,8 +8,8 @@
              xmlns:vm="clr-namespace:Atomex.Client.Desktop.ViewModels"
              Name="MessageView"
              Width="560"
-             xmlns:i="using:Avalonia.Xaml.Interactivity"
-             xmlns:ia="using:Avalonia.Xaml.Interactions.Core">
+             xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
+             xmlns:ia="clr-namespace:Avalonia.Xaml.Interactions.Core;assembly=Avalonia.Xaml.Interactions">
 
     <Design.DataContext>
         <vm:MessageViewModel />

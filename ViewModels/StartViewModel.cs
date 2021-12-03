@@ -10,6 +10,10 @@ namespace Atomex.Client.Desktop.ViewModels
 {
     public class StartViewModel : ViewModelBase
     {
+        public StartViewModel()
+        {
+        }
+
         public StartViewModel(Action<ViewModelBase> showContent, Action showStart, IAtomexApp app,
             MainWindowViewModel mainWindowWM)
         {

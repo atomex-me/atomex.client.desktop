@@ -85,6 +85,10 @@ namespace Atomex.Client.Desktop.ViewModels
             return Sha256.Compute(Sha256.Compute(publicKey)).ToHexString();
         }
 
+        public WertCurrencyViewModel()
+        {
+        }
+
         public WertCurrencyViewModel(CurrencyConfig currency, IAtomexApp app, WertApi wertApi)
         {
             _app = app ?? throw new ArgumentNullException(nameof(app));

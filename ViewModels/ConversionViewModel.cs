@@ -720,47 +720,47 @@ namespace Atomex.Client.Desktop.ViewModels
 
         private void DesignerMode()
         {
-            var btc = DesignTime.Currencies.Get<BitcoinConfig>("BTC");
-            var ltc = DesignTime.Currencies.Get<LitecoinConfig>("LTC");
+            //var btc = DesignTime.Currencies.Get<BitcoinConfig>("BTC");
+            //var ltc = DesignTime.Currencies.Get<LitecoinConfig>("LTC");
 
-            var currencyViewModels = new List<CurrencyViewModel>
-            {
-                CurrencyViewModelCreator.CreateViewModel(btc, subscribeToUpdates: false),
-                CurrencyViewModelCreator.CreateViewModel(ltc, subscribeToUpdates: false)
-            };
+            //var currencyViewModels = new List<CurrencyViewModel>
+            //{
+            //    CurrencyViewModelCreator.CreateViewModel(btc, subscribeToUpdates: false),
+            //    CurrencyViewModelCreator.CreateViewModel(ltc, subscribeToUpdates: false)
+            //};
 
-            FromCurrencies = currencyViewModels;
-            FromCurrencyViewModel = currencyViewModels.First(c => c.Currency.Name == btc.Name);
-            ToCurrencyViewModel = currencyViewModels.First(c => c.Currency.Name == ltc.Name);
+            //FromCurrencies = currencyViewModels;
+            //FromCurrencyViewModel = currencyViewModels.First(c => c.Currency.Name == btc.Name);
+            //ToCurrencyViewModel = currencyViewModels.First(c => c.Currency.Name == ltc.Name);
 
-            var swapViewModels = new List<SwapViewModel>()
-            {
-                SwapViewModelFactory.CreateSwapViewModel(new Swap
-                    {
-                        Symbol    = "LTC/BTC",
-                        Price     = 0.0000888m,
-                        Qty       = 0.001000m,
-                        Side      = Side.Buy,
-                        TimeStamp = DateTime.UtcNow
-                    },
-                    DesignTime.Currencies),
-                SwapViewModelFactory.CreateSwapViewModel(new Swap
-                    {
-                        Symbol    = "LTC/BTC",
-                        Price     = 0.0100808m,
-                        Qty       = 0.0043000m,
-                        Side      = Side.Sell,
-                        TimeStamp = DateTime.UtcNow
-                    },
-                    DesignTime.Currencies)
-            };
+            //var swapViewModels = new List<SwapViewModel>()
+            //{
+            //    SwapViewModelFactory.CreateSwapViewModel(new Swap
+            //        {
+            //            Symbol    = "LTC/BTC",
+            //            Price     = 0.0000888m,
+            //            Qty       = 0.001000m,
+            //            Side      = Side.Buy,
+            //            TimeStamp = DateTime.UtcNow
+            //        },
+            //        DesignTime.Currencies),
+            //    SwapViewModelFactory.CreateSwapViewModel(new Swap
+            //        {
+            //            Symbol    = "LTC/BTC",
+            //            Price     = 0.0100808m,
+            //            Qty       = 0.0043000m,
+            //            Side      = Side.Sell,
+            //            TimeStamp = DateTime.UtcNow
+            //        },
+            //        DesignTime.Currencies)
+            //};
 
-            Swaps = new ObservableCollection<SwapViewModel>(swapViewModels);
+            //Swaps = new ObservableCollection<SwapViewModel>(swapViewModels);
 
-            Warning = string.Format(
-                CultureInfo.InvariantCulture,
-                Resources.CvInsufficientChainFunds,
-                FromCurrencyViewModel.Currency.FeeCurrencyName);
+            //Warning = string.Format(
+            //    CultureInfo.InvariantCulture,
+            //    Resources.CvInsufficientChainFunds,
+            //    FromCurrencyViewModel.Currency.FeeCurrencyName);
         }
     }
 }

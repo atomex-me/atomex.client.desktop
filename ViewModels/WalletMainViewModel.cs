@@ -13,6 +13,10 @@ namespace Atomex.Client.Desktop.ViewModels
 {
     public class WalletMainViewModel : ViewModelBase
     {
+        public WalletMainViewModel()
+        {
+        }
+
         public WalletMainViewModel(IAtomexApp app)
         {
             AtomexApp = app ?? throw new ArgumentNullException(nameof(app));
