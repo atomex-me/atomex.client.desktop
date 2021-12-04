@@ -87,11 +87,11 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
                 CurrencyCode = _currencyViewModel?.CurrencyCode;
                 FeeCurrencyCode = _currencyViewModel?.FeeCurrencyCode;
-                BaseCurrencyCode = _currencyViewModel?.BaseCurrencyCode;
+                BaseCurrencyCode = CurrencyViewModel.BaseCurrencyCode;
 
                 CurrencyFormat = _currencyViewModel?.CurrencyFormat;
                 FeeCurrencyFormat = CurrencyViewModel?.FeeCurrencyFormat;
-                BaseCurrencyFormat = _currencyViewModel?.BaseCurrencyFormat;
+                BaseCurrencyFormat = CurrencyViewModel.BaseCurrencyFormat;
             }
         }
 

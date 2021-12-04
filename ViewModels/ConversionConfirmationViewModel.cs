@@ -32,26 +32,14 @@ namespace Atomex.Client.Desktop.ViewModels
         public string To { get; }
         public string RedeemAddress { get; }
 
-        public CurrencyConfig FromCurrency { get; set; }
-        public CurrencyConfig ToCurrency { get; set; }
         public CurrencyViewModel FromCurrencyViewModel { get; set; }
         public CurrencyViewModel ToCurrencyViewModel { get; set; }
         public string PriceFormat { get; set; }
-        public string CurrencyFormat { get; set; }
-        public string TargetCurrencyFormat { get; set; }
-        public string BaseCurrencyFormat { get; set; }
+
         public decimal Amount { get; set; }
         public decimal AmountInBase { get; set; }
         public decimal TargetAmount { get; set; }
         public decimal TargetAmountInBase { get; set; }
-        public string CurrencyCode { get; set; }
-        public string TargetCurrencyCode { get; set; }
-        public string BaseCurrencyCode { get; set; }
-
-        public string FromFeeCurrencyCode { get; set; }
-        public string FromFeeCurrencyFormat { get; set; }
-        public string TargetFeeCurrencyCode { get; set; }
-        public string TargetFeeCurrencyFormat { get; set; }
 
         public decimal EstimatedPrice { get; set; }
         public decimal EstimatedOrderPrice { get; set; }
@@ -141,8 +129,8 @@ namespace Atomex.Client.Desktop.ViewModels
                 var fromWallets = await GetFromAddressesAsync();
 
                 foreach (var fromWallet in fromWallets)
-                    if (fromWallet.Currency != FromCurrency.Name)
-                        fromWallet.Currency = FromCurrency.Name;
+                    if (fromWallet.Currency != FromCurrencyViewModel.Currency.Name)
+                        fromWallet.Currency = FromCurrencyViewModel.Currency.Name;
 
                 // check balances
                 var errors = await BalanceChecker.CheckBalancesAsync(App.Account, fromWallets);
@@ -158,10 +146,10 @@ namespace Atomex.Client.Desktop.ViewModels
 
                 var symbol = App.SymbolsProvider
                     .GetSymbols(App.Account.Network)
-                    .SymbolByCurrencies(FromCurrency, ToCurrency);
+                    .SymbolByCurrencies(FromCurrencyViewModel.Currency, ToCurrencyViewModel.Currency);
 
                 var baseCurrency = App.Account.Currencies.GetByName(symbol.Base);
-                var side         = symbol.OrderSideForBuyCurrency(ToCurrency);
+                var side         = symbol.OrderSideForBuyCurrency(ToCurrencyViewModel.Currency);
                 var terminal     = App.Terminal;
                 var price        = EstimatedPrice;
                 var orderPrice   = EstimatedOrderPrice;
@@ -174,22 +162,22 @@ namespace Atomex.Client.Desktop.ViewModels
                 if (qty < symbol.MinimumQty)
                 {
                     var minimumAmount =
-                        AmountHelper.QtyToAmount(side, symbol.MinimumQty, price, FromCurrency.DigitsMultiplier);
+                        AmountHelper.QtyToAmount(side, symbol.MinimumQty, price, FromCurrencyViewModel.Currency.DigitsMultiplier);
                     var message = string.Format(CultureInfo.InvariantCulture, Resources.CvMinimumAllowedQtyWarning,
-                        minimumAmount, FromCurrency.Name);
+                        minimumAmount, FromCurrencyViewModel.Currency.Name);
 
                     return new Error(Errors.SwapError, message);
                 }
 
                 var order = new Order
                 {
-                    Symbol = symbol.Name,
-                    TimeStamp = DateTime.UtcNow,
-                    Price = orderPrice,
-                    Qty = qty,
-                    Side = side,
-                    Type = OrderType.FillOrKill,
-                    FromWallets = fromWallets.ToList(),
+                    Symbol          = symbol.Name,
+                    TimeStamp       = DateTime.UtcNow,
+                    Price           = orderPrice,
+                    Qty             = qty,
+                    Side            = side,
+                    Type            = OrderType.FillOrKill,
+                    FromWallets     = fromWallets.ToList(),
                     MakerNetworkFee = EstimatedMakerNetworkFee
                 };
 
@@ -246,18 +234,18 @@ namespace Atomex.Client.Desktop.ViewModels
             if (From is FromAddress fromAddress)
             {
                 var walletAddress = await App.Account
-                    .GetAddressAsync(FromCurrency.Name, fromAddress.Address);
+                    .GetAddressAsync(FromCurrencyViewModel.Currency.Name, fromAddress.Address);
 
                 return new WalletAddress[] { walletAddress };
             }
             else if (From is FromOutputs fromOutputs)
             {
-                var config = (BitcoinBasedConfig)FromCurrency;
+                var config = (BitcoinBasedConfig)FromCurrencyViewModel.Currency;
 
                 return await Task.WhenAll(fromOutputs.Outputs
                     .Select(o => o.DestinationAddress(config.Network))
                     .Distinct()
-                    .Select(async a => await App.Account.GetAddressAsync(FromCurrency.Name, a)));
+                    .Select(async a => await App.Account.GetAddressAsync(FromCurrencyViewModel.Currency.Name, a)));
   
             }
 
@@ -281,32 +269,23 @@ namespace Atomex.Client.Desktop.ViewModels
         {
             var currencies = DesignTime.Currencies.ToList();
 
-            FromCurrency          = currencies[0];
-            ToCurrency            = currencies[1];
-            FromCurrencyViewModel = CurrencyViewModelCreator.CreateViewModel(FromCurrency, false);
-            ToCurrencyViewModel   = CurrencyViewModelCreator.CreateViewModel(ToCurrency, false);
+            FromCurrencyViewModel     = CurrencyViewModelCreator.CreateViewModel(currencies[0], false);
+            ToCurrencyViewModel       = CurrencyViewModelCreator.CreateViewModel(currencies[1], false);
 
-            PriceFormat          = $"F{FromCurrency.Digits}";
-            CurrencyCode         = FromCurrencyViewModel.CurrencyCode;
-            CurrencyFormat       = FromCurrencyViewModel.CurrencyFormat;
-            TargetCurrencyCode   = ToCurrencyViewModel.CurrencyCode;
-            TargetCurrencyFormat = ToCurrencyViewModel.CurrencyFormat;
-            BaseCurrencyCode     = FromCurrencyViewModel.BaseCurrencyCode;
-            BaseCurrencyFormat   = FromCurrencyViewModel.BaseCurrencyFormat;
+            PriceFormat               = $"F{FromCurrencyViewModel.Currency.Digits}";
+            EstimatedPrice            = 0.003m;
 
-            EstimatedPrice = 0.003m;
+            Amount                    = 0.00001234m;
+            AmountInBase              = 10.23m;
 
-            Amount       = 0.00001234m;
-            AmountInBase = 10.23m;
-
-            TargetAmount       = Amount / EstimatedPrice;
-            TargetAmountInBase = AmountInBase;
+            TargetAmount              = Amount / EstimatedPrice;
+            TargetAmountInBase        = AmountInBase;
 
             EstimatedPaymentFee       = 0.0001904m;
             EstimatedPaymentFeeInBase = 0.22m;
 
-            EstimatedRedeemFee       = 0.001m;
-            EstimatedRedeemFeeInBase = 0.11m;
+            EstimatedRedeemFee        = 0.001m;
+            EstimatedRedeemFeeInBase  = 0.11m;
         }
     }
 }

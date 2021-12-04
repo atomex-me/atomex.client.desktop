@@ -170,7 +170,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
                     FeeRate = await Config.GetFeeRateAsync();
 
-                    var (maxAmount, maxFee, _) = await account.EstimateMaxAmountToSendAsync(
+                    var maxAmountEstimation = await account.EstimateMaxAmountToSendAsync(
                         from: new FromOutputs(Outputs),
                         to: _to,
                         type: BlockchainTransactionType.Output,
@@ -178,12 +178,12 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                         feePrice: _feeRate,
                         reserve: false);
 
-                    if (maxAmount > 0)
-                        _amount = maxAmount;
+                    if (maxAmountEstimation.Amount > 0)
+                        _amount = maxAmountEstimation.Amount;
 
                     OnPropertyChanged(nameof(AmountString));
 
-                    _fee = maxFee;
+                    _fee = maxAmountEstimation.Fee;
                     OnPropertyChanged(nameof(FeeString));
                 }
                 else // manual fee

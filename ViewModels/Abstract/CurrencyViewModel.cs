@@ -1,16 +1,21 @@
 using System;
 using System.Threading.Tasks;
-using Atomex.Core;
-using Atomex.MarketData.Abstract;
-using Atomex.Wallet;
-using Atomex.Wallet.Abstract;
+
 using Avalonia;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
 using Avalonia.Threading;
+
 using ReactiveUI;
+using ReactiveUI.Fody.Helpers;
 using Serilog;
+
+using Atomex.Core;
+using Atomex.MarketData.Abstract;
+using Atomex.Wallet;
+using Atomex.Wallet.Abstract;
+using System.Reactive.Linq;
 
 namespace Atomex.Client.Desktop.ViewModels.Abstract
 {
@@ -33,16 +38,19 @@ namespace Atomex.Client.Desktop.ViewModels.Abstract
         public Color AmountColor { get; set; }
         public IImage IconPath { get; set; }
         public IImage LargeIconPath { get; set; }
+        [Reactive]
         public decimal TotalAmount { get; set; }
+        [Reactive]
         public decimal TotalAmountInBase { get; set; }
+        [Reactive]
         public decimal AvailableAmount { get; set; }
+        [Reactive]
         public decimal AvailableAmountInBase { get; set; }
+        [Reactive]
         public decimal UnconfirmedAmount { get; set; }
-
+        [Reactive]
         public decimal UnconfirmedAmountInBase { get; set; }
 
-        //public decimal LockedAmount { get; set; }
-        //public decimal LockedAmountInBase { get; set; }
         public string CurrencyCode => Currency.Name;
         public string FeeCurrencyCode => Currency.FeeCode;
         public string BaseCurrencyCode => "USD"; // todo: use base currency from settings
@@ -51,23 +59,19 @@ namespace Atomex.Client.Desktop.ViewModels.Abstract
         public string BaseCurrencyFormat => "$0.00"; // todo: use base currency format from settings
         public string FeeName { get; set; }
 
-        public bool HasUnconfirmedAmount => UnconfirmedAmount != 0;
+        [ObservableAsProperty]
+        public bool HasUnconfirmedAmount { get; }
 
-        private decimal _portfolioPercent;
-
-        public decimal PortfolioPercent
-        {
-            get => _portfolioPercent;
-            set
-            {
-                _portfolioPercent = value;
-                this.RaisePropertyChanged(nameof(PortfolioPercent));
-            }
-        }
+        [Reactive]
+        public decimal PortfolioPercent { get; set; }
 
         protected CurrencyViewModel(CurrencyConfig currency)
         {
             Currency = currency ?? throw new ArgumentNullException(nameof(currency));
+
+            this.WhenAnyValue(vm => vm.UnconfirmedAmount)
+                .Select(ua => ua != 0)
+                .ToPropertyEx(this, vm => vm.HasUnconfirmedAmount);
         }
 
         protected virtual async Task UpdateAsync()
@@ -79,16 +83,11 @@ namespace Atomex.Client.Desktop.ViewModels.Abstract
             await Dispatcher.UIThread.InvokeAsync(() =>
             {
                 TotalAmount = balance.Confirmed;
-                this.RaisePropertyChanged(nameof(TotalAmount));
-
                 AvailableAmount = balance.Available;
-                this.RaisePropertyChanged(nameof(AvailableAmount));
-
                 UnconfirmedAmount = balance.UnconfirmedIncome + balance.UnconfirmedOutcome;
-                this.RaisePropertyChanged(nameof(UnconfirmedAmount));
-                this.RaisePropertyChanged(nameof(HasUnconfirmedAmount));
 
                 UpdateQuotesInBaseCurrency(QuotesProvider);
+
             }, DispatcherPriority.Background);
         }
 
@@ -109,7 +108,7 @@ namespace Atomex.Client.Desktop.ViewModels.Abstract
             QuotesProvider.QuotesUpdated += OnQuotesUpdatedEventHandler;
         }
 
-        private async void OnBalanceChangedEventHandler(object sender, CurrencyEventArgs args)
+        private async void OnBalanceChangedEventHandler(object? sender, CurrencyEventArgs args)
         {
             try
             {
@@ -123,9 +122,9 @@ namespace Atomex.Client.Desktop.ViewModels.Abstract
             }
         }
 
-        private void OnQuotesUpdatedEventHandler(object sender, EventArgs args)
+        private void OnQuotesUpdatedEventHandler(object? sender, EventArgs args)
         {
-            if (!(sender is ICurrencyQuotesProvider quotesProvider))
+            if (sender is not ICurrencyQuotesProvider quotesProvider)
                 return;
 
             UpdateQuotesInBaseCurrency(quotesProvider);
@@ -136,16 +135,8 @@ namespace Atomex.Client.Desktop.ViewModels.Abstract
             var quote = quotesProvider.GetQuote(CurrencyCode, BaseCurrencyCode);
 
             TotalAmountInBase = TotalAmount * (quote?.Bid ?? 0m);
-            this.RaisePropertyChanged(nameof(TotalAmountInBase));
-
             AvailableAmountInBase = AvailableAmount * (quote?.Bid ?? 0m);
-            this.RaisePropertyChanged(nameof(AvailableAmountInBase));
-
             UnconfirmedAmountInBase = UnconfirmedAmount * (quote?.Bid ?? 0m);
-            this.RaisePropertyChanged(nameof(UnconfirmedAmountInBase));
-
-            //LockedAmountInBase = LockedAmount * (quote?.Bid ?? 0m);
-            //OnPropertyChanged(nameof(LockedAmountInBase));
 
             AmountUpdated?.Invoke(this, EventArgs.Empty);
         }
@@ -178,9 +169,6 @@ namespace Atomex.Client.Desktop.ViewModels.Abstract
                     if (QuotesProvider != null)
                         QuotesProvider.QuotesUpdated -= OnQuotesUpdatedEventHandler;
                 }
-
-                Account = null;
-                Currency = null;
 
                 _disposedValue = true;
             }

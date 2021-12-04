@@ -102,7 +102,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 if (App.Account.GetCurrencyAccount(Currency.Name) is not IEstimatable account)
                     return; // todo: error?
 
-                var (maxAmount, _, _) = await account.EstimateMaxAmountToSendAsync(
+                var maxAmountEstimation = await account.EstimateMaxAmountToSendAsync(
                     from: new FromAddress(From),
                     to: _to,
                     type: BlockchainTransactionType.Output,
@@ -118,7 +118,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     _feePrice = await Currency.GetDefaultFeePriceAsync();
                     OnPropertyChanged(nameof(FeePriceString));
 
-                    if (_amount > maxAmount)
+                    if (_amount > maxAmountEstimation.Amount)
                     {
                         if (_amount <= availableAmount)
                             Warning = string.Format(CultureInfo.InvariantCulture, Resources.CvInsufficientChainFunds, Currency.FeeCurrencyName);
@@ -136,7 +136,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 }
                 else
                 {
-                    if (_amount > maxAmount)
+                    if (_amount > maxAmountEstimation.Amount)
                     {
                         if (_amount <= availableAmount)
                             Warning = string.Format(CultureInfo.InvariantCulture, Resources.CvInsufficientChainFunds, Currency.FeeCurrencyName);
@@ -194,7 +194,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     if (App.Account.GetCurrencyAccount(Currency.Name) is not IEstimatable account)
                         return; // todo: error?
 
-                    var (maxAmount, _, _) = await account.EstimateMaxAmountToSendAsync(
+                    var maxAmountEstimation = await account.EstimateMaxAmountToSendAsync(
                         from: new FromAddress(From),
                         to: _to,
                         type: BlockchainTransactionType.Output,
@@ -202,7 +202,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                         feePrice: _feePrice,
                         reserve: false);
 
-                    if (_amount > maxAmount)
+                    if (_amount > maxAmountEstimation.Amount)
                     {
                         var availableAmount = CurrencyViewModel.AvailableAmount;
 
@@ -264,7 +264,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     if (App.Account.GetCurrencyAccount(Currency.Name) is not IEstimatable account)
                         return; // todo: error?
 
-                    var (maxAmount, _, _) = await account.EstimateMaxAmountToSendAsync(
+                    var maxAmountEstimation = await account.EstimateMaxAmountToSendAsync(
                         from: new FromAddress(From),
                         to: _to,
                         type: BlockchainTransactionType.Output,
@@ -272,7 +272,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                         feePrice: _feePrice,
                         reserve: false);
 
-                    if (_amount > maxAmount)
+                    if (_amount > maxAmountEstimation.Amount)
                     {
                         var availableAmount = CurrencyViewModel.AvailableAmount;
 
@@ -319,7 +319,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
                 if (UseDefaultFee)
                 {
-                    var (maxAmount, maxFeeAmount, _) = await account.EstimateMaxAmountToSendAsync(
+                    var maxAmountEstimation = await account.EstimateMaxAmountToSendAsync(
                         from: new FromAddress(From),
                         to: _to,
                         type: BlockchainTransactionType.Output,
@@ -327,8 +327,8 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                         feePrice: 0,
                         reserve: false);
 
-                    if (maxAmount > 0)
-                        _amount = maxAmount;
+                    if (maxAmountEstimation.Amount > 0)
+                        _amount = maxAmountEstimation.Amount;
                     else if(CurrencyViewModel.AvailableAmount > 0)
                         Warning = string.Format(CultureInfo.InvariantCulture, Resources.CvInsufficientChainFunds, Currency.FeeCurrencyName);
 
@@ -340,7 +340,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     _feePrice = await Currency.GetDefaultFeePriceAsync();
                     OnPropertyChanged(nameof(FeePriceString));
 
-                    UpdateTotalFeeString(maxFeeAmount);
+                    UpdateTotalFeeString(maxAmountEstimation.Fee);
                     OnPropertyChanged(nameof(TotalFeeString));
                 }
                 else
@@ -356,7 +356,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                         }
                     }
 
-                    var (maxAmount, maxFeeAmount, _) = await account.EstimateMaxAmountToSendAsync(
+                    var maxAmountEstimation = await account.EstimateMaxAmountToSendAsync(
                         from: new FromAddress(From),
                         to: _to,
                         type: BlockchainTransactionType.Output,
@@ -364,14 +364,14 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                         feePrice: _feePrice,
                         reserve: false);
 
-                    _amount = maxAmount;
+                    _amount = maxAmountEstimation.Amount;
 
-                    if (maxAmount < availableAmount)
+                    if (maxAmountEstimation.Amount < availableAmount)
                         Warning = string.Format(CultureInfo.InvariantCulture, Resources.CvInsufficientChainFunds, Currency.FeeCurrencyName);
 
                     OnPropertyChanged(nameof(AmountString));
 
-                    UpdateTotalFeeString(maxFeeAmount);
+                    UpdateTotalFeeString(maxAmountEstimation.Fee);
                     OnPropertyChanged(nameof(TotalFeeString));
                 }
 

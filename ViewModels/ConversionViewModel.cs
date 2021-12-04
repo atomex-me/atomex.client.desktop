@@ -56,9 +56,15 @@ namespace Atomex.Client.Desktop.ViewModels
         }
 
         private IFromSource FromSource { get; set; }
-        private ObservableCollection<WalletAddressViewModel> ToAddresses { get; set; }
-        private string To { get; set; }
-        private string RedeemAddress { get; set; }
+
+        [Reactive]
+        public decimal FromBalance { get; set; }
+
+        [Reactive]
+        public string ToAddress { get; set; }
+
+        [Reactive]
+        public string RedeemAddress { get; set; }
 
         [Reactive]
         public List<CurrencyViewModel> FromCurrencies { get; set; }
@@ -187,13 +193,13 @@ namespace Atomex.Client.Desktop.ViewModels
             DGSelectedIndex = cellIndex;
         }
 
+#if DEBUG
         public ConversionViewModel()
         {
-#if DEBUG
             if (Env.IsInDesignerMode())
                 DesignerMode();
-#endif
         }
+#endif
 
         public ConversionViewModel(IAtomexApp app)
         {
@@ -294,11 +300,11 @@ namespace Atomex.Client.Desktop.ViewModels
         {
             try
             {
-                if (FromSource == null || RedeemAddress == null)
+                if (FromSource == null)
                     return; // TODO: warning?
 
                 var swapParams = await Atomex.ViewModels.Helpers
-                    .EstimateSwapPaymentParamsAsync(
+                    .EstimateSwapParamsAsync(
                         from: FromSource,
                         amount: EstimatedMaxAmount,
                         redeemFromAddress: RedeemAddress,
@@ -350,12 +356,12 @@ namespace Atomex.Client.Desktop.ViewModels
             Warning = string.Empty;
             IsCriticalWarning = false;
 
-            if (FromSource == null || RedeemAddress == null)
+            if (FromSource == null)
                 return;
 
             // estimate max payment amount and max fee
             var swapParams = await Atomex.ViewModels.Helpers
-                .EstimateSwapPaymentParamsAsync(
+                .EstimateSwapParamsAsync(
                     from: FromSource,
                     amount: amount,
                     redeemFromAddress: RedeemAddress,
@@ -682,29 +688,29 @@ namespace Atomex.Client.Desktop.ViewModels
 
             var viewModel = new ConversionConfirmationViewModel(_app)
             {
-                FromCurrencyViewModel = FromCurrencyViewModel,
-                ToCurrencyViewModel   = ToCurrencyViewModel,
-                PriceFormat           = PriceFormat,
+                FromCurrencyViewModel          = FromCurrencyViewModel,
+                ToCurrencyViewModel            = ToCurrencyViewModel,
+                PriceFormat                    = PriceFormat,
 
-                Amount             = _amount,
-                AmountInBase       = AmountInBase,
-                TargetAmount       = TargetAmount,
-                TargetAmountInBase = TargetAmountInBase,
+                Amount                         = _amount,
+                AmountInBase                   = AmountInBase,
+                TargetAmount                   = TargetAmount,
+                TargetAmountInBase             = TargetAmountInBase,
 
-                EstimatedPrice           = EstimatedPrice,
-                EstimatedOrderPrice      = _estimatedOrderPrice,
-                EstimatedPaymentFee      = EstimatedPaymentFee,
-                EstimatedRedeemFee       = EstimatedRedeemFee,
-                EstimatedMakerNetworkFee = EstimatedMakerNetworkFee,
+                EstimatedPrice                 = EstimatedPrice,
+                EstimatedOrderPrice            = _estimatedOrderPrice,
+                EstimatedPaymentFee            = EstimatedPaymentFee,
+                EstimatedRedeemFee             = EstimatedRedeemFee,
+                EstimatedMakerNetworkFee       = EstimatedMakerNetworkFee,
 
                 EstimatedPaymentFeeInBase      = EstimatedPaymentFeeInBase,
                 EstimatedRedeemFeeInBase       = EstimatedRedeemFeeInBase,
                 EstimatedMakerNetworkFeeInBase = EstimatedMakerNetworkFeeInBase,
                 EstimatedTotalNetworkFeeInBase = EstimatedTotalNetworkFeeInBase,
 
-                RewardForRedeem       = RewardForRedeem,
-                RewardForRedeemInBase = RewardForRedeemInBase,
-                HasRewardForRedeem    = HasRewardForRedeem
+                RewardForRedeem                = RewardForRedeem,
+                RewardForRedeemInBase          = RewardForRedeemInBase,
+                HasRewardForRedeem             = HasRewardForRedeem
             };
 
             viewModel.OnSuccess += OnSuccessConvertion;
@@ -712,7 +718,7 @@ namespace Atomex.Client.Desktop.ViewModels
             App.DialogService.Show(viewModel);
         }
 
-        private void OnSuccessConvertion(object sender, EventArgs e)
+        private void OnSuccessConvertion(object? sender, EventArgs e)
         {
             _amount = Math.Min(_amount, EstimatedMaxAmount); // recalculate amount
             _ = EstimateSwapParamsAsync(_amount);
@@ -720,47 +726,48 @@ namespace Atomex.Client.Desktop.ViewModels
 
         private void DesignerMode()
         {
-            //var btc = DesignTime.Currencies.Get<BitcoinConfig>("BTC");
-            //var ltc = DesignTime.Currencies.Get<LitecoinConfig>("LTC");
+            var btc = DesignTime.Currencies.Get<BitcoinConfig>("BTC");
+            var ltc = DesignTime.Currencies.Get<LitecoinConfig>("LTC");
 
-            //var currencyViewModels = new List<CurrencyViewModel>
-            //{
-            //    CurrencyViewModelCreator.CreateViewModel(btc, subscribeToUpdates: false),
-            //    CurrencyViewModelCreator.CreateViewModel(ltc, subscribeToUpdates: false)
-            //};
+            var currencyViewModels = new List<CurrencyViewModel>
+            {
+                CurrencyViewModelCreator.CreateViewModel(btc, subscribeToUpdates: false),
+                CurrencyViewModelCreator.CreateViewModel(ltc, subscribeToUpdates: false)
+            };
 
-            //FromCurrencies = currencyViewModels;
-            //FromCurrencyViewModel = currencyViewModels.First(c => c.Currency.Name == btc.Name);
-            //ToCurrencyViewModel = currencyViewModels.First(c => c.Currency.Name == ltc.Name);
+            FromCurrencies        = currencyViewModels;
+            FromCurrencyViewModel = currencyViewModels.First(c => c.Currency.Name == btc.Name);
+            ToCurrencies          = currencyViewModels;
+            ToCurrencyViewModel   = currencyViewModels.First(c => c.Currency.Name == ltc.Name);
 
-            //var swapViewModels = new List<SwapViewModel>()
-            //{
-            //    SwapViewModelFactory.CreateSwapViewModel(new Swap
-            //        {
-            //            Symbol    = "LTC/BTC",
-            //            Price     = 0.0000888m,
-            //            Qty       = 0.001000m,
-            //            Side      = Side.Buy,
-            //            TimeStamp = DateTime.UtcNow
-            //        },
-            //        DesignTime.Currencies),
-            //    SwapViewModelFactory.CreateSwapViewModel(new Swap
-            //        {
-            //            Symbol    = "LTC/BTC",
-            //            Price     = 0.0100808m,
-            //            Qty       = 0.0043000m,
-            //            Side      = Side.Sell,
-            //            TimeStamp = DateTime.UtcNow
-            //        },
-            //        DesignTime.Currencies)
-            //};
+            var swapViewModels = new List<SwapViewModel>()
+            {
+                SwapViewModelFactory.CreateSwapViewModel(new Swap
+                    {
+                        Symbol    = "LTC/BTC",
+                        Price     = 0.0000888m,
+                        Qty       = 0.001000m,
+                        Side      = Side.Buy,
+                        TimeStamp = DateTime.UtcNow
+                    },
+                    DesignTime.Currencies),
+                SwapViewModelFactory.CreateSwapViewModel(new Swap
+                    {
+                        Symbol    = "LTC/BTC",
+                        Price     = 0.0100808m,
+                        Qty       = 0.0043000m,
+                        Side      = Side.Sell,
+                        TimeStamp = DateTime.UtcNow
+                    },
+                    DesignTime.Currencies)
+            };
 
-            //Swaps = new ObservableCollection<SwapViewModel>(swapViewModels);
+            Swaps = new ObservableCollection<SwapViewModel>(swapViewModels);
 
-            //Warning = string.Format(
-            //    CultureInfo.InvariantCulture,
-            //    Resources.CvInsufficientChainFunds,
-            //    FromCurrencyViewModel.Currency.FeeCurrencyName);
+            Warning = string.Format(
+                CultureInfo.InvariantCulture,
+                Resources.CvInsufficientChainFunds,
+                FromCurrencyViewModel.Currency.FeeCurrencyName);
         }
     }
 }

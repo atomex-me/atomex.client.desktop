@@ -85,7 +85,7 @@
                         </TextBlock>
                         <TextBlock Margin="4 0 0 2"
                                    Foreground="{DynamicResource DefaultForegroundBrush}"
-                                   Text="{Binding CurrencyCode}"
+                                   Text="{Binding FromCurrencyViewModel.CurrencyCode}"
                                    FontFamily="{DynamicResource DefaultFontFamily}"
                                    VerticalAlignment="Bottom" />
                     </StackPanel>
@@ -102,13 +102,13 @@
                             <TextBlock.Text>
                                 <MultiBinding Converter="{StaticResource AmountToStringConverter}">
                                     <Binding Path="AmountInBase" Mode="TwoWay" />
-                                    <Binding Path="BaseCurrencyFormat" Mode="OneWay" />
+                                    <Binding Path="FromCurrencyViewModel.BaseCurrencyFormat" Mode="OneWay" />
                                 </MultiBinding>
                             </TextBlock.Text>
                         </TextBlock>
                         <TextBlock Margin="4 3 0 0"
                                    Foreground="{DynamicResource DefaultAmountInBaseForegroundBrush}"
-                                   Text="{Binding BaseCurrencyCode}"
+                                   Text="{Binding FromCurrencyViewModel.BaseCurrencyCode}"
                                    FontFamily="{DynamicResource DefaultFontFamily}"
                                    VerticalAlignment="Top" />
                     </StackPanel>
@@ -148,13 +148,13 @@
                             <TextBlock.Text>
                                 <MultiBinding Converter="{StaticResource AmountToStringConverter}">
                                     <Binding Path="TargetAmount" Mode="TwoWay" />
-                                    <Binding Path="TargetCurrencyFormat" Mode="OneWay" />
+                                    <Binding Path="ToCurrencyViewModel.CurrencyFormat" Mode="OneWay" />
                                 </MultiBinding>
                             </TextBlock.Text>
                         </TextBlock>
                         <TextBlock Margin="4 0 0 2"
                                    Foreground="{DynamicResource DefaultForegroundBrush}"
-                                   Text="{Binding TargetCurrencyCode}"
+                                   Text="{Binding ToCurrencyViewModel.CurrencyCode}"
                                    FontFamily="{DynamicResource DefaultFontFamily}"
                                    VerticalAlignment="Bottom" />
                     </StackPanel>
@@ -171,13 +171,13 @@
                             <TextBlock.Text>
                                 <MultiBinding Converter="{StaticResource AmountToStringConverter}">
                                     <Binding Path="TargetAmountInBase" Mode="TwoWay" />
-                                    <Binding Path="BaseCurrencyFormat" Mode="OneWay" />
+                                    <Binding Path="FromCurrencyViewModel.BaseCurrencyFormat" Mode="OneWay" />
                                 </MultiBinding>
                             </TextBlock.Text>
                         </TextBlock>
                         <TextBlock Margin="4 3 0 0"
                                    Foreground="{DynamicResource DefaultAmountInBaseForegroundBrush}"
-                                   Text="{Binding BaseCurrencyCode}"
+                                   Text="{Binding FromCurrencyViewModel.BaseCurrencyCode}"
                                    FontFamily="{DynamicResource DefaultFontFamily}"
                                    VerticalAlignment="Top" />
                     </StackPanel>
@@ -233,7 +233,7 @@
                         <TextBlock.Text>
                             <MultiBinding Converter="{StaticResource AmountToStringConverter}">
                                 <Binding Path="EstimatedTotalNetworkFeeInBase" Mode="OneWay" />
-                                <Binding Path="BaseCurrencyFormat" Mode="OneWay" />
+                                <Binding Path="FromCurrencyViewModel.BaseCurrencyFormat" Mode="OneWay" />
                             </MultiBinding>
                         </TextBlock.Text>
                     </TextBlock>
