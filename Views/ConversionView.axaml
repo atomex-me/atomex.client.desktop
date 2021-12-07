@@ -460,7 +460,7 @@
                                                     </TextBlock.Text>
                                                 </TextBlock>
 
-                                                <TextBlock Text="{Binding FromFeeCurrencyCode}"
+                                                <TextBlock Text="{Binding FromCurrencyViewModel.FeeCurrencyCode}"
                                                            Margin="3 0 0 2"
                                                            FontSize="9"
                                                            VerticalAlignment="Bottom"
