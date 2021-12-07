@@ -127,15 +127,15 @@
                          Text="{Binding AmountString, Mode=OneWay}"
                          Name="AmountString"
                          helpers:TextBoxHelper.CornerRadius="20"
-                         helpers:AmountTextBoxHelper.CurrencyCode="{Binding CurrencyCode}"
-                         helpers:AmountTextBoxHelper.BaseCurrencyCode="{Binding BaseCurrencyCode}"
+                         helpers:AmountTextBoxHelper.CurrencyCode="{Binding FromCurrencyViewModel.CurrencyCode}"
+                         helpers:AmountTextBoxHelper.BaseCurrencyCode="{Binding FromCurrencyViewModel.BaseCurrencyCode}"
                          Grid.Column="1"
                          Classes="CustomTextBox AmountTextBox"
                          Grid.Row="2">
                     <helpers:AmountTextBoxHelper.AmountInBase>
                         <MultiBinding Converter="{StaticResource AmountToStringConverter}">
                             <Binding Path="AmountInBase" Mode="OneWay" />
-                            <Binding Path="BaseCurrencyFormat" Mode="OneWay" />
+                            <Binding Path="FromCurrencyViewModel.BaseCurrencyFormat" Mode="OneWay" />
                         </MultiBinding>
                     </helpers:AmountTextBoxHelper.AmountInBase>
                   
@@ -189,7 +189,7 @@
                         <TextBlock.Text>
                             <MultiBinding Converter="{StaticResource AmountToStringConverter}">
                                 <Binding Path="EstimatedMaxAmount" Mode="OneWay" />
-                                <Binding Path="CurrencyFormat" Mode="OneWay" />
+                                <Binding Path="FromCurrencyViewModel.CurrencyFormat" Mode="OneWay" />
                             </MultiBinding>
                         </TextBlock.Text>
                     </TextBlock>
@@ -197,7 +197,7 @@
                                FontSize="9"
                                Margin="3 0 0 1"
                                VerticalAlignment="Bottom"
-                               Text="{Binding CurrencyCode}" />
+                               Text="{Binding FromCurrencyViewModel.CurrencyCode}" />
 
                     <Border>
                         <controls:IconButton
@@ -247,7 +247,7 @@
                                    VerticalAlignment="Bottom" />
                         <TextBlock Margin="4 0 0 2"
                                    Foreground="{DynamicResource DefaultForegroundBrush}"
-                                   Text="{Binding CurrencyCode}"
+                                   Text="{Binding FromCurrencyViewModel.CurrencyCode}"
                                    FontFamily="{DynamicResource DefaultFontFamily}"
                                    VerticalAlignment="Bottom" />
                     </StackPanel>
@@ -264,13 +264,13 @@
                             <TextBlock.Text>
                                 <MultiBinding Converter="{StaticResource AmountToStringConverter}">
                                     <Binding Path="AmountInBase" Mode="TwoWay" />
-                                    <Binding Path="BaseCurrencyFormat" Mode="OneWay" />
+                                    <Binding Path="FromCurrencyViewModel.BaseCurrencyFormat" Mode="OneWay" />
                                 </MultiBinding>
                             </TextBlock.Text>
                         </TextBlock>
                         <TextBlock Margin="4 3 0 0"
                                    Foreground="{DynamicResource DefaultAmountInBaseForegroundBrush}"
-                                   Text="{Binding BaseCurrencyCode}"
+                                   Text="{Binding FromCurrencyViewModel.BaseCurrencyCode}"
                                    FontFamily="{DynamicResource DefaultFontFamily}"
                                    VerticalAlignment="Top" />
                     </StackPanel>
@@ -320,13 +320,13 @@
                             <TextBlock.Text>
                                 <MultiBinding Converter="{StaticResource AmountToStringConverter}">
                                     <Binding Path="TargetAmount" Mode="TwoWay" />
-                                    <Binding Path="TargetCurrencyFormat" Mode="OneWay" />
+                                    <Binding Path="ToCurrencyViewModel.CurrencyFormat" Mode="OneWay" />
                                 </MultiBinding>
                             </TextBlock.Text>
                         </TextBlock>
                         <TextBlock Margin="4 0 0 2"
                                    Foreground="{DynamicResource DefaultForegroundBrush}"
-                                   Text="{Binding TargetCurrencyCode}"
+                                   Text="{Binding ToCurrencyViewModel.CurrencyCode}"
                                    FontFamily="{DynamicResource DefaultFontFamily}"
                                    VerticalAlignment="Bottom"
                                    IsVisible="{Binding !IsNoLiquidity}" />
@@ -344,13 +344,13 @@
                             <TextBlock.Text>
                                 <MultiBinding Converter="{StaticResource AmountToStringConverter}">
                                     <Binding Path="TargetAmountInBase" Mode="TwoWay" />
-                                    <Binding Path="BaseCurrencyFormat" Mode="OneWay" />
+                                    <Binding Path="FromCurrencyViewModel.BaseCurrencyFormat" Mode="OneWay" />
                                 </MultiBinding>
                             </TextBlock.Text>
                         </TextBlock>
                         <TextBlock Margin="4 3 0 0"
                                    Foreground="{DynamicResource DefaultAmountInBaseForegroundBrush}"
-                                   Text="{Binding BaseCurrencyCode}"
+                                   Text="{Binding FromCurrencyViewModel.BaseCurrencyCode}"
                                    FontFamily="{DynamicResource DefaultFontFamily}"
                                    VerticalAlignment="Top" />
                     </StackPanel>
@@ -419,7 +419,7 @@
                                     <TextBlock.Text>
                                         <MultiBinding Converter="{StaticResource AmountToStringConverter}">
                                             <Binding Path="EstimatedTotalNetworkFeeInBase" Mode="TwoWay" />
-                                            <Binding Path="BaseCurrencyFormat" Mode="OneWay" />
+                                            <Binding Path="FromCurrencyViewModel.BaseCurrencyFormat" Mode="OneWay" />
                                         </MultiBinding>
                                     </TextBlock.Text>
                                 </TextBlock>
@@ -455,7 +455,7 @@
                                                         <MultiBinding
                                                             Converter="{StaticResource AmountToStringConverter}">
                                                             <Binding Path="EstimatedPaymentFee" Mode="TwoWay" />
-                                                            <Binding Path="FromFeeCurrencyFormat" Mode="OneWay" />
+                                                            <Binding Path="FromCurrencyViewModel.FeeCurrencyFormat" Mode="OneWay" />
                                                         </MultiBinding>
                                                     </TextBlock.Text>
                                                 </TextBlock>
@@ -478,7 +478,7 @@
                                                         <MultiBinding
                                                             Converter="{StaticResource AmountToStringConverter}">
                                                             <Binding Path="EstimatedPaymentFeeInBase" Mode="TwoWay" />
-                                                            <Binding Path="BaseCurrencyFormat" Mode="OneWay" />
+                                                            <Binding Path="FromCurrencyViewModel.BaseCurrencyFormat" Mode="OneWay" />
                                                         </MultiBinding>
                                                     </TextBlock.Text>
                                                 </TextBlock>
@@ -504,12 +504,12 @@
                                                         <MultiBinding
                                                             Converter="{StaticResource AmountToStringConverter}">
                                                             <Binding Path="EstimatedRedeemFee" Mode="TwoWay" />
-                                                            <Binding Path="TargetFeeCurrencyFormat" Mode="OneWay" />
+                                                            <Binding Path="ToCurrencyViewModel.FeeCurrencyFormat" Mode="OneWay" />
                                                         </MultiBinding>
                                                     </TextBlock.Text>
                                                 </TextBlock>
 
-                                                <TextBlock Text="{Binding TargetFeeCurrencyCode}"
+                                                <TextBlock Text="{Binding ToCurrencyViewModel.FeeCurrencyCode}"
                                                            Margin="3 0 0 2"
                                                            FontSize="9"
                                                            VerticalAlignment="Bottom"
@@ -527,7 +527,7 @@
                                                         <MultiBinding
                                                             Converter="{StaticResource AmountToStringConverter}">
                                                             <Binding Path="EstimatedRedeemFeeInBase" Mode="TwoWay" />
-                                                            <Binding Path="BaseCurrencyFormat" Mode="OneWay" />
+                                                            <Binding Path="FromCurrencyViewModel.BaseCurrencyFormat" Mode="OneWay" />
                                                         </MultiBinding>
                                                     </TextBlock.Text>
                                                 </TextBlock>
@@ -552,12 +552,12 @@
                                                         <MultiBinding
                                                             Converter="{StaticResource AmountToStringConverter}">
                                                             <Binding Path="EstimatedMakerNetworkFee" Mode="TwoWay" />
-                                                            <Binding Path="CurrencyFormat" Mode="OneWay" />
+                                                            <Binding Path="FromCurrencyViewModel.CurrencyFormat" Mode="OneWay" />
                                                         </MultiBinding>
                                                     </TextBlock.Text>
                                                 </TextBlock>
 
-                                                <TextBlock Text="{Binding CurrencyCode}"
+                                                <TextBlock Text="{Binding FromCurrencyViewModel.CurrencyCode}"
                                                            Margin="3 0 0 2"
                                                            FontSize="9"
                                                            VerticalAlignment="Bottom"
@@ -576,7 +576,7 @@
                                                             Converter="{StaticResource AmountToStringConverter}">
                                                             <Binding Path="EstimatedMakerNetworkFeeInBase"
                                                                      Mode="TwoWay" />
-                                                            <Binding Path="BaseCurrencyFormat" Mode="OneWay" />
+                                                            <Binding Path="FromCurrencyViewModel.BaseCurrencyFormat" Mode="OneWay" />
                                                         </MultiBinding>
                                                     </TextBlock.Text>
                                                 </TextBlock>
@@ -603,12 +603,12 @@
                                                         <MultiBinding
                                                             Converter="{StaticResource AmountToStringConverter}">
                                                             <Binding Path="RewardForRedeem" Mode="TwoWay" />
-                                                            <Binding Path="TargetCurrencyFormat" Mode="OneWay" />
+                                                            <Binding Path="ToCurrencyViewModel.CurrencyFormat" Mode="OneWay" />
                                                         </MultiBinding>
                                                     </TextBlock.Text>
                                                 </TextBlock>
 
-                                                <TextBlock Text="{Binding TargetCurrencyCode}"
+                                                <TextBlock Text="{Binding ToCurrencyViewModel.CurrencyCode}"
                                                            Margin="3 0 0 2"
                                                            FontSize="9"
                                                            VerticalAlignment="Bottom"
@@ -626,7 +626,7 @@
                                                         <MultiBinding
                                                             Converter="{StaticResource AmountToStringConverter}">
                                                             <Binding Path="RewardForRedeemInBase" Mode="TwoWay" />
-                                                            <Binding Path="BaseCurrencyFormat" Mode="OneWay" />
+                                                            <Binding Path="FromCurrencyViewModel.BaseCurrencyFormat" Mode="OneWay" />
                                                         </MultiBinding>
                                                     </TextBlock.Text>
                                                 </TextBlock>
@@ -652,7 +652,7 @@
                                                             Converter="{StaticResource AmountToStringConverter}">
                                                             <Binding Path="EstimatedTotalNetworkFeeInBase"
                                                                      Mode="TwoWay" />
-                                                            <Binding Path="BaseCurrencyFormat" Mode="OneWay" />
+                                                            <Binding Path="FromCurrencyViewModel.BaseCurrencyFormat" Mode="OneWay" />
                                                         </MultiBinding>
                                                     </TextBlock.Text>
                                                 </TextBlock>

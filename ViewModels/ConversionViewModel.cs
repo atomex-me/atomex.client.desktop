@@ -97,7 +97,7 @@ namespace Atomex.Client.Desktop.ViewModels
                 }
                 else
                 {
-                    _amount = amount.TruncateByFormat(FromCurrencyViewModel.CurrencyFormat);
+                    _amount = amount.TruncateByFormat(FromCurrencyViewModel?.CurrencyFormat ?? "0.0");
 
                     if (_amount > long.MaxValue)
                         _amount = long.MaxValue;
@@ -235,6 +235,11 @@ namespace Atomex.Client.Desktop.ViewModels
                 .WhereNotNull()
                 .Subscribe(t => { _ = EstimateSwapParamsAsync(amount: 0); });
 
+            // "To" currency changed => estimate swap params with zero amount
+            this.WhenAnyValue(vm => vm.ToCurrencyViewModel)
+                .WhereNotNull()
+                .Subscribe(t => { _ = EstimateSwapParamsAsync(amount: _amount); });
+
             // Amount changed => estimate swap params with new amount
             this.WhenAnyValue(vm => vm.AmountString)
                 .Subscribe(a => { _ = EstimateSwapParamsAsync(amount: _amount); });
@@ -300,8 +305,8 @@ namespace Atomex.Client.Desktop.ViewModels
         {
             try
             {
-                if (FromSource == null)
-                    return; // TODO: warning?
+                if (FromCurrencyViewModel == null || ToCurrencyViewModel == null)
+                    return;
 
                 var swapParams = await Atomex.ViewModels.Helpers
                     .EstimateSwapParamsAsync(
@@ -356,7 +361,7 @@ namespace Atomex.Client.Desktop.ViewModels
             Warning = string.Empty;
             IsCriticalWarning = false;
 
-            if (FromSource == null)
+            if (FromCurrencyViewModel == null || ToCurrencyViewModel == null)
                 return;
 
             // estimate max payment amount and max fee
