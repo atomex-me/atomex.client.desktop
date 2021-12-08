@@ -9,7 +9,6 @@
              xmlns:controls="clr-namespace:Atomex.Client.Desktop.Controls"
              xmlns:converters="clr-namespace:Atomex.Client.Desktop.Converters"
              xmlns:styles="clr-namespace:Atomex.Client.Desktop.Styles"
-             xmlns:views="clr-namespace:Atomex.Client.Desktop.Views"
              xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
              xmlns:ia="clr-namespace:Avalonia.Xaml.Interactions.Core;assembly=Avalonia.Xaml.Interactions">
 

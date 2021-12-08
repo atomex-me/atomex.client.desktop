@@ -1,39 +1,43 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-
+using System.Windows.Input;
 using Atomex.Blockchain.Abstract;
 using Atomex.Blockchain.BitcoinBased;
 using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.Properties;
+using Atomex.Client.Desktop.ViewModels.SendViewModels;
 using Atomex.Core;
 using Atomex.Wallet.Abstract;
 using Atomex.Wallet.BitcoinBased;
+using Avalonia.Controls;
+using ReactiveUI;
+using ReactiveUI.Fody.Helpers;
 
 namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 {
     public class BitcoinBasedSendViewModel : SendViewModel
     {
         // TODO: select outputs from UI
-        public IEnumerable<BitcoinBasedTxOutput> Outputs { get; set; }
+        [Reactive] public ObservableCollection<BitcoinBasedTxOutput>? Outputs { get; set; }
 
-        protected decimal _feeRate;
-        public decimal FeeRate
-        {
-            get => _feeRate;
-            set { _feeRate = value; OnPropertyChanged(nameof(FeeRate)); }
-        }
+        [Reactive] public decimal FeeRate { get; set; }
 
         private BitcoinBasedConfig Config => (BitcoinBasedConfig)Currency;
+
+        private BitcoinBasedAccount Account => App.Account.GetCurrencyAccount<BitcoinBasedAccount>(Currency.Name);
+
+        private static SelectOutputsViewModel SelectOutputsViewModel { get; set; }
 
         public BitcoinBasedSendViewModel()
             : base()
         {
 #if DEBUG
-            if (Env.IsInDesignerMode())
-                DesignerMode();
+            if (Design.IsDesignMode)
+                BitcoinBasedDesignerMode();
 #endif
         }
 
@@ -42,10 +46,23 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             CurrencyConfig currency)
             : base(app, currency)
         {
+            _ = Task.Run(async () =>
+            {
+                var outputs = (await Account.GetAvailableOutputsAsync())
+                    .Select(o => (BitcoinBasedTxOutput)o);
+                Outputs = new ObservableCollection<BitcoinBasedTxOutput>(outputs);
+
+                SelectOutputsViewModel = new SelectOutputsViewModel()
+                {
+                    BackAction = () => { Desktop.App.DialogService.Show(this); }
+                };
+            });
         }
 
         protected override async void UpdateAmount(decimal amount)
         {
+            if (IsAmountUpdating || Outputs == null || string.IsNullOrEmpty(_to)) return;
+
             IsAmountUpdating = true;
 
             _amount = amount;
@@ -53,8 +70,6 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
             try
             {
-                var account = App.Account.GetCurrencyAccount<BitcoinBasedAccount>(Currency.Name);
-
                 if (UseDefaultFee)
                 {
                     FeeRate = await Config.GetFeeRateAsync();
@@ -63,8 +78,8 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                         availableOutputs: Outputs,
                         to: _to,
                         amount: _amount,
-                        feeRate: _feeRate,
-                        account: account);
+                        feeRate: FeeRate,
+                        account: Account);
 
                     if (transactionParams == null)
                     {
@@ -83,7 +98,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                         to: _to,
                         amount: _amount,
                         fee: _fee,
-                        account: account);
+                        account: Account);
 
                     if (transactionParams == null)
                     {
@@ -108,8 +123,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
         protected override async void UpdateFee(decimal fee)
         {
-            if (IsFeeUpdating)
-                return;
+            if (IsFeeUpdating || Outputs == null || string.IsNullOrEmpty(_to)) return;
 
             IsFeeUpdating = true;
 
@@ -118,14 +132,12 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
             try
             {
-                var account = App.Account.GetCurrencyAccount<BitcoinBasedAccount>(Currency.Name);
-
                 var transactionParams = await BitcoinTransactionParams.SelectTransactionParamsByFeeAsync(
                     availableOutputs: Outputs,
                     to: _to,
                     amount: _amount,
                     fee: _fee,
-                    account: account);
+                    account: Account);
 
                 if (transactionParams == null)
                 {
@@ -175,7 +187,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                         to: _to,
                         type: BlockchainTransactionType.Output,
                         fee: 0,
-                        feePrice: _feeRate,
+                        feePrice: FeeRate,
                         reserve: false);
 
                     if (maxAmountEstimation.Amount > 0)
@@ -193,14 +205,12 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     var maxAmountInSatoshi = availableInSatoshi - feeInSatoshi;
                     var maxAmount = Config.SatoshiToCoin(maxAmountInSatoshi);
 
-                    var account = App.Account.GetCurrencyAccount<BitcoinBasedAccount>(Currency.Name);
-
                     var transactionParams = await BitcoinTransactionParams.SelectTransactionParamsByFeeAsync(
                         availableOutputs: Outputs,
                         to: _to,
                         amount: maxAmount,
                         fee: _fee,
-                        account: account);
+                        account: Account);
 
                     if (transactionParams == null)
                     {
@@ -231,9 +241,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             SendConfirmationViewModel confirmationViewModel,
             CancellationToken cancellationToken = default)
         {
-            var account = App.Account.GetCurrencyAccount<BitcoinBasedAccount>(Currency.Name);
-
-            return account.SendAsync(
+            return Account.SendAsync(
                 from: Outputs.ToList(),
                 to: confirmationViewModel.To,
                 amount: confirmationViewModel.Amount,
@@ -242,9 +250,20 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 cancellationToken: cancellationToken);
         }
 
-        private void DesignerMode()
+        private ICommand _showOutputsWindowCommand;
+
+        public ICommand ShowOutputsWindowCommand => _showOutputsWindowCommand ??=
+            (_showOutputsWindowCommand = ReactiveCommand.Create(ShowOutputsWindow));
+
+        private static void ShowOutputsWindow()
         {
-            _feeRate = 200;
+            Desktop.App.DialogService.Show(SelectOutputsViewModel);
+        }
+
+        private void BitcoinBasedDesignerMode()
+        {
+            FeeRate = 98765;
+            _warning = "Insufficient BTC balance";
         }
     }
 }

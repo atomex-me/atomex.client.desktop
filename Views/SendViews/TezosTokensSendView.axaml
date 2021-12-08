@@ -74,17 +74,7 @@
                         </ComboBox.Styles>
                         <ComboBox.ItemTemplate>
                             <DataTemplate>
-                                <Grid VerticalAlignment="Stretch">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="Auto" />
-                                        <ColumnDefinition Width="Auto" />
-                                        <ColumnDefinition Width="*" />
-                                    </Grid.ColumnDefinitions>
-
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="*" />
-                                        <RowDefinition Height="*" />
-                                    </Grid.RowDefinitions>
+                                <Grid VerticalAlignment="Stretch" ColumnDefinitions="Auto,Auto,*" RowDefinitions="*,*">
                                     <TextBlock
                                         Grid.RowSpan="2"
                                         Text="(new)"
@@ -195,12 +185,10 @@
                                             FontFamily="{DynamicResource DefaultFontFamily}"
                                             VerticalAlignment="Center" />
                                     </StackPanel>
-
                                 </Grid>
                             </DataTemplate>
                         </ComboBox.ItemTemplate>
                     </ComboBox>
-
                 </StackPanel>
 
                 <StackPanel Orientation="Horizontal"

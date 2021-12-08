@@ -14,6 +14,7 @@ using Atomex.Client.Desktop.ViewModels.Abstract;
 using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
 using Atomex.Core;
 using Atomex.MarketData.Abstract;
+using Avalonia.Controls;
 
 namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 {
@@ -181,7 +182,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         public decimal Fee
         {
             get => _fee;
-            set { UpdateFee(value); }
+            set {  UpdateFee(value); }
         }
 
         public virtual string FeeString
@@ -362,7 +363,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         public SendViewModel()
         {
 #if DEBUG
-            if (Env.IsInDesignerMode())
+            if (Design.IsDesignMode)
                 DesignerMode();
 #endif
         }
