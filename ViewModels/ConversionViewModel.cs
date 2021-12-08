@@ -240,9 +240,13 @@ namespace Atomex.Client.Desktop.ViewModels
                 .WhereNotNull()
                 .Subscribe(t => { _ = EstimateSwapParamsAsync(amount: _amount); });
 
-            // Amount changed => estimate swap params with new amount
+            // Amount changed => estimate swap params and prices with new amount
             this.WhenAnyValue(vm => vm.AmountString)
                 .Subscribe(a => { _ = EstimateSwapParamsAsync(amount: _amount); });
+
+            // Amoung changed => estimate swap price and target amount
+            this.WhenAnyValue(vm => vm.AmountString)
+                .Subscribe(a => OnQuotesUpdatedEventHandler(sender: this, args: null));
 
             // Amount changed => update AmountInBase
             this.WhenAnyValue(vm => vm.AmountString)
@@ -320,6 +324,9 @@ namespace Atomex.Client.Desktop.ViewModels
                         symbolsProvider: _app.SymbolsProvider,
                         quotesProvider: _app.QuotesProvider);
 
+                if (swapParams == null)
+                    return;
+
                 //if (swapParams.Error != null) {
                 //    TODO: warning?
                 //}
@@ -376,6 +383,16 @@ namespace Atomex.Client.Desktop.ViewModels
                     atomexClient: _app.Terminal,
                     symbolsProvider: _app.SymbolsProvider,
                     quotesProvider: _app.QuotesProvider);
+
+            if (swapParams == null)
+            {
+                EstimatedPaymentFee      = 0;
+                EstimatedRedeemFee       = 0;
+                RewardForRedeem          = 0;
+                EstimatedMakerNetworkFee = 0;
+                Warning                  = string.Empty;
+                return;
+            }
 
             if (swapParams.Error != null)
             {
@@ -527,7 +544,7 @@ namespace Atomex.Client.Desktop.ViewModels
             }, DispatcherPriority.Background);
         }
 
-        protected async void OnQuotesUpdatedEventHandler(object? sender, MarketDataEventArgs args)
+        protected async void OnQuotesUpdatedEventHandler(object? sender, MarketDataEventArgs? args)
         {
             try
             {
