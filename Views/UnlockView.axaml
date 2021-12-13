@@ -11,6 +11,18 @@
     <Design.DataContext>
         <vm:UnlockViewModel />
     </Design.DataContext>
+    
+    <UserControl.Resources>
+        <Color x:Key="ChildViewBackgroundColor1">#1a4274</Color>
+        <Color x:Key="ChildViewBackgroundColor2">#1a2e4c</Color>
+
+        <LinearGradientBrush x:Key="ChildViewBackgroundBrush" StartPoint="100%,0%" EndPoint="0%,100%">
+            <LinearGradientBrush.GradientStops>
+                <GradientStop Offset="0" Color="{DynamicResource ChildViewBackgroundColor1}" />
+                <GradientStop Offset="1" Color="{DynamicResource ChildViewBackgroundColor2}" />
+            </LinearGradientBrush.GradientStops>
+        </LinearGradientBrush>
+    </UserControl.Resources>
 
     <UserControl.Styles>
         <Style Selector="Panel.UnlockView">
