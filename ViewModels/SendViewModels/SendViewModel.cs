@@ -5,7 +5,6 @@ using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using System.Threading;
-using System.Windows.Input;
 using ReactiveUI;
 using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.Properties;
@@ -14,7 +13,6 @@ using Atomex.Core;
 using Atomex.MarketData.Abstract;
 using Avalonia.Controls;
 using ReactiveUI.Fody.Helpers;
-using Serilog;
 
 
 namespace Atomex.Client.Desktop.ViewModels.SendViewModels
@@ -30,7 +28,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         [Reactive] public string To { get; set; }
 
         [Reactive] protected decimal Amount { get; set; }
-        
+
         [ObservableAsProperty] public string AmountString { get; }
 
 
@@ -50,8 +48,6 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 }
             }
         }
-
-        [Reactive] protected bool IsFeeUpdating { get; set; }
 
         [Reactive] protected decimal Fee { get; set; }
 
@@ -95,17 +91,19 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         public string BaseCurrencyFormat => CurrencyViewModel.BaseCurrencyFormat;
 
 
-        private ICommand _backCommand;
+        private ReactiveCommand<Unit, Unit> _backCommand;
 
-        public ICommand BackCommand => _backCommand ??= (_backCommand = ReactiveCommand.Create(() =>
+        public ReactiveCommand<Unit, Unit> BackCommand => _backCommand ??= (_backCommand = ReactiveCommand.Create(() =>
         {
             Desktop.App.DialogService.Close();
         }));
 
-        private ICommand _nextCommand;
-        public ICommand NextCommand => _nextCommand ??= (_nextCommand = ReactiveCommand.Create(OnNextCommand));
+        private ReactiveCommand<Unit, Unit> _nextCommand;
 
-        protected void OnNextCommand()
+        public ReactiveCommand<Unit, Unit> NextCommand =>
+            _nextCommand ??= (_nextCommand = ReactiveCommand.Create(OnNextCommand));
+
+        private void OnNextCommand()
         {
             if (string.IsNullOrEmpty(To))
             {
@@ -178,7 +176,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         {
             App = app ?? throw new ArgumentNullException(nameof(app));
             Currency = currency ?? throw new ArgumentNullException(nameof(currency));
-            
+
             CurrencyViewModel = CurrencyViewModelCreator.CreateViewModel(currency);
             UseDefaultFee = true;
 
