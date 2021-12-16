@@ -13,6 +13,18 @@
         <vm:MyWalletsViewModel />
     </Design.DataContext>
 
+    <UserControl.Resources>
+        <Color x:Key="ChildViewBackgroundColor1">#1a4274</Color>
+        <Color x:Key="ChildViewBackgroundColor2">#1a2e4c</Color>
+
+        <LinearGradientBrush x:Key="ChildViewBackgroundBrush" StartPoint="100%,0%" EndPoint="0%,100%">
+            <LinearGradientBrush.GradientStops>
+                <GradientStop Offset="0" Color="{DynamicResource ChildViewBackgroundColor1}" />
+                <GradientStop Offset="1" Color="{DynamicResource ChildViewBackgroundColor2}" />
+            </LinearGradientBrush.GradientStops>
+        </LinearGradientBrush>
+    </UserControl.Resources>
+
     <UserControl.Styles>
         <Style Selector="Panel.MyWalletsView">
             <Setter Property="Background" Value="{DynamicResource ChildViewBackgroundBrush}" />
@@ -50,11 +62,7 @@
         <Border CornerRadius="0"
                 HorizontalAlignment="Center"
                 VerticalAlignment="Center">
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="219*" />
-                    <RowDefinition Height="98*" />
-                </Grid.RowDefinitions>
+            <Grid RowDefinitions="219*,98*">
                 <StackPanel Orientation="Vertical"
                             VerticalAlignment="Center"
                             Grid.RowSpan="2">

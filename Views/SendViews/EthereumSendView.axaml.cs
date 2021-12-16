@@ -25,31 +25,31 @@ namespace Atomex.Client.Desktop.Views.SendViews
                     Dispatcher.UIThread.InvokeAsync(() =>
                     {
                         if (DataContext is EthereumSendViewModel sendViewModel)
-                            sendViewModel.AmountString = text;
+                            sendViewModel.SetAmountFromString(text);
                     });
                 });
             
-            feePriceTextBox.GetObservable(TextBox.TextProperty)
-                .Throttle(TimeSpan.FromMilliseconds(1))
-                .Subscribe(text =>
-                {
-                    Dispatcher.UIThread.InvokeAsync(() =>
-                    {
-                        if (DataContext is EthereumSendViewModel sendViewModel)
-                            sendViewModel.FeePriceString = text;
-                    });
-                });
-            
-            gasStringTextBox.GetObservable(TextBox.TextProperty)
-                .Throttle(TimeSpan.FromMilliseconds(1))
-                .Subscribe(text =>
-                {
-                    Dispatcher.UIThread.InvokeAsync(() =>
-                    {
-                        if (DataContext is EthereumSendViewModel sendViewModel)
-                            sendViewModel.GasString = text;
-                    });
-                });
+            // feePriceTextBox.GetObservable(TextBox.TextProperty)
+            //     .Throttle(TimeSpan.FromMilliseconds(1))
+            //     .Subscribe(text =>
+            //     {
+            //         Dispatcher.UIThread.InvokeAsync(() =>
+            //         {
+            //             if (DataContext is EthereumSendViewModel sendViewModel)
+            //                 sendViewModel.FeePriceString = text;
+            //         });
+            //     });
+            //
+            // gasStringTextBox.GetObservable(TextBox.TextProperty)
+            //     .Throttle(TimeSpan.FromMilliseconds(1))
+            //     .Subscribe(text =>
+            //     {
+            //         Dispatcher.UIThread.InvokeAsync(() =>
+            //         {
+            //             if (DataContext is EthereumSendViewModel sendViewModel)
+            //                 sendViewModel.GasString = text;
+            //         });
+            //     });
         }
 
         private void InitializeComponent()

@@ -13,7 +13,7 @@ namespace Atomex.Client.Desktop.Views.SendViews
         public SendView()
         {
             InitializeComponent();
-            
+
             var amountStringTextBox = this.FindControl<TextBox>("AmountString");
             var feeStringTextBox = this.FindControl<TextBox>("FeeString");
 
@@ -24,10 +24,10 @@ namespace Atomex.Client.Desktop.Views.SendViews
                     Dispatcher.UIThread.InvokeAsync(() =>
                     {
                         if (DataContext is SendViewModel sendViewModel)
-                            sendViewModel.AmountString = text;
+                            sendViewModel.SetAmountFromString(text);
                     });
                 });
-            
+
             feeStringTextBox.GetObservable(TextBox.TextProperty)
                 .Throttle(TimeSpan.FromMilliseconds(1))
                 .Subscribe(text =>
@@ -35,7 +35,7 @@ namespace Atomex.Client.Desktop.Views.SendViews
                     Dispatcher.UIThread.InvokeAsync(() =>
                     {
                         if (DataContext is SendViewModel sendViewModel)
-                            sendViewModel.FeeString = text;
+                            sendViewModel.SetFeeFromString(text);
                     });
                 });
         }

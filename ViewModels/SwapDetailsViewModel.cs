@@ -1,13 +1,9 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Input;
-using Atomex.Client.Desktop.ViewModels.Abstract;
-using Atomex.Core;
-using DynamicData;
+using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
 using ReactiveUI;
-using Serilog;
 
 namespace Atomex.Client.Desktop.ViewModels
 {

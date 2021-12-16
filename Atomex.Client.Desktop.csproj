@@ -11,37 +11,37 @@
         <Version>1.1.58</Version>
     </PropertyGroup>
     <ItemGroup>
-        <AvaloniaResource Include="Assets\**"/>
-        <AvaloniaResource Include="Resources\*"/>
-        <AvaloniaResource Include="Resources\Fonts\*"/>
-        <AvaloniaResource Include="Resources\Icons\*"/>
-        <AvaloniaResource Include="Resources\Images\*"/>
+        <AvaloniaResource Include="Assets\**" />
+        <AvaloniaResource Include="Resources\*" />
+        <AvaloniaResource Include="Resources\Fonts\*" />
+        <AvaloniaResource Include="Resources\Icons\*" />
+        <AvaloniaResource Include="Resources\Images\*" />
     </ItemGroup>
     <ItemGroup>
-        <PackageReference Include="Avalonia" Version="0.10.10"/>
-        <PackageReference Include="Avalonia.Controls.DataGrid" Version="0.10.10"/>
-        <PackageReference Include="Avalonia.Desktop" Version="0.10.10"/>
-        <PackageReference Include="Avalonia.Diagnostics" Version="0.10.10"/>
-        <PackageReference Include="Avalonia.ReactiveUI" Version="0.10.10"/>
-        <PackageReference Include="Avalonia.Xaml.Behaviors" Version="0.10.10.3"/>
-        <PackageReference Include="Avalonia.Svg.Skia" Version="0.10.10"/>
-        <PackageReference Include="DialogHost.Avalonia" Version="0.3.1"/>
-        <PackageReference Include="Deadpikle.AvaloniaProgressRing" Version="0.9.0"/>
-        <PackageReference Include="NetSparkleUpdater.SparkleUpdater" Version="2.0.7"/>
-        <PackageReference Include="NetSparkleUpdater.UI.Avalonia" Version="2.0.8"/>
-        <PackageReference Include="OxyPlot.Avalonia" Version="2.1.0-20201211.2"/>
-        <PackageReference Include="QRCoder" Version="1.4.1"/>
-        <PackageReference Include="runtime.osx.10.10-x64.CoreCompat.System.Drawing" Version="5.8.64"/>
-        <PackageReference Include="Sentry.Serilog" Version="2.1.4"/>
-        <PackageReference Include="Serilog.Settings.Configuration" Version="3.1.0"/>
-        <PackageReference Include="Serilog.Sinks.Console" Version="3.1.1"/>
-        <PackageReference Include="ReactiveUI.Fody" Version="16.4.1"/>
+        <PackageReference Include="Avalonia" Version="0.10.10" />
+        <PackageReference Include="Avalonia.Controls.DataGrid" Version="0.10.10" />
+        <PackageReference Include="Avalonia.Desktop" Version="0.10.10" />
+        <PackageReference Include="Avalonia.Diagnostics" Version="0.10.10" />
+        <PackageReference Include="Avalonia.ReactiveUI" Version="0.10.10" />
+        <PackageReference Include="Avalonia.Xaml.Behaviors" Version="0.10.10.3" />
+        <PackageReference Include="Avalonia.Svg.Skia" Version="0.10.10" />
+        <PackageReference Include="DialogHost.Avalonia" Version="0.3.1" />
+        <PackageReference Include="Deadpikle.AvaloniaProgressRing" Version="0.9.0" />
+        <PackageReference Include="NetSparkleUpdater.SparkleUpdater" Version="2.0.7" />
+        <PackageReference Include="NetSparkleUpdater.UI.Avalonia" Version="2.0.8" />
+        <PackageReference Include="OxyPlot.Avalonia" Version="2.1.0-20201211.2" />
+        <PackageReference Include="QRCoder" Version="1.4.1" />
+        <PackageReference Include="runtime.osx.10.10-x64.CoreCompat.System.Drawing" Version="5.8.64" />
+        <PackageReference Include="Sentry.Serilog" Version="2.1.4" />
+        <PackageReference Include="Serilog.Settings.Configuration" Version="3.1.0" />
+        <PackageReference Include="Serilog.Sinks.Console" Version="3.1.1" />
+        <PackageReference Include="ReactiveUI.Fody" Version="16.4.1" />
     </ItemGroup>
 
 
     <ItemGroup>
-        <None Remove="config.debug.json"/>
-        <None Remove="config.json"/>
+        <None Remove="config.debug.json" />
+        <None Remove="config.json" />
     </ItemGroup>
     <ItemGroup>
         <EmbeddedResource Include="config.debug.json">

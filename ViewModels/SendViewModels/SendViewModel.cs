@@ -1,19 +1,21 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Reactive;
+using System.Reactive.Linq;
 using System.Threading.Tasks;
 using System.Threading;
 using System.Windows.Input;
-
 using ReactiveUI;
-
 using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.Properties;
-using Atomex.Client.Desktop.ViewModels.Abstract;
 using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
 using Atomex.Core;
 using Atomex.MarketData.Abstract;
+using Avalonia.Controls;
+using ReactiveUI.Fody.Helpers;
+using Serilog;
+
 
 namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 {
@@ -21,274 +23,77 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
     {
         protected IAtomexApp App { get; set; }
 
-        private List<CurrencyViewModel> _fromCurrencies;
+        protected CurrencyConfig Currency { get; set; }
 
-        public virtual List<CurrencyViewModel> FromCurrencies
+        [Reactive] public CurrencyViewModel CurrencyViewModel { get; set; }
+
+        [Reactive] public string To { get; set; }
+
+        [Reactive] protected decimal Amount { get; set; }
+        
+        [ObservableAsProperty] public string AmountString { get; }
+
+
+        public void SetAmountFromString(string value)
         {
-            get => _fromCurrencies;
-            set
+            decimal.TryParse(value, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out var amount);
             {
-                _fromCurrencies = value;
-                OnPropertyChanged(nameof(FromCurrencies));
-            }
-        }
+                var truncatedValue = amount.TruncateByFormat(CurrencyFormat);
 
-        private int _currencyIndex;
-        public int CurrencyIndex
-        {
-            get => _currencyIndex;
-            set
-            {
-                _currencyIndex = value;
-                OnPropertyChanged(nameof(CurrencyIndex));
-
-                Currency = FromCurrencies.ElementAt(_currencyIndex).Currency;
-            }
-        }
-
-        protected CurrencyConfig _currency;
-
-        public virtual CurrencyConfig Currency
-        {
-            get => _currency;
-            set
-            {
-                if (_currency != null && _currency != value)
+                if (truncatedValue != Amount)
                 {
-                    var sendViewModel = SendViewModelCreator.CreateViewModel(App, value);
-
-                    Desktop.App.DialogService.Show(sendViewModel);
-                    return;
+                    Amount = truncatedValue;
                 }
-
-                _currency = value;
-                OnPropertyChanged(nameof(Currency));
-
-                CurrencyViewModel = FromCurrencies.FirstOrDefault(c => c.Currency.Name == Currency.Name);
-
-                _amount = 0;
-                OnPropertyChanged(nameof(AmountString));
-
-                _fee = 0;
-                OnPropertyChanged(nameof(FeeString));
-
-                Warning = string.Empty;
-            }
-        }
-
-        protected CurrencyViewModel _currencyViewModel;
-
-        public virtual CurrencyViewModel CurrencyViewModel
-        {
-            get => _currencyViewModel;
-            set
-            {
-                _currencyViewModel = value;
-
-                CurrencyCode = _currencyViewModel?.CurrencyCode;
-                FeeCurrencyCode = _currencyViewModel?.FeeCurrencyCode;
-                BaseCurrencyCode = CurrencyViewModel.BaseCurrencyCode;
-
-                CurrencyFormat = _currencyViewModel?.CurrencyFormat;
-                FeeCurrencyFormat = CurrencyViewModel?.FeeCurrencyFormat;
-                BaseCurrencyFormat = CurrencyViewModel.BaseCurrencyFormat;
-            }
-        }
-
-        protected string _to;
-
-        public virtual string To
-        {
-            get => _to;
-            set
-            {
-                _to = value;
-                OnPropertyChanged(nameof(To));
-
-                Warning = string.Empty;
-            }
-        }
-
-        protected string CurrencyFormat { get; set; }
-        protected string FeeCurrencyFormat { get; set; }
-
-        private string _baseCurrencyFormat;
-
-        public virtual string BaseCurrencyFormat
-        {
-            get => _baseCurrencyFormat;
-            set
-            {
-                _baseCurrencyFormat = value;
-                OnPropertyChanged(nameof(BaseCurrencyFormat));
-            }
-        }
-
-        protected decimal _amount;
-
-        public decimal Amount
-        {
-            get => _amount;
-            set { UpdateAmount(value); }
-        }
-
-        private bool _isAmountUpdating;
-
-        public bool IsAmountUpdating
-        {
-            get => _isAmountUpdating;
-            set
-            {
-                _isAmountUpdating = value;
-                OnPropertyChanged(nameof(IsAmountUpdating));
-            }
-        }
-
-        public string AmountString
-        {
-            get => Amount.ToString(CurrencyFormat, CultureInfo.InvariantCulture);
-            set
-            {
-                if (!decimal.TryParse(value, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture,
-                    out var amount))
+                else
                 {
-                    if (amount == 0)
-                        Amount = amount;
-
-                    OnPropertyChanged(nameof(AmountString));
-                    return;
+                    this.RaisePropertyChanged(nameof(AmountString));
                 }
-
-                Amount = amount.TruncateByFormat(CurrencyFormat);
-                OnPropertyChanged(nameof(AmountString));
             }
         }
 
-        private bool _isFeeUpdating;
+        [Reactive] protected bool IsFeeUpdating { get; set; }
 
-        public bool IsFeeUpdating
+        [Reactive] protected decimal Fee { get; set; }
+
+        [ObservableAsProperty] public string FeeString { get; }
+
+        public void SetFeeFromString(string value)
         {
-            get => _isFeeUpdating;
-            set
+            decimal.TryParse(value, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out var fee);
             {
-                _isFeeUpdating = value;
-                OnPropertyChanged(nameof(IsFeeUpdating));
-            }
-        }
+                var truncatedValue = fee.TruncateByFormat(FeeCurrencyFormat);
 
-        protected decimal _fee;
-
-        public decimal Fee
-        {
-            get => _fee;
-            set { UpdateFee(value); }
-        }
-
-        public virtual string FeeString
-        {
-            get => Fee.ToString(FeeCurrencyFormat, CultureInfo.InvariantCulture);
-            set
-            {
-                if (!decimal.TryParse(value, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out var fee))
+                if (truncatedValue != Fee)
                 {
-                    if (fee == 0)
-                        Fee = fee;
-
-                    OnPropertyChanged(nameof(FeeString));
-                    return;
+                    Fee = truncatedValue;
                 }
-
-                Fee = fee.TruncateByFormat(FeeCurrencyFormat);
-                OnPropertyChanged(nameof(FeeString));
+                else
+                {
+                    this.RaisePropertyChanged(nameof(FeeString));
+                }
             }
         }
 
-        protected bool _useDefaultFee;
+        [Reactive] public bool UseDefaultFee { get; set; }
 
-        public virtual bool UseDefaultFee
-        {
-            get => _useDefaultFee;
-            set
-            {
-                _useDefaultFee = value;
-                OnPropertyChanged(nameof(UseDefaultFee));
+        [Reactive] public decimal AmountInBase { get; set; }
 
-                if (_useDefaultFee)
-                    Amount = _amount; // recalculate amount and fee using default fee
-            }
-        }
+        [Reactive] public decimal FeeInBase { get; set; }
 
-        protected decimal _amountInBase;
+        [Reactive] public string Warning { get; set; }
 
-        public decimal AmountInBase
-        {
-            get => _amountInBase;
-            set
-            {
-                _amountInBase = value;
-                OnPropertyChanged(nameof(AmountInBase));
-            }
-        }
+        public string CurrencyCode => CurrencyViewModel.CurrencyCode;
 
-        protected decimal _feeInBase;
+        public string FeeCurrencyCode => CurrencyViewModel.FeeCurrencyCode;
 
-        public decimal FeeInBase
-        {
-            get => _feeInBase;
-            set
-            {
-                _feeInBase = value;
-                OnPropertyChanged(nameof(FeeInBase));
-            }
-        }
+        public string BaseCurrencyCode => CurrencyViewModel.BaseCurrencyCode;
 
-        protected string _currencyCode;
+        protected string CurrencyFormat => CurrencyViewModel.CurrencyFormat;
 
-        public string CurrencyCode
-        {
-            get => _currencyCode;
-            set
-            {
-                _currencyCode = value;
-                OnPropertyChanged(nameof(CurrencyCode));
-            }
-        }
+        protected string FeeCurrencyFormat => CurrencyViewModel.FeeCurrencyFormat;
 
-        protected string _feeCurrencyCode;
+        public string BaseCurrencyFormat => CurrencyViewModel.BaseCurrencyFormat;
 
-        public string FeeCurrencyCode
-        {
-            get => _feeCurrencyCode;
-            set
-            {
-                _feeCurrencyCode = value;
-                OnPropertyChanged(nameof(FeeCurrencyCode));
-            }
-        }
-
-        protected string _baseCurrencyCode;
-
-        public string BaseCurrencyCode
-        {
-            get => _baseCurrencyCode;
-            set
-            {
-                _baseCurrencyCode = value;
-                OnPropertyChanged(nameof(BaseCurrencyCode));
-            }
-        }
-
-        protected string _warning;
-
-        public string Warning
-        {
-            get => _warning;
-            set
-            {
-                _warning = value;
-                OnPropertyChanged(nameof(Warning));
-            }
-        }
 
         private ICommand _backCommand;
 
@@ -300,7 +105,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         private ICommand _nextCommand;
         public ICommand NextCommand => _nextCommand ??= (_nextCommand = ReactiveCommand.Create(OnNextCommand));
 
-        protected virtual void OnNextCommand()
+        protected void OnNextCommand()
         {
             if (string.IsNullOrEmpty(To))
             {
@@ -338,31 +143,31 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
             var confirmationViewModel = new SendConfirmationViewModel
             {
-                Currency           = Currency,
-                To                 = To,
-                Amount             = Amount,
-                AmountInBase       = AmountInBase,
-                BaseCurrencyCode   = BaseCurrencyCode,
+                Currency = Currency,
+                To = To,
+                Amount = Amount,
+                AmountInBase = AmountInBase,
+                BaseCurrencyCode = BaseCurrencyCode,
                 BaseCurrencyFormat = BaseCurrencyFormat,
-                Fee                = Fee,
-                UseDeafultFee      = UseDefaultFee,
-                FeeInBase          = FeeInBase,
-                CurrencyCode       = CurrencyCode,
-                CurrencyFormat     = CurrencyFormat,
-            
-                FeeCurrencyCode    = FeeCurrencyCode,
-                FeeCurrencyFormat  = FeeCurrencyFormat,
-                BackView           = this,
-                SendCallback       = Send
+                Fee = Fee,
+                UseDeafultFee = UseDefaultFee,
+                FeeInBase = FeeInBase,
+                CurrencyCode = CurrencyCode,
+                CurrencyFormat = CurrencyFormat,
+
+                FeeCurrencyCode = FeeCurrencyCode,
+                FeeCurrencyFormat = FeeCurrencyFormat,
+                BackView = this,
+                SendCallback = Send
             };
-            
+
             Desktop.App.DialogService.Show(confirmationViewModel);
         }
 
         public SendViewModel()
         {
 #if DEBUG
-            if (Env.IsInDesignerMode())
+            if (Design.IsDesignMode)
                 DesignerMode();
 #endif
         }
@@ -372,17 +177,39 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             CurrencyConfig currency)
         {
             App = app ?? throw new ArgumentNullException(nameof(app));
-
-            FromCurrencies = App.Account.Currencies
-                .Select(CurrencyViewModelCreator.CreateViewModel)
-                .ToList();
-
-            var CurrencyVM = FromCurrencies
-                .FirstOrDefault(c => c.Currency.Name == currency.Name);
-
-            CurrencyIndex = FromCurrencies.IndexOf(CurrencyVM);
+            Currency = currency ?? throw new ArgumentNullException(nameof(currency));
             
-            UseDefaultFee = true; // use default fee by default
+            CurrencyViewModel = CurrencyViewModelCreator.CreateViewModel(currency);
+            UseDefaultFee = true;
+
+            var updateAmountCommand = ReactiveCommand.CreateFromTask<decimal>(UpdateAmount);
+            var updateFeeCommand = ReactiveCommand.CreateFromTask<decimal>(UpdateFee);
+
+            this.WhenAnyValue(
+                    vm => vm.To,
+                    vm => vm.Amount,
+                    vm => vm.Fee
+                )
+                .Subscribe(_ => Warning = string.Empty);
+
+            this.WhenAnyValue(vm => vm.Amount)
+                .InvokeCommand(updateAmountCommand);
+
+            this.WhenAnyValue(vm => vm.Amount)
+                .Select(amount => amount.ToString(CurrencyFormat, CultureInfo.InvariantCulture))
+                .ToPropertyEx(this, vm => vm.AmountString);
+
+            this.WhenAnyValue(vm => vm.Fee)
+                .Select(fee => Math.Min(fee, Currency.GetMaximumFee()))
+                .InvokeCommand(updateFeeCommand);
+
+            this.WhenAnyValue(vm => vm.Fee)
+                .Select(fee => fee.ToString(FeeCurrencyFormat, CultureInfo.InvariantCulture))
+                .ToPropertyEx(this, vm => vm.FeeString);
+
+            this.WhenAnyValue(vm => vm.UseDefaultFee)
+                .Where(useDefaultFee => useDefaultFee)
+                .Subscribe(_ => updateAmountCommand.Execute(Amount));
 
             SubscribeToServices();
         }
@@ -393,15 +220,21 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 App.QuotesProvider.QuotesUpdated += OnQuotesUpdatedEventHandler;
         }
 
-        protected abstract void UpdateAmount(decimal amount);
-        protected abstract void UpdateFee(decimal fee);
+        protected abstract Task UpdateAmount(decimal amount);
+        protected abstract Task UpdateFee(decimal fee);
 
-        protected ICommand _maxCommand;
-        public ICommand MaxCommand => _maxCommand ??= (_maxCommand = ReactiveCommand.Create(OnMaxClick));
+        private ReactiveCommand<Unit, Unit> _maxCommand;
 
-        protected abstract void OnMaxClick();
+        public ReactiveCommand<Unit, Unit> MaxCommand =>
+            _maxCommand ??= (_maxCommand = ReactiveCommand.CreateFromTask(async () =>
+            {
+                Warning = string.Empty;
+                await OnMaxClick();
+            }));
 
-        protected virtual void OnQuotesUpdatedEventHandler(object sender, EventArgs args)
+        protected abstract Task OnMaxClick();
+
+        protected void OnQuotesUpdatedEventHandler(object sender, EventArgs args)
         {
             if (sender is not ICurrencyQuotesProvider quotesProvider)
                 return;
@@ -409,7 +242,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             var quote = quotesProvider.GetQuote(CurrencyCode, BaseCurrencyCode);
 
             AmountInBase = Amount * (quote?.Bid ?? 0m);
-            FeeInBase    = Fee * (quote?.Bid ?? 0m);
+            FeeInBase = Fee * (quote?.Bid ?? 0m);
         }
 
         protected abstract Task<Error> Send(
@@ -418,16 +251,18 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
         private void DesignerMode()
         {
-            FromCurrencies = DesignTime.Currencies
+            var fromCurrencies = DesignTime.Currencies
                 .Select(c => CurrencyViewModelCreator.CreateViewModel(c, subscribeToUpdates: false))
                 .ToList();
 
-            _currency     = FromCurrencies[0].Currency;
-            _to           = "1BvBMSEYstWetqTFn5Au4m4GFg7xJaNVN2";
-            _amount       = 0.00001234m;
-            _amountInBase = 10.23m;
-            _fee          = 0.0001m;
-            _feeInBase    = 8.43m;
+            Currency = fromCurrencies[0].Currency;
+            To = "1BvBMSEYstWetqTFn5Au4m4GFg7xJaNVN2";
+            Amount = 0.00001234m;
+            AmountInBase = 10.23m;
+            Fee = 0.0001m;
+            FeeInBase = 8.43m;
+
+            CurrencyViewModel = CurrencyViewModelCreator.CreateViewModel(Currency);
         }
     }
 }

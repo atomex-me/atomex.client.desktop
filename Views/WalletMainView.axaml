@@ -170,7 +170,7 @@
 
             <StackPanel DockPanel.Dock="Bottom">
                 <controls:MenuButton
-                    IsVisible="False"
+                    IsVisible="True"
                     Background="Transparent"
                     Foreground="White"
                     IsSelected="{Binding IsSettingsSectionActive}"

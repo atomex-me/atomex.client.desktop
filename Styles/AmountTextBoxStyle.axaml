@@ -51,6 +51,7 @@
                                                    TextWrapping="{TemplateBinding TextWrapping}"
                                                    IsVisible="{TemplateBinding Text, Converter={x:Static StringConverters.IsNullOrEmpty}}" />
                                         <TextPresenter Name="PART_TextPresenter"
+                                                       Margin="0 0 1 0"
                                                        Text="{TemplateBinding Text, Mode=TwoWay}"
                                                        CaretIndex="{TemplateBinding CaretIndex}"
                                                        SelectionStart="{TemplateBinding SelectionStart}"

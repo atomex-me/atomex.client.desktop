@@ -1,0 +1,311 @@
+<ResourceDictionary xmlns='https://github.com/avaloniaui'
+                    xmlns:x='http://schemas.microsoft.com/winfx/2006/xaml'>
+    <!-- Fonts -->
+
+    <FontFamily x:Key="DefaultFontFamily">avares://Atomex.Client.Desktop/Resources/Fonts#Inter</FontFamily>
+
+    <FontFamily x:Key="DefaultLightFontFamily">avares://Atomex.Client.Desktop/Resources/Fonts#Inter</FontFamily>
+    <FontWeight x:Key="DefaultLightFontWeight">Light</FontWeight>
+
+    <FontFamily x:Key="DefaultMediumFontFamily">avares://Atomex.Client.Desktop/Resources/Fonts#Inter</FontFamily>
+    <FontWeight x:Key="DefaultMediumFontWeight">Medium</FontWeight>
+
+    <FontFamily x:Key="DefaultBoldFontFamily">avares://Atomex.Client.Desktop/Resources/Fonts#Inter</FontFamily>
+    <FontWeight x:Key="DefaultBoldFontWeight">Bold</FontWeight>
+
+    <FontFamily x:Key="DefaultButtonFontFamily">avares://Atomex.Client.Desktop/Resources/Fonts#Inter</FontFamily>
+    <FontWeight x:Key="DefaultButtonFontWeight">Medium</FontWeight>
+
+    <FontFamily x:Key="DefaultTextBlockFontFamily">avares://Atomex.Client.Desktop/Resources/Fonts#Inter</FontFamily>
+
+    <!-- Base Colors -->
+
+    <Color x:Key="DefaultBackgroundColor">#122d4f</Color>
+    <Color x:Key="LightDefault">#C4DEFF</Color>
+    <Color x:Key="LightDefaultOpacity10">#1AC4DEFF</Color>
+    <Color x:Key="LightDefaultOpacity6">#0FC4DEFF</Color>
+    <Color x:Key="Blue">#20439E</Color>
+    <Color x:Key="LightBlue">#3964D3</Color>
+    <Color x:Key="DarkBlue">#0F3088</Color>
+    <Color x:Key="DefaultButtonMouseOverColor">#265590</Color>
+    <Color x:Key="DefaultButtonPressedColor">#1c3f6b</Color>
+    <Color x:Key="DefaultButtonBackgroundLightColor">#92aec7</Color>
+    <Color x:Key="DefaultButtonMouseOverLightColor">#b6cadc</Color>
+    <Color x:Key="DefaultButtonPressedLightColor">#122d4f</Color>
+    <Color x:Key="DefaultTextBoxBackgroundColor">#b6cadc</Color>
+    <Color x:Key="DefaultTextBoxForegroundColor">#2e5185</Color>
+    <Color x:Key="DefaultTextBoxCuretColor">#1388ba</Color>
+    <Color x:Key="DefaultSubstrateColor">#2f000000</Color>
+    <Color x:Key="DefaultMenuItemSelectedColor">#1183b5</Color>
+    <Color x:Key="DefaultProgressRingColor">#1183b5</Color>
+    <Color x:Key="DefaultMenuItemMouseOverColor">#0f4d6d</Color>
+    <Color x:Key="CriticalWarningColor">#ef6a41</Color>
+    <Color x:Key="DarkRed">#E1457C</Color>
+    <Color x:Key="Emerald">#48C3AD</Color>
+    
+    <Color x:Key="MahApps.Colors.Gray1">#FF333333</Color>
+    <Color x:Key="MahApps.Colors.Gray2">#FF7F7F7F</Color>
+    <Color x:Key="MahApps.Colors.Gray3">#FF9D9D9D</Color>
+    <Color x:Key="MahApps.Colors.Gray4">#FFA59F93</Color>
+    <Color x:Key="MahApps.Colors.Gray5">#FFB9B9B9</Color>
+    <Color x:Key="MahApps.Colors.Gray6">#FFCCCCCC</Color>
+    <Color x:Key="MahApps.Colors.Gray7">#FFD8D8D9</Color>
+    <Color x:Key="MahApps.Colors.Gray8">#FFE0E0E0</Color>
+    <Color x:Key="MahApps.Colors.Gray9">#5EC9C9C9</Color>
+    <Color x:Key="MahApps.Colors.Gray10">#FFF7F7F7</Color>
+
+    <Color x:Key="MahApps.Colors.Gray">#FFBEBEBE</Color>
+    <Color x:Key="MahApps.Colors.Gray.MouseOver">#FF333333</Color>
+    <Color x:Key="MahApps.Colors.Gray.SemiTransparent">#40808080</Color>
+    
+    <SolidColorBrush x:Key="GrayBrush1" Color="{DynamicResource MahApps.Colors.Gray1}" />
+    <SolidColorBrush x:Key="GrayBrush2" Color="{DynamicResource MahApps.Colors.Gray2}" />
+    <SolidColorBrush x:Key="GrayBrush3" Color="{DynamicResource MahApps.Colors.Gray3}" />
+    <SolidColorBrush x:Key="GrayBrush4" Color="{DynamicResource MahApps.Colors.Gray4}" />
+    <SolidColorBrush x:Key="GrayBrush5" Color="{DynamicResource MahApps.Colors.Gray5}" />
+    <SolidColorBrush x:Key="GrayBrush6" Color="{DynamicResource MahApps.Colors.Gray6}" />
+    <SolidColorBrush x:Key="GrayBrush7" Color="{DynamicResource MahApps.Colors.Gray7}" />
+    <SolidColorBrush x:Key="GrayBrush8" Color="{DynamicResource MahApps.Colors.Gray8}" />
+    <SolidColorBrush x:Key="GrayBrush9" Color="{DynamicResource MahApps.Colors.Gray9}" />
+    <SolidColorBrush x:Key="GrayBrush10" Color="{DynamicResource MahApps.Colors.Gray10}" />
+    
+
+    <SolidColorBrush x:Key="DefaultBackgroundBrush" Color="{DynamicResource DefaultBackgroundColor}" />
+    <SolidColorBrush x:Key="DefaultForegroundBrush" Color="{DynamicResource LightDefault}" />
+    <SolidColorBrush x:Key="DefaultButtonBackgroundBrush" Color="{DynamicResource Blue}" />
+    <SolidColorBrush x:Key="DefaultTextBoxBackgroundBrush" Color="{DynamicResource DefaultTextBoxBackgroundColor}" />
+    <SolidColorBrush x:Key="DefaultTextBoxForegroundBrush" Color="{DynamicResource DefaultTextBoxForegroundColor}" />
+    <SolidColorBrush x:Key="DefaultTextBoxCuretBrush" Color="{DynamicResource DefaultTextBoxCuretColor}" />
+    <SolidColorBrush x:Key="DefaultSubstrateBrush" Color="{DynamicResource DefaultSubstrateColor}" />
+    <SolidColorBrush x:Key="WarningForegroundBrush" Color="Gold" />
+    <SolidColorBrush x:Key="CriticalWarningForegroundBrush" Color="{DynamicResource CriticalWarningColor}" />
+    <SolidColorBrush x:Key="FieldHeaderBackgroundBrush" Color="#214174" />
+    <SolidColorBrush x:Key="DefaultAmountForegroundBrush" Color="#eeff00" />
+    <SolidColorBrush x:Key="DefaultAmountInBaseForegroundBrush" Color="DarkGray" />
+    <SolidColorBrush x:Key="DefaultAddressForegroundBrush" Color="Orange" />
+    <SolidColorBrush x:Key="DefaultTooltipBackgroundBrush" Color="#80000000" />
+    <SolidColorBrush x:Key="DefaultMenuItemSelectedBrush" Color="{DynamicResource DefaultMenuItemSelectedColor}" />
+    <SolidColorBrush x:Key="DefaultMenuItemMouseOverBrush" Color="{DynamicResource DefaultMenuItemMouseOverColor}" />
+    
+    <SolidColorBrush x:Key="DefaultProgressRingBrush" Color="{DynamicResource DefaultProgressRingColor}" />
+
+    <x:Int32 x:Key="DefaultTooltipFontSize">12</x:Int32>
+
+    <!-- Main View -->
+
+    <Color x:Key="MainBackgroundColor1">#0f1a28</Color>
+    <Color x:Key="MainBackgroundColor2">#1a2e4c</Color>
+    <Color x:Key="MainBorderColor">Azure</Color>
+    <Color x:Key="MainOverlayColor">#40000000</Color>
+
+    <SolidColorBrush x:Key="MainWindowTitleBrush" Color="{StaticResource MainBackgroundColor1}" />
+    <SolidColorBrush x:Key="MainNoActiveWindowTitleBrush" Color="{StaticResource MainBackgroundColor1}" />
+    <SolidColorBrush x:Key="MainBorderBrush" Color="{StaticResource MainBorderColor}" />
+    <SolidColorBrush x:Key="MainOverlayBrush" Color="{StaticResource MainOverlayColor}" />
+    <SolidColorBrush x:Key="StatusBarConnectedForeground" Color="AliceBlue" />
+    <SolidColorBrush x:Key="StatusBarDisconnectedForeground" Color="{StaticResource CriticalWarningColor}" />
+    <SolidColorBrush x:Key="StatusBarVersionForeground" Color="DarkGray"/>
+    <SolidColorBrush x:Key="MainWindowTitleBarForeground" Color="DarkGray"/>
+    <SolidColorBrush x:Key="DefaultUpdateForegroundBrush" Color="Gold" />
+
+    <LinearGradientBrush x:Key="MainBackgroundBrush" StartPoint="0%,0%" EndPoint="100%,100%">
+        <LinearGradientBrush.GradientStops>
+            <GradientStop Offset="0" Color="{StaticResource MainBackgroundColor1}" />
+            <GradientStop Offset="1" Color="{StaticResource MainBackgroundColor2}" />
+        </LinearGradientBrush.GradientStops>
+    </LinearGradientBrush>
+
+    <FontFamily x:Key="MainTitleFontFamily">avares://Atomex.Client.Desktop/Resources/Fonts#Comfortaa</FontFamily>
+    <FontFamily x:Key="AgencyFb">avares://Atomex.Client.Desktop/Resources/Fonts/Agency-FB.ttf#Agency FB</FontFamily>
+
+    <!-- Child View -->
+
+    <Color x:Key="ChildViewShadowColor">Black</Color>
+    <Color x:Key="ChildViewBackgroundColor1">#122B50</Color>
+    <Color x:Key="ChildViewBackgroundColor2">#11233C</Color>
+
+    <LinearGradientBrush x:Key="ChildViewBackgroundBrush" StartPoint="100%,0%" EndPoint="0%,100%">
+        <LinearGradientBrush.GradientStops>
+            <GradientStop Offset="0" Color="{DynamicResource ChildViewBackgroundColor1}" />
+            <GradientStop Offset="1" Color="{DynamicResource ChildViewBackgroundColor2}" />
+        </LinearGradientBrush.GradientStops>
+    </LinearGradientBrush>
+
+    <Color x:Key="ChildViewBackgroundLightColor1">AliceBlue</Color>
+    <Color x:Key="ChildViewBackgroundLightColor2">#c9dae9</Color>
+
+    <LinearGradientBrush x:Key="ChildViewBackgroundBrushLight" StartPoint="0%,0%" EndPoint="100%,100%">
+        <LinearGradientBrush.GradientStops>
+            <GradientStop Offset="0" Color="{DynamicResource ChildViewBackgroundLightColor1}" />
+            <GradientStop Offset="1" Color="{DynamicResource ChildViewBackgroundLightColor2}" />
+        </LinearGradientBrush.GradientStops>
+    </LinearGradientBrush>
+
+    <SolidColorBrush x:Key="ChildViewHeaderForegroundBrush" Color="{DynamicResource LightDefault}" />
+    <SolidColorBrush x:Key="ChildViewHeaderBackgroundBrush" Color="{DynamicResource DefaultBackgroundColor}" />
+    <SolidColorBrush x:Key="ChildViewCloseButtonBrush" Color="{DynamicResource Blue}" />
+    <SolidColorBrush x:Key="ChildViewCloseButtonMouseOverBrush" Color="{DynamicResource DefaultButtonMouseOverColor}" />
+    <SolidColorBrush x:Key="ChildViewCloseButtonPressedBrush" Color="{DynamicResource DefaultButtonPressedColor}" />
+    <SolidColorBrush x:Key="ChildViewCloseButtonLightBrush" Color="{DynamicResource DefaultButtonBackgroundLightColor}" />
+    <SolidColorBrush x:Key="ChildViewCloseButtonMouseOverLightBrush"
+                     Color="{DynamicResource DefaultButtonMouseOverLightColor}" />
+    <SolidColorBrush x:Key="ChildViewCloseButtonPressedLightBrush"
+                     Color="{DynamicResource DefaultButtonPressedLightColor}" />
+
+    <!-- Hamburger Menu -->
+
+    <Color x:Key="HamburgerMenuItemSelectedColor">#1183b5</Color>
+    <Color x:Key="HamburgerMenuItemMouseOverColor">#0f4d6d</Color>
+    <SolidColorBrush x:Key="HamburgerMenuBackgroundBrush" Color="{DynamicResource DefaultSubstrateColor}" />
+    <SolidColorBrush x:Key="HamburgerMenuItemForegroundBrush" Color="White" />
+    <SolidColorBrush x:Key="HamburgerMenuItemSelectedBackground"
+                     Color="{DynamicResource HamburgerMenuItemSelectedColor}" />
+    <SolidColorBrush x:Key="HamburgerMenuItemSelectedMouseOverBackground"
+                     Color="{DynamicResource HamburgerMenuItemSelectedColor}" />
+    <SolidColorBrush x:Key="HamburgerMenuItemUnselectedMouseOverBackground"
+                     Color="{DynamicResource HamburgerMenuItemMouseOverColor}" />
+    <SolidColorBrush x:Key="HamburgerMenuItemDisabledBackground" Color="#330078d7" />
+    <FontFamily x:Key="HamburgerMenuItemFontFamily">avares://Atomex.Client.Desktop/Resources/Fonts#Roboto</FontFamily>
+    <FontWeight x:Key="HamburgerMenuItemFontWeight">Medium</FontWeight>
+
+    <!-- Custom TextBox -->
+
+    <SolidColorBrush x:Key="CustomTextBoxBackgroundBrush" Color="{DynamicResource DefaultTextBoxBackgroundColor}" />
+    <SolidColorBrush x:Key="CustomTextBoxForegroundBrush" Color="{DynamicResource DefaultTextBoxForegroundColor}" />
+    <SolidColorBrush x:Key="CustomTextBoxBorderBrush" Color="{DynamicResource DefaultTextBoxBackgroundColor}" />
+    <SolidColorBrush x:Key="CustomTextBoxCaretBrush" Color="#1388ba" />
+    
+
+    <!-- Custom ComboBox -->
+
+    <SolidColorBrush x:Key="CustomComboBoxBackgroundBrush" Color="{DynamicResource DefaultTextBoxBackgroundColor}" />
+    <SolidColorBrush x:Key="CustomComboBoxForegroundBrush" Color="{DynamicResource DefaultTextBoxForegroundColor}" />
+    <SolidColorBrush x:Key="CustomComboBoxDisabledForegroundBrush" Color="#888888" />
+
+    <!-- Currency ComboBox -->
+
+    <SolidColorBrush x:Key="CurrencyComboBoxItemBackground" Color="{DynamicResource MainBackgroundColor1}" />
+    <SolidColorBrush x:Key="CurrencyComboBoxItemSelectedBackground" Color="{DynamicResource ChildViewBackgroundColor2}" />
+    <SolidColorBrush x:Key="CurrencyComboBoxItemSelectedMouseOverBackground"
+                     Color="{DynamicResource ChildViewBackgroundColor1}" />
+    <SolidColorBrush x:Key="CurrencyComboBoxItemUnselectedMouseOverBackground"
+                     Color="{DynamicResource ChildViewBackgroundColor1}" />
+    <SolidColorBrush x:Key="CurrencyComboBoxItemDisabledBackground" Color="#303030" />
+    <SolidColorBrush x:Key="CurrencyComboBoxIconBrush" Color="LightGray" />
+
+    <!-- Custom PasswordBox -->
+
+    <SolidColorBrush x:Key="CustomPasswordBoxBackgroundBrush" Color="{DynamicResource DefaultTextBoxBackgroundColor}" />
+    <SolidColorBrush x:Key="CustomPasswordBoxForegroundBrush" Color="{DynamicResource DefaultTextBoxForegroundColor}" />
+    <SolidColorBrush x:Key="CustomPasswordBoxBorderBrush" Color="{DynamicResource DefaultTextBoxBackgroundColor}" />
+    <SolidColorBrush x:Key="CustomPasswordBoxCaretBrush" Color="{DynamicResource DefaultTextBoxForegroundColor}" />
+    <SolidColorBrush x:Key="CustomPasswordBoxCapsLockBrush" Color="{DynamicResource DefaultTextBoxForegroundColor}" />
+    <SolidColorBrush x:Key="CustomPasswordBoxRevealButtonBrush" Color="{DynamicResource DefaultTextBoxForegroundColor}" />
+    <SolidColorBrush x:Key="CustomPasswordBoxRevealButtonMouseOverBrush"
+                     Color="{DynamicResource DefaultButtonMouseOverColor}" />
+    <SolidColorBrush x:Key="CustomPasswordBoxRevealButtonPressedBrush"
+                     Color="{DynamicResource DefaultButtonPressedColor}" />
+
+    <!-- Custom DataGrid -->
+
+    <SolidColorBrush x:Key="CustomDataGridColumnBackground" Color="{DynamicResource DefaultSubstrateColor}" />
+    <SolidColorBrush x:Key="CustomDataGridBackground" Color="{DynamicResource DefaultSubstrateColor}" />
+    <SolidColorBrush x:Key="CustomDataGridRowBackground" Color="Transparent" />
+    <SolidColorBrush x:Key="CustomDataGridAlternativeRowBackground" Color="#15253c" />
+    <SolidColorBrush x:Key="CustomDataGridNoData" Color="#03ffffff" />
+    <SolidColorBrush x:Key="CustomDataGridHeaderPointerOver" Color="{DynamicResource MahApps.Colors.Gray2}" Opacity="0.5" />
+
+    <!-- Baker ComboBox -->
+
+    <SolidColorBrush x:Key="BakerComboBoxItemsBackgroundBrush" Color="#172130" />
+    <SolidColorBrush x:Key="MinDelegationBrush" Color="#c0c0c0" />
+    <SolidColorBrush x:Key="BakerFullForegroundBrush" Color="#ffa500" />
+
+    <!-- Rounded Button -->
+
+    <SolidColorBrush x:Key="RoundedButtonBackgroundBrush" Color="{DynamicResource Blue}" />
+    <SolidColorBrush x:Key="RoundedButtonMouseOverBrush" Color="{DynamicResource LightBlue}" />
+    <SolidColorBrush x:Key="RoundedButtonPressedBrush" Color="{DynamicResource DarkBlue}" />
+    <SolidColorBrush x:Key="RoundedButtonDisabledBrush" Color="{DynamicResource LightDefaultOpacity10}" />
+    <SolidColorBrush x:Key="RoundedButtonForegroundBrush" Color="White" />
+
+    <!-- Link Button -->
+
+    <SolidColorBrush x:Key="DefaultLinkButtonForegroundBrush" Color="#2e5185" />
+    <SolidColorBrush x:Key="DefaultLinkButtonMouseOverBrush" Color="Black" />
+
+    <!-- Start View -->
+
+    <SolidColorBrush x:Key="CopyrightForegroundBrush" Color="#122d4f" />
+    <SolidColorBrush x:Key="SocialDefaultBrush" Color="#7f122d4f" />
+    <SolidColorBrush x:Key="SocialMouseOverBrush" Color="#122d4f" />
+
+    <!-- Create Wallet View -->
+
+    <SolidColorBrush x:Key="GenerateButtonMouseOverBrush" Color="#326099" />
+    <SolidColorBrush x:Key="GenerateButtonPressedBrush" Color="#0b1c32" />
+    <SolidColorBrush x:Key="GenerateButtonPressedForegroundBrush" Color="#92aec7" />
+    <SolidColorBrush x:Key="StepBackgroundBrush" Color="#1e56af" />
+    <SolidColorBrush x:Key="StepForegroundBrush" Color="GhostWhite" />
+    <SolidColorBrush x:Key="CompletedStepBackgroundBrush" Color="#1a4070" />
+
+    <!-- My Wallets View -->
+
+    <SolidColorBrush x:Key="AvailableWalletListBackgroundBrush" Color="#0b213d" />
+    <SolidColorBrush x:Key="MainNetWalletForegroundBrush" Color="White" />
+    <SolidColorBrush x:Key="TestNetWalletForegroundBrush" Color="#ffd0e6f9" />
+
+    <!-- Transaction Details View -->
+
+    <SolidColorBrush x:Key="IconButtonForegroundBrush" Color="#becfde" />
+    <SolidColorBrush x:Key="IconButtonMouseOverBrush" Color="White" />
+    <SolidColorBrush x:Key="IconButtonPressedBrush" Color="#29456d" />
+    <SolidColorBrush x:Key="AlmostTransparentBrush" Color="#00000001" />
+    <SolidColorBrush x:Key="TransactionDetailsLineHeaderBrush" Color="LightGray" />
+    <SolidColorBrush x:Key="TransactionDetailsBackgroundBrush" Color="Transparent" />
+
+    <!-- Receive View -->
+
+    <SolidColorBrush x:Key="NewAddressBrush" Color="#b8b8b8" />
+    <SolidColorBrush x:Key="AmountBrush" Color="#ffa500" />
+
+    <!-- Wallet View -->
+
+    <Color x:Key="UnknownColor">#515973</Color>
+    <Color x:Key="PendingColor">#515973</Color>
+    <Color x:Key="ConfirmedColor">#4b79bb</Color>
+    <Color x:Key="UnconfirmedColor">#29456d</Color>
+    <Color x:Key="FailedColor">#e42552</Color>
+
+    <SolidColorBrush x:Key="UnknownBrush" Color="{DynamicResource UnknownColor}" />
+    <SolidColorBrush x:Key="PendingBrush" Color="{DynamicResource PendingColor}" />
+    <SolidColorBrush x:Key="ConfirmedBrush" Color="{DynamicResource ConfirmedColor}" />
+    <SolidColorBrush x:Key="UnconfirmedBrush" Color="{DynamicResource UnconfirmedColor}" />
+    <SolidColorBrush x:Key="FailedBrush" Color="{DynamicResource FailedColor}" />
+    <SolidColorBrush x:Key="CheckboxCheckedBrush" Color="{DynamicResource ConfirmedColor}" />
+
+    <SolidColorBrush x:Key="BalanceBackgroundBrush" Color="White" />
+    <SolidColorBrush x:Key="UsdBalanceBackgroundBrush" Color="Gray" />
+    <SolidColorBrush x:Key="ExplorerLinkButtonForegroundBrush" Color="#6bbaff" />
+    <SolidColorBrush x:Key="ExplorerLinkButtonMouseOverBrush" Color="#cfe4f7" />
+
+    <SolidColorBrush x:Key="NoDelegationsBrush" Color="Gray" />
+    <SolidColorBrush x:Key="DelegatedAmountBrush" Color="#ffa500" />
+    <SolidColorBrush x:Key="UnconfirmedAmountBrush" Color="#ffa500" />
+    <SolidColorBrush x:Key="NegativeAmountBrush" Color="#aec4e5" />
+    <SolidColorBrush x:Key="PositiveAmountBrush" Color="White" />
+
+    <!-- Conversion View -->
+
+    <SolidColorBrush x:Key="NoLiquidityForegroundBrush" Color="#e25b5b" />
+    <SolidColorBrush x:Key="MarketVolumeForegroundBrush" Color="AliceBlue" />
+    <SolidColorBrush x:Key="ConversionArrowBrush" Color="LightGray" />
+    <SolidColorBrush x:Key="InvalidAmountForegroundBrush" Color="#e25b5b"/>
+
+    <SolidColorBrush x:Key="SwapStateCanceledBackgroundBrush" Color="{DynamicResource UnconfirmedColor}" />
+    <SolidColorBrush x:Key="SwapStateCompletedBackgroundBrush" Color="{DynamicResource ConfirmedColor}" />
+    <SolidColorBrush x:Key="SwapStateInProgressBackgroundBrush" Color="{DynamicResource UnconfirmedColor}" />
+    <SolidColorBrush x:Key="SwapStateUnconfirmedBackgroundBrush" Color="{DynamicResource UnconfirmedColor}" />
+    <SolidColorBrush x:Key="SwapStateRefundedBackgroundBrush" Color="{DynamicResource ConfirmedColor}" />
+    <SolidColorBrush x:Key="SwapStateUnsettledBackgroundBrush" Color="{DynamicResource UnknownColor}" />
+</ResourceDictionary>

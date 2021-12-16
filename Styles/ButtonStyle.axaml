@@ -1,0 +1,18 @@
+<Styles xmlns='https://github.com/avaloniaui'
+        xmlns:x='http://schemas.microsoft.com/winfx/2006/xaml'>
+    <Styles.Resources>
+        <SolidColorBrush x:Key="PrimaryTextColor" Color="{DynamicResource LightDefault}" />
+    </Styles.Resources>
+
+    <Style Selector=":is(Button)">
+        <Setter Property="Cursor" Value="Hand" />
+    </Style>
+
+    <Style
+        Selector="Button.CloseBtn:not(:pointerover) /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="Transparent" />
+    </Style>
+    <Style Selector="Button.CloseBtn > Path">
+        <Setter Property="Fill" Value="{StaticResource PrimaryTextColor}" />
+    </Style>
+</Styles>

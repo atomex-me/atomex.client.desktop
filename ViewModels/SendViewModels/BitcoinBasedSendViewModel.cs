@@ -1,39 +1,44 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-
+using System.Windows.Input;
 using Atomex.Blockchain.Abstract;
 using Atomex.Blockchain.BitcoinBased;
-using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.Properties;
 using Atomex.Core;
 using Atomex.Wallet.Abstract;
 using Atomex.Wallet.BitcoinBased;
+using Avalonia.Controls;
+using NBitcoin;
+using ReactiveUI;
+using ReactiveUI.Fody.Helpers;
+using Network = NBitcoin.Network;
 
 namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 {
     public class BitcoinBasedSendViewModel : SendViewModel
     {
-        // TODO: select outputs from UI
-        public IEnumerable<BitcoinBasedTxOutput> Outputs { get; set; }
+        [Reactive] public ObservableCollection<BitcoinBasedTxOutput>? Outputs { get; set; }
 
-        protected decimal _feeRate;
-        public decimal FeeRate
-        {
-            get => _feeRate;
-            set { _feeRate = value; OnPropertyChanged(nameof(FeeRate)); }
-        }
+        [Reactive] public decimal FeeRate { get; set; }
+
+        public string FeeRateFormat => "0.#";
 
         private BitcoinBasedConfig Config => (BitcoinBasedConfig)Currency;
+
+        private BitcoinBasedAccount Account => App.Account.GetCurrencyAccount<BitcoinBasedAccount>(Currency.Name);
+
+        private static SelectOutputsViewModel SelectOutputsViewModel { get; set; }
 
         public BitcoinBasedSendViewModel()
             : base()
         {
 #if DEBUG
-            if (Env.IsInDesignerMode())
-                DesignerMode();
+            if (Design.IsDesignMode)
+                BitcoinBasedDesignerMode();
 #endif
         }
 
@@ -42,128 +47,114 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             CurrencyConfig currency)
             : base(app, currency)
         {
+            _ = Task.Run(async () =>
+            {
+                var outputs = (await Account.GetAvailableOutputsAsync())
+                    .Select(o => (BitcoinBasedTxOutput)o);
+
+                Outputs = new ObservableCollection<BitcoinBasedTxOutput>(outputs);
+
+                SelectOutputsViewModel = new SelectOutputsViewModel()
+                {
+                    BackAction = () => { Desktop.App.DialogService.Show(this); }
+                };
+            });
         }
 
-        protected override async void UpdateAmount(decimal amount)
+        protected override async Task UpdateAmount(decimal amount)
         {
-            IsAmountUpdating = true;
-
-            _amount = amount;
-            Warning = string.Empty;
-
             try
             {
-                var account = App.Account.GetCurrencyAccount<BitcoinBasedAccount>(Currency.Name);
-
                 if (UseDefaultFee)
                 {
                     FeeRate = await Config.GetFeeRateAsync();
 
                     var transactionParams = await BitcoinTransactionParams.SelectTransactionParamsByFeeRateAsync(
                         availableOutputs: Outputs,
-                        to: _to,
-                        amount: _amount,
-                        feeRate: _feeRate,
-                        account: account);
+                        to: To,
+                        amount: Amount,
+                        feeRate: FeeRate,
+                        account: Account);
 
                     if (transactionParams == null)
                     {
                         Warning = Resources.CvInsufficientFunds;
-                        IsAmountUpdating = false;
                         return;
                     }
 
-                    _fee = Config.SatoshiToCoin((long)transactionParams.FeeInSatoshi);
-                    OnPropertyChanged(nameof(FeeString));
+                    var feeVal = Config.SatoshiToCoin((long)transactionParams.FeeInSatoshi);
+                    Fee = feeVal;
                 }
                 else
                 {
                     var transactionParams = await BitcoinTransactionParams.SelectTransactionParamsByFeeAsync(
                         availableOutputs: Outputs,
-                        to: _to,
-                        amount: _amount,
-                        fee: _fee,
-                        account: account);
+                        to: To,
+                        amount: Amount,
+                        fee: Fee,
+                        account: Account);
 
                     if (transactionParams == null)
                     {
                         Warning = Resources.CvInsufficientFunds;
-                        IsAmountUpdating = false;
                         return;
                     }
 
-                    FeeRate = transactionParams.FeeRate;
-                    //Fee = _fee; // recalculate fee
-                }
+                    var minimumFeeInSatoshi = Config.GetMinimumFee((int)transactionParams.Size);
+                    var minimumFee = Config.SatoshiToCoin(minimumFeeInSatoshi);
 
-                OnPropertyChanged(nameof(AmountString));
+                    if (Fee < minimumFee)
+                        Warning = Resources.CvLowFees;
+
+                    FeeRate = transactionParams.FeeRate;
+                }
 
                 OnQuotesUpdatedEventHandler(App.QuotesProvider, EventArgs.Empty);
             }
-            finally
+            catch
             {
-                IsAmountUpdating = false;
+                // ignored
             }
         }
 
-        protected override async void UpdateFee(decimal fee)
+        protected override async Task UpdateFee(decimal fee)
         {
-            if (IsFeeUpdating)
-                return;
-
-            IsFeeUpdating = true;
-
-            _fee = Math.Min(fee, Currency.GetMaximumFee());
-            Warning = string.Empty;
-
             try
             {
-                var account = App.Account.GetCurrencyAccount<BitcoinBasedAccount>(Currency.Name);
-
                 var transactionParams = await BitcoinTransactionParams.SelectTransactionParamsByFeeAsync(
                     availableOutputs: Outputs,
-                    to: _to,
-                    amount: _amount,
-                    fee: _fee,
-                    account: account);
+                    to: To,
+                    amount: Amount,
+                    fee: Fee,
+                    account: Account);
 
                 if (transactionParams == null)
                 {
                     Warning = Resources.CvInsufficientFunds;
-                    IsFeeUpdating = false;
                     return;
                 }
 
                 var minimumFeeInSatoshi = Config.GetMinimumFee((int)transactionParams.Size);
                 var minimumFee = Config.SatoshiToCoin(minimumFeeInSatoshi);
 
-                if (_fee < minimumFee)
+                if (Fee < minimumFee)
                     Warning = Resources.CvLowFees;
 
                 FeeRate = transactionParams.FeeRate;
 
-                //OnPropertyChanged(nameof(AmountString));
-                OnPropertyChanged(nameof(FeeString));
-
                 OnQuotesUpdatedEventHandler(App.QuotesProvider, EventArgs.Empty);
             }
-            finally
+            catch
             {
-                IsFeeUpdating = false;
+                // ignored
             }
         }
 
-        protected override async void OnMaxClick()
+        protected override async Task OnMaxClick()
         {
-            if (IsAmountUpdating)
-                return;
-
-            IsAmountUpdating = true;
-            Warning = string.Empty;
-
             try
             {
-                if (UseDefaultFee) // auto fee
+                if (UseDefaultFee)
                 {
                     if (App.Account.GetCurrencyAccount(Currency.Name) is not IEstimatable account)
                         return; // todo: error?
@@ -172,58 +163,62 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
                     var maxAmountEstimation = await account.EstimateMaxAmountToSendAsync(
                         from: new FromOutputs(Outputs),
-                        to: _to,
+                        to: To,
                         type: BlockchainTransactionType.Output,
                         fee: 0,
-                        feePrice: _feeRate,
+                        feePrice: FeeRate,
                         reserve: false);
 
                     if (maxAmountEstimation.Amount > 0)
-                        _amount = maxAmountEstimation.Amount;
+                    {
+                        Amount = maxAmountEstimation.Amount;
+                        return;
+                    }
 
-                    OnPropertyChanged(nameof(AmountString));
-
-                    _fee = maxAmountEstimation.Fee;
-                    OnPropertyChanged(nameof(FeeString));
+                    Fee = maxAmountEstimation.Fee;
                 }
                 else // manual fee
                 {
                     var availableInSatoshi = Outputs.Sum(o => o.Value);
-                    var feeInSatoshi = Config.CoinToSatoshi(_fee);
+                    var feeInSatoshi = Config.CoinToSatoshi(Fee);
                     var maxAmountInSatoshi = availableInSatoshi - feeInSatoshi;
                     var maxAmount = Config.SatoshiToCoin(maxAmountInSatoshi);
 
-                    var account = App.Account.GetCurrencyAccount<BitcoinBasedAccount>(Currency.Name);
-
                     var transactionParams = await BitcoinTransactionParams.SelectTransactionParamsByFeeAsync(
                         availableOutputs: Outputs,
-                        to: _to,
+                        to: To,
                         amount: maxAmount,
-                        fee: _fee,
-                        account: account);
+                        fee: Fee,
+                        account: Account);
 
                     if (transactionParams == null)
                     {
                         Warning = Resources.CvInsufficientFunds;
-                        IsAmountUpdating = false;
-
-                        _amount = 0;
-                        OnPropertyChanged(nameof(AmountString));
-
+                        Amount = 0;
                         return;
                     }
 
-                    _amount = maxAmount;
-                    OnPropertyChanged(nameof(AmountString));
+                    if (Amount != maxAmount)
+                    {
+                        Amount = maxAmount;
+                    }
+                    else
+                    {
+                        var minimumFeeInSatoshi = Config.GetMinimumFee((int)transactionParams.Size);
+                        var minimumFee = Config.SatoshiToCoin(minimumFeeInSatoshi);
+
+                        if (Fee < minimumFee)
+                            Warning = Resources.CvLowFees;
+                    }
 
                     FeeRate = transactionParams.FeeRate;
                 }
 
                 OnQuotesUpdatedEventHandler(App.QuotesProvider, EventArgs.Empty);
             }
-            finally
+            catch
             {
-                IsAmountUpdating = false;
+                // ignored
             }
         }
 
@@ -231,9 +226,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             SendConfirmationViewModel confirmationViewModel,
             CancellationToken cancellationToken = default)
         {
-            var account = App.Account.GetCurrencyAccount<BitcoinBasedAccount>(Currency.Name);
-
-            return account.SendAsync(
+            return Account.SendAsync(
                 from: Outputs.ToList(),
                 to: confirmationViewModel.To,
                 amount: confirmationViewModel.Amount,
@@ -242,9 +235,36 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 cancellationToken: cancellationToken);
         }
 
-        private void DesignerMode()
+        private ICommand _showOutputsWindowCommand;
+
+        public ICommand ShowOutputsWindowCommand => _showOutputsWindowCommand ??=
+            (_showOutputsWindowCommand = ReactiveCommand.Create(ShowOutputsWindow));
+
+        private static void ShowOutputsWindow()
         {
-            _feeRate = 200;
+            Desktop.App.DialogService.Show(SelectOutputsViewModel);
+        }
+
+        private void BitcoinBasedDesignerMode()
+        {
+            FeeRate = 98765;
+            Warning = "Insufficient BTC balance";
+
+            var amount = new Money((decimal)0.0001, MoneyUnit.Satoshi);
+            var script = BitcoinAddress.Create("muRDku2ZwNTz2msCZCHSUhDD5o6NxGsoXM", Network.TestNet).ScriptPubKey;
+
+            var outputs = new List<BitcoinBasedTxOutput>
+            {
+                new BitcoinBasedTxOutput(
+                    coin: new Coin(
+                        fromTxHash: new uint256("19aa2187cda7610590d09dfab41ed4720f8570d7414b71b3dc677e237f72d4a1"),
+                        fromOutputIndex: 0u,
+                        amount: amount,
+                        scriptPubKey: script),
+                    spentTxPoint: null)
+            };
+
+            Outputs = new ObservableCollection<BitcoinBasedTxOutput>(outputs);
         }
     }
 }

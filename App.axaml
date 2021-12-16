@@ -11,6 +11,7 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceInclude Source="/Resources/Icons.axaml" />
                 <ResourceInclude Source="/Themes/blue.axaml" />
+                <ResourceInclude Source="/Themes/redesign.axaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>
@@ -24,8 +25,8 @@
         <StyleInclude Source="/Styles/Styles.axaml" />
         <StyleInclude Source="/Styles/MainWindowStyle.axaml" />
         <StyleInclude Source="/Styles/ChildViewStyle.axaml" />
-        <StyleInclude Source="/Styles/DefaultButtonStyle.axaml" />
-        <StyleInclude Source="/Styles/GenerateButtonStyle.axaml" />
+        <StyleInclude Source="/Styles/ButtonStyle.axaml" />
+        <StyleInclude Source="/Styles/RoundedButtonStyle.axaml" />
         <StyleInclude Source="/Styles/IconButtonStyle.axaml" />
         <StyleInclude Source="/Styles/LinkButtonStyle.axaml" />
         <StyleInclude Source="/Styles/CustomComboBoxStyle.axaml" />
@@ -41,6 +42,7 @@
         <StyleInclude Source="/Styles/WalletViewStyle.axaml" />
         <StyleInclude Source="/Styles/SwapViewStyle.axaml" />
         <StyleInclude Source="/Styles/CurrencyComboBoxStyle.axaml" />
+        <StyleInclude Source="/Styles/CurrencySendControlStyle.axaml" />
         <StyleInclude Source="/Styles/ToggleSwitchStyle.axaml" />
         <StyleInclude Source="/Styles/CustomTitlebarStyle.axaml" />
         <StyleInclude Source="/Styles/TypeTest.axaml" />
