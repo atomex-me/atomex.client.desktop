@@ -10,54 +10,52 @@
              x:Class="Atomex.Client.Desktop.Views.SendViews.BitcoinBasedSendView"
              Width="560">
 
+    <Design.DataContext>
+        <vm:BitcoinBasedSendViewModel />
+    </Design.DataContext>
+
     <UserControl.Resources>
         <converters:AmountToStringConverter x:Key="AmountToStringConverter" />
     </UserControl.Resources>
 
-    <Design.DataContext>
-        <vm:BitcoinBasedSendViewModel />
-    </Design.DataContext>
-    
     <Border Classes="ChildViewBorder">
         <Grid Width="560">
             <StackPanel Orientation="Vertical">
-                <Border Margin="0 10 0 10"
-                        Height="33"
-                        VerticalAlignment="Top"
-                        HorizontalAlignment="Stretch"
-                        Background="{DynamicResource ChildViewHeaderBackgroundBrush}">
-                    <TextBlock Text="Send"
-                               Foreground="{DynamicResource ChildViewHeaderForegroundBrush}"
-                               FontFamily="{DynamicResource DefaultLightFontFamily}"
-                               FontSize="25"
-                               HorizontalAlignment="Center"
-                               VerticalAlignment="Center" />
+                <TextBlock Text="Confirm sending"
+                           Margin="0 20 0 20"
+                           Foreground="{DynamicResource ChildViewHeaderForegroundBrush}"
+                           FontFamily="{DynamicResource DefaultLightFontFamily}"
+                           FontSize="25"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center" />
+
+                <Border Height="1"
+                        Background="{DynamicResource LightDefaultOpacity10}" />
+
+                <!-- <ComboBox Width="480" -->
+                <!--           MinHeight="68" -->
+                <!--           Margin="0 5 0 5" -->
+                <!--           HorizontalAlignment="Center" -->
+                <!--           Items="{Binding FromCurrencies}" -->
+                <!--           SelectedIndex="{Binding CurrencyIndex}" -->
+                <!--           helpers:ComboBoxHelper.CornerRadius="20" -->
+                <!--           Classes="CurrencyComboBox" /> -->
+
+                <Border Background="{DynamicResource LightDefaultOpacity6}"
+                        Margin="0 32 0 0">
+
+                    <ContentControl Content="{Binding}"
+                                    ContentTemplate="{StaticResource CurrencySendItemTemplate}" />
                 </Border>
 
-                <TextBlock Text="Instantly sending of currency."
-                           Foreground="{DynamicResource DefaultForegroundBrush}"
-                           FontFamily="{DynamicResource DefaultLightFontFamily}"
-                           FontSize="15"
-                           Margin="40 20 40 15"
-                           TextWrapping="Wrap"
-                           HorizontalAlignment="Center" />
+                <!-- <controls:RoundedButton Width="480" -->
+                <!--                         Height="40" -->
+                <!--                         Margin="0 5 0 5" -->
+                <!--                         CornerRadius="20" -->
+                <!--                         Content="Select from outputs" -->
+                <!--                         IsEnabled="False" -->
+                <!--                         Command="{Binding ShowOutputsWindowCommand}" /> -->
 
-                <ComboBox Width="480"
-                          MinHeight="68"
-                          Margin="0 5 0 5"
-                          HorizontalAlignment="Center"
-                          Items="{Binding FromCurrencies}"
-                          SelectedIndex="{Binding CurrencyIndex}"
-                          helpers:ComboBoxHelper.CornerRadius="20"
-                          Classes="CurrencyComboBox" />
-                
-                <controls:RoundedButton Width="480"
-                                        Height="40"
-                                        Margin="0 5 0 5"
-                                        CornerRadius="20"
-                                        Content="Select from outputs"
-                                        Command="{Binding ShowOutputsWindowCommand}" />
-                
                 <StackPanel Orientation="Horizontal"
                             HorizontalAlignment="Center">
                     <Border Classes="FieldHeader">
@@ -174,10 +172,16 @@
                              FontSize="18"
                              Background="{DynamicResource DefaultSubstrateBrush}"
                              Foreground="{DynamicResource DefaultForegroundBrush}"
-                             Text="{Binding FeeRate}"
                              helpers:TextBoxHelper.CornerRadius="0 20 20 0"
                              helpers:AmountTextBoxHelper.CurrencyCode="sat/byte"
-                             Classes="CustomTextBox AmountTextBox" />
+                             Classes="CustomTextBox AmountTextBox">
+                        <TextBlock.Text>
+                            <MultiBinding Converter="{StaticResource AmountToStringConverter}">
+                                <Binding Path="FeeRate" Mode="OneWay" />
+                                <Binding Path="FeeRateFormat" Mode="OneWay" />
+                            </MultiBinding>
+                        </TextBlock.Text>
+                    </TextBox>
                 </StackPanel>
 
                 <ToggleSwitch HorizontalAlignment="Center"
@@ -193,6 +197,7 @@
                 <TextBlock Text="{Binding Warning}"
                            Foreground="{DynamicResource WarningForegroundBrush}"
                            FontFamily="{DynamicResource DefaultLightFontFamily}"
+                           Height="20"
                            FontSize="13"
                            Margin="20 5 20 0"
                            TextWrapping="Wrap"

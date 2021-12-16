@@ -15,7 +15,7 @@
     </Design.DataContext>
 
     <UserControl.Resources>
-        <SolidColorBrush x:Key="PrimaryTextColor" Color="{DynamicResource DefaultForegroundColor}" />
+        <SolidColorBrush x:Key="PrimaryTextColor" Color="{DynamicResource LightDefault}" />
         <SolidColorBrush x:Key="SecondaryTextColor" Color="DarkGray" />
 
         <converters:StringNotEmptyConverter x:Key="StringNotEmptyConverter" />

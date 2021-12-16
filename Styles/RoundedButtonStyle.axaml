@@ -3,12 +3,11 @@
         xmlns:controls="clr-namespace:Atomex.Client.Desktop.Controls">
 
     <Style Selector="controls|RoundedButton">
-        <!-- <Setter Property="FocusVisualStyle" Value="{x:Null}"/> -->
-        <Setter Property="Background" Value="{DynamicResource RoundedButtonBackgroundBrush}"/>
-        <Setter Property="Foreground" Value="{DynamicResource RoundedButtonForegroundBrush}"/>
-        <Setter Property="FontFamily" Value="{DynamicResource DefaultButtonFontFamily}"/>
-        <Setter Property="FontWeight" Value="{DynamicResource DefaultButtonFontWeight}"></Setter>
-        <Setter Property="FontSize" Value="13"/>
+        <Setter Property="Background" Value="{DynamicResource RoundedButtonBackgroundBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource RoundedButtonForegroundBrush}" />
+        <Setter Property="FontFamily" Value="{DynamicResource DefaultButtonFontFamily}" />
+        <Setter Property="FontWeight" Value="{DynamicResource DefaultButtonFontWeight}" />
+        <Setter Property="FontSize" Value="13" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type controls:RoundedButton}">
@@ -20,31 +19,31 @@
                         <Grid>
                             <ContentPresenter Content="{TemplateBinding Content}"
                                               HorizontalAlignment="Center"
-                                              VerticalAlignment="Center"/>
+                                              VerticalAlignment="Center" />
                         </Grid>
                     </Border>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
     </Style>
-    
+
     <Style Selector="controls|RoundedButton:focus">
-        <Setter Property="Background" Value="{DynamicResource RoundedButtonMouseOverBrush}"/>
+        <Setter Property="Background" Value="{DynamicResource RoundedButtonMouseOverBrush}" />
     </Style>
 
     <!-- IsMouseOver -->
     <Style Selector="controls|RoundedButton:pointerover">
-        <Setter Property="Background" Value="{DynamicResource RoundedButtonMouseOverBrush}"/>
+        <Setter Property="Background" Value="{DynamicResource RoundedButtonMouseOverBrush}" />
     </Style>
 
     <!-- IsPressed -->
     <Style Selector="controls|RoundedButton:pressed">
-        <Setter Property="Background" Value="{DynamicResource RoundedButtonPressedBrush}"/>
+        <Setter Property="Background" Value="{DynamicResource RoundedButtonPressedBrush}" />
     </Style>
 
     <!-- IsEnabled -->
     <Style Selector="controls|RoundedButton:disabled">
-        <Setter Property="Background" Value="{DynamicResource RoundedButtonDisabledBrush}"/>
+        <Setter Property="Background" Value="{DynamicResource RoundedButtonDisabledBrush}" />
         <Setter Property="Opacity" Value="0.5" />
     </Style>
 </Styles>

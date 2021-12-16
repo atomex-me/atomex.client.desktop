@@ -1,6 +1,6 @@
 <Styles xmlns='https://github.com/avaloniaui'
         xmlns:x='http://schemas.microsoft.com/winfx/2006/xaml'
-        xmlns:abstractViewModels="clr-namespace:Atomex.Client.Desktop.ViewModels.Abstract"
+        xmlns:currencyViewModels="clr-namespace:Atomex.Client.Desktop.ViewModels.CurrencyViewModels"
         xmlns:converters="clr-namespace:Atomex.Client.Desktop.Converters">
 
     <Styles.Resources>
@@ -8,18 +8,8 @@
         <converters:StringToUpperCaseConverter x:Key="StringToUpperCaseConverter" />
         <CornerRadius x:Key="CurrencyComboboxCornerRadius">20</CornerRadius>
 
-        <DataTemplate x:Key="CurrencyItemTemplate" DataType="{x:Type abstractViewModels:CurrencyViewModel}">
-            <Grid Margin="3">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="48" />
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
-
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="26" />
-                    <RowDefinition Height="22" />
-                </Grid.RowDefinitions>
-
+        <DataTemplate x:Key="CurrencyItemTemplate" DataType="{x:Type currencyViewModels:CurrencyViewModel}">
+            <Grid Margin="3" ColumnDefinitions="48,*" RowDefinitions="26,22">
                 <Image Width="48"
                        Height="48"
                        Source="{Binding LargeIconPath}"
@@ -61,8 +51,7 @@
             </Grid>
         </DataTemplate>
     </Styles.Resources>
-
-
+    
     <Style Selector="ComboBox.CurrencyComboBox">
         <Setter Property="BorderThickness" Value="0" />
         <Setter Property="ItemTemplate" Value="{StaticResource CurrencyItemTemplate}" />

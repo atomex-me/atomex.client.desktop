@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Input;
-using Atomex.Client.Desktop.ViewModels.Abstract;
+using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
 using ReactiveUI;
 
 namespace Atomex.Client.Desktop.ViewModels

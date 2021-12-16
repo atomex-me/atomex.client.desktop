@@ -1,0 +1,59 @@
+<Styles xmlns='https://github.com/avaloniaui'
+        xmlns:x='http://schemas.microsoft.com/winfx/2006/xaml'
+        xmlns:currencySendVm="clr-namespace:Atomex.Client.Desktop.ViewModels.SendViewModels"
+        xmlns:converters="clr-namespace:Atomex.Client.Desktop.Converters">
+
+    <Styles.Resources>
+        <converters:AmountToStringConverter x:Key="AmountToStringConverter" />
+        <converters:StringToUpperCaseConverter x:Key="StringToUpperCaseConverter" />
+
+        <DataTemplate x:Key="CurrencySendItemTemplate"
+                      DataType="{x:Type currencySendVm:SendViewModel}">
+            <Border Padding="20 16 0 21">
+                <Grid ColumnDefinitions="24,*"
+                      RowDefinitions="26,22">
+                    <Image Width="24"
+                           Height="24"
+                           Source="{Binding CurrencyViewModel.LargeIconPath}"
+                           UseLayoutRounding="True"
+                           Grid.Row="0"
+                           Grid.Column="0"
+                           Grid.RowSpan="2" />
+
+                    <TextBlock
+                        Text="{Binding CurrencyViewModel.CurrencyCode,
+                        Converter={StaticResource StringToUpperCaseConverter}}"
+                        FontFamily="{DynamicResource DefaultMediumFontFamily}"
+                        FontSize="18"
+                        Foreground="{DynamicResource DefaultForegroundBrush}"
+                        Margin="7 0 0 0"
+                        VerticalAlignment="Bottom"
+                        Grid.Column="1"
+                        Grid.Row="0" />
+
+                    <StackPanel Orientation="Horizontal"
+                                VerticalAlignment="Top"
+                                Grid.Column="1"
+                                Grid.Row="1">
+                        <TextBlock FontFamily="{DynamicResource DefaultFontFamily}"
+                                   FontSize="13"
+                                   Foreground="{DynamicResource DefaultForegroundBrush}"
+                                   Margin="7 0 0 0">
+                            <TextBlock.Text>
+                                <MultiBinding Converter="{StaticResource AmountToStringConverter}">
+                                    <Binding Path="CurrencyViewModel.TotalAmount" Mode="OneWay" />
+                                    <Binding Path="CurrencyViewModel.CurrencyFormat" Mode="OneWay" />
+                                </MultiBinding>
+                            </TextBlock.Text>
+                        </TextBlock>
+                        <TextBlock Text="{Binding CurrencyViewModel.CurrencyCode}"
+                                   FontFamily="{DynamicResource DefaultFontFamily}"
+                                   FontSize="9"
+                                   Foreground="{DynamicResource DefaultForegroundBrush}"
+                                   Margin="4 3 0 0" />
+                    </StackPanel>
+                </Grid>
+            </Border>
+        </DataTemplate>
+    </Styles.Resources>
+</Styles>

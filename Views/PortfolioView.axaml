@@ -5,9 +5,8 @@
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="Atomex.Client.Desktop.Views.PortfolioView"
              xmlns:vm="clr-namespace:Atomex.Client.Desktop.ViewModels"
-             xmlns:abstractViewModels="clr-namespace:Atomex.Client.Desktop.ViewModels.Abstract"
+             xmlns:currencyViewModels="clr-namespace:Atomex.Client.Desktop.ViewModels.CurrencyViewModels"
              xmlns:converters="clr-namespace:Atomex.Client.Desktop.Converters"
-             xmlns:helpers="clr-namespace:Atomex.Client.Desktop.Helpers"
              xmlns:oxy="http://oxyplot.org/avalonia">
 
     <Design.DataContext>
@@ -73,7 +72,7 @@
             <DataGrid.Columns>
                 <DataGridTemplateColumn Header="CURRENCY" Width="*">
                     <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate DataType="{x:Type abstractViewModels:CurrencyViewModel}">
+                        <DataTemplate DataType="{x:Type currencyViewModels:CurrencyViewModel}">
                             <Grid Margin="5 5 5 5" Background="Transparent">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="48" />
@@ -98,7 +97,7 @@
                 </DataGridTemplateColumn>
                 <DataGridTemplateColumn Header="BALANCE">
                     <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate DataType="{x:Type abstractViewModels:CurrencyViewModel}">
+                        <DataTemplate DataType="{x:Type currencyViewModels:CurrencyViewModel}">
                             <StackPanel Orientation="Horizontal"
                                         HorizontalAlignment="Left"
                                         Margin="0 0 10 0">
@@ -122,7 +121,7 @@
                 </DataGridTemplateColumn>
                 <DataGridTemplateColumn Header="VALUE">
                     <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate DataType="{x:Type abstractViewModels:CurrencyViewModel}">
+                        <DataTemplate DataType="{x:Type currencyViewModels:CurrencyViewModel}">
                             <TextBlock Margin="0 0 10 0"
                                        FontFamily="{DynamicResource DefaultFontFamily}"
                                        VerticalAlignment="Center"

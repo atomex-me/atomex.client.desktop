@@ -1,7 +1,7 @@
 <Styles xmlns='https://github.com/avaloniaui'
         xmlns:x='http://schemas.microsoft.com/winfx/2006/xaml'>
     <Styles.Resources>
-        <SolidColorBrush x:Key="PrimaryTextColor" Color="{DynamicResource DefaultForegroundColor}" />
+        <SolidColorBrush x:Key="PrimaryTextColor" Color="{DynamicResource LightDefault}" />
     </Styles.Resources>
 
     <Style Selector=":is(Button)">

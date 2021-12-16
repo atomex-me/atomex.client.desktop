@@ -2,27 +2,31 @@
                     xmlns:x='http://schemas.microsoft.com/winfx/2006/xaml'>
     <!-- Fonts -->
 
-    <FontFamily x:Key="DefaultFontFamily">avares://Atomex.Client.Desktop/Resources/Fonts#Roboto</FontFamily>
+    <FontFamily x:Key="DefaultFontFamily">avares://Atomex.Client.Desktop/Resources/Fonts#Inter</FontFamily>
 
-    <FontFamily x:Key="DefaultLightFontFamily">avares://Atomex.Client.Desktop/Resources/Fonts#Roboto</FontFamily>
+    <FontFamily x:Key="DefaultLightFontFamily">avares://Atomex.Client.Desktop/Resources/Fonts#Inter</FontFamily>
     <FontWeight x:Key="DefaultLightFontWeight">Light</FontWeight>
 
-    <FontFamily x:Key="DefaultMediumFontFamily">avares://Atomex.Client.Desktop/Resources/Fonts#Roboto</FontFamily>
+    <FontFamily x:Key="DefaultMediumFontFamily">avares://Atomex.Client.Desktop/Resources/Fonts#Inter</FontFamily>
     <FontWeight x:Key="DefaultMediumFontWeight">Medium</FontWeight>
 
-    <FontFamily x:Key="DefaultBoldFontFamily">avares://Atomex.Client.Desktop/Resources/Fonts#Roboto</FontFamily>
+    <FontFamily x:Key="DefaultBoldFontFamily">avares://Atomex.Client.Desktop/Resources/Fonts#Inter</FontFamily>
     <FontWeight x:Key="DefaultBoldFontWeight">Bold</FontWeight>
 
-    <FontFamily x:Key="DefaultButtonFontFamily">avares://Atomex.Client.Desktop/Resources/Fonts#Roboto</FontFamily>
+    <FontFamily x:Key="DefaultButtonFontFamily">avares://Atomex.Client.Desktop/Resources/Fonts#Inter</FontFamily>
     <FontWeight x:Key="DefaultButtonFontWeight">Medium</FontWeight>
 
-    <FontFamily x:Key="DefaultTextBlockFontFamily">avares://Atomex.Client.Desktop/Resources/Fonts#Roboto</FontFamily>
+    <FontFamily x:Key="DefaultTextBlockFontFamily">avares://Atomex.Client.Desktop/Resources/Fonts#Inter</FontFamily>
 
     <!-- Base Colors -->
 
     <Color x:Key="DefaultBackgroundColor">#122d4f</Color>
-    <Color x:Key="DefaultForegroundColor">White</Color>
-    <Color x:Key="DefaultButtonBackgroundColor">#122d4f</Color>
+    <Color x:Key="LightDefault">#C4DEFF</Color>
+    <Color x:Key="LightDefaultOpacity10">#1AC4DEFF</Color>
+    <Color x:Key="LightDefaultOpacity6">#0FC4DEFF</Color>
+    <Color x:Key="Blue">#20439E</Color>
+    <Color x:Key="LightBlue">#3964D3</Color>
+    <Color x:Key="DarkBlue">#0F3088</Color>
     <Color x:Key="DefaultButtonMouseOverColor">#265590</Color>
     <Color x:Key="DefaultButtonPressedColor">#1c3f6b</Color>
     <Color x:Key="DefaultButtonBackgroundLightColor">#92aec7</Color>
@@ -67,8 +71,8 @@
     
 
     <SolidColorBrush x:Key="DefaultBackgroundBrush" Color="{DynamicResource DefaultBackgroundColor}" />
-    <SolidColorBrush x:Key="DefaultForegroundBrush" Color="{DynamicResource DefaultForegroundColor}" />
-    <SolidColorBrush x:Key="DefaultButtonBackgroundBrush" Color="{DynamicResource DefaultButtonBackgroundColor}" />
+    <SolidColorBrush x:Key="DefaultForegroundBrush" Color="{DynamicResource LightDefault}" />
+    <SolidColorBrush x:Key="DefaultButtonBackgroundBrush" Color="{DynamicResource Blue}" />
     <SolidColorBrush x:Key="DefaultTextBoxBackgroundBrush" Color="{DynamicResource DefaultTextBoxBackgroundColor}" />
     <SolidColorBrush x:Key="DefaultTextBoxForegroundBrush" Color="{DynamicResource DefaultTextBoxForegroundColor}" />
     <SolidColorBrush x:Key="DefaultTextBoxCuretBrush" Color="{DynamicResource DefaultTextBoxCuretColor}" />
@@ -137,9 +141,9 @@
         </LinearGradientBrush.GradientStops>
     </LinearGradientBrush>
 
-    <SolidColorBrush x:Key="ChildViewHeaderForegroundBrush" Color="{DynamicResource DefaultForegroundColor}" />
+    <SolidColorBrush x:Key="ChildViewHeaderForegroundBrush" Color="{DynamicResource LightDefault}" />
     <SolidColorBrush x:Key="ChildViewHeaderBackgroundBrush" Color="{DynamicResource DefaultBackgroundColor}" />
-    <SolidColorBrush x:Key="ChildViewCloseButtonBrush" Color="{DynamicResource DefaultButtonBackgroundColor}" />
+    <SolidColorBrush x:Key="ChildViewCloseButtonBrush" Color="{DynamicResource Blue}" />
     <SolidColorBrush x:Key="ChildViewCloseButtonMouseOverBrush" Color="{DynamicResource DefaultButtonMouseOverColor}" />
     <SolidColorBrush x:Key="ChildViewCloseButtonPressedBrush" Color="{DynamicResource DefaultButtonPressedColor}" />
     <SolidColorBrush x:Key="ChildViewCloseButtonLightBrush" Color="{DynamicResource DefaultButtonBackgroundLightColor}" />
@@ -219,11 +223,11 @@
 
     <!-- Rounded Button -->
 
-    <SolidColorBrush x:Key="RoundedButtonBackgroundBrush" Color="{DynamicResource DefaultButtonBackgroundColor}" />
-    <SolidColorBrush x:Key="RoundedButtonMouseOverBrush" Color="{DynamicResource DefaultButtonMouseOverColor}" />
-    <SolidColorBrush x:Key="RoundedButtonPressedBrush" Color="{DynamicResource DefaultButtonPressedColor}" />
-    <SolidColorBrush x:Key="RoundedButtonDisabledBrush" Color="{DynamicResource DefaultButtonBackgroundColor}" />
-    <SolidColorBrush x:Key="RoundedButtonForegroundBrush" Color="{DynamicResource DefaultForegroundColor}" />
+    <SolidColorBrush x:Key="RoundedButtonBackgroundBrush" Color="{DynamicResource Blue}" />
+    <SolidColorBrush x:Key="RoundedButtonMouseOverBrush" Color="{DynamicResource LightBlue}" />
+    <SolidColorBrush x:Key="RoundedButtonPressedBrush" Color="{DynamicResource DarkBlue}" />
+    <SolidColorBrush x:Key="RoundedButtonDisabledBrush" Color="{DynamicResource LightDefaultOpacity10}" />
+    <SolidColorBrush x:Key="RoundedButtonForegroundBrush" Color="White" />
 
     <!-- Link Button -->
 

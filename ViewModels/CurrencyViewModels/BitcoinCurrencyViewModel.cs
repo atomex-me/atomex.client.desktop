@@ -1,7 +1,11 @@
-﻿using Atomex.Client.Desktop.Properties;
+﻿using System.Collections.ObjectModel;
+using System.Linq;
+using System.Threading.Tasks;
+using Atomex.Blockchain.BitcoinBased;
+using Atomex.Client.Desktop.Properties;
 using Atomex.Core;
 using Avalonia.Media;
-using Atomex.Client.Desktop.ViewModels.Abstract;
+using Atomex.Wallet.BitcoinBased;
 using Avalonia.Visuals.Media.Imaging;
 
 
@@ -12,9 +16,9 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
         public BitcoinCurrencyViewModel(CurrencyConfig currency)
             : base(currency)
         {
-            var iconBrush = new ImageBrush(GetBitmap(PathToImage("bitcoin_90x90.png")));
-            var iconMaskBrush = new ImageBrush(GetBitmap(PathToImage("bitcoin_mask.png")));
-            iconBrush.BitmapInterpolationMode = BitmapInterpolationMode.HighQuality;
+            var iconBrush                         = new ImageBrush(GetBitmap(PathToImage("bitcoin_90x90.png")));
+            var iconMaskBrush                     = new ImageBrush(GetBitmap(PathToImage("bitcoin_mask.png")));
+            iconBrush.BitmapInterpolationMode     = BitmapInterpolationMode.HighQuality;
             iconMaskBrush.BitmapInterpolationMode = BitmapInterpolationMode.HighQuality;
             
             Header              = Currency.Description;

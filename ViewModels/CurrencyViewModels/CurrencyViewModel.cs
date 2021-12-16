@@ -17,13 +17,13 @@ using Atomex.Wallet;
 using Atomex.Wallet.Abstract;
 using System.Reactive.Linq;
 
-namespace Atomex.Client.Desktop.ViewModels.Abstract
+namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
 {
     public abstract class CurrencyViewModel : ViewModelBase
     {
         private const string PathToImages = "avares://Atomex.Client.Desktop/Resources/Images";
 
-        private IAccount Account { get; set; }
+        protected IAccount Account { get; set; }
         private ICurrencyQuotesProvider QuotesProvider { get; set; }
 
         public event EventHandler AmountUpdated;
@@ -145,8 +145,8 @@ namespace Atomex.Client.Desktop.ViewModels.Abstract
         {
             return $"{PathToImages}/{imageName}";
         }
-        
-        public static IBitmap GetBitmap(string uri)
+
+        protected static IBitmap GetBitmap(string uri)
         {
             var assets = AvaloniaLocator.Current.GetService<IAssetLoader>();
             var bitmap = new Bitmap(assets.Open(new Uri(uri)));
@@ -159,19 +159,17 @@ namespace Atomex.Client.Desktop.ViewModels.Abstract
 
         protected virtual void Dispose(bool disposing)
         {
-            if (!_disposedValue)
+            if (_disposedValue) return;
+            if (disposing)
             {
-                if (disposing)
-                {
-                    if (Account != null)
-                        Account.BalanceUpdated -= OnBalanceChangedEventHandler;
+                if (Account != null)
+                    Account.BalanceUpdated -= OnBalanceChangedEventHandler;
 
-                    if (QuotesProvider != null)
-                        QuotesProvider.QuotesUpdated -= OnQuotesUpdatedEventHandler;
-                }
-
-                _disposedValue = true;
+                if (QuotesProvider != null)
+                    QuotesProvider.QuotesUpdated -= OnQuotesUpdatedEventHandler;
             }
+
+            _disposedValue = true;
         }
 
         ~CurrencyViewModel()
