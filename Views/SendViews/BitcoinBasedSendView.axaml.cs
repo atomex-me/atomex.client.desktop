@@ -23,7 +23,7 @@ namespace Atomex.Client.Desktop.Views.SendViews
 
             amountStringTextBox.AddHandler(KeyDownEvent, (_, args) =>
             {
-                if (DataContext is not BitcoinBasedSendViewModel sendViewModel || args.Key != Key.Back) return;
+                if (DataContext is not BitcoinBasedSendViewModel sendViewModel || args.Key is not (Key.Back or Key.Delete)) return;
 
                 if (amountStringTextBox.SelectionStart != amountStringTextBox.SelectionEnd)
                 {
@@ -40,7 +40,7 @@ namespace Atomex.Client.Desktop.Views.SendViews
 
             feeStringTextBox.AddHandler(KeyDownEvent, (_, args) =>
             {
-                if (DataContext is not BitcoinBasedSendViewModel sendViewModel || args.Key != Key.Back) return;
+                if (DataContext is not BitcoinBasedSendViewModel sendViewModel || args.Key is not (Key.Back or Key.Delete)) return;
 
                 if (feeStringTextBox.SelectionStart != feeStringTextBox.SelectionEnd)
                 {

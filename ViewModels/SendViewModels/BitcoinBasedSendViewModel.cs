@@ -181,7 +181,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 {
                     var availableInSatoshi = Outputs.Sum(o => o.Value);
                     var feeInSatoshi = Config.CoinToSatoshi(Fee);
-                    var maxAmountInSatoshi = availableInSatoshi - feeInSatoshi;
+                    var maxAmountInSatoshi = Math.Max(availableInSatoshi - feeInSatoshi, 0);
                     var maxAmount = Config.SatoshiToCoin(maxAmountInSatoshi);
 
                     var transactionParams = await BitcoinTransactionParams.SelectTransactionParamsByFeeAsync(

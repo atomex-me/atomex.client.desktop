@@ -62,7 +62,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
                 if (truncatedValue != Fee)
                 {
-                    Fee = truncatedValue;
+                    Fee = Math.Min(truncatedValue, Currency.GetMaximumFee());
                 }
 
                 Dispatcher.UIThread.InvokeAsync(() => this.RaisePropertyChanged(nameof(FeeString)));
@@ -197,7 +197,6 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 .ToPropertyEx(this, vm => vm.AmountString);
 
             this.WhenAnyValue(vm => vm.Fee)
-                .Select(fee => Math.Min(fee, Currency.GetMaximumFee()))
                 .InvokeCommand(updateFeeCommand);
 
             this.WhenAnyValue(vm => vm.Fee)
