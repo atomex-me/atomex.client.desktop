@@ -356,17 +356,14 @@ namespace Atomex.Client.Desktop.ViewModels
 
         protected virtual async Task EstimateSwapParamsAsync(decimal amount)
         {
-            if (FromCurrencyViewModel == null || ToCurrencyViewModel == null)
-                return;
-
             // estimate max payment amount and max fee
             var swapParams = await Atomex.ViewModels.Helpers
                 .EstimateSwapParamsAsync(
                     from: FromSource,
                     amount: amount,
                     redeemFromAddress: RedeemAddress,
-                    fromCurrency: FromCurrencyViewModel.Currency,
-                    toCurrency: ToCurrencyViewModel.Currency,
+                    fromCurrency: FromCurrencyViewModel?.Currency,
+                    toCurrency: ToCurrencyViewModel?.Currency,
                     account: _app.Account,
                     atomexClient: _app.Terminal,
                     symbolsProvider: _app.SymbolsProvider,
@@ -550,11 +547,17 @@ namespace Atomex.Client.Desktop.ViewModels
                     atomexClient: _app.Terminal,
                     symbolsProvider: _app.SymbolsProvider);
 
-                if (swapPriceEstimation == null)
-                    return;
-
                 await Dispatcher.UIThread.InvokeAsync(() =>
                 {
+                    if (swapPriceEstimation == null)
+                    {
+                        TargetAmount       = 0;
+                        EstimatedPrice     = 0;
+                        EstimatedMaxAmount = 0;
+                        IsNoLiquidity      = false;
+                        return;
+                    }
+
                     _estimatedOrderPrice = swapPriceEstimation.OrderPrice;
 
                     TargetAmount       = swapPriceEstimation.TargetAmount;
