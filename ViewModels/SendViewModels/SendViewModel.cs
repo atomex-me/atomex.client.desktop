@@ -14,6 +14,7 @@ using Atomex.MarketData.Abstract;
 using Avalonia.Controls;
 using Avalonia.Threading;
 using ReactiveUI.Fody.Helpers;
+using Serilog;
 
 
 namespace Atomex.Client.Desktop.ViewModels.SendViewModels
@@ -95,6 +96,13 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         public ReactiveCommand<Unit, Unit> BackCommand => _backCommand ??= (_backCommand = ReactiveCommand.Create(() =>
         {
             Desktop.App.DialogService.Close();
+        }));
+        
+        private ReactiveCommand<Unit, Unit> _selectFromCommand;
+
+        public ReactiveCommand<Unit, Unit> SelectFromCommand => _selectFromCommand ??= (_selectFromCommand = ReactiveCommand.Create(() =>
+        {
+            Log.Fatal("CURRENCY CLICKED");
         }));
 
         private ReactiveCommand<Unit, Unit> _nextCommand;
@@ -252,13 +260,12 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 .ToList();
 
             Currency = fromCurrencies[0].Currency;
+            CurrencyViewModel = fromCurrencies[0];
             To = "1BvBMSEYstWetqTFn5Au4m4GFg7xJaNVN2";
             Amount = 0.00001234m;
             AmountInBase = 10.23m;
             Fee = 0.0001m;
             FeeInBase = 8.43m;
-
-            CurrencyViewModel = CurrencyViewModelCreator.CreateViewModel(Currency);
         }
     }
 }

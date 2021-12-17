@@ -1,59 +1,105 @@
 <Styles xmlns='https://github.com/avaloniaui'
         xmlns:x='http://schemas.microsoft.com/winfx/2006/xaml'
         xmlns:currencySendVm="clr-namespace:Atomex.Client.Desktop.ViewModels.SendViewModels"
+        xmlns:helpers="clr-namespace:Atomex.Client.Desktop.Helpers"
         xmlns:converters="clr-namespace:Atomex.Client.Desktop.Converters">
 
+    <Design.PreviewWith>
+        <Border />
+    </Design.PreviewWith>
+    
+    <Style Selector="Button.EmptyBtnWithContent:pressed /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource AlmostTransparentBrush}" />    
+    </Style>
+    
+    <Style Selector="Button.EmptyBtnWithContent:pressed">
+        <Setter Property="RenderTransform" Value="none" />
+    </Style>
+    
+    <Style Selector="Button.EmptyBtnWithContent:not(:pressed) /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource AlmostTransparentBrush}" />    
+    </Style>
+    
+    
     <Styles.Resources>
         <converters:AmountToStringConverter x:Key="AmountToStringConverter" />
         <converters:StringToUpperCaseConverter x:Key="StringToUpperCaseConverter" />
 
         <DataTemplate x:Key="CurrencySendItemTemplate"
                       DataType="{x:Type currencySendVm:SendViewModel}">
-            <Border Padding="20 16 0 21">
-                <Grid ColumnDefinitions="24,*"
-                      RowDefinitions="26,22">
-                    <Image Width="24"
-                           Height="24"
-                           Source="{Binding CurrencyViewModel.LargeIconPath}"
-                           UseLayoutRounding="True"
-                           Grid.Row="0"
-                           Grid.Column="0"
-                           Grid.RowSpan="2" />
 
-                    <TextBlock
-                        Text="{Binding CurrencyViewModel.CurrencyCode,
-                        Converter={StaticResource StringToUpperCaseConverter}}"
-                        FontFamily="{DynamicResource DefaultMediumFontFamily}"
-                        FontSize="18"
-                        Foreground="{DynamicResource DefaultForegroundBrush}"
-                        Margin="7 0 0 0"
-                        VerticalAlignment="Bottom"
-                        Grid.Column="1"
-                        Grid.Row="0" />
+            <Border Background="{DynamicResource LightDefaultOpacity6}"
+                    CornerRadius="6"
+                    Width="440"
+                    Height="80"
+                    VerticalAlignment="Center">
+                <Button Padding="20 0"
+                        Width="440"
+                        Height="80"
+                        Command="{Binding SelectFromCommand}"
+                        Classes="EmptyBtnWithContent">
+                    <Grid ColumnDefinitions="24,*, Auto"
+                          RowDefinitions="*">
 
-                    <StackPanel Orientation="Horizontal"
-                                VerticalAlignment="Top"
-                                Grid.Column="1"
-                                Grid.Row="1">
-                        <TextBlock FontFamily="{DynamicResource DefaultFontFamily}"
+                        <!-- Width="24" -->
+                        <!-- Height="24" -->
+                        <Image Width="36"
+                               Height="36"
+                               Source="{Binding CurrencyViewModel.LargeIconPath}"
+                               
+                               UseLayoutRounding="True"
+                               Grid.Row="0"
+                               Grid.Column="0" />
+
+                        <!-- Text="{Binding CurrencyViewModel.CurrencyCode}" -->
+                        <TextBlock Text="mxFz···n24f"
+                                   FontFamily="{DynamicResource DefaultMediumFontFamily}"
+                                   FontSize="16"
+                                   LineHeight="24"
+                                   Foreground="{DynamicResource DefaultForegroundBrush}"
+                                   Margin="17 0 0 0"
+                                   VerticalAlignment="Center"
+                                   Grid.Column="1"
+                                   Grid.Row="0" />
+
+                        <!-- <StackPanel Orientation="Horizontal" -->
+                        <!--             VerticalAlignment="Top" -->
+                        <!--             Grid.Column="1" -->
+                        <!--             Grid.Row="1"> -->
+                        <!--      -->
+                        <!--     <TextBlock FontFamily="{DynamicResource DefaultFontFamily}" -->
+                        <!--                FontSize="13" -->
+                        <!--                Foreground="{DynamicResource DefaultForegroundBrush}" -->
+                        <!--                Margin="7 0 0 0"> -->
+                        <!--         <TextBlock.Text> -->
+                        <!--             <MultiBinding Converter="{StaticResource AmountToStringConverter}"> -->
+                        <!--                 <Binding Path="CurrencyViewModel.TotalAmount" Mode="OneWay" /> -->
+                        <!--                 <Binding Path="CurrencyViewModel.CurrencyFormat" Mode="OneWay" /> -->
+                        <!--             </MultiBinding> -->
+                        <!--         </TextBlock.Text> -->
+                        <!--     </TextBlock> -->
+                        <!--     <TextBlock Text="{Binding CurrencyViewModel.CurrencyCode}" -->
+                        <!--                FontFamily="{DynamicResource DefaultFontFamily}" -->
+                        <!--                FontSize="9" -->
+                        <!--                Foreground="{DynamicResource DefaultForegroundBrush}" -->
+                        <!--                Margin="4 3 0 0" /> -->
+                        <!-- </StackPanel> -->
+
+                        <!-- Text="{Binding CurrencyViewModel.CurrencyCode}" -->
+                        <TextBlock Text="0.074322001 ETH"
+                                   FontFamily="{DynamicResource DefaultMediumFontFamily}"
                                    FontSize="13"
-                                   Foreground="{DynamicResource DefaultForegroundBrush}"
-                                   Margin="7 0 0 0">
-                            <TextBlock.Text>
-                                <MultiBinding Converter="{StaticResource AmountToStringConverter}">
-                                    <Binding Path="CurrencyViewModel.TotalAmount" Mode="OneWay" />
-                                    <Binding Path="CurrencyViewModel.CurrencyFormat" Mode="OneWay" />
-                                </MultiBinding>
-                            </TextBlock.Text>
-                        </TextBlock>
-                        <TextBlock Text="{Binding CurrencyViewModel.CurrencyCode}"
-                                   FontFamily="{DynamicResource DefaultFontFamily}"
-                                   FontSize="9"
-                                   Foreground="{DynamicResource DefaultForegroundBrush}"
-                                   Margin="4 3 0 0" />
-                    </StackPanel>
-                </Grid>
+                                   LineHeight="16"
+                                   Foreground="{DynamicResource SecondaryForegroundBrush}"
+                                   Margin="17 0 0 0"
+                                   VerticalAlignment="Center"
+                                   Grid.Column="2"
+                                   Grid.Row="0" />
+                    </Grid>
+                </Button>
             </Border>
+
+
         </DataTemplate>
     </Styles.Resources>
 </Styles>

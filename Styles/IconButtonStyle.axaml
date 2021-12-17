@@ -66,20 +66,4 @@
         <Setter Property="Opacity" Value="0.9" />
         <Setter Property="Background" Value="{DynamicResource AlmostTransparentBrush}" />
     </Style>
-    
-    <Style Selector="controls|IconButton.EmptyBtnWithContent">
-        <Setter Property="Template">
-            <ControlTemplate>
-                <ContentPresenter x:Name="PART_ContentPresenter"
-                                  Background="{TemplateBinding Background}"
-                                  BorderBrush="{TemplateBinding BorderBrush}"
-                                  BorderThickness="{TemplateBinding BorderThickness}"
-                                  Content="{TemplateBinding Content}"
-                                  ContentTemplate="{TemplateBinding ContentTemplate}"
-                                  Padding="{TemplateBinding Padding}"
-                                  HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                  VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}" />
-            </ControlTemplate>
-        </Setter>
-    </Style>
 </Styles>
