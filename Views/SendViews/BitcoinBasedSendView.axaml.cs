@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 using System.Linq;
 using System.Reactive.Linq;
 using Atomex.Client.Desktop.ViewModels.SendViewModels;
@@ -7,7 +8,6 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
-using ReactiveUI;
 
 
 namespace Atomex.Client.Desktop.Views.SendViews
@@ -24,24 +24,39 @@ namespace Atomex.Client.Desktop.Views.SendViews
             amountStringTextBox.AddHandler(KeyDownEvent, (_, args) =>
             {
                 if (DataContext is not BitcoinBasedSendViewModel sendViewModel || args.Key != Key.Back) return;
+
+                if (amountStringTextBox.SelectionStart != amountStringTextBox.SelectionEnd)
+                {
+                    sendViewModel.SetAmountFromString(0m.ToString(CultureInfo.InvariantCulture));
+                    args.Handled = true;
+                    return;
+                }
+
                 var dotSymbol = sendViewModel.AmountString.FirstOrDefault(c => !char.IsDigit(c));
                 var dotIndex = sendViewModel.AmountString.IndexOf(dotSymbol);
                 if (dotIndex != amountStringTextBox.CaretIndex - 1) return;
-                amountStringTextBox.CaretIndex = dotIndex;
+                amountStringTextBox.CaretIndex -= 1;
             }, RoutingStrategies.Tunnel);
 
             feeStringTextBox.AddHandler(KeyDownEvent, (_, args) =>
             {
                 if (DataContext is not BitcoinBasedSendViewModel sendViewModel || args.Key != Key.Back) return;
+
+                if (feeStringTextBox.SelectionStart != feeStringTextBox.SelectionEnd)
+                {
+                    sendViewModel.SetFeeFromString(0m.ToString(CultureInfo.InvariantCulture));
+                    args.Handled = true;
+                    return;
+                }
+
                 var dotSymbol = sendViewModel.FeeString.FirstOrDefault(c => !char.IsDigit(c));
                 var dotIndex = sendViewModel.FeeString.IndexOf(dotSymbol);
                 if (dotIndex != feeStringTextBox.CaretIndex - 1) return;
-                feeStringTextBox.CaretIndex = dotIndex;
+                feeStringTextBox.CaretIndex -= 1;
             }, RoutingStrategies.Tunnel);
 
             amountStringTextBox.GetObservable(TextBox.TextProperty)
-                .Throttle(TimeSpan.FromMilliseconds(1))
-                .ObserveOn(RxApp.MainThreadScheduler)
+                .Where(_ => amountStringTextBox.SelectionStart == amountStringTextBox.SelectionEnd)
                 .Subscribe(text =>
                 {
                     if (DataContext is not BitcoinBasedSendViewModel sendViewModel) return;
@@ -49,8 +64,7 @@ namespace Atomex.Client.Desktop.Views.SendViews
                 });
 
             feeStringTextBox.GetObservable(TextBox.TextProperty)
-                .Throttle(TimeSpan.FromMilliseconds(1))
-                .ObserveOn(RxApp.MainThreadScheduler)
+                .Where(_ => feeStringTextBox.SelectionStart == feeStringTextBox.SelectionEnd)
                 .Subscribe(text =>
                 {
                     if (DataContext is not BitcoinBasedSendViewModel sendViewModel) return;

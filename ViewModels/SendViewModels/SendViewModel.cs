@@ -12,6 +12,7 @@ using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
 using Atomex.Core;
 using Atomex.MarketData.Abstract;
 using Avalonia.Controls;
+using Avalonia.Threading;
 using ReactiveUI.Fody.Helpers;
 
 
@@ -28,45 +29,43 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         [Reactive] public string To { get; set; }
 
         [Reactive] protected decimal Amount { get; set; }
-
         [ObservableAsProperty] public string AmountString { get; }
-
 
         public void SetAmountFromString(string value)
         {
-            decimal.TryParse(value, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out var amount);
+            if (value == AmountString) return;
+            var parsed = decimal.TryParse(value, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture,
+                out var amount);
             {
+                if (!parsed) amount = Amount;
                 var truncatedValue = amount.TruncateByFormat(CurrencyFormat);
-
                 if (truncatedValue != Amount)
                 {
                     Amount = truncatedValue;
                 }
-                else
-                {
-                    this.RaisePropertyChanged(nameof(AmountString));
-                }
+
+                Dispatcher.UIThread.InvokeAsync(() => this.RaisePropertyChanged(nameof(AmountString)));
             }
         }
 
         [Reactive] protected decimal Fee { get; set; }
-
         [ObservableAsProperty] public string FeeString { get; }
 
         public void SetFeeFromString(string value)
         {
-            decimal.TryParse(value, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out var fee);
+            if (value == FeeString) return;
+            var parsed = decimal.TryParse(value, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture,
+                out var fee);
             {
+                if (!parsed) fee = Fee;
                 var truncatedValue = fee.TruncateByFormat(FeeCurrencyFormat);
 
                 if (truncatedValue != Fee)
                 {
                     Fee = truncatedValue;
                 }
-                else
-                {
-                    this.RaisePropertyChanged(nameof(FeeString));
-                }
+
+                Dispatcher.UIThread.InvokeAsync(() => this.RaisePropertyChanged(nameof(FeeString)));
             }
         }
 
