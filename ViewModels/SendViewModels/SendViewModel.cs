@@ -21,14 +21,14 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 {
     public abstract class SendViewModel : ViewModelBase
     {
-        protected IAtomexApp App { get; set; }
+        protected IAtomexApp App { get; }
 
         protected CurrencyConfig Currency { get; set; }
 
         [Reactive] public CurrencyViewModel CurrencyViewModel { get; set; }
-
+        [Reactive] public string From { get; set; }
+        [Reactive] public decimal SelectedFromAmount { get; set; }
         [Reactive] public string To { get; set; }
-
         [Reactive] protected decimal Amount { get; set; }
         [ObservableAsProperty] public string AmountString { get; }
 
@@ -97,13 +97,11 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         {
             Desktop.App.DialogService.Close();
         }));
-        
+
         private ReactiveCommand<Unit, Unit> _selectFromCommand;
 
-        public ReactiveCommand<Unit, Unit> SelectFromCommand => _selectFromCommand ??= (_selectFromCommand = ReactiveCommand.Create(() =>
-        {
-            Log.Fatal("CURRENCY CLICKED");
-        }));
+        public ReactiveCommand<Unit, Unit> SelectFromCommand => _selectFromCommand ??=
+            (_selectFromCommand = ReactiveCommand.Create(() => { }));
 
         private ReactiveCommand<Unit, Unit> _nextCommand;
 
@@ -252,6 +250,12 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         protected abstract Task<Error> Send(
             SendConfirmationViewModel confirmationViewModel,
             CancellationToken cancellationToken = default);
+
+        protected static string GetShortenedAddress(string address)
+        {
+            const int length = 4;
+            return $"{address[..length]}···{address[^length..]}";
+        }
 
         private void DesignerMode()
         {
