@@ -76,6 +76,11 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             });
         }
 
+        protected override void FromClick()
+        {
+            Desktop.App.DialogService.Show(SelectOutputsViewModel);
+        }
+
         protected override async Task UpdateAmount(decimal amount)
         {
             try
@@ -248,16 +253,6 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 fee: confirmationViewModel.Fee,
                 dustUsagePolicy: DustUsagePolicy.AddToFee,
                 cancellationToken: cancellationToken);
-        }
-
-        private ICommand _showOutputsWindowCommand;
-
-        public ICommand ShowOutputsWindowCommand => _showOutputsWindowCommand ??=
-            (_showOutputsWindowCommand = ReactiveCommand.Create(ShowOutputsWindow));
-
-        private static void ShowOutputsWindow()
-        {
-            Desktop.App.DialogService.Show(SelectOutputsViewModel);
         }
 
         private void BitcoinBasedDesignerMode()

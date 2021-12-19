@@ -57,7 +57,6 @@
                             <Image Width="36"
                                    Height="36"
                                    Source="{Binding CurrencyViewModel.LargeIconPath}"
-
                                    UseLayoutRounding="True"
                                    Grid.Row="0"
                                    Grid.Column="0" />

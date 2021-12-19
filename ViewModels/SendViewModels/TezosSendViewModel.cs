@@ -12,6 +12,11 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 {
     public class TezosSendViewModel : SendViewModel
     {
+        protected override void FromClick()
+        {
+            throw new NotImplementedException();
+        }
+
         protected override Task UpdateAmount(decimal amount)
         {
             throw new NotImplementedException();
