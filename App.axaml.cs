@@ -1,30 +1,31 @@
+
 using System;
 using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.IO;
-using System.Reflection;
-using Microsoft.Extensions.Configuration;
+using System.Globalization;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.InteropServices;
-using Atomex.Common.Configuration;
-using Atomex.Core;
-using Atomex.MarketData.Bitfinex;
-using Atomex.Services;
-using Atomex.Client.Desktop.Dialogs.Views;
-using Atomex.Client.Desktop.Services;
-using Atomex.Client.Desktop.ViewModels;
-using Atomex.Client.Desktop.Views;
-using Atomex.Web;
+
 using Avalonia;
-using Avalonia.Input.Platform;
 using Avalonia.Controls.ApplicationLifetimes;
+using Avalonia.Input.Platform;
 using Avalonia.Markup.Xaml;
-using Sentry;
+using Microsoft.Extensions.Configuration;
 using Serilog;
 using Serilog.Core;
 using Serilog.Events;
 using Serilog.Formatting;
 using Serilog.Formatting.Display;
+
+using Atomex.Client.Desktop.Services;
+using Atomex.Client.Desktop.ViewModels;
+using Atomex.Client.Desktop.Views;
+using Atomex.Common.Configuration;
+using Atomex.Core;
+using Atomex.MarketData.Bitfinex;
+using Atomex.Services;
 
 namespace Atomex.Client.Desktop
 {
@@ -45,6 +46,9 @@ namespace Atomex.Client.Desktop
             TemplateService = new TemplateService();
             ImageService = new ImageService();
             Clipboard = AvaloniaLocator.Current.GetService<IClipboard>();
+
+            // set invariant culture by default
+            CultureInfo.CurrentCulture = CultureInfo.InvariantCulture;
 
             // init logger
             Log.Logger = new LoggerConfiguration()

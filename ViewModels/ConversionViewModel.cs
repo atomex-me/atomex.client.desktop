@@ -83,20 +83,20 @@ namespace Atomex.Client.Desktop.ViewModels
         private decimal _amount;
         public string AmountString
         {
-            get => _amount.ToString(FromCurrencyViewModel?.CurrencyFormat ?? "0.0", CultureInfo.InvariantCulture);
+            get => _amount.ToString(FromCurrencyViewModel?.CurrencyFormat ?? "0");
             set
             {
                 if (!decimal.TryParse(
                     s: value,
                     style: NumberStyles.AllowDecimalPoint,
-                    provider: CultureInfo.InvariantCulture,
+                    provider: CultureInfo.CurrentCulture,
                     result: out var amount))
                 {
                     _amount = 0;
                 }
                 else
                 {
-                    _amount = amount.TruncateByFormat(FromCurrencyViewModel?.CurrencyFormat ?? "0.0");
+                    _amount = amount.TruncateByFormat(FromCurrencyViewModel?.CurrencyFormat ?? "0");
 
                     if (_amount > long.MaxValue)
                         _amount = long.MaxValue;
@@ -225,7 +225,7 @@ namespace Atomex.Client.Desktop.ViewModels
                 {
                     var tempAmountString = AmountString;
 
-                    AmountString = _amount.ToString(CultureInfo.InvariantCulture); // update amount string with new "from" currency format
+                    AmountString = _amount.ToString(); // update amount string with new "from" currency format
 
                     if (AmountString == tempAmountString)
                         UpdateAmountInBase(); // force update amount in base in case when amount string not changed

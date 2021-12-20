@@ -1,18 +1,14 @@
 ﻿using System;
-using System.Diagnostics;
-using System.Globalization;
 using System.Windows.Input;
-using Atomex.Blockchain;
-using Atomex.Blockchain.Abstract;
-using Atomex.Client.Desktop.ViewModels;
-using Atomex.Client.Desktop.Common;
-using Atomex.Client.Desktop.ViewModels.Abstract;
-using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
-using Atomex.Core;
+
 using ReactiveUI;
 using Serilog;
-using Avalonia;
-using Avalonia.Input.Platform;
+
+using Atomex.Blockchain;
+using Atomex.Blockchain.Abstract;
+using Atomex.Client.Desktop.Common;
+using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
+using Atomex.Core;
 
 namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
 {
@@ -154,15 +150,15 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
         {
             if (type.HasFlag(BlockchainTransactionType.SwapPayment))
             {
-                return $"Swap payment {Math.Abs(amount).ToString("0." + new string('#', amountDigits), CultureInfo.InvariantCulture)} {currencyCode}";
+                return $"Swap payment {Math.Abs(amount).ToString("0." + new string('#', amountDigits))} {currencyCode}";
             }
             else if (type.HasFlag(BlockchainTransactionType.SwapRefund))
             {
-                return $"Swap refund {Math.Abs(netAmount).ToString("0." + new string('#', amountDigits), CultureInfo.InvariantCulture)} {currencyCode}";
+                return $"Swap refund {Math.Abs(netAmount).ToString("0." + new string('#', amountDigits))} {currencyCode}";
             }
             else if (type.HasFlag(BlockchainTransactionType.SwapRedeem))
             {
-                return $"Swap redeem {Math.Abs(netAmount).ToString("0." + new string('#', amountDigits), CultureInfo.InvariantCulture)} {currencyCode}";
+                return $"Swap redeem {Math.Abs(netAmount).ToString("0." + new string('#', amountDigits))} {currencyCode}";
             }
             else if (type.HasFlag(BlockchainTransactionType.TokenApprove))
             {
@@ -178,11 +174,11 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
             }
             else if (amount <= 0)
             {
-                return $"Sent {Math.Abs(netAmount).ToString("0." + new string('#', amountDigits), CultureInfo.InvariantCulture)} {currencyCode}";
+                return $"Sent {Math.Abs(netAmount).ToString("0." + new string('#', amountDigits))} {currencyCode}";
             }
             else if (amount > 0)
             {
-                return $"Received {Math.Abs(netAmount).ToString("0." + new string('#', amountDigits), CultureInfo.InvariantCulture)} {currencyCode}";
+                return $"Received {Math.Abs(netAmount).ToString("0." + new string('#', amountDigits))} {currencyCode}";
             }
 
             return "Unknown transaction";

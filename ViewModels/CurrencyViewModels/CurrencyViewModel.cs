@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using System.Reactive.Linq;
 
 using Avalonia;
 using Avalonia.Media;
@@ -15,7 +16,6 @@ using Atomex.Core;
 using Atomex.MarketData.Abstract;
 using Atomex.Wallet;
 using Atomex.Wallet.Abstract;
-using System.Reactive.Linq;
 
 namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
 {
