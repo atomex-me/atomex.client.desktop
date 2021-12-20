@@ -22,7 +22,7 @@ namespace Atomex.Client.Desktop.Properties {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    public class Resources {
+    internal class Resources {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
@@ -36,7 +36,7 @@ namespace Atomex.Client.Desktop.Properties {
         ///   Возвращает кэшированный экземпляр ResourceManager, использованный этим классом.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        public static global::System.Resources.ResourceManager ResourceManager {
+        internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
                     global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Atomex.Client.Desktop.Properties.Resources", typeof(Resources).Assembly);
@@ -51,7 +51,7 @@ namespace Atomex.Client.Desktop.Properties {
         ///   обращений к ресурсу с помощью этого класса ресурса со строгой типизацией.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        public static global::System.Globalization.CultureInfo Culture {
+        internal static global::System.Globalization.CultureInfo Culture {
             get {
                 return resourceCulture;
             }
@@ -63,16 +63,25 @@ namespace Atomex.Client.Desktop.Properties {
         /// <summary>
         ///   Ищет локализованную строку, похожую на You have active swaps. Closing the application or sign out may result in loss of funds as a result of the failure of the refund or redeem operations. Are you sure you want to close the application?.
         /// </summary>
-        public static string ActiveSwapsWarning {
+        internal static string ActiveSwapsWarning {
             get {
                 return ResourceManager.GetString("ActiveSwapsWarning", resourceCulture);
             }
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Amount is greater than the available. Please use the Max button to get the maximum available value..
+        /// </summary>
+        internal static string CvBigAmount {
+            get {
+                return ResourceManager.GetString("CvBigAmount", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Conversion error. Please contant technical support..
         /// </summary>
-        public static string CvConversionError {
+        internal static string CvConversionError {
             get {
                 return ResourceManager.GetString("CvConversionError", resourceCulture);
             }
@@ -81,16 +90,25 @@ namespace Atomex.Client.Desktop.Properties {
         /// <summary>
         ///   Ищет локализованную строку, похожую на Error.
         /// </summary>
-        public static string CvError {
+        internal static string CvError {
             get {
                 return ResourceManager.GetString("CvError", resourceCulture);
             }
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на &quot;From&quot; address is null or empty.
+        /// </summary>
+        internal static string CvFromAddressIsNullOrEmpty {
+            get {
+                return ResourceManager.GetString("CvFromAddressIsNullOrEmpty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Insufficient {0} to cover token transfer fee.
         /// </summary>
-        public static string CvInsufficientChainFunds {
+        internal static string CvInsufficientChainFunds {
             get {
                 return ResourceManager.GetString("CvInsufficientChainFunds", resourceCulture);
             }
@@ -99,7 +117,7 @@ namespace Atomex.Client.Desktop.Properties {
         /// <summary>
         ///   Ищет локализованную строку, похожую на Insufficient funds.
         /// </summary>
-        public static string CvInsufficientFunds {
+        internal static string CvInsufficientFunds {
             get {
                 return ResourceManager.GetString("CvInsufficientFunds", resourceCulture);
             }
@@ -108,7 +126,7 @@ namespace Atomex.Client.Desktop.Properties {
         /// <summary>
         ///   Ищет локализованную строку, похожую на Warning: too low fees.
         /// </summary>
-        public static string CvLowFees {
+        internal static string CvLowFees {
             get {
                 return ResourceManager.GetString("CvLowFees", resourceCulture);
             }
@@ -117,16 +135,16 @@ namespace Atomex.Client.Desktop.Properties {
         /// <summary>
         ///   Ищет локализованную строку, похожую на The amount must be greater than or equal to the minimum allowed amount {0} {1}..
         /// </summary>
-        public static string CvMinimumAllowedQtyWarning {
+        internal static string CvMinimumAllowedQtyWarning {
             get {
                 return ResourceManager.GetString("CvMinimumAllowedQtyWarning", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Not enough liquidity to convert a specified amount..
+        ///   Ищет локализованную строку, похожую на Not enough liquidity to convert a specified amount. In case you require more liquidity make multiple trades..
         /// </summary>
-        public static string CvNoLiquidity {
+        internal static string CvNoLiquidity {
             get {
                 return ResourceManager.GetString("CvNoLiquidity", resourceCulture);
             }
@@ -135,7 +153,7 @@ namespace Atomex.Client.Desktop.Properties {
         /// <summary>
         ///   Ищет локализованную строку, похожую на This symbol does not support direct conversion..
         /// </summary>
-        public static string CvNotSupportedSymbol {
+        internal static string CvNotSupportedSymbol {
             get {
                 return ResourceManager.GetString("CvNotSupportedSymbol", resourceCulture);
             }
@@ -144,7 +162,7 @@ namespace Atomex.Client.Desktop.Properties {
         /// <summary>
         ///   Ищет локализованную строку, похожую на Standard.
         /// </summary>
-        public static string CvOrderTypeStandard {
+        internal static string CvOrderTypeStandard {
             get {
                 return ResourceManager.GetString("CvOrderTypeStandard", resourceCulture);
             }
@@ -153,7 +171,7 @@ namespace Atomex.Client.Desktop.Properties {
         /// <summary>
         ///   Ищет локализованную строку, похожую на Standard With Fixed Fee.
         /// </summary>
-        public static string CvOrderTypeStandardWithFixedFee {
+        internal static string CvOrderTypeStandardWithFixedFee {
             get {
                 return ResourceManager.GetString("CvOrderTypeStandardWithFixedFee", resourceCulture);
             }
@@ -162,7 +180,7 @@ namespace Atomex.Client.Desktop.Properties {
         /// <summary>
         ///   Ищет локализованную строку, похожую на Atomex services unavailable. Please check your network connection or contact technical support..
         /// </summary>
-        public static string CvServicesUnavailable {
+        internal static string CvServicesUnavailable {
             get {
                 return ResourceManager.GetString("CvServicesUnavailable", resourceCulture);
             }
@@ -171,7 +189,7 @@ namespace Atomex.Client.Desktop.Properties {
         /// <summary>
         ///   Ищет локализованную строку, похожую на Sufficient network fee for this amount ({0} is {1})..
         /// </summary>
-        public static string CvSufficientNetworkFee {
+        internal static string CvSufficientNetworkFee {
             get {
                 return ResourceManager.GetString("CvSufficientNetworkFee", resourceCulture);
             }
@@ -180,7 +198,7 @@ namespace Atomex.Client.Desktop.Properties {
         /// <summary>
         ///   Ищет локализованную строку, похожую на Too high network fee for this amount ({0} is {1})!.
         /// </summary>
-        public static string CvTooHighNetworkFee {
+        internal static string CvTooHighNetworkFee {
             get {
                 return ResourceManager.GetString("CvTooHighNetworkFee", resourceCulture);
             }
@@ -189,7 +207,7 @@ namespace Atomex.Client.Desktop.Properties {
         /// <summary>
         ///   Ищет локализованную строку, похожую на Wallet locked. Please unlock the wallet to continue..
         /// </summary>
-        public static string CvWalletLocked {
+        internal static string CvWalletLocked {
             get {
                 return ResourceManager.GetString("CvWalletLocked", resourceCulture);
             }
@@ -198,7 +216,7 @@ namespace Atomex.Client.Desktop.Properties {
         /// <summary>
         ///   Ищет локализованную строку, похожую на Warning.
         /// </summary>
-        public static string CvWarning {
+        internal static string CvWarning {
             get {
                 return ResourceManager.GetString("CvWarning", resourceCulture);
             }
@@ -207,16 +225,25 @@ namespace Atomex.Client.Desktop.Properties {
         /// <summary>
         ///   Ищет локализованную строку, похожую на Amount to convert must be greater than zero..
         /// </summary>
-        public static string CvWrongAmount {
+        internal static string CvWrongAmount {
             get {
                 return ResourceManager.GetString("CvWrongAmount", resourceCulture);
             }
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Amount must be greater than zero..
+        /// </summary>
+        internal static string CvZeroAmount {
+            get {
+                return ResourceManager.GetString("CvZeroAmount", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Back.
         /// </summary>
-        public static string CwvBack {
+        internal static string CwvBack {
             get {
                 return ResourceManager.GetString("CwvBack", resourceCulture);
             }
@@ -225,7 +252,7 @@ namespace Atomex.Client.Desktop.Properties {
         /// <summary>
         ///   Ищет локализованную строку, похожую на Cancel.
         /// </summary>
-        public static string CwvCancel {
+        internal static string CwvCancel {
             get {
                 return ResourceManager.GetString("CwvCancel", resourceCulture);
             }
@@ -234,7 +261,7 @@ namespace Atomex.Client.Desktop.Properties {
         /// <summary>
         ///   Ищет локализованную строку, похожую на Generate and write down the mnemonic before continuing!.
         /// </summary>
-        public static string CwvCreateMnemonicWarning {
+        internal static string CwvCreateMnemonicWarning {
             get {
                 return ResourceManager.GetString("CwvCreateMnemonicWarning", resourceCulture);
             }
@@ -243,7 +270,7 @@ namespace Atomex.Client.Desktop.Properties {
         /// <summary>
         ///   Ищет локализованную строку, похожую на Wallet name must be not empty..
         /// </summary>
-        public static string CwvEmptyWalletName {
+        internal static string CwvEmptyWalletName {
             get {
                 return ResourceManager.GetString("CwvEmptyWalletName", resourceCulture);
             }
@@ -252,7 +279,7 @@ namespace Atomex.Client.Desktop.Properties {
         /// <summary>
         ///   Ищет локализованную строку, похожую на Finish.
         /// </summary>
-        public static string CwvFinish {
+        internal static string CwvFinish {
             get {
                 return ResourceManager.GetString("CwvFinish", resourceCulture);
             }
@@ -261,7 +288,7 @@ namespace Atomex.Client.Desktop.Properties {
         /// <summary>
         ///   Ищет локализованную строку, похожую на Invalid wallet name..
         /// </summary>
-        public static string CwvInvalidWalletName {
+        internal static string CwvInvalidWalletName {
             get {
                 return ResourceManager.GetString("CwvInvalidWalletName", resourceCulture);
             }
@@ -270,7 +297,7 @@ namespace Atomex.Client.Desktop.Properties {
         /// <summary>
         ///   Ищет локализованную строку, похожую на Invalid mnemonic phrase..
         /// </summary>
-        public static string CwvMnemonicInvalidError {
+        internal static string CwvMnemonicInvalidError {
             get {
                 return ResourceManager.GetString("CwvMnemonicInvalidError", resourceCulture);
             }
@@ -279,7 +306,7 @@ namespace Atomex.Client.Desktop.Properties {
         /// <summary>
         ///   Ищет локализованную строку, похожую на Word count should be 12,15,18,21 or 24..
         /// </summary>
-        public static string CwvMnemonicInvalidWordcountError {
+        internal static string CwvMnemonicInvalidWordcountError {
             get {
                 return ResourceManager.GetString("CwvMnemonicInvalidWordcountError", resourceCulture);
             }
@@ -288,7 +315,7 @@ namespace Atomex.Client.Desktop.Properties {
         /// <summary>
         ///   Ищет локализованную строку, похожую на Word {0} is not in the wordlist for this language..
         /// </summary>
-        public static string CwvMnemonicInvalidWordError {
+        internal static string CwvMnemonicInvalidWordError {
             get {
                 return ResourceManager.GetString("CwvMnemonicInvalidWordError", resourceCulture);
             }
@@ -297,7 +324,7 @@ namespace Atomex.Client.Desktop.Properties {
         /// <summary>
         ///   Ищет локализованную строку, похожую на Mnemonic phrase can not be empty..
         /// </summary>
-        public static string CwvMnemonicIsEmptyError {
+        internal static string CwvMnemonicIsEmptyError {
             get {
                 return ResourceManager.GetString("CwvMnemonicIsEmptyError", resourceCulture);
             }
@@ -306,7 +333,7 @@ namespace Atomex.Client.Desktop.Properties {
         /// <summary>
         ///   Ищет локализованную строку, похожую на Next.
         /// </summary>
-        public static string CwvNext {
+        internal static string CwvNext {
             get {
                 return ResourceManager.GetString("CwvNext", resourceCulture);
             }
@@ -315,7 +342,7 @@ namespace Atomex.Client.Desktop.Properties {
         /// <summary>
         ///   Ищет локализованную строку, похожую на Password has insufficient complexity..
         /// </summary>
-        public static string CwvPasswordInsufficientComplexity {
+        internal static string CwvPasswordInsufficientComplexity {
             get {
                 return ResourceManager.GetString("CwvPasswordInsufficientComplexity", resourceCulture);
             }
@@ -324,7 +351,7 @@ namespace Atomex.Client.Desktop.Properties {
         /// <summary>
         ///   Ищет локализованную строку, похожую на Passwords do not match..
         /// </summary>
-        public static string CwvPasswordsDoNotMatch {
+        internal static string CwvPasswordsDoNotMatch {
             get {
                 return ResourceManager.GetString("CwvPasswordsDoNotMatch", resourceCulture);
             }
@@ -333,7 +360,7 @@ namespace Atomex.Client.Desktop.Properties {
         /// <summary>
         ///   Ищет локализованную строку, похожую на Scan.
         /// </summary>
-        public static string CwvScan {
+        internal static string CwvScan {
             get {
                 return ResourceManager.GetString("CwvScan", resourceCulture);
             }
@@ -342,7 +369,7 @@ namespace Atomex.Client.Desktop.Properties {
         /// <summary>
         ///   Ищет локализованную строку, похожую на Scan All.
         /// </summary>
-        public static string CwvScanAll {
+        internal static string CwvScanAll {
             get {
                 return ResourceManager.GetString("CwvScanAll", resourceCulture);
             }
@@ -351,7 +378,7 @@ namespace Atomex.Client.Desktop.Properties {
         /// <summary>
         ///   Ищет локализованную строку, похожую на Wallet with the same name already exists..
         /// </summary>
-        public static string CwvWalletAlreadyExists {
+        internal static string CwvWalletAlreadyExists {
             get {
                 return ResourceManager.GetString("CwvWalletAlreadyExists", resourceCulture);
             }
@@ -360,7 +387,7 @@ namespace Atomex.Client.Desktop.Properties {
         /// <summary>
         ///   Ищет локализованную строку, похожую на No tokens.
         /// </summary>
-        public static string PwNoTokens {
+        internal static string PwNoTokens {
             get {
                 return ResourceManager.GetString("PwNoTokens", resourceCulture);
             }
@@ -369,7 +396,7 @@ namespace Atomex.Client.Desktop.Properties {
         /// <summary>
         ///   Ищет локализованную строку, похожую на Amount must be greater than zero..
         /// </summary>
-        public static string SvAmountLessThanZeroError {
+        internal static string SvAmountLessThanZeroError {
             get {
                 return ResourceManager.GetString("SvAmountLessThanZeroError", resourceCulture);
             }
@@ -378,7 +405,7 @@ namespace Atomex.Client.Desktop.Properties {
         /// <summary>
         ///   Ищет локализованную строку, похожую на The transfer amount {0} with estimated commission {1} exceeds the amount of available funds!.
         /// </summary>
-        public static string SvAvailableFundsDetailedError {
+        internal static string SvAvailableFundsDetailedError {
             get {
                 return ResourceManager.GetString("SvAvailableFundsDetailedError", resourceCulture);
             }
@@ -387,7 +414,7 @@ namespace Atomex.Client.Desktop.Properties {
         /// <summary>
         ///   Ищет локализованную строку, похожую на The transfer amount (including commission) exceeds the amount of available funds!.
         /// </summary>
-        public static string SvAvailableFundsError {
+        internal static string SvAvailableFundsError {
             get {
                 return ResourceManager.GetString("SvAvailableFundsError", resourceCulture);
             }
@@ -396,7 +423,7 @@ namespace Atomex.Client.Desktop.Properties {
         /// <summary>
         ///   Ищет локализованную строку, похожую на Back.
         /// </summary>
-        public static string SvBack {
+        internal static string SvBack {
             get {
                 return ResourceManager.GetString("SvBack", resourceCulture);
             }
@@ -405,7 +432,7 @@ namespace Atomex.Client.Desktop.Properties {
         /// <summary>
         ///   Ищет локализованную строку, похожую на Cancel.
         /// </summary>
-        public static string SvCancel {
+        internal static string SvCancel {
             get {
                 return ResourceManager.GetString("SvCancel", resourceCulture);
             }
@@ -414,7 +441,7 @@ namespace Atomex.Client.Desktop.Properties {
         /// <summary>
         ///   Ищет локализованную строку, похожую на Commission must be a positive value..
         /// </summary>
-        public static string SvCommissionLessThanZeroError {
+        internal static string SvCommissionLessThanZeroError {
             get {
                 return ResourceManager.GetString("SvCommissionLessThanZeroError", resourceCulture);
             }
@@ -423,7 +450,7 @@ namespace Atomex.Client.Desktop.Properties {
         /// <summary>
         ///   Ищет локализованную строку, похожую на Address must be not empty..
         /// </summary>
-        public static string SvEmptyAddressError {
+        internal static string SvEmptyAddressError {
             get {
                 return ResourceManager.GetString("SvEmptyAddressError", resourceCulture);
             }
@@ -432,7 +459,7 @@ namespace Atomex.Client.Desktop.Properties {
         /// <summary>
         ///   Ищет локализованную строку, похожую на Error.
         /// </summary>
-        public static string SvError {
+        internal static string SvError {
             get {
                 return ResourceManager.GetString("SvError", resourceCulture);
             }
@@ -441,7 +468,7 @@ namespace Atomex.Client.Desktop.Properties {
         /// <summary>
         ///   Ищет локализованную строку, похожую на Failed.
         /// </summary>
-        public static string SvFailed {
+        internal static string SvFailed {
             get {
                 return ResourceManager.GetString("SvFailed", resourceCulture);
             }
@@ -450,7 +477,7 @@ namespace Atomex.Client.Desktop.Properties {
         /// <summary>
         ///   Ищет локализованную строку, похожую на Gas limit:.
         /// </summary>
-        public static string SvGasLimit {
+        internal static string SvGasLimit {
             get {
                 return ResourceManager.GetString("SvGasLimit", resourceCulture);
             }
@@ -459,7 +486,7 @@ namespace Atomex.Client.Desktop.Properties {
         /// <summary>
         ///   Ищет локализованную строку, похожую на Insufficient funds for default fee..
         /// </summary>
-        public static string SvInsufficientFundsForDefaultFeeError {
+        internal static string SvInsufficientFundsForDefaultFeeError {
             get {
                 return ResourceManager.GetString("SvInsufficientFundsForDefaultFeeError", resourceCulture);
             }
@@ -468,7 +495,7 @@ namespace Atomex.Client.Desktop.Properties {
         /// <summary>
         ///   Ищет локализованную строку, похожую на Address is invalid..
         /// </summary>
-        public static string SvInvalidAddressError {
+        internal static string SvInvalidAddressError {
             get {
                 return ResourceManager.GetString("SvInvalidAddressError", resourceCulture);
             }
@@ -477,7 +504,7 @@ namespace Atomex.Client.Desktop.Properties {
         /// <summary>
         ///   Ищет локализованную строку, похожую на Mining fee:.
         /// </summary>
-        public static string SvMiningFee {
+        internal static string SvMiningFee {
             get {
                 return ResourceManager.GetString("SvMiningFee", resourceCulture);
             }
@@ -486,7 +513,7 @@ namespace Atomex.Client.Desktop.Properties {
         /// <summary>
         ///   Ищет локализованную строку, похожую на No.
         /// </summary>
-        public static string SvNo {
+        internal static string SvNo {
             get {
                 return ResourceManager.GetString("SvNo", resourceCulture);
             }
@@ -495,7 +522,7 @@ namespace Atomex.Client.Desktop.Properties {
         /// <summary>
         ///   Ищет локализованную строку, похожую на Ok.
         /// </summary>
-        public static string SvOk {
+        internal static string SvOk {
             get {
                 return ResourceManager.GetString("SvOk", resourceCulture);
             }
@@ -506,7 +533,7 @@ namespace Atomex.Client.Desktop.Properties {
         ///
         ///NOTE: Do not sign out or close the application until the swap is completed, otherwise it may result in a loss of funds..
         /// </summary>
-        public static string SvOrderMatched {
+        internal static string SvOrderMatched {
             get {
                 return ResourceManager.GetString("SvOrderMatched", resourceCulture);
             }
@@ -515,7 +542,7 @@ namespace Atomex.Client.Desktop.Properties {
         /// <summary>
         ///   Ищет локализованную строку, похожую на Order rejected..
         /// </summary>
-        public static string SvOrderRejected {
+        internal static string SvOrderRejected {
             get {
                 return ResourceManager.GetString("SvOrderRejected", resourceCulture);
             }
@@ -524,7 +551,7 @@ namespace Atomex.Client.Desktop.Properties {
         /// <summary>
         ///   Ищет локализованную строку, похожую на Oops, the price has changed during the order sending. Please try again..
         /// </summary>
-        public static string SvPriceHasChanged {
+        internal static string SvPriceHasChanged {
             get {
                 return ResourceManager.GetString("SvPriceHasChanged", resourceCulture);
             }
@@ -533,7 +560,7 @@ namespace Atomex.Client.Desktop.Properties {
         /// <summary>
         ///   Ищет локализованную строку, похожую на Send.
         /// </summary>
-        public static string SvSend {
+        internal static string SvSend {
             get {
                 return ResourceManager.GetString("SvSend", resourceCulture);
             }
@@ -542,7 +569,7 @@ namespace Atomex.Client.Desktop.Properties {
         /// <summary>
         ///   Ищет локализованную строку, похожую на Send Confirmation.
         /// </summary>
-        public static string SvSendConfirmation {
+        internal static string SvSendConfirmation {
             get {
                 return ResourceManager.GetString("SvSendConfirmation", resourceCulture);
             }
@@ -551,7 +578,7 @@ namespace Atomex.Client.Desktop.Properties {
         /// <summary>
         ///   Ищет локализованную строку, похожую на Sending....
         /// </summary>
-        public static string SvSending {
+        internal static string SvSending {
             get {
                 return ResourceManager.GetString("SvSending", resourceCulture);
             }
@@ -560,7 +587,7 @@ namespace Atomex.Client.Desktop.Properties {
         /// <summary>
         ///   Ищет локализованную строку, похожую на Success.
         /// </summary>
-        public static string SvSuccess {
+        internal static string SvSuccess {
             get {
                 return ResourceManager.GetString("SvSuccess", resourceCulture);
             }
@@ -569,7 +596,7 @@ namespace Atomex.Client.Desktop.Properties {
         /// <summary>
         ///   Ищет локализованную строку, похожую на Atomex is not responding for a long time..
         /// </summary>
-        public static string SvTimeoutReached {
+        internal static string SvTimeoutReached {
             get {
                 return ResourceManager.GetString("SvTimeoutReached", resourceCulture);
             }
@@ -578,7 +605,7 @@ namespace Atomex.Client.Desktop.Properties {
         /// <summary>
         ///   Ищет локализованную строку, похожую на Yes.
         /// </summary>
-        public static string SvYes {
+        internal static string SvYes {
             get {
                 return ResourceManager.GetString("SvYes", resourceCulture);
             }
@@ -587,26 +614,9 @@ namespace Atomex.Client.Desktop.Properties {
         /// <summary>
         ///   Ищет локализованную строку, похожую на Warning.
         /// </summary>
-        public static string Warning {
+        internal static string Warning {
             get {
                 return ResourceManager.GetString("Warning", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Ищет локализованную строку, похожую на Amount must be greater than zero.
-        /// </summary>
-        public static string CvZeroAmount
-        { 
-            get {
-                return ResourceManager.GetString("CvZeroAmount", resourceCulture);
-            }
-        }
-
-        public static string CvBigAmount
-        {
-            get {
-                return ResourceManager.GetString("CvBigAmount", resourceCulture);
             }
         }
     }

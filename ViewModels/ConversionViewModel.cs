@@ -399,11 +399,12 @@ namespace Atomex.Client.Desktop.ViewModels
                 {
                     Warning = swapParams.Error.Code switch
                     {
-                        Errors.InsufficientFunds => Resources.CvInsufficientFunds,
+                        Errors.InsufficientFunds      => Resources.CvInsufficientFunds,
                         Errors.InsufficientChainFunds => string.Format(
-                            CultureInfo.InvariantCulture,
-                            Resources.CvInsufficientChainFunds,
-                            FromCurrencyViewModel?.Currency.FeeCurrencyName),
+                            provider: CultureInfo.CurrentCulture,
+                            format: Resources.CvInsufficientChainFunds,
+                            arg0: FromCurrencyViewModel?.Currency.FeeCurrencyName),
+                        Errors.FromAddressIsNullOrEmpty => Resources.CvFromAddressIsNullOrEmpty,
                         _ => Resources.CvError
                     };
                 }
@@ -515,7 +516,7 @@ namespace Atomex.Client.Desktop.ViewModels
             {
                 IsCriticalWarning = true;
                 Warning = string.Format(
-                    CultureInfo.InvariantCulture,
+                    CultureInfo.CurrentCulture,
                     Resources.CvTooHighNetworkFee,
                     FormattableString.Invariant($"{EstimatedTotalNetworkFeeInBase:$0.00}"),
                     FormattableString.Invariant($"{EstimatedTotalNetworkFeeInBase / AmountInBase:0.00%}"));
@@ -524,7 +525,7 @@ namespace Atomex.Client.Desktop.ViewModels
             {
                 IsCriticalWarning = false;
                 Warning = string.Format(
-                    CultureInfo.InvariantCulture,
+                    CultureInfo.CurrentCulture,
                     Resources.CvSufficientNetworkFee,
                     FormattableString.Invariant($"{EstimatedTotalNetworkFeeInBase:$0.00}"),
                     FormattableString.Invariant($"{EstimatedTotalNetworkFeeInBase / AmountInBase:0.00%}"));
@@ -703,7 +704,7 @@ namespace Atomex.Client.Desktop.ViewModels
                     digitsMultiplier: FromCurrencyViewModel.Currency.DigitsMultiplier);
 
                 var message = string.Format(
-                    CultureInfo.InvariantCulture,
+                    CultureInfo.CurrentCulture,
                     Resources.CvMinimumAllowedQtyWarning,
                     minimumAmount,
                     FromCurrencyViewModel.Currency.Name);
@@ -796,7 +797,7 @@ namespace Atomex.Client.Desktop.ViewModels
             Swaps = new ObservableCollection<SwapViewModel>(swapViewModels);
 
             Warning = string.Format(
-                CultureInfo.InvariantCulture,
+                CultureInfo.CurrentCulture,
                 Resources.CvInsufficientChainFunds,
                 FromCurrencyViewModel.Currency.FeeCurrencyName);
         }
