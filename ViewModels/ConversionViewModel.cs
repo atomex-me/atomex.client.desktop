@@ -21,7 +21,6 @@ using Atomex.Services;
 using Atomex.Swaps;
 using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.Properties;
-using Atomex.Client.Desktop.ViewModels.Abstract;
 using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
 using Atomex.Wallet.Abstract;
 
@@ -67,16 +66,16 @@ namespace Atomex.Client.Desktop.ViewModels
         public string RedeemAddress { get; set; }
 
         [Reactive]
-        public List<CurrencyViewModel> FromCurrencies { get; set; }
+        public List<CurrencyViewModel>? FromCurrencies { get; set; }
 
         [Reactive]
-        public List<CurrencyViewModel> ToCurrencies { get; set; }
+        public List<CurrencyViewModel>? ToCurrencies { get; set; }
 
         [Reactive]
         public CurrencyViewModel? FromCurrencyViewModel { get; set; }
 
         [Reactive]
-        public CurrencyViewModel ToCurrencyViewModel { get; set; }
+        public CurrencyViewModel? ToCurrencyViewModel { get; set; }
 
         [ObservableAsProperty]
         public string PriceFormat { get; }
@@ -209,17 +208,30 @@ namespace Atomex.Client.Desktop.ViewModels
             CanConvert = true;
             DGSelectedIndex = -1;
 
-            // "From" currency changed => Update "To" currencies list
+            // FromCurrencyViewModel changed => Update ToCurrencies
             this.WhenAnyValue(vm => vm.FromCurrencyViewModel)
                 .WhereNotNull()
                 .Subscribe(c =>
                 {
                     ToCurrencies = FromCurrencies
-                        .Where(fc => Symbols.SymbolByCurrencies(fc.Currency, c.Currency) != null)
+                        ?.Where(fc => Symbols.SymbolByCurrencies(fc.Currency, c.Currency) != null)
                         .ToList();
                 });
 
-            // "From" or "To" currencies changed => update PriceFormat
+            // FromCurrencyViewModel currency changed => Update AmountString and AmountInBase if need
+            this.WhenAnyValue(vm => vm.FromCurrencyViewModel)
+                .WhereNotNull()
+                .Subscribe(c =>
+                {
+                    var tempAmountString = AmountString;
+
+                    AmountString = _amount.ToString(CultureInfo.InvariantCulture); // update amount string with new "from" currency format
+
+                    if (AmountString == tempAmountString)
+                        UpdateAmountInBase(); // force update amount in base in case when amount string not changed
+                });
+
+            // FromCurrencyViewModel or ToCurrencyViewModel changed => update PriceFormat
             this.WhenAnyValue(vm => vm.FromCurrencyViewModel, vm => vm.ToCurrencyViewModel)
                 .WhereAllNotNull()
                 .Select(t =>
@@ -230,7 +242,7 @@ namespace Atomex.Client.Desktop.ViewModels
                 .WhereNotNull()
                 .ToPropertyEx(this, vm => vm.PriceFormat);
 
-            // Amoung, "From" currency or  "To" currency changed => estimate swap price and target amount
+            // AmountString, FromCurrencyViewModel or ToCurrencyViewModel changed => estimate swap price and target amount
             this.WhenAnyValue(vm => vm.AmountString, vm => vm.FromCurrencyViewModel, vm => vm.ToCurrencyViewModel)
                 .Throttle(TimeSpan.FromMilliseconds(1))
                 .Subscribe(a =>
@@ -343,7 +355,7 @@ namespace Atomex.Client.Desktop.ViewModels
 
         public void SetFromCurrency(CurrencyConfig fromCurrency)
         {
-            FromCurrencyViewModel = FromCurrencies.FirstOrDefault(vm => vm.Currency.Name == fromCurrency.Name);
+            FromCurrencyViewModel = FromCurrencies?.FirstOrDefault(vm => vm.Currency.Name == fromCurrency.Name);
         }
 
         private void SubscribeToServices()
@@ -451,7 +463,7 @@ namespace Atomex.Client.Desktop.ViewModels
             currency: ToCurrencyViewModel?.Currency?.FeeCurrencyName,
             baseCurrency: FromCurrencyViewModel?.BaseCurrencyCode,
             provider: _app.QuotesProvider,
-            defaultAmountInBase: EstimatedRedeemFeeInBase);
+            defaultAmountInBase: 0); // EstimatedRedeemFeeInBase);
 
         private void UpdateRewardForRedeemInBase() => RewardForRedeemInBase = TryGetAmountInBase(
             amount: RewardForRedeem,
