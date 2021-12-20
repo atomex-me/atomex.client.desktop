@@ -1,10 +1,12 @@
 using System;
 using System.Reactive.Linq;
-using Atomex.Client.Desktop.ViewModels.SendViewModels;
+
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 using Avalonia.Threading;
+
+using Atomex.Client.Desktop.ViewModels.SendViewModels;
 
 namespace Atomex.Client.Desktop.Views.SendViews
 {
@@ -23,7 +25,8 @@ namespace Atomex.Client.Desktop.Views.SendViews
                 {
                     Dispatcher.UIThread.InvokeAsync(() =>
                     {
-                        ((TezosTokensSendViewModel) DataContext)!.AmountString = text;
+                        if (DataContext is TezosTokensSendViewModel dataContext)
+                            dataContext.AmountString = text;
                     });
                 });
             
@@ -33,7 +36,8 @@ namespace Atomex.Client.Desktop.Views.SendViews
                 {
                     Dispatcher.UIThread.InvokeAsync(() =>
                     {
-                        ((TezosTokensSendViewModel) DataContext)!.FeeString = text;
+                        if (DataContext is TezosTokensSendViewModel dataContext)
+                            dataContext.FeeString = text;
                     });
                 });
         }

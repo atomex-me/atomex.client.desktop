@@ -63,7 +63,7 @@ namespace Atomex.Client.Desktop.ViewModels
         public string ToAddress { get; set; }
 
         [Reactive]
-        public string RedeemAddress { get; set; }
+        public string RedeemFromAddress { get; set; }
 
         [Reactive]
         public List<CurrencyViewModel>? FromCurrencies { get; set; }
@@ -319,7 +319,7 @@ namespace Atomex.Client.Desktop.ViewModels
                     .EstimateSwapParamsAsync(
                         from: FromSource,
                         amount: EstimatedMaxAmount,
-                        redeemFromAddress: RedeemAddress,
+                        redeemFromAddress: RedeemFromAddress,
                         fromCurrency: FromCurrencyViewModel?.Currency,
                         toCurrency: ToCurrencyViewModel?.Currency,
                         account: _app.Account,
@@ -373,7 +373,7 @@ namespace Atomex.Client.Desktop.ViewModels
                 .EstimateSwapParamsAsync(
                     from: FromSource,
                     amount: amount,
-                    redeemFromAddress: RedeemAddress,
+                    redeemFromAddress: RedeemFromAddress,
                     fromCurrency: FromCurrencyViewModel?.Currency,
                     toCurrency: ToCurrencyViewModel?.Currency,
                     account: _app.Account,
@@ -505,7 +505,7 @@ namespace Atomex.Client.Desktop.ViewModels
                 .ToList();
 
             FromCurrencyViewModel = FromCurrencies.First(c => c.Currency.Name == "BTC");
-            ToCurrencyViewModel = ToCurrencies.First(c => c.Currency.Name == "LTC");
+            ToCurrencyViewModel = ToCurrencies?.First(c => c.Currency.Name == "LTC");
 
             OnSwapEventHandler(this, args: null);
         }
@@ -516,19 +516,19 @@ namespace Atomex.Client.Desktop.ViewModels
             {
                 IsCriticalWarning = true;
                 Warning = string.Format(
-                    CultureInfo.CurrentCulture,
-                    Resources.CvTooHighNetworkFee,
-                    FormattableString.Invariant($"{EstimatedTotalNetworkFeeInBase:$0.00}"),
-                    FormattableString.Invariant($"{EstimatedTotalNetworkFeeInBase / AmountInBase:0.00%}"));
+                    provider: CultureInfo.CurrentCulture,
+                    format: Resources.CvTooHighNetworkFee,
+                    arg0: FormattableString.Invariant($"{EstimatedTotalNetworkFeeInBase:$0.00}"),
+                    arg1: FormattableString.Invariant($"{EstimatedTotalNetworkFeeInBase / AmountInBase:0.00%}"));
             }
             else if (AmountInBase != 0 && EstimatedTotalNetworkFeeInBase / AmountInBase > 0.1m)
             {
                 IsCriticalWarning = false;
                 Warning = string.Format(
-                    CultureInfo.CurrentCulture,
-                    Resources.CvSufficientNetworkFee,
-                    FormattableString.Invariant($"{EstimatedTotalNetworkFeeInBase:$0.00}"),
-                    FormattableString.Invariant($"{EstimatedTotalNetworkFeeInBase / AmountInBase:0.00%}"));
+                    provider: CultureInfo.CurrentCulture,
+                    format: Resources.CvSufficientNetworkFee,
+                    arg0: FormattableString.Invariant($"{EstimatedTotalNetworkFeeInBase:$0.00}"),
+                    arg1: FormattableString.Invariant($"{EstimatedTotalNetworkFeeInBase / AmountInBase:0.00%}"));
             }
 
             CanConvert = AmountInBase == 0 || EstimatedTotalNetworkFeeInBase / AmountInBase <= 0.75m;
@@ -635,6 +635,21 @@ namespace Atomex.Client.Desktop.ViewModels
                 return;
             }
 
+            if (FromSource == null)
+            {
+                return;
+            }
+
+            if (ToAddress == null)
+            {
+                return;
+            }
+
+            if (RedeemFromAddress == null)
+            {
+                return;
+            }
+
             if (_amount == 0)
             {
                 App.DialogService.Show(
@@ -704,10 +719,10 @@ namespace Atomex.Client.Desktop.ViewModels
                     digitsMultiplier: FromCurrencyViewModel.Currency.DigitsMultiplier);
 
                 var message = string.Format(
-                    CultureInfo.CurrentCulture,
-                    Resources.CvMinimumAllowedQtyWarning,
-                    minimumAmount,
-                    FromCurrencyViewModel.Currency.Name);
+                    provider: CultureInfo.CurrentCulture,
+                    format: Resources.CvMinimumAllowedQtyWarning,
+                    arg0: minimumAmount,
+                    arg1: FromCurrencyViewModel.Currency.Name);
 
                 App.DialogService.Show(
                     MessageViewModel.Message(
@@ -722,8 +737,11 @@ namespace Atomex.Client.Desktop.ViewModels
             {
                 FromCurrencyViewModel          = FromCurrencyViewModel,
                 ToCurrencyViewModel            = ToCurrencyViewModel,
-                PriceFormat                    = PriceFormat,
+                FromSource                     = FromSource,
+                ToAddress                      = ToAddress,
+                RedeemFromAddress              = RedeemFromAddress,
 
+                PriceFormat                    = PriceFormat,
                 Amount                         = _amount,
                 AmountInBase                   = AmountInBase,
                 TargetAmount                   = TargetAmount,

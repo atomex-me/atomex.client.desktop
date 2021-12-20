@@ -10,7 +10,6 @@ using Serilog;
 
 using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.Properties;
-using Atomex.Client.Desktop.ViewModels.Abstract;
 using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
 using Atomex.Client.Desktop.ViewModels.SendViewModels;
 using Atomex.Common;
@@ -27,10 +26,10 @@ namespace Atomex.Client.Desktop.ViewModels
         private static readonly TimeSpan SwapTimeout = TimeSpan.FromSeconds(60);
         private static readonly TimeSpan SwapCheckInterval = TimeSpan.FromSeconds(3);
 
-        private IAtomexApp App { get; }
-        public IFromSource From { get; }
-        public string To { get; }
-        public string RedeemAddress { get; }
+        private readonly IAtomexApp _app;
+        public IFromSource FromSource { get; init; }
+        public string ToAddress { get; init; }
+        public string RedeemFromAddress { get; init; }
 
         public CurrencyViewModel FromCurrencyViewModel { get; set; }
         public CurrencyViewModel ToCurrencyViewModel { get; set; }
@@ -42,24 +41,24 @@ namespace Atomex.Client.Desktop.ViewModels
         public decimal TargetAmountInBase { get; set; }
 
         public decimal EstimatedPrice { get; set; }
-        public decimal EstimatedOrderPrice { get; set; }
+        public decimal EstimatedOrderPrice { get; init; }
         public decimal EstimatedPaymentFee { get; set; }
         public decimal EstimatedPaymentFeeInBase { get; set; }
         public decimal EstimatedRedeemFee { get; set; }
         public decimal EstimatedRedeemFeeInBase { get; set; }
-        public decimal EstimatedMakerNetworkFee { get; set; }
-        public decimal EstimatedMakerNetworkFeeInBase { get; set; }
-        public decimal EstimatedTotalNetworkFeeInBase { get; set; }
+        public decimal EstimatedMakerNetworkFee { get; init; }
+        public decimal EstimatedMakerNetworkFeeInBase { get; init; }
+        public decimal EstimatedTotalNetworkFeeInBase { get; init; }
 
-        public decimal RewardForRedeem { get; set; }
-        public decimal RewardForRedeemInBase { get; set; }
-        public bool HasRewardForRedeem { get; set; }
+        public decimal RewardForRedeem { get; init; }
+        public decimal RewardForRedeemInBase { get; init; }
+        public bool HasRewardForRedeem { get; init; }
 
         private ICommand _backCommand;
 
         public ICommand BackCommand => _backCommand ??= ReactiveCommand.Create(() =>
         {
-            Desktop.App.DialogService.Close();
+            App.DialogService.Close();
         });
 
         private ICommand _nextCommand;
@@ -74,14 +73,14 @@ namespace Atomex.Client.Desktop.ViewModels
 #endif
         public ConversionConfirmationViewModel(IAtomexApp app)
         {
-            App = app ?? throw new ArgumentNullException(nameof(app));
+            _app = app ?? throw new ArgumentNullException(nameof(app));
         }
 
         private async void Send()
         {
             try
             {
-                Desktop.App.DialogService.Show(new SendingViewModel());
+                App.DialogService.Show(new SendingViewModel());
 
                 var error = await ConvertAsync();
 
@@ -89,42 +88,42 @@ namespace Atomex.Client.Desktop.ViewModels
                 {
                     if (error.Code == Errors.PriceHasChanged)
                     {
-                        Desktop.App.DialogService.Show(MessageViewModel.Message(
+                        App.DialogService.Show(MessageViewModel.Message(
                             title: Resources.SvFailed,
                             text: error.Description,
-                            backAction: () => Desktop.App.DialogService.Show(this)));
+                            backAction: () => App.DialogService.Show(this)));
                     }
                     else
                     {
-                        Desktop.App.DialogService.Show(MessageViewModel.Error(
+                        App.DialogService.Show(MessageViewModel.Error(
                             text: error.Description,
-                            backAction: () => Desktop.App.DialogService.Show(this)));
+                            backAction: () => App.DialogService.Show(this)));
                     }
 
                     return;
                 }
                 
-                Desktop.App.DialogService.Show(MessageViewModel.Success(
+                App.DialogService.Show(MessageViewModel.Success(
                     text: Resources.SvOrderMatched,
-                    nextAction: () => Desktop.App.DialogService.Close()));
+                    nextAction: () => App.DialogService.Close()));
 
                 OnSuccess?.Invoke(this, EventArgs.Empty);
             }
             catch (Exception e)
             {
-                Desktop.App.DialogService.Show(MessageViewModel.Error(
+                App.DialogService.Show(MessageViewModel.Error(
                     text: "An error has occurred while sending swap.",
-                    backAction: () => Desktop.App.DialogService.Show(this)));
+                    backAction: () => App.DialogService.Show(this)));
 
                 Log.Error(e, "Swap error.");
             }
         }
 
-        private async Task<Error> ConvertAsync()
+        private async Task<Error?> ConvertAsync()
         {
             try
             {
-                var account = App.Account;
+                var account = _app.Account;
 
                 var fromWallets = await GetFromAddressesAsync();
 
@@ -133,7 +132,7 @@ namespace Atomex.Client.Desktop.ViewModels
                         fromWallet.Currency = FromCurrencyViewModel.Currency.Name;
 
                 // check balances
-                var errors = await BalanceChecker.CheckBalancesAsync(App.Account, fromWallets);
+                var errors = await BalanceChecker.CheckBalancesAsync(_app.Account, fromWallets);
 
                 if (errors.Any())
                     return new Error(Errors.SwapError, GetErrorsDescription(errors));
@@ -144,13 +143,13 @@ namespace Atomex.Client.Desktop.ViewModels
                 if (Amount > 0 && !fromWallets.Any())
                     return new Error(Errors.SwapError, Resources.CvInsufficientFunds);
 
-                var symbol = App.SymbolsProvider
-                    .GetSymbols(App.Account.Network)
+                var symbol = _app.SymbolsProvider
+                    .GetSymbols(_app.Account.Network)
                     .SymbolByCurrencies(FromCurrencyViewModel.Currency, ToCurrencyViewModel.Currency);
 
-                var baseCurrency = App.Account.Currencies.GetByName(symbol.Base);
+                var baseCurrency = _app.Account.Currencies.GetByName(symbol.Base);
                 var side         = symbol.OrderSideForBuyCurrency(ToCurrencyViewModel.Currency);
-                var terminal     = App.Terminal;
+                var terminal     = _app.Terminal;
                 var price        = EstimatedPrice;
                 var orderPrice   = EstimatedOrderPrice;
 
@@ -161,24 +160,36 @@ namespace Atomex.Client.Desktop.ViewModels
 
                 if (qty < symbol.MinimumQty)
                 {
-                    var minimumAmount =
-                        AmountHelper.QtyToAmount(side, symbol.MinimumQty, price, FromCurrencyViewModel.Currency.DigitsMultiplier);
-                    var message = string.Format(CultureInfo.InvariantCulture, Resources.CvMinimumAllowedQtyWarning,
-                        minimumAmount, FromCurrencyViewModel.Currency.Name);
+                    var minimumAmount = AmountHelper.QtyToAmount(
+                        side: side,
+                        qty: symbol.MinimumQty,
+                        price: price,
+                        digitsMultiplier: FromCurrencyViewModel.Currency.DigitsMultiplier);
+
+                    var message = string.Format(
+                        provider: CultureInfo.InvariantCulture,
+                        format: Resources.CvMinimumAllowedQtyWarning,
+                        arg0: minimumAmount,
+                        arg1: FromCurrencyViewModel.Currency.Name);
 
                     return new Error(Errors.SwapError, message);
                 }
 
                 var order = new Order
                 {
-                    Symbol          = symbol.Name,
-                    TimeStamp       = DateTime.UtcNow,
-                    Price           = orderPrice,
-                    Qty             = qty,
-                    Side            = side,
-                    Type            = OrderType.FillOrKill,
-                    FromWallets     = fromWallets.ToList(),
-                    MakerNetworkFee = EstimatedMakerNetworkFee
+                    Symbol            = symbol.Name,
+                    TimeStamp         = DateTime.UtcNow,
+                    Price             = orderPrice,
+                    Qty               = qty,
+                    Side              = side,
+                    Type              = OrderType.FillOrKill,
+                    FromWallets       = fromWallets.ToList(),
+                    MakerNetworkFee   = EstimatedMakerNetworkFee,
+
+                    FromAddress       = FromSource is FromAddress fromAddress ? fromAddress.Address : null,
+                    FromOutputs       = FromSource is FromOutputs fromOutputs ? fromOutputs.Outputs.ToList() : null,
+                    ToAddress         = ToAddress,
+                    RedeemFromAddress = RedeemFromAddress
                 };
 
                 await order.CreateProofOfPossessionAsync(account);
@@ -203,7 +214,7 @@ namespace Atomex.Client.Desktop.ViewModels
                     if (currentOrder.Status == OrderStatus.PartiallyFilled || currentOrder.Status == OrderStatus.Filled)
                     {
                         var swap = (await terminal.Account
-                                .GetSwapsAsync())
+                            .GetSwapsAsync())
                             .FirstOrDefault(s => s.OrderId == currentOrder.Id);
 
                         if (swap == null)
@@ -231,21 +242,21 @@ namespace Atomex.Client.Desktop.ViewModels
         
         private async Task<IEnumerable<WalletAddress>> GetFromAddressesAsync()
         {
-            if (From is FromAddress fromAddress)
+            if (FromSource is FromAddress fromAddress)
             {
-                var walletAddress = await App.Account
+                var walletAddress = await _app.Account
                     .GetAddressAsync(FromCurrencyViewModel.Currency.Name, fromAddress.Address);
 
                 return new WalletAddress[] { walletAddress };
             }
-            else if (From is FromOutputs fromOutputs)
+            else if (FromSource is FromOutputs fromOutputs)
             {
                 var config = (BitcoinBasedConfig)FromCurrencyViewModel.Currency;
 
                 return await Task.WhenAll(fromOutputs.Outputs
                     .Select(o => o.DestinationAddress(config.Network))
                     .Distinct()
-                    .Select(async a => await App.Account.GetAddressAsync(FromCurrencyViewModel.Currency.Name, a)));
+                    .Select(async a => await _app.Account.GetAddressAsync(FromCurrencyViewModel.Currency.Name, a)));
   
             }
 
@@ -257,8 +268,9 @@ namespace Atomex.Client.Desktop.ViewModels
             var descriptions = errors.Select(e => e.Type switch
             {
                 BalanceErrorType.FailedToGet => $"Balance check for address {e.Address} failed",
-                BalanceErrorType.LessThanExpected =>
-                    $"Balance for address {e.Address} is {e.ActualBalance.ToString(CultureInfo.InvariantCulture)} and less than local {e.LocalBalance.ToString(CultureInfo.InvariantCulture)}",
+                BalanceErrorType.LessThanExpected => $"Balance for address {e.Address} is " +
+                    $"{e.ActualBalance.ToString(CultureInfo.InvariantCulture)} and less than" +
+                    $" local {e.LocalBalance.ToString(CultureInfo.InvariantCulture)}",
                 _ => $"Balance for address {e.Address} has changed and needs to be updated"
             });
 
