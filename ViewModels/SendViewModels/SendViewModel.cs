@@ -102,8 +102,15 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
         public ReactiveCommand<Unit, Unit> SelectFromCommand => _selectFromCommand ??=
             (_selectFromCommand = ReactiveCommand.Create(FromClick));
+        
+        private ReactiveCommand<Unit, Unit> _selectToCommand;
+
+        public ReactiveCommand<Unit, Unit> SelectToCommand => _selectToCommand ??=
+            (_selectToCommand = ReactiveCommand.Create(ToClick));
 
         protected abstract void FromClick();
+        
+        protected abstract void ToClick();
 
         private ReactiveCommand<Unit, Unit> _nextCommand;
 

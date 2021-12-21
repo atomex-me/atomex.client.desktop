@@ -25,6 +25,7 @@
     <Color x:Key="LightDefaultOpacity50">#80C4DEFF</Color>
     <Color x:Key="LightDefaultOpacity20">#34C4DEFF</Color>
     <Color x:Key="LightDefaultOpacity10">#1AC4DEFF</Color>
+    <Color x:Key="LightDefaultOpacity20">#34C4DEFF</Color>
     <Color x:Key="LightDefaultOpacity6">#0FC4DEFF</Color>
     <Color x:Key="Blue">#20439E</Color>
     <Color x:Key="LightBlue">#3964D3</Color>
@@ -75,6 +76,7 @@
     <SolidColorBrush x:Key="DefaultBackgroundBrush" Color="{DynamicResource DefaultBackgroundColor}" />
     <SolidColorBrush x:Key="DefaultForegroundBrush" Color="{DynamicResource LightDefault}" />
     <SolidColorBrush x:Key="SecondaryForegroundBrush" Color="{DynamicResource LightDefaultOpacity50}" />
+    <SolidColorBrush x:Key="DisabledForegroundBrush" Color="{DynamicResource LightDefaultOpacity20}" />
     <SolidColorBrush x:Key="DefaultButtonBackgroundBrush" Color="{DynamicResource Blue}" />
     <SolidColorBrush x:Key="DefaultTextBoxBackgroundBrush" Color="{DynamicResource DefaultTextBoxBackgroundColor}" />
     <SolidColorBrush x:Key="DefaultTextBoxForegroundBrush" Color="{DynamicResource DefaultTextBoxForegroundColor}" />
@@ -84,7 +86,7 @@
     <SolidColorBrush x:Key="CriticalWarningForegroundBrush" Color="{DynamicResource CriticalWarningColor}" />
     <SolidColorBrush x:Key="FieldHeaderBackgroundBrush" Color="#214174" />
     <SolidColorBrush x:Key="DefaultAmountForegroundBrush" Color="#eeff00" />
-    <SolidColorBrush x:Key="DefaultAmountInBaseForegroundBrush" Color="DarkGray" />
+    <SolidColorBrush x:Key="DefaultAmountInBaseForegroundBrush" Color="{DynamicResource LightDefaultOpacity50}" />
     <SolidColorBrush x:Key="DefaultAddressForegroundBrush" Color="Orange" />
     <SolidColorBrush x:Key="DefaultTooltipBackgroundBrush" Color="#80000000" />
     <SolidColorBrush x:Key="DefaultMenuItemSelectedBrush" Color="{DynamicResource DefaultMenuItemSelectedColor}" />
@@ -175,8 +177,10 @@
 
     <SolidColorBrush x:Key="CustomTextBoxBackgroundBrush" Color="{DynamicResource DefaultTextBoxBackgroundColor}" />
     <SolidColorBrush x:Key="CustomTextBoxForegroundBrush" Color="{DynamicResource DefaultTextBoxForegroundColor}" />
-    <SolidColorBrush x:Key="CustomTextBoxBorderBrush" Color="{DynamicResource DefaultTextBoxBackgroundColor}" />
+    <SolidColorBrush x:Key="CustomTextBoxBorderBrush" Color="{DynamicResource LightDefaultOpacity50}" />
+    <SolidColorBrush x:Key="CustomTextBoxDisabledBorderBrush" Color="{DynamicResource LightDefaultOpacity20}" />
     <SolidColorBrush x:Key="CustomTextBoxCaretBrush" Color="#1388ba" />
+    <SolidColorBrush x:Key="AmountTextBoxCaretBrush" Color="{DynamicResource LightDefault}" />
     
 
     <!-- Custom ComboBox -->
@@ -230,6 +234,7 @@
     <SolidColorBrush x:Key="RoundedButtonMouseOverBrush" Color="{DynamicResource LightBlue}" />
     <SolidColorBrush x:Key="RoundedButtonPressedBrush" Color="{DynamicResource DarkBlue}" />
     <SolidColorBrush x:Key="RoundedButtonDisabledBrush" Color="{DynamicResource LightDefaultOpacity10}" />
+    <SolidColorBrush x:Key="RoundedButtonDisabledForegroundBrush" Color="{DynamicResource LightDefaultOpacity20}" />
     <SolidColorBrush x:Key="RoundedButtonForegroundBrush" Color="White" />
 
     <!-- Link Button -->

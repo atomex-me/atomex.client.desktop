@@ -1,8 +1,10 @@
 <Styles xmlns='https://github.com/avaloniaui'
-        xmlns:x='http://schemas.microsoft.com/winfx/2006/xaml'>
+        xmlns:x='http://schemas.microsoft.com/winfx/2006/xaml'
+        xmlns:svg="clr-namespace:Avalonia.Svg.Skia;assembly=Avalonia.Svg.Skia">
 
     <Style Selector="Button.LinkButton">
         <Setter Property="FontFamily" Value="{DynamicResource DefaultFontFamily}" />
+        <Setter Property="Foreground" Value="{DynamicResource DefaultLinkButtonForegroundBrush}" />
         <Setter Property="FontSize" Value="12" />
 
         <Setter Property="Template">
@@ -12,10 +14,47 @@
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
-        <Setter Property="Foreground" Value="{DynamicResource DefaultLinkButtonForegroundBrush}" />
     </Style>
 
     <Style Selector="Button.LinkButton:pointerover">
         <Setter Property="Foreground" Value="{DynamicResource DefaultLinkButtonMouseOverBrush}" />
+    </Style>
+
+    <Style Selector="Button.LinkButton.Max">
+        <Setter Property="FontSize" Value="13" />
+        <Setter Property="FontFamily" Value="{DynamicResource DefaultFontFamily}" />
+        <Setter Property="Foreground" Value="{DynamicResource DefaultForegroundBrush}" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="BorderThickness" Value="0" />
+
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <StackPanel>
+                        <TextBlock Text="{TemplateBinding Content}"
+                                   FontSize="{TemplateBinding FontSize}"
+                                   Foreground="{TemplateBinding Foreground}"
+                                   FontFamily="{TemplateBinding FontFamily}"
+                                   FontWeight="{TemplateBinding FontWeight}"
+                                   HorizontalAlignment="Center"
+                                   Padding="0"
+                                   Margin="0 0 0 2"
+                                   LineHeight="16" />
+                        <svg:Svg HorizontalAlignment="Center"
+                                 Width="30"
+                                 Height="1"
+                                 Path="/Resources/Icons/max-dashed.svg" />
+                    </StackPanel>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style Selector="Button.LinkButton.Max:disabled">
+        <Setter Property="Foreground" Value="{DynamicResource DisabledForegroundBrush}" />
+    </Style>
+
+    <Style Selector="Button.LinkButton.Max:disabled /template/ Svg">
+        <Setter Property="IsVisible" Value="False" />
     </Style>
 </Styles>

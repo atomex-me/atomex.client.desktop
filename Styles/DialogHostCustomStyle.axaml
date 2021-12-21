@@ -55,8 +55,8 @@
 
 
                                 <Button
-                                    Canvas.Right="33"
-                                    Canvas.Top="27"
+                                    Canvas.Right="28"
+                                    Canvas.Top="21"
                                     Width="28"
                                     Height="28"
                                     Padding="3"

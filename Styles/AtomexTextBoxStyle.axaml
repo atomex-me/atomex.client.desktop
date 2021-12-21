@@ -1,0 +1,49 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:helpers="clr-namespace:Atomex.Client.Desktop.Helpers">
+
+    <Styles.Resources>
+        <CornerRadius x:Key="AtomexTextBoxCornerRadius">6</CornerRadius>
+    </Styles.Resources>
+
+    <Style Selector=":is(TextBox)">
+        <Setter Property="Cursor" Value="Ibeam" />
+    </Style>
+    
+    <Style Selector=":is(TextBox)[IsEnabled=False]">
+        <Setter Property="Cursor" Value="Arrow" />
+    </Style>
+
+    <Style Selector="TextBox.AtomexTextBox">
+        <Setter Property="Background" Value="{DynamicResource AlmostTransparentBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource DefaultForegroundBrush}" />
+        <Setter Property="Padding" Value="20 0" />
+        <Setter Property="Height" Value="50" />
+        <Setter Property="BorderBrush" Value="{DynamicResource CustomTextBoxBorderBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CaretBrush" Value="{DynamicResource CustomTextBoxCaretBrush}" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="FontFamily" Value="{DynamicResource DefaultFontFamily}" />
+        <Setter Property="FontSize" Value="{TemplateBinding FontSize}" />
+    </Style>
+    
+    <Style Selector="TextBox.AtomexTextBox:disabled">
+        <Setter Property="BorderBrush" Value="{DynamicResource CustomTextBoxDisabledBorderBrush}" />
+    </Style>
+
+
+    <Style Selector="TextBox.AtomexTextBox /template/ Border">
+        <Setter Property="CornerRadius" Value="{StaticResource AtomexTextBoxCornerRadius}" />
+        <Setter Property="Background" Value="{TemplateBinding Background}" />
+    </Style>
+
+    <Style Selector="TextBox:focus /template/ Border">
+        <Setter Property="Background" Value="{TemplateBinding Background}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource CustomTextBoxBorderBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+    </Style>
+
+    <Style Selector="TextBox:pointerover /template/ Border">
+        <Setter Property="Background" Value="{TemplateBinding Background}" />
+    </Style>
+</Styles>

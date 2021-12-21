@@ -32,6 +32,7 @@
         <StyleInclude Source="/Styles/CustomComboBoxStyle.axaml" />
         <StyleInclude Source="/Styles/BakersComboBoxStyle.axaml" />
         <StyleInclude Source="/Styles/CustomTextBoxStyle.axaml" />
+        <StyleInclude Source="/Styles/AtomexTextBoxStyle.axaml" />
         <StyleInclude Source="/Styles/AmountTextBoxStyle.axaml" />
         <StyleInclude Source="/Styles/PasswordTextBoxStyle.axaml" />
         <StyleInclude Source="/Styles/TabControl.axaml" />

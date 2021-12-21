@@ -17,6 +17,11 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             throw new NotImplementedException();
         }
 
+        protected override void ToClick()
+        {
+            throw new NotImplementedException();
+        }
+
         protected override Task UpdateAmount(decimal amount)
         {
             throw new NotImplementedException();

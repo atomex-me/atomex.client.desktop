@@ -41,9 +41,9 @@
         <Setter Property="Background" Value="{DynamicResource RoundedButtonPressedBrush}" />
     </Style>
 
-    <!-- IsEnabled -->
+    <!-- IsDisabled -->
     <Style Selector="controls|RoundedButton:disabled">
         <Setter Property="Background" Value="{DynamicResource RoundedButtonDisabledBrush}" />
-        <Setter Property="Opacity" Value="0.5" />
+        <Setter Property="Foreground" Value="{DynamicResource RoundedButtonDisabledForegroundBrush}" />
     </Style>
 </Styles>

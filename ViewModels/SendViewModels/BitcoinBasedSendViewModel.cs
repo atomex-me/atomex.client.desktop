@@ -73,10 +73,18 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 {
                     BackAction = () => { Desktop.App.DialogService.Show(this); }
                 };
+
+                // todo: remove
+                To = "mptaZCY98rZTDh3dovtQUEdESmxTAcyNQr";
             });
         }
 
         protected override void FromClick()
+        {
+            Desktop.App.DialogService.Show(SelectOutputsViewModel);
+        }
+        
+        protected override void ToClick()
         {
             Desktop.App.DialogService.Show(SelectOutputsViewModel);
         }

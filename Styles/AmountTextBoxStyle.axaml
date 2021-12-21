@@ -3,10 +3,12 @@
         xmlns:helpers="clr-namespace:Atomex.Client.Desktop.Helpers">
 
     <Style Selector="TextBox.AmountTextBox">
-        <Setter Property="helpers:AmountTextBoxHelper.CurrencyCodeFontSize" Value="12" />
-        <!-- <Setter Property="helpers:AmountTextBoxHelper.BaseCurrencyCodeFontSize" Value="10" /> -->
-        <!-- <Setter Property="helpers:AmountTextBoxHelper.AmountInBaseFontSize" Value="15" /> -->
-        <Setter Property="CaretBrush" Value="{DynamicResource DefaultTextBoxCuretBrush}" />
+        <Setter Property="helpers:AmountTextBoxHelper.CurrencyCodeFontSize" Value="16" />
+        <Setter Property="FontSize" Value="16" />
+        <Setter Property="helpers:AmountTextBoxHelper.BaseCurrencyCodeFontSize" Value="10" />
+        <Setter Property="helpers:AmountTextBoxHelper.AmountInBaseMargin" Value="0" />
+        <Setter Property="helpers:AmountTextBoxHelper.AmountInBaseFontSize" Value="13" />
+        <Setter Property="CaretBrush" Value="{DynamicResource AmountTextBoxCaretBrush}" />
     </Style>
     <Style Selector="TextBox.AmountTextBox">
         <Setter Property="Template">
@@ -72,6 +74,7 @@
                                                    HorizontalAlignment="Left"
                                                    VerticalAlignment="Bottom"
                                                    Margin="3 0 0 2"
+                                                   LineHeight="20"
                                                    Foreground="{TemplateBinding Foreground}"
                                                    Text="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type TextBox}}, Path=(helpers:AmountTextBoxHelper.CurrencyCode)}"
                                                    IsVisible="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type TextBox}}, Path=(helpers:AmountTextBoxHelper.CurrencyCode), Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
@@ -82,16 +85,19 @@
                                 <ContentPresenter Grid.Column="3" Grid.ColumnSpan="1">
                                     <ContentPresenter.Content>
                                         <StackPanel Orientation="Horizontal"
-                                                    VerticalAlignment="Center">
+                                                    VerticalAlignment="Center"
+                                                    Margin="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type TextBox}}, Path=(helpers:AmountTextBoxHelper.AmountInBaseMargin)}">
                                             <TextBlock HorizontalAlignment="Right"
                                                        VerticalAlignment="Center"
                                                        Foreground="{DynamicResource DefaultAmountInBaseForegroundBrush}"
+                                                       LineHeight="16"
                                                        Text="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type TextBox}}, Path=(helpers:AmountTextBoxHelper.AmountInBase)}"
                                                        FontSize="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type TextBox}}, Path=(helpers:AmountTextBoxHelper.AmountInBaseFontSize)}" />
                                             <TextBlock HorizontalAlignment="Right"
                                                        VerticalAlignment="Bottom"
                                                        Margin="3 4 10 2"
                                                        Foreground="{DynamicResource DefaultAmountInBaseForegroundBrush}"
+                                                       IsVisible="False"
                                                        Text="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type TextBox}}, Path=(helpers:AmountTextBoxHelper.BaseCurrencyCode)}"
                                                        FontSize="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type TextBox}}, Path=(helpers:AmountTextBoxHelper.BaseCurrencyCodeFontSize)}" />
                                         </StackPanel>
