@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Reactive.Linq;
 using System.Windows.Input;
 
+using Avalonia.Controls;
 using Avalonia.Threading;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
@@ -195,7 +196,7 @@ namespace Atomex.Client.Desktop.ViewModels
 #if DEBUG
         public ConversionViewModel()
         {
-            if (Env.IsInDesignerMode())
+            if (Design.IsDesignMode)
                 DesignerMode();
         }
 #endif
@@ -645,10 +646,10 @@ namespace Atomex.Client.Desktop.ViewModels
                 return;
             }
 
-            if (RedeemFromAddress == null)
-            {
-                return;
-            }
+            //if (RedeemFromAddress == null)
+            //{
+            //    return;
+            //}
 
             if (_amount == 0)
             {

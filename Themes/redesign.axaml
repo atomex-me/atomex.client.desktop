@@ -23,6 +23,7 @@
     <Color x:Key="DefaultBackgroundColor">#122d4f</Color>
     <Color x:Key="LightDefault">#C4DEFF</Color>
     <Color x:Key="LightDefaultOpacity50">#80C4DEFF</Color>
+    <Color x:Key="LightDefaultOpacity20">#34C4DEFF</Color>
     <Color x:Key="LightDefaultOpacity10">#1AC4DEFF</Color>
     <Color x:Key="LightDefaultOpacity6">#0FC4DEFF</Color>
     <Color x:Key="Blue">#20439E</Color>
