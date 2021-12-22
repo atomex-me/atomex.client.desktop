@@ -64,7 +64,8 @@
                                                        RevealPassword="{TemplateBinding RevealPassword}"
                                                        SelectionBrush="{TemplateBinding SelectionBrush}"
                                                        SelectionForegroundBrush="{TemplateBinding SelectionForegroundBrush}"
-                                                       CaretBrush="{TemplateBinding CaretBrush}" />
+                                                       CaretBrush="{TemplateBinding CaretBrush}"
+                                                       VerticalAlignment="Center" />
 
                                     </Panel>
                                 </ScrollViewer>
@@ -72,9 +73,9 @@
                                     <ContentPresenter.Content>
                                         <TextBlock x:Name="CurrencyCode"
                                                    HorizontalAlignment="Left"
-                                                   VerticalAlignment="Bottom"
+                                                   VerticalAlignment="Center"
                                                    Margin="3 0 0 2"
-                                                   LineHeight="20"
+                                                   LineHeight="19"
                                                    Foreground="{TemplateBinding Foreground}"
                                                    Text="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type TextBox}}, Path=(helpers:AmountTextBoxHelper.CurrencyCode)}"
                                                    IsVisible="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type TextBox}}, Path=(helpers:AmountTextBoxHelper.CurrencyCode), Converter={x:Static StringConverters.IsNotNullOrEmpty}}"

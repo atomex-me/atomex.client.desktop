@@ -48,5 +48,7 @@
         <StyleInclude Source="/Styles/CustomTitlebarStyle.axaml" />
         <StyleInclude Source="/Styles/TypeTest.axaml" />
         <StyleInclude Source="/Styles/DialogHostCustomStyle.axaml" />
+        <StyleInclude Source="/Styles/CustomCheckBoxStyle.axaml" />
+        <StyleInclude Source="/Styles/CollapsedAnimation.axaml" />
     </Application.Styles>
 </Application>

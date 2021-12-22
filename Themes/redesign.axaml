@@ -44,6 +44,7 @@
     <Color x:Key="CriticalWarningColor">#ef6a41</Color>
     <Color x:Key="DarkRed">#E1457C</Color>
     <Color x:Key="Emerald">#48C3AD</Color>
+    <Color x:Key="Orange">#FFA800</Color>
     
     <Color x:Key="MahApps.Colors.Gray1">#FF333333</Color>
     <Color x:Key="MahApps.Colors.Gray2">#FF7F7F7F</Color>
@@ -81,7 +82,7 @@
     <SolidColorBrush x:Key="DefaultTextBoxForegroundBrush" Color="{DynamicResource DefaultTextBoxForegroundColor}" />
     <SolidColorBrush x:Key="DefaultTextBoxCuretBrush" Color="{DynamicResource DefaultTextBoxCuretColor}" />
     <SolidColorBrush x:Key="DefaultSubstrateBrush" Color="{DynamicResource DefaultSubstrateColor}" />
-    <SolidColorBrush x:Key="WarningForegroundBrush" Color="Gold" />
+    <SolidColorBrush x:Key="WarningForegroundBrush" Color="Orange" />
     <SolidColorBrush x:Key="CriticalWarningForegroundBrush" Color="{DynamicResource CriticalWarningColor}" />
     <SolidColorBrush x:Key="FieldHeaderBackgroundBrush" Color="#214174" />
     <SolidColorBrush x:Key="DefaultAmountForegroundBrush" Color="#eeff00" />

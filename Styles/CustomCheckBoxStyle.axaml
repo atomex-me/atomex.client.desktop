@@ -1,0 +1,25 @@
+<Styles xmlns='https://github.com/avaloniaui'
+        xmlns:x='http://schemas.microsoft.com/winfx/2006/xaml'>
+
+    <Style Selector="CheckBox:checked /template/ Border#NormalRectangle">
+        <Setter Property="BorderBrush" Value="{DynamicResource LightDefaultOpacity20}" />
+        <Setter Property="Background" Value="{DynamicResource AlmostTransparentBrush}" />
+    </Style>
+
+    <Style Selector="CheckBox:not(:checked) /template/ Border#NormalRectangle">
+        <Setter Property="BorderBrush" Value="{DynamicResource LightDefaultOpacity20}" />
+        <Setter Property="Background" Value="{DynamicResource AlmostTransparentBrush}" />
+    </Style>
+
+    <Style Selector="CheckBox:checked /template/ Path#CheckGlyph">
+        <Setter Property="Fill" Value="{DynamicResource LightDefault}" />
+    </Style>
+
+    <Style Selector="CheckBox:checked /template/ ContentPresenter#ContentPresenter">
+        <Setter Property="TextBlock.Foreground" Value="{DynamicResource SecondaryForegroundBrush}" />
+    </Style>
+
+    <Style Selector="CheckBox:not(:checked) /template/ ContentPresenter#ContentPresenter">
+        <Setter Property="TextBlock.Foreground" Value="{DynamicResource SecondaryForegroundBrush}" />
+    </Style>
+</Styles>

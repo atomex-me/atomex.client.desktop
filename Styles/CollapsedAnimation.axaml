@@ -1,0 +1,52 @@
+<Styles xmlns='https://github.com/avaloniaui'
+        xmlns:x='http://schemas.microsoft.com/winfx/2006/xaml'>
+
+    <Style Selector=":is(Control).AnimationCollapsed">
+        <Setter Property="RenderTransform" Value="none" />
+        <Setter Property="Transitions">
+            <Transitions>
+                <TransformOperationsTransition Property="RenderTransform" Duration="0:0:.075" />
+            </Transitions>
+        </Setter>
+    </Style>
+
+    <Style Selector=":is(Control).AnimationCollapsed:disabled">
+        <Setter Property="RenderTransform" Value="scaleY(0)" />
+    </Style>
+
+    <Style Selector=":is(Control).AnimationCollapsed:disabled">
+        <Style.Animations>
+            <Animation Duration="0:0:.074"
+                       FillMode="Forward"
+                       Delay="0:0:.001">
+                <KeyFrame Cue="10%">
+                    <Setter Property="Height" Value="45" />
+                    <Setter Property="Opacity" Value="0.9" />
+                </KeyFrame>
+                <KeyFrame Cue="100%">
+                    <Setter Property="Height" Value="0" />
+                    <Setter Property="Opacity" Value="0" />
+                    <Setter Property="Margin" Value="0"/>
+                </KeyFrame>
+            </Animation>
+        </Style.Animations>
+    </Style>
+
+    <Style Selector=":is(Control).AnimationCollapsed:not(:disabled)">
+        <Style.Animations>
+            <Animation Duration="0:0:.074"
+                       FillMode="Forward"
+                       Delay="0:0:.001">
+                <KeyFrame Cue="10%">
+                    <Setter Property="Height" Value="5" />
+                    <Setter Property="Opacity" Value="0.1" />
+                </KeyFrame>
+                <KeyFrame Cue="100%">
+                    <Setter Property="Height" Value="50" />
+                    <Setter Property="Opacity" Value="1" />
+                    <Setter Property="Margin" Value="0 12 0 0"/>
+                </KeyFrame>
+            </Animation>
+        </Style.Animations>
+    </Style>
+</Styles>

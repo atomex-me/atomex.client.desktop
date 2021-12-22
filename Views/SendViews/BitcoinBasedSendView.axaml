@@ -16,6 +16,8 @@
 
     <UserControl.Resources>
         <converters:AmountToStringConverter x:Key="AmountToStringConverter" />
+        <converters:AmountToStringInBracketsConverter x:Key="AmountToStringInBracketsConverter" />
+        <converters:StringNotEmptyConverter x:Key="StringNotEmptyConverter" />
     </UserControl.Resources>
 
     <Border Classes="ChildViewBorder">
@@ -121,16 +123,20 @@
                             </MultiBinding>
                         </helpers:AmountTextBoxHelper.AmountInBase>
                     </TextBox>
-                    
+
                     <Button Classes="LinkButton Max"
                             Margin="-67 0 0 0"
-                            Command="{Binding MaxCommand}">max</Button>
+                            Command="{Binding MaxCommand}">
+                        max
+                    </Button>
                 </StackPanel>
 
                 <StackPanel Orientation="Horizontal"
                             HorizontalAlignment="Center"
-                            Margin="0 12 0 0">
-
+                            IsEnabled="{Binding !UseDefaultFee}"
+                            Margin="0 12 0 0"
+                            Height="50"
+                            Classes="AnimationCollapsed">
                     <Border Width="60"
                             Margin="-60 0 0 0">
                         <TextBlock Text="Fee"
@@ -144,7 +150,6 @@
 
                     <TextBox Width="440"
                              FontSize="16"
-                             IsEnabled="{Binding !UseDefaultFee}"
                              Text="{Binding FeeString, Mode=OneWay}"
                              helpers:AmountTextBoxHelper.CurrencyCode="{Binding FeeCurrencyCode}"
                              helpers:AmountTextBoxHelper.BaseCurrencyCode="{Binding BaseCurrencyCode}"
@@ -160,54 +165,103 @@
                 </StackPanel>
 
                 <StackPanel Orientation="Horizontal"
-                            HorizontalAlignment="Center"
-                            Margin="0 12 0 0">
-
-                    <Border Width="80"
-                            Margin="-80 0 0 0">
-                        <TextBlock Text="Fee rate"
-                                   Margin="0 0 12 0"
-                                   Foreground="{DynamicResource SecondaryForegroundBrush}"
-                                   FontFamily="{DynamicResource DefaultMediumFontFamily}"
-                                   FontSize="13"
-                                   VerticalAlignment="Center"
-                                   HorizontalAlignment="Right" />
-                    </Border>
-
-                    <TextBox Width="440"
-                             FontSize="16"
-                             IsEnabled="False"
-                             helpers:AmountTextBoxHelper.CurrencyCode="sat/byte"
-                             Classes="AtomexTextBox AmountTextBox">
-                        <TextBlock.Text>
-                            <MultiBinding Converter="{StaticResource AmountToStringConverter}">
-                                <Binding Path="FeeRate" Mode="OneWay" />
-                                <Binding Path="FeeRateFormat" Mode="OneWay" />
-                            </MultiBinding>
-                        </TextBlock.Text>
-                    </TextBox>
+                            IsEnabled="{Binding Warning,
+                            Converter={StaticResource StringNotEmptyConverter}}"
+                            Margin="0 8 0 0"
+                            Width="440"
+                            Height="16">
+                    <TextBlock Text="{Binding Warning}"
+                               Foreground="{DynamicResource WarningForegroundBrush}"
+                               FontFamily="{DynamicResource DefaultLightFontFamily}"
+                               FontSize="13"
+                               LineHeight="16"
+                               TextWrapping="WrapWithOverflow"
+                               HorizontalAlignment="Left"
+                               VerticalAlignment="Bottom" />
                 </StackPanel>
-                
-                <StackPanel HorizontalAlignment="Center"
-                            Margin="0 14 0 0"
-                            Width="440">
-                    <CheckBox IsChecked="{Binding UseDefaultFee, Mode=TwoWay}"
+
+                <Grid ColumnDefinitions="*,Auto"
+                      RowDefinitions="Auto,Auto"
+                      Margin="0 12 0 0"
+                      Width="440">
+
+                    <CheckBox Grid.Row="0"
+                              Grid.Column="0"
+                              Grid.RowSpan="2"
+                              Padding="12 0 0 0"
+                              IsChecked="{Binding UseDefaultFee, Mode=TwoWay}"
                               FontSize="13"
                               FontFamily="{DynamicResource DefaultLightFontFamily}"
                               Foreground="{DynamicResource SecondaryForegroundBrush}">
                         Use default fee
                     </CheckBox>
-                </StackPanel>
 
-                <TextBlock Text="{Binding Warning}"
-                           Foreground="{DynamicResource WarningForegroundBrush}"
-                           FontFamily="{DynamicResource DefaultLightFontFamily}"
-                           Height="20"
-                           FontSize="13"
-                           Margin="20 5 20 0"
-                           TextWrapping="Wrap"
-                           HorizontalAlignment="Center"
-                           VerticalAlignment="Bottom" />
+                    <StackPanel Grid.Row="0"
+                                Grid.Column="1"
+                                HorizontalAlignment="Right"
+                                Orientation="Horizontal">
+                        <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
+                                   FontFamily="{DynamicResource DefaultFontFamily}"
+                                   LineHeight="20"
+                                   TextAlignment="Right"
+                                   Text="Fee:" />
+                        <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
+                                   FontFamily="{DynamicResource DefaultFontFamily}"
+                                   LineHeight="20"
+                                   Margin="3 0 0 0"
+                                   TextAlignment="Right"
+                                   Text="{Binding FeeString}" />
+                        <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
+                                   FontFamily="{DynamicResource DefaultFontFamily}"
+                                   LineHeight="20"
+                                   Margin="3 0 0 0"
+                                   TextAlignment="Right"
+                                   Text="{Binding FeeCurrencyCode}" />
+                        <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
+                                   FontFamily="{DynamicResource DefaultFontFamily}"
+                                   LineHeight="20"
+                                   Margin="3 0 0 0"
+                                   TextAlignment="Right">
+                            <TextBlock.Text>
+                                <MultiBinding Converter="{StaticResource AmountToStringInBracketsConverter}">
+                                    <Binding Path="FeeInBase" Mode="OneWay" />
+                                    <Binding Path="BaseCurrencyFormat" Mode="OneWay" />
+                                </MultiBinding>
+                            </TextBlock.Text>
+                        </TextBlock>
+                    </StackPanel>
+
+                    <StackPanel Grid.Row="1"
+                                Grid.Column="1"
+                                HorizontalAlignment="Right"
+                                Orientation="Horizontal">
+                        <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
+                                   FontFamily="{DynamicResource DefaultFontFamily}"
+                                   LineHeight="20"
+                                   TextAlignment="Right"
+                                   Text="Fee rate:" />
+
+                        <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
+                                   FontFamily="{DynamicResource DefaultFontFamily}"
+                                   LineHeight="20"
+                                   Margin="3 0 0 0"
+                                   TextAlignment="Right">
+                            <TextBlock.Text>
+                                <MultiBinding Converter="{StaticResource AmountToStringConverter}">
+                                    <Binding Path="FeeRate" Mode="OneWay" />
+                                    <Binding Path="FeeRateFormat" Mode="OneWay" />
+                                </MultiBinding>
+                            </TextBlock.Text>
+                        </TextBlock>
+
+                        <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
+                                   FontFamily="{DynamicResource DefaultFontFamily}"
+                                   LineHeight="20"
+                                   Margin="3 0 0 0"
+                                   TextAlignment="Right"
+                                   Text="sat/byte" />
+                    </StackPanel>
+                </Grid>
 
                 <StackPanel Orientation="Horizontal"
                             HorizontalAlignment="Center"
@@ -217,6 +271,7 @@
                                             CornerRadius="6"
                                             Content="Send"
                                             FontSize="18"
+                                            FontFamily="{DynamicResource DefaultFontFamily}"
                                             FontWeight="Normal"
                                             Command="{Binding NextCommand}" />
                 </StackPanel>
