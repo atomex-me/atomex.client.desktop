@@ -26,6 +26,7 @@
     <Color x:Key="LightDefaultOpacity20">#34C4DEFF</Color>
     <Color x:Key="LightDefaultOpacity10">#1AC4DEFF</Color>
     <Color x:Key="LightDefaultOpacity6">#0FC4DEFF</Color>
+    <Color x:Key="LightDefaultOpacity4">#0AC4DEFF</Color>
     <Color x:Key="Blue">#20439E</Color>
     <Color x:Key="LightBlue">#3964D3</Color>
     <Color x:Key="DarkBlue">#0F3088</Color>

@@ -9,10 +9,40 @@
     </Style>
 
     <Style
-        Selector="Button.CloseBtn:not(:pointerover) /template/ ContentPresenter#PART_ContentPresenter">
+        Selector="Button.ButtonWithIcon:not(:pointerover) /template/ ContentPresenter#PART_ContentPresenter">
         <Setter Property="Background" Value="Transparent" />
     </Style>
-    <Style Selector="Button.CloseBtn > Path">
+    <Style Selector="Button.ButtonWithIcon > Path">
         <Setter Property="Fill" Value="{StaticResource PrimaryTextColor}" />
+    </Style>
+
+
+    <Style
+        Selector="Button.SecondaryButton:not(:pointerover) /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource LightDefaultOpacity4}" />
+        <Setter Property="TextBlock.Foreground" Value="{DynamicResource SecondaryForegroundBrush}" />
+    </Style>
+    
+    <Style
+        Selector="Button.SecondaryButton:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource LightDefaultOpacity10}" />
+        <Setter Property="TextBlock.Foreground" Value="{DynamicResource SecondaryForegroundBrush}" />
+    </Style>
+    
+    <Style
+        Selector="Button.SecondaryButton:pressed /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource LightDefaultOpacity6}" />
+    </Style>
+    
+    <Style Selector="Button.SecondaryButton > Path">
+        <Setter Property="Fill" Value="{StaticResource SecondaryForegroundBrush}" />
+    </Style>
+    
+    <Style Selector="Button.SecondaryButton">
+        <Setter Property="Foreground" Value="{DynamicResource SecondaryForegroundBrush}" />
+        <Setter Property="FontFamily" Value="{DynamicResource DefaultFontFamily}" />
+        <Setter Property="FontSize" Value="13" />
+        <Setter Property="Padding" Value="9 5" />
+        <Setter Property="CornerRadius" Value="8" />
     </Style>
 </Styles>

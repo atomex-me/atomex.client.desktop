@@ -28,7 +28,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
         public string FeeRateFormat => "0.#";
 
-        private BitcoinBasedConfig Config => (BitcoinBasedConfig) Currency;
+        private BitcoinBasedConfig Config => (BitcoinBasedConfig)Currency;
 
         private BitcoinBasedAccount Account => App.Account.GetCurrencyAccount<BitcoinBasedAccount>(Currency.Name);
 
@@ -57,7 +57,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                         : GetShortenedAddress(outputs.ElementAt(0).DestinationAddress(Config.Network));
 
                     var totalOutputsSatoshi = outputs
-                        .Aggregate((long) 0, (sum, output) => sum + output.Value);
+                        .Aggregate((long)0, (sum, output) => sum + output.Value);
 
                     SelectedFromAmount = Config.SatoshiToCoin(totalOutputsSatoshi);
                 });
@@ -65,13 +65,20 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             _ = Task.Run(async () =>
             {
                 var outputs = (await Account.GetAvailableOutputsAsync())
-                    .Select(output => (BitcoinBasedTxOutput) output);
+                    .Select(output => (BitcoinBasedTxOutput)output);
+
 
                 Outputs = new ObservableCollection<BitcoinBasedTxOutput>(outputs);
 
+
                 SelectOutputsViewModel = new SelectOutputsViewModel
                 {
-                    BackAction = () => { Desktop.App.DialogService.Show(this); }
+                    BackAction = () => { Desktop.App.DialogService.Show(this); },
+                    Outputs = Outputs.Select(output => new OutputViewModel
+                    {
+                        Output = output,
+                        Config = Config
+                    })
                 };
 
                 // todo: remove
@@ -83,7 +90,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         {
             Desktop.App.DialogService.Show(SelectOutputsViewModel);
         }
-        
+
         protected override void ToClick()
         {
             Desktop.App.DialogService.Show(SelectOutputsViewModel);
@@ -110,7 +117,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                         return;
                     }
 
-                    var feeVal = Config.SatoshiToCoin((long) transactionParams.FeeInSatoshi);
+                    var feeVal = Config.SatoshiToCoin((long)transactionParams.FeeInSatoshi);
                     Fee = feeVal;
                 }
                 else
@@ -128,7 +135,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                         return;
                     }
 
-                    var minimumFeeInSatoshi = Config.GetMinimumFee((int) transactionParams.Size);
+                    var minimumFeeInSatoshi = Config.GetMinimumFee((int)transactionParams.Size);
                     var minimumFee = Config.SatoshiToCoin(minimumFeeInSatoshi);
 
                     if (Fee < minimumFee)
@@ -162,7 +169,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     return;
                 }
 
-                var minimumFeeInSatoshi = Config.GetMinimumFee((int) transactionParams.Size);
+                var minimumFeeInSatoshi = Config.GetMinimumFee((int)transactionParams.Size);
                 var minimumFee = Config.SatoshiToCoin(minimumFeeInSatoshi);
 
                 if (Fee < minimumFee)
@@ -232,7 +239,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     }
                     else
                     {
-                        var minimumFeeInSatoshi = Config.GetMinimumFee((int) transactionParams.Size);
+                        var minimumFeeInSatoshi = Config.GetMinimumFee((int)transactionParams.Size);
                         var minimumFee = Config.SatoshiToCoin(minimumFeeInSatoshi);
 
                         if (Fee < minimumFee)
@@ -268,7 +275,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             FeeRate = 98765;
             Warning = "Insufficient BTC balance";
 
-            var amount = new Money((decimal) 0.0001, MoneyUnit.Satoshi);
+            var amount = new Money((decimal)0.0001, MoneyUnit.Satoshi);
             var script = BitcoinAddress.Create("muRDku2ZwNTz2msCZCHSUhDD5o6NxGsoXM", Network.TestNet).ScriptPubKey;
 
             var outputs = new List<BitcoinBasedTxOutput>

@@ -55,7 +55,7 @@
 
 
                                 <Button
-                                    Canvas.Right="28"
+                                    Canvas.Right="25"
                                     Canvas.Top="21"
                                     Width="28"
                                     Height="28"
@@ -63,7 +63,7 @@
                                     BorderThickness="0"
                                     VerticalContentAlignment="Center"
                                     Command="{Binding CloseDialog}"
-                                    Classes="CloseBtn">
+                                    Classes="ButtonWithIcon">
 
                                     <svg:Svg Width="28"
                                              Path="/Resources/Icons/close.svg"
