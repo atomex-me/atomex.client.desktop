@@ -131,12 +131,13 @@
                     </Button>
                 </StackPanel>
 
+                <!-- Classes="AnimationCollapsed" -->
+                <!-- IsEnabled="{Binding !UseDefaultFee}" -->
                 <StackPanel Orientation="Horizontal"
                             HorizontalAlignment="Center"
-                            IsEnabled="{Binding !UseDefaultFee}"
+                            IsVisible="{Binding !UseDefaultFee}"
                             Margin="0 12 0 0"
-                            Height="50"
-                            Classes="AnimationCollapsed">
+                            Height="50">
                     <Border Width="60"
                             Margin="-60 0 0 0">
                         <TextBlock Text="Fee"
@@ -169,10 +170,11 @@
                             Converter={StaticResource StringNotEmptyConverter}}"
                             Margin="0 8 0 0"
                             Width="440"
-                            Height="16">
+                            MinHeight="16">
                     <TextBlock Text="{Binding Warning}"
                                Foreground="{DynamicResource WarningForegroundBrush}"
                                FontFamily="{DynamicResource DefaultLightFontFamily}"
+                               MaxWidth="440"
                                FontSize="13"
                                LineHeight="16"
                                TextWrapping="WrapWithOverflow"
