@@ -154,7 +154,7 @@
                     VerticalContentAlignment="Center"
                     Padding="0"
                     Command="{Binding CloseCommand}"
-                    Classes="CloseBtn">
+                    Classes="ButtonWithIcon">
                 <Path Width="11"
                       Height="11"
                       Stretch="Uniform"
