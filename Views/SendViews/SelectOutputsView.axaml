@@ -112,11 +112,12 @@
                 <CheckBox Grid.Row="0"
                           Grid.Column="0"
                           Padding="12 0 0 0"
-                          IsChecked="{Binding DeselectAll, Mode=TwoWay}"
+                          IsChecked="{Binding SelectAll, Mode=TwoWay}"
+                          Command="{Binding SelectAllCommand}"
                           FontSize="13"
                           FontFamily="{DynamicResource DefaultLightFontFamily}"
                           Foreground="{DynamicResource SecondaryForegroundBrush}">
-                    Deselect all
+                    Select all
                 </CheckBox>
 
                 <Button Grid.Row="0"
@@ -135,7 +136,7 @@
                         CornerRadius="8"
                         Padding="4 5"
                         Margin="8 0 0 0"
-                        IsEnabled="{Binding SortIsAscending}"
+                        IsEnabled="{Binding !SortIsAscending}"
                         Classes="SortIcon">
                     <svg:Svg HorizontalAlignment="Center"
                              Width="16"
@@ -170,13 +171,14 @@
                               RowDefinitions="Auto">
                             <CheckBox Grid.Column="0"
                                       Content="{Binding Address}"
-                                      IsChecked="{Binding IsSelected}"
+                                      IsChecked="{Binding IsSelected, Mode=TwoWay}"
+                                      Command="{Binding $parent[ListBox].DataContext.OutputCheckCommand}"
                                       FontSize="13"
                                       FontFamily="{DynamicResource DefaultLightFontFamily}"
                                       Foreground="{DynamicResource SecondaryForegroundBrush}" />
 
                             <TextBlock Grid.Column="1"
-                                       Text="{Binding Balance}" />
+                                       Text="{Binding BalanceString}" />
 
                             <Button Grid.Column="2"
                                     Padding="3"
