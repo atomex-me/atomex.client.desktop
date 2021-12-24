@@ -67,20 +67,19 @@
                    FontFamily="{DynamicResource DefaultLightFontFamily}"
                    Foreground="{DynamicResource LightDefaultOpacity50Brush}"
                    VerticalAlignment="Bottom"/>
-        <Button Content="max"
-                Height="30"
-                FontSize="13"
-                FontFamily="{DynamicResource DefaultLightFontFamily}"
-                Foreground="{DynamicResource DefaultForegroundBrush}"
-                Background="Transparent"
-                VerticalAlignment="Top"/>
+        <Button Margin="7 0 0 -3"
+                Command="{Binding MaxCommand}"
+                Content="max"
+                VerticalAlignment="Bottom"
+                Classes="LinkButton Max"/>
       </StackPanel>
 
       <StackPanel Orientation="Horizontal"
                   HorizontalAlignment="Right"
                   Grid.Row="1"
                   Grid.Column="2">
-        <TextBox Height="40"
+        <TextBox Margin="0 0 0 -3"
+                 Height="40"
                  Text="{Binding AmountString}"
                  FontSize="22"
                  FontFamily="{DynamicResource DefaultLightFontFamily}"
@@ -93,14 +92,16 @@
                  VerticalContentAlignment="Bottom"
                  HorizontalAlignment="Stretch"
                  HorizontalContentAlignment="Right"/>
-        <TextBlock Text="{Binding CurrencyViewModel.CurrencyCode}"
+        <TextBlock Margin="0 0 0 2"
+                   Text="{Binding CurrencyViewModel.CurrencyCode}"
                    FontSize="22"
                    FontFamily="{DynamicResource DefaultLightFontFamily}"
                    Foreground="{DynamicResource DefaultForegroundBrush}"
                    VerticalAlignment="Bottom"/>
       </StackPanel>
 
-      <TextBlock Text="{Binding AmountInBaseString}"
+      <TextBlock Margin="0 1 0 0"
+                 Text="{Binding AmountInBaseString}"
                  HorizontalAlignment="Right"
                  FontSize="13"
                  FontFamily="{DynamicResource DefaultLightFontFamily}"

@@ -36,7 +36,7 @@ namespace Atomex.Client.Desktop.ViewModels
             get
             {
 #if DEBUG
-                if (Env.IsInDesignerMode())
+                if (Design.IsDesignMode)
                     return DesignTime.Symbols;
 #endif
                 return _app.SymbolsProvider
@@ -48,7 +48,7 @@ namespace Atomex.Client.Desktop.ViewModels
             get
             {
 #if DEBUG
-                if (Env.IsInDesignerMode())
+                if (Design.IsDesignMode)
                     return DesignTime.Currencies;
 #endif
                 return _app.Account.Currencies;
@@ -777,6 +777,18 @@ namespace Atomex.Client.Desktop.ViewModels
 
         private void DesignerMode()
         {
+            this.WhenAnyValue(vm => vm.DGSelectedIndex)
+                .Select(i => i != -1)
+                .ToPropertyEx(this, vm => vm.DetailsVisible);
+
+            this.WhenAnyValue(vm => vm.DetailsVisible)
+                .Select(dv => dv ? 1 : 2)
+                .ToPropertyEx(this, vm => vm.ColumnSpan);
+
+            this.WhenAnyValue(vm => vm.DetailsVisible)
+                .Select(dv => dv ? Swaps?[DGSelectedIndex]?.Details : null)
+                .ToPropertyEx(this, vm => vm.SwapDetailsViewModel);
+
             var btc = DesignTime.Currencies.Get<BitcoinConfig>("BTC");
             var ltc = DesignTime.Currencies.Get<LitecoinConfig>("LTC");
 
@@ -786,10 +798,10 @@ namespace Atomex.Client.Desktop.ViewModels
                 CurrencyViewModelCreator.CreateViewModel(ltc, subscribeToUpdates: false)
             };
 
-            FromCurrencies        = currencyViewModels;
+            FromCurrencies = currencyViewModels;
             FromCurrencyViewModel = currencyViewModels.First(c => c.Currency.Name == btc.Name);
-            ToCurrencies          = currencyViewModels;
-            ToCurrencyViewModel   = currencyViewModels.First(c => c.Currency.Name == ltc.Name);
+            ToCurrencies = currencyViewModels;
+            ToCurrencyViewModel = currencyViewModels.First(c => c.Currency.Name == ltc.Name);
 
             var swapViewModels = new List<SwapViewModel>()
             {
@@ -819,6 +831,10 @@ namespace Atomex.Client.Desktop.ViewModels
                 CultureInfo.CurrentCulture,
                 Resources.CvInsufficientChainFunds,
                 FromCurrencyViewModel.Currency.FeeCurrencyName);
+
+            IsAmountValid = true;
+            CanConvert = true;
+            DGSelectedIndex = 1;
         }
     }
 }

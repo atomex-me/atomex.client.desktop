@@ -11,6 +11,7 @@ using ReactiveUI.Fody.Helpers;
 
 using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
+using System.Windows.Input;
 
 namespace Atomex.Client.Desktop.ViewModels
 {
@@ -50,6 +51,9 @@ namespace Atomex.Client.Desktop.ViewModels
 
         [Reactive]
         public string AmountInBaseString { get; set; }
+
+        private ICommand _maxCommand;
+        public ICommand MaxCommand => _maxCommand ??= ReactiveCommand.Create(() => { });
 
         public CurrencySelectionViewModel()
         {

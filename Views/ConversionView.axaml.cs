@@ -15,7 +15,7 @@ namespace Atomex.Client.Desktop.Views
         public ConversionView()
         {
             InitializeComponent();
-            
+
             var amountStringTextBox = this.FindControl<TextBox>("AmountString");
 
             amountStringTextBox.GetObservable(TextBox.TextProperty)
@@ -29,9 +29,9 @@ namespace Atomex.Client.Desktop.Views
                             viewModel.AmountString = text;
                     });
                 });
-            
+
             var dgConversions = this.FindControl<DataGrid>("DgConversions");
-            
+
             dgConversions.CellPointerPressed += (sender, args) =>
             {
                 var cellIndex = args.Row.GetIndex();

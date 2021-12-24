@@ -1,11 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
+
+using Avalonia.Media;
+
 using Atomex.Abstract;
 using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
 using Atomex.Common;
 using Atomex.Core;
-using Avalonia.Media;
-using Serilog;
 
 namespace Atomex.Client.Desktop.ViewModels
 {
@@ -36,39 +36,39 @@ namespace Atomex.Client.Desktop.ViewModels
 
             var detailsViewModel = new SwapDetailsViewModel
             {
-                DetailingInfo = Atomex.ViewModels.Helpers.GetSwapDetailingInfo(swap, App.AtomexApp.Account),
-                CompactState = compactState,
-                SwapId = swap.Id.ToString(),
-                Price = swap.Price,
-                TimeStamp = swap.TimeStamp.ToLocalTime(),
+                DetailingInfo         = Atomex.ViewModels.Helpers.GetSwapDetailingInfo(swap, currencies),
+                CompactState          = compactState,
+                SwapId                = swap.Id.ToString(),
+                Price                 = swap.Price,
+                TimeStamp             = swap.TimeStamp.ToLocalTime(),
                 FromCurrencyViewModel = fromCurrencyViewModel,
-                ToCurrencyViewModel = toCurrencyViewModel,
-                FromAmount = fromAmount,
-                ToAmount = toAmount,
-                OnClose = onCloseSwap
+                ToCurrencyViewModel   = toCurrencyViewModel,
+                FromAmount            = fromAmount,
+                ToAmount              = toAmount,
+                OnClose               = onCloseSwap
             };
 
             return new SwapViewModel
             {
-                Id = swap.Id.ToString(),
-                CompactState = compactState,
-                Mode = ModeBySwap(swap),
-                Time = swap.TimeStamp,
+                Id               = swap.Id.ToString(),
+                CompactState     = compactState,
+                Mode             = ModeBySwap(swap),
+                Time             = swap.TimeStamp,
 
-                FromBrush = new SolidColorBrush(fromCurrencyViewModel.AmountColor),
-                FromAmount = fromAmount,
+                FromBrush        = new SolidColorBrush(fromCurrencyViewModel.AmountColor),
+                FromAmount       = fromAmount,
                 FromAmountFormat = fromCurrencyViewModel.CurrencyFormat,
                 FromCurrencyCode = fromCurrencyViewModel.CurrencyCode,
 
-                ToBrush = new SolidColorBrush(toCurrencyViewModel.AmountColor),
-                ToAmount = toAmount,
-                ToAmountFormat = toCurrencyViewModel.CurrencyFormat,
-                ToCurrencyCode = toCurrencyViewModel.CurrencyCode,
+                ToBrush          = new SolidColorBrush(toCurrencyViewModel.AmountColor),
+                ToAmount         = toAmount,
+                ToAmountFormat   = toCurrencyViewModel.CurrencyFormat,
+                ToCurrencyCode   = toCurrencyViewModel.CurrencyCode,
 
-                Price = swap.Price,
-                PriceFormat = $"F{quoteCurrency.Digits}",
-                
-                Details = detailsViewModel
+                Price            = swap.Price,
+                PriceFormat      = $"F{quoteCurrency.Digits}",
+
+                Details          = detailsViewModel
             };
         }
 
