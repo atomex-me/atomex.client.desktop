@@ -294,13 +294,13 @@ namespace Atomex.Client.Desktop.ViewModels
                 .Select(i => i != -1)
                 .ToPropertyEx(this, vm => vm.DetailsVisible);
 
+            this.WhenAnyValue(vm => vm.DGSelectedIndex)
+                .Select(i => i != -1 ? Swaps?[i]?.Details : null)
+                .ToPropertyEx(this, vm => vm.SwapDetailsViewModel);
+
             this.WhenAnyValue(vm => vm.DetailsVisible)
                 .Select(dv => dv ? 1 : 2)
                 .ToPropertyEx(this, vm => vm.ColumnSpan);
-
-            this.WhenAnyValue(vm => vm.DetailsVisible)
-                .Select(dv => dv ? Swaps?[DGSelectedIndex]?.Details : null)
-                .ToPropertyEx(this, vm => vm.SwapDetailsViewModel);
 
             SubscribeToServices();
         }
@@ -600,7 +600,10 @@ namespace Atomex.Client.Desktop.ViewModels
                         .Select(s => SwapViewModelFactory.CreateSwapViewModel(
                             swap: s,
                             currencies: Currencies,
-                            onCloseSwap: () => { DGSelectedIndex = -1; }))
+                            onCloseSwap: () => {
+                                DGSelectedIndex = -1;
+                            }))
+                        .Where(s => s != null)
                         .ToList()
                         .SortList((s1, s2) =>
                             s2.Time.ToUniversalTime().CompareTo(s1.Time.ToUniversalTime()));
@@ -834,7 +837,7 @@ namespace Atomex.Client.Desktop.ViewModels
 
             IsAmountValid = true;
             CanConvert = true;
-            DGSelectedIndex = 1;
+            DGSelectedIndex = 0; // -1;
         }
     }
 }

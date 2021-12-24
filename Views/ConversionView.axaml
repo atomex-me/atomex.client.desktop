@@ -42,11 +42,14 @@
             <ColumnDefinition Width="*" />
             <ColumnDefinition Width="360" />
         </Grid.ColumnDefinitions>
-
+      
         <StackPanel Orientation="Vertical"
                     Grid.ColumnSpan="{Binding ColumnSpan}"
                     Grid.Column="0"
                     Grid.Row="0">
+
+          <!--<views:CurrencySelectionView Grid.Row="0" Grid.Column="0" />-->
+
             <Grid HorizontalAlignment="Stretch"
                   Margin="0 15 0 0">
                 <Grid.ColumnDefinitions>
@@ -714,7 +717,6 @@
                   Grid.ColumnSpan="{Binding ColumnSpan}"
                   Grid.Column="0"
                   Grid.Row="1">
-
             <DataGrid.Columns>
                 <DataGridTemplateColumn Header="DESCRIPTION" CanUserSort="False" Width="*">
                     <DataGridTemplateColumn.CellTemplate>
@@ -779,11 +781,11 @@
             </DataGrid.Columns>
         </DataGrid>
       
-        <ContentControl
+        <views:SwapDetailsView
             Grid.Row="0"
             Grid.Column="1"
             Grid.RowSpan="2"
-            IsVisible="{Binding DetailsVisible}"
-            Content="{Binding SwapDetailsViewModel}" />
+            IsVisible="{Binding $parent.DataContext.DetailsVisible}"
+            DataContext="{Binding SwapDetailsViewModel}"/>
     </Grid>
 </UserControl>
