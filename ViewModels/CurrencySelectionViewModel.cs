@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Windows.Input;
 using System.Globalization;
 using System.Linq;
 using System.Text;
@@ -11,7 +12,6 @@ using ReactiveUI.Fody.Helpers;
 
 using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
-using System.Windows.Input;
 
 namespace Atomex.Client.Desktop.ViewModels
 {
@@ -55,6 +55,12 @@ namespace Atomex.Client.Desktop.ViewModels
         private ICommand _maxCommand;
         public ICommand MaxCommand => _maxCommand ??= ReactiveCommand.Create(() => { });
 
+        [Reactive]
+        public bool Selected { get; set; }
+
+        [Reactive]
+        public string UnselectedLabel { get; set; }
+
         public CurrencySelectionViewModel()
         {
             if (Design.IsDesignMode)
@@ -64,6 +70,9 @@ namespace Atomex.Client.Desktop.ViewModels
         private void DesignerMode()
         {
             var btc = DesignTime.Currencies.Get<BitcoinConfig>("BTC");
+
+            Selected           = false;
+            UnselectedLabel    = "Choose From";
 
             CurrencyViewModel  = CurrencyViewModelCreator.CreateViewModel(btc, subscribeToUpdates: false);
             Address            = "mkns...vg1h";

@@ -67,6 +67,12 @@ namespace Atomex.Client.Desktop.ViewModels
         public string RedeemFromAddress { get; set; }
 
         [Reactive]
+        public CurrencySelectionViewModel FromViewModel { get; set; }
+
+        [Reactive]
+        public CurrencySelectionViewModel ToViewModel { get; set; }
+
+        [Reactive]
         public List<CurrencyViewModel>? FromCurrencies { get; set; }
 
         [Reactive]
@@ -794,6 +800,26 @@ namespace Atomex.Client.Desktop.ViewModels
 
             var btc = DesignTime.Currencies.Get<BitcoinConfig>("BTC");
             var ltc = DesignTime.Currencies.Get<LitecoinConfig>("LTC");
+
+            FromViewModel = new CurrencySelectionViewModel
+            {
+                CurrencyViewModel  = CurrencyViewModelCreator.CreateViewModel(btc, subscribeToUpdates: false),
+                Address            = "bc1q...f3hr",
+                AmountString       = "0.00007881",
+                UnselectedLabel    = "Choose From",
+                AmountInBaseString = "$12.32",
+                Selected           = true
+            };
+
+            ToViewModel = new CurrencySelectionViewModel
+            {
+                CurrencyViewModel  = CurrencyViewModelCreator.CreateViewModel(ltc, subscribeToUpdates: false),
+                Address            = "ltc1...med6",
+                AmountString       = "558.55271303",
+                UnselectedLabel    = "Choose To",
+                AmountInBaseString = "$123.32",
+                Selected           = true
+            };
 
             var currencyViewModels = new List<CurrencyViewModel>
             {
