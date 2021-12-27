@@ -10,6 +10,7 @@
              xmlns:controls="clr-namespace:Atomex.Client.Desktop.Controls"
              xmlns:converters="clr-namespace:Atomex.Client.Desktop.Converters"
              xmlns:styles="clr-namespace:Atomex.Client.Desktop.Styles"
+             xmlns:svg="clr-namespace:Avalonia.Svg.Skia;assembly=Avalonia.Svg.Skia"
              xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
              xmlns:ia="clr-namespace:Avalonia.Xaml.Interactions.Core;assembly=Avalonia.Xaml.Interactions">
 
@@ -54,16 +55,83 @@
                      FontFamily="{DynamicResource DefaultLightFontFamily}"
                      HorizontalAlignment="Center"
                      Foreground="{DynamicResource DefaultForegroundBrush}"/>
-          
+
+          <!-- From currency view -->
           <views:CurrencySelectionView Width="486"
                                        Height="102"
                                        DataContext="{Binding FromViewModel}"/>
+
+          <!-- Warning and swap currencies button view -->
+          <Grid Width="486">
+            <StackPanel Orientation="Horizontal"
+                        Margin="0 12 0 24"
+                        HorizontalAlignment="Left"
+                        IsVisible="True">
+              <TextBlock Text="Error line Error line Error line h h Error line Error line Error line Error line Error line Error line Error line Error line Error line"
+                         MaxWidth="471"
+                         TextWrapping="Wrap"
+                         Foreground="Orange"
+                         FontSize="13"
+                         FontFamily="{DynamicResource DefaultLightFontFamily}"/>
+              <Button Padding="3"
+                      VerticalAlignment="Center"
+                      VerticalContentAlignment="Center"
+                      Classes="ButtonWithIcon">
+                  <svg:Svg HorizontalAlignment="Center"
+                           VerticalAlignment="Center"
+                           Width="12"
+                           Height="12"
+                           Path="/Resources/Icons/question.svg"/>
+              </Button>
+            </StackPanel>
+            <Button HorizontalAlignment="Right"
+                    HorizontalContentAlignment="Center"
+                    Padding="0"
+                    Width="30"
+                    Height="30"
+                    Margin="0 -9 -45 -9"
+                    Classes="ButtonWithIcon">
+              <StackPanel Orientation="Horizontal">
+                <svg:Svg HorizontalAlignment="Center"
+                         VerticalAlignment="Center"
+                         Width="24"
+                         Height="24"
+                         Path="/Resources/Icons/swap-arrows.svg">
+                  <svg:Svg.RenderTransform>
+                    <RotateTransform Angle="90"/>
+                  </svg:Svg.RenderTransform>
+                </svg:Svg>
+              </StackPanel>
+            </Button>
+          </Grid>
           
+          <!-- To currency view -->
           <views:CurrencySelectionView Margin="0 0 0 0"
                                        Width="486"
                                        Height="102"
                                        DataContext="{Binding ToViewModel}"/>
 
+          <!-- Change redeem adderss, price, available volume, fees and warning view -->
+          <Grid Width="486"
+                ColumnDefinitions="Auto,Auto"
+                Margin="0 12 0 16"
+                IsVisible="True">
+            <StackPanel Orientation="Vertical"
+                        Grid.Column="0">
+              <Button Margin="0 0 0 16"
+                      Content="Change redeem address"
+                      VerticalAlignment="Bottom"
+                      Classes="LinkButton Max"/>
+              <Line Stroke="AliceBlue"
+                    Width="150"
+                    Height="1"
+                    StartPoint="0 0"
+                    EndPoint="150 0"
+                    StrokeThickness="1"
+                    StrokeDashArray="2,2"/>
+            </StackPanel>
+          </Grid>
+          
           <controls:RoundedButton Width="486"
                                   Height="52"
                                   CornerRadius="6"
@@ -719,7 +787,6 @@
                            VerticalAlignment="Bottom"
                            IsVisible="{Binding IsCriticalWarning}" />
             </StackPanel>-->
-
 
         </StackPanel>
 

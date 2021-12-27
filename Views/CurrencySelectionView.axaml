@@ -6,20 +6,26 @@
              d:DesignWidth="486"
              d:DesignHeight="102"
              xmlns:vm="clr-namespace:Atomex.Client.Desktop.ViewModels"
-             x:Class="Atomex.Client.Desktop.Views.CurrencySelectionView">
+             xmlns:views="clr-namespace:Atomex.Client.Desktop.Views"
+             x:Class="Atomex.Client.Desktop.Views.CurrencySelectionView"
+             Classes="designer">
 
   <Design.DataContext>
     <vm:CurrencySelectionViewModel/>
   </Design.DataContext>
-  
+
+  <Design.DesignStyle>
+    <Style Selector="Border.designer">
+      <Setter Property="Background" Value="#10243f"/>
+    </Style>
+  </Design.DesignStyle>
+
   <UserControl.Resources>
-    <Color x:Key="CurrencySelectionViewBorderBackgroundColor">Transparent</Color>
+    <Color x:Key="CurrencySelectionViewBackgroundColor">Transparent</Color>
     <SolidColorBrush x:Key="CurrencySelectionViewBorderBrush"
                      Color="{DynamicResource LightDefaultOpacity20}"/>
-    <SolidColorBrush x:Key="CurrencySelectionViewBorderBackgroundBrush"
-                     Color="{DynamicResource CurrencySelectionViewBorderBackgroundColor}"/>
-    <SolidColorBrush x:Key="CurrencySelectionViewBorderBackgroundDebugBrush"
-                     Color="#10243f"/>
+    <SolidColorBrush x:Key="CurrencySelectionViewBackgroundBrush"
+                     Color="{DynamicResource CurrencySelectionViewBackgroundColor}"/>
     <SolidColorBrush x:Key="LightDefaultOpacity50Brush"
                      Color="{DynamicResource LightDefaultOpacity50}"/>
     <SolidColorBrush x:Key="LightDefaultOpacity4Brush"
@@ -27,14 +33,14 @@
     <SolidColorBrush x:Key="LightDefaultOpacity20Brush"
                      Color="{DynamicResource LightDefaultOpacity20}"/>
   </UserControl.Resources>
-  
-  <Border BorderThickness="1"
-          CornerRadius="4"
-          Background="Transparent"
-          BorderBrush="{DynamicResource LightDefaultOpacity20}">
-    <Grid ColumnDefinitions="20,Auto,*,24"
-          RowDefinitions="20,40,*,18">
 
+  <Border BorderThickness="1"
+          CornerRadius="4"      
+          BorderBrush="{DynamicResource LightDefaultOpacity20}"
+          Classes="designer">
+    <Grid ColumnDefinitions="20,Auto,*,24"
+          RowDefinitions="20,40,*,18"
+          Background="{DynamicResource CurrencySelectionViewBackgroundBrush}">
       <Button CornerRadius="8"
               VerticalAlignment="Stretch"
               HorizontalAlignment="Stretch"

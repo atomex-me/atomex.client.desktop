@@ -71,7 +71,7 @@ namespace Atomex.Client.Desktop.ViewModels
         {
             var btc = DesignTime.Currencies.Get<BitcoinConfig>("BTC");
 
-            Selected           = false;
+            Selected           = true;
             UnselectedLabel    = "Choose From";
 
             CurrencyViewModel  = CurrencyViewModelCreator.CreateViewModel(btc, subscribeToUpdates: false);

@@ -1,6 +1,7 @@
 <Styles xmlns='https://github.com/avaloniaui'
         xmlns:x='http://schemas.microsoft.com/winfx/2006/xaml'
-        xmlns:svg="clr-namespace:Avalonia.Svg.Skia;assembly=Avalonia.Svg.Skia">
+        xmlns:svg="clr-namespace:Avalonia.Svg.Skia;assembly=Avalonia.Svg.Skia"     
+        xmlns:converters="clr-namespace:Atomex.Client.Desktop.Converters">
 
     <Style Selector="Button.LinkButton">
         <Setter Property="FontFamily" Value="{DynamicResource DefaultFontFamily}" />
@@ -27,26 +28,38 @@
         <Setter Property="Padding" Value="0" />
         <Setter Property="BorderThickness" Value="0" />
 
+        <Style.Resources>
+          <converters:WidthToPointConverter x:Key="WidthToPointConverter"/>
+        </Style.Resources>
+
         <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="Button">
-                    <StackPanel>
-                        <TextBlock Text="{TemplateBinding Content}"
-                                   FontSize="{TemplateBinding FontSize}"
-                                   Foreground="{TemplateBinding Foreground}"
-                                   FontFamily="{TemplateBinding FontFamily}"
-                                   FontWeight="{TemplateBinding FontWeight}"
-                                   HorizontalAlignment="Center"
-                                   Padding="0"
-                                   Margin="0 0 0 2"
-                                   LineHeight="16" />
-                        <svg:Svg HorizontalAlignment="Center"
+          <Setter.Value>
+            <ControlTemplate TargetType="Button">
+              <StackPanel>
+                <TextBlock Text="{TemplateBinding Content}"
+                           FontSize="{TemplateBinding FontSize}"
+                           Foreground="{TemplateBinding Foreground}"
+                           FontFamily="{TemplateBinding FontFamily}"
+                           FontWeight="{TemplateBinding FontWeight}"
+                           HorizontalAlignment="Center"
+                           Padding="0"
+                           Margin="0 0 0 2"
+                           LineHeight="16" />
+                <!--<Line Height="1"
+                      Width="{Binding $parent.Width}"
+                      StartPoint="0,0"
+                      EndPoint="{Binding $parent.Width, Converter={StaticResource WidthToPointConverter}}"
+                      StrokeThickness="1"
+                      StrokeDashArray="2,2"
+                      Stroke="{DynamicResource LightDefaultOpacity20}">
+                </Line>-->
+                <svg:Svg HorizontalAlignment="Center"
                                  Width="30"
                                  Height="1"
                                  Path="/Resources/Icons/max-dashed.svg" />
-                    </StackPanel>
-                </ControlTemplate>
-            </Setter.Value>
+              </StackPanel>
+            </ControlTemplate>
+          </Setter.Value>
         </Setter>
     </Style>
 
