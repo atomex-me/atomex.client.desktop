@@ -16,20 +16,6 @@ namespace Atomex.Client.Desktop.Views
         {
             InitializeComponent();
 
-            //var amountStringTextBox = this.FindControl<TextBox>("AmountString");
-
-            //amountStringTextBox.GetObservable(TextBox.TextProperty)
-            //    .Throttle(TimeSpan.FromMilliseconds(1))
-            //    .Where(text => text != null)
-            //    .Subscribe(text =>
-            //    {
-            //        Dispatcher.UIThread.InvokeAsync(() =>
-            //        {
-            //            if (DataContext is ConversionViewModel viewModel)
-            //                viewModel.AmountString = text;
-            //        });
-            //    });
-
             var dgConversions = this.FindControl<DataGrid>("DgConversions");
 
             dgConversions.CellPointerPressed += (sender, args) =>

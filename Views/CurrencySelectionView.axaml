@@ -18,7 +18,7 @@
     <Style Selector="Border.designer">
       <Setter Property="Background" Value="#10243f"/>
     </Style>
-  </Design.DesignStyle>
+  </Design.DesignStyle>       
 
   <UserControl.Resources>
     <SolidColorBrush x:Key="CurrencySelectionViewBorderBrush"
@@ -83,7 +83,7 @@
                 Command="{Binding MaxCommand}"
                 Content="max"
                 VerticalAlignment="Bottom"
-                Classes="LinkButton Max"
+                Classes="LinkButton Underlined"
                 ToolTip.Placement="AnchorAndGravity"
                 ToolTip.VerticalOffset="-30">
           <ToolTip.Tip>

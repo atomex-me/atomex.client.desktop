@@ -66,12 +66,11 @@ namespace Atomex.Client.Desktop.ViewModels
 
         private void DesignerMode()
         {
-            var btc = DesignTime.Currencies.Get<BitcoinConfig>("BTC");
-
             Selected           = true;
             UnselectedLabel    = "Choose From";
-
-            CurrencyViewModel  = CurrencyViewModelCreator.CreateViewModel(btc, subscribeToUpdates: false);
+            CurrencyViewModel  = CurrencyViewModelCreator.CreateViewModel(
+                currencyConfig: DesignTime.Currencies.Get<BitcoinConfig>("BTC"),
+                subscribeToUpdates: false);
             Address            = "13V2gzjUL9DiHZLy1WFk9q6pZ3yBsb4TzP".TruncateAddress();
             AmountString       = "12.000516666";
             AmountInBaseString = "$3451.43";

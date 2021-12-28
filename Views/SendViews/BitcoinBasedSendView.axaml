@@ -124,11 +124,10 @@
                         </helpers:AmountTextBoxHelper.AmountInBase>
                     </TextBox>
 
-                    <Button Classes="LinkButton Max"
+                    <Button Classes="LinkButton Underlined"
                             Margin="-67 0 0 0"
-                            Command="{Binding MaxCommand}">
-                        max
-                    </Button>
+                            Command="{Binding MaxCommand}"
+                            Content="max"/>
                 </StackPanel>
 
                 <!-- Classes="AnimationCollapsed" -->

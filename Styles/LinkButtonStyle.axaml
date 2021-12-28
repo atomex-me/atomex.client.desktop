@@ -21,7 +21,7 @@
         <Setter Property="Foreground" Value="{DynamicResource DefaultLinkButtonMouseOverBrush}" />
     </Style>
 
-    <Style Selector="Button.LinkButton.Max">
+    <Style Selector="Button.LinkButton.Underlined">
         <Setter Property="FontSize" Value="13" />
         <Setter Property="FontFamily" Value="{DynamicResource DefaultFontFamily}" />
         <Setter Property="Foreground" Value="{DynamicResource DefaultForegroundBrush}" />
@@ -30,13 +30,15 @@
 
         <Style.Resources>
           <converters:WidthToPointConverter x:Key="WidthToPointConverter"/>
+          <SolidColorBrush x:Key="LineStrokeBrush" Color="{DynamicResource LightDefaultOpacity20}"/>
         </Style.Resources>
 
         <Setter Property="Template">
           <Setter.Value>
             <ControlTemplate TargetType="Button">
               <StackPanel>
-                <TextBlock Text="{TemplateBinding Content}"
+                <TextBlock Name="TextBlock"
+                           Text="{TemplateBinding Content}"
                            FontSize="{TemplateBinding FontSize}"
                            Foreground="{TemplateBinding Foreground}"
                            FontFamily="{TemplateBinding FontFamily}"
@@ -46,12 +48,12 @@
                            Margin="0 0 0 2"
                            LineHeight="16" />
                 <Line Height="1"
-                      Width="{Binding $parent[StackPanel].Bounds.Width}"
+                      Width="{Binding #TextBlock.Bounds.Width}"
                       StartPoint="0,0"
-                      EndPoint="{Binding $parent[StackPanel].Bounds.Width, Converter={StaticResource WidthToPointConverter}}"
+                      EndPoint="{Binding #TextBlock.Bounds.Width, Converter={StaticResource WidthToPointConverter}}"
                       StrokeThickness="1"
                       StrokeDashArray="2,2"
-                      Stroke="{DynamicResource LightDefaultOpacity20}">
+                      Stroke="{DynamicResource LineStrokeBrush}">
                 </Line>
               </StackPanel>
             </ControlTemplate>
@@ -59,11 +61,11 @@
         </Setter>
     </Style>
 
-    <Style Selector="Button.LinkButton.Max:disabled">
+    <Style Selector="Button.LinkButton.Underlined:disabled">
         <Setter Property="Foreground" Value="{DynamicResource DisabledForegroundBrush}" />
     </Style>
 
-    <Style Selector="Button.LinkButton.Max:disabled /template/ Svg">
+    <Style Selector="Button.LinkButton.Underlined:disabled /template/ Svg">
         <Setter Property="IsVisible" Value="False" />
     </Style>
 </Styles>

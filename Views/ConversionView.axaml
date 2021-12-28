@@ -121,7 +121,7 @@
               <Button Margin="0 0 0 16"
                       Content="Change redeem address"
                       VerticalAlignment="Bottom"
-                      Classes="LinkButton Max"/>
+                      Classes="LinkButton Underlined"/>
               <StackPanel Orientation="Horizontal">
                 <TextBlock Text="Estimated Price 1"
                            Foreground="{DynamicResource SecondaryForegroundBrush}"
