@@ -14,7 +14,7 @@ namespace Atomex.Client.Desktop.ViewModels
     public class CurrencySelectionViewModel : ViewModelBase
     {
         public event EventHandler MaxClicked;
-        public event EventHandler ChooseCurrencyClicked;
+        public event EventHandler SelectCurrencyClicked;
 
         [Reactive] public CurrencyViewModel? CurrencyViewModel { get; set; }
 
@@ -51,8 +51,8 @@ namespace Atomex.Client.Desktop.ViewModels
         private ICommand _maxCommand;
         public ICommand MaxCommand => _maxCommand ??= ReactiveCommand.Create(() => MaxClicked?.Invoke(this, EventArgs.Empty));
 
-        private ICommand _chooseCurrencyCommand;
-        public ICommand ChooseCurrencyCommand => _chooseCurrencyCommand ??= ReactiveCommand.Create(() => ChooseCurrencyClicked?.Invoke(this, EventArgs.Empty));
+        private ICommand _selectCurrencyCommand;
+        public ICommand SelectCurrencyCommand => _selectCurrencyCommand ??= ReactiveCommand.Create(() => SelectCurrencyClicked?.Invoke(this, EventArgs.Empty));
 
         [Reactive] public bool Selected { get; set; }
 

@@ -25,12 +25,28 @@
                      Color="{DynamicResource LightDefaultOpacity20}"/>
     <SolidColorBrush x:Key="CurrencySelectionViewBackgroundBrush"
                      Color="Transparent"/>
-    <SolidColorBrush x:Key="ChooseCurrencyButtonBackgroundBrush"
+    <SolidColorBrush x:Key="SelectCurrencyButtonBackgroundBrush"
                      Color="{DynamicResource LightDefaultOpacity4}"/>
+    <SolidColorBrush x:Key="SelectCurrencyButtonHoverBrush"
+                     Color="{DynamicResource LightDefaultOpacity6}"/>
+    <SolidColorBrush x:Key="SelectCurrencyButtonPressedBrush"
+                     Color="{DynamicResource LightDefaultOpacity10}"/>
     <SolidColorBrush x:Key="WatermarkForegroundBrush"
                      Color="{DynamicResource LightDefaultOpacity20}"/>
   </UserControl.Resources>
 
+  <UserControl.Styles>
+    <Style Selector="Button.Default /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="{DynamicResource SelectCurrencyButtonBackgroundBrush}"/>
+    </Style>
+    <Style Selector="Button.Default:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="{DynamicResource SelectCurrencyButtonHoverBrush}"/>
+    </Style>
+    <Style Selector="Button.Default:pressed /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="{DynamicResource SelectCurrencyButtonPressedBrush}"/>
+    </Style>
+  </UserControl.Styles>
+  
   <Border BorderThickness="1"
           CornerRadius="4"      
           BorderBrush="{DynamicResource CurrencySelectionViewBorderBrush}"
@@ -44,11 +60,12 @@
               VerticalContentAlignment="Center"
               HorizontalContentAlignment="Center"
               Padding="0"
-              Background="{DynamicResource ChooseCurrencyButtonBackgroundBrush}"
+              Background="{DynamicResource SelectCurrencyButtonBackgroundBrush}"
               Grid.Row="1"
               Grid.Column="1"
               IsVisible="{Binding Selected}"
-              Command="{Binding ChooseCurrencyCommand}">
+              Command="{Binding SelectCurrencyCommand}"
+              Classes="Default">
         <Button.Content>
           <StackPanel Orientation="Horizontal"
                       VerticalAlignment="Center"
@@ -135,12 +152,13 @@
               HorizontalContentAlignment="Center"
               Padding="15 0 15 0"
               Margin="0 -1 0 0"
-              Background="{DynamicResource ChooseCurrencyButtonBackgroundBrush}"
+              Background="{DynamicResource SelectCurrencyButtonBackgroundBrush}"
               Grid.Row="1"
               Grid.RowSpan="2"
               Grid.Column="1"
               IsVisible="{Binding !Selected}"
-              Command="{Binding ChooseCurrencyCommand}">
+              Command="{Binding SelectCurrencyCommand}"
+              Classes="Default">
         <Button.Content>
             <TextBlock Text="{Binding UnselectedLabel}"
                        FontSize="18"

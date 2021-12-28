@@ -27,6 +27,13 @@ using Atomex.Wallet.Abstract;
 
 namespace Atomex.Client.Desktop.ViewModels
 {
+    public enum MessageType
+    {
+        Regular,
+        Warning,
+        Error
+    }
+
     public class ConversionViewModel : ViewModelBase
     {
         private readonly IAtomexApp _app;
@@ -56,31 +63,25 @@ namespace Atomex.Client.Desktop.ViewModels
         }
 
         private IFromSource FromSource { get; set; }
+        [Reactive] public decimal FromBalance { get; set; }
+        [Reactive] public string ToAddress { get; set; }
+        [Reactive] public string RedeemFromAddress { get; set; }
 
-        [Reactive]
-        public decimal FromBalance { get; set; }
+        [Reactive] public CurrencySelectionViewModel FromViewModel { get; set; }
+        [Reactive] public CurrencySelectionViewModel ToViewModel { get; set; }
 
-        [Reactive]
-        public string ToAddress { get; set; }
+        [Reactive] public string FromValidationMessage { get; set; }
+        [Reactive] public string FromValidationMessageToolTip { get; set; }
+        [Reactive] public MessageType FromValidationMessageType { get; set; }
 
-        [Reactive]
-        public string RedeemFromAddress { get; set; }
-
-        [Reactive]
-        public CurrencySelectionViewModel FromViewModel { get; set; }
-
-        [Reactive]
-        public CurrencySelectionViewModel ToViewModel { get; set; }
 
         [Reactive]
         public List<CurrencyViewModel>? FromCurrencies { get; set; }
-
         [Reactive]
         public List<CurrencyViewModel>? ToCurrencies { get; set; }
 
         [Reactive]
         public CurrencyViewModel? FromCurrencyViewModel { get; set; }
-
         [Reactive]
         public CurrencyViewModel? ToCurrencyViewModel { get; set; }
 
@@ -820,6 +821,11 @@ namespace Atomex.Client.Desktop.ViewModels
                 AmountInBaseString = "$123.32",
                 Selected           = true
             };
+
+            FromValidationMessage = "Error line Error line Error line Error line Error line Error line " +
+                "Error line Error line Error line Error line Error line Error line Error line";
+            FromValidationMessageToolTip = "Unknown super mega error description";
+            FromValidationMessageType = MessageType.Error;
 
             var currencyViewModels = new List<CurrencyViewModel>
             {
