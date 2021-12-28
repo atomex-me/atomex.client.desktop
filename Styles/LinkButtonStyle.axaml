@@ -45,18 +45,14 @@
                            Padding="0"
                            Margin="0 0 0 2"
                            LineHeight="16" />
-                <!--<Line Height="1"
-                      Width="{Binding $parent.Width}"
+                <Line Height="1"
+                      Width="{Binding $parent[StackPanel].Bounds.Width}"
                       StartPoint="0,0"
-                      EndPoint="{Binding $parent.Width, Converter={StaticResource WidthToPointConverter}}"
+                      EndPoint="{Binding $parent[StackPanel].Bounds.Width, Converter={StaticResource WidthToPointConverter}}"
                       StrokeThickness="1"
                       StrokeDashArray="2,2"
                       Stroke="{DynamicResource LightDefaultOpacity20}">
-                </Line>-->
-                <svg:Svg HorizontalAlignment="Center"
-                                 Width="30"
-                                 Height="1"
-                                 Path="/Resources/Icons/max-dashed.svg" />
+                </Line>
               </StackPanel>
             </ControlTemplate>
           </Setter.Value>

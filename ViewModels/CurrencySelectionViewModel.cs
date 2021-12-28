@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Windows.Input;
 using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 using Avalonia.Controls;
 using ReactiveUI;
@@ -17,11 +13,12 @@ namespace Atomex.Client.Desktop.ViewModels
 {
     public class CurrencySelectionViewModel : ViewModelBase
     {
-        [Reactive]
-        public CurrencyViewModel? CurrencyViewModel { get; set; }
+        public event EventHandler MaxClicked;
+        public event EventHandler ChooseCurrencyClicked;
 
-        [Reactive]
-        public string Address { get; set; }
+        [Reactive] public CurrencyViewModel? CurrencyViewModel { get; set; }
+
+        [Reactive] public string Address { get; set; }
 
         private decimal _amount;
         public string AmountString
@@ -49,17 +46,17 @@ namespace Atomex.Client.Desktop.ViewModels
             }
         }
 
-        [Reactive]
-        public string AmountInBaseString { get; set; }
+        [Reactive] public string AmountInBaseString { get; set; }
 
         private ICommand _maxCommand;
-        public ICommand MaxCommand => _maxCommand ??= ReactiveCommand.Create(() => { });
+        public ICommand MaxCommand => _maxCommand ??= ReactiveCommand.Create(() => MaxClicked?.Invoke(this, EventArgs.Empty));
 
-        [Reactive]
-        public bool Selected { get; set; }
+        private ICommand _chooseCurrencyCommand;
+        public ICommand ChooseCurrencyCommand => _chooseCurrencyCommand ??= ReactiveCommand.Create(() => ChooseCurrencyClicked?.Invoke(this, EventArgs.Empty));
 
-        [Reactive]
-        public string UnselectedLabel { get; set; }
+        [Reactive] public bool Selected { get; set; }
+
+        [Reactive] public string UnselectedLabel { get; set; }
 
         public CurrencySelectionViewModel()
         {
@@ -75,9 +72,9 @@ namespace Atomex.Client.Desktop.ViewModels
             UnselectedLabel    = "Choose From";
 
             CurrencyViewModel  = CurrencyViewModelCreator.CreateViewModel(btc, subscribeToUpdates: false);
-            Address            = "mkns...vg1h";
+            Address            = "13V2gzjUL9DiHZLy1WFk9q6pZ3yBsb4TzP".TruncateAddress();
             AmountString       = "12.000516666";
-            AmountInBaseString = "3451.43 $";
+            AmountInBaseString = "$3451.43";
         }
     }
 }

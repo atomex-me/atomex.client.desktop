@@ -2,113 +2,129 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:helpers="clr-namespace:Atomex.Client.Desktop.Helpers">
 
-    <Style Selector="TextBox.AmountTextBox">
-        <Setter Property="helpers:AmountTextBoxHelper.CurrencyCodeFontSize" Value="16" />
-        <Setter Property="FontSize" Value="16" />
-        <Setter Property="helpers:AmountTextBoxHelper.BaseCurrencyCodeFontSize" Value="10" />
-        <Setter Property="helpers:AmountTextBoxHelper.AmountInBaseMargin" Value="0" />
-        <Setter Property="helpers:AmountTextBoxHelper.AmountInBaseFontSize" Value="13" />
-        <Setter Property="CaretBrush" Value="{DynamicResource AmountTextBoxCaretBrush}" />
-    </Style>
-    <Style Selector="TextBox.AmountTextBox">
-        <Setter Property="Template">
-            <ControlTemplate>
-                <Border Name="border"
-                        Background="{TemplateBinding Background}"
-                        BorderBrush="{TemplateBinding BorderBrush}"
-                        BorderThickness="{TemplateBinding BorderThickness}">
-                    <DockPanel Margin="{TemplateBinding Padding}"
-                               HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                               VerticalAlignment="{TemplateBinding VerticalContentAlignment}">
+  <Style Selector="TextBox.AmountTextBox">
+      <Setter Property="helpers:AmountTextBoxHelper.CurrencyCodeFontSize" Value="16" />
+      <Setter Property="FontSize" Value="16" />
+      <Setter Property="helpers:AmountTextBoxHelper.BaseCurrencyCodeFontSize" Value="10" />
+      <Setter Property="helpers:AmountTextBoxHelper.AmountInBaseMargin" Value="0" />
+      <Setter Property="helpers:AmountTextBoxHelper.AmountInBaseFontSize" Value="13" />
+      <Setter Property="CaretBrush" Value="{DynamicResource AmountTextBoxCaretBrush}" />
+  </Style>
+  <Style Selector="TextBox.AmountTextBox">
+      <Setter Property="Template">
+          <ControlTemplate>
+              <Border Name="border"
+                      Background="{TemplateBinding Background}"
+                      BorderBrush="{TemplateBinding BorderBrush}"
+                      BorderThickness="{TemplateBinding BorderThickness}">
+                  <DockPanel Margin="{TemplateBinding Padding}"
+                              HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                              VerticalAlignment="{TemplateBinding VerticalContentAlignment}">
 
-                        <TextBlock Name="floatingWatermark"
-                                   Foreground="{DynamicResource ThemeAccentBrush}"
-                                   FontSize="{DynamicResource FontSizeSmall}"
-                                   Text="{TemplateBinding Watermark}"
-                                   DockPanel.Dock="Top">
-                            <TextBlock.IsVisible>
-                                <MultiBinding Converter="{x:Static BoolConverters.And}">
-                                    <Binding RelativeSource="{RelativeSource TemplatedParent}"
-                                             Path="UseFloatingWatermark" />
-                                    <Binding RelativeSource="{RelativeSource TemplatedParent}"
-                                             Path="Text"
-                                             Converter="{x:Static StringConverters.IsNotNullOrEmpty}" />
-                                </MultiBinding>
-                            </TextBlock.IsVisible>
-                        </TextBlock>
+                      <TextBlock Name="floatingWatermark"
+                                  Foreground="{DynamicResource ThemeAccentBrush}"
+                                  FontSize="{DynamicResource FontSizeSmall}"
+                                  Text="{TemplateBinding Watermark}"
+                                  DockPanel.Dock="Top">
+                          <TextBlock.IsVisible>
+                              <MultiBinding Converter="{x:Static BoolConverters.And}">
+                                  <Binding RelativeSource="{RelativeSource TemplatedParent}"
+                                            Path="UseFloatingWatermark" />
+                                  <Binding RelativeSource="{RelativeSource TemplatedParent}"
+                                            Path="Text"
+                                            Converter="{x:Static StringConverters.IsNotNullOrEmpty}" />
+                              </MultiBinding>
+                          </TextBlock.IsVisible>
+                      </TextBlock>
 
-                        <DataValidationErrors>
+                      <DataValidationErrors>
 
-                            <Grid ColumnDefinitions="Auto,Auto,*,Auto">
-                                <ContentPresenter Grid.Column="0" Grid.ColumnSpan="1"
-                                                  Content="{TemplateBinding InnerLeftContent}" />
-                                <ScrollViewer Grid.Column="1" Grid.ColumnSpan="1"
-                                              HorizontalScrollBarVisibility="{TemplateBinding (ScrollViewer.HorizontalScrollBarVisibility)}"
-                                              VerticalScrollBarVisibility="{TemplateBinding (ScrollViewer.VerticalScrollBarVisibility)}">
-                                    <Panel>
-                                        <TextBlock Name="watermark"
-                                                   Opacity="0.5"
-                                                   Text="{TemplateBinding Watermark}"
-                                                   TextAlignment="{TemplateBinding TextAlignment}"
-                                                   TextWrapping="{TemplateBinding TextWrapping}"
-                                                   IsVisible="{TemplateBinding Text, Converter={x:Static StringConverters.IsNullOrEmpty}}" />
-                                        <TextPresenter Name="PART_TextPresenter"
-                                                       Margin="0 0 1 0"
-                                                       Text="{TemplateBinding Text, Mode=TwoWay}"
-                                                       CaretIndex="{TemplateBinding CaretIndex}"
-                                                       SelectionStart="{TemplateBinding SelectionStart}"
-                                                       SelectionEnd="{TemplateBinding SelectionEnd}"
-                                                       TextAlignment="{TemplateBinding TextAlignment}"
-                                                       TextWrapping="{TemplateBinding TextWrapping}"
-                                                       PasswordChar="{TemplateBinding PasswordChar}"
-                                                       RevealPassword="{TemplateBinding RevealPassword}"
-                                                       SelectionBrush="{TemplateBinding SelectionBrush}"
-                                                       SelectionForegroundBrush="{TemplateBinding SelectionForegroundBrush}"
-                                                       CaretBrush="{TemplateBinding CaretBrush}"
-                                                       VerticalAlignment="Center" />
+                          <Grid ColumnDefinitions="Auto,Auto,*,Auto">
+                              <ContentPresenter Grid.Column="0" Grid.ColumnSpan="1"
+                                                Content="{TemplateBinding InnerLeftContent}" />
+                              <ScrollViewer Grid.Column="1" Grid.ColumnSpan="1"
+                                            HorizontalScrollBarVisibility="{TemplateBinding (ScrollViewer.HorizontalScrollBarVisibility)}"
+                                            VerticalScrollBarVisibility="{TemplateBinding (ScrollViewer.VerticalScrollBarVisibility)}">
+                                  <Panel>
+                                      <TextBlock Name="watermark"
+                                                  Opacity="0.5"
+                                                  Text="{TemplateBinding Watermark}"
+                                                  TextAlignment="{TemplateBinding TextAlignment}"
+                                                  TextWrapping="{TemplateBinding TextWrapping}"
+                                                  IsVisible="{TemplateBinding Text, Converter={x:Static StringConverters.IsNullOrEmpty}}" />
+                                      <TextPresenter Name="PART_TextPresenter"
+                                                      Margin="0 0 1 0"
+                                                      Text="{TemplateBinding Text, Mode=TwoWay}"
+                                                      CaretIndex="{TemplateBinding CaretIndex}"
+                                                      SelectionStart="{TemplateBinding SelectionStart}"
+                                                      SelectionEnd="{TemplateBinding SelectionEnd}"
+                                                      TextAlignment="{TemplateBinding TextAlignment}"
+                                                      TextWrapping="{TemplateBinding TextWrapping}"
+                                                      PasswordChar="{TemplateBinding PasswordChar}"
+                                                      RevealPassword="{TemplateBinding RevealPassword}"
+                                                      SelectionBrush="{TemplateBinding SelectionBrush}"
+                                                      SelectionForegroundBrush="{TemplateBinding SelectionForegroundBrush}"
+                                                      CaretBrush="{TemplateBinding CaretBrush}"
+                                                      VerticalAlignment="Center" />
 
-                                    </Panel>
-                                </ScrollViewer>
-                                <ContentPresenter Grid.Column="2">
-                                    <ContentPresenter.Content>
-                                        <TextBlock x:Name="CurrencyCode"
-                                                   HorizontalAlignment="Left"
-                                                   VerticalAlignment="Center"
-                                                   Margin="3 0 0 2"
-                                                   LineHeight="19"
-                                                   Foreground="{TemplateBinding Foreground}"
-                                                   Text="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type TextBox}}, Path=(helpers:AmountTextBoxHelper.CurrencyCode)}"
-                                                   IsVisible="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type TextBox}}, Path=(helpers:AmountTextBoxHelper.CurrencyCode), Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
-                                                   FontSize="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type TextBox}}, Path=(helpers:AmountTextBoxHelper.CurrencyCodeFontSize)}" />
-                                    </ContentPresenter.Content>
-                                </ContentPresenter>
+                                  </Panel>
+                              </ScrollViewer>
+                              <ContentPresenter Grid.Column="2">
+                                  <ContentPresenter.Content>
+                                      <TextBlock x:Name="CurrencyCode"
+                                                  HorizontalAlignment="Left"
+                                                  VerticalAlignment="Center"
+                                                  Margin="3 0 0 2"
+                                                  LineHeight="19"
+                                                  Foreground="{TemplateBinding Foreground}"
+                                                  Text="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type TextBox}}, Path=(helpers:AmountTextBoxHelper.CurrencyCode)}"
+                                                  IsVisible="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type TextBox}}, Path=(helpers:AmountTextBoxHelper.CurrencyCode), Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                                                  FontSize="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type TextBox}}, Path=(helpers:AmountTextBoxHelper.CurrencyCodeFontSize)}" />
+                                  </ContentPresenter.Content>
+                              </ContentPresenter>
 
-                                <ContentPresenter Grid.Column="3" Grid.ColumnSpan="1">
-                                    <ContentPresenter.Content>
-                                        <StackPanel Orientation="Horizontal"
-                                                    VerticalAlignment="Center"
-                                                    Margin="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type TextBox}}, Path=(helpers:AmountTextBoxHelper.AmountInBaseMargin)}">
-                                            <TextBlock HorizontalAlignment="Right"
-                                                       VerticalAlignment="Center"
-                                                       Foreground="{DynamicResource DefaultAmountInBaseForegroundBrush}"
-                                                       LineHeight="16"
-                                                       Text="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type TextBox}}, Path=(helpers:AmountTextBoxHelper.AmountInBase)}"
-                                                       FontSize="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type TextBox}}, Path=(helpers:AmountTextBoxHelper.AmountInBaseFontSize)}" />
-                                            <TextBlock HorizontalAlignment="Right"
-                                                       VerticalAlignment="Bottom"
-                                                       Margin="3 4 10 2"
-                                                       Foreground="{DynamicResource DefaultAmountInBaseForegroundBrush}"
-                                                       IsVisible="False"
-                                                       Text="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type TextBox}}, Path=(helpers:AmountTextBoxHelper.BaseCurrencyCode)}"
-                                                       FontSize="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type TextBox}}, Path=(helpers:AmountTextBoxHelper.BaseCurrencyCodeFontSize)}" />
-                                        </StackPanel>
-                                    </ContentPresenter.Content>
-                                </ContentPresenter>
-                            </Grid>
-                        </DataValidationErrors>
-                    </DockPanel>
-                </Border>
-            </ControlTemplate>
-        </Setter>
-    </Style>
+                              <ContentPresenter Grid.Column="3" Grid.ColumnSpan="1">
+                                  <ContentPresenter.Content>
+                                      <StackPanel Orientation="Horizontal"
+                                                  VerticalAlignment="Center"
+                                                  Margin="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type TextBox}}, Path=(helpers:AmountTextBoxHelper.AmountInBaseMargin)}">
+                                          <TextBlock HorizontalAlignment="Right"
+                                                      VerticalAlignment="Center"
+                                                      Foreground="{DynamicResource DefaultAmountInBaseForegroundBrush}"
+                                                      LineHeight="16"
+                                                      Text="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type TextBox}}, Path=(helpers:AmountTextBoxHelper.AmountInBase)}"
+                                                      FontSize="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type TextBox}}, Path=(helpers:AmountTextBoxHelper.AmountInBaseFontSize)}" />
+                                          <TextBlock HorizontalAlignment="Right"
+                                                      VerticalAlignment="Bottom"
+                                                      Margin="3 4 10 2"
+                                                      Foreground="{DynamicResource DefaultAmountInBaseForegroundBrush}"
+                                                      IsVisible="False"
+                                                      Text="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type TextBox}}, Path=(helpers:AmountTextBoxHelper.BaseCurrencyCode)}"
+                                                      FontSize="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type TextBox}}, Path=(helpers:AmountTextBoxHelper.BaseCurrencyCodeFontSize)}" />
+                                      </StackPanel>
+                                  </ContentPresenter.Content>
+                              </ContentPresenter>
+                          </Grid>
+                      </DataValidationErrors>
+                  </DockPanel>
+              </Border>
+          </ControlTemplate>
+      </Setter>
+  </Style>
+
+  <Style Selector="TextBox.Amount">
+    <Setter Property="BorderThickness" Value="0"/>
+    <Setter Property="CornerRadius" Value="0"/>
+    <Setter Property="CaretBrush" Value="{DynamicResource DefaultForegroundBrush}"/>
+    <Setter Property="Foreground" Value="{DynamicResource DefaultForegroundBrush}"/>
+    <Setter Property="Background" Value="Transparent"/>
+    <Setter Property="FontSize" Value="22"/>
+    <Setter Property="FontFamily" Value="{DynamicResource DefaultLightFontFamily}"/>
+  </Style>
+
+  <Style Selector="TextBox.Amount:focus /template/ Border">
+    <Setter Property="BorderThickness" Value="0"/>
+  </Style>
+
+
 </Styles>
