@@ -3,6 +3,7 @@ using System.Reactive.Linq;
 
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.Threading;
 
@@ -32,6 +33,13 @@ namespace Atomex.Client.Desktop.Views
         private void InitializeComponent()
         {
             AvaloniaXamlLoader.Load(this);
+        }
+
+        private void HelpClickHandler(object sender, RoutedEventArgs e)
+        {
+            var source = e.Source as Button;
+
+            source?.SetValue(ToolTip.IsOpenProperty, true);
         }
     }
 }

@@ -74,6 +74,8 @@ namespace Atomex.Client.Desktop.ViewModels
         [Reactive] public string FromValidationMessageToolTip { get; set; }
         [Reactive] public MessageType FromValidationMessageType { get; set; }
 
+        [Reactive] public bool IsRedeemAddressUsed { get; set; }
+
 
         [Reactive]
         public List<CurrencyViewModel>? FromCurrencies { get; set; }
@@ -359,6 +361,12 @@ namespace Atomex.Client.Desktop.ViewModels
             var previousFromCurrency = FromCurrencyViewModel;
             FromCurrencyViewModel = ToCurrencyViewModel;
             ToCurrencyViewModel = previousFromCurrency;
+        });
+
+        private ICommand _changeRedeemAddress;
+        public ICommand ChangeRedeemAddress => _changeRedeemAddress ??= ReactiveCommand.Create(() =>
+        {
+
         });
 
         public void SetFromCurrency(CurrencyConfig fromCurrency)

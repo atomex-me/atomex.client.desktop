@@ -79,7 +79,7 @@
                                           Value="Warning">
                     <ia:ChangePropertyAction TargetObject="{Binding self}"
                                              PropertyName="Foreground"
-                                             Value="Orange" />
+                                             Value="{DynamicResource Orange}" />
                   </ia:DataTriggerBehavior>
                   <ia:DataTriggerBehavior Binding="{Binding FromValidationMessageType}"
                                           ComparisonCondition="Equal"
@@ -96,12 +96,13 @@
                       ToolTip.Tip="{Binding FromValidationMessageToolTip}"
                       ToolTip.Placement="AnchorAndGravity"
                       ToolTip.VerticalOffset="30"
+                      Click="HelpClickHandler"
                       Classes="ButtonWithIcon">
                 <Path HorizontalAlignment="Center"
                       VerticalAlignment="Center"
                       Width="12"
                       Height="12"
-                      Data="{DynamicResource Question}"
+                      Data="{DynamicResource Help}"
                       Fill="{DynamicResource LightDefaultOpacity20}"/>
               </Button>
             </StackPanel>
@@ -109,28 +110,20 @@
                     HorizontalContentAlignment="Center"
                     VerticalContentAlignment="Center"
                     Padding="0"
-                    Width="30"
-                    Height="30"
+                    Width="40"
+                    Height="40"
+                    CornerRadius="20"
                     Margin="0 -9 -45 -9"
                     Classes="ButtonWithIcon">
-                <!--<Path HorizontalAlignment="Center"
-                      Width="30"
-                      Height="30"
+                <Path Width="18"
+                      Height="18"
+                      Stretch="Fill"
                       Data="{DynamicResource SwapArrows}"
                       Fill="{DynamicResource LightDefaultOpacity50}">
                   <Path.RenderTransform>
                     <RotateTransform Angle="90"/>
                   </Path.RenderTransform>
-                </Path>-->
-                <svg:Svg HorizontalAlignment="Center"
-                         VerticalAlignment="Center"
-                         Width="24"
-                         Height="24"
-                         Path="/Resources/Icons/swap-arrows.svg">
-                  <svg:Svg.RenderTransform>
-                    <RotateTransform Angle="90"/>
-                  </svg:Svg.RenderTransform>
-                </svg:Svg>
+                </Path>
             </Button>
           </Grid>
           
@@ -147,10 +140,29 @@
                 IsVisible="True">
             <StackPanel Orientation="Vertical"
                         Grid.Column="0">
-              <Button Margin="0 0 0 16"
-                      Content="Change redeem address"
-                      VerticalAlignment="Bottom"
-                      Classes="LinkButton Underlined"/>
+              <StackPanel Orientation="Horizontal"
+                          Margin="0 0 0 16">
+                <Button Content="Change redeem address"
+                        VerticalAlignment="Bottom"
+                        Command="{Binding ChangeRedeemAddress}"
+                        Classes="LinkButton Underlined"/>
+                <Button Padding="3"
+                        VerticalAlignment="Center"
+                        VerticalContentAlignment="Center"
+                        ToolTip.Placement="AnchorAndGravity"
+                        ToolTip.Tip="By default wallet will send a redeem transaction from the address you use to receive funds. You can change the address to any other that has sufficient funds to send the redeem transaction"
+                        ToolTip.VerticalOffset="50"
+                        Click="HelpClickHandler"
+                        Classes="ButtonWithIcon">
+                  <Path HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Width="12"
+                        Height="12"
+                        Data="{DynamicResource Help}"
+                        Fill="{DynamicResource LightDefaultOpacity20}"/>
+                </Button>
+              </StackPanel>
+
               <StackPanel Orientation="Horizontal">
                 <TextBlock Text="Estimated Price 1"
                            Foreground="{DynamicResource SecondaryForegroundBrush}"
@@ -175,12 +187,13 @@
                 <Button Padding="3"
                         VerticalAlignment="Center"
                         VerticalContentAlignment="Center"
+                        Click="HelpClickHandler"
                         Classes="ButtonWithIcon">
                   <Path HorizontalAlignment="Center"
                         VerticalAlignment="Center"
                         Width="12"
                         Height="12"
-                        Data="{DynamicResource Question}"
+                        Data="{DynamicResource Help}"
                         Fill="{DynamicResource LightDefaultOpacity20}"/>
                 </Button>
               </StackPanel>
@@ -196,12 +209,13 @@
                 <Button Padding="3"
                         VerticalAlignment="Center"
                         VerticalContentAlignment="Center"
+                        Click="HelpClickHandler"
                         Classes="ButtonWithIcon">
                   <Path HorizontalAlignment="Center"
                         VerticalAlignment="Center"
                         Width="12"
                         Height="12"
-                        Data="{DynamicResource Question}"
+                        Data="{DynamicResource Help}"
                         Fill="{DynamicResource LightDefaultOpacity20}"/>
                 </Button>
               </StackPanel>
