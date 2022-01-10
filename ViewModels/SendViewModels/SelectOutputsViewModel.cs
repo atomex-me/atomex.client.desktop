@@ -9,11 +9,8 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 using Atomex.Blockchain.BitcoinBased;
 using Atomex.Client.Desktop.Common;
-using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
 using Atomex.Common;
 using Avalonia.Controls;
-using DynamicData;
-using DynamicData.Binding;
 using NBitcoin;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
@@ -63,12 +60,31 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 .WhereNotNull()
                 .Take(1)
                 .Subscribe(outputs =>
+                {
                     Outputs = new ObservableCollection<OutputViewModel>(
-                        outputs.OrderByDescending(output => output.BalanceString)));
+                        outputs.OrderByDescending(output => output.BalanceString));
+                    RecalculateTotalStats();
+                });
         }
 
         [Reactive] public bool SelectAll { get; set; }
         [Reactive] public bool SortIsAscending { get; set; }
+        [Reactive] public string TotalSelected { get; set; }
+        [Reactive] public string TotalCoinAmountSelected { get; set; }
+
+        private void RecalculateTotalStats()
+        {
+            Task.Run(() =>
+            {
+                TotalSelected =
+                    $"{Outputs.Aggregate(0, (result, output) => output.IsSelected ? result + 1 : result)} selected";
+                
+                var totalCoinAmount = Outputs.Aggregate(0m, (result, output) => output.IsSelected ? result + output.Balance : result);
+
+                // todo: format decimal value and BTC;
+                TotalCoinAmountSelected = $"Total {totalCoinAmount}";
+            });
+        }
 
         private bool _checkedFromList;
 
@@ -81,12 +97,18 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 var selectionResult = Outputs.Aggregate(true, (result, output) => result && output.IsSelected);
                 if (SelectAll != selectionResult)
                     SelectAll = selectionResult;
+
+                RecalculateTotalStats();
             }));
 
         private ReactiveCommand<Unit, Unit> _selectAllCommand;
 
         public ReactiveCommand<Unit, Unit> SelectAllCommand => _selectAllCommand ??=
-            (_selectAllCommand = ReactiveCommand.Create(() => { _checkedFromList = false; }));
+            (_selectAllCommand = ReactiveCommand.Create(() =>
+            {
+                _checkedFromList = false;
+                RecalculateTotalStats();
+            }));
 
         private ReactiveCommand<Unit, Unit> _closeCommand;
 
@@ -173,7 +195,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         public BitcoinBasedTxOutput Output { get; set; }
         public BitcoinBasedConfig Config { get; set; }
 
-        private decimal Balance => Config.SatoshiToCoin(Output.Value);
+        public decimal Balance => Config.SatoshiToCoin(Output.Value);
         public string BalanceString => $"{Balance.ToString(Config.Format, CultureInfo.InvariantCulture)} {Config.Name}";
         public string Address => Output.DestinationAddress(Config.Network);
     }
