@@ -219,7 +219,7 @@
     <SolidColorBrush x:Key="CustomDataGridColumnBackground" Color="{DynamicResource DefaultSubstrateColor}" />
     <SolidColorBrush x:Key="CustomDataGridBackground" Color="{DynamicResource DefaultSubstrateColor}" />
     <SolidColorBrush x:Key="CustomDataGridRowBackground" Color="Transparent" />
-    <SolidColorBrush x:Key="CustomDataGridAlternativeRowBackground" Color="#15253c" />
+    <SolidColorBrush x:Key="CustomDataGridAlternativeRowBackground" Color="{DynamicResource LightDefaultOpacity6}" />
     <SolidColorBrush x:Key="CustomDataGridNoData" Color="#03ffffff" />
     <SolidColorBrush x:Key="CustomDataGridHeaderPointerOver" Color="{DynamicResource MahApps.Colors.Gray2}" Opacity="0.5" />
 

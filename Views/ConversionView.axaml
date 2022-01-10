@@ -2,7 +2,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="1000"
+             mc:Ignorable="d" d:DesignWidth="1200" d:DesignHeight="1000"
              x:Class="Atomex.Client.Desktop.Views.ConversionView"
              xmlns:vm="clr-namespace:Atomex.Client.Desktop.ViewModels"
              xmlns:views="clr-namespace:Atomex.Client.Desktop.Views"
@@ -14,320 +14,728 @@
              xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
              xmlns:ia="clr-namespace:Avalonia.Xaml.Interactions.Core;assembly=Avalonia.Xaml.Interactions">
 
-    <Design.DataContext>
-        <vm:ConversionViewModel />
-    </Design.DataContext>
-    <UserControl.Styles>
-        <Style Selector="TextBlock.HeaderFieldTextBlockStyle">
-            <Setter Property="Margin" Value="0 0 10 0" />
-            <Setter Property="Foreground" Value="{DynamicResource DefaultForegroundBrush}" />
-            <Setter Property="FontFamily" Value="{DynamicResource DefaultMediumFontFamily}" />
-            <Setter Property="FontSize" Value="15" />
-            <Setter Property="VerticalAlignment" Value="Center" />
-            <Setter Property="HorizontalAlignment" Value="Right" />
-        </Style>
-    </UserControl.Styles>
+  <Design.DataContext>
+    <vm:ConversionViewModel/>
+  </Design.DataContext>
+  <UserControl.Styles>
+    <Style Selector="TextBlock.HeaderFieldTextBlockStyle">
+      <Setter Property="Margin" Value="0 0 10 0"/>
+      <Setter Property="Foreground" Value="{DynamicResource DefaultForegroundBrush}"/>
+      <Setter Property="FontFamily" Value="{DynamicResource DefaultMediumFontFamily}"/>
+      <Setter Property="FontSize" Value="15"/>
+      <Setter Property="VerticalAlignment" Value="Center"/>
+      <Setter Property="HorizontalAlignment" Value="Right"/>
+    </Style>
+  </UserControl.Styles>
 
-    <UserControl.Resources>
-        <converters:AmountToStringConverter x:Key="AmountToStringConverter" />
-        <converters:DateTimeToTxTimeConverter x:Key="DateTimeToTxTimeConverter" />
-    </UserControl.Resources>
+  <UserControl.Resources>
+    <converters:AmountToStringConverter x:Key="AmountToStringConverter"/>
+    <converters:DateTimeToTxTimeConverter x:Key="DateTimeToTxTimeConverter"/>
+  </UserControl.Resources>
 
-    <Grid Background="{DynamicResource ChildViewBackgroundBrush}">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
-        </Grid.RowDefinitions>
+  <Grid Background="{DynamicResource ChildViewBackgroundBrush}">
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto"/>
+      <RowDefinition Height="Auto"/>
+      <RowDefinition Height="*"/>
+    </Grid.RowDefinitions>
 
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="360" />
-        </Grid.ColumnDefinitions>
+    <Grid.ColumnDefinitions>
+      <ColumnDefinition Width="*"/>
+      <ColumnDefinition Width="360"/>
+    </Grid.ColumnDefinitions>
       
+    <StackPanel Orientation="Vertical"
+                Grid.ColumnSpan="{Binding ColumnSpan}"
+                Grid.Column="0"
+                Grid.Row="0">
+
+      <TextBlock Margin="0 80 0 32"
+                  Text="Exchange"
+                  FontSize="32"
+                  FontFamily="{DynamicResource DefaultLightFontFamily}"
+                  HorizontalAlignment="Center"
+                  Foreground="{DynamicResource DefaultForegroundBrush}"/>
+
+      <!-- From currency view -->
+      <views:CurrencySelectionView Width="486"
+                                    Height="102"
+                                    DataContext="{Binding FromViewModel}"/>
+
+      <!-- Warning and swap currencies button view -->
+      <Grid Width="486">
+        <StackPanel Orientation="Horizontal"
+                    Margin="0 12 0 24"
+                    HorizontalAlignment="Left"
+                    IsVisible="True">
+          <TextBlock Text="{Binding FromValidationMessage}"
+                      MaxWidth="471"
+                      TextWrapping="Wrap"
+                      Foreground="{DynamicResource LightDefaultOpacity50}"
+                      FontSize="13"
+                      FontFamily="{DynamicResource DefaultLightFontFamily}">
+            <i:Interaction.Behaviors>
+              <ia:DataTriggerBehavior Binding="{Binding FromValidationMessageType}"
+                                      ComparisonCondition="Equal"
+                                      Value="Warning">
+                <ia:ChangePropertyAction TargetObject="{Binding self}"
+                                          PropertyName="Foreground"
+                                          Value="{DynamicResource Orange}"/>
+              </ia:DataTriggerBehavior>
+              <ia:DataTriggerBehavior Binding="{Binding FromValidationMessageType}"
+                                      ComparisonCondition="Equal"
+                                      Value="Error">
+                <ia:ChangePropertyAction TargetObject="{Binding self}"
+                                          PropertyName="Foreground"
+                                          Value="{DynamicResource DarkRed}"/>
+              </ia:DataTriggerBehavior>
+            </i:Interaction.Behaviors>          
+          </TextBlock>
+          <Button Padding="3"
+                  VerticalAlignment="Center"
+                  VerticalContentAlignment="Center"
+                  ToolTip.Tip="{Binding FromValidationMessageToolTip}"
+                  ToolTip.Placement="AnchorAndGravity"
+                  ToolTip.VerticalOffset="30"
+                  Click="HelpClickHandler"
+                  Classes="ButtonWithIcon">
+            <Path HorizontalAlignment="Center"
+                  VerticalAlignment="Center"
+                  Width="12"
+                  Height="12"
+                  Data="{DynamicResource Help}"
+                  Fill="{DynamicResource LightDefaultOpacity20}"/>
+          </Button>
+        </StackPanel>
+        <Button HorizontalAlignment="Right"
+                HorizontalContentAlignment="Center"
+                VerticalContentAlignment="Center"
+                Padding="0"
+                Width="40"
+                Height="40"
+                CornerRadius="20"
+                Margin="0 -9 -45 -9"
+                Classes="ButtonWithIcon">
+            <Path Width="18"
+                  Height="18"
+                  Stretch="Fill"
+                  Data="{DynamicResource SwapArrows}"
+                  Fill="{DynamicResource LightDefaultOpacity50}">
+              <Path.RenderTransform>
+                <RotateTransform Angle="90"/>
+              </Path.RenderTransform>
+            </Path>
+        </Button>
+      </Grid>
+          
+      <!-- To currency view -->
+      <views:CurrencySelectionView Margin="0 0 0 0"
+                                    Width="486"
+                                    Height="102"
+                                    DataContext="{Binding ToViewModel}"/>
+
+      <!-- Change redeem adderss, price, available volume, fees and warning view -->
+      <Grid Width="486"
+            ColumnDefinitions="Auto,*"
+            Margin="0 12 0 16"
+            IsVisible="True">
         <StackPanel Orientation="Vertical"
-                    Grid.ColumnSpan="{Binding ColumnSpan}"
-                    Grid.Column="0"
-                    Grid.Row="0">
-
-          <TextBlock Margin="0 80 0 32"
-                     Text="Exchange"
-                     FontSize="32"
-                     FontFamily="{DynamicResource DefaultLightFontFamily}"
-                     HorizontalAlignment="Center"
-                     Foreground="{DynamicResource DefaultForegroundBrush}"/>
-
-          <!-- From currency view -->
-          <views:CurrencySelectionView Width="486"
-                                       Height="102"
-                                       DataContext="{Binding FromViewModel}"/>
-
-          <!-- Warning and swap currencies button view -->
-          <Grid Width="486">
-            <StackPanel Orientation="Horizontal"
-                        Margin="0 12 0 24"
-                        HorizontalAlignment="Left"
-                        IsVisible="True">
-              <TextBlock Text="{Binding FromValidationMessage}"
-                         MaxWidth="471"
-                         TextWrapping="Wrap"
-                         Foreground="{DynamicResource LightDefaultOpacity50}"
-                         FontSize="13"
-                         FontFamily="{DynamicResource DefaultLightFontFamily}">
-                <i:Interaction.Behaviors>
-                  <ia:DataTriggerBehavior Binding="{Binding FromValidationMessageType}"
-                                          ComparisonCondition="Equal"
-                                          Value="Warning">
-                    <ia:ChangePropertyAction TargetObject="{Binding self}"
-                                             PropertyName="Foreground"
-                                             Value="{DynamicResource Orange}" />
-                  </ia:DataTriggerBehavior>
-                  <ia:DataTriggerBehavior Binding="{Binding FromValidationMessageType}"
-                                          ComparisonCondition="Equal"
-                                          Value="Error">
-                    <ia:ChangePropertyAction TargetObject="{Binding self}"
-                                             PropertyName="Foreground"
-                                             Value="{DynamicResource DarkRed}" />
-                  </ia:DataTriggerBehavior>
-                </i:Interaction.Behaviors>          
-              </TextBlock>
-              <Button Padding="3"
-                      VerticalAlignment="Center"
-                      VerticalContentAlignment="Center"
-                      ToolTip.Tip="{Binding FromValidationMessageToolTip}"
-                      ToolTip.Placement="AnchorAndGravity"
-                      ToolTip.VerticalOffset="30"
-                      Click="HelpClickHandler"
-                      Classes="ButtonWithIcon">
-                <Path HorizontalAlignment="Center"
-                      VerticalAlignment="Center"
-                      Width="12"
-                      Height="12"
-                      Data="{DynamicResource Help}"
-                      Fill="{DynamicResource LightDefaultOpacity20}"/>
-              </Button>
-            </StackPanel>
-            <Button HorizontalAlignment="Right"
-                    HorizontalContentAlignment="Center"
+                    Grid.Column="0">
+          <StackPanel Orientation="Horizontal"
+                      Margin="0 0 0 16">
+            <Button Content="Change redeem address"
+                    VerticalAlignment="Bottom"
+                    Command="{Binding ChangeRedeemAddress}"
+                    Classes="LinkButton Underlined"/>
+            <Button Padding="3"
+                    VerticalAlignment="Center"
                     VerticalContentAlignment="Center"
-                    Padding="0"
-                    Width="40"
-                    Height="40"
-                    CornerRadius="20"
-                    Margin="0 -9 -45 -9"
+                    ToolTip.Placement="AnchorAndGravity"
+                    ToolTip.Tip="By default wallet will send a redeem transaction from the address you use to receive funds. You can change the address to any other that has sufficient funds to send the redeem transaction"
+                    ToolTip.VerticalOffset="50"
+                    Click="HelpClickHandler"
                     Classes="ButtonWithIcon">
-                <Path Width="18"
-                      Height="18"
-                      Stretch="Fill"
-                      Data="{DynamicResource SwapArrows}"
-                      Fill="{DynamicResource LightDefaultOpacity50}">
-                  <Path.RenderTransform>
-                    <RotateTransform Angle="90"/>
-                  </Path.RenderTransform>
-                </Path>
+              <Path HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Width="12"
+                    Height="12"
+                    Data="{DynamicResource Help}"
+                    Fill="{DynamicResource LightDefaultOpacity20}"/>
             </Button>
-          </Grid>
-          
-          <!-- To currency view -->
-          <views:CurrencySelectionView Margin="0 0 0 0"
-                                       Width="486"
-                                       Height="102"
-                                       DataContext="{Binding ToViewModel}"/>
+          </StackPanel>
 
-          <!-- Change redeem adderss, price, available volume, fees and warning view -->
-          <Grid Width="486"
-                ColumnDefinitions="Auto,*"
-                Margin="0 12 0 16"
-                IsVisible="True">
-            <StackPanel Orientation="Vertical"
-                        Grid.Column="0">
-              <StackPanel Orientation="Horizontal"
-                          Margin="0 0 0 16">
-                <Button Content="Change redeem address"
-                        VerticalAlignment="Bottom"
-                        Command="{Binding ChangeRedeemAddress}"
-                        Classes="LinkButton Underlined"/>
-                <Button Padding="3"
+          <!-- Estimated price -->
+          <StackPanel Orientation="Horizontal">
+            <TextBlock Text="Estimated Price 1"
+                        Foreground="{DynamicResource SecondaryForegroundBrush}"
                         VerticalAlignment="Center"
-                        VerticalContentAlignment="Center"
-                        ToolTip.Placement="AnchorAndGravity"
-                        ToolTip.Tip="By default wallet will send a redeem transaction from the address you use to receive funds. You can change the address to any other that has sufficient funds to send the redeem transaction"
-                        ToolTip.VerticalOffset="50"
-                        Click="HelpClickHandler"
-                        Classes="ButtonWithIcon">
-                  <Path HorizontalAlignment="Center"
+                        FontSize="13"
+                        FontFamily="{DynamicResource DefaultLightFontFamily}"/>
+            <TextBlock Margin="4 0 0 0"
+                        Text="{Binding BaseCurrencyCode}"
                         VerticalAlignment="Center"
-                        Width="12"
-                        Height="12"
-                        Data="{DynamicResource Help}"
-                        Fill="{DynamicResource LightDefaultOpacity20}"/>
-                </Button>
-              </StackPanel>
+                        Foreground="{DynamicResource SecondaryForegroundBrush}"
+                        FontSize="13"
+                        FontFamily="{DynamicResource DefaultLightFontFamily}"/>
+            <TextBlock Margin="4 0 0 0"
+                        Text="="
+                        Foreground="{DynamicResource SecondaryForegroundBrush}"
+                        VerticalAlignment="Center"
+                        FontSize="13"
+                        FontFamily="{DynamicResource DefaultLightFontFamily}"/>
+            <TextBlock Margin="4 0 0 0"
+                        Foreground="{DynamicResource SecondaryForegroundBrush}"
+                        VerticalAlignment="Center"
+                        FontSize="13"
+                        FontFamily="{DynamicResource DefaultLightFontFamily}">
+              <TextBlock.Text>
+                <MultiBinding Converter="{StaticResource AmountToStringConverter}">
+                  <Binding Path="EstimatedPrice"/>
+                  <Binding Path="PriceFormat"/>
+                </MultiBinding>
+              </TextBlock.Text>
+            </TextBlock>
+            <TextBlock Margin="4 0 0 0"
+                        Text="{Binding QuoteCurrencyCode}"
+                        Foreground="{DynamicResource SecondaryForegroundBrush}"
+                        VerticalAlignment="Center"
+                        FontSize="13"
+                        FontFamily="{DynamicResource DefaultLightFontFamily}"/>
+            <Button Padding="3"
+                    VerticalAlignment="Center"
+                    VerticalContentAlignment="Center"
+                    Click="HelpClickHandler"
+                    Classes="ButtonWithIcon">
+              <Path HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Width="12"
+                    Height="12"
+                    Data="{DynamicResource Help}"
+                    Fill="{DynamicResource LightDefaultOpacity20}"/>
+            </Button>
+          </StackPanel>
 
-              <StackPanel Orientation="Horizontal">
-                <TextBlock Text="Estimated Price 1"
-                           Foreground="{DynamicResource SecondaryForegroundBrush}"
-                           FontSize="13"
-                           FontFamily="{DynamicResource DefaultLightFontFamily}"/>
-                <TextBlock Text="{Binding BaseCurrencyCode}"
-                           Foreground="{DynamicResource SecondaryForegroundBrush}"
-                           FontSize="13"
-                           FontFamily="{DynamicResource DefaultLightFontFamily}"/>
-                <TextBlock Text="="
-                           Foreground="{DynamicResource SecondaryForegroundBrush}"
-                           FontSize="13"
-                           FontFamily="{DynamicResource DefaultLightFontFamily}"/>
-                <TextBlock Text="{Binding Price}"
-                           Foreground="{DynamicResource SecondaryForegroundBrush}"
-                           FontSize="13"
-                           FontFamily="{DynamicResource DefaultLightFontFamily}"/>
-                <TextBlock Text="{Binding QuoteCurrencyCode}"
-                           Foreground="{DynamicResource SecondaryForegroundBrush}"
-                           FontSize="13"
-                           FontFamily="{DynamicResource DefaultLightFontFamily}"/>
-                <Button Padding="3"
+          <!-- Estimated network fees -->
+          <StackPanel Orientation="Horizontal">
+            <TextBlock Text="Estimated network fees"
+                        Foreground="{DynamicResource SecondaryForegroundBrush}"
                         VerticalAlignment="Center"
-                        VerticalContentAlignment="Center"
-                        Click="HelpClickHandler"
-                        Classes="ButtonWithIcon">
-                  <Path HorizontalAlignment="Center"
+                        FontSize="13"
+                        FontFamily="{DynamicResource DefaultLightFontFamily}"/>
+            <TextBlock Margin="4 0 0 0"
+                        Text="{Binding EstimatedTotalNetworkFeeInBase}"
+                        Foreground="{DynamicResource SecondaryForegroundBrush}"
                         VerticalAlignment="Center"
-                        Width="12"
-                        Height="12"
-                        Data="{DynamicResource Help}"
-                        Fill="{DynamicResource LightDefaultOpacity20}"/>
-                </Button>
-              </StackPanel>
-              <StackPanel Orientation="Horizontal">
-                <TextBlock Text="Estimated network fees"
-                           Foreground="{DynamicResource SecondaryForegroundBrush}"
-                           FontSize="13"
-                           FontFamily="{DynamicResource DefaultLightFontFamily}"/>
-                <TextBlock Text="{Binding TotalNetworkFee}"
-                           Foreground="{DynamicResource SecondaryForegroundBrush}"
-                           FontSize="13"
-                           FontFamily="{DynamicResource DefaultLightFontFamily}"/>
-                <Button Padding="3"
-                        VerticalAlignment="Center"
-                        VerticalContentAlignment="Center"
-                        Click="HelpClickHandler"
-                        Classes="ButtonWithIcon">
-                  <Path HorizontalAlignment="Center"
-                        VerticalAlignment="Center"
-                        Width="12"
-                        Height="12"
-                        Data="{DynamicResource Help}"
-                        Fill="{DynamicResource LightDefaultOpacity20}"/>
-                </Button>
-              </StackPanel>
-            </StackPanel>
-            <StackPanel Orientation="Vertical"
-                        Grid.Column="1">
-              <StackPanel Orientation="Horizontal"
-                          HorizontalAlignment="Right">
-                <TextBlock Text="Available"
-                           Foreground="{DynamicResource SecondaryForegroundBrush}"
-                           FontSize="13"
-                           FontFamily="{DynamicResource DefaultLightFontFamily}"/>
-                <TextBlock Text="{Binding EstimatedMaxAmount}"
-                           Foreground="{DynamicResource SecondaryForegroundBrush}"
-                           FontSize="13"
-                           FontFamily="{DynamicResource DefaultLightFontFamily}"/>
-              </StackPanel>
-            </StackPanel>
-          </Grid>
-          
-          <controls:RoundedButton Width="486"
-                                  Height="52"
-                                  CornerRadius="6"
-                                  Content="Exchange"
-                                  FontSize="18"
-                                  FontFamily="{DynamicResource DefaultFontFamily}"
-                                  FontWeight="Normal"
-                                  Command="{Binding ConvertCommand}"
-                                  IsEnabled="{Binding CanConvert}"/>
+                        FontSize="13"
+                        FontFamily="{DynamicResource DefaultLightFontFamily}">
+              <TextBlock.Text>
+                <MultiBinding Converter="{StaticResource AmountToStringConverter}">
+                  <Binding Path="EstimatedTotalNetworkFeeInBase"/>
+                  <Binding Path="FromCurrencyViewModel.BaseCurrencyFormat"/>
+                </MultiBinding>
+              </TextBlock.Text>
+            </TextBlock>
+            <Button Padding="3"
+                    VerticalAlignment="Center"
+                    VerticalContentAlignment="Center"
+                    Click="HelpClickHandler"
+                    Classes="ButtonWithIcon">
+              <Path HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Width="12"
+                    Height="12"
+                    Data="{DynamicResource Help}"
+                    Fill="{DynamicResource LightDefaultOpacity20}"/>
+              <ToolTip.Tip>
+                <StackPanel Orientation="Vertical">
+                  <TextBlock Foreground="{DynamicResource DefaultAmountInBaseForegroundBrush}"
+                             Text="Network fees for atomic swap:"/>
+
+                  <StackPanel Margin="0 7 0 0"
+                              Orientation="Horizontal"
+                              HorizontalAlignment="Left"
+                              VerticalAlignment="Center">
+                    <TextBlock Foreground="{DynamicResource DefaultAmountInBaseForegroundBrush}"
+                               Text="Payment fee:"/>
+
+                    <TextBlock Margin="5 0 0 0"
+                               Foreground="{DynamicResource DefaultForegroundBrush}"
+                               FontFamily="{DynamicResource DefaultFontFamily}">
+                      <TextBlock.Text>
+                        <MultiBinding Converter="{StaticResource AmountToStringConverter}">
+                          <Binding Path="EstimatedPaymentFee"
+                                   Mode="TwoWay"/>
+                          <Binding Path="FromCurrencyViewModel.FeeCurrencyFormat"
+                                   Mode="OneWay"/>
+                        </MultiBinding>
+                      </TextBlock.Text>
+                    </TextBlock>
+
+                    <TextBlock Text="{Binding FromCurrencyViewModel.FeeCurrencyCode}"
+                               Margin="3 0 0 2"
+                               FontSize="9"
+                               VerticalAlignment="Bottom"
+                               Foreground="{DynamicResource DefaultForegroundBrush}"
+                               FontFamily="{DynamicResource DefaultFontFamily}"/>
+
+                    <TextBlock Margin="5 0 0 0"
+                               Foreground="{DynamicResource DefaultAmountInBaseForegroundBrush}"
+                               Text="("/>
+
+                    <TextBlock Foreground="{DynamicResource DefaultAmountInBaseForegroundBrush}"
+                                FontFamily="{DynamicResource DefaultFontFamily}">
+                      <TextBlock.Text>
+                        <MultiBinding Converter="{StaticResource AmountToStringConverter}">
+                          <Binding Path="EstimatedPaymentFeeInBase"
+                                   Mode="TwoWay"/>
+                          <Binding Path="FromCurrencyViewModel.BaseCurrencyFormat"
+                                   Mode="OneWay"/>
+                        </MultiBinding>
+                      </TextBlock.Text>
+                    </TextBlock>
+
+                    <TextBlock Foreground="{DynamicResource DefaultAmountInBaseForegroundBrush}"
+                               Text=")" />
+                  </StackPanel>
+
+                  <StackPanel Orientation="Horizontal"
+                              HorizontalAlignment="Left"
+                              VerticalAlignment="Center"
+                              IsVisible="{Binding !HasRewardForRedeem}">
+                    <TextBlock Foreground="{DynamicResource DefaultAmountInBaseForegroundBrush}"
+                               Text="Redeem fee:"/>
+
+                    <TextBlock Margin="5 0 0 0"
+                               Foreground="{DynamicResource DefaultForegroundBrush}"
+                               FontFamily="{DynamicResource DefaultFontFamily}">
+                      <TextBlock.Text>
+                        <MultiBinding Converter="{StaticResource AmountToStringConverter}">
+                          <Binding Path="EstimatedRedeemFee"
+                                   Mode="TwoWay"/>
+                          <Binding Path="ToCurrencyViewModel.FeeCurrencyFormat"
+                                   Mode="OneWay"/>
+                        </MultiBinding>
+                      </TextBlock.Text>
+                    </TextBlock>
+
+                    <TextBlock Text="{Binding ToCurrencyViewModel.FeeCurrencyCode}"
+                               Margin="3 0 0 2"
+                               FontSize="9"
+                               VerticalAlignment="Bottom"
+                               Foreground="{DynamicResource DefaultForegroundBrush}"
+                               FontFamily="{DynamicResource DefaultFontFamily}"/>
+
+                    <TextBlock Margin="5 0 0 0"
+                               Foreground="{DynamicResource DefaultAmountInBaseForegroundBrush}"
+                               Text="("/>
+
+                    <TextBlock Foreground="{DynamicResource DefaultAmountInBaseForegroundBrush}"
+                               FontFamily="{DynamicResource DefaultFontFamily}">
+                      <TextBlock.Text>
+                        <MultiBinding Converter="{StaticResource AmountToStringConverter}">
+                          <Binding Path="EstimatedRedeemFeeInBase"
+                                   Mode="TwoWay"/>
+                          <Binding Path="FromCurrencyViewModel.BaseCurrencyFormat"
+                                   Mode="OneWay"/>
+                        </MultiBinding>
+                      </TextBlock.Text>
+                    </TextBlock>
+
+                    <TextBlock Foreground="{DynamicResource DefaultAmountInBaseForegroundBrush}"
+                               Text=")"/>
+                  </StackPanel>
+
+                  <StackPanel Orientation="Horizontal"
+                              HorizontalAlignment="Left"
+                              VerticalAlignment="Center">
+                    <TextBlock Foreground="{DynamicResource DefaultAmountInBaseForegroundBrush}"
+                               Text="Maker fee:"/>
+
+                    <TextBlock Margin="5 0 0 0"
+                               Foreground="{DynamicResource DefaultForegroundBrush}"
+                               FontFamily="{DynamicResource DefaultFontFamily}">
+                      <TextBlock.Text>
+                        <MultiBinding Converter="{StaticResource AmountToStringConverter}">
+                          <Binding Path="EstimatedMakerNetworkFee"
+                                   Mode="TwoWay"/>
+                          <Binding Path="FromCurrencyViewModel.CurrencyFormat"
+                                   Mode="OneWay"/>
+                        </MultiBinding>
+                      </TextBlock.Text>
+                    </TextBlock>
+
+                    <TextBlock Text="{Binding FromCurrencyViewModel.CurrencyCode}"
+                               Margin="3 0 0 2"
+                               FontSize="9"
+                               VerticalAlignment="Bottom"
+                               Foreground="{DynamicResource DefaultForegroundBrush}"
+                               FontFamily="{DynamicResource DefaultFontFamily}"/>
+
+                    <TextBlock Margin="5 0 0 0"
+                               Foreground="{DynamicResource DefaultAmountInBaseForegroundBrush}"
+                               Text="("/>
+
+                    <TextBlock Foreground="{DynamicResource DefaultAmountInBaseForegroundBrush}"
+                               FontFamily="{DynamicResource DefaultFontFamily}">
+                      <TextBlock.Text>
+                        <MultiBinding Converter="{StaticResource AmountToStringConverter}">
+                          <Binding Path="EstimatedMakerNetworkFeeInBase"
+                                   Mode="TwoWay"/>
+                          <Binding Path="FromCurrencyViewModel.BaseCurrencyFormat"
+                                   Mode="OneWay"/>
+                        </MultiBinding>
+                      </TextBlock.Text>
+                    </TextBlock>
+
+                    <TextBlock Foreground="{DynamicResource DefaultAmountInBaseForegroundBrush}"
+                               Text=")"/>
+                  </StackPanel>
+
+                  <StackPanel Orientation="Horizontal"
+                              HorizontalAlignment="Left"
+                              VerticalAlignment="Center"
+                              IsVisible="{Binding HasRewardForRedeem}">
+                    <TextBlock Foreground="{DynamicResource DefaultAmountInBaseForegroundBrush}"
+                               Text="Reward for redeem:"/>
+
+                    <TextBlock Margin="5 0 0 0"
+                               Foreground="{DynamicResource DefaultForegroundBrush}"
+                               FontFamily="{DynamicResource DefaultFontFamily}">
+                      <TextBlock.Text>
+                        <MultiBinding Converter="{StaticResource AmountToStringConverter}">
+                          <Binding Path="RewardForRedeem"
+                                   Mode="TwoWay"/>
+                          <Binding Path="ToCurrencyViewModel.CurrencyFormat"
+                                   Mode="OneWay"/>
+                        </MultiBinding>
+                      </TextBlock.Text>
+                    </TextBlock>
+
+                    <TextBlock Text="{Binding ToCurrencyViewModel.CurrencyCode}"
+                               Margin="3 0 0 2"
+                               FontSize="9"
+                               VerticalAlignment="Bottom"
+                               Foreground="{DynamicResource DefaultForegroundBrush}"
+                               FontFamily="{DynamicResource DefaultFontFamily}"/>
+
+                    <TextBlock Margin="5 0 0 0"
+                               Foreground="{DynamicResource DefaultAmountInBaseForegroundBrush}"
+                               Text="("/>
+
+                    <TextBlock Foreground="{DynamicResource DefaultAmountInBaseForegroundBrush}"
+                               FontFamily="{DynamicResource DefaultFontFamily}">
+                      <TextBlock.Text>
+                        <MultiBinding Converter="{StaticResource AmountToStringConverter}">
+                          <Binding Path="RewardForRedeemInBase"
+                                   Mode="TwoWay"/>
+                          <Binding Path="FromCurrencyViewModel.BaseCurrencyFormat"
+                                   Mode="OneWay"/>
+                        </MultiBinding>
+                      </TextBlock.Text>
+                    </TextBlock>
+
+                    <TextBlock Foreground="{DynamicResource DefaultAmountInBaseForegroundBrush}"
+                               Text=")"/>
+                  </StackPanel>
+
+                  <StackPanel Margin="0 7 0 0"
+                              Orientation="Horizontal"
+                              HorizontalAlignment="Left"
+                              VerticalAlignment="Center">
+                    <TextBlock Foreground="{DynamicResource DefaultAmountInBaseForegroundBrush}"
+                               Text="Total network fees:"/>
+
+                    <TextBlock Margin="5 0 0 0"
+                               Foreground="{DynamicResource DefaultAmountForegroundBrush}"
+                               FontFamily="{DynamicResource DefaultFontFamily}">
+                      <TextBlock.Text>
+                        <MultiBinding Converter="{StaticResource AmountToStringConverter}">
+                          <Binding Path="EstimatedTotalNetworkFeeInBase"
+                                   Mode="TwoWay"/>
+                          <Binding Path="FromCurrencyViewModel.BaseCurrencyFormat"
+                                   Mode="OneWay"/>
+                        </MultiBinding>
+                      </TextBlock.Text>
+                    </TextBlock>
+                  </StackPanel>
+                </StackPanel>                    
+              </ToolTip.Tip>
+            </Button>
+          </StackPanel>
         </StackPanel>
 
-        <DataGrid x:Name="DgConversions"
-                  Margin="48 64 48 0"
-                  AutoGenerateColumns="False"
-                  IsReadOnly="True"
-                  Cursor="Hand"
-                  RowDetailsVisibilityMode="VisibleWhenSelected"
-                  SelectionMode="Single"
-                  Items="{Binding Swaps}"
-                  CanUserResizeColumns="True"
-                  Grid.ColumnSpan="{Binding ColumnSpan}"
-                  Grid.Column="0"
-                  Grid.Row="1">
-            <DataGrid.Columns>
-                <DataGridTemplateColumn Header="DESCRIPTION" CanUserSort="False" Width="*">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate DataType="{x:Type vm:SwapViewModel}">
-                            <StackPanel Orientation="Horizontal" Margin="10 0 5 0">
-                                <TextBlock Text="Convert "
-                                           FontFamily="{DynamicResource DefaultFontFamily}"
-                                           FontSize="13" />
-                                <TextBlock FontFamily="{DynamicResource DefaultMediumFontFamily}"
-                                           FontSize="13"
-                                           Foreground="{Binding FromBrush}">
-                                    <TextBlock.Text>
-                                        <MultiBinding Converter="{StaticResource AmountToStringConverter}">
-                                            <Binding Path="FromAmount" Mode="OneWay" />
-                                            <Binding Path="FromAmountFormat" Mode="OneWay" />
-                                        </MultiBinding>
-                                    </TextBlock.Text>
-                                </TextBlock>
-                                <TextBlock Text="{Binding FromCurrencyCode}"
-                                           FontFamily="{DynamicResource DefaultMediumFontFamily}"
-                                           FontSize="9"
-                                           Foreground="{Binding FromBrush}"
-                                           VerticalAlignment="Bottom"
-                                           Margin="3 3 0 2" />
-                                <TextBlock Text=" to "
-                                           FontFamily="{DynamicResource DefaultFontFamily}"
-                                           FontSize="13" />
-                                <TextBlock FontFamily="{DynamicResource DefaultMediumFontFamily}"
-                                           FontSize="13"
-                                           Foreground="{Binding ToBrush}">
-                                    <TextBlock.Text>
-                                        <MultiBinding Converter="{StaticResource AmountToStringConverter}">
-                                            <Binding Path="ToAmount" Mode="OneWay" />
-                                            <Binding Path="ToAmountFormat" Mode="OneWay" />
-                                        </MultiBinding>
-                                    </TextBlock.Text>
-                                </TextBlock>
-                                <TextBlock Text="{Binding ToCurrencyCode}"
-                                           FontFamily="{DynamicResource DefaultMediumFontFamily}"
-                                           FontSize="9"
-                                           Foreground="{Binding ToBrush}"
-                                           VerticalAlignment="Bottom"
-                                           Margin="3 0 0 2" />
-                            </StackPanel>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
-                <DataGridTemplateColumn Header="STATE" MinWidth="82">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <styles:TypeTest>
-                                <styles:TypeTest.DataTemplate>
-                                    <controls:SwapStateDataTemplateSelector />
-                                </styles:TypeTest.DataTemplate>
-                            </styles:TypeTest>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
-                <DataGridTextColumn Header="TIME"
-                                    MinWidth="158"
-                                    Binding="{Binding LocalTime, Converter={StaticResource DateTimeToTxTimeConverter}}" />
-            </DataGrid.Columns>
-        </DataGrid>
+        <!-- Available amount -->            
+        <StackPanel Orientation="Vertical"
+                    Grid.Column="1">
+          <StackPanel Orientation="Horizontal"
+                      HorizontalAlignment="Right">
+            <TextBlock Text="Available"
+                       Foreground="{DynamicResource SecondaryForegroundBrush}"
+                       VerticalAlignment="Center"
+                       FontSize="13"
+                       FontFamily="{DynamicResource DefaultLightFontFamily}"/>
+            <TextBlock Margin="4 0 0 0"
+                       Foreground="{DynamicResource SecondaryForegroundBrush}"
+                       VerticalAlignment="Center"
+                       FontSize="13"
+                       FontFamily="{DynamicResource DefaultLightFontFamily}">
+              <TextBlock.Text>
+                <MultiBinding Converter="{StaticResource AmountToStringConverter}">
+                  <Binding Path="EstimatedMaxAmount"/>
+                  <Binding Path="FromCurrencyViewModel.CurrencyFormat"/>
+                </MultiBinding>
+              </TextBlock.Text>         
+            </TextBlock>
+            <TextBlock Margin="4 0 0 0"
+                       Text="{Binding FromCurrencyViewModel.CurrencyCode}"
+                       VerticalAlignment="Center"
+                       Foreground="{DynamicResource SecondaryForegroundBrush}"
+                       FontSize="13"
+                       FontFamily="{DynamicResource DefaultLightFontFamily}"/>
+            <Button Padding="3"
+                    VerticalAlignment="Center"
+                    VerticalContentAlignment="Center"
+                    ToolTip.Placement="AnchorAndGravity"
+                    ToolTip.Tip="The limit applies to a single trade. In case you require more liquidity make multiple trades"
+                    ToolTip.VerticalOffset="40"
+                    Click="HelpClickHandler"
+                    Classes="ButtonWithIcon">
+              <Path HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Width="12"
+                    Height="12"
+                    Data="{DynamicResource Help}"
+                    Fill="{DynamicResource LightDefaultOpacity20}"/>
+            </Button>           
+          </StackPanel>
+        </StackPanel>
+      </Grid>
+
+      <StackPanel Orientation="Horizontal"
+                  Width="486"
+                  Margin="0 0 0 16"
+                  IsVisible="True">
+        <TextBlock Text="{Binding ValidationMessage}"
+                   MaxWidth="471"
+                   TextWrapping="Wrap"
+                   Foreground="{DynamicResource LightDefaultOpacity50}"
+                   FontSize="13"
+                   FontFamily="{DynamicResource DefaultLightFontFamily}">
+          <i:Interaction.Behaviors>
+            <ia:DataTriggerBehavior Binding="{Binding ValidationMessageType}"
+                                    ComparisonCondition="Equal"
+                                    Value="Warning">
+              <ia:ChangePropertyAction TargetObject="{Binding self}"
+                                       PropertyName="Foreground"
+                                       Value="{DynamicResource Orange}"/>
+            </ia:DataTriggerBehavior>
+            <ia:DataTriggerBehavior Binding="{Binding ValidationMessageType}"
+                                    ComparisonCondition="Equal"
+                                    Value="Error">
+              <ia:ChangePropertyAction TargetObject="{Binding self}"
+                                       PropertyName="Foreground"
+                                       Value="{DynamicResource DarkRed}"/>
+            </ia:DataTriggerBehavior>
+          </i:Interaction.Behaviors>
+        </TextBlock>
+        <Button Padding="3"
+                VerticalAlignment="Center"
+                VerticalContentAlignment="Center"
+                ToolTip.Tip="{Binding ValidationMessageToolTip}"
+                ToolTip.Placement="AnchorAndGravity"
+                ToolTip.VerticalOffset="30"
+                Click="HelpClickHandler"
+                Classes="ButtonWithIcon">
+          <Path HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                Width="12"
+                Height="12"
+                Data="{DynamicResource Help}"
+                Fill="{DynamicResource LightDefaultOpacity20}"/>
+        </Button>
+      </StackPanel>
+          
+      <controls:RoundedButton Width="486"
+                              Height="52"
+                              CornerRadius="6"
+                              Content="Exchange"
+                              FontSize="18"
+                              FontFamily="{DynamicResource DefaultFontFamily}"
+                              FontWeight="Normal"
+                              Command="{Binding ConvertCommand}"
+                              IsEnabled="{Binding CanConvert}"/>
+    </StackPanel>
+
+    <TextBlock Margin="48 64 48 0"
+               Text="Swap History"    
+               Foreground="{DynamicResource DefaultForegroundBrush}"
+               FontSize="22"
+               FontFamily="{DynamicResource DefaultLightFontFamily}"
+               Grid.Column="0"
+               Grid.Row="1"/>
+    
+    <DataGrid x:Name="DgConversions"
+              Margin="48 16 48 7"
+              Background="Transparent"
+              AutoGenerateColumns="False"
+              IsReadOnly="True"
+              Cursor="Hand"
+              RowDetailsVisibilityMode="VisibleWhenSelected"
+              SelectionMode="Single"
+              Items="{Binding Swaps}"
+              
+              CanUserResizeColumns="True"
+              Grid.Column="0"
+              Grid.ColumnSpan="{Binding ColumnSpan}"
+              Grid.Row="2">
+      <DataGrid.Columns>
+        <DataGridTemplateColumn Header="From - To"
+                                CanUserSort="False"
+                                Width="*">
+          <DataGridTemplateColumn.CellTemplate>
+            <DataTemplate DataType="{x:Type vm:SwapViewModel}">
+              <StackPanel Orientation="Horizontal" Margin="10 0 5 0">
+                <TextBlock Text="Convert "
+                            FontFamily="{DynamicResource DefaultFontFamily}"
+                            FontSize="13" />
+                <TextBlock FontFamily="{DynamicResource DefaultMediumFontFamily}"
+                            FontSize="13"
+                            Foreground="{Binding FromBrush}">
+                  <TextBlock.Text>
+                    <MultiBinding Converter="{StaticResource AmountToStringConverter}">
+                      <Binding Path="FromAmount" Mode="OneWay" />
+                      <Binding Path="FromAmountFormat" Mode="OneWay" />
+                    </MultiBinding>
+                  </TextBlock.Text>
+                </TextBlock>
+                <TextBlock Text="{Binding FromCurrencyCode}"
+                            FontFamily="{DynamicResource DefaultMediumFontFamily}"
+                            FontSize="9"
+                            Foreground="{Binding FromBrush}"
+                            VerticalAlignment="Bottom"
+                            Margin="3 3 0 2" />
+                <TextBlock Text=" to "
+                            FontFamily="{DynamicResource DefaultFontFamily}"
+                            FontSize="13" />
+                <TextBlock FontFamily="{DynamicResource DefaultMediumFontFamily}"
+                            FontSize="13"
+                            Foreground="{Binding ToBrush}">
+                  <TextBlock.Text>
+                    <MultiBinding Converter="{StaticResource AmountToStringConverter}">
+                      <Binding Path="ToAmount" Mode="OneWay" />
+                      <Binding Path="ToAmountFormat" Mode="OneWay" />
+                    </MultiBinding>
+                  </TextBlock.Text>
+                </TextBlock>
+                <TextBlock Text="{Binding ToCurrencyCode}"
+                            FontFamily="{DynamicResource DefaultMediumFontFamily}"
+                            FontSize="9"
+                            Foreground="{Binding ToBrush}"
+                            VerticalAlignment="Bottom"
+                            Margin="3 0 0 2" />
+              </StackPanel>
+            </DataTemplate>
+          </DataGridTemplateColumn.CellTemplate>
+        </DataGridTemplateColumn>
+        <DataGridTemplateColumn Header="Status"
+                                MinWidth="82">
+          <DataGridTemplateColumn.CellTemplate>
+            <DataTemplate>
+              <styles:TypeTest>
+                <styles:TypeTest.DataTemplate>
+                  <controls:SwapStateDataTemplateSelector />
+                </styles:TypeTest.DataTemplate>
+              </styles:TypeTest>
+            </DataTemplate>
+          </DataGridTemplateColumn.CellTemplate>
+        </DataGridTemplateColumn>
+        <DataGridTextColumn Header="Time"
+                            MinWidth="158"
+                            Binding="{Binding LocalTime, Converter={StaticResource DateTimeToTxTimeConverter}}" />
+      </DataGrid.Columns>
+    </DataGrid>
       
-        <views:SwapDetailsView
-            Grid.Row="0"
-            Grid.Column="1"
-            Grid.RowSpan="2"
-            IsVisible="{Binding $parent.DataContext.DetailsVisible}"
-            DataContext="{Binding SwapDetailsViewModel}"/>
-    </Grid>
+      <!--<DataGrid x:Name="DgConversions"
+                Margin="48 64 48 0"
+                AutoGenerateColumns="False"
+                IsReadOnly="True"
+                Cursor="Hand"
+                RowDetailsVisibilityMode="VisibleWhenSelected"
+                SelectionMode="Single"
+                Items="{Binding Swaps}"
+                CanUserResizeColumns="True"
+                Grid.ColumnSpan="{Binding ColumnSpan}"
+                Grid.Column="0"
+                Grid.Row="1">
+          <DataGrid.Columns>
+              <DataGridTemplateColumn Header="DESCRIPTION" CanUserSort="False" Width="*">
+                  <DataGridTemplateColumn.CellTemplate>
+                      <DataTemplate DataType="{x:Type vm:SwapViewModel}">
+                          <StackPanel Orientation="Horizontal" Margin="10 0 5 0">
+                              <TextBlock Text="Convert "
+                                          FontFamily="{DynamicResource DefaultFontFamily}"
+                                          FontSize="13" />
+                              <TextBlock FontFamily="{DynamicResource DefaultMediumFontFamily}"
+                                          FontSize="13"
+                                          Foreground="{Binding FromBrush}">
+                                  <TextBlock.Text>
+                                      <MultiBinding Converter="{StaticResource AmountToStringConverter}">
+                                          <Binding Path="FromAmount" Mode="OneWay" />
+                                          <Binding Path="FromAmountFormat" Mode="OneWay" />
+                                      </MultiBinding>
+                                  </TextBlock.Text>
+                              </TextBlock>
+                              <TextBlock Text="{Binding FromCurrencyCode}"
+                                          FontFamily="{DynamicResource DefaultMediumFontFamily}"
+                                          FontSize="9"
+                                          Foreground="{Binding FromBrush}"
+                                          VerticalAlignment="Bottom"
+                                          Margin="3 3 0 2" />
+                              <TextBlock Text=" to "
+                                          FontFamily="{DynamicResource DefaultFontFamily}"
+                                          FontSize="13" />
+                              <TextBlock FontFamily="{DynamicResource DefaultMediumFontFamily}"
+                                          FontSize="13"
+                                          Foreground="{Binding ToBrush}">
+                                  <TextBlock.Text>
+                                      <MultiBinding Converter="{StaticResource AmountToStringConverter}">
+                                          <Binding Path="ToAmount" Mode="OneWay" />
+                                          <Binding Path="ToAmountFormat" Mode="OneWay" />
+                                      </MultiBinding>
+                                  </TextBlock.Text>
+                              </TextBlock>
+                              <TextBlock Text="{Binding ToCurrencyCode}"
+                                          FontFamily="{DynamicResource DefaultMediumFontFamily}"
+                                          FontSize="9"
+                                          Foreground="{Binding ToBrush}"
+                                          VerticalAlignment="Bottom"
+                                          Margin="3 0 0 2" />
+                          </StackPanel>
+                      </DataTemplate>
+                  </DataGridTemplateColumn.CellTemplate>
+              </DataGridTemplateColumn>
+              <DataGridTemplateColumn Header="STATE" MinWidth="82">
+                  <DataGridTemplateColumn.CellTemplate>
+                      <DataTemplate>
+                          <styles:TypeTest>
+                              <styles:TypeTest.DataTemplate>
+                                  <controls:SwapStateDataTemplateSelector />
+                              </styles:TypeTest.DataTemplate>
+                          </styles:TypeTest>
+                      </DataTemplate>
+                  </DataGridTemplateColumn.CellTemplate>
+              </DataGridTemplateColumn>
+              <DataGridTextColumn Header="TIME"
+                                  MinWidth="158"
+                                  Binding="{Binding LocalTime, Converter={StaticResource DateTimeToTxTimeConverter}}" />
+          </DataGrid.Columns>
+      </DataGrid>-->
+      
+    <views:SwapDetailsView
+      Grid.Row="0"
+      Grid.Column="1"
+      Grid.RowSpan="3"
+      IsVisible="{Binding $parent.DataContext.DetailsVisible}"
+      DataContext="{Binding SwapDetailsViewModel}"/>
+  </Grid>
 </UserControl>

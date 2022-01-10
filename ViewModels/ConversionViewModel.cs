@@ -76,6 +76,15 @@ namespace Atomex.Client.Desktop.ViewModels
 
         [Reactive] public bool IsRedeemAddressUsed { get; set; }
 
+        [Reactive] public string BaseCurrencyCode { get; set; }
+        [Reactive] public string QuoteCurrencyCode { get; set; }
+
+        [Reactive] public string ValidationMessage { get; set; }
+        [Reactive] public string ValidationMessageToolTip { get; set; }
+        [Reactive] public MessageType ValidationMessageType { get; set; }
+
+
+
 
         [Reactive]
         public List<CurrencyViewModel>? FromCurrencies { get; set; }
@@ -87,8 +96,7 @@ namespace Atomex.Client.Desktop.ViewModels
         [Reactive]
         public CurrencyViewModel? ToCurrencyViewModel { get; set; }
 
-        [ObservableAsProperty]
-        public string PriceFormat { get; }
+        [ObservableAsProperty] public string PriceFormat { get; }
 
         private decimal _amount;
         public string AmountString
@@ -133,8 +141,7 @@ namespace Atomex.Client.Desktop.ViewModels
 
         private decimal _estimatedOrderPrice;
 
-        [Reactive]
-        public decimal EstimatedPrice { get; set; }
+        [Reactive] public decimal EstimatedPrice { get; set; }
 
         [Reactive]
         public decimal EstimatedMaxAmount { get; set; }
@@ -833,13 +840,26 @@ namespace Atomex.Client.Desktop.ViewModels
             FromValidationMessage = "Error line Error line Error line Error line Error line Error line " +
                 "Error line Error line Error line Error line Error line Error line Error line";
             FromValidationMessageToolTip = "Unknown super mega error description";
-            FromValidationMessageType = MessageType.Error;
+            FromValidationMessageType = MessageType.Warning;
 
             var currencyViewModels = new List<CurrencyViewModel>
             {
                 CurrencyViewModelCreator.CreateViewModel(btc, subscribeToUpdates: false),
                 CurrencyViewModelCreator.CreateViewModel(ltc, subscribeToUpdates: false)
             };
+
+            BaseCurrencyCode = "ETH";
+            QuoteCurrencyCode = "BTC";
+            EstimatedPrice = 0.01235678m;
+            EstimatedTotalNetworkFeeInBase = 14.88m;
+
+            ValidationMessage = "Error line Error line Error line Error line Error line Error line " +
+                "Error line Error line Error line Error line Error line Error line Error line";
+            ValidationMessageToolTip = "Unknown super mega error description";
+            ValidationMessageType = MessageType.Error;
+
+
+
 
             FromCurrencies = currencyViewModels;
             FromCurrencyViewModel = currencyViewModels.First(c => c.Currency.Name == btc.Name);

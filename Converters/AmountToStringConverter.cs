@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+
 using Avalonia;
 using Avalonia.Data.Converters;
-
 
 namespace Atomex.Client.Desktop.Converters
 {
@@ -23,16 +23,16 @@ namespace Atomex.Client.Desktop.Converters
             return amount.ToString(format, culture);
         }
 
-        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
-        {
-            if (!(value is string s))
-                throw new InvalidOperationException("Invalid value");
+        //public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
+        //{
+        //    if (value is not string s)
+        //        throw new InvalidOperationException("Invalid value");
 
-            return new object[]
-            {
-                string.IsNullOrEmpty(s) ? 0.0m : decimal.Parse(s, culture),
-                null
-            };
-        }
+        //    return new object[]
+        //    {
+        //        string.IsNullOrEmpty(s) ? 0.0m : decimal.Parse(s, culture),
+        //        null
+        //    };
+        //}
     }
 }
