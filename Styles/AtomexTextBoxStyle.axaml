@@ -37,13 +37,38 @@
         <Setter Property="Background" Value="{TemplateBinding Background}" />
     </Style>
 
-    <Style Selector="TextBox:focus /template/ Border">
+    <Style Selector="TextBox.AtomexTextBox:focus /template/ Border">
         <Setter Property="Background" Value="{TemplateBinding Background}" />
         <Setter Property="BorderBrush" Value="{DynamicResource CustomTextBoxBorderBrush}" />
         <Setter Property="BorderThickness" Value="1" />
     </Style>
 
-    <Style Selector="TextBox:pointerover /template/ Border">
+    <Style Selector="TextBox.AtomexTextBox:pointerover /template/ Border">
         <Setter Property="Background" Value="{TemplateBinding Background}" />
+    </Style>
+    
+    <Style Selector="TextBox.SearchTextBox">
+        <Setter Property="Background" Value="{DynamicResource LightDefaultOpacity6}" />
+        <Setter Property="Foreground" Value="{DynamicResource DefaultForegroundBrush}" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="Padding" Value="12 10" />
+        <Setter Property="FontFamily" Value="{DynamicResource DefaultFontFamily}" />
+        <Setter Property="CaretBrush" Value="{DynamicResource LightDefault}" />
+    </Style>
+
+    <Style Selector="TextBox.SearchTextBox /template/ Border">
+        <Setter Property="Background" Value="{DynamicResource LightDefaultOpacity6}" />
+        <Setter Property="CornerRadius" Value="{TemplateBinding CornerRadius}" />
+    </Style>
+
+    <Style Selector="TextBox.SearchTextBox:focus /template/ Border">
+        <Setter Property="BorderBrush" Value="{DynamicResource CustomTextBoxBorderBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+    </Style>
+
+    <Style
+        Selector="TextBox.SearchTextBox /template/ TextBlock#PART_Watermark, TextBox.SearchTextBox /template/ TextBlock#PART_FloatingWatermark">
+        <Setter Property="Foreground" Value="{DynamicResource SecondaryForegroundBrush}" />
     </Style>
 </Styles>

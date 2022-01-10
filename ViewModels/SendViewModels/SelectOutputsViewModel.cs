@@ -5,11 +5,15 @@ using System.Globalization;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
+using System.Threading.Tasks;
 using System.Windows.Input;
 using Atomex.Blockchain.BitcoinBased;
 using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
+using Atomex.Common;
 using Avalonia.Controls;
+using DynamicData;
+using DynamicData.Binding;
 using NBitcoin;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
@@ -21,6 +25,8 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
     {
         public Action BackAction { get; set; }
         [Reactive] public ObservableCollection<OutputViewModel> Outputs { get; set; }
+
+        [Reactive] public string SearchText { get; set; }
 
         public SelectOutputsViewModel()
         {
@@ -66,9 +72,9 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
         private bool _checkedFromList;
 
-        private ICommand _outputCheckCommand;
+        private ReactiveCommand<Unit, Unit> _outputCheckCommand;
 
-        public ICommand OutputCheckCommand => _outputCheckCommand ??=
+        public ReactiveCommand<Unit, Unit> OutputCheckCommand => _outputCheckCommand ??=
             (_outputCheckCommand = ReactiveCommand.Create(() =>
             {
                 _checkedFromList = true;
@@ -77,19 +83,19 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     SelectAll = selectionResult;
             }));
 
-        private ICommand _selectAllCommand;
+        private ReactiveCommand<Unit, Unit> _selectAllCommand;
 
-        public ICommand SelectAllCommand => _selectAllCommand ??=
+        public ReactiveCommand<Unit, Unit> SelectAllCommand => _selectAllCommand ??=
             (_selectAllCommand = ReactiveCommand.Create(() => { _checkedFromList = false; }));
 
-        private ICommand _closeCommand;
+        private ReactiveCommand<Unit, Unit> _closeCommand;
 
-        public ICommand CloseCommand => _closeCommand ??=
+        public ReactiveCommand<Unit, Unit> CloseCommand => _closeCommand ??=
             (_closeCommand = ReactiveCommand.Create(() => { Desktop.App.DialogService.Close(); }));
 
-        private ICommand _backCommand;
+        private ReactiveCommand<Unit, Unit> _backCommand;
 
-        public ICommand BackCommand => _backCommand ??=
+        public ReactiveCommand<Unit, Unit> BackCommand => _backCommand ??=
             (_backCommand = ReactiveCommand.Create(() => { BackAction?.Invoke(); }));
 
         private ReactiveCommand<Unit, Unit> _changeSortTypeCommand;
@@ -97,9 +103,27 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         public ReactiveCommand<Unit, Unit> ChangeSortTypeCommand => _changeSortTypeCommand ??=
             (_changeSortTypeCommand = ReactiveCommand.Create(() => { SortIsAscending = !SortIsAscending; }));
 
+        private ReactiveCommand<Unit, Unit> _confirmCommand;
+
+        public ReactiveCommand<Unit, Unit> ConfirmCommand => _confirmCommand ??=
+            (_confirmCommand = ReactiveCommand.Create(() => { Log.Information("Confirm Command"); }));
+
+
+        private ICommand _copyAddressCommand;
+
+        public ICommand CopyAddressCommand =>
+            _copyAddressCommand ??= (_copyAddressCommand = ReactiveCommand.Create((string address) =>
+            {
+                _ = App.Clipboard.SetTextAsync(address);
+
+                Outputs.ForEachDo(output => output.CopyButtonToolTip = OutputViewModel.DefaultCopyButtonToolTip);
+                Outputs.First(output => output.Address == address).CopyButtonToolTip =
+                    OutputViewModel.CopiedButtonToolTip;
+            }));
+
         private void DesignerMode()
         {
-            var amount = new Money((decimal) 0.9999, MoneyUnit.Satoshi);
+            var amount = new Money((decimal)0.9999, MoneyUnit.Satoshi);
             var script = BitcoinAddress.Create("muRDku2ZwNTz2msCZCHSUhDD5o6NxGsoXM", Network.TestNet).ScriptPubKey;
 
             var outputs = new List<BitcoinBasedTxOutput>
@@ -129,26 +153,28 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             Outputs = new ObservableCollection<OutputViewModel>(outputs.Select(output => new OutputViewModel
             {
                 Output = output,
-                Config = (BitcoinBasedConfig) btcCurrencyConfig
+                Config = (BitcoinBasedConfig)btcCurrencyConfig
             }));
         }
     }
 
     public class OutputViewModel : ViewModelBase
     {
+        public const string DefaultCopyButtonToolTip = "Copy address to clipboard";
+        public const string CopiedButtonToolTip = "Successfully copied!";
+
+        public OutputViewModel()
+        {
+            CopyButtonToolTip = DefaultCopyButtonToolTip;
+        }
+
         [Reactive] public bool IsSelected { get; set; }
+        [Reactive] public string CopyButtonToolTip { get; set; }
         public BitcoinBasedTxOutput Output { get; set; }
         public BitcoinBasedConfig Config { get; set; }
 
         private decimal Balance => Config.SatoshiToCoin(Output.Value);
-        public string BalanceString => Balance.ToString(Config.Format, CultureInfo.InvariantCulture);
-
+        public string BalanceString => $"{Balance.ToString(Config.Format, CultureInfo.InvariantCulture)} {Config.Name}";
         public string Address => Output.DestinationAddress(Config.Network);
-
-
-        private ReactiveCommand<Unit, Unit> _copyCommand;
-
-        public ReactiveCommand<Unit, Unit> CopyCommand =>
-            _copyCommand ??= (_copyCommand = ReactiveCommand.CreateFromTask(() => App.Clipboard.SetTextAsync(Address)));
     }
 }

@@ -5,49 +5,15 @@
              mc:Ignorable="d" d:DesignWidth="700" d:DesignHeight="650"
              x:Class="Atomex.Client.Desktop.Views.SendViews.SelectOutputsView"
              xmlns:svg="clr-namespace:Avalonia.Svg.Skia;assembly=Avalonia.Svg.Skia"
-             xmlns:vm="clr-namespace:Atomex.Client.Desktop.ViewModels.SendViewModels">
+             xmlns:vm="clr-namespace:Atomex.Client.Desktop.ViewModels.SendViewModels"
+             xmlns:controls="clr-namespace:Atomex.Client.Desktop.Controls">
 
     <Design.DataContext>
         <vm:SelectOutputsViewModel />
     </Design.DataContext>
 
-    <UserControl.Resources>
-        <SolidColorBrush x:Key="LightDefault" Color="#AAC4DEFF" />
-    </UserControl.Resources>
-
     <UserControl.Styles>
-        <Style Selector="Button.ButtonWithIcon > Path">
-            <Setter Property="Fill" Value="{StaticResource LightDefault}" />
-        </Style>
-
-        <Style Selector="TextBox.SearchTextBox">
-            <Setter Property="Background" Value="{DynamicResource LightDefaultOpacity6}" />
-            <Setter Property="BorderBrush" Value="{DynamicResource LightDefaultOpacity6}" />
-            <Setter Property="Foreground" Value="{DynamicResource DefaultForegroundBrush}" />
-            <Setter Property="Padding" Value="12 10" />
-            <Setter Property="BorderThickness" Value="0" />
-            <Setter Property="FontFamily" Value="{DynamicResource DefaultFontFamily}" />
-            <Setter Property="CaretBrush" Value="{DynamicResource LightDefault}" />
-
-        </Style>
-
-        <Style Selector="TextBox.SearchTextBox:not(:disabled) /template/ Border#PART_BorderElement">
-            <Setter Property="Background" Value="{DynamicResource LightDefaultOpacity6}" />
-            <Setter Property="BorderBrush" Value="{DynamicResource LightDefaultOpacity6}" />
-        </Style>
-
-        <Style Selector="TextBox.SearchTextBox:disabled /template/ Border#PART_BorderElement">
-            <Setter Property="Background" Value="{DynamicResource LightDefaultOpacity6}" />
-            <Setter Property="BorderBrush" Value="{DynamicResource LightDefaultOpacity6}" />
-        </Style>
-
-        <Style
-            Selector="TextBox.SearchTextBox /template/ TextBlock#PART_Watermark, TextBox.SearchTextBox /template/ TextBlock#PART_FloatingWatermark">
-            <Setter Property="Foreground" Value="{DynamicResource SecondaryForegroundBrush}" />
-        </Style>
-
         <Style Selector="Border.SortIcon[IsEnabled=False]" />
-
         <Style Selector="Border.SortIcon">
             <Setter Property="RenderTransform" Value="rotate(180deg)" />
             <Setter Property="Transitions">
@@ -67,7 +33,8 @@
             Width="700">
 
         <StackPanel Orientation="Vertical">
-            <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto">
+            <Grid ColumnDefinitions="Auto,*"
+                  RowDefinitions="Auto">
                 <Button Grid.Column="0"
                         Width="28"
                         Height="28"
@@ -94,15 +61,14 @@
 
             <Border Margin="-24 16 -24 0"
                     Height="1"
-                    Opacity="0.1"
-                    Background="{StaticResource LightDefault}" />
+                    Background="{DynamicResource LightDefaultOpacity10}" />
 
             <TextBox Margin="0 16 0 0"
                      Height="44"
                      CornerRadius="8"
                      Watermark="Search"
                      FontSize="16"
-                     BorderThickness="0"
+                     Text="{Binding SearchText, Mode=TwoWay}"
                      Classes="SearchTextBox" />
 
 
@@ -147,56 +113,111 @@
 
             <Border Margin="-24 10 -24 0"
                     Height="1"
-                    Opacity="0.1"
-                    Background="{StaticResource LightDefault}" />
+                    Background="{StaticResource LightDefaultOpacity10}" />
 
-            <ListBox Background="Transparent"
-                     MaxHeight="450"
+            <ListBox MaxHeight="315"
+                     Background="{DynamicResource AlmostTransparentBrush}"
                      ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                      Items="{Binding Outputs}"
                      SelectionMode="Multiple">
                 <ListBox.Styles>
-                    <Style Selector="ListBoxItem:selected /template/ ContentPresenter#PART_ContentPresenter CheckBox">
-                        <Setter Property="IsChecked" Value="True" />
+                    <Style Selector="ListBoxItem">
+                        <Setter Property="Padding" Value="0" />
                     </Style>
-
-                    <Style
-                        Selector="ListBoxItem:not(:selected) /template/ ContentPresenter#PART_ContentPresenter CheckBox">
-                        <Setter Property="IsChecked" Value="False" />
+                    <Style Selector="ListBoxItem:pointerover /template/ ContentPresenter">
+                        <Setter Property="Background" Value="{DynamicResource ButtonBackgroundPointerOver}" />
+                    </Style>
+                    <Style Selector="ListBoxItem:not(:pointerover) /template/ ContentPresenter">
+                        <Setter Property="Background" Value="{DynamicResource AlmostTransparentBrush}" />
                     </Style>
                 </ListBox.Styles>
+
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <Grid ColumnDefinitions="*,Auto,Auto"
+                              Margin="0 10 0 10"
+                              Background="Transparent"
+                              HorizontalAlignment="Stretch"
                               RowDefinitions="Auto">
                             <CheckBox Grid.Column="0"
+                                      Padding="12 0 0 0"
+                                      Width="520"
+                                      VerticalContentAlignment="Center"
+                                      VerticalAlignment="Center"
                                       Content="{Binding Address}"
                                       IsChecked="{Binding IsSelected, Mode=TwoWay}"
                                       Command="{Binding $parent[ListBox].DataContext.OutputCheckCommand}"
-                                      FontSize="13"
+                                      FontSize="16"
                                       FontFamily="{DynamicResource DefaultLightFontFamily}"
-                                      Foreground="{DynamicResource SecondaryForegroundBrush}" />
+                                      Foreground="{DynamicResource DefaultForegroundBrush}" />
 
                             <TextBlock Grid.Column="1"
+                                       VerticalAlignment="Center"
+                                       Margin="0 0 20 0"
+                                       Foreground="{DynamicResource SecondaryForegroundBrush}"
+                                       FontSize="16"
                                        Text="{Binding BalanceString}" />
 
-                            <Button Grid.Column="2"
-                                    Padding="3"
-                                    BorderThickness="0"
-                                    VerticalContentAlignment="Center"
-                                    Command="{Binding CopyCommand}"
-                                    Classes="ButtonWithIcon">
+                            <Border Grid.Column="2"
+                                    ToolTip.Placement="AnchorAndGravity"
+                                    ToolTip.VerticalOffset="-32">
+                                <Button Padding="3"
+                                        BorderThickness="0"
+                                        VerticalContentAlignment="Center"
+                                        Command="{Binding $parent[ListBox].DataContext.CopyAddressCommand}"
+                                        CommandParameter="{Binding Address}"
+                                        Classes="ButtonWithIcon">
 
-                                <svg:Svg HorizontalAlignment="Center"
-                                         VerticalAlignment="Center"
-                                         Width="24"
-                                         Height="24"
-                                         Path="/Resources/Icons/copy.svg" />
-                            </Button>
+                                    <svg:Svg HorizontalAlignment="Center"
+                                             VerticalAlignment="Center"
+                                             Width="24"
+                                             Height="24"
+                                             Path="/Resources/Icons/copy.svg" />
+                                </Button>
+                                <ToolTip.Tip>
+                                    <TextBlock Text="{Binding CopyButtonToolTip}" />
+                                </ToolTip.Tip>
+                            </Border>
                         </Grid>
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>
+
+            <Border Margin="-24 0 -24 16"
+                    Height="1"
+                    Background="{DynamicResource LightDefaultOpacity10}" />
+
+            <Grid ColumnDefinitions="*,Auto">
+                <StackPanel Grid.Column="0"
+                            Margin="0 0 24 0"
+                            VerticalAlignment="Center"
+                            Orientation="Vertical">
+                    <TextBlock HorizontalAlignment="Right"
+                               Margin="0 0 0 2"
+                               LineHeight="16"
+                               FontSize="13"
+                               FontFamily="{DynamicResource DefaultFontFamily}"
+                               Foreground="{DynamicResource SecondaryForegroundBrush}"
+                               Text="10 selected" />
+                    <TextBlock HorizontalAlignment="Right"
+                               Margin="0 2 0 0"
+                               LineHeight="16"
+                               FontSize="13"
+                               FontFamily="{DynamicResource DefaultFontFamily}"
+                               Foreground="{DynamicResource SecondaryForegroundBrush}"
+                               Text="Total 0.003442 BTC" />
+                </StackPanel>
+
+                <controls:RoundedButton Grid.Column="1"
+                                        Width="200"
+                                        Height="50"
+                                        CornerRadius="6"
+                                        Content="Confirm"
+                                        FontSize="18"
+                                        FontFamily="{DynamicResource DefaultFontFamily}"
+                                        FontWeight="Normal"
+                                        Command="{Binding ConfirmCommand}" />
+            </Grid>
         </StackPanel>
     </Border>
 </UserControl>
