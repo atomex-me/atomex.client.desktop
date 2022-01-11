@@ -68,7 +68,7 @@
                      CornerRadius="8"
                      Watermark="Search"
                      FontSize="16"
-                     Text="{Binding SearchText, Mode=TwoWay}"
+                     Text="{Binding SearchPattern, Mode=TwoWay}"
                      Classes="SearchTextBox" />
 
 

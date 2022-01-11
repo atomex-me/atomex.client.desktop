@@ -23,6 +23,8 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         public Action BackAction { get; set; }
         public BitcoinBasedConfig Config { get; set; }
 
+        private ObservableCollection<OutputViewModel> InitialOutputs { get; set; }
+
         public SelectOutputsViewModel()
         {
 #if DEBUG
@@ -63,12 +65,31 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 {
                     Outputs = new ObservableCollection<OutputViewModel>(
                         outputs.OrderByDescending(output => output.BalanceString));
+                    InitialOutputs = new ObservableCollection<OutputViewModel>(Outputs);
+
                     RecalculateTotalStats();
+                });
+
+            this.WhenAnyValue(vm => vm.SearchPattern)
+                .Where(_ => Outputs != null)
+                .Subscribe(searchPattern =>
+                {
+                    Outputs = SortIsAscending
+                        ? new ObservableCollection<OutputViewModel>(
+                            InitialOutputs
+                                .OrderBy(output => output.BalanceString)
+                                .Where(output => output.Address.ToLower().Contains(searchPattern.ToLower()))
+                        )
+                        : new ObservableCollection<OutputViewModel>(
+                            InitialOutputs
+                                .OrderByDescending(output => output.BalanceString)
+                                .Where(output => output.Address.ToLower().Contains(searchPattern.ToLower()))
+                        );
                 });
         }
 
         [Reactive] public ObservableCollection<OutputViewModel> Outputs { get; set; }
-        [Reactive] public string SearchText { get; set; }
+        [Reactive] public string SearchPattern { get; set; }
         [Reactive] public bool SelectAll { get; set; }
         [Reactive] public bool SortIsAscending { get; set; }
         [Reactive] public string TotalSelected { get; set; }
