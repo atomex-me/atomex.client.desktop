@@ -1,6 +1,8 @@
 ﻿using System;
+
 using Avalonia.Media;
-using Serilog;
+
+using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
 
 namespace Atomex.Client.Desktop.ViewModels
 {
@@ -28,11 +30,13 @@ namespace Atomex.Client.Desktop.ViewModels
         public DateTime Time { get; set; }
         public DateTime LocalTime => Time.ToLocalTime();
 
+        public CurrencyViewModel FromCurrencyViewModel { get; set; }
         public IBrush FromBrush { get; set; }
         public decimal FromAmount { get; set; }
         public string FromAmountFormat { get; set; }
         public string FromCurrencyCode { get; set; }
 
+        public CurrencyViewModel ToCurrencyViewModel { get; set; }
         public IBrush ToBrush { get; set; }
         public decimal ToAmount { get; set; }
         public string ToAmountFormat { get; set; }
@@ -43,26 +47,19 @@ namespace Atomex.Client.Desktop.ViewModels
 
         public SwapDetailsViewModel Details { get; set; }
         
-
         public string State
         {
             get
             {
-                switch (CompactState)
+                return CompactState switch
                 {
-                    case SwapCompactState.Canceled:
-                        return "Canceled";
-                    case SwapCompactState.InProgress:
-                        return "In Progress";
-                    case SwapCompactState.Completed:
-                        return "Completed";
-                    case SwapCompactState.Refunded:
-                        return "Refunded";
-                    case SwapCompactState.Unsettled:
-                        return "Unsettled";
-                    default:
-                        throw new ArgumentOutOfRangeException();
-                }
+                    SwapCompactState.Canceled   => "Canceled",
+                    SwapCompactState.InProgress => "In Progress",
+                    SwapCompactState.Completed  => "Completed",
+                    SwapCompactState.Refunded   => "Refunded",
+                    SwapCompactState.Unsettled  => "Unsettled",
+                    _ => throw new ArgumentOutOfRangeException(),
+                };
             }
         }
     }

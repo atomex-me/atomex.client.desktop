@@ -1,11 +1,11 @@
 ﻿using System;
-using Atomex.Blockchain.Abstract;
+
 using Avalonia.Controls;
 using Avalonia.Controls.Templates;
+using Avalonia.Markup.Xaml.Templates;
+
 using Atomex.Client.Desktop.Services;
 using Atomex.Client.Desktop.ViewModels;
-using Atomex.Client.Desktop.ViewModels.TransactionViewModels;
-using Avalonia.Markup.Xaml.Templates;
 
 namespace Atomex.Client.Desktop.Controls
 {
@@ -20,29 +20,20 @@ namespace Atomex.Client.Desktop.Controls
 
         private static DataTemplate? GetTemplate(object data)
         {
-            if (!(data is SwapViewModel swap))
+            if (data is not SwapViewModel swap)
                 return null;
 
-            switch (swap.CompactState)
+            return swap.CompactState switch
             {
-                case SwapCompactState.Canceled:
-                    return App.TemplateService.GetSwapStateTemplate(SwapStateTemplate.SwapCanceledTemplate);
-                case SwapCompactState.InProgress:
-                    return App.TemplateService.GetSwapStateTemplate(SwapStateTemplate.SwapInProgressTemplate);
-                case SwapCompactState.Completed:
-                    return App.TemplateService.GetSwapStateTemplate(SwapStateTemplate.SwapCompletedTemplate);
-                case SwapCompactState.Refunded:
-                    return App.TemplateService.GetSwapStateTemplate(SwapStateTemplate.SwapRefundTemplate);
-                case SwapCompactState.Unsettled:
-                    return App.TemplateService.GetSwapStateTemplate(SwapStateTemplate.SwapUnsettledTemplate);
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
+                SwapCompactState.Canceled   => App.TemplateService.GetSwapStateTemplate(SwapStateTemplate.SwapCanceledTemplate),
+                SwapCompactState.InProgress => App.TemplateService.GetSwapStateTemplate(SwapStateTemplate.SwapInProgressTemplate),
+                SwapCompactState.Completed  => App.TemplateService.GetSwapStateTemplate(SwapStateTemplate.SwapCompletedTemplate),
+                SwapCompactState.Refunded   => App.TemplateService.GetSwapStateTemplate(SwapStateTemplate.SwapRefundTemplate),
+                SwapCompactState.Unsettled  => App.TemplateService.GetSwapStateTemplate(SwapStateTemplate.SwapUnsettledTemplate),
+                _ => throw new ArgumentOutOfRangeException($"Unknown swap compact state {swap.CompactState}"),
+            };
         }
 
-        public bool Match(object data)
-        {
-            return data is SwapViewModel;
-        }
+        public bool Match(object data) => data is SwapViewModel;
     }
 }

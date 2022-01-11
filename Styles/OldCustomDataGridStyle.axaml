@@ -1,0 +1,180 @@
+﻿<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:helpers="clr-namespace:Atomex.Client.Desktop.Helpers"
+        xmlns:dialogHost="clr-namespace:DialogHost;assembly=DialogHost.Avalonia"
+        xmlns:converters="clr-namespace:Atomex.Client.Desktop.Converters">
+
+  <Styles.Resources>
+    <converters:ShouldShowSort x:Key="ShouldShowSort" />
+    <converters:AddAscToStringConverter x:Key="AddAscToStringConverter" />
+    <converters:AddDescToStringConverter x:Key="AddDescToStringConverter" />
+    <converters:DialogOpenedToBorderThicknessConverter x:Key="DialogOpenedToBorderThicknessConverter" />
+  </Styles.Resources>
+
+  <Style Selector="Path.SortPath[IsEnabled=False]">
+    <Setter Property="Opacity" Value="0" />
+  </Style>
+
+  <Style Selector="DataGridColumnHeader">
+    <Setter Property="Background" Value="{DynamicResource CustomDataGridColumnBackground}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource GrayBrush5}" />
+    <Setter Property="BorderThickness"
+            Value="{Binding RelativeSource={RelativeSource Mode=FindAncestor,
+                    AncestorType={x:Type dialogHost:DialogHost}},
+                    Path=(dialogHost:DialogHost.IsOpen),
+                    Converter={StaticResource DialogOpenedToBorderThicknessConverter}}" />
+
+    <Setter Property="Cursor" Value="Hand" />
+    <Setter Property="FontWeight" Value="SemiBold" />
+    <Setter Property="FontSize" Value="14" />
+    <Setter Property="Foreground" Value="White" />
+    <Setter Property="HorizontalContentAlignment" Value="Left" />
+    <Setter Property="Margin" Value="0" />
+    <Setter Property="MinHeight" Value="25" />
+    <Setter Property="MinWidth" Value="0" />
+    <Setter Property="Padding" Value="10 4 4 7" />
+
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="{x:Type DataGridColumnHeader}">
+          <Grid ColumnDefinitions="*,Auto">
+            <Border x:Name="BackgroundBorder"
+                    Grid.ColumnSpan="2"
+                    Background="{TemplateBinding Background}"
+                    BorderBrush="{TemplateBinding BorderBrush}"
+                    BorderThickness="{TemplateBinding BorderThickness}" />
+
+            <ContentControl Grid.Column="0" x:Name="HeaderContent"
+                            Padding="{TemplateBinding Padding}"
+                            HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                            VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+                            Content="{TemplateBinding Content}"
+                            ContentTemplate="{TemplateBinding ContentTemplate}" />
+
+            <Path x:Name="SortArrowAsc"
+                  Grid.Column="1"
+                  Width="8"
+                  Height="10"
+                  Margin="0 0 8 2"
+                  VerticalAlignment="Center"
+                  Fill="{DynamicResource GrayBrush2}"
+                  RenderTransformOrigin="0.5,0.5"
+                  Data="F1 M 34,57L 42,57L 42,32.25L 52,42.25L 52,31.75L 38,17.75L 24,31.75L 24,42.25L 34,32.25L 34,57 Z "
+                  Stretch="Fill"
+                  Classes="SortPath">
+              <Path.IsEnabled>
+                <MultiBinding Converter="{StaticResource ShouldShowSort}">
+                  <Binding
+                      RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type DataGrid}}"
+                      Path="(helpers:DataGridHelper.SortInfo)" />
+                  <Binding RelativeSource="{RelativeSource TemplatedParent}" Path="Content"
+                           Converter="{StaticResource AddDescToStringConverter}" />
+                </MultiBinding>
+              </Path.IsEnabled>
+            </Path>
+
+            <Path x:Name="SortArrowDesc"
+                  Grid.Column="1"
+                  Width="8"
+                  Height="10"
+                  Margin="0 0 8 0"
+                  VerticalAlignment="Center"
+                  Fill="{DynamicResource GrayBrush2}"
+                  RenderTransformOrigin="0.5,0.5"
+                  Data="F1 M 42,19.0002L 34,19.0002L 34,43.7502L 24,33.7502L 24,44.2502L 38,58.2502L 52,44.2502L 52,33.7502L 42,43.7502L 42,19.0002 Z "
+                  Stretch="Fill"
+                  Classes="SortPath">
+
+              <Path.IsEnabled>
+                <MultiBinding Converter="{StaticResource ShouldShowSort}">
+                  <Binding
+                      RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type DataGrid}}"
+                      Path="(helpers:DataGridHelper.SortInfo)" />
+                  <Binding RelativeSource="{RelativeSource TemplatedParent}" Path="Content"
+                           Converter="{StaticResource AddAscToStringConverter}" />
+                </MultiBinding>
+              </Path.IsEnabled>
+            </Path>
+
+            <Thumb x:Name="PART_LeftHeaderGripper"
+                   Grid.Column="0"
+                   HorizontalAlignment="Left"
+                   Background="Transparent" />
+
+            <Thumb x:Name="PART_RightHeaderGripper"
+                   Grid.Column="1"
+                   HorizontalAlignment="Right" />
+          </Grid>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+  </Style>
+
+  <Style Selector="DataGrid">
+    <Setter Property="Background" Value="{DynamicResource CustomDataGridBackground}" />
+    <Setter Property="Foreground" Value="White" />
+    <Setter Property="BorderBrush" Value="{DynamicResource AccentColorBrush}" />
+    <Setter Property="BorderThickness" Value="0 0 0 0" />
+    <Setter Property="FontFamily" Value="{DynamicResource DefaultFontFamily}" />
+    <Setter Property="FontSize" Value="13" />
+    <Setter Property="GridLinesVisibility" Value="None" />
+    <Setter Property="HeadersVisibility" Value="Column" />
+    <Setter Property="HorizontalGridLinesBrush" Value="{DynamicResource GrayBrush7}" />
+    <Setter Property="RowBackground" Value="{DynamicResource CustomDataGridRowBackground}" />
+    <Setter Property="AlternatingRowBackground" Value="{DynamicResource CustomDataGridAlternativeRowBackground}" />
+    <Setter Property="VerticalGridLinesBrush" Value="{DynamicResource GrayBrush7}" />
+  </Style>
+
+  <Style Selector="DataGridRow">
+    <Setter Property="Focusable" Value="False" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <DataGridFrozenGrid Name="PART_Root"
+                            RowDefinitions="*,Auto,Auto"
+                            ColumnDefinitions="Auto,*">
+
+          <Rectangle Name="BackgroundRectangle"
+                     Grid.RowSpan="2"
+                     Grid.ColumnSpan="2" />
+          <Rectangle x:Name="InvalidVisualElement"
+                     Grid.ColumnSpan="2"
+                     Fill="{DynamicResource DataGridRowInvalidBrush}" />
+
+          <DataGridRowHeader Name="PART_RowHeader"
+                             Grid.RowSpan="3"
+                             DataGridFrozenGrid.IsFrozen="True" />
+          <DataGridCellsPresenter Name="PART_CellsPresenter"
+                                  Grid.Column="1"
+                                  DataGridFrozenGrid.IsFrozen="True" />
+          <DataGridDetailsPresenter Name="PART_DetailsPresenter"
+                                    Grid.Row="1"
+                                    Grid.Column="1"
+                                    Background="{DynamicResource AlmostTransparentBrush}" />
+          <Rectangle Name="PART_BottomGridLine"
+                     Grid.Row="2"
+                     Grid.Column="1"
+                     HorizontalAlignment="Stretch"
+                     Height="1" />
+
+        </DataGridFrozenGrid>
+      </ControlTemplate>
+    </Setter>
+  </Style>
+
+  <Style Selector="DataGridCell">
+    <Setter Property="MinHeight" Value="35" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+  </Style>
+
+  <Style Selector="DataGridRow:selected /template/ Rectangle#BackgroundRectangle">
+    <Setter Property="Fill" Value="{DynamicResource AlmostTransparentBrush}" />
+  </Style>
+  <Style Selector="DataGrid:focus DataGridCell:current /template/ Grid#FocusVisual">
+    <Setter Property="IsVisible" Value="False" />
+  </Style>
+
+  <Style Selector="DataGridColumnHeader:pointerover /template/ Border#BackgroundBorder">
+    <Setter Property="Background" Value="{DynamicResource CustomDataGridHeaderPointerOver}" />
+  </Style>
+</Styles>

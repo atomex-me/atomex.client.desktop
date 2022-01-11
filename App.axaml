@@ -39,7 +39,8 @@
         <!-- <StyleInclude Source="/Styles/WalletTabControlStyle.axaml" /> -->
         <StyleInclude Source="/Styles/CustomTooltipStyle.axaml" />
         <StyleInclude Source="/Styles/WalletMenuButton.axaml" />
-        <StyleInclude Source="/Styles/CustomDataGridStyle.axaml" />
+        <StyleInclude Source="/Styles/OldCustomDataGridStyle.axaml" />
+        <StyleInclude Source="/Styles/RedesignDataGridStyle.axaml" />
         <StyleInclude Source="/Styles/WalletViewStyle.axaml" />
         <StyleInclude Source="/Styles/SwapViewStyle.axaml" />
         <StyleInclude Source="/Styles/CurrencyComboBoxStyle.axaml" />

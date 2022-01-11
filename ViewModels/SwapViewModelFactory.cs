@@ -56,25 +56,27 @@ namespace Atomex.Client.Desktop.ViewModels
 
                 return new SwapViewModel
                 {
-                    Id               = swap.Id.ToString(),
-                    CompactState     = compactState,
-                    Mode             = ModeBySwap(swap),
-                    Time             = swap.TimeStamp,
+                    Id                    = swap.Id.ToString(),
+                    CompactState          = compactState,
+                    Mode                  = ModeBySwap(swap),
+                    Time                  = swap.TimeStamp,
 
-                    FromBrush        = new SolidColorBrush(fromCurrencyViewModel.AmountColor),
-                    FromAmount       = fromAmount,
-                    FromAmountFormat = fromCurrencyViewModel.CurrencyFormat,
-                    FromCurrencyCode = fromCurrencyViewModel.CurrencyCode,
+                    FromCurrencyViewModel = fromCurrencyViewModel,
+                    FromBrush             = new SolidColorBrush(fromCurrencyViewModel.AmountColor),
+                    FromAmount            = fromAmount,
+                    FromAmountFormat      = fromCurrencyViewModel.CurrencyFormat,
+                    FromCurrencyCode      = fromCurrencyViewModel.CurrencyCode,
 
-                    ToBrush          = new SolidColorBrush(toCurrencyViewModel.AmountColor),
-                    ToAmount         = toAmount,
-                    ToAmountFormat   = toCurrencyViewModel.CurrencyFormat,
-                    ToCurrencyCode   = toCurrencyViewModel.CurrencyCode,
+                    ToCurrencyViewModel   = toCurrencyViewModel,
+                    ToBrush               = new SolidColorBrush(toCurrencyViewModel.AmountColor),
+                    ToAmount              = toAmount,
+                    ToAmountFormat        = toCurrencyViewModel.CurrencyFormat,
+                    ToCurrencyCode        = toCurrencyViewModel.CurrencyCode,
 
-                    Price            = swap.Price,
-                    PriceFormat      = $"F{quoteCurrency.Digits}",
+                    Price                 = swap.Price,
+                    PriceFormat           = $"F{quoteCurrency.Digits}",
 
-                    Details          = detailsViewModel
+                    Details               = detailsViewModel
                 };
             }
             catch (Exception e)

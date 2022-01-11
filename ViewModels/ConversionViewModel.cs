@@ -870,11 +870,12 @@ namespace Atomex.Client.Desktop.ViewModels
             {
                 SwapViewModelFactory.CreateSwapViewModel(new Swap
                     {
-                        Symbol    = "LTC/BTC",
-                        Price     = 0.0000888m,
-                        Qty       = 0.001000m,
-                        Side      = Side.Buy,
-                        TimeStamp = DateTime.UtcNow
+                        Symbol     = "LTC/BTC",
+                        Price      = 0.0000888m,
+                        Qty        = 0.001000m,
+                        Side       = Side.Buy,
+                        TimeStamp  = DateTime.UtcNow,
+                        StateFlags = SwapStateFlags.IsRedeemConfirmed
                     },
                     DesignTime.Currencies),
                 SwapViewModelFactory.CreateSwapViewModel(new Swap
@@ -883,7 +884,37 @@ namespace Atomex.Client.Desktop.ViewModels
                         Price     = 0.0100808m,
                         Qty       = 0.0043000m,
                         Side      = Side.Sell,
-                        TimeStamp = DateTime.UtcNow
+                        TimeStamp = DateTime.UtcNow,
+                    },
+                    DesignTime.Currencies),
+                SwapViewModelFactory.CreateSwapViewModel(new Swap
+                    {
+                        Symbol     = "XTZ/ETH",
+                        Price      = 0.0100808m,
+                        Qty        = 1200.0043m,
+                        Side       = Side.Sell,
+                        TimeStamp  = DateTime.UtcNow,
+                        StateFlags = SwapStateFlags.IsRefundConfirmed,
+                    },
+                    DesignTime.Currencies),
+                SwapViewModelFactory.CreateSwapViewModel(new Swap
+                    {
+                        Symbol     = "XTZ/ETH",
+                        Price      = 0.0100808m,
+                        Qty        = 1200.0043m,
+                        Side       = Side.Buy,
+                        TimeStamp  = DateTime.UtcNow,
+                        StateFlags = SwapStateFlags.IsCanceled,
+                    },
+                    DesignTime.Currencies),
+                SwapViewModelFactory.CreateSwapViewModel(new Swap
+                    {
+                        Symbol     = "XTZ/ETH",
+                        Price      = 0.0100808m,
+                        Qty        = 20200.0043m,
+                        Side       = Side.Buy,
+                        TimeStamp  = DateTime.UtcNow,
+                        StateFlags = SwapStateFlags.IsUnsettled,
                     },
                     DesignTime.Currencies)
             };
