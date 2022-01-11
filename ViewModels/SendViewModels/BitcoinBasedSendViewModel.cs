@@ -67,20 +67,17 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 var outputs = (await Account.GetAvailableOutputsAsync())
                     .Select(output => (BitcoinBasedTxOutput)output);
 
-
                 Outputs = new ObservableCollection<BitcoinBasedTxOutput>(outputs);
 
-
-                SelectOutputsViewModel = new SelectOutputsViewModel
+                SelectOutputsViewModel = new SelectOutputsViewModel(outputs, Config)
                 {
                     BackAction = () => { Desktop.App.DialogService.Show(this); },
-                    Config = Config,
-                    Outputs = new ObservableCollection<OutputViewModel>(
-                        Outputs.Select(output => new OutputViewModel
-                        {
-                            Output = output,
-                            Config = Config
-                        }))
+                    ConfirmAction = outputs =>
+                    {
+                        Outputs = new ObservableCollection<BitcoinBasedTxOutput>(outputs);
+                        Desktop.App.DialogService.Show(this);
+                    },
+                    Config = Config
                 };
 
                 // todo: remove

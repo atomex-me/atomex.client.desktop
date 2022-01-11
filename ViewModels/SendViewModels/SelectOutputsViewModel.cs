@@ -21,11 +21,20 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
     public class SelectOutputsViewModel : ViewModelBase
     {
         public Action BackAction { get; set; }
+        public Action<IEnumerable<BitcoinBasedTxOutput>> ConfirmAction { get; set; }
         public BitcoinBasedConfig Config { get; set; }
 
         private ObservableCollection<OutputViewModel> InitialOutputs { get; set; }
 
         public SelectOutputsViewModel()
+        {
+#if DEBUG
+            if (Design.IsDesignMode)
+                DesignerMode();
+#endif
+        }
+
+        public SelectOutputsViewModel(IEnumerable<BitcoinBasedTxOutput> outputs, BitcoinBasedConfig config)
         {
 #if DEBUG
             if (Design.IsDesignMode)
@@ -86,6 +95,16 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                                 .Where(output => output.Address.ToLower().Contains(searchPattern.ToLower()))
                         );
                 });
+
+            Config = config;
+            Outputs = new ObservableCollection<OutputViewModel>(
+                outputs.Select(output => new OutputViewModel
+                {
+                    Output = output,
+                    Config = config
+                }));
+
+            SelectAll = true;
         }
 
         [Reactive] public ObservableCollection<OutputViewModel> Outputs { get; set; }
@@ -148,7 +167,10 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         private ReactiveCommand<Unit, Unit> _confirmCommand;
 
         public ReactiveCommand<Unit, Unit> ConfirmCommand => _confirmCommand ??=
-            (_confirmCommand = ReactiveCommand.Create(() => { Log.Information("Confirm Command"); }));
+            (_confirmCommand = ReactiveCommand.Create(() =>
+            {
+                ConfirmAction?.Invoke(Outputs.Where(o => o.IsSelected).Select(o => o.Output));
+            }));
 
 
         private ICommand _copyAddressCommand;
