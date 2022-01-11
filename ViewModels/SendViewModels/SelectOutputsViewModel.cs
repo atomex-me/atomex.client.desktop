@@ -21,9 +21,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
     public class SelectOutputsViewModel : ViewModelBase
     {
         public Action BackAction { get; set; }
-        [Reactive] public ObservableCollection<OutputViewModel> Outputs { get; set; }
-
-        [Reactive] public string SearchText { get; set; }
+        public BitcoinBasedConfig Config { get; set; }
 
         public SelectOutputsViewModel()
         {
@@ -43,6 +41,8 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                             output.IsSelected = selectAll;
                             return output;
                         }));
+
+                    RecalculateTotalStats();
                 });
 
             this.WhenAnyValue(vm => vm.SortIsAscending)
@@ -67,6 +67,8 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 });
         }
 
+        [Reactive] public ObservableCollection<OutputViewModel> Outputs { get; set; }
+        [Reactive] public string SearchText { get; set; }
         [Reactive] public bool SelectAll { get; set; }
         [Reactive] public bool SortIsAscending { get; set; }
         [Reactive] public string TotalSelected { get; set; }
@@ -78,11 +80,12 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             {
                 TotalSelected =
                     $"{Outputs.Aggregate(0, (result, output) => output.IsSelected ? result + 1 : result)} selected";
-                
-                var totalCoinAmount = Outputs.Aggregate(0m, (result, output) => output.IsSelected ? result + output.Balance : result);
 
-                // todo: format decimal value and BTC;
-                TotalCoinAmountSelected = $"Total {totalCoinAmount}";
+                var totalCoinAmount = Outputs.Aggregate(0m,
+                    (result, output) => output.IsSelected ? result + output.Balance : result);
+
+                TotalCoinAmountSelected =
+                    $"Total {totalCoinAmount.ToString(Config.Format, CultureInfo.InvariantCulture)} {Config.Name}";
             });
         }
 
@@ -104,11 +107,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         private ReactiveCommand<Unit, Unit> _selectAllCommand;
 
         public ReactiveCommand<Unit, Unit> SelectAllCommand => _selectAllCommand ??=
-            (_selectAllCommand = ReactiveCommand.Create(() =>
-            {
-                _checkedFromList = false;
-                RecalculateTotalStats();
-            }));
+            (_selectAllCommand = ReactiveCommand.Create(() => { _checkedFromList = false; }));
 
         private ReactiveCommand<Unit, Unit> _closeCommand;
 
