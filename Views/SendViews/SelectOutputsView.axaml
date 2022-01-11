@@ -15,7 +15,7 @@
     <UserControl.Styles>
         <Style Selector="Border.SortIcon[IsEnabled=False]" />
         <Style Selector="Border.SortIcon">
-            <Setter Property="RenderTransform" Value="rotate(180deg)" />
+            <Setter Property="RenderTransform" Value="none" />
             <Setter Property="Transitions">
                 <Transitions>
                     <TransformOperationsTransition Property="RenderTransform" Duration="0:0:.075" />
@@ -24,7 +24,7 @@
         </Style>
 
         <Style Selector="Border.SortIcon:disabled">
-            <Setter Property="RenderTransform" Value="none" />
+            <Setter Property="RenderTransform" Value="rotate(180deg)" />
         </Style>
     </UserControl.Styles>
 

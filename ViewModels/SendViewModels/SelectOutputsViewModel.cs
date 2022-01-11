@@ -10,16 +10,20 @@ using System.Windows.Input;
 using Atomex.Blockchain.BitcoinBased;
 using Atomex.Client.Desktop.Common;
 using Atomex.Common;
+using Atomex.Core;
+using Atomex.Wallet.BitcoinBased;
 using Avalonia.Controls;
 using NBitcoin;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
-using Serilog;
+using Network = NBitcoin.Network;
+
 
 namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 {
     public class SelectOutputsViewModel : ViewModelBase
     {
+        private BitcoinBasedAccount Account { get; }
         public Action BackAction { get; set; }
         public Action<IEnumerable<BitcoinBasedTxOutput>> ConfirmAction { get; set; }
         public BitcoinBasedConfig Config { get; set; }
@@ -34,7 +38,10 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 #endif
         }
 
-        public SelectOutputsViewModel(IEnumerable<BitcoinBasedTxOutput> outputs, BitcoinBasedConfig config)
+        public SelectOutputsViewModel(
+            IEnumerable<BitcoinBasedTxOutput> outputs,
+            BitcoinBasedConfig config,
+            BitcoinBasedAccount account)
         {
 #if DEBUG
             if (Design.IsDesignMode)
@@ -70,12 +77,43 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             this.WhenAnyValue(vm => vm.Outputs)
                 .WhereNotNull()
                 .Take(1)
-                .Subscribe(outputs =>
+                .Subscribe(async outputs =>
                 {
-                    Outputs = new ObservableCollection<OutputViewModel>(
-                        outputs.OrderByDescending(output => output.BalanceString));
-                    InitialOutputs = new ObservableCollection<OutputViewModel>(Outputs);
+                    var addresses = (await Account
+                            .GetAddressesAsync())
+                        .Where(address => outputs.FirstOrDefault(o => o.Address == address.Address) != null)
+                        .ToList();
 
+                    var outputsWithAddresses = outputs.Select(output =>
+                    {
+                        var address = addresses.FirstOrDefault(a => a.Address == output.Address);
+                        output.WalletAddress = address ?? null;
+                        return output;
+                    });
+
+                    Outputs = new ObservableCollection<OutputViewModel>(
+                        outputsWithAddresses.OrderByDescending(output => output.BalanceString));
+
+                    // addresses.Sort((a1, a2) =>
+                    // {
+                    //     var typeResult = a1.KeyType.CompareTo(a2.KeyType);
+                    //
+                    //     if (typeResult != 0)
+                    //         return typeResult;
+                    //
+                    //     var accountResult = a1.KeyIndex.Account.CompareTo(a2.KeyIndex.Account);
+                    //
+                    //     if (accountResult != 0)
+                    //         return accountResult;
+                    //
+                    //     var chainResult = a1.KeyIndex.Chain.CompareTo(a2.KeyIndex.Chain);
+                    //
+                    //     return chainResult != 0
+                    //         ? chainResult
+                    //         : a1.KeyIndex.Index.CompareTo(a2.KeyIndex.Index);
+                    // }
+
+                    InitialOutputs = new ObservableCollection<OutputViewModel>(Outputs);
                     RecalculateTotalStats();
                 });
 
@@ -96,6 +134,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                         );
                 });
 
+            Account = account;
             Config = config;
             Outputs = new ObservableCollection<OutputViewModel>(
                 outputs.Select(output => new OutputViewModel
@@ -178,7 +217,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         public ICommand CopyAddressCommand =>
             _copyAddressCommand ??= (_copyAddressCommand = ReactiveCommand.Create((string address) =>
             {
-                _ = App.Clipboard.SetTextAsync(address);
+                _ = Desktop.App.Clipboard.SetTextAsync(address);
 
                 Outputs.ForEachDo(output => output.CopyButtonToolTip = OutputViewModel.DefaultCopyButtonToolTip);
                 Outputs.First(output => output.Address == address).CopyButtonToolTip =
@@ -236,7 +275,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         [Reactive] public string CopyButtonToolTip { get; set; }
         public BitcoinBasedTxOutput Output { get; set; }
         public BitcoinBasedConfig Config { get; set; }
-
+        public WalletAddress WalletAddress { get; set; }
         public decimal Balance => Config.SatoshiToCoin(Output.Value);
         public string BalanceString => $"{Balance.ToString(Config.Format, CultureInfo.InvariantCulture)} {Config.Name}";
         public string Address => Output.DestinationAddress(Config.Network);
