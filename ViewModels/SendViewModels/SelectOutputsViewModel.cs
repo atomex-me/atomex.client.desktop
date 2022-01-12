@@ -63,17 +63,6 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     RecalculateTotalStats();
                 });
 
-            this.WhenAnyValue(vm => vm.SortIsAscending)
-                .Where(_ => Outputs != null)
-                .Subscribe(sortIsAscending =>
-                {
-                    Outputs = sortIsAscending
-                        ? new ObservableCollection<OutputViewModel>(
-                            Outputs.OrderBy(output => output.BalanceString))
-                        : new ObservableCollection<OutputViewModel>(
-                            Outputs.OrderByDescending(output => output.BalanceString));
-                });
-
             this.WhenAnyValue(vm => vm.Outputs)
                 .WhereNotNull()
                 .Take(1)
@@ -93,27 +82,8 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
                     Outputs = new ObservableCollection<OutputViewModel>(
                         outputsWithAddresses.OrderByDescending(output => output.BalanceString));
-
-                    // addresses.Sort((a1, a2) =>
-                    // {
-                    //     var typeResult = a1.KeyType.CompareTo(a2.KeyType);
-                    //
-                    //     if (typeResult != 0)
-                    //         return typeResult;
-                    //
-                    //     var accountResult = a1.KeyIndex.Account.CompareTo(a2.KeyIndex.Account);
-                    //
-                    //     if (accountResult != 0)
-                    //         return accountResult;
-                    //
-                    //     var chainResult = a1.KeyIndex.Chain.CompareTo(a2.KeyIndex.Chain);
-                    //
-                    //     return chainResult != 0
-                    //         ? chainResult
-                    //         : a1.KeyIndex.Index.CompareTo(a2.KeyIndex.Index);
-                    // }
-
                     InitialOutputs = new ObservableCollection<OutputViewModel>(Outputs);
+
                     RecalculateTotalStats();
                 });
 
@@ -121,17 +91,84 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 .Where(_ => Outputs != null)
                 .Subscribe(searchPattern =>
                 {
-                    Outputs = SortIsAscending
-                        ? new ObservableCollection<OutputViewModel>(
-                            InitialOutputs
-                                .OrderBy(output => output.BalanceString)
-                                .Where(output => output.Address.ToLower().Contains(searchPattern.ToLower()))
-                        )
-                        : new ObservableCollection<OutputViewModel>(
-                            InitialOutputs
-                                .OrderByDescending(output => output.BalanceString)
-                                .Where(output => output.Address.ToLower().Contains(searchPattern.ToLower()))
-                        );
+                    Outputs = new ObservableCollection<OutputViewModel>(SortIsAscending
+                        ? InitialOutputs
+                            .OrderBy(output => output.BalanceString)
+                            .Where(output => output.Address.ToLower().Contains(searchPattern.ToLower()))
+                        : InitialOutputs
+                            .OrderByDescending(output => output.BalanceString)
+                            .Where(output => output.Address.ToLower().Contains(searchPattern.ToLower()))
+                    );
+                });
+
+            this.WhenAnyValue(vm => vm.SortByDate, vm => vm.SortIsAscending)
+                .Subscribe(value =>
+                {
+                    // item1 == SortByDate; item2 == SortIsAscending;
+                    var (item1, item2) = value;
+
+                    SortTypeString = item1 ? "Sort by date" : "Sort by balance";
+
+                    if (Outputs == null) return;
+
+                    if (item1)
+                    {
+                        var outputsList = Outputs.ToList();
+                        if (item2)
+                        {
+                            outputsList.Sort((a1, a2) =>
+                            {
+                                var typeResult = a1.WalletAddress.KeyType.CompareTo(a2.WalletAddress.KeyType);
+
+                                if (typeResult != 0)
+                                    return typeResult;
+
+                                var accountResult =
+                                    a1.WalletAddress.KeyIndex.Account.CompareTo(a2.WalletAddress.KeyIndex.Account);
+
+                                if (accountResult != 0)
+                                    return accountResult;
+
+                                var chainResult =
+                                    a1.WalletAddress.KeyIndex.Chain.CompareTo(a2.WalletAddress.KeyIndex.Chain);
+
+                                return chainResult != 0
+                                    ? chainResult
+                                    : a1.WalletAddress.KeyIndex.Index.CompareTo(a2.WalletAddress.KeyIndex.Index);
+                            });
+                        }
+                        else
+                        {
+                            outputsList.Sort((a2, a1) =>
+                            {
+                                var typeResult = a1.WalletAddress.KeyType.CompareTo(a2.WalletAddress.KeyType);
+
+                                if (typeResult != 0)
+                                    return typeResult;
+
+                                var accountResult =
+                                    a1.WalletAddress.KeyIndex.Account.CompareTo(a2.WalletAddress.KeyIndex.Account);
+
+                                if (accountResult != 0)
+                                    return accountResult;
+
+                                var chainResult =
+                                    a1.WalletAddress.KeyIndex.Chain.CompareTo(a2.WalletAddress.KeyIndex.Chain);
+
+                                return chainResult != 0
+                                    ? chainResult
+                                    : a1.WalletAddress.KeyIndex.Index.CompareTo(a2.WalletAddress.KeyIndex.Index);
+                            });
+                        }
+
+                        Outputs = new ObservableCollection<OutputViewModel>(outputsList);
+                    }
+                    else
+                    {
+                        Outputs = new ObservableCollection<OutputViewModel>(item2
+                            ? Outputs.OrderBy(output => output.BalanceString)
+                            : Outputs.OrderByDescending(output => output.BalanceString));
+                    }
                 });
 
             Account = account;
@@ -149,9 +186,11 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         [Reactive] public ObservableCollection<OutputViewModel> Outputs { get; set; }
         [Reactive] public string SearchPattern { get; set; }
         [Reactive] public bool SelectAll { get; set; }
-        [Reactive] public bool SortIsAscending { get; set; }
+        [Reactive] private bool SortIsAscending { get; set; }
+        [Reactive] private bool SortByDate { get; set; }
         [Reactive] public string TotalSelected { get; set; }
         [Reactive] public string TotalCoinAmountSelected { get; set; }
+        [Reactive] public string SortTypeString { get; set; }
 
         private void RecalculateTotalStats()
         {
@@ -201,7 +240,12 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         private ReactiveCommand<Unit, Unit> _changeSortTypeCommand;
 
         public ReactiveCommand<Unit, Unit> ChangeSortTypeCommand => _changeSortTypeCommand ??=
-            (_changeSortTypeCommand = ReactiveCommand.Create(() => { SortIsAscending = !SortIsAscending; }));
+            (_changeSortTypeCommand = ReactiveCommand.Create(() => { SortByDate = !SortByDate; }));
+
+        private ReactiveCommand<Unit, Unit> _changeSortDirectionCommand;
+
+        public ReactiveCommand<Unit, Unit> ChangeSortDirectionCommand => _changeSortDirectionCommand ??=
+            (_changeSortDirectionCommand = ReactiveCommand.Create(() => { SortIsAscending = !SortIsAscending; }));
 
         private ReactiveCommand<Unit, Unit> _confirmCommand;
 

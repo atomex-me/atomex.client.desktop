@@ -13,9 +13,7 @@
     </Design.DataContext>
 
     <UserControl.Styles>
-        <Style Selector="Border.SortIcon[IsEnabled=False]" />
-        <Style Selector="Border.SortIcon">
-            <Setter Property="RenderTransform" Value="none" />
+        <Style Selector="Button.Sort">
             <Setter Property="Transitions">
                 <Transitions>
                     <TransformOperationsTransition Property="RenderTransform" Duration="0:0:.075" />
@@ -23,8 +21,11 @@
             </Setter>
         </Style>
 
-        <Style Selector="Border.SortIcon:disabled">
+        <Style Selector="Button.Sort.Rotated">
             <Setter Property="RenderTransform" Value="rotate(180deg)" />
+        </Style>
+        <Style Selector="Button.Sort.NotRotated">
+            <Setter Property="RenderTransform" Value="none" />
         </Style>
     </UserControl.Styles>
 
@@ -90,11 +91,11 @@
                         Grid.Column="1"
                         HorizontalAlignment="Right"
                         Command="{Binding ChangeSortTypeCommand}"
-                        Classes="SecondaryButton">
-                    Sort by balance
-                </Button>
+                        Content="{Binding SortTypeString}"
+                        Classes="SecondaryButton" />
 
-                <Border Grid.Row="0"
+                <!-- helpers:ButtonHelper.Rotated="{Binding SortIsAscending}" -->
+                <Button Grid.Row="0"
                         Grid.Column="2"
                         Width="24"
                         Height="26"
@@ -102,13 +103,15 @@
                         CornerRadius="8"
                         Padding="4 5"
                         Margin="8 0 0 0"
-                        IsEnabled="{Binding !SortIsAscending}"
-                        Classes="SortIcon">
+                        Command="{Binding ChangeSortDirectionCommand}"
+                        Classes.Rotated="{Binding SortIsAscending}"
+                        Classes.NotRotated="{Binding !SortIsAscending}"
+                        Classes="SecondaryButton Sort">
                     <svg:Svg HorizontalAlignment="Center"
                              Width="16"
                              Height="16"
                              Path="/Resources/Icons/sort.svg" />
-                </Border>
+                </Button>
             </Grid>
 
             <Border Margin="-24 10 -24 0"

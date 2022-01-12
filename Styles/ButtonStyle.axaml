@@ -6,6 +6,7 @@
 
     <Style Selector=":is(Button)">
         <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="FontFamily" Value="{DynamicResource DefaultFontFamily}" />
     </Style>
 
     <Style
@@ -40,7 +41,6 @@
     
     <Style Selector="Button.SecondaryButton">
         <Setter Property="Foreground" Value="{DynamicResource SecondaryForegroundBrush}" />
-        <Setter Property="FontFamily" Value="{DynamicResource DefaultFontFamily}" />
         <Setter Property="FontSize" Value="13" />
         <Setter Property="Padding" Value="9 5" />
         <Setter Property="CornerRadius" Value="8" />
