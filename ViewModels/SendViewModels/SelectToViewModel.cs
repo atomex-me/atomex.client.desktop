@@ -14,8 +14,12 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
     public class SelectToViewModel : ViewModelBase
     {
         public Action BackAction { get; set; }
-        [Reactive] public List<WalletAddressViewModel> FromAddressList { get; set; }
-        [Reactive] public string SRT { get; set; }
+        public Action<string> ConfirmAction { get; set; }
+        [Reactive] private List<WalletAddressViewModel> FromAddressList { get; set; }
+        [Reactive] public string SearchPattern { get; set; }
+        [Reactive] public string SortTypeString { get; set; }
+        [Reactive] private bool SortIsAscending { get; set; }
+        [Reactive] private bool SortByDate { get; set; }
 
         public SelectToViewModel()
         {
@@ -27,6 +31,14 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
         public SelectToViewModel(IAccount account, CurrencyConfig currency)
         {
+            this.WhenAnyValue(vm => vm.SortByDate, vm => vm.SortIsAscending)
+                .Subscribe(value =>
+                {
+                    var (item1, item2) = value;
+
+                    SortTypeString = item1 ? "Sort by date" : "Sort by balance";
+                });
+
             // get all addresses with tokens (if exists)
             var tokenAddresses = Currencies.HasTokens(currency.Name)
                 ? (account.GetCurrencyAccount(currency.Name) as IHasTokens)
@@ -47,7 +59,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
             FromAddressList = activeAddresses
                 .Concat(tokenAddresses)
-                .Concat(new [] { freeAddress })
+                .Concat(new[] { freeAddress })
                 .GroupBy(w => w.Address)
                 .Select(g =>
                 {
@@ -68,16 +80,34 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                         IsFreeAddress = isFreeAddress
                     };
                 }).ToList();
-
-            var a = 5;
         }
 
         private ReactiveCommand<Unit, Unit> _backCommand;
+
         public ReactiveCommand<Unit, Unit> BackCommand => _backCommand ??=
             (_backCommand = ReactiveCommand.Create(() => { BackAction?.Invoke(); }));
 
+        private ReactiveCommand<Unit, Unit> _changeSortTypeCommand;
+
+        public ReactiveCommand<Unit, Unit> ChangeSortTypeCommand => _changeSortTypeCommand ??=
+            (_changeSortTypeCommand = ReactiveCommand.Create(() => { SortByDate = !SortByDate; }));
+
+        private ReactiveCommand<Unit, Unit> _changeSortDirectionCommand;
+
+        public ReactiveCommand<Unit, Unit> ChangeSortDirectionCommand => _changeSortDirectionCommand ??=
+            (_changeSortDirectionCommand = ReactiveCommand.Create(() => { SortIsAscending = !SortIsAscending; }));
+        
+        private ReactiveCommand<Unit, Unit> _confirmCommand;
+
+        public ReactiveCommand<Unit, Unit> ConfirmCommand => _confirmCommand ??=
+            (_confirmCommand = ReactiveCommand.Create(() =>
+            {
+                ConfirmAction?.Invoke("Lorem ipsum");
+            }));
+
         private void DesignerMode()
         {
+            SortTypeString = "Sort by balance";
         }
     }
 }

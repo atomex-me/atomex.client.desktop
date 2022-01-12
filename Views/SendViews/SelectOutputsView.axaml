@@ -12,23 +12,6 @@
         <vm:SelectOutputsViewModel />
     </Design.DataContext>
 
-    <UserControl.Styles>
-        <Style Selector="Button.Sort">
-            <Setter Property="Transitions">
-                <Transitions>
-                    <TransformOperationsTransition Property="RenderTransform" Duration="0:0:.075" />
-                </Transitions>
-            </Setter>
-        </Style>
-
-        <Style Selector="Button.Sort.Rotated">
-            <Setter Property="RenderTransform" Value="rotate(180deg)" />
-        </Style>
-        <Style Selector="Button.Sort.NotRotated">
-            <Setter Property="RenderTransform" Value="none" />
-        </Style>
-    </UserControl.Styles>
-
     <Border Classes="ChildViewBorder"
             Padding="24 20 24 16"
             Width="700">
@@ -71,8 +54,7 @@
                      FontSize="16"
                      Text="{Binding SearchPattern, Mode=TwoWay}"
                      Classes="SearchTextBox" />
-
-
+            
             <Grid Margin="0 18 0 0"
                   ColumnDefinitions="Auto,*,Auto,Auto"
                   RowDefinitions="Auto">
@@ -93,8 +75,7 @@
                         Command="{Binding ChangeSortTypeCommand}"
                         Content="{Binding SortTypeString}"
                         Classes="SecondaryButton" />
-
-                <!-- helpers:ButtonHelper.Rotated="{Binding SortIsAscending}" -->
+                
                 <Button Grid.Row="0"
                         Grid.Column="2"
                         Width="24"
@@ -114,7 +95,7 @@
                 </Button>
             </Grid>
 
-            <Border Margin="-24 10 -24 0"
+            <Border Margin="0 10 0 0"
                     Height="1"
                     Background="{StaticResource LightDefaultOpacity10}" />
 

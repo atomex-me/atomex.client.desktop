@@ -14,6 +14,7 @@ using Avalonia.Controls;
 using NBitcoin;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
+using Serilog;
 using Network = NBitcoin.Network;
 
 namespace Atomex.Client.Desktop.ViewModels.SendViewModels
@@ -95,7 +96,12 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         {
             SelectToViewModel ??= new SelectToViewModel(App.Account, Currency)
             {
-                BackAction = () => { Desktop.App.DialogService.Show(this); }
+                BackAction = () => { Desktop.App.DialogService.Show(this); },
+                ConfirmAction = address =>
+                {
+                    Log.Information(address);
+                    Desktop.App.DialogService.Show(this);
+                }
             };
             Desktop.App.DialogService.Show(SelectToViewModel);
         }
@@ -197,6 +203,13 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 {
                     if (App.Account.GetCurrencyAccount(Currency.Name) is not IEstimatable account)
                         return; // todo: error?
+
+                    if (Outputs.Count == 0)
+                    {
+                        Warning = Resources.CvInsufficientFunds;
+                        Amount = 0;
+                        return;
+                    }
 
                     FeeRate = await Config.GetFeeRateAsync();
 

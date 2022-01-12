@@ -104,7 +104,6 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             this.WhenAnyValue(vm => vm.SortByDate, vm => vm.SortIsAscending)
                 .Subscribe(value =>
                 {
-                    // item1 == SortByDate; item2 == SortIsAscending;
                     var (item1, item2) = value;
 
                     SortTypeString = item1 ? "Sort by date" : "Sort by balance";
@@ -270,6 +269,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
         private void DesignerMode()
         {
+            SortTypeString = "Sort by balance";
             var amount = new Money((decimal)0.9999, MoneyUnit.Satoshi);
             var script = BitcoinAddress.Create("muRDku2ZwNTz2msCZCHSUhDD5o6NxGsoXM", Network.TestNet).ScriptPubKey;
 
