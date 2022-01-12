@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows.Input;
 using Atomex.Blockchain.Abstract;
 using Atomex.Blockchain.BitcoinBased;
 using Atomex.Client.Desktop.Properties;
@@ -60,6 +58,9 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                         .Aggregate((long)0, (sum, output) => sum + output.Value);
 
                     SelectedFromAmount = Config.SatoshiToCoin(totalOutputsSatoshi);
+
+                    Warning = string.Empty;
+                    _ = UpdateAmount(Amount);
                 });
 
             _ = Task.Run(async () =>
@@ -72,9 +73,9 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 SelectOutputsViewModel = new SelectOutputsViewModel(outputs, Config, Account)
                 {
                     BackAction = () => { Desktop.App.DialogService.Show(this); },
-                    ConfirmAction = outputs =>
+                    ConfirmAction = ots =>
                     {
-                        Outputs = new ObservableCollection<BitcoinBasedTxOutput>(outputs);
+                        Outputs = new ObservableCollection<BitcoinBasedTxOutput>(ots);
                         Desktop.App.DialogService.Show(this);
                     },
                     Config = Config,
@@ -92,7 +93,11 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
         protected override void ToClick()
         {
-            Desktop.App.DialogService.Show(SelectOutputsViewModel);
+            SelectToViewModel ??= new SelectToViewModel(App.Account, Currency)
+            {
+                BackAction = () => { Desktop.App.DialogService.Show(this); }
+            };
+            Desktop.App.DialogService.Show(SelectToViewModel);
         }
 
         protected override async Task UpdateAmount(decimal amount)
