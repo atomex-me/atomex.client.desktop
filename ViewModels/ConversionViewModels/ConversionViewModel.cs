@@ -24,6 +24,7 @@ using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.Properties;
 using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
 using Atomex.Wallet.Abstract;
+using Atomex.Client.Desktop.ViewModels.ConversionViewModels;
 
 namespace Atomex.Client.Desktop.ViewModels
 {
@@ -183,14 +184,47 @@ namespace Atomex.Client.Desktop.ViewModels
             {
                 UnselectedLabel = "Choose From",
                 MaxClicked = () => { },
-                SelectCurrencyClicked = () => { }
+                SelectCurrencyClicked = () =>
+                {
+                    var selectCurrencyViewModel = new SelectCurrencyViewModel()
+                    {
+                        Currencies = new ObservableCollection<SelectCurrencyViewModelItem>(
+                            FromCurrencies.Select(c => new SelectCurrencyViewModelItem(c))),
+                        CurrencySelected = i =>
+                        {
+                            FromCurrencyViewModel = FromCurrencies.First(c => c.Currency.Name == i.CurrencyViewModel.Currency.Name);
+                            FromViewModel.CurrencyViewModel = FromCurrencyViewModel;
+                            //this.RaisePropertyChanged(nameof(FromViewModel));
+
+                            App.DialogService.Close();
+                        }
+                    };
+
+                    App.DialogService.Show(selectCurrencyViewModel);
+                }
             };
 
             ToViewModel = new ConversionCurrencyViewModel
             {
                 UnselectedLabel = "Choose To",
                 MaxClicked = () => { },
-                SelectCurrencyClicked = () => { }
+                SelectCurrencyClicked = () =>
+                {
+                    var selectCurrencyViewModel = new SelectCurrencyViewModel()
+                    {
+                        Currencies = new ObservableCollection<SelectCurrencyViewModelItem>(
+                            ToCurrencies.Select(c => new SelectCurrencyViewModelItem(c))),
+                        CurrencySelected = i =>
+                        {
+                            ToCurrencyViewModel = ToCurrencies.First(c => c.Currency.Name == i.CurrencyViewModel.Currency.Name);
+                            ToViewModel.CurrencyViewModel = ToCurrencyViewModel;
+
+                            App.DialogService.Close();
+                        }
+                    };
+
+                    App.DialogService.Show(selectCurrencyViewModel);
+                }
             };
 
 
@@ -794,7 +828,6 @@ namespace Atomex.Client.Desktop.ViewModels
                 AmountString       = "0.00007881",
                 UnselectedLabel    = "Choose From",
                 AmountInBaseString = "$12.32",
-                Selected           = false //true
             };
 
             ToViewModel = new ConversionCurrencyViewModel
@@ -804,7 +837,6 @@ namespace Atomex.Client.Desktop.ViewModels
                 AmountString       = "558.55271303",
                 UnselectedLabel    = "Choose To",
                 AmountInBaseString = "$123.32",
-                Selected           = false //true
             };
 
             //FromValidationMessage = "Error line Error line Error line Error line Error line Error line " +

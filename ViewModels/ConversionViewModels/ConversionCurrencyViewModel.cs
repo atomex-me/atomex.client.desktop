@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reactive.Linq;
 using System.Windows.Input;
 using System.Globalization;
 
@@ -54,7 +55,7 @@ namespace Atomex.Client.Desktop.ViewModels
         private ICommand _selectCurrencyCommand;
         public ICommand SelectCurrencyCommand => _selectCurrencyCommand ??= ReactiveCommand.Create(() => SelectCurrencyClicked?.Invoke());
 
-        [Reactive] public bool Selected { get; set; }
+        [ObservableAsProperty] public bool Selected { get; }
 
         [Reactive] public string UnselectedLabel { get; set; }
 
@@ -62,11 +63,14 @@ namespace Atomex.Client.Desktop.ViewModels
         {
             if (Design.IsDesignMode)
                 DesignerMode();
+
+            this.WhenAnyValue(vm => vm.CurrencyViewModel)
+                .Select(i => i != null)
+                .ToPropertyEx(this, vm => vm.Selected);
         }
 
         private void DesignerMode()
         {
-            Selected           = true;
             UnselectedLabel    = "Choose From";
             CurrencyViewModel  = CurrencyViewModelCreator.CreateViewModel(
                 currencyConfig: DesignTime.Currencies.Get<BitcoinConfig>("BTC"),

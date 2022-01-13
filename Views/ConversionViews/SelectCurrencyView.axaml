@@ -2,7 +2,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             mc:Ignorable="d" d:DesignWidth="700" d:DesignHeight="450"
+             mc:Ignorable="d" d:DesignWidth="700" d:DesignHeight="570"
              x:Class="Atomex.Client.Desktop.Views.ConversionViews.SelectCurrencyView"
              xmlns:svg="clr-namespace:Avalonia.Svg.Skia;assembly=Avalonia.Svg.Skia"
              xmlns:vm="clr-namespace:Atomex.Client.Desktop.ViewModels.ConversionViewModels">
@@ -12,8 +12,7 @@
 
   <Border Classes="ChildViewBorder"
           Width="700">
-    <Grid ColumnDefinitions="*,64"
-          RowDefinitions="72,*">
+    <Grid RowDefinitions="72,*">
       <!-- title -->
       <TextBlock FontSize="22"
                  FontFamily="{DynamicResource DefaultFontFamily}"
@@ -24,33 +23,17 @@
                  Grid.Column="0"
                  Grid.ColumnSpan="2"/>
 
-      <!-- close button -->
-      <Button Width="28"
-              Height="28"
-              Padding="3"
-              BorderThickness="0"
-              HorizontalAlignment="Center"
-              VerticalAlignment="Center"
-              Classes="ButtonWithIcon"
-              Grid.Column="1">
-        <svg:Svg Width="28"
-                 Path="/Resources/Icons/close.svg"
-                 HorizontalAlignment="Left"/>
-      </Button>
-
       <Border Height="1"
               Background="{DynamicResource LightDefaultOpacity10}"
-              VerticalAlignment="Bottom"
-              Grid.Column="0"
-              Grid.ColumnSpan="2"/>
+              VerticalAlignment="Bottom"/>
 
       <ListBox Margin="16 10 16 16"
+               MaxHeight="460"
                ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                Background="{DynamicResource AlmostTransparentBrush}"
                Items="{Binding Currencies}"
                SelectionMode="Single"
-               Grid.Column="0"
-               Grid.ColumnSpan="2"
+               SelectedItem="{Binding SelectedCurrency}"
                Grid.Row="1">
         <ListBox.Styles>
           <Style Selector="ListBoxItem">
@@ -121,6 +104,8 @@
                       FontSize="13"
                       FontFamily="{DynamicResource DefaultFontFamily}"
                       Foreground="{DynamicResource LightDefaultOpacity50}"
+                      Command="{Binding #parent[ListBox].DataContext.ChangeAddressesCommand}"
+                      CommandParameter="{Binding}"
                       Grid.Column="1">
                 <Button.Styles>
                   <Style Selector="Button:pointerover Border#BackgroundBorder">
@@ -172,7 +157,6 @@
           </DataTemplate>
         </ListBox.ItemTemplate>
       </ListBox>
-
     </Grid>
   </Border>
 </UserControl>

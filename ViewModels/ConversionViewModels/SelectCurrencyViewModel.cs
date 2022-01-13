@@ -1,12 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Windows.Input;
 
 using Avalonia.Controls;
+using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
 using Atomex.Client.Desktop.Common;
@@ -26,13 +25,29 @@ namespace Atomex.Client.Desktop.ViewModels.ConversionViewModels
 
     public class SelectCurrencyViewModel : ViewModelBase
     {
+        public Action<SelectCurrencyViewModelItem> CurrencySelected;
+
         [Reactive] public ObservableCollection<SelectCurrencyViewModelItem> Currencies { get; set; }
+
+        [Reactive] public SelectCurrencyViewModelItem SelectedCurrency { get; set; }
+
+        private ICommand _changeAddressesCommand;
+        public ICommand ChangeAddressesCommand => _changeAddressesCommand ??= ReactiveCommand.Create<SelectCurrencyViewModelItem>(i =>
+        {
+            // todo: change addresses
+        });
 
 #if DEBUG
         public SelectCurrencyViewModel()
         {
             if (Design.IsDesignMode)
                 DesignerMode();
+
+            this.WhenAnyValue(vm => vm.SelectedCurrency)
+                .WhereNotNull()
+                .Subscribe(i => {
+                    CurrencySelected?.Invoke(i);
+                });
         }
 #endif
 
