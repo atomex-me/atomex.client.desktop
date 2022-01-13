@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reactive;
+using System.Windows.Input;
 using Atomex.Common;
 using Atomex.Core;
 using Atomex.Wallet.Abstract;
@@ -15,6 +16,8 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
     {
         public Action BackAction { get; set; }
         public Action<string> ConfirmAction { get; set; }
+
+        private List<WalletAddressViewModel> InitialFromAddressList { get; set; }
         [Reactive] private List<WalletAddressViewModel> FromAddressList { get; set; }
         [Reactive] public string SearchPattern { get; set; }
         [Reactive] public string SortTypeString { get; set; }
@@ -67,19 +70,18 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     var address = g.FirstOrDefault(w => w.Currency == currency.Name);
 
                     var isFreeAddress = address?.Address == freeAddress.Address;
-
-                    var hasTokens = g.Any(w => w.Currency != currency.Name);
-
+                    
                     return new WalletAddressViewModel
                     {
                         Address = g.Key,
-                        HasActivity = address?.HasActivity ?? hasTokens,
                         AvailableBalance = address?.AvailableBalance() ?? 0m,
                         CurrencyFormat = currency.Format,
                         CurrencyCode = currency.Name,
                         IsFreeAddress = isFreeAddress
                     };
                 }).ToList();
+            
+            InitialFromAddressList = new List<WalletAddressViewModel>(FromAddressList);
         }
 
         private ReactiveCommand<Unit, Unit> _backCommand;
@@ -104,10 +106,24 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             {
                 ConfirmAction?.Invoke("Lorem ipsum");
             }));
+        
+        private ICommand _copyAddressCommand;
+
+        public ICommand CopyAddressCommand =>
+            _copyAddressCommand ??= (_copyAddressCommand = ReactiveCommand.Create((string address) =>
+            {
+                _ = Desktop.App.Clipboard.SetTextAsync(address);
+
+                // Outputs.ForEachDo(output => output.CopyButtonToolTip = OutputViewModel.DefaultCopyButtonToolTip);
+                // Outputs.First(output => output.Address == address).CopyButtonToolTip =
+                //     OutputViewModel.CopiedButtonToolTip;
+            }));
 
         private void DesignerMode()
         {
             SortTypeString = "Sort by balance";
         }
     }
+    //
+    // public class 
 }

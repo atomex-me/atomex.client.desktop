@@ -8,6 +8,7 @@
 
     <Style Selector=":is(TextBox)">
         <Setter Property="Cursor" Value="Ibeam" />
+        <Setter Property="FontFamily" Value="{DynamicResource DefaultFontFamily}" />
     </Style>
     
     <Style Selector=":is(TextBox)[IsEnabled=False]">

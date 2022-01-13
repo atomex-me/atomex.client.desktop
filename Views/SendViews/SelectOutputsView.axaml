@@ -54,12 +54,13 @@
                      FontSize="16"
                      Text="{Binding SearchPattern, Mode=TwoWay}"
                      Classes="SearchTextBox" />
-            
+
             <Grid Margin="0 18 0 0"
                   ColumnDefinitions="Auto,*,Auto,Auto"
                   RowDefinitions="Auto">
                 <CheckBox Grid.Row="0"
                           Grid.Column="0"
+                          Margin="12 0 0 0"
                           Padding="12 0 0 0"
                           IsChecked="{Binding SelectAll, Mode=TwoWay}"
                           Command="{Binding SelectAllCommand}"
@@ -75,7 +76,7 @@
                         Command="{Binding ChangeSortTypeCommand}"
                         Content="{Binding SortTypeString}"
                         Classes="SecondaryButton" />
-                
+
                 <Button Grid.Row="0"
                         Grid.Column="2"
                         Width="24"
@@ -83,7 +84,7 @@
                         Background="{DynamicResource LightDefaultOpacity4}"
                         CornerRadius="8"
                         Padding="4 5"
-                        Margin="8 0 0 0"
+                        Margin="8 0 12 0"
                         Command="{Binding ChangeSortDirectionCommand}"
                         Classes.Rotated="{Binding SortIsAscending}"
                         Classes.NotRotated="{Binding !SortIsAscending}"
@@ -107,9 +108,11 @@
                 <ListBox.Styles>
                     <Style Selector="ListBoxItem">
                         <Setter Property="Padding" Value="0" />
+                        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
                     </Style>
                     <Style Selector="ListBoxItem:pointerover /template/ ContentPresenter">
-                        <Setter Property="Background" Value="{DynamicResource ButtonBackgroundPointerOver}" />
+                        <Setter Property="Background" Value="{DynamicResource ListBoxItemPointeroverBrush}" />
+                        <Setter Property="CornerRadius" Value="8" />
                     </Style>
                     <Style Selector="ListBoxItem:not(:pointerover) /template/ ContentPresenter">
                         <Setter Property="Background" Value="{DynamicResource AlmostTransparentBrush}" />
@@ -124,8 +127,8 @@
                               HorizontalAlignment="Stretch"
                               RowDefinitions="Auto">
                             <CheckBox Grid.Column="0"
+                                      Margin="12 0 0 0"
                                       Padding="12 0 0 0"
-                                      Width="520"
                                       VerticalContentAlignment="Center"
                                       VerticalAlignment="Center"
                                       Content="{Binding Address}"
@@ -145,7 +148,8 @@
                             <Border Grid.Column="2"
                                     ToolTip.Placement="AnchorAndGravity"
                                     ToolTip.VerticalOffset="-32">
-                                <Button Padding="3"
+                                <Button Margin="0 0 9 0"
+                                        Padding="3"
                                         BorderThickness="0"
                                         VerticalContentAlignment="Center"
                                         Command="{Binding $parent[ListBox].DataContext.CopyAddressCommand}"

@@ -222,6 +222,11 @@
     <SolidColorBrush x:Key="CustomDataGridAlternativeRowBackground" Color="{DynamicResource LightDefaultOpacity6}" />
     <SolidColorBrush x:Key="CustomDataGridNoData" Color="#03ffffff" />
     <SolidColorBrush x:Key="CustomDataGridHeaderPointerOver" Color="{DynamicResource MahApps.Colors.Gray2}" Opacity="0.5" />
+    
+    <!-- Custom ListBox -->
+    
+    <SolidColorBrush x:Key="ListBoxItemSelectedBrush" Color="{DynamicResource Blue}" />
+    <SolidColorBrush x:Key="ListBoxItemPointeroverBrush" Color="{DynamicResource  LightDefaultOpacity6}" />
 
     <!-- Baker ComboBox -->
 

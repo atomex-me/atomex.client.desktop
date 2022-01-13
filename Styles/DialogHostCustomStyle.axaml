@@ -52,10 +52,9 @@
                                 <!--         HorizontalAlignment="Right" -->
                                 <!--         VerticalAlignment="Top" -->
                                 <!--         Command="{Binding CloseDialog}" /> -->
-
-
+                                
                                 <Button
-                                    Canvas.Right="25"
+                                    Canvas.Right="24"
                                     Canvas.Top="21"
                                     Width="28"
                                     Height="28"
