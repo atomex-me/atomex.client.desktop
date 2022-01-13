@@ -11,10 +11,10 @@ using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
 
 namespace Atomex.Client.Desktop.ViewModels
 {
-    public class CurrencySelectionViewModel : ViewModelBase
+    public class ConversionCurrencyViewModel : ViewModelBase
     {
-        public event EventHandler MaxClicked;
-        public event EventHandler SelectCurrencyClicked;
+        public Action MaxClicked { get; set; }
+        public Action SelectCurrencyClicked { get; set; }
 
         [Reactive] public CurrencyViewModel? CurrencyViewModel { get; set; }
 
@@ -49,16 +49,16 @@ namespace Atomex.Client.Desktop.ViewModels
         [Reactive] public string AmountInBaseString { get; set; }
 
         private ICommand _maxCommand;
-        public ICommand MaxCommand => _maxCommand ??= ReactiveCommand.Create(() => MaxClicked?.Invoke(this, EventArgs.Empty));
+        public ICommand MaxCommand => _maxCommand ??= ReactiveCommand.Create(() => MaxClicked?.Invoke());
 
         private ICommand _selectCurrencyCommand;
-        public ICommand SelectCurrencyCommand => _selectCurrencyCommand ??= ReactiveCommand.Create(() => SelectCurrencyClicked?.Invoke(this, EventArgs.Empty));
+        public ICommand SelectCurrencyCommand => _selectCurrencyCommand ??= ReactiveCommand.Create(() => SelectCurrencyClicked?.Invoke());
 
         [Reactive] public bool Selected { get; set; }
 
         [Reactive] public string UnselectedLabel { get; set; }
 
-        public CurrencySelectionViewModel()
+        public ConversionCurrencyViewModel()
         {
             if (Design.IsDesignMode)
                 DesignerMode();

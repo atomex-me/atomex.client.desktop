@@ -7,11 +7,11 @@
              d:DesignHeight="102"
              xmlns:vm="clr-namespace:Atomex.Client.Desktop.ViewModels"
              xmlns:views="clr-namespace:Atomex.Client.Desktop.Views"
-             x:Class="Atomex.Client.Desktop.Views.CurrencySelectionView"
+             x:Class="Atomex.Client.Desktop.Views.ConversionCurrencyView"
              Classes="designer">
 
   <Design.DataContext>
-    <vm:CurrencySelectionViewModel/>
+    <vm:ConversionCurrencyViewModel/>
   </Design.DataContext>
 
   <Design.DesignStyle>

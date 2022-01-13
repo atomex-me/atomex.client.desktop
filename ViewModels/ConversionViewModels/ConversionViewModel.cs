@@ -67,8 +67,8 @@ namespace Atomex.Client.Desktop.ViewModels
         [Reactive] public string ToAddress { get; set; }
         [Reactive] public string RedeemFromAddress { get; set; }
 
-        [Reactive] public CurrencySelectionViewModel FromViewModel { get; set; }
-        [Reactive] public CurrencySelectionViewModel ToViewModel { get; set; }
+        [Reactive] public ConversionCurrencyViewModel FromViewModel { get; set; }
+        [Reactive] public ConversionCurrencyViewModel ToViewModel { get; set; }
 
         [Reactive] public string FromValidationMessage { get; set; }
         [Reactive] public string FromValidationMessageToolTip { get; set; }
@@ -86,15 +86,11 @@ namespace Atomex.Client.Desktop.ViewModels
 
 
 
-        [Reactive]
-        public List<CurrencyViewModel>? FromCurrencies { get; set; }
-        [Reactive]
-        public List<CurrencyViewModel>? ToCurrencies { get; set; }
+        [Reactive] public List<CurrencyViewModel>? FromCurrencies { get; set; }
+        [Reactive] public List<CurrencyViewModel>? ToCurrencies { get; set; }
 
-        [Reactive]
-        public CurrencyViewModel? FromCurrencyViewModel { get; set; }
-        [Reactive]
-        public CurrencyViewModel? ToCurrencyViewModel { get; set; }
+        [Reactive] public CurrencyViewModel? FromCurrencyViewModel { get; set; }
+        [Reactive] public CurrencyViewModel? ToCurrencyViewModel { get; set; }
 
         [ObservableAsProperty] public string PriceFormat { get; }
 
@@ -124,85 +120,43 @@ namespace Atomex.Client.Desktop.ViewModels
             }
         }
 
-        [Reactive]
-        public decimal AmountInBase { get; set; }
+        [Reactive] public decimal AmountInBase { get; set; }
 
-        [Reactive]
-        public bool IsSwapParamsEstimating { get; set; }
+        [Reactive] public bool IsSwapParamsEstimating { get; set; }
 
-        [Reactive]
-        public bool IsAmountValid { get; set; }
+        [Reactive] public bool IsAmountValid { get; set; }
 
-        [Reactive]
-        public decimal TargetAmount { get; set; }
-
-        [Reactive]
-        public decimal TargetAmountInBase { get; set; }
+        [Reactive] public decimal TargetAmount { get; set; }
+        [Reactive] public decimal TargetAmountInBase { get; set; }
 
         private decimal _estimatedOrderPrice;
 
         [Reactive] public decimal EstimatedPrice { get; set; }
+        [Reactive] public decimal EstimatedMaxAmount { get; set; }
+        [Reactive] public decimal EstimatedMakerNetworkFee { get; set; }
+        [Reactive] public decimal EstimatedMakerNetworkFeeInBase { get; set; }
+        [Reactive] public decimal EstimatedPaymentFee { get; set; }
+        [Reactive] public decimal EstimatedPaymentFeeInBase { get; set; }
+        [Reactive] public decimal EstimatedRedeemFee { get; set; }
+        [Reactive] public decimal EstimatedRedeemFeeInBase { get; set; }
+        [Reactive] public decimal EstimatedTotalNetworkFeeInBase { get; set; }
+        [Reactive] public decimal RewardForRedeem { get; set; }
+        [Reactive] public decimal RewardForRedeemInBase { get; set; }
+        [Reactive] public bool HasRewardForRedeem { get; set; }
 
-        [Reactive]
-        public decimal EstimatedMaxAmount { get; set; }
+        [Reactive] public string Warning { get; set; }
+        [Reactive] public bool IsCriticalWarning { get; set; }
 
-        [Reactive]
-        public decimal EstimatedMakerNetworkFee { get; set; }
+        [Reactive] public bool CanConvert { get; set; }
 
-        [Reactive]
-        public decimal EstimatedMakerNetworkFeeInBase { get; set; }
+        [Reactive] public ObservableCollection<SwapViewModel> Swaps { get; set; }
 
-        [Reactive]
-        public decimal EstimatedPaymentFee { get; set; }
+        [Reactive] public bool IsNoLiquidity { get; set; }
 
-        [Reactive]
-        public decimal EstimatedPaymentFeeInBase { get; set; }
-
-        [Reactive]
-        public decimal EstimatedRedeemFee { get; set; }
-
-        [Reactive]
-        public decimal EstimatedRedeemFeeInBase { get; set; }
-
-        [Reactive]
-        public decimal EstimatedTotalNetworkFeeInBase { get; set; }
-
-        [Reactive]
-        public decimal RewardForRedeem { get; set; }
-
-        [Reactive]
-        public decimal RewardForRedeemInBase { get; set; }
-
-        [Reactive]
-        public bool HasRewardForRedeem { get; set; }
-
-        [Reactive]
-        public string Warning { get; set; }
-
-        [Reactive]
-        public bool IsCriticalWarning { get; set; }
-
-        [Reactive]
-        public bool CanConvert { get; set; }
-
-        [Reactive]
-        public ObservableCollection<SwapViewModel> Swaps { get; set; }
-
-        [Reactive]
-        public bool IsNoLiquidity { get; set; }
-
-        [ObservableAsProperty]
-        public int ColumnSpan { get; }
-
-        [ObservableAsProperty]
-        public bool DetailsVisible { get; }
-
-        [ObservableAsProperty]
-        public SwapDetailsViewModel? SwapDetailsViewModel { get; }
-
-        // current selected swap in DataGrid
-        [Reactive]
-        public int DGSelectedIndex { get; set; }
+        [ObservableAsProperty] public int ColumnSpan { get; }
+        [ObservableAsProperty] public bool DetailsVisible { get; }
+        [ObservableAsProperty] public SwapDetailsViewModel? SwapDetailsViewModel { get; }
+        [Reactive] public int DGSelectedIndex { get; set; } // current selected swap in DataGrid
 
         public void CellPointerPressed(int cellIndex)
         {
@@ -224,6 +178,21 @@ namespace Atomex.Client.Desktop.ViewModels
             IsAmountValid = true;
             CanConvert = true;
             DGSelectedIndex = -1;
+
+            FromViewModel = new ConversionCurrencyViewModel
+            {
+                UnselectedLabel = "Choose From",
+                MaxClicked = () => { },
+                SelectCurrencyClicked = () => { }
+            };
+
+            ToViewModel = new ConversionCurrencyViewModel
+            {
+                UnselectedLabel = "Choose To",
+                MaxClicked = () => { },
+                SelectCurrencyClicked = () => { }
+            };
+
 
             // FromCurrencyViewModel changed => Update ToCurrencies
             this.WhenAnyValue(vm => vm.FromCurrencyViewModel)
@@ -800,6 +769,7 @@ namespace Atomex.Client.Desktop.ViewModels
             _ = EstimateSwapParamsAsync(_amount);
         }
 
+#if DEBUG
         private void DesignerMode()
         {
             this.WhenAnyValue(vm => vm.DGSelectedIndex)
@@ -817,30 +787,30 @@ namespace Atomex.Client.Desktop.ViewModels
             var btc = DesignTime.Currencies.Get<BitcoinConfig>("BTC");
             var ltc = DesignTime.Currencies.Get<LitecoinConfig>("LTC");
 
-            FromViewModel = new CurrencySelectionViewModel
+            FromViewModel = new ConversionCurrencyViewModel
             {
                 CurrencyViewModel  = CurrencyViewModelCreator.CreateViewModel(btc, subscribeToUpdates: false),
                 Address            = "bc1q...f3hr",
                 AmountString       = "0.00007881",
                 UnselectedLabel    = "Choose From",
                 AmountInBaseString = "$12.32",
-                Selected           = true
+                Selected           = false //true
             };
 
-            ToViewModel = new CurrencySelectionViewModel
+            ToViewModel = new ConversionCurrencyViewModel
             {
                 CurrencyViewModel  = CurrencyViewModelCreator.CreateViewModel(ltc, subscribeToUpdates: false),
                 Address            = "ltc1...med6",
                 AmountString       = "558.55271303",
                 UnselectedLabel    = "Choose To",
                 AmountInBaseString = "$123.32",
-                Selected           = true
+                Selected           = false //true
             };
 
-            FromValidationMessage = "Error line Error line Error line Error line Error line Error line " +
-                "Error line Error line Error line Error line Error line Error line Error line";
-            FromValidationMessageToolTip = "Unknown super mega error description";
-            FromValidationMessageType = MessageType.Warning;
+            //FromValidationMessage = "Error line Error line Error line Error line Error line Error line " +
+            //    "Error line Error line Error line Error line Error line Error line Error line";
+            //FromValidationMessageToolTip = "Unknown super mega error description";
+            //FromValidationMessageType = MessageType.Warning;
 
             var currencyViewModels = new List<CurrencyViewModel>
             {
@@ -853,10 +823,10 @@ namespace Atomex.Client.Desktop.ViewModels
             EstimatedPrice = 0.01235678m;
             EstimatedTotalNetworkFeeInBase = 14.88m;
 
-            ValidationMessage = "Error line Error line Error line Error line Error line Error line " +
-                "Error line Error line Error line Error line Error line Error line Error line";
-            ValidationMessageToolTip = "Unknown super mega error description";
-            ValidationMessageType = MessageType.Error;
+            //ValidationMessage = "Error line Error line Error line Error line Error line Error line " +
+            //    "Error line Error line Error line Error line Error line Error line Error line";
+            //ValidationMessageToolTip = "Unknown super mega error description";
+            //ValidationMessageType = MessageType.Error;
 
 
 
@@ -931,4 +901,5 @@ namespace Atomex.Client.Desktop.ViewModels
             DGSelectedIndex = 0; // -1;
         }
     }
+#endif
 }

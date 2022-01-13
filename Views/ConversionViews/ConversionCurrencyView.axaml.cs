@@ -10,9 +10,9 @@ using Atomex.Client.Desktop.ViewModels;
 
 namespace Atomex.Client.Desktop.Views
 {
-    public partial class CurrencySelectionView : UserControl
+    public partial class ConversionCurrencyView : UserControl
     {
-        public CurrencySelectionView()
+        public ConversionCurrencyView()
         {
             InitializeComponent();
 
@@ -25,7 +25,7 @@ namespace Atomex.Client.Desktop.Views
                 {
                     Dispatcher.UIThread.InvokeAsync(() =>
                     {
-                        if (DataContext is CurrencySelectionViewModel viewModel)
+                        if (DataContext is ConversionCurrencyViewModel viewModel)
                             viewModel.AmountString = text;
                     });
                 });

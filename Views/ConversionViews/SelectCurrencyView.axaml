@@ -1,0 +1,178 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="700" d:DesignHeight="450"
+             x:Class="Atomex.Client.Desktop.Views.ConversionViews.SelectCurrencyView"
+             xmlns:svg="clr-namespace:Avalonia.Svg.Skia;assembly=Avalonia.Svg.Skia"
+             xmlns:vm="clr-namespace:Atomex.Client.Desktop.ViewModels.ConversionViewModels">
+  <Design.DataContext>
+    <vm:SelectCurrencyViewModel/>
+  </Design.DataContext>
+
+  <Border Classes="ChildViewBorder"
+          Width="700">
+    <Grid ColumnDefinitions="*,64"
+          RowDefinitions="72,*">
+      <!-- title -->
+      <TextBlock FontSize="22"
+                 FontFamily="{DynamicResource DefaultFontFamily}"
+                 HorizontalAlignment="Center"
+                 VerticalAlignment="Center"
+                 Foreground="{DynamicResource LightDefault}"
+                 Text="Send from"
+                 Grid.Column="0"
+                 Grid.ColumnSpan="2"/>
+
+      <!-- close button -->
+      <Button Width="28"
+              Height="28"
+              Padding="3"
+              BorderThickness="0"
+              HorizontalAlignment="Center"
+              VerticalAlignment="Center"
+              Classes="ButtonWithIcon"
+              Grid.Column="1">
+        <svg:Svg Width="28"
+                 Path="/Resources/Icons/close.svg"
+                 HorizontalAlignment="Left"/>
+      </Button>
+
+      <Border Height="1"
+              Background="{DynamicResource LightDefaultOpacity10}"
+              VerticalAlignment="Bottom"
+              Grid.Column="0"
+              Grid.ColumnSpan="2"/>
+
+      <ListBox Margin="16 10 16 16"
+               ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+               Background="{DynamicResource AlmostTransparentBrush}"
+               Items="{Binding Currencies}"
+               SelectionMode="Single"
+               Grid.Column="0"
+               Grid.ColumnSpan="2"
+               Grid.Row="1">
+        <ListBox.Styles>
+          <Style Selector="ListBoxItem">
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="CornerRadius" Value="8"/>
+            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+          </Style>
+
+          <Style Selector="ListBoxItem:pressed /template/ ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource LightDefaultOpacity4}"/>
+          </Style>
+          <Style Selector="ListBoxItem[IsSelected=true] /template/ ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource LightDefaultOpacity4}"/>
+          </Style>
+          <Style Selector="ListBoxItem[IsSelected=true] Border#BottomLine">
+            <Setter Property="IsVisible" Value="False"/>
+          </Style>
+          <Style Selector="ListBoxItem:pointerover:not(:pressed) /template/ ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource LightDefaultOpacity6}"/>
+          </Style>
+          <Style Selector="ListBoxItem:pointerover Border#BottomLine">
+            <Setter Property="IsVisible" Value="False"/>
+          </Style>
+        </ListBox.Styles>
+        
+        <ListBox.ItemTemplate>
+          <DataTemplate>
+            <Grid ColumnDefinitions="*,Auto">
+              <StackPanel Margin="16 14 16 14"
+                          Orientation="Horizontal"
+                          VerticalAlignment="Center"
+                          Grid.Column="0">
+                <Image Width="24"
+                       Height="24"
+                       Source="{Binding CurrencyViewModel.LargeIconPath}"
+                       VerticalAlignment="Center"
+                       UseLayoutRounding="True"/>
+                <TextBlock Margin="17 0 0 0"
+                           Text="{Binding CurrencyViewModel.Header}"
+                           FontFamily="{DynamicResource DefaultLightFontFamily}"
+                           FontSize="18"
+                           Foreground="{DynamicResource DefaultForegroundBrush}"
+                           VerticalAlignment="Center"/>
+                <TextBlock Margin="12 0 0 -2"
+                           FontFamily="{DynamicResource DefaultLightFontFamily}"
+                           FontSize="16"
+                           Foreground="{DynamicResource LightDefaultOpacity50}"
+                           VerticalAlignment="Center">
+                  <TextBlock.Text>
+                    <MultiBinding Converter="{StaticResource AmountToStringConverter}">
+                      <Binding Path="CurrencyViewModel.TotalAmount" Mode="OneWay"/>
+                      <Binding Path="CurrencyViewModel.CurrencyFormat" Mode="OneWay"/>
+                    </MultiBinding>
+                  </TextBlock.Text>
+                </TextBlock>
+                <TextBlock Margin="6 0 0 -2"
+                           Text="{Binding CurrencyViewModel.CurrencyCode}"
+                           FontFamily="{DynamicResource DefaultLightFontFamily}"
+                           FontSize="16"
+                           Foreground="{DynamicResource LightDefaultOpacity50}"
+                           VerticalAlignment="Center"/>
+              </StackPanel>
+
+              <Button Margin="0 0 16 0"
+                      Padding="10 6 10 6"
+                      Content="from 10 addresses (0.00000 BTC)"
+                      HorizontalAlignment="Right"
+                      FontSize="13"
+                      FontFamily="{DynamicResource DefaultFontFamily}"
+                      Foreground="{DynamicResource LightDefaultOpacity50}"
+                      Grid.Column="1">
+                <Button.Styles>
+                  <Style Selector="Button:pointerover Border#BackgroundBorder">
+                    <Setter Property="Background" Value="{DynamicResource LightDefaultOpacity6}"/>
+                  </Style>
+                  <Style Selector="Button:pointerover Line#Underline">
+                    <Setter Property="IsVisible" Value="False"/>
+                  </Style>
+                </Button.Styles>
+                <Button.Template>
+                  <ControlTemplate>
+                    <Border Name="BackgroundBorder"
+                            Padding="{TemplateBinding Padding}"
+                            CornerRadius="8">
+                      <Grid>
+                        <TextBlock Name="TextBlock"
+                                   Text="{TemplateBinding Content}"
+                                   FontSize="{TemplateBinding FontSize}"
+                                   Foreground="{TemplateBinding Foreground}"
+                                   FontFamily="{TemplateBinding FontFamily}"
+                                   FontWeight="{TemplateBinding FontWeight}"
+                                   HorizontalAlignment="Center"
+                                   Padding="0"
+                                   Margin="0 0 0 2"
+                                   LineHeight="16" />
+                        <Line Name="Underline"
+                              Height="1"
+                              Margin="0 17 0 0"
+                              Width="{Binding #TextBlock.Bounds.Width}"
+                              StartPoint="0,0"
+                              EndPoint="{Binding #TextBlock.Bounds.Width, Converter={StaticResource WidthToPointConverter}}"
+                              StrokeThickness="1"
+                              StrokeDashArray="2,2"
+                              Stroke="{DynamicResource LineStrokeBrush}">
+                        </Line>
+                      </Grid>
+                    </Border>
+                  </ControlTemplate>
+                </Button.Template>
+              </Button>
+
+              <Border Name="BottomLine"
+                      Margin="16 0 16 0"
+                      Height="1"
+                      VerticalAlignment="Bottom"
+                      Background="{DynamicResource LightDefaultOpacity10}"
+                      Grid.ColumnSpan="2"/>
+            </Grid>
+          </DataTemplate>
+        </ListBox.ItemTemplate>
+      </ListBox>
+
+    </Grid>
+  </Border>
+</UserControl>

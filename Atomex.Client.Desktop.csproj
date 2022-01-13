@@ -61,6 +61,9 @@
           <AutoGen>True</AutoGen>
           <DependentUpon>Resources.resx</DependentUpon>
         </Compile>
+        <Compile Update="Views\ConversionViews\ConversionCurrencyView.axaml.cs">
+          <DependentUpon>ConversionCurrencyView.axaml</DependentUpon>
+        </Compile>
         <Compile Update="Views\StartView.axaml.cs">
             <DependentUpon>StartView.axaml</DependentUpon>
         </Compile>
@@ -107,7 +110,7 @@
         <Compile Update="Views\WalletMainView.axaml.cs">
             <DependentUpon>WalletMainView.axaml</DependentUpon>
         </Compile>
-        <Compile Update="Views\ConversionView.axaml.cs">
+        <Compile Update="Views\ConversionViews\ConversionView.axaml.cs">
             <DependentUpon>ConversionView.axaml</DependentUpon>
         </Compile>
         <Compile Update="Views\WalletViews\WalletView.axaml.cs">
@@ -153,7 +156,7 @@
             <DependentUpon>EthereumTransactionDetailsView.axaml</DependentUpon>
             <SubType>Code</SubType>
         </Compile>
-        <Compile Update="Views\ConversionConfirmationView.axaml.cs">
+        <Compile Update="Views\ConversionViews\ConversionConfirmationView.axaml.cs">
             <DependentUpon>ConversionConfirmationView.axaml</DependentUpon>
         </Compile>
         <Compile Update="Views\AddressesView.axaml.cs">
