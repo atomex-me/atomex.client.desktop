@@ -22,4 +22,12 @@
     <Style Selector="CheckBox:not(:checked) /template/ ContentPresenter#ContentPresenter">
         <Setter Property="TextBlock.Foreground" Value="{DynamicResource SecondaryForegroundBrush}" />
     </Style>
+    
+    <Style Selector="CheckBox.Primary:checked /template/ ContentPresenter#ContentPresenter">
+        <Setter Property="TextBlock.Foreground" Value="{DynamicResource DefaultForegroundBrush}" />
+    </Style>
+
+    <Style Selector="CheckBox.Primary:not(:checked) /template/ ContentPresenter#ContentPresenter">
+        <Setter Property="TextBlock.Foreground" Value="{DynamicResource DefaultForegroundBrush}" />
+    </Style>
 </Styles>

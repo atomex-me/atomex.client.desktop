@@ -136,7 +136,8 @@
                                       Command="{Binding $parent[ListBox].DataContext.OutputCheckCommand}"
                                       FontSize="16"
                                       FontFamily="{DynamicResource DefaultLightFontFamily}"
-                                      Foreground="{DynamicResource DefaultForegroundBrush}" />
+                                      Foreground="{DynamicResource DefaultForegroundBrush}"
+                                      Classes="Primary"/>
 
                             <TextBlock Grid.Column="1"
                                        VerticalAlignment="Center"
