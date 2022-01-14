@@ -22,9 +22,9 @@ using Atomex.Services;
 using Atomex.Swaps;
 using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.Properties;
+using Atomex.Client.Desktop.ViewModels.ConversionViewModels;
 using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
 using Atomex.Wallet.Abstract;
-using Atomex.Client.Desktop.ViewModels.ConversionViewModels;
 
 namespace Atomex.Client.Desktop.ViewModels
 {
@@ -186,7 +186,7 @@ namespace Atomex.Client.Desktop.ViewModels
                 MaxClicked = () => { },
                 SelectCurrencyClicked = () =>
                 {
-                    var selectCurrencyViewModel = new SelectCurrencyViewModel()
+                    var selectCurrencyViewModel = new SelectCurrencyViewModel(account: _app.Account, title: "Send from")
                     {
                         Currencies = new ObservableCollection<SelectCurrencyViewModelItem>(
                             FromCurrencies.Select(c => new SelectCurrencyViewModelItem(c))),
@@ -194,7 +194,6 @@ namespace Atomex.Client.Desktop.ViewModels
                         {
                             FromCurrencyViewModel = FromCurrencies.First(c => c.Currency.Name == i.CurrencyViewModel.Currency.Name);
                             FromViewModel.CurrencyViewModel = FromCurrencyViewModel;
-                            //this.RaisePropertyChanged(nameof(FromViewModel));
 
                             App.DialogService.Close();
                         }
@@ -210,7 +209,7 @@ namespace Atomex.Client.Desktop.ViewModels
                 MaxClicked = () => { },
                 SelectCurrencyClicked = () =>
                 {
-                    var selectCurrencyViewModel = new SelectCurrencyViewModel()
+                    var selectCurrencyViewModel = new SelectCurrencyViewModel(account: _app.Account, title: "Receive to")
                     {
                         Currencies = new ObservableCollection<SelectCurrencyViewModelItem>(
                             ToCurrencies.Select(c => new SelectCurrencyViewModelItem(c))),
@@ -226,7 +225,6 @@ namespace Atomex.Client.Desktop.ViewModels
                     App.DialogService.Show(selectCurrencyViewModel);
                 }
             };
-
 
             // FromCurrencyViewModel changed => Update ToCurrencies
             this.WhenAnyValue(vm => vm.FromCurrencyViewModel)

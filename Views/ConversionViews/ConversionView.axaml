@@ -50,7 +50,7 @@
                 Grid.Column="0"
                 Grid.Row="0">
 
-      <TextBlock Margin="0 80 0 32"
+      <TextBlock Margin="0 40 0 32"
                  Text="Exchange"
                  FontSize="32"
                  FontFamily="{DynamicResource DefaultLightFontFamily}"

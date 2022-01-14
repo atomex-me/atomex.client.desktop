@@ -19,7 +19,7 @@
                  HorizontalAlignment="Center"
                  VerticalAlignment="Center"
                  Foreground="{DynamicResource LightDefault}"
-                 Text="Send from"
+                 Text="{Binding Title}"
                  Grid.Column="0"
                  Grid.ColumnSpan="2"/>
 
@@ -99,7 +99,7 @@
 
               <Button Margin="0 0 16 0"
                       Padding="10 6 10 6"
-                      Content="from 10 addresses (0.00000 BTC)"
+                      Content="{Binding SelectAddressDescription}"
                       HorizontalAlignment="Right"
                       FontSize="13"
                       FontFamily="{DynamicResource DefaultFontFamily}"
