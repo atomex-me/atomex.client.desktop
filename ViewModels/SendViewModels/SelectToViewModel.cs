@@ -3,13 +3,16 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive;
+using System.Threading.Tasks;
 using System.Windows.Input;
 using Atomex.Common;
 using Atomex.Core;
 using Atomex.Wallet.Abstract;
 using Avalonia.Controls;
+using Avalonia.Threading;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
+using Serilog;
 
 namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 {
@@ -19,9 +22,8 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         public Action<string> ConfirmAction { get; set; }
 
         private ObservableCollection<AddressViewModel> InitialMyAddresses { get; set; }
-        [Reactive] private ObservableCollection<AddressViewModel> MyAddresses { get; set; }
+        [Reactive] public ObservableCollection<AddressViewModel> MyAddresses { get; set; }
         [Reactive] public string SearchPattern { get; set; }
-        [Reactive] public string SortTypeString { get; set; }
         [Reactive] private bool SortIsAscending { get; set; }
         [Reactive] private bool SortByDate { get; set; }
 
@@ -35,14 +37,6 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
         public SelectToViewModel(IAccount account, CurrencyConfig currency)
         {
-            this.WhenAnyValue(vm => vm.SortByDate, vm => vm.SortIsAscending)
-                .Subscribe(value =>
-                {
-                    var (item1, item2) = value;
-
-                    SortTypeString = item1 ? "Sort by date" : "Sort by balance";
-                });
-
             // get all addresses with tokens (if exists)
             var tokenAddresses = Currencies.HasTokens(currency.Name)
                 ? (account.GetCurrencyAccount(currency.Name) as IHasTokens)
@@ -106,29 +100,20 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         public ReactiveCommand<Unit, Unit> ConfirmCommand => _confirmCommand ??=
             (_confirmCommand = ReactiveCommand.Create(() => { ConfirmAction?.Invoke("Lorem ipsum"); }));
 
-        private ReactiveCommand<WalletAddress, Unit> _copyAddressCommand;
+        private ICommand _copyAddressCommand;
 
-        public ReactiveCommand<WalletAddress, Unit> CopyAddressCommand =>
+        public ICommand CopyAddressCommand =>
             _copyAddressCommand ??= (_copyAddressCommand = ReactiveCommand.Create((WalletAddress address) =>
             {
                 _ = Desktop.App.Clipboard.SetTextAsync(address.Address);
-                
-                
 
-                MyAddresses.ForEachDo(addressViewModel =>
-                    addressViewModel.CopyButtonToolTip = AddressViewModel.DefaultCopyButtonToolTip);
-                
-                var element =
-                    MyAddresses.First(addressViewModel => addressViewModel.WalletAddress == address);
-                
-                element.CopyButtonToolTip = AddressViewModel.CopiedButtonToolTip;
-                
-                MyAddresses = new ObservableCollection<AddressViewModel>(MyAddresses);
+                // MyAddresses.ForEachDo(o => o.CopyButtonToolTip = AddressViewModel.DefaultCopyButtonToolTip);
+                // MyAddresses.First(o => o.WalletAddress.Address == address.Address).CopyButtonToolTip =
+                //     AddressViewModel.CopiedButtonToolTip;
             }));
 
         private void DesignerMode()
         {
-            SortTypeString = "Sort by balance";
         }
     }
 

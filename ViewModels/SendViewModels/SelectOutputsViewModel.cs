@@ -16,6 +16,7 @@ using Avalonia.Controls;
 using NBitcoin;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
+using Serilog;
 using Network = NBitcoin.Network;
 
 
@@ -73,10 +74,11 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                         .Where(address => outputs.FirstOrDefault(o => o.Address == address.Address) != null)
                         .ToList();
 
-                    var outputsWithAddresses = outputs.Select(output =>
+                    var outputsWithAddresses = outputs.Select((output, index) =>
                     {
                         var address = addresses.FirstOrDefault(a => a.Address == output.Address);
                         output.WalletAddress = address ?? null;
+                        output.Id = index;
                         return output;
                     });
 
@@ -87,28 +89,14 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     RecalculateTotalStats();
                 });
 
-            // this.WhenAnyValue(vm => vm.SearchPattern)
-            //     .Where(_ => Outputs != null)
-            //     .Subscribe(searchPattern =>
-            //     {
-            //         Outputs = new ObservableCollection<OutputViewModel>(SortIsAscending
-            //             ? InitialOutputs
-            //                 .OrderBy(output => output.BalanceString)
-            //                 .Where(output => output.Address.ToLower().Contains(searchPattern.ToLower()))
-            //             : InitialOutputs
-            //                 .OrderByDescending(output => output.BalanceString)
-            //                 .Where(output => output.Address.ToLower().Contains(searchPattern.ToLower()))
-            //         );
-            //     });
-
-            this.WhenAnyValue(vm => vm.SortByDate,
+            this.WhenAnyValue(
+                    vm => vm.SortByDate,
                     vm => vm.SortIsAscending,
                     vm => vm.SearchPattern)
                 .Subscribe(value =>
                 {
                     var (item1, item2, item3) = value;
-
-                    SortTypeString = item1 ? "Sort by date" : "Sort by balance";
+                    
                     if (Outputs == null) return;
 
                     var outputs = new ObservableCollection<OutputViewModel>(
@@ -194,7 +182,6 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         [Reactive] private bool SortByDate { get; set; }
         [Reactive] public string TotalSelected { get; set; }
         [Reactive] public string TotalCoinAmountSelected { get; set; }
-        [Reactive] public string SortTypeString { get; set; }
 
         private void RecalculateTotalStats()
         {
@@ -268,15 +255,12 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 _ = Desktop.App.Clipboard.SetTextAsync(output.Address);
 
                 Outputs.ForEachDo(o => o.CopyButtonToolTip = OutputViewModel.DefaultCopyButtonToolTip);
-                Outputs.First(o => o.Output.TxId == output.Output.TxId).CopyButtonToolTip =
+                Outputs.First(o => o.Id == output.Id).CopyButtonToolTip =
                     OutputViewModel.CopiedButtonToolTip;
-
-                Outputs = new ObservableCollection<OutputViewModel>(Outputs);
             }));
 
         private void DesignerMode()
         {
-            SortTypeString = "Sort by balance";
             var amount = new Money((decimal)0.9999, MoneyUnit.Satoshi);
             var script = BitcoinAddress.Create("muRDku2ZwNTz2msCZCHSUhDD5o6NxGsoXM", Network.TestNet).ScriptPubKey;
 
@@ -322,6 +306,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             CopyButtonToolTip = DefaultCopyButtonToolTip;
         }
 
+        public int Id { get; set; }
         [Reactive] public bool IsSelected { get; set; }
         [Reactive] public string CopyButtonToolTip { get; set; }
         public BitcoinBasedTxOutput Output { get; set; }

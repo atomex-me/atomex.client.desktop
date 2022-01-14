@@ -6,7 +6,9 @@
              x:Class="Atomex.Client.Desktop.Views.SendViews.SelectOutputsView"
              xmlns:svg="clr-namespace:Avalonia.Svg.Skia;assembly=Avalonia.Svg.Skia"
              xmlns:vm="clr-namespace:Atomex.Client.Desktop.ViewModels.SendViewModels"
-             xmlns:controls="clr-namespace:Atomex.Client.Desktop.Controls">
+             xmlns:controls="clr-namespace:Atomex.Client.Desktop.Controls"
+             xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
+             xmlns:ia="clr-namespace:Avalonia.Xaml.Interactions.Core;assembly=Avalonia.Xaml.Interactions">
 
     <Design.DataContext>
         <vm:SelectOutputsViewModel />
@@ -74,8 +76,25 @@
                         Grid.Column="1"
                         HorizontalAlignment="Right"
                         Command="{Binding ChangeSortTypeCommand}"
-                        Content="{Binding SortTypeString}"
-                        Classes="SecondaryButton" />
+                        Classes="SecondaryButton"
+                        Name="SortTypeButton">
+                    <i:Interaction.Behaviors>
+                        <ia:DataTriggerBehavior Binding="{Binding SortByDate}"
+                                                ComparisonCondition="Equal"
+                                                Value="True">
+                            <ia:ChangePropertyAction TargetObject="{Binding #SortTypeButton}"
+                                                     PropertyName="Content"
+                                                     Value="Sort by date" />
+                        </ia:DataTriggerBehavior>
+                        <ia:DataTriggerBehavior Binding="{Binding SortByDate}"
+                                                ComparisonCondition="NotEqual"
+                                                Value="True">
+                            <ia:ChangePropertyAction TargetObject="{Binding #SortTypeButton}"
+                                                     PropertyName="Content"
+                                                     Value="Sort by balance" />
+                        </ia:DataTriggerBehavior>
+                    </i:Interaction.Behaviors>
+                </Button>
 
                 <Button Grid.Row="0"
                         Grid.Column="2"
@@ -104,7 +123,7 @@
                      Background="{DynamicResource AlmostTransparentBrush}"
                      ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                      Items="{Binding Outputs}"
-                     SelectionMode="Multiple">
+                     SelectionMode="Single">
                 <ListBox.Styles>
                     <Style Selector="ListBoxItem">
                         <Setter Property="Padding" Value="0" />
@@ -137,7 +156,7 @@
                                       FontSize="16"
                                       FontFamily="{DynamicResource DefaultLightFontFamily}"
                                       Foreground="{DynamicResource DefaultForegroundBrush}"
-                                      Classes="Primary"/>
+                                      Classes="Primary" />
 
                             <TextBlock Grid.Column="1"
                                        VerticalAlignment="Center"
