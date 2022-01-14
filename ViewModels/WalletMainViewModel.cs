@@ -211,6 +211,11 @@ namespace Atomex.Client.Desktop.ViewModels
             RefreshAllMenus();
         }
 
+        public void SurveyCommand()
+        {
+            App.OpenBrowser("https://forms.gle/TACSt9JDJSd7tZyk9");
+        }
+
         public bool IsPortfolioSectionActive => Content.GetType() == typeof(PortfolioViewModel);
         public bool IsWalletsSectionActive => Content.GetType() == typeof(WalletsViewModel);
         public bool IsConversionSectionActive => Content.GetType() == typeof(ConversionViewModel);
