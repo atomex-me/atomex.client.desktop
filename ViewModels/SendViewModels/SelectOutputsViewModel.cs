@@ -87,32 +87,37 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     RecalculateTotalStats();
                 });
 
-            this.WhenAnyValue(vm => vm.SearchPattern)
-                .Where(_ => Outputs != null)
-                .Subscribe(searchPattern =>
-                {
-                    Outputs = new ObservableCollection<OutputViewModel>(SortIsAscending
-                        ? InitialOutputs
-                            .OrderBy(output => output.BalanceString)
-                            .Where(output => output.Address.ToLower().Contains(searchPattern.ToLower()))
-                        : InitialOutputs
-                            .OrderByDescending(output => output.BalanceString)
-                            .Where(output => output.Address.ToLower().Contains(searchPattern.ToLower()))
-                    );
-                });
+            // this.WhenAnyValue(vm => vm.SearchPattern)
+            //     .Where(_ => Outputs != null)
+            //     .Subscribe(searchPattern =>
+            //     {
+            //         Outputs = new ObservableCollection<OutputViewModel>(SortIsAscending
+            //             ? InitialOutputs
+            //                 .OrderBy(output => output.BalanceString)
+            //                 .Where(output => output.Address.ToLower().Contains(searchPattern.ToLower()))
+            //             : InitialOutputs
+            //                 .OrderByDescending(output => output.BalanceString)
+            //                 .Where(output => output.Address.ToLower().Contains(searchPattern.ToLower()))
+            //         );
+            //     });
 
-            this.WhenAnyValue(vm => vm.SortByDate, vm => vm.SortIsAscending)
+            this.WhenAnyValue(vm => vm.SortByDate,
+                    vm => vm.SortIsAscending,
+                    vm => vm.SearchPattern)
                 .Subscribe(value =>
                 {
-                    var (item1, item2) = value;
+                    var (item1, item2, item3) = value;
 
                     SortTypeString = item1 ? "Sort by date" : "Sort by balance";
-
                     if (Outputs == null) return;
+
+                    var outputs = new ObservableCollection<OutputViewModel>(
+                        InitialOutputs
+                            .Where(output => output.Address.ToLower().Contains(item3?.ToLower() ?? string.Empty)));
 
                     if (item1)
                     {
-                        var outputsList = Outputs.ToList();
+                        var outputsList = outputs.ToList();
                         if (item2)
                         {
                             outputsList.Sort((a1, a2) =>
@@ -165,8 +170,8 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     else
                     {
                         Outputs = new ObservableCollection<OutputViewModel>(item2
-                            ? Outputs.OrderBy(output => output.BalanceString)
-                            : Outputs.OrderByDescending(output => output.BalanceString));
+                            ? outputs.OrderBy(output => output.BalanceString)
+                            : outputs.OrderByDescending(output => output.BalanceString));
                     }
                 });
 
@@ -258,13 +263,15 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         private ICommand _copyAddressCommand;
 
         public ICommand CopyAddressCommand =>
-            _copyAddressCommand ??= (_copyAddressCommand = ReactiveCommand.Create((string address) =>
+            _copyAddressCommand ??= (_copyAddressCommand = ReactiveCommand.Create((OutputViewModel output) =>
             {
-                _ = Desktop.App.Clipboard.SetTextAsync(address);
+                _ = Desktop.App.Clipboard.SetTextAsync(output.Address);
 
-                Outputs.ForEachDo(output => output.CopyButtonToolTip = OutputViewModel.DefaultCopyButtonToolTip);
-                Outputs.First(output => output.Address == address).CopyButtonToolTip =
+                Outputs.ForEachDo(o => o.CopyButtonToolTip = OutputViewModel.DefaultCopyButtonToolTip);
+                Outputs.First(o => o.Output.TxId == output.Output.TxId).CopyButtonToolTip =
                     OutputViewModel.CopiedButtonToolTip;
+
+                Outputs = new ObservableCollection<OutputViewModel>(Outputs);
             }));
 
         private void DesignerMode()

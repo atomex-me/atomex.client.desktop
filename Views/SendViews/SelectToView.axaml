@@ -98,7 +98,7 @@
             <ListBox MaxHeight="315"
                      Background="{DynamicResource AlmostTransparentBrush}"
                      ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                     Items="{Binding FromAddressList}"
+                     Items="{Binding MyAddresses}"
                      HorizontalAlignment="Stretch"
                      SelectionMode="Single">
                 <ListBox.Styles>
@@ -130,7 +130,7 @@
                                        Margin="12 0 20 0"
                                        Foreground="{DynamicResource DefaultForegroundBrush}"
                                        FontSize="16"
-                                       Text="{Binding Address}" />
+                                       Text="{Binding WalletAddress.Address}" />
 
                             <StackPanel Grid.Column="1"
                                         Orientation="Horizontal"
@@ -143,8 +143,8 @@
                                         Margin="0 0 20 0"
                                         IsVisible="{Binding IsFreeAddress}">
                                     <TextBlock Text="new"
-                                               FontSize="13"
-                                               VerticalAlignment="Stretch"
+                                               FontSize="12"
+                                               VerticalAlignment="Center"
                                                FontFamily="{DynamicResource DefaultFontFamily}"
                                                Foreground="{DynamicResource DefaultForegroundBrush}" />
                                 </Border>
@@ -179,7 +179,7 @@
                                             BorderThickness="0"
                                             VerticalContentAlignment="Center"
                                             Command="{Binding $parent[ListBox].DataContext.CopyAddressCommand}"
-                                            CommandParameter="{Binding Address}"
+                                            CommandParameter="{Binding WalletAddress}"
                                             Classes="ButtonWithIcon">
 
                                         <svg:Svg HorizontalAlignment="Center"
@@ -188,10 +188,8 @@
                                                  Height="24"
                                                  Path="/Resources/Icons/copy.svg" />
                                     </Button>
-
-                                    <!-- <TextBlock Text="{Binding CopyButtonToolTip}" /> -->
                                     <ToolTip.Tip>
-                                        <TextBlock Text="Copy address to clipboard" />
+                                        <TextBlock Text="{Binding CopyButtonToolTip}" />
                                     </ToolTip.Tip>
                                 </Border>
                             </StackPanel>

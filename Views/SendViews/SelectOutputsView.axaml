@@ -154,7 +154,7 @@
                                         BorderThickness="0"
                                         VerticalContentAlignment="Center"
                                         Command="{Binding $parent[ListBox].DataContext.CopyAddressCommand}"
-                                        CommandParameter="{Binding Address}"
+                                        CommandParameter="{Binding}"
                                         Classes="ButtonWithIcon">
 
                                     <svg:Svg HorizontalAlignment="Center"

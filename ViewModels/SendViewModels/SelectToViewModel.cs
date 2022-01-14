@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive;
 using System.Windows.Input;
@@ -17,8 +18,8 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         public Action BackAction { get; set; }
         public Action<string> ConfirmAction { get; set; }
 
-        private List<WalletAddressViewModel> InitialFromAddressList { get; set; }
-        [Reactive] private List<WalletAddressViewModel> FromAddressList { get; set; }
+        private ObservableCollection<AddressViewModel> InitialMyAddresses { get; set; }
+        [Reactive] private ObservableCollection<AddressViewModel> MyAddresses { get; set; }
         [Reactive] public string SearchPattern { get; set; }
         [Reactive] public string SortTypeString { get; set; }
         [Reactive] private bool SortIsAscending { get; set; }
@@ -60,7 +61,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 .GetFreeExternalAddressAsync(currency.Name)
                 .WaitForResult();
 
-            FromAddressList = activeAddresses
+            var myAddresses = activeAddresses
                 .Concat(tokenAddresses)
                 .Concat(new[] { freeAddress })
                 .GroupBy(w => w.Address)
@@ -70,18 +71,19 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     var address = g.FirstOrDefault(w => w.Currency == currency.Name);
 
                     var isFreeAddress = address?.Address == freeAddress.Address;
-                    
-                    return new WalletAddressViewModel
+
+                    return new AddressViewModel()
                     {
-                        Address = g.Key,
+                        WalletAddress = address,
                         AvailableBalance = address?.AvailableBalance() ?? 0m,
                         CurrencyFormat = currency.Format,
                         CurrencyCode = currency.Name,
                         IsFreeAddress = isFreeAddress
                     };
-                }).ToList();
-            
-            InitialFromAddressList = new List<WalletAddressViewModel>(FromAddressList);
+                });
+
+            MyAddresses = new ObservableCollection<AddressViewModel>(myAddresses);
+            InitialMyAddresses = new ObservableCollection<AddressViewModel>(MyAddresses);
         }
 
         private ReactiveCommand<Unit, Unit> _backCommand;
@@ -98,25 +100,30 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
         public ReactiveCommand<Unit, Unit> ChangeSortDirectionCommand => _changeSortDirectionCommand ??=
             (_changeSortDirectionCommand = ReactiveCommand.Create(() => { SortIsAscending = !SortIsAscending; }));
-        
+
         private ReactiveCommand<Unit, Unit> _confirmCommand;
 
         public ReactiveCommand<Unit, Unit> ConfirmCommand => _confirmCommand ??=
-            (_confirmCommand = ReactiveCommand.Create(() =>
-            {
-                ConfirmAction?.Invoke("Lorem ipsum");
-            }));
-        
-        private ICommand _copyAddressCommand;
+            (_confirmCommand = ReactiveCommand.Create(() => { ConfirmAction?.Invoke("Lorem ipsum"); }));
 
-        public ICommand CopyAddressCommand =>
-            _copyAddressCommand ??= (_copyAddressCommand = ReactiveCommand.Create((string address) =>
-            {
-                _ = Desktop.App.Clipboard.SetTextAsync(address);
+        private ReactiveCommand<WalletAddress, Unit> _copyAddressCommand;
 
-                // Outputs.ForEachDo(output => output.CopyButtonToolTip = OutputViewModel.DefaultCopyButtonToolTip);
-                // Outputs.First(output => output.Address == address).CopyButtonToolTip =
-                //     OutputViewModel.CopiedButtonToolTip;
+        public ReactiveCommand<WalletAddress, Unit> CopyAddressCommand =>
+            _copyAddressCommand ??= (_copyAddressCommand = ReactiveCommand.Create((WalletAddress address) =>
+            {
+                _ = Desktop.App.Clipboard.SetTextAsync(address.Address);
+                
+                
+
+                MyAddresses.ForEachDo(addressViewModel =>
+                    addressViewModel.CopyButtonToolTip = AddressViewModel.DefaultCopyButtonToolTip);
+                
+                var element =
+                    MyAddresses.First(addressViewModel => addressViewModel.WalletAddress == address);
+                
+                element.CopyButtonToolTip = AddressViewModel.CopiedButtonToolTip;
+                
+                MyAddresses = new ObservableCollection<AddressViewModel>(MyAddresses);
             }));
 
         private void DesignerMode()
@@ -124,6 +131,22 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             SortTypeString = "Sort by balance";
         }
     }
-    //
-    // public class 
+
+    public class AddressViewModel
+    {
+        public const string DefaultCopyButtonToolTip = "Copy address to clipboard";
+        public const string CopiedButtonToolTip = "Successfully copied!";
+
+        public AddressViewModel()
+        {
+            CopyButtonToolTip = DefaultCopyButtonToolTip;
+        }
+
+        [Reactive] public string CopyButtonToolTip { get; set; }
+        public WalletAddress WalletAddress { get; set; }
+        public decimal AvailableBalance { get; set; }
+        public string CurrencyFormat { get; set; }
+        public string CurrencyCode { get; set; }
+        public bool IsFreeAddress { get; set; }
+    }
 }
