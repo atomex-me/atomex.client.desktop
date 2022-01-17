@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Atomex.Blockchain.Abstract;
 using Atomex.Blockchain.BitcoinBased;
 using Atomex.Client.Desktop.Properties;
+using Atomex.Common;
 using Atomex.Core;
 using Atomex.Wallet.Abstract;
 using Atomex.Wallet.BitcoinBased;
@@ -30,8 +31,6 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         private BitcoinBasedConfig Config => (BitcoinBasedConfig)Currency;
 
         private BitcoinBasedAccount Account => App.Account.GetCurrencyAccount<BitcoinBasedAccount>(Currency.Name);
-
-        private static SelectOutputsViewModel SelectOutputsViewModel { get; set; }
 
         public BitcoinBasedSendViewModel()
             : base()
@@ -63,46 +62,52 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     Warning = string.Empty;
                     _ = UpdateAmount(Amount);
                 });
+            
+            var outputs = Account.GetAvailableOutputsAsync()
+                .WaitForResult()
+                .Select(output => (BitcoinBasedTxOutput)output);
 
-            _ = Task.Run(async () =>
+            Outputs = new ObservableCollection<BitcoinBasedTxOutput>(outputs);
+
+            SelectFromViewModel = new SelectOutputsViewModel(outputs, Config, Account)
             {
-                var outputs = (await Account.GetAvailableOutputsAsync())
-                    .Select(output => (BitcoinBasedTxOutput)output);
-
-                Outputs = new ObservableCollection<BitcoinBasedTxOutput>(outputs);
-
-                SelectOutputsViewModel = new SelectOutputsViewModel(outputs, Config, Account)
+                BackAction = () => { Desktop.App.DialogService.Show(this); },
+                ConfirmAction = ots =>
                 {
-                    BackAction = () => { Desktop.App.DialogService.Show(this); },
-                    ConfirmAction = ots =>
-                    {
-                        Outputs = new ObservableCollection<BitcoinBasedTxOutput>(ots);
-                        Desktop.App.DialogService.Show(this);
-                    },
-                    Config = Config,
-                };
-
-                // todo: remove
-                To = "mptaZCY98rZTDh3dovtQUEdESmxTAcyNQr";
-            });
+                    Outputs = new ObservableCollection<BitcoinBasedTxOutput>(ots);
+                    Desktop.App.DialogService.Show(SelectToViewModel);
+                },
+                Config = Config,
+            };
+            
+            SelectToViewModel = new SelectToViewModel(App.Account, Currency)
+            {
+                BackAction = () => { Desktop.App.DialogService.Show(SelectFromViewModel); },
+                ConfirmAction = address =>
+                {
+                    To = address;
+                    Desktop.App.DialogService.Show(this);
+                }
+            };
         }
 
         protected override void FromClick()
         {
-            Desktop.App.DialogService.Show(SelectOutputsViewModel);
+            var selectOutputsViewModel = SelectFromViewModel as SelectOutputsViewModel;
+            
+            selectOutputsViewModel!.ConfirmAction = ots =>
+            {
+                Outputs = new ObservableCollection<BitcoinBasedTxOutput>(ots);
+                Desktop.App.DialogService.Show(this);
+            };
+            
+            Desktop.App.DialogService.Show(selectOutputsViewModel);
         }
 
         protected override void ToClick()
         {
-            SelectToViewModel ??= new SelectToViewModel(App.Account, Currency)
-            {
-                BackAction = () => { Desktop.App.DialogService.Show(this); },
-                ConfirmAction = address =>
-                {
-                    Log.Information(address);
-                    Desktop.App.DialogService.Show(this);
-                }
-            };
+            SelectToViewModel.BackAction = () => Desktop.App.DialogService.Show(this);
+            
             Desktop.App.DialogService.Show(SelectToViewModel);
         }
 

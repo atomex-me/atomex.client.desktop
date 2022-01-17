@@ -23,7 +23,7 @@ namespace Atomex.Client.Desktop.ViewModels
         {
             App = app ?? throw new ArgumentNullException(nameof(app));
             
-            App.AtomexClientChanged += OnTerminalChangedEventHandler;
+            // App.AtomexClientChanged += OnTerminalChangedEventHandler;
             // SubscribeToServices();
         }
         
@@ -35,7 +35,6 @@ namespace Atomex.Client.Desktop.ViewModels
             var btc = App.Account.Currencies.GetByName("BTC");
 
             Content = new BitcoinBasedSendViewModel(App, btc);
-            var a = 5;
         }
 
         [Reactive]

@@ -219,7 +219,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         protected virtual void OnSendClick()
         {
             var sendViewModel = SendViewModelCreator.CreateViewModel(App, Currency);
-            Desktop.App.DialogService.Show(sendViewModel);
+            Desktop.App.DialogService.Show(sendViewModel.SelectFromViewModel);
         }
 
         protected virtual void OnReceiveClick()

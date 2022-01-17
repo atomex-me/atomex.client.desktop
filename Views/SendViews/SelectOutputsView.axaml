@@ -7,12 +7,17 @@
              xmlns:svg="clr-namespace:Avalonia.Svg.Skia;assembly=Avalonia.Svg.Skia"
              xmlns:vm="clr-namespace:Atomex.Client.Desktop.ViewModels.SendViewModels"
              xmlns:controls="clr-namespace:Atomex.Client.Desktop.Controls"
+             xmlns:converters="clr-namespace:Atomex.Client.Desktop.Converters"
              xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
              xmlns:ia="clr-namespace:Avalonia.Xaml.Interactions.Core;assembly=Avalonia.Xaml.Interactions">
 
     <Design.DataContext>
         <vm:SelectOutputsViewModel />
     </Design.DataContext>
+    
+    <UserControl.Resources>
+        <converters:StringNotEmptyConverter x:Key="StringNotEmptyConverter" />
+    </UserControl.Resources>
 
     <Border Classes="ChildViewBorder"
             Padding="24 20 24 16"
@@ -55,7 +60,26 @@
                      Watermark="Search"
                      FontSize="16"
                      Text="{Binding SearchPattern, Mode=TwoWay}"
-                     Classes="SearchTextBox" />
+                     Classes="SearchTextBox">
+                <TextBox.InnerRightContent>
+                    <StackPanel VerticalAlignment="Center"
+                                IsVisible="{Binding SearchPattern,
+                                Converter={StaticResource StringNotEmptyConverter}}">
+                        <Button Margin="0 0 15 0"
+                                Padding="0"
+                                BorderThickness="0"
+                                VerticalContentAlignment="Center"
+                                Command="{ReflectionBinding $parent[TextBox].Clear}"
+                                Classes="ButtonWithIcon WithoutEffects">
+
+                            <svg:Svg HorizontalAlignment="Center"
+                                     Width="18"
+                                     Height="18"
+                                     Path="/Resources/Icons/subtract.svg" />
+                        </Button>
+                    </StackPanel>
+                </TextBox.InnerRightContent>
+            </TextBox>
 
             <Grid Margin="0 18 0 0"
                   ColumnDefinitions="Auto,*,Auto,Auto"
@@ -119,7 +143,7 @@
                     Height="1"
                     Background="{StaticResource LightDefaultOpacity10}" />
 
-            <ListBox MaxHeight="315"
+            <ListBox Height="300"
                      Background="{DynamicResource AlmostTransparentBrush}"
                      ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                      Items="{Binding Outputs}"

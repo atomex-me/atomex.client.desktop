@@ -26,6 +26,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         [Reactive] public string SearchPattern { get; set; }
         [Reactive] private bool SortIsAscending { get; set; }
         [Reactive] private bool SortByDate { get; set; }
+        [Reactive] public AddressViewModel? SelectedAddress { get; set; }
 
         public SelectToViewModel()
         {
@@ -37,6 +38,81 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
         public SelectToViewModel(IAccount account, CurrencyConfig currency)
         {
+            this.WhenAnyValue(
+                    vm => vm.SortByDate,
+                    vm => vm.SortIsAscending,
+                    vm => vm.SearchPattern)
+                .Subscribe(value =>
+                {
+                    var (item1, item2, item3) = value;
+
+                    if (MyAddresses == null) return;
+
+                    var myAddresses = new ObservableCollection<AddressViewModel>(
+                        InitialMyAddresses
+                            .Where(addressViewModel => addressViewModel.WalletAddress.Address.ToLower()
+                                .Contains(item3?.ToLower() ?? string.Empty)));
+
+                    if (item1)
+                    {
+                        var myAddressesList = myAddresses.ToList();
+                        if (item2)
+                        {
+                            myAddressesList.Sort((a1, a2) =>
+                            {
+                                var typeResult = a1.WalletAddress.KeyType.CompareTo(a2.WalletAddress.KeyType);
+
+                                if (typeResult != 0)
+                                    return typeResult;
+
+                                var accountResult =
+                                    a1.WalletAddress.KeyIndex.Account.CompareTo(a2.WalletAddress.KeyIndex.Account);
+
+                                if (accountResult != 0)
+                                    return accountResult;
+
+                                var chainResult =
+                                    a1.WalletAddress.KeyIndex.Chain.CompareTo(a2.WalletAddress.KeyIndex.Chain);
+
+                                return chainResult != 0
+                                    ? chainResult
+                                    : a1.WalletAddress.KeyIndex.Index.CompareTo(a2.WalletAddress.KeyIndex.Index);
+                            });
+                        }
+                        else
+                        {
+                            myAddressesList.Sort((a2, a1) =>
+                            {
+                                var typeResult = a1.WalletAddress.KeyType.CompareTo(a2.WalletAddress.KeyType);
+
+                                if (typeResult != 0)
+                                    return typeResult;
+
+                                var accountResult =
+                                    a1.WalletAddress.KeyIndex.Account.CompareTo(a2.WalletAddress.KeyIndex.Account);
+
+                                if (accountResult != 0)
+                                    return accountResult;
+
+                                var chainResult =
+                                    a1.WalletAddress.KeyIndex.Chain.CompareTo(a2.WalletAddress.KeyIndex.Chain);
+
+                                return chainResult != 0
+                                    ? chainResult
+                                    : a1.WalletAddress.KeyIndex.Index.CompareTo(a2.WalletAddress.KeyIndex.Index);
+                            });
+                        }
+
+                        MyAddresses = new ObservableCollection<AddressViewModel>(myAddressesList);
+                    }
+                    else
+                    {
+                        MyAddresses = new ObservableCollection<AddressViewModel>(item2
+                            ? myAddresses.OrderBy(addressViewModel => addressViewModel.AvailableBalance)
+                            : myAddresses.OrderByDescending(addressViewModel => addressViewModel.AvailableBalance));
+                    }
+                });
+
             // get all addresses with tokens (if exists)
             var tokenAddresses = Currencies.HasTokens(currency.Name)
                 ? (account.GetCurrencyAccount(currency.Name) as IHasTokens)
@@ -94,11 +170,19 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
         public ReactiveCommand<Unit, Unit> ChangeSortDirectionCommand => _changeSortDirectionCommand ??=
             (_changeSortDirectionCommand = ReactiveCommand.Create(() => { SortIsAscending = !SortIsAscending; }));
+        
 
         private ReactiveCommand<Unit, Unit> _confirmCommand;
 
         public ReactiveCommand<Unit, Unit> ConfirmCommand => _confirmCommand ??=
-            (_confirmCommand = ReactiveCommand.Create(() => { ConfirmAction?.Invoke("Lorem ipsum"); }));
+            (_confirmCommand = ReactiveCommand.Create(() =>
+            {
+                var selectedAddress = SelectedAddress == null
+                    ? SearchPattern
+                    : SelectedAddress.WalletAddress.Address;
+
+                ConfirmAction?.Invoke(selectedAddress);
+            }));
 
         private ICommand _copyAddressCommand;
 

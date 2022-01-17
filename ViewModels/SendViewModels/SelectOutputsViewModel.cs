@@ -28,7 +28,6 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         public Action BackAction { get; set; }
         public Action<IEnumerable<BitcoinBasedTxOutput>> ConfirmAction { get; set; }
         public BitcoinBasedConfig Config { get; set; }
-
         private ObservableCollection<OutputViewModel> InitialOutputs { get; set; }
 
         public SelectOutputsViewModel()

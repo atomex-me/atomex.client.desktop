@@ -48,9 +48,9 @@
                             Width="440"
                             Height="80"
                             Command="{Binding SelectFromCommand}"
+                            IsEnabled="{Binding !ConfirmStage}"
                             Classes="EmptyBtnWithContent">
-                        <Grid ColumnDefinitions="24,*, Auto"
-                              RowDefinitions="*">
+                        <Grid ColumnDefinitions="24,*, Auto">
 
                             <!-- Width="24" -->
                             <!-- Height="24" -->

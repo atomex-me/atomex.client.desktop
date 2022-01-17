@@ -17,7 +17,15 @@
         <Setter Property="Fill" Value="{StaticResource PrimaryTextColor}" />
     </Style>
 
-
+    <Style
+        Selector="Button.ButtonWithIcon.WithoutEffects:not(:pointerover) /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="Transparent" />
+    </Style>
+    <Style
+        Selector="Button.ButtonWithIcon.WithoutEffects:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="Transparent" />
+    </Style>
+    
     <Style
         Selector="Button.SecondaryButton:not(:pointerover) /template/ ContentPresenter#PART_ContentPresenter">
         <Setter Property="Background" Value="{DynamicResource LightDefaultOpacity4}" />

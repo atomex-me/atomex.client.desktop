@@ -23,6 +23,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
     {
         protected IAtomexApp App { get; }
         protected CurrencyConfig Currency { get; set; }
+        public ViewModelBase SelectFromViewModel { get; set; }
         protected SelectToViewModel SelectToViewModel { get; set; }
 
         [Reactive] public CurrencyViewModel CurrencyViewModel { get; set; }
@@ -30,6 +31,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         [Reactive] public decimal SelectedFromAmount { get; set; }
         [Reactive] public string To { get; set; }
         [Reactive] protected decimal Amount { get; set; }
+        [Reactive] public bool ConfirmStage { get; set; }
         [ObservableAsProperty] public string AmountString { get; }
 
         public void SetAmountFromString(string value)
@@ -98,6 +100,11 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             Desktop.App.DialogService.Close();
         }));
 
+        private ReactiveCommand<Unit, Unit> _undoConfirmStageCommand;
+
+        public ReactiveCommand<Unit, Unit> UndoConfirmStageCommand => _undoConfirmStageCommand ??=
+            (_undoConfirmStageCommand = ReactiveCommand.Create(() => { ConfirmStage = false; }));
+
         private ReactiveCommand<Unit, Unit> _selectFromCommand;
 
         public ReactiveCommand<Unit, Unit> SelectFromCommand => _selectFromCommand ??=
@@ -153,27 +160,29 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 return;
             }
 
-            var confirmationViewModel = new SendConfirmationViewModel
-            {
-                Currency = Currency,
-                To = To,
-                Amount = Amount,
-                AmountInBase = AmountInBase,
-                BaseCurrencyCode = BaseCurrencyCode,
-                BaseCurrencyFormat = BaseCurrencyFormat,
-                Fee = Fee,
-                UseDeafultFee = UseDefaultFee,
-                FeeInBase = FeeInBase,
-                CurrencyCode = CurrencyCode,
-                CurrencyFormat = CurrencyFormat,
+            // var confirmationViewModel = new SendConfirmationViewModel
+            // {
+            //     Currency = Currency,
+            //     To = To,
+            //     Amount = Amount,
+            //     AmountInBase = AmountInBase,
+            //     BaseCurrencyCode = BaseCurrencyCode,
+            //     BaseCurrencyFormat = BaseCurrencyFormat,
+            //     Fee = Fee,
+            //     UseDeafultFee = UseDefaultFee,
+            //     FeeInBase = FeeInBase,
+            //     CurrencyCode = CurrencyCode,
+            //     CurrencyFormat = CurrencyFormat,
+            //
+            //     FeeCurrencyCode = FeeCurrencyCode,
+            //     FeeCurrencyFormat = FeeCurrencyFormat,
+            //     BackView = this,
+            //     SendCallback = Send
+            // };
 
-                FeeCurrencyCode = FeeCurrencyCode,
-                FeeCurrencyFormat = FeeCurrencyFormat,
-                BackView = this,
-                SendCallback = Send
-            };
+            ConfirmStage = true;
 
-            Desktop.App.DialogService.Show(confirmationViewModel);
+            // Desktop.App.DialogService.Show(confirmationViewModel);
         }
 
         public SendViewModel()
