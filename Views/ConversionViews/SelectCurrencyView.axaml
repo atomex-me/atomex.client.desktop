@@ -42,19 +42,19 @@
             <Setter Property="HorizontalContentAlignment" Value="Stretch" />
           </Style>
 
+          <Style Selector="ListBoxItem:pointerover Border#BottomLine">
+            <Setter Property="IsVisible" Value="False"/>
+          </Style>
+          <Style Selector="ListBoxItem:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource ListBoxItemPointeroverBrush}"/>
+          </Style>
           <Style Selector="ListBoxItem:pressed /template/ ContentPresenter">
             <Setter Property="Background" Value="{DynamicResource LightDefaultOpacity4}"/>
           </Style>
-          <Style Selector="ListBoxItem[IsSelected=true] /template/ ContentPresenter">
-            <Setter Property="Background" Value="{DynamicResource LightDefaultOpacity4}"/>
+          <Style Selector="ListBoxItem:selected /template/ ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource ListBoxItemSelectedBrush}"/>
           </Style>
-          <Style Selector="ListBoxItem[IsSelected=true] Border#BottomLine">
-            <Setter Property="IsVisible" Value="False"/>
-          </Style>
-          <Style Selector="ListBoxItem:pointerover:not(:pressed) /template/ ContentPresenter">
-            <Setter Property="Background" Value="{DynamicResource LightDefaultOpacity6}"/>
-          </Style>
-          <Style Selector="ListBoxItem:pointerover Border#BottomLine">
+          <Style Selector="ListBoxItem:selected Border#BottomLine">
             <Setter Property="IsVisible" Value="False"/>
           </Style>
         </ListBox.Styles>
