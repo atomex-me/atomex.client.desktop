@@ -104,7 +104,7 @@
                       FontSize="13"
                       FontFamily="{DynamicResource DefaultFontFamily}"
                       Foreground="{DynamicResource LightDefaultOpacity50}"
-                      Command="{Binding #parent[ListBox].DataContext.ChangeAddressesCommand}"
+                      Command="{Binding $parent[ListBox].DataContext.ChangeAddressesCommand}"
                       CommandParameter="{Binding}"
                       Grid.Column="1">
                 <Button.Styles>
