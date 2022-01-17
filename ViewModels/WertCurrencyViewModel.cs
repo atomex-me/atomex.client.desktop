@@ -13,11 +13,11 @@ using ReactiveUI;
 using Atomex.Client.Desktop.Api;
 using Atomex.Client.Desktop.Common;
 using Atomex.Core;
-using Atomex.Client.Desktop.ViewModels.Abstract;
 using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
 using Atomex.Common;
 using Atomex.Cryptography;
 using Atomex.Wallet.Abstract;
+using Atomex.ViewModels;
 
 namespace Atomex.Client.Desktop.ViewModels
 {

@@ -15,41 +15,89 @@ using Atomex.Blockchain.BitcoinBased;
 using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
 using Atomex.Client.Desktop.ViewModels.SendViewModels;
+using Atomex.Common;
 using Atomex.Core;
 using Atomex.Wallet.Abstract;
 using Atomex.Wallet.BitcoinBased;
 
 namespace Atomex.Client.Desktop.ViewModels.ConversionViewModels
 {
-    public class SelectCurrencyViewModelItem : ViewModelBase
+    public enum SelectCurrencyType
+    {
+        From,
+        To
+    }
+
+    public abstract class SelectCurrencyViewModelItem : ViewModelBase
     {
         [Reactive] public CurrencyViewModel CurrencyViewModel { get; set; }
-        [Reactive] public WalletAddress Address { get; set; }
-        [Reactive] public IEnumerable<BitcoinBasedTxOutput> Outputs { get; set; }
-        [ObservableAsProperty] public string SelectAddressDescription { get; }
+        [ObservableAsProperty] public string? SelectedAddressDescription { get; }
 
         public SelectCurrencyViewModelItem(CurrencyViewModel currencyViewModel)
         {
             CurrencyViewModel = currencyViewModel ?? throw new ArgumentNullException(nameof(currencyViewModel));
+        }
+    }
 
-            this.WhenAnyValue(vm => vm.Address, vm => vm.Outputs)
-                .Select(i =>
-                {
-                    if (i.Item1 != null)
-                    {
-                        return $"from {i.Item1.Address.TruncateAddress()} ({i.Item1.Balance} {CurrencyViewModel.Currency.Name})";
-                    }
-                    else if (i.Item2 != null)
-                    {
-                        var currency = (BitcoinBasedConfig)CurrencyViewModel.Currency;
-                        var totalOutputsValue = currency.SatoshiToCoin(i.Item2.Sum(o => o.Value));
+    public class SelectCurrencyWithOutputsViewModelItem : SelectCurrencyViewModelItem
+    {
+        public IEnumerable<BitcoinBasedTxOutput> AvailableOutputs { get; set; }
+        [Reactive] public IEnumerable<BitcoinBasedTxOutput> SelectedOutputs { get; set; }
 
-                        return $"from {i.Item2.Count()} outputs ({totalOutputsValue} {currency.Name})";
-                    }
-                    else return null;
-                })
+        public SelectCurrencyWithOutputsViewModelItem(
+            CurrencyViewModel currencyViewModel,
+            IEnumerable<BitcoinBasedTxOutput> availableOutputs,
+            IEnumerable<BitcoinBasedTxOutput>? selectedOutputs = null)
+            : base(currencyViewModel)
+        {
+            this.WhenAnyValue(vm => vm.SelectedOutputs)
                 .WhereNotNull()
-                .ToPropertyEx(this, vm => vm.SelectAddressDescription);
+                .Select(outputs =>
+                {
+                    var currency = (BitcoinBasedConfig)CurrencyViewModel.Currency;
+                    var totalAmountInSatoshi = outputs.Sum(o => o.Value);
+                    var totalAmount = currency.SatoshiToCoin(totalAmountInSatoshi);
+
+                    return $"from {outputs.Count()} outputs ({totalAmount} {currency.Name})";
+                })
+                .ToPropertyEx(this, vm => vm.SelectedAddressDescription);
+
+            AvailableOutputs = availableOutputs ?? throw new ArgumentNullException(nameof(availableOutputs));
+            SelectedOutputs = selectedOutputs ?? availableOutputs;
+        }
+    }
+
+    public class SelectCurrencyWithAddressViewModelItem : SelectCurrencyViewModelItem
+    {
+        private readonly SelectCurrencyType _type;
+
+        public IEnumerable<WalletAddress> AvailableAddresses { get; set; }
+        [Reactive] public WalletAddress SelectedAddress { get; set; }
+        [Reactive] public bool IsNew { get; set; }
+
+        public SelectCurrencyWithAddressViewModelItem(
+            CurrencyViewModel currencyViewModel,
+            SelectCurrencyType type,
+            IEnumerable<WalletAddress> availableAddresses,
+            WalletAddress? selectedAddress = null)
+            : base(currencyViewModel)
+        {
+            _type = type;
+
+            this.WhenAnyValue(vm => vm.SelectedAddress)
+                .WhereNotNull()
+                .Select(address =>
+                {
+                    if (_type == SelectCurrencyType.To && IsNew)
+                        return $"receiving to new address {address.Address.TruncateAddress()}";
+
+                    var prefix = _type == SelectCurrencyType.From ? "from" : "to";
+                    return $"{prefix} {address.Address.TruncateAddress()} ({address.Balance} {CurrencyViewModel.Currency.Name})";
+                })
+                .ToPropertyEx(this, vm => vm.SelectedAddressDescription);
+
+            AvailableAddresses = availableAddresses ?? throw new ArgumentNullException(nameof(availableAddresses));
+            SelectedAddress = selectedAddress ?? availableAddresses.MaxBy(w => w.Balance);
         }
     }
 
@@ -66,7 +114,7 @@ namespace Atomex.Client.Desktop.ViewModels.ConversionViewModels
         {
             var currency = i.CurrencyViewModel.Currency;
 
-            if (Atomex.Currencies.IsBitcoinBased(currency.Name))
+            if (i is SelectCurrencyWithOutputsViewModelItem item)
             {
                 var bitcoinBasedAccount = _account
                     .GetCurrencyAccount<BitcoinBasedAccount>(currency.Name);
@@ -83,7 +131,7 @@ namespace Atomex.Client.Desktop.ViewModels.ConversionViewModels
                     BackAction = () => { App.DialogService.Show(this); },
                     ConfirmAction = ots =>
                     {
-                        i.Outputs = ots;
+                        item.SelectedOutputs = ots;
                         CurrencySelected?.Invoke(i);
                     }
                 };
@@ -131,40 +179,46 @@ namespace Atomex.Client.Desktop.ViewModels.ConversionViewModels
             Title = "Send from";
 
             var currencies = DesignTime.Currencies
-                .Select(c =>
+                .Select<CurrencyConfig, SelectCurrencyViewModelItem>(c =>
                 {
                     if (Atomex.Currencies.IsBitcoinBased(c.Name))
                     {
-                        return new SelectCurrencyViewModelItem(CurrencyViewModelCreator.CreateViewModel(c, subscribeToUpdates: false))
+                        var outputs = new List<BitcoinBasedTxOutput>
                         {
-                            Outputs = new List<BitcoinBasedTxOutput>
-                            {
-                                new BitcoinBasedTxOutput(
-                                    coin: new Coin(
-                                        fromTxHash: new uint256("19aa2187cda7610590d09dfab41ed4720f8570d7414b71b3dc677e237f72d4a1"),
-                                        fromOutputIndex: 0u,
-                                        amount: Money.Satoshis(1234567),
-                                        scriptPubKey: BitcoinAddress.Create("muRDku2ZwNTz2msCZCHSUhDD5o6NxGsoXM", Network.TestNet).ScriptPubKey),
-                                    spentTxPoint: null),
-                                new BitcoinBasedTxOutput(
-                                    coin: new Coin(
-                                        fromTxHash: new uint256("d70fa62762775362e767737e56cab7e8a094eafa8f96b935530d6450be1cfbce"),
-                                        fromOutputIndex: 0u,
-                                        amount: Money.Satoshis(100120000),
-                                        scriptPubKey: BitcoinAddress.Create("mg8DcFTnNAJRHEZ248nVjeJuEjTsHn4vrZ", Network.TestNet).ScriptPubKey),
-                                    spentTxPoint: null)
-                            }
+                            new BitcoinBasedTxOutput(
+                                coin: new Coin(
+                                    fromTxHash: new uint256("19aa2187cda7610590d09dfab41ed4720f8570d7414b71b3dc677e237f72d4a1"),
+                                    fromOutputIndex: 0u,
+                                    amount: Money.Satoshis(1234567),
+                                    scriptPubKey: BitcoinAddress.Create("muRDku2ZwNTz2msCZCHSUhDD5o6NxGsoXM", Network.TestNet).ScriptPubKey),
+                                spentTxPoint: null),
+                            new BitcoinBasedTxOutput(
+                                coin: new Coin(
+                                    fromTxHash: new uint256("d70fa62762775362e767737e56cab7e8a094eafa8f96b935530d6450be1cfbce"),
+                                    fromOutputIndex: 0u,
+                                    amount: Money.Satoshis(100120000),
+                                    scriptPubKey: BitcoinAddress.Create("mg8DcFTnNAJRHEZ248nVjeJuEjTsHn4vrZ", Network.TestNet).ScriptPubKey),
+                                spentTxPoint: null)
                         };
+
+                        return new SelectCurrencyWithOutputsViewModelItem(
+                            currencyViewModel: CurrencyViewModelCreator.CreateViewModel(c, subscribeToUpdates: false),
+                            availableOutputs: outputs,
+                            selectedOutputs: outputs);
                     }
                     else
                     {
-                        return new SelectCurrencyViewModelItem(CurrencyViewModelCreator.CreateViewModel(c, subscribeToUpdates: false))
+                        var address = new WalletAddress
                         {
-                            Address = new WalletAddress {
-                                Address = "0xE9C251cbB4881f9e056e40135E7d3EA9A7d037df",
-                                Balance = 1.2m
-                            }
+                            Address = "0xE9C251cbB4881f9e056e40135E7d3EA9A7d037df",
+                            Balance = 1.2m
                         };
+
+                        return new SelectCurrencyWithAddressViewModelItem(
+                            currencyViewModel: CurrencyViewModelCreator.CreateViewModel(c, subscribeToUpdates: false),
+                            type: SelectCurrencyType.From,
+                            availableAddresses: new WalletAddress[] { address },
+                            selectedAddress: address);
                     }
                  });
 

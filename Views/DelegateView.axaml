@@ -4,7 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="Atomex.Client.Desktop.Views.DelegateView"
-             xmlns:vm="clr-namespace:Atomex.Client.Desktop.ViewModels"
+             xmlns:vm="clr-namespace:Atomex.ViewModels;assembly=Atomex.Client.Core"
              xmlns:controls="clr-namespace:Atomex.Client.Desktop.Controls"
              xmlns:helpers="clr-namespace:Atomex.Client.Desktop.Helpers"
              xmlns:converters="clr-namespace:Atomex.Client.Desktop.Converters"

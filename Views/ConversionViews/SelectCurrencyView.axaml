@@ -99,7 +99,7 @@
 
               <Button Margin="0 0 16 0"
                       Padding="10 6 10 6"
-                      Content="{Binding SelectAddressDescription}"
+                      Content="{Binding SelectedAddressDescription}"
                       HorizontalAlignment="Right"
                       FontSize="13"
                       FontFamily="{DynamicResource DefaultFontFamily}"

@@ -18,6 +18,7 @@ using Atomex.MarketData.Abstract;
 using Atomex.TezosTokens;
 using Atomex.Wallet.Tezos;
 using Atomex.Wallet.Abstract;
+using Atomex.ViewModels;
 
 namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 {
