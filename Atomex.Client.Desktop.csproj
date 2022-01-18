@@ -133,10 +133,6 @@
             <DependentUpon>BitcoinBasedSendView.axaml</DependentUpon>
             <SubType>Code</SubType>
         </Compile>
-        <Compile Update="Views\SendViews\SendConfirmationView.axaml.cs">
-            <DependentUpon>SendConfirmationView.axaml</DependentUpon>
-            <SubType>Code</SubType>
-        </Compile>
         <Compile Update="Views\SendViews\SendingView.axaml.cs">
             <DependentUpon>SendingView.axaml</DependentUpon>
             <SubType>Code</SubType>

@@ -2,34 +2,33 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             mc:Ignorable="d" d:DesignWidth="700"
              x:Class="Atomex.Client.Desktop.Views.SendViews.SendingView"
-             xmlns:mah="clr-namespace:AvaloniaProgressRing;assembly=AvaloniaProgressRing"
-             Width="560"
-             Height="200">
+             xmlns:mah="clr-namespace:AvaloniaProgressRing;assembly=AvaloniaProgressRing">
 
-    <Border Classes="ChildViewBorder">
-        <StackPanel Orientation="Vertical"
-                    Width="560">
-            <Border Margin="0 10 0 10"
-                    Height="33"
-                    VerticalAlignment="Top"
-                    HorizontalAlignment="Stretch"
-                    Background="{DynamicResource ChildViewHeaderBackgroundBrush}">
-                <TextBlock Text="Sending..."
-                           Foreground="{DynamicResource ChildViewHeaderForegroundBrush}"
-                           FontFamily="{DynamicResource DefaultLightFontFamily}"
-                           FontSize="25"
-                           HorizontalAlignment="Center"
-                           VerticalAlignment="Center" />
-            </Border>
+    <Border Classes="ChildViewBorder"
+            Padding="24 20 24 16"
+            Width="700">
 
-            <Grid>
+        <StackPanel Orientation="Vertical">
+            <TextBlock FontSize="22"
+                       FontWeight="400"
+                       HorizontalAlignment="Center"
+                       FontFamily="{DynamicResource DefaultFontFamily}"
+                       Foreground="{DynamicResource DefaultForegroundBrush}">
+                Sending, please wait
+            </TextBlock>
+
+            <Border Margin="-24 16 -24 0"
+                    Height="1"
+                    Background="{DynamicResource LightDefaultOpacity10}" />
+
+            <Border Height="180">
                 <mah:ProgressRing Width="50"
                                   Height="50"
-                                  Foreground="{DynamicResource DefaultProgressRingBrush}"
-                                  Margin="0 40 0 40" />
-            </Grid>
+                                  VerticalAlignment="Center"
+                                  Foreground="{DynamicResource DefaultProgressRingBrush}" />
+            </Border>
         </StackPanel>
     </Border>
 </UserControl>

@@ -15,7 +15,6 @@ namespace Atomex.Client.Desktop.ViewModels
 
         public string Title { get; }
         public string Text { get; }
-        public string BackText { get; }
         public string BaseUrl { get; }
         public string Id { get; }
         public string NextText { get; }
@@ -37,7 +36,7 @@ namespace Atomex.Client.Desktop.ViewModels
         public MessageViewModel(
             string title,
             string text,
-            string backTitle,
+            bool isBackVisible,
             string nextTitle,
             Action backAction,
             Action nextAction)
@@ -45,10 +44,9 @@ namespace Atomex.Client.Desktop.ViewModels
             Title = title;
             Text = text;
 
-            BackText = backTitle;
             NextText = nextTitle;
 
-            IsBackVisible = !string.IsNullOrEmpty(BackText);
+            IsBackVisible = isBackVisible;
             IsNextVisible = !string.IsNullOrEmpty(NextText);
 
             _backAction = backAction;
@@ -60,21 +58,20 @@ namespace Atomex.Client.Desktop.ViewModels
             string text,
             string baseUrl,
             string id,
-            string backTitle,
+            bool isBackVisible,
             string nextTitle,
             Action backAction,
             Action nextAction)
         {
             Title = title;
             Text = text;
-
-            BackText = backTitle;
+            
             NextText = nextTitle;
             BaseUrl = baseUrl;
             Id = id;
 
             IsLinkVisible = !string.IsNullOrEmpty(BaseUrl) && !string.IsNullOrEmpty(Id);
-            IsBackVisible = !string.IsNullOrEmpty(BackText);
+            IsBackVisible = isBackVisible;
             IsNextVisible = !string.IsNullOrEmpty(NextText);
 
             _backAction = backAction;
@@ -85,7 +82,7 @@ namespace Atomex.Client.Desktop.ViewModels
             new MessageViewModel(
                 title: Resources.SvError,
                 text: text,
-                backTitle: Resources.SvBack,
+                isBackVisible: true,
                 nextTitle: null,
                 backAction: backAction,
                 nextAction: null);
@@ -94,7 +91,7 @@ namespace Atomex.Client.Desktop.ViewModels
             new MessageViewModel(
                 title: Resources.SvSuccess,
                 text: text,
-                backTitle: null,
+                isBackVisible: false,
                 nextTitle: Resources.SvOk,
                 backAction: null,
                 nextAction: nextAction);
@@ -103,7 +100,7 @@ namespace Atomex.Client.Desktop.ViewModels
             new MessageViewModel(
                 title: title,
                 text: text,
-                backTitle: null,
+                isBackVisible: false,
                 nextTitle: Resources.SvOk,
                 backAction: null,
                 nextAction: nextAction);
@@ -112,7 +109,7 @@ namespace Atomex.Client.Desktop.ViewModels
             new MessageViewModel(
                 title: title,
                 text: text,
-                backTitle: Resources.SvBack,
+                isBackVisible: true,
                 nextTitle: null,
                 backAction: backAction,
                 nextAction: null);
@@ -121,7 +118,7 @@ namespace Atomex.Client.Desktop.ViewModels
             new MessageViewModel(
                 title: title,
                 text: text,
-                backTitle: Resources.SvBack,
+                isBackVisible: true,
                 nextTitle: nextTitle,
                 backAction: backAction,
                 nextAction: nextAction);
@@ -132,7 +129,7 @@ namespace Atomex.Client.Desktop.ViewModels
                 text: text,
                 baseUrl: baseUrl,
                 id: id,
-                backTitle: null,
+                isBackVisible: false,
                 nextTitle: Resources.SvOk,
                 backAction: null,
                 nextAction: nextAction);

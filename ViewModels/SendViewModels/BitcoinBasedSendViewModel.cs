@@ -279,15 +279,13 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             }
         }
 
-        protected override Task<Error> Send(
-            SendConfirmationViewModel confirmationViewModel,
-            CancellationToken cancellationToken = default)
+        protected override Task<Error> Send(CancellationToken cancellationToken = default)
         {
             return Account.SendAsync(
                 from: Outputs.ToList(),
-                to: confirmationViewModel.To,
-                amount: confirmationViewModel.Amount,
-                fee: confirmationViewModel.Fee,
+                to: To,
+                amount: Amount,
+                fee: Fee,
                 dustUsagePolicy: DustUsagePolicy.AddToFee,
                 cancellationToken: cancellationToken);
         }

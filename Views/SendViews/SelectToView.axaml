@@ -249,9 +249,9 @@
                     Height="1"
                     Background="{DynamicResource LightDefaultOpacity10}" />
 
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                <controls:RoundedButton DockPanel.Dock="Right"
-                                        Width="200"
+            <StackPanel Orientation="Horizontal"
+                        HorizontalAlignment="Right">
+                <controls:RoundedButton Width="200"
                                         Height="50"
                                         CornerRadius="6"
                                         Content="Confirm"

@@ -41,7 +41,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             throw new NotImplementedException();
         }
 
-        protected override Task<Error> Send(SendConfirmationViewModel confirmationViewModel, CancellationToken cancellationToken = default)
+        protected override Task<Error> Send(CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
         }

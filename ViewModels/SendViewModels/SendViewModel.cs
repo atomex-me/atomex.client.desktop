@@ -123,9 +123,9 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         private ReactiveCommand<Unit, Unit> _nextCommand;
 
         public ReactiveCommand<Unit, Unit> NextCommand =>
-            _nextCommand ??= (_nextCommand = ReactiveCommand.Create(OnNextCommand));
+            _nextCommand ??= (_nextCommand = ReactiveCommand.CreateFromTask(OnNextCommand));
 
-        private void OnNextCommand()
+        private async Task OnNextCommand()
         {
             if (string.IsNullOrEmpty(To))
             {
@@ -161,29 +161,42 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 return;
             }
 
-            // var confirmationViewModel = new SendConfirmationViewModel
-            // {
-            //     Currency = Currency,
-            //     To = To,
-            //     Amount = Amount,
-            //     AmountInBase = AmountInBase,
-            //     BaseCurrencyCode = BaseCurrencyCode,
-            //     BaseCurrencyFormat = BaseCurrencyFormat,
-            //     Fee = Fee,
-            //     UseDeafultFee = UseDefaultFee,
-            //     FeeInBase = FeeInBase,
-            //     CurrencyCode = CurrencyCode,
-            //     CurrencyFormat = CurrencyFormat,
-            //
-            //     FeeCurrencyCode = FeeCurrencyCode,
-            //     FeeCurrencyFormat = FeeCurrencyFormat,
-            //     BackView = this,
-            //     SendCallback = Send
-            // };
+            if (ConfirmStage)
+            {
+                try
+                {
+                    Desktop.App.DialogService.Show(new SendingViewModel());
+
+                    var error = await Send();
+
+                    if (error != null)
+                    {
+                        Desktop.App.DialogService.Show(MessageViewModel.Error(
+                            text: error.Description,
+                            backAction: () => Desktop.App.DialogService.Show(this)));
+
+                        return;
+                    }
+
+                    Desktop.App.DialogService.Show(MessageViewModel.Success(
+                        text: "Sending was successful",
+                        nextAction: () => { Desktop.App.DialogService.Close(); }));
+                }
+                catch (Exception e)
+                {
+                    Desktop.App.DialogService.Show(MessageViewModel.Error(
+                        text: "An error has occurred while sending transaction.",
+                        backAction: () => Desktop.App.DialogService.Show(this)));
+
+                    Log.Error(e, "Transaction send error.");
+                }
+                finally
+                {
+                    ConfirmStage = false;
+                }
+            }
 
             ConfirmStage = true;
-
-            // Desktop.App.DialogService.Show(confirmationViewModel);
         }
 
         public SendViewModel()
@@ -274,9 +287,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             FeeInBase = Fee * (quote?.Bid ?? 0m);
         }
 
-        protected abstract Task<Error> Send(
-            SendConfirmationViewModel confirmationViewModel,
-            CancellationToken cancellationToken = default);
+        protected abstract Task<Error> Send(CancellationToken cancellationToken = default);
 
         protected static string GetShortenedAddress(string address)
         {

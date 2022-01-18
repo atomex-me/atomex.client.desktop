@@ -2,44 +2,65 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             mc:Ignorable="d" d:DesignWidth="700" d:DesignHeight="450"
              x:Class="Atomex.Client.Desktop.Views.MessageView"
              xmlns:controls="clr-namespace:Atomex.Client.Desktop.Controls"
              xmlns:vm="clr-namespace:Atomex.Client.Desktop.ViewModels"
-             Name="MessageView"
-             Width="560"
-             xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
-             xmlns:ia="clr-namespace:Avalonia.Xaml.Interactions.Core;assembly=Avalonia.Xaml.Interactions">
+             xmlns:svg="clr-namespace:Avalonia.Svg.Skia;assembly=Avalonia.Svg.Skia"
+             Name="MessageView">
 
     <Design.DataContext>
         <vm:MessageViewModel />
     </Design.DataContext>
+    <UserControl.Styles>
+        <Style Selector="TextBlock.withBack">
+            <Setter Property="Margin" Value="-28 0 0 0" />
+        </Style>
+        <Style Selector="TextBlock.withoutBack">
+            <Setter Property="Margin" Value="0 0 0 0" />
+        </Style>
+    </UserControl.Styles>
 
-    <UserControl.Resources>
-        <CornerRadius x:Key="FullRoundCorner">20</CornerRadius>
-        <CornerRadius x:Key="LeftRoundCorner">20 0 0 20</CornerRadius>
-        <CornerRadius x:Key="RightRoundCorner">0 20 20 0</CornerRadius>
-    </UserControl.Resources>
+        <Border Classes="ChildViewBorder"
+                Padding="24 0 24 16"
+                Width="700">
+        <StackPanel Orientation="Vertical">
+            <Grid ColumnDefinitions="Auto,*"
+                  RowDefinitions="Auto"
+                  Margin="0 20 0 20">
+                <Button Grid.Column="0"
+                        Width="28"
+                        Height="28"
+                        Padding="3"
+                        BorderThickness="0"
+                        VerticalContentAlignment="Center"
+                        IsVisible="{Binding IsBackVisible}"
+                        Command="{Binding BackCommand}"
+                        Classes="ButtonWithIcon">
 
-    <Border Classes="ChildViewBorder">
-        <StackPanel Orientation="Vertical"
-                    Width="560">
+                    <svg:Svg Width="28"
+                             Path="/Resources/Icons/back.svg"
+                             HorizontalAlignment="Left" />
+                </Button>
 
-            <Border Margin="0 10 0 10"
-                    Height="33"
-                    VerticalAlignment="Top"
-                    HorizontalAlignment="Stretch"
-                    Background="{DynamicResource ChildViewHeaderBackgroundBrush}">
-                <TextBlock Text="{Binding Title}"
+                <TextBlock Grid.Column="1"
                            Foreground="{DynamicResource ChildViewHeaderForegroundBrush}"
                            FontFamily="{DynamicResource DefaultLightFontFamily}"
-                           FontSize="25"
+                           Classes.withBack="{Binding IsBackVisible}"
+                           Classes.withoutBack="{Binding !IsBackVisible}"
+                           FontSize="22"
                            HorizontalAlignment="Center"
-                           VerticalAlignment="Center" />
-            </Border>
+                           VerticalAlignment="Center"
+                           Text="{Binding Title}"
+                           Name="WindowTitle" />
+            </Grid>
+
+            <Border Height="1"
+                    Margin="-24 0 -24 0"
+                    Background="{DynamicResource LightDefaultOpacity10}" />
 
             <TextBlock Text="{Binding Text}"
-                       Margin="20 20 20 0"
+                       Margin="0 32 0 0"
                        FontSize="15"
                        FontFamily="{DynamicResource DefaultLightFontFamily}"
                        HorizontalAlignment="Center"
@@ -53,7 +74,7 @@
 
                 <!-- ToolTip="{Binding TxExplorerUri}" -->
                 <Button Content="{Binding Id}"
-                        Margin="20 20 20 0"
+                        Margin="20 32 20 0"
                         HorizontalAlignment="Center"
                         VerticalAlignment="Center"
                         Command="{Binding OpenTxInExplorerCommand}"
@@ -75,70 +96,22 @@
                     Classes="PathButtonStyle" />
             </StackPanel>
 
+            <Border Margin="-24 32 -24 16"
+                    Height="1"
+                    Background="{DynamicResource LightDefaultOpacity10}"
+                    IsVisible="{Binding IsNextVisible}" />
+
             <StackPanel Orientation="Horizontal"
-                        HorizontalAlignment="Center"
-                        Margin="0 20 0 20">
-                <controls:RoundedButton Width="100"
-                                        Height="40"
-                                        Margin="0 0 3 0"
-                                        Content="{Binding BackText}"
-                                        Command="{Binding BackCommand}"
-                                        IsVisible="{Binding IsBackVisible}"
-                                        CornerRadius="20"
-                                        x:Name="FirstRoundedBtn">
-
-                    <i:Interaction.Behaviors>
-                        <ia:DataTriggerBehavior Binding="{Binding IsNextVisible}"
-                                                ComparisonCondition="NotEqual"
-                                                Value="True">
-                            <ia:ChangePropertyAction TargetObject="{Binding #FirstRoundedBtn}"
-                                                     PropertyName="CornerRadius"
-                                                     Value="{StaticResource FullRoundCorner}" />
-                            <ia:ChangePropertyAction TargetObject="{Binding #FirstRoundedBtn}"
-                                                     PropertyName="Width"
-                                                     Value="150" />
-                        </ia:DataTriggerBehavior>
-                        <ia:DataTriggerBehavior Binding="{Binding IsNextVisible}"
-                                                ComparisonCondition="Equal"
-                                                Value="True">
-                            <ia:ChangePropertyAction TargetObject="{Binding #FirstRoundedBtn}"
-                                                     PropertyName="CornerRadius"
-                                                     Value="{StaticResource LeftRoundCorner}" />
-                            <ia:ChangePropertyAction TargetObject="{Binding #FirstRoundedBtn}"
-                                                     PropertyName="Width"
-                                                     Value="100" />
-                        </ia:DataTriggerBehavior>
-                    </i:Interaction.Behaviors>
-                </controls:RoundedButton>
-
-                <controls:RoundedButton Height="40"
+                        HorizontalAlignment="Right"
+                        IsVisible="{Binding IsNextVisible}">
+                <controls:RoundedButton Width="200"
+                                        Height="50"
+                                        CornerRadius="6"
+                                        FontSize="18"
+                                        FontWeight="Normal"
+                                        FontFamily="{DynamicResource DefaultFontFamily}"
                                         Content="{Binding NextText}"
-                                        Command="{Binding NextCommand}"
-                                        IsVisible="{Binding IsNextVisible}"
-                                        Name="SecondRoundedBtn">
-                    <i:Interaction.Behaviors>
-                        <ia:DataTriggerBehavior Binding="{Binding IsBackVisible}"
-                                                ComparisonCondition="NotEqual"
-                                                Value="True">
-                            <ia:ChangePropertyAction TargetObject="{Binding #SecondRoundedBtn}"
-                                                     PropertyName="CornerRadius"
-                                                     Value="{StaticResource FullRoundCorner}" />
-                            <ia:ChangePropertyAction TargetObject="{Binding #SecondRoundedBtn}"
-                                                     PropertyName="Width"
-                                                     Value="150" />
-                        </ia:DataTriggerBehavior>
-                        <ia:DataTriggerBehavior Binding="{Binding IsBackVisible}"
-                                                ComparisonCondition="Equal"
-                                                Value="True">
-                            <ia:ChangePropertyAction TargetObject="{Binding #SecondRoundedBtn}"
-                                                     PropertyName="CornerRadius"
-                                                     Value="{StaticResource RightRoundCorner}" />
-                            <ia:ChangePropertyAction TargetObject="{Binding #SecondRoundedBtn}"
-                                                     PropertyName="Width"
-                                                     Value="100" />
-                        </ia:DataTriggerBehavior>
-                    </i:Interaction.Behaviors>
-                </controls:RoundedButton>
+                                        Command="{Binding NextCommand}" />
             </StackPanel>
         </StackPanel>
     </Border>
