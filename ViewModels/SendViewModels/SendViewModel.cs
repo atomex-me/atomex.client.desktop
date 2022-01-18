@@ -26,13 +26,14 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         public ViewModelBase SelectFromViewModel { get; set; }
         protected SelectToViewModel SelectToViewModel { get; set; }
 
+        [Reactive] public bool ConfirmStage { get; set; }
         [Reactive] public CurrencyViewModel CurrencyViewModel { get; set; }
         [Reactive] public string From { get; set; }
         [Reactive] public decimal SelectedFromAmount { get; set; }
         [Reactive] public string To { get; set; }
         [Reactive] protected decimal Amount { get; set; }
-        [Reactive] public bool ConfirmStage { get; set; }
         [ObservableAsProperty] public string AmountString { get; }
+        [ObservableAsProperty] public string TotalAmountString { get; }
 
         public void SetAmountFromString(string value)
         {
@@ -212,6 +213,14 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     vm => vm.Fee
                 )
                 .Subscribe(_ => Warning = string.Empty);
+
+            this.WhenAnyValue(
+                    vm => vm.Amount,
+                    vm => vm.Fee,
+                    (amount, fee) => amount + fee
+                )
+                .Select(totalAmount => totalAmount.ToString(CurrencyFormat, CultureInfo.InvariantCulture))
+                .ToPropertyEx(this, vm => vm.TotalAmountString);
 
             this.WhenAnyValue(vm => vm.Amount)
                 .InvokeCommand(updateAmountCommand);

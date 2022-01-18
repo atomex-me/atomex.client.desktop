@@ -11,7 +11,7 @@ namespace Atomex.Client.Desktop.Converters
     {
         public object Convert(IList<object> values, Type targetType, object parameter, CultureInfo culture)
         {
-            if (values == null || values.Count != 2)
+            if (values is not { Count: 2 })
                 throw new InvalidOperationException("Invalid values");
 
             if (values[0] == AvaloniaProperty.UnsetValue || values[1] == AvaloniaProperty.UnsetValue)
@@ -25,7 +25,7 @@ namespace Atomex.Client.Desktop.Converters
 
         public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
         {
-            if (!(value is string s))
+            if (value is not string s)
                 throw new InvalidOperationException("Invalid value");
 
             return new object[]
