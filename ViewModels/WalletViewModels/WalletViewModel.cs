@@ -225,6 +225,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         protected virtual void OnReceiveClick()
         {
             var receiveViewModel = new ReceiveViewModel(App, Currency);
+
             Desktop.App.DialogService.Show(receiveViewModel);
         }
 

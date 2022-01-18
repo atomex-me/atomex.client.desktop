@@ -586,7 +586,8 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             var receiveViewModel = new ReceiveViewModel(
                 app: App,
                 currency: tezosConfig,
-                tokenContract: TokenContract?.Contract?.Address);
+                tokenContract: TokenContract?.Contract?.Address,
+                tokenType: TokenContract?.Contract?.GetContractType());
 
             Desktop.App.DialogService.Show(receiveViewModel);
         }

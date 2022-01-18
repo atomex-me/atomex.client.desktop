@@ -42,7 +42,8 @@ namespace Atomex.Client.Desktop.ViewModels.ReceiveViewModels
                         .GetReceivingAddressesAsync(
                             account: _app.Account,
                             currency: _currency,
-                            tokenContract: TokenContract)
+                            tokenContract: TokenContract,
+                            tokenType: TokenType)
                         .WaitForResult()
                         .ToList();
 #if DEBUG
@@ -107,6 +108,7 @@ namespace Atomex.Client.Desktop.ViewModels.ReceiveViewModels
         public IBitmap QrCode { get; private set; }
 
         public string TokenContract { get; private set; }
+        public string TokenType { get; private set; }
 
         public ReceiveViewModel()
         {
@@ -119,11 +121,13 @@ namespace Atomex.Client.Desktop.ViewModels.ReceiveViewModels
         public ReceiveViewModel(
             IAtomexApp app,
             CurrencyConfig currency,
-            string tokenContract = null)
+            string tokenContract = null,
+            string tokenType = null)
         {
             _app = app ?? throw new ArgumentNullException(nameof(app));
 
             TokenContract = tokenContract;
+            TokenType = tokenType;
             Currency = currency;
             CurrencyViewModel = CurrencyViewModelCreator.CreateViewModel(currency);
         }

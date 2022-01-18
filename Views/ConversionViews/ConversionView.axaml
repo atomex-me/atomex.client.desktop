@@ -247,7 +247,9 @@
                     VerticalAlignment="Center"
                     VerticalContentAlignment="Center"
                     Click="HelpClickHandler"
-                    Classes="ButtonWithIcon">
+                    Classes="ButtonWithIcon"
+                    ToolTip.Placement="Top"
+                    ToolTip.HorizontalOffset="25">
               <Path HorizontalAlignment="Center"
                     VerticalAlignment="Center"
                     Width="12"
@@ -256,14 +258,15 @@
                     Fill="{DynamicResource LightDefaultOpacity20}"/>
               <ToolTip.Tip>
                 <StackPanel Orientation="Vertical">
-                  <TextBlock Foreground="{DynamicResource DefaultAmountInBaseForegroundBrush}"
+                  <TextBlock Foreground="{DynamicResource DefaultForegroundBrush}"
                              Text="Network fees for atomic swap:"/>
 
                   <StackPanel Margin="0 7 0 0"
                               Orientation="Horizontal"
                               HorizontalAlignment="Left"
                               VerticalAlignment="Center">
-                    <TextBlock Foreground="{DynamicResource DefaultAmountInBaseForegroundBrush}"
+                    <!-- payment fee -->
+                    <TextBlock Foreground="{DynamicResource DefaultForegroundBrush}"
                                Text="Payment fee:"/>
 
                     <TextBlock Margin="5 0 0 0"
@@ -286,6 +289,7 @@
                                Foreground="{DynamicResource DefaultForegroundBrush}"
                                FontFamily="{DynamicResource DefaultFontFamily}"/>
 
+                    <!-- payment fee in base -->
                     <TextBlock Margin="5 0 0 0"
                                Foreground="{DynamicResource DefaultAmountInBaseForegroundBrush}"
                                Text="("/>
@@ -306,11 +310,12 @@
                                Text=")" />
                   </StackPanel>
 
+                  <!-- redeem fee -->
                   <StackPanel Orientation="Horizontal"
                               HorizontalAlignment="Left"
                               VerticalAlignment="Center"
                               IsVisible="{Binding !HasRewardForRedeem}">
-                    <TextBlock Foreground="{DynamicResource DefaultAmountInBaseForegroundBrush}"
+                    <TextBlock Foreground="{DynamicResource DefaultForegroundBrush}"
                                Text="Redeem fee:"/>
 
                     <TextBlock Margin="5 0 0 0"
@@ -333,6 +338,7 @@
                                Foreground="{DynamicResource DefaultForegroundBrush}"
                                FontFamily="{DynamicResource DefaultFontFamily}"/>
 
+                    <!-- redeem fee in base -->
                     <TextBlock Margin="5 0 0 0"
                                Foreground="{DynamicResource DefaultAmountInBaseForegroundBrush}"
                                Text="("/>
@@ -353,10 +359,11 @@
                                Text=")"/>
                   </StackPanel>
 
+                  <!-- maker fee -->
                   <StackPanel Orientation="Horizontal"
                               HorizontalAlignment="Left"
                               VerticalAlignment="Center">
-                    <TextBlock Foreground="{DynamicResource DefaultAmountInBaseForegroundBrush}"
+                    <TextBlock Foreground="{DynamicResource DefaultForegroundBrush}"
                                Text="Maker fee:"/>
 
                     <TextBlock Margin="5 0 0 0"
@@ -379,6 +386,7 @@
                                Foreground="{DynamicResource DefaultForegroundBrush}"
                                FontFamily="{DynamicResource DefaultFontFamily}"/>
 
+                    <!-- maker fee in base -->
                     <TextBlock Margin="5 0 0 0"
                                Foreground="{DynamicResource DefaultAmountInBaseForegroundBrush}"
                                Text="("/>
@@ -399,6 +407,7 @@
                                Text=")"/>
                   </StackPanel>
 
+                  <!-- reward for redeem -->
                   <StackPanel Orientation="Horizontal"
                               HorizontalAlignment="Left"
                               VerticalAlignment="Center"
@@ -426,6 +435,7 @@
                                Foreground="{DynamicResource DefaultForegroundBrush}"
                                FontFamily="{DynamicResource DefaultFontFamily}"/>
 
+                    <!-- reward for redeem in base -->
                     <TextBlock Margin="5 0 0 0"
                                Foreground="{DynamicResource DefaultAmountInBaseForegroundBrush}"
                                Text="("/>
@@ -446,11 +456,12 @@
                                Text=")"/>
                   </StackPanel>
 
+                  <!-- total network fees -->
                   <StackPanel Margin="0 7 0 0"
                               Orientation="Horizontal"
                               HorizontalAlignment="Left"
                               VerticalAlignment="Center">
-                    <TextBlock Foreground="{DynamicResource DefaultAmountInBaseForegroundBrush}"
+                    <TextBlock Foreground="{DynamicResource DefaultForegroundBrush}"
                                Text="Total network fees:"/>
 
                     <TextBlock Margin="5 0 0 0"

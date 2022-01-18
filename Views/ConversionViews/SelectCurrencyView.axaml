@@ -106,7 +106,8 @@
                       Foreground="{DynamicResource LightDefaultOpacity50}"
                       Command="{Binding $parent[ListBox].DataContext.ChangeAddressesCommand}"
                       CommandParameter="{Binding}"
-                      Grid.Column="1">
+                      Grid.Column="1"
+                      ToolTip.Tip="Click to change address">
                 <Button.Styles>
                   <Style Selector="Button:pointerover Border#BackgroundBorder">
                     <Setter Property="Background" Value="{DynamicResource LightDefaultOpacity6}"/>

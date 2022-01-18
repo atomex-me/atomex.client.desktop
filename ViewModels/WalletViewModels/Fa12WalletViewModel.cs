@@ -94,7 +94,13 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         protected override void OnReceiveClick()
         {
             var tezosConfig = App.Account.Currencies.GetByName(TezosConfig.Xtz);
-            var receiveViewModel = new ReceiveViewModel(App, tezosConfig, Currency.TokenContractAddress);
+
+            var receiveViewModel = new ReceiveViewModel(
+                app: App,
+                currency: tezosConfig,
+                tokenContract: Currency.TokenContractAddress,
+                tokenType: "FA12");
+
             Desktop.App.DialogService.Show(receiveViewModel);
         }
 

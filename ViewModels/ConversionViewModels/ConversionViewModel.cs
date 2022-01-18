@@ -91,8 +91,6 @@ namespace Atomex.Client.Desktop.ViewModels
         [Reactive] public MessageType ValidationMessageType { get; set; }
 
 
-
-
         [Reactive] public List<CurrencyViewModel>? FromCurrencies { get; set; }
         [Reactive] public List<CurrencyViewModel>? ToCurrencies { get; set; }
 
@@ -419,7 +417,6 @@ namespace Atomex.Client.Desktop.ViewModels
                 }
                 else
                 {
-                    // todo: add free address if there are no unspent addresses
                     var availableAddresses = await _app.Account
                         .GetUnspentAddressesAsync(currencyName)
                         .ConfigureAwait(false);
