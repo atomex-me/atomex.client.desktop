@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 using Atomex.Common;
 using Atomex.Core;
+using Atomex.ViewModels;
 using Atomex.Wallet.Abstract;
 using Avalonia.Controls;
 using Avalonia.Threading;
@@ -21,12 +22,12 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         public Action BackAction { get; set; }
         public Action<string> ConfirmAction { get; set; }
 
-        private ObservableCollection<AddressViewModel> InitialMyAddresses { get; set; }
-        [Reactive] public ObservableCollection<AddressViewModel> MyAddresses { get; set; }
+        private ObservableCollection<WalletAddressViewModel> InitialMyAddresses { get; set; }
+        [Reactive] public ObservableCollection<WalletAddressViewModel> MyAddresses { get; set; }
         [Reactive] public string SearchPattern { get; set; }
         [Reactive] private bool SortIsAscending { get; set; }
         [Reactive] private bool SortByDate { get; set; }
-        [Reactive] public AddressViewModel? SelectedAddress { get; set; }
+        [Reactive] public WalletAddressViewModel? SelectedAddress { get; set; }
 
         public SelectToViewModel()
         {
@@ -48,7 +49,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
                     if (MyAddresses == null) return;
 
-                    var myAddresses = new ObservableCollection<AddressViewModel>(
+                    var myAddresses = new ObservableCollection<WalletAddressViewModel>(
                         InitialMyAddresses
                             .Where(addressViewModel => addressViewModel.WalletAddress.Address.ToLower()
                                 .Contains(item3?.ToLower() ?? string.Empty)));
@@ -103,57 +104,23 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                             });
                         }
 
-                        MyAddresses = new ObservableCollection<AddressViewModel>(myAddressesList);
+                        MyAddresses = new ObservableCollection<WalletAddressViewModel>(myAddressesList);
                     }
                     else
                     {
-                        MyAddresses = new ObservableCollection<AddressViewModel>(item2
+                        MyAddresses = new ObservableCollection<WalletAddressViewModel>(item2
                             ? myAddresses.OrderBy(addressViewModel => addressViewModel.AvailableBalance)
                             : myAddresses.OrderByDescending(addressViewModel => addressViewModel.AvailableBalance));
                     }
                 });
 
-            // get all addresses with tokens (if exists)
-            var tokenAddresses = Currencies.HasTokens(currency.Name)
-                ? (account.GetCurrencyAccount(currency.Name) as IHasTokens)
-                ?.GetUnspentTokenAddressesAsync()
-                .WaitForResult() ?? new List<WalletAddress>()
-                : new List<WalletAddress>();
-
-            // get all active addresses
-            var activeAddresses = account
-                .GetUnspentAddressesAsync(currency.Name)
-                .WaitForResult()
-                .ToList();
-
-            // get free external address
-            var freeAddress = account
-                .GetFreeExternalAddressAsync(currency.Name)
-                .WaitForResult();
-
-            var myAddresses = activeAddresses
-                .Concat(tokenAddresses)
-                .Concat(new[] { freeAddress })
-                .GroupBy(w => w.Address)
-                .Select(g =>
-                {
-                    // main address
-                    var address = g.FirstOrDefault(w => w.Currency == currency.Name);
-
-                    var isFreeAddress = address?.Address == freeAddress.Address;
-
-                    return new AddressViewModel()
-                    {
-                        WalletAddress = address,
-                        AvailableBalance = address?.AvailableBalance() ?? 0m,
-                        CurrencyFormat = currency.Format,
-                        CurrencyCode = currency.Name,
-                        IsFreeAddress = isFreeAddress
-                    };
-                });
-
-            MyAddresses = new ObservableCollection<AddressViewModel>(myAddresses);
-            InitialMyAddresses = new ObservableCollection<AddressViewModel>(MyAddresses);
+            MyAddresses = new ObservableCollection<WalletAddressViewModel>(
+                AddressesHelper
+                    .GetReceivingAddressesAsync(
+                        account: account,
+                        currency: currency)
+                    .WaitForResult());
+            InitialMyAddresses = new ObservableCollection<WalletAddressViewModel>(MyAddresses);
         }
 
         private ReactiveCommand<Unit, Unit> _backCommand;
@@ -170,7 +137,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
         public ReactiveCommand<Unit, Unit> ChangeSortDirectionCommand => _changeSortDirectionCommand ??=
             (_changeSortDirectionCommand = ReactiveCommand.Create(() => { SortIsAscending = !SortIsAscending; }));
-        
+
 
         private ReactiveCommand<Unit, Unit> _confirmCommand;
 
@@ -199,23 +166,5 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         private void DesignerMode()
         {
         }
-    }
-
-    public class AddressViewModel
-    {
-        public const string DefaultCopyButtonToolTip = "Copy address to clipboard";
-        public const string CopiedButtonToolTip = "Successfully copied!";
-
-        public AddressViewModel()
-        {
-            CopyButtonToolTip = DefaultCopyButtonToolTip;
-        }
-
-        [Reactive] public string CopyButtonToolTip { get; set; }
-        public WalletAddress WalletAddress { get; set; }
-        public decimal AvailableBalance { get; set; }
-        public string CurrencyFormat { get; set; }
-        public string CurrencyCode { get; set; }
-        public bool IsFreeAddress { get; set; }
     }
 }

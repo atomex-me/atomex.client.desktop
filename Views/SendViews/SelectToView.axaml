@@ -227,6 +227,7 @@
                                             VerticalContentAlignment="Center"
                                             Command="{Binding $parent[ListBox].DataContext.CopyAddressCommand}"
                                             CommandParameter="{Binding WalletAddress}"
+                                            Click="CopyButtonOnClick"
                                             Classes="ButtonWithIcon">
 
                                         <svg:Svg HorizontalAlignment="Center"
@@ -236,7 +237,8 @@
                                                  Path="/Resources/Icons/copy.svg" />
                                     </Button>
                                     <ToolTip.Tip>
-                                        <TextBlock Text="{Binding CopyButtonToolTip}" />
+                                        <TextBlock Text="Copy address to clipboard"
+                                                   Name="CopyTextBlock"/>
                                     </ToolTip.Tip>
                                 </Border>
                             </StackPanel>

@@ -1,5 +1,5 @@
-using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 
 namespace Atomex.Client.Desktop.Views.SendViews
@@ -14,6 +14,15 @@ namespace Atomex.Client.Desktop.Views.SendViews
         private void InitializeComponent()
         {
             AvaloniaXamlLoader.Load(this);
+        }
+
+        private void CopyButtonOnClick(object? sender, RoutedEventArgs e)
+        {
+            // var copyTextBlock = this.FindControl<TextBlock>("CopyTextBlock");
+            // var initialText = copyTextBlock.Text;
+            // copyTextBlock.Text = "Successfully copied!";
+            // await Task.Delay(TimeSpan.FromSeconds(5));
+            // copyTextBlock.Text = initialText;
         }
     }
 }
