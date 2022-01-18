@@ -32,6 +32,7 @@ namespace Atomex.Client.Desktop.ViewModels.ConversionViewModels
     {
         [Reactive] public CurrencyViewModel CurrencyViewModel { get; set; }
         [ObservableAsProperty] public string? SelectedAddressDescription { get; }
+        public abstract string Address { get; }
 
         public SelectCurrencyViewModelItem(CurrencyViewModel currencyViewModel)
         {
@@ -43,6 +44,7 @@ namespace Atomex.Client.Desktop.ViewModels.ConversionViewModels
     {
         public IEnumerable<BitcoinBasedTxOutput> AvailableOutputs { get; set; }
         [Reactive] public IEnumerable<BitcoinBasedTxOutput> SelectedOutputs { get; set; }
+        public override string Address => $"{SelectedOutputs?.Count() ?? 0} outputs";
 
         public SelectCurrencyWithOutputsViewModelItem(
             CurrencyViewModel currencyViewModel,
@@ -74,6 +76,7 @@ namespace Atomex.Client.Desktop.ViewModels.ConversionViewModels
         public IEnumerable<WalletAddress> AvailableAddresses { get; set; }
         [Reactive] public WalletAddress SelectedAddress { get; set; }
         [Reactive] public bool IsNew { get; set; }
+        public override string Address => SelectedAddress?.Address?.TruncateAddress();
 
         public SelectCurrencyWithAddressViewModelItem(
             CurrencyViewModel currencyViewModel,

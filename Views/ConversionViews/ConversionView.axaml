@@ -117,6 +117,7 @@
                 Height="40"
                 CornerRadius="20"
                 Margin="0 -14 -45 -14"
+                Command="{Binding SwapCurrenciesCommand}"
                 Classes="ButtonWithIcon">
             <Path Width="18"
                   Height="18"
