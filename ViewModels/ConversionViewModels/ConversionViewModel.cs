@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Linq;
-using System.Threading.Tasks;
 using System.Reactive.Linq;
+using System.Threading.Tasks;
 using System.Windows.Input;
 
 using Avalonia.Controls;
@@ -14,21 +14,21 @@ using ReactiveUI.Fody.Helpers;
 using Serilog;
 
 using Atomex.Abstract;
+using Atomex.Blockchain.BitcoinBased;
+using Atomex.Client.Desktop.Common;
+using Atomex.Client.Desktop.Properties;
+using Atomex.Client.Desktop.ViewModels.ConversionViewModels;
+using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
 using Atomex.Common;
 using Atomex.Core;
 using Atomex.MarketData;
 using Atomex.MarketData.Abstract;
 using Atomex.Services;
 using Atomex.Swaps;
-using Atomex.Client.Desktop.Common;
-using Atomex.Client.Desktop.Properties;
-using Atomex.Client.Desktop.ViewModels.ConversionViewModels;
-using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
+using Atomex.TezosTokens;
+using Atomex.ViewModels;
 using Atomex.Wallet.Abstract;
 using Atomex.Wallet.BitcoinBased;
-using Atomex.Blockchain.BitcoinBased;
-using Atomex.ViewModels;
-using Atomex.TezosTokens;
 
 namespace Atomex.Client.Desktop.ViewModels
 {
@@ -71,6 +71,10 @@ namespace Atomex.Client.Desktop.ViewModels
         [Reactive] public decimal FromBalance { get; set; }
         [Reactive] public string ToAddress { get; set; }
         [Reactive] public string RedeemFromAddress { get; set; }
+        [Reactive] public bool IsRedeemAddressUsed { get; set; }
+
+        [Reactive] public List<CurrencyViewModel>? FromCurrencies { get; set; }
+        [Reactive] public List<CurrencyViewModel>? ToCurrencies { get; set; }
 
         [Reactive] public ConversionCurrencyViewModel FromViewModel { get; set; }
         [Reactive] public ConversionCurrencyViewModel ToViewModel { get; set; }
@@ -82,8 +86,6 @@ namespace Atomex.Client.Desktop.ViewModels
         [Reactive] public string FromValidationMessageToolTip { get; set; }
         [Reactive] public MessageType FromValidationMessageType { get; set; }
 
-        [Reactive] public bool IsRedeemAddressUsed { get; set; }
-
         [Reactive] public string BaseCurrencyCode { get; set; }
         [Reactive] public string QuoteCurrencyCode { get; set; }
 
@@ -91,19 +93,12 @@ namespace Atomex.Client.Desktop.ViewModels
         [Reactive] public string ValidationMessageToolTip { get; set; }
         [Reactive] public MessageType ValidationMessageType { get; set; }
 
-
-        [Reactive] public List<CurrencyViewModel>? FromCurrencies { get; set; }
-        [Reactive] public List<CurrencyViewModel>? ToCurrencies { get; set; }
-
-        [Reactive] public CurrencyViewModel? FromCurrencyViewModel { get; set; }
-        [Reactive] public CurrencyViewModel? ToCurrencyViewModel { get; set; }
-
         [ObservableAsProperty] public string PriceFormat { get; }
 
         private decimal _amount;
         public string AmountString
         {
-            get => _amount.ToString(FromCurrencyViewModel?.CurrencyFormat ?? "0");
+            get => _amount.ToString(FromViewModel.CurrencyViewModel?.CurrencyFormat ?? "0");
             set
             {
                 if (!decimal.TryParse(
@@ -116,7 +111,7 @@ namespace Atomex.Client.Desktop.ViewModels
                 }
                 else
                 {
-                    _amount = amount.TruncateByFormat(FromCurrencyViewModel?.CurrencyFormat ?? "0");
+                    _amount = amount.TruncateByFormat(FromViewModel.CurrencyViewModel?.CurrencyFormat ?? "0");
 
                     if (_amount > long.MaxValue)
                         _amount = long.MaxValue;
@@ -200,10 +195,9 @@ namespace Atomex.Client.Desktop.ViewModels
 
                         CurrencySelected = i =>
                         {
-                            FromCurrencyViewModel = FromCurrencies.First(c => c.Currency.Name == i.CurrencyViewModel.Currency.Name);
                             FromCurrencyViewModelItem = i;
 
-                            FromViewModel.CurrencyViewModel = FromCurrencyViewModel;
+                            FromViewModel.CurrencyViewModel = FromCurrencies.First(c => c.Currency.Name == i.CurrencyViewModel.Currency.Name);
                             FromViewModel.Address = i.Address;
 
                             App.DialogService.Close();
@@ -229,10 +223,9 @@ namespace Atomex.Client.Desktop.ViewModels
 
                         CurrencySelected = i =>
                         {
-                            ToCurrencyViewModel = ToCurrencies.First(c => c.Currency.Name == i.CurrencyViewModel.Currency.Name);
                             ToCurrencyViewModelItem = i;
 
-                            ToViewModel.CurrencyViewModel = ToCurrencyViewModel;
+                            ToViewModel.CurrencyViewModel = ToCurrencies.First(c => c.Currency.Name == i.CurrencyViewModel.Currency.Name);
                             ToViewModel.Address = i.Address;
 
                             App.DialogService.Close();
@@ -244,7 +237,7 @@ namespace Atomex.Client.Desktop.ViewModels
             };
 
             // FromCurrencyViewModel changed => Update ToCurrencies
-            this.WhenAnyValue(vm => vm.FromCurrencyViewModel)
+            this.WhenAnyValue(vm => vm.FromViewModel.CurrencyViewModel)
                 .WhereNotNull()
                 .Subscribe(c =>
                 {
@@ -254,7 +247,7 @@ namespace Atomex.Client.Desktop.ViewModels
                 });
 
             // FromCurrencyViewModel currency changed => Update AmountString and AmountInBase if need
-            this.WhenAnyValue(vm => vm.FromCurrencyViewModel)
+            this.WhenAnyValue(vm => vm.FromViewModel.CurrencyViewModel)
                 .WhereNotNull()
                 .Subscribe(c =>
                 {
@@ -267,7 +260,7 @@ namespace Atomex.Client.Desktop.ViewModels
                 });
 
             // FromCurrencyViewModel or ToCurrencyViewModel changed => update PriceFormat
-            this.WhenAnyValue(vm => vm.FromCurrencyViewModel, vm => vm.ToCurrencyViewModel)
+            this.WhenAnyValue(vm => vm.FromViewModel.CurrencyViewModel, vm => vm.ToViewModel.CurrencyViewModel)
                 .WhereAllNotNull()
                 .Select(t =>
                 {
@@ -278,7 +271,7 @@ namespace Atomex.Client.Desktop.ViewModels
                 .ToPropertyEx(this, vm => vm.PriceFormat);
 
             // AmountString, FromCurrencyViewModel or ToCurrencyViewModel changed => estimate swap price and target amount
-            this.WhenAnyValue(vm => vm.AmountString, vm => vm.FromCurrencyViewModel, vm => vm.ToCurrencyViewModel)
+            this.WhenAnyValue(vm => vm.AmountString, vm => vm.FromViewModel.CurrencyViewModel, vm => vm.ToViewModel.CurrencyViewModel)
                 .Throttle(TimeSpan.FromMilliseconds(1))
                 .Subscribe(a =>
                 {
@@ -347,7 +340,7 @@ namespace Atomex.Client.Desktop.ViewModels
         {
             try
             {
-                if (FromCurrencyViewModel == null || ToCurrencyViewModel == null)
+                if (FromViewModel.CurrencyViewModel == null || ToViewModel.CurrencyViewModel == null)
                     return;
 
                 var swapParams = await Atomex.ViewModels.Helpers
@@ -355,8 +348,8 @@ namespace Atomex.Client.Desktop.ViewModels
                         from: FromSource,
                         amount: EstimatedMaxAmount,
                         redeemFromAddress: RedeemFromAddress,
-                        fromCurrency: FromCurrencyViewModel?.Currency,
-                        toCurrency: ToCurrencyViewModel?.Currency,
+                        fromCurrency: FromViewModel.CurrencyViewModel?.Currency,
+                        toCurrency: ToViewModel.CurrencyViewModel?.Currency,
                         account: _app.Account,
                         atomexClient: _app.Terminal,
                         symbolsProvider: _app.SymbolsProvider,
@@ -380,18 +373,16 @@ namespace Atomex.Client.Desktop.ViewModels
         private ICommand _swapCurrenciesCommand;
         public ICommand SwapCurrenciesCommand => _swapCurrenciesCommand ??= ReactiveCommand.Create(() =>
         {
-            if (FromCurrencyViewModel == null || ToCurrencyViewModel == null)
+            if (FromViewModel.CurrencyViewModel == null || ToViewModel.CurrencyViewModel == null)
                 return;
 
-            var previousFromCurrency = FromCurrencyViewModel;
-            FromCurrencyViewModel = ToCurrencyViewModel;
-            ToCurrencyViewModel = previousFromCurrency;
+            var previousFromCurrency = FromViewModel.CurrencyViewModel;
 
-            FromViewModel.CurrencyViewModel = FromCurrencyViewModel;
+            FromViewModel.CurrencyViewModel = ToViewModel.CurrencyViewModel;
             FromViewModel.Address = null;
             FromCurrencyViewModelItem = null;
 
-            ToViewModel.CurrencyViewModel = ToCurrencyViewModel;
+            ToViewModel.CurrencyViewModel = previousFromCurrency;
             ToViewModel.Address = null;
             ToCurrencyViewModelItem = null;
         });
@@ -496,7 +487,7 @@ namespace Atomex.Client.Desktop.ViewModels
 
         public void SetFromCurrency(CurrencyConfig fromCurrency)
         {
-            FromCurrencyViewModel = FromCurrencies?.FirstOrDefault(vm => vm.Currency.Name == fromCurrency.Name);
+            FromViewModel.CurrencyViewModel = FromCurrencies?.FirstOrDefault(vm => vm.Currency.Name == fromCurrency.Name);
         }
 
         private void SubscribeToServices()
@@ -515,8 +506,8 @@ namespace Atomex.Client.Desktop.ViewModels
                     from: FromSource,
                     amount: amount,
                     redeemFromAddress: RedeemFromAddress,
-                    fromCurrency: FromCurrencyViewModel?.Currency,
-                    toCurrency: ToCurrencyViewModel?.Currency,
+                    fromCurrency: FromViewModel.CurrencyViewModel?.Currency,
+                    toCurrency: ToViewModel.CurrencyViewModel?.Currency,
                     account: _app.Account,
                     atomexClient: _app.Terminal,
                     symbolsProvider: _app.SymbolsProvider,
@@ -544,7 +535,7 @@ namespace Atomex.Client.Desktop.ViewModels
                         Errors.InsufficientChainFunds => string.Format(
                             provider: CultureInfo.CurrentCulture,
                             format: Resources.CvInsufficientChainFunds,
-                            arg0: FromCurrencyViewModel?.Currency.FeeCurrencyName),
+                            arg0: FromViewModel.CurrencyViewModel?.Currency.FeeCurrencyName),
                         Errors.FromAddressIsNullOrEmpty => Resources.CvFromAddressIsNullOrEmpty,
                         _ => Resources.CvError
                     };
@@ -559,8 +550,8 @@ namespace Atomex.Client.Desktop.ViewModels
                 RewardForRedeem          = swapParams.RewardForRedeem;
                 EstimatedMakerNetworkFee = swapParams.MakerNetworkFee;
 
-                if (FromCurrencyViewModel?.CurrencyFormat != null)
-                    IsAmountValid = _amount <= swapParams.Amount.TruncateByFormat(FromCurrencyViewModel.CurrencyFormat);
+                if (FromViewModel.CurrencyViewModel?.CurrencyFormat != null)
+                    IsAmountValid = _amount <= swapParams.Amount.TruncateByFormat(FromViewModel.CurrencyViewModel.CurrencyFormat);
 
             }, DispatcherPriority.Background);
         }
@@ -581,43 +572,43 @@ namespace Atomex.Client.Desktop.ViewModels
 
         private void UpdateAmountInBase() => AmountInBase = TryGetAmountInBase(
             amount: _amount,
-            currency: FromCurrencyViewModel?.CurrencyCode,
-            baseCurrency: FromCurrencyViewModel?.BaseCurrencyCode,
+            currency: FromViewModel.CurrencyViewModel?.CurrencyCode,
+            baseCurrency: FromViewModel.CurrencyViewModel?.BaseCurrencyCode,
             provider: _app.QuotesProvider,
             defaultAmountInBase: AmountInBase);
 
         private void UpdateTargetAmountInBase() => TargetAmountInBase = TryGetAmountInBase(
             amount: TargetAmount,
-            currency: ToCurrencyViewModel?.CurrencyCode,
-            baseCurrency: FromCurrencyViewModel?.BaseCurrencyCode,
+            currency: ToViewModel.CurrencyViewModel?.CurrencyCode,
+            baseCurrency: FromViewModel.CurrencyViewModel?.BaseCurrencyCode,
             provider: _app.QuotesProvider,
             defaultAmountInBase: TargetAmountInBase);
 
         private void UpdateEstimatedPaymentFeeInBase() => EstimatedPaymentFeeInBase = TryGetAmountInBase(
             amount: EstimatedPaymentFee,
-            currency: FromCurrencyViewModel?.Currency?.FeeCurrencyName,
-            baseCurrency: FromCurrencyViewModel?.BaseCurrencyCode,
+            currency: FromViewModel.CurrencyViewModel?.Currency?.FeeCurrencyName,
+            baseCurrency: FromViewModel.CurrencyViewModel?.BaseCurrencyCode,
             provider: _app.QuotesProvider,
             defaultAmountInBase: EstimatedPaymentFeeInBase);
 
         private void UpdateEstimatedRedeemFeeInBase() => EstimatedRedeemFeeInBase = TryGetAmountInBase(
             amount: EstimatedRedeemFee,
-            currency: ToCurrencyViewModel?.Currency?.FeeCurrencyName,
-            baseCurrency: FromCurrencyViewModel?.BaseCurrencyCode,
+            currency: ToViewModel.CurrencyViewModel?.Currency?.FeeCurrencyName,
+            baseCurrency: FromViewModel.CurrencyViewModel?.BaseCurrencyCode,
             provider: _app.QuotesProvider,
             defaultAmountInBase: 0); // EstimatedRedeemFeeInBase);
 
         private void UpdateRewardForRedeemInBase() => RewardForRedeemInBase = TryGetAmountInBase(
             amount: RewardForRedeem,
-            currency: ToCurrencyViewModel?.CurrencyCode,
-            baseCurrency: FromCurrencyViewModel?.BaseCurrencyCode,
+            currency: ToViewModel.CurrencyViewModel?.CurrencyCode,
+            baseCurrency: FromViewModel.CurrencyViewModel?.BaseCurrencyCode,
             provider: _app.QuotesProvider,
             defaultAmountInBase: RewardForRedeemInBase);
 
         private void UpdateEstimatedMakerNetworkFeeInBase() => EstimatedMakerNetworkFeeInBase = TryGetAmountInBase(
             amount: EstimatedMakerNetworkFee,
-            currency: FromCurrencyViewModel?.CurrencyCode,
-            baseCurrency: FromCurrencyViewModel?.BaseCurrencyCode,
+            currency: FromViewModel.CurrencyViewModel?.CurrencyCode,
+            baseCurrency: FromViewModel.CurrencyViewModel?.BaseCurrencyCode,
             provider: _app.QuotesProvider,
             defaultAmountInBase: EstimatedMakerNetworkFeeInBase);
 
@@ -645,8 +636,8 @@ namespace Atomex.Client.Desktop.ViewModels
                 .Select(CurrencyViewModelCreator.CreateViewModel)
                 .ToList();
 
-            FromCurrencyViewModel = FromCurrencies.First(c => c.Currency.Name == "BTC");
-            ToCurrencyViewModel = ToCurrencies?.First(c => c.Currency.Name == "LTC");
+            //FromViewModel.CurrencyViewModel = FromCurrencies.First(c => c.Currency.Name == "BTC");
+            //ToViewModel.CurrencyViewModel = ToCurrencies?.First(c => c.Currency.Name == "LTC");
 
             OnSwapEventHandler(this, args: null);
         }
@@ -695,8 +686,8 @@ namespace Atomex.Client.Desktop.ViewModels
             {
                 var swapPriceEstimation = await Atomex.ViewModels.Helpers.EstimateSwapPriceAsync(
                     amount: _amount,
-                    fromCurrency: FromCurrencyViewModel?.Currency,
-                    toCurrency: ToCurrencyViewModel?.Currency,
+                    fromCurrency: FromViewModel.CurrencyViewModel?.Currency,
+                    toCurrency: ToViewModel.CurrencyViewModel?.Currency,
                     account: _app.Account,
                     atomexClient: _app.Terminal,
                     symbolsProvider: _app.SymbolsProvider);
@@ -767,13 +758,13 @@ namespace Atomex.Client.Desktop.ViewModels
 
         private void OnConvertClick()
         {
-            if (FromCurrencyViewModel == null)
+            if (FromViewModel.CurrencyViewModel == null)
             {
                 // TODO: warning
                 return;
             }
 
-            if (ToCurrencyViewModel == null)
+            if (ToViewModel.CurrencyViewModel == null)
             {
                 // TODO: warning
                 return;
@@ -834,7 +825,7 @@ namespace Atomex.Client.Desktop.ViewModels
                 return;
             }
 
-            var symbol = Symbols.SymbolByCurrencies(FromCurrencyViewModel.Currency, ToCurrencyViewModel.Currency);
+            var symbol = Symbols.SymbolByCurrencies(FromViewModel.CurrencyViewModel.Currency, ToViewModel.CurrencyViewModel.Currency);
             if (symbol == null)
             {
                 App.DialogService.Show(
@@ -844,7 +835,7 @@ namespace Atomex.Client.Desktop.ViewModels
                 return;
             }
 
-            var side         = symbol.OrderSideForBuyCurrency(ToCurrencyViewModel.Currency);
+            var side         = symbol.OrderSideForBuyCurrency(ToViewModel.CurrencyViewModel.Currency);
             var price        = EstimatedPrice;
             var baseCurrency = Currencies.GetByName(symbol.Base);
 
@@ -860,13 +851,13 @@ namespace Atomex.Client.Desktop.ViewModels
                     side: side,
                     qty: symbol.MinimumQty,
                     price: price,
-                    digitsMultiplier: FromCurrencyViewModel.Currency.DigitsMultiplier);
+                    digitsMultiplier: FromViewModel.CurrencyViewModel.Currency.DigitsMultiplier);
 
                 var message = string.Format(
                     provider: CultureInfo.CurrentCulture,
                     format: Resources.CvMinimumAllowedQtyWarning,
                     arg0: minimumAmount,
-                    arg1: FromCurrencyViewModel.Currency.Name);
+                    arg1: FromViewModel.CurrencyViewModel.Currency.Name);
 
                 App.DialogService.Show(
                     MessageViewModel.Message(
@@ -879,8 +870,8 @@ namespace Atomex.Client.Desktop.ViewModels
 
             var viewModel = new ConversionConfirmationViewModel(_app)
             {
-                FromCurrencyViewModel          = FromCurrencyViewModel,
-                ToCurrencyViewModel            = ToCurrencyViewModel,
+                FromCurrencyViewModel          = FromViewModel.CurrencyViewModel,
+                ToCurrencyViewModel            = ToViewModel.CurrencyViewModel,
                 FromSource                     = FromSource,
                 ToAddress                      = ToAddress,
                 RedeemFromAddress              = RedeemFromAddress,
@@ -936,9 +927,21 @@ namespace Atomex.Client.Desktop.ViewModels
             var btc = DesignTime.Currencies.Get<BitcoinConfig>("BTC");
             var ltc = DesignTime.Currencies.Get<LitecoinConfig>("LTC");
 
+            var btcViewModel = CurrencyViewModelCreator.CreateViewModel(btc, subscribeToUpdates: false);
+            var ltcViewModel = CurrencyViewModelCreator.CreateViewModel(ltc, subscribeToUpdates: false);
+
+            var currencyViewModels = new List<CurrencyViewModel>
+            {
+                btcViewModel,
+                ltcViewModel
+            };
+
+            FromCurrencies = currencyViewModels;
+            ToCurrencies   = currencyViewModels;
+
             FromViewModel = new ConversionCurrencyViewModel
             {
-                CurrencyViewModel  = CurrencyViewModelCreator.CreateViewModel(btc, subscribeToUpdates: false),
+                CurrencyViewModel  = btcViewModel,
                 Address            = "bc1q...f3hr",
                 AmountString       = "0.00007881",
                 UnselectedLabel    = "Choose From",
@@ -947,7 +950,7 @@ namespace Atomex.Client.Desktop.ViewModels
 
             ToViewModel = new ConversionCurrencyViewModel
             {
-                CurrencyViewModel  = CurrencyViewModelCreator.CreateViewModel(ltc, subscribeToUpdates: false),
+                CurrencyViewModel  = ltcViewModel,
                 Address            = "ltc1...med6",
                 AmountString       = "558.55271303",
                 UnselectedLabel    = "Choose To",
@@ -959,11 +962,6 @@ namespace Atomex.Client.Desktop.ViewModels
             //FromValidationMessageToolTip = "Unknown super mega error description";
             //FromValidationMessageType = MessageType.Warning;
 
-            var currencyViewModels = new List<CurrencyViewModel>
-            {
-                CurrencyViewModelCreator.CreateViewModel(btc, subscribeToUpdates: false),
-                CurrencyViewModelCreator.CreateViewModel(ltc, subscribeToUpdates: false)
-            };
 
             BaseCurrencyCode = "ETH";
             QuoteCurrencyCode = "BTC";
@@ -974,14 +972,6 @@ namespace Atomex.Client.Desktop.ViewModels
             //    "Error line Error line Error line Error line Error line Error line Error line";
             //ValidationMessageToolTip = "Unknown super mega error description";
             //ValidationMessageType = MessageType.Error;
-
-
-
-
-            FromCurrencies = currencyViewModels;
-            FromCurrencyViewModel = currencyViewModels.First(c => c.Currency.Name == btc.Name);
-            ToCurrencies = currencyViewModels;
-            ToCurrencyViewModel = currencyViewModels.First(c => c.Currency.Name == ltc.Name);
 
             var swapViewModels = new List<SwapViewModel>()
             {
@@ -1041,7 +1031,7 @@ namespace Atomex.Client.Desktop.ViewModels
             Warning = string.Format(
                 CultureInfo.CurrentCulture,
                 Resources.CvInsufficientChainFunds,
-                FromCurrencyViewModel.Currency.FeeCurrencyName);
+                FromViewModel.CurrencyViewModel.Currency.FeeCurrencyName);
 
             IsAmountValid = true;
             CanConvert = true;
