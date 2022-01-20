@@ -29,9 +29,10 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         [Reactive] public bool ConfirmStage { get; set; }
         [Reactive] public CurrencyViewModel CurrencyViewModel { get; set; }
         [Reactive] public string From { get; set; }
-        [Reactive] public decimal SelectedFromAmount { get; set; }
+        [Reactive] public decimal SelectedFromBalance { get; set; }
         [Reactive] public string To { get; set; }
         [Reactive] protected decimal Amount { get; set; }
+        [ObservableAsProperty] public string FromBeautified { get; }
         [ObservableAsProperty] public string AmountString { get; }
         [ObservableAsProperty] public string TotalAmountString { get; }
 
@@ -242,6 +243,11 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 )
                 .Select(_ => Unit.Default)
                 .InvokeCommand(updateAmountCommand);
+
+            this.WhenAnyValue(vm => vm.From)
+                .WhereNotNull()
+                .Select(GetShortenedAddress)
+                .ToPropertyEx(this, vm => vm.FromBeautified);
 
             this.WhenAnyValue(vm => vm.Amount)
                 .Select(amount => amount.ToString(CurrencyFormat, CultureInfo.InvariantCulture))

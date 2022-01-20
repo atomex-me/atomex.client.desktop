@@ -20,7 +20,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
     public class SelectAddressViewModel : ViewModelBase
     {
         public Action BackAction { get; set; }
-        public Action<string> ConfirmAction { get; set; }
+        public Action<string, decimal> ConfirmAction { get; set; }
         public bool UseToSelectFrom { get; set; }
         private ObservableCollection<WalletAddressViewModel> InitialMyAddresses { get; set; }
         [Reactive] public ObservableCollection<WalletAddressViewModel> MyAddresses { get; set; }
@@ -151,8 +151,12 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 var selectedAddress = SelectedAddress == null
                     ? SearchPattern
                     : SelectedAddress.WalletAddress.Address;
+                
+                var balance = SelectedAddress == null
+                    ? 0m
+                    : SelectedAddress.WalletAddress.AvailableBalance();
 
-                ConfirmAction?.Invoke(selectedAddress);
+                ConfirmAction?.Invoke(selectedAddress, balance);
             }));
 
         private ICommand _copyAddressCommand;

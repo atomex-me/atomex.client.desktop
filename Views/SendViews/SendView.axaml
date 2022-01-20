@@ -76,74 +76,9 @@
                     Margin="-24 0 -24 0"
                     Background="{DynamicResource LightDefaultOpacity10}" />
 
-            <StackPanel Orientation="Horizontal"
-                        HorizontalAlignment="Center"
-                        Margin="0 32 0 0">
-                <Border Width="50"
-                        Margin="-50 0 0 0">
-                    <TextBlock Text="From"
-                               Margin="0 0 12 0"
-                               Foreground="{DynamicResource SecondaryForegroundBrush}"
-                               FontFamily="{DynamicResource DefaultMediumFontFamily}"
-                               FontSize="13"
-                               VerticalAlignment="Center"
-                               HorizontalAlignment="Right" />
-                </Border>
-
-                <Border Background="{DynamicResource LightDefaultOpacity6}"
-                        CornerRadius="6"
-                        Width="440"
-                        Height="80"
-                        VerticalAlignment="Center">
-                    <Button Padding="20 0"
-                            Width="440"
-                            Height="80"
-                            Command="{Binding SelectFromCommand}"
-                            IsEnabled="{Binding !ConfirmStage}"
-                            VerticalContentAlignment="Center"
-                            Classes="EmptyBtnWithContent">
-                        <Grid ColumnDefinitions="24,*">
-                            <Image Width="36"
-                                   Height="36"
-                                   Source="{Binding CurrencyViewModel.LargeIconPath}"
-                                   UseLayoutRounding="True"
-                                   Grid.Row="0"
-                                   Grid.Column="0" />
-
-                            <TextBlock Grid.Column="1"
-                                       FontFamily="{DynamicResource DefaultMediumFontFamily}"
-                                       Text="{Binding From}"
-                                       FontSize="16"
-                                       LineHeight="24"
-                                       Margin="17 0 0 0"
-                                       VerticalAlignment="Center"
-                                       Name="FromTextBox">
-                                <i:Interaction.Behaviors>
-                                    <ia:DataTriggerBehavior
-                                        Binding="{Binding From, Converter={StaticResource StringNotEmptyConverter}}"
-                                        ComparisonCondition="Equal"
-                                        Value="False">
-                                        <ia:ChangePropertyAction TargetObject="{Binding #FromTextBox}"
-                                                                 PropertyName="Text"
-                                                                 Value="Select source address..." />
-                                        <ia:ChangePropertyAction TargetObject="{Binding #FromTextBox}"
-                                                                 PropertyName="Foreground"
-                                                                 Value="{StaticResource SecondaryForegroundBrush}" />
-                                    </ia:DataTriggerBehavior>
-                                    <ia:DataTriggerBehavior
-                                        Binding="{Binding From, Converter={StaticResource StringNotEmptyConverter}}"
-                                        ComparisonCondition="Equal"
-                                        Value="True">
-                                        <ia:ChangePropertyAction TargetObject="{Binding #FromTextBox}"
-                                                                 PropertyName="Foreground"
-                                                                 Value="{StaticResource DefaultForegroundBrush}" />
-                                    </ia:DataTriggerBehavior>
-                                </i:Interaction.Behaviors>
-                            </TextBlock>
-                        </Grid>
-                    </Button>
-                </Border>
-            </StackPanel>
+            <ContentControl Content="{Binding}"
+                            ContentTemplate="{StaticResource CurrencySendItemTemplate}"
+                            Margin="0 32 0 0" />
 
             <StackPanel Orientation="Horizontal"
                         HorizontalAlignment="Center"
@@ -427,7 +362,7 @@
                         </TextBlock.Text>
                     </TextBlock>
                 </Grid>
-                
+
                 <Border Height="1"
                         Margin="0 18 0 18"
                         Background="{DynamicResource LightDefaultOpacity10}" />

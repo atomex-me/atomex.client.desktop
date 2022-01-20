@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Atomex.Blockchain.Abstract;
@@ -15,7 +16,6 @@ using Avalonia.Controls;
 using NBitcoin;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
-using Serilog;
 using Network = NBitcoin.Network;
 
 namespace Atomex.Client.Desktop.ViewModels.SendViewModels
@@ -23,7 +23,6 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
     public class BitcoinBasedSendViewModel : SendViewModel
     {
         [Reactive] private ObservableCollection<BitcoinBasedTxOutput> Outputs { get; set; }
-
         [Reactive] public decimal FeeRate { get; set; }
 
         public string FeeRateFormat => "0.#";
@@ -48,6 +47,13 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         {
             this.WhenAnyValue(vm => vm.Outputs)
                 .WhereNotNull()
+                .Select(outputs => outputs.Count != 1
+                    ? $"{outputs.Count} outputs"
+                    : GetShortenedAddress(outputs.ElementAt(0).DestinationAddress(Config.Network)))
+                .ToPropertyEx(this, vm => vm.FromBeautified);
+
+            this.WhenAnyValue(vm => vm.Outputs)
+                .WhereNotNull()
                 .Subscribe(outputs =>
                 {
                     From = outputs.Count != 1
@@ -57,9 +63,9 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     var totalOutputsSatoshi = outputs
                         .Aggregate((long)0, (sum, output) => sum + output.Value);
 
-                    SelectedFromAmount = Config.SatoshiToCoin(totalOutputsSatoshi);
+                    SelectedFromBalance = Config.SatoshiToCoin(totalOutputsSatoshi);
                 });
-            
+
             var outputs = Account.GetAvailableOutputsAsync()
                 .WaitForResult()
                 .Select(output => (BitcoinBasedTxOutput)output);
@@ -76,11 +82,11 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 },
                 Config = Config,
             };
-            
+
             SelectToViewModel = new SelectAddressViewModel(App.Account, Currency)
             {
                 BackAction = () => { Desktop.App.DialogService.Show(SelectFromViewModel); },
-                ConfirmAction = address =>
+                ConfirmAction = (address, _) =>
                 {
                     To = address;
                     Desktop.App.DialogService.Show(this);
@@ -91,20 +97,20 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         protected override void FromClick()
         {
             var selectOutputsViewModel = SelectFromViewModel as SelectOutputsViewModel;
-            
+
             selectOutputsViewModel!.ConfirmAction = ots =>
             {
                 Outputs = new ObservableCollection<BitcoinBasedTxOutput>(ots);
                 Desktop.App.DialogService.Show(this);
             };
-            
+
             Desktop.App.DialogService.Show(selectOutputsViewModel);
         }
 
         protected override void ToClick()
         {
             SelectToViewModel.BackAction = () => Desktop.App.DialogService.Show(this);
-            
+
             Desktop.App.DialogService.Show(SelectToViewModel);
         }
 

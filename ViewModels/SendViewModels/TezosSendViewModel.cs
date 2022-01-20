@@ -24,9 +24,10 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             SelectFromViewModel = new SelectAddressViewModel(App.Account, Currency, true)
             {
                 BackAction = () => { Desktop.App.DialogService.Show(this); },
-                ConfirmAction = address =>
+                ConfirmAction = (address, balance) =>
                 {
                     From = address;
+                    SelectedFromBalance = balance;
                     Desktop.App.DialogService.Show(SelectToViewModel);
                 }
             };
@@ -34,7 +35,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             SelectToViewModel = new SelectAddressViewModel(App.Account, Currency)
             {
                 BackAction = () => { Desktop.App.DialogService.Show(SelectFromViewModel); },
-                ConfirmAction = address =>
+                ConfirmAction = (address, _) =>
                 {
                     To = address;
                     Desktop.App.DialogService.Show(this);
@@ -46,9 +47,10 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         {
             var selectFromViewModel = SelectFromViewModel as SelectAddressViewModel;
             
-            selectFromViewModel!.ConfirmAction = address =>
+            selectFromViewModel!.ConfirmAction = (address, balance) =>
             {
                 From = address;
+                SelectedFromBalance = balance;
                 Desktop.App.DialogService.Show(this);
             };
             

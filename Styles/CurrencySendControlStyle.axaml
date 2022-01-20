@@ -61,7 +61,7 @@
                                    Grid.Row="0"
                                    Grid.Column="0" />
 
-                            <TextBlock Text="{Binding From}"
+                            <TextBlock Text="{Binding FromBeautified}"
                                        FontFamily="{DynamicResource DefaultMediumFontFamily}"
                                        FontSize="16"
                                        LineHeight="24"
@@ -81,7 +81,7 @@
                                            VerticalAlignment="Center">
                                     <TextBlock.Text>
                                         <MultiBinding Converter="{StaticResource AmountToStringConverter}">
-                                            <Binding Path="SelectedFromAmount" Mode="OneWay" />
+                                            <Binding Path="SelectedFromBalance" Mode="OneWay" />
                                             <Binding Path="CurrencyFormat" Mode="OneWay" />
                                         </MultiBinding>
                                     </TextBlock.Text>
