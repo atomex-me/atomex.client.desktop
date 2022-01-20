@@ -188,11 +188,10 @@ namespace Atomex.Client.Desktop.ViewModels
                 {
                     var selectCurrencyViewModel = new SelectCurrencyViewModel(
                         account: _app.Account,
-                        title: "Send from")
+                        title: "Send from",
+                        currencies: await CreateFromCurrencyViewModelItemsAsync(FromCurrencies),
+                        selected: FromCurrencyViewModelItem)
                     {
-                        Currencies = new ObservableCollection<SelectCurrencyViewModelItem>(
-                            await CreateFromCurrencyViewModelItemsAsync(FromCurrencies)),
-
                         CurrencySelected = i =>
                         {
                             FromCurrencyViewModelItem = i;
@@ -216,11 +215,10 @@ namespace Atomex.Client.Desktop.ViewModels
                 {
                     var selectCurrencyViewModel = new SelectCurrencyViewModel(
                         account: _app.Account,
-                        title: "Receive to")
+                        title: "Receive to",
+                        currencies: await CreateFromCurrencyViewModelItemsAsync(ToCurrencies),
+                        selected: ToCurrencyViewModelItem)
                     {
-                        Currencies = new ObservableCollection<SelectCurrencyViewModelItem>(
-                            await CreateFromCurrencyViewModelItemsAsync(ToCurrencies)),
-
                         CurrencySelected = i =>
                         {
                             ToCurrencyViewModelItem = i;

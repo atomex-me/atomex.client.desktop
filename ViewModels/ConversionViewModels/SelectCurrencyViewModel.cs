@@ -67,6 +67,29 @@ namespace Atomex.Client.Desktop.ViewModels.ConversionViewModels
             AvailableOutputs = availableOutputs ?? throw new ArgumentNullException(nameof(availableOutputs));
             SelectedOutputs = selectedOutputs ?? availableOutputs;
         }
+
+        public void TryInitializeFromItem(SelectCurrencyViewModelItem source)
+        {
+            if (source is not SelectCurrencyWithOutputsViewModelItem sourceWithOutputs)
+                return;
+
+            var selectedOutputs = new List<BitcoinBasedTxOutput>();
+
+            foreach (var output in sourceWithOutputs.SelectedOutputs)
+            {
+                var selectedOutput = AvailableOutputs.FirstOrDefault(o => o.TxId == output.TxId && o.Index == output.Index && o.Value == output.Value);
+
+                if (selectedOutput == null)
+                {
+                    selectedOutputs.Clear();
+                    return;
+                }
+
+                selectedOutputs.Add(selectedOutput);
+            }
+
+            SelectedOutputs = selectedOutputs;
+        }
     }
 
     public class SelectCurrencyWithAddressViewModelItem : SelectCurrencyViewModelItem
@@ -101,6 +124,17 @@ namespace Atomex.Client.Desktop.ViewModels.ConversionViewModels
 
             AvailableAddresses = availableAddresses ?? throw new ArgumentNullException(nameof(availableAddresses));
             SelectedAddress = selectedAddress ?? availableAddresses.MaxBy(w => w.Balance);
+        }
+
+        public void TryInitializeFromItem(SelectCurrencyViewModelItem source)
+        {
+            if (source is not SelectCurrencyWithAddressViewModelItem sourceWithAddress)
+                return;
+
+            var address = AvailableAddresses.FirstOrDefault(a => a.Address == sourceWithAddress.Address);
+
+            if (address != null)
+                SelectedAddress = address;
         }
     }
 
@@ -149,11 +183,33 @@ namespace Atomex.Client.Desktop.ViewModels.ConversionViewModels
 
         private readonly IAccount _account;
 
-        public SelectCurrencyViewModel(IAccount account, string title)
+        public SelectCurrencyViewModel(
+            IAccount account,
+            string title,
+            IEnumerable<SelectCurrencyViewModelItem> currencies,
+            SelectCurrencyViewModelItem selected = null)
         {
             _account = account ?? throw new ArgumentNullException(nameof(account));
 
             Title = title ?? throw new ArgumentNullException(nameof(title));
+            Currencies = new ObservableCollection<SelectCurrencyViewModelItem>(currencies);
+            
+            if (selected != null)
+            {
+                var selectedCurrencyViewItem = Currencies
+                    .FirstOrDefault(c => c.CurrencyViewModel.Currency.Name == selected.CurrencyViewModel.Currency.Name);
+
+                if (selectedCurrencyViewItem is SelectCurrencyWithOutputsViewModelItem selectedCurrencyWithOutputs)
+                {
+                    selectedCurrencyWithOutputs.TryInitializeFromItem(selected);
+                }
+                else if (selectedCurrencyViewItem is SelectCurrencyWithAddressViewModelItem selectedCurrencyWithAddress)
+                {
+                    selectedCurrencyWithAddress.TryInitializeFromItem(selected);
+                }
+
+                SelectedCurrency = selectedCurrencyViewItem;
+            }
 
             this.WhenAnyValue(vm => vm.SelectedCurrency)
                 .WhereNotNull()
