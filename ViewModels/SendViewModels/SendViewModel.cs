@@ -239,7 +239,8 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
             this.WhenAnyValue(
                     vm => vm.Amount,
-                    vm => vm.From
+                    vm => vm.From,
+                    vm => vm.To
                 )
                 .Select(_ => Unit.Default)
                 .InvokeCommand(updateAmountCommand);

@@ -31,7 +31,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     Desktop.App.DialogService.Show(SelectToViewModel);
                 }
             };
-            
+
             SelectToViewModel = new SelectAddressViewModel(App.Account, Currency)
             {
                 BackAction = () => { Desktop.App.DialogService.Show(SelectFromViewModel); },
@@ -42,25 +42,26 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 }
             };
         }
-        
+
         protected override void FromClick()
         {
             var selectFromViewModel = SelectFromViewModel as SelectAddressViewModel;
-            
+
             selectFromViewModel!.ConfirmAction = (address, balance) =>
             {
                 From = address;
                 SelectedFromBalance = balance;
+
                 Desktop.App.DialogService.Show(this);
             };
-            
+
             Desktop.App.DialogService.Show(selectFromViewModel);
         }
 
         protected override void ToClick()
         {
             SelectToViewModel.BackAction = () => Desktop.App.DialogService.Show(this);
-            
+
             Desktop.App.DialogService.Show(SelectToViewModel);
         }
 

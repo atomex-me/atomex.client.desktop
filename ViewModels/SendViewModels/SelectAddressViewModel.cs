@@ -113,7 +113,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                             : myAddresses.OrderByDescending(addressViewModel => addressViewModel.AvailableBalance));
                     }
                 });
-            
+
             UseToSelectFrom = useToSelectFrom;
 
             MyAddresses = new ObservableCollection<WalletAddressViewModel>(
@@ -123,7 +123,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                         currency: currency)
                     .WaitForResult()
                     .Where(address => !useToSelectFrom || !address.IsFreeAddress)
-                );
+            );
             InitialMyAddresses = new ObservableCollection<WalletAddressViewModel>(MyAddresses);
         }
 
@@ -151,7 +151,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 var selectedAddress = SelectedAddress == null
                     ? SearchPattern
                     : SelectedAddress.WalletAddress.Address;
-                
+
                 var balance = SelectedAddress == null
                     ? 0m
                     : SelectedAddress.WalletAddress.AvailableBalance();
