@@ -4,9 +4,9 @@ using Avalonia.Markup.Xaml;
 
 namespace Atomex.Client.Desktop.Views.SendViews
 {
-    public class SelectToView : UserControl
+    public class SelectAddressView : UserControl
     {
-        public SelectToView()
+        public SelectAddressView()
         {
             InitializeComponent();
         }

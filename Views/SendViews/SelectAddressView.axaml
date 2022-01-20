@@ -3,7 +3,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d" d:DesignWidth="700" d:DesignHeight="450"
-             x:Class="Atomex.Client.Desktop.Views.SendViews.SelectToView"
+             x:Class="Atomex.Client.Desktop.Views.SendViews.SelectAddressView"
              xmlns:vm="clr-namespace:Atomex.Client.Desktop.ViewModels.SendViewModels"
              xmlns:svg="clr-namespace:Avalonia.Svg.Skia;assembly=Avalonia.Svg.Skia"
              xmlns:controls="clr-namespace:Atomex.Client.Desktop.Controls"
@@ -11,7 +11,7 @@
              xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
              xmlns:ia="clr-namespace:Avalonia.Xaml.Interactions.Core;assembly=Avalonia.Xaml.Interactions">
     <Design.DataContext>
-        <vm:SelectToViewModel />
+        <vm:SelectAddressViewModel />
     </Design.DataContext>
 
     <UserControl.Resources>
@@ -43,8 +43,24 @@
                            FontWeight="400"
                            Margin="-28 0 0 0"
                            HorizontalAlignment="Center"
-                           Foreground="{DynamicResource LightDefault}">
-                    Receive to
+                           Foreground="{DynamicResource LightDefault}"
+                           Name="Title">
+                    <i:Interaction.Behaviors>
+                        <ia:DataTriggerBehavior Binding="{Binding UseToSelectFrom}"
+                                                ComparisonCondition="Equal"
+                                                Value="True">
+                            <ia:ChangePropertyAction TargetObject="{Binding #Title}"
+                                                     PropertyName="Text"
+                                                     Value="Send from" />
+                        </ia:DataTriggerBehavior>
+                        <ia:DataTriggerBehavior Binding="{Binding UseToSelectFrom}"
+                                                ComparisonCondition="NotEqual"
+                                                Value="True">
+                            <ia:ChangePropertyAction TargetObject="{Binding #Title}"
+                                                     PropertyName="Text"
+                                                     Value="Receive to" />
+                        </ia:DataTriggerBehavior>
+                    </i:Interaction.Behaviors>
                 </TextBlock>
             </Grid>
 

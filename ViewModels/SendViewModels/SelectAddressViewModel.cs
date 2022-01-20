@@ -17,11 +17,11 @@ using Serilog;
 
 namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 {
-    public class SelectToViewModel : ViewModelBase
+    public class SelectAddressViewModel : ViewModelBase
     {
         public Action BackAction { get; set; }
         public Action<string> ConfirmAction { get; set; }
-
+        public bool UseToSelectFrom { get; set; }
         private ObservableCollection<WalletAddressViewModel> InitialMyAddresses { get; set; }
         [Reactive] public ObservableCollection<WalletAddressViewModel> MyAddresses { get; set; }
         [Reactive] public string SearchPattern { get; set; }
@@ -29,7 +29,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         [Reactive] private bool SortByDate { get; set; }
         [Reactive] public WalletAddressViewModel? SelectedAddress { get; set; }
 
-        public SelectToViewModel()
+        public SelectAddressViewModel()
         {
 #if DEBUG
             if (Design.IsDesignMode)
@@ -37,7 +37,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 #endif
         }
 
-        public SelectToViewModel(IAccount account, CurrencyConfig currency)
+        public SelectAddressViewModel(IAccount account, CurrencyConfig currency, bool useToSelectFrom = false)
         {
             this.WhenAnyValue(
                     vm => vm.SortByDate,
@@ -113,13 +113,17 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                             : myAddresses.OrderByDescending(addressViewModel => addressViewModel.AvailableBalance));
                     }
                 });
+            
+            UseToSelectFrom = useToSelectFrom;
 
             MyAddresses = new ObservableCollection<WalletAddressViewModel>(
                 AddressesHelper
                     .GetReceivingAddressesAsync(
                         account: account,
                         currency: currency)
-                    .WaitForResult());
+                    .WaitForResult()
+                    .Where(address => !useToSelectFrom || !address.IsFreeAddress)
+                );
             InitialMyAddresses = new ObservableCollection<WalletAddressViewModel>(MyAddresses);
         }
 

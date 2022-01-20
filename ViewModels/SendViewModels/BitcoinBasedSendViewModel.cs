@@ -58,9 +58,6 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                         .Aggregate((long)0, (sum, output) => sum + output.Value);
 
                     SelectedFromAmount = Config.SatoshiToCoin(totalOutputsSatoshi);
-
-                    Warning = string.Empty;
-                    _ = UpdateAmount(Amount);
                 });
             
             var outputs = Account.GetAvailableOutputsAsync()
@@ -80,7 +77,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 Config = Config,
             };
             
-            SelectToViewModel = new SelectToViewModel(App.Account, Currency)
+            SelectToViewModel = new SelectAddressViewModel(App.Account, Currency)
             {
                 BackAction = () => { Desktop.App.DialogService.Show(SelectFromViewModel); },
                 ConfirmAction = address =>
@@ -111,7 +108,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             Desktop.App.DialogService.Show(SelectToViewModel);
         }
 
-        protected override async Task UpdateAmount(decimal amount)
+        protected override async Task UpdateAmount()
         {
             try
             {
@@ -167,7 +164,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             }
         }
 
-        protected override async Task UpdateFee(decimal fee)
+        protected override async Task UpdateFee()
         {
             try
             {
@@ -206,9 +203,6 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             {
                 if (UseDefaultFee)
                 {
-                    if (App.Account.GetCurrencyAccount(Currency.Name) is not IEstimatable account)
-                        return; // todo: error?
-
                     if (Outputs.Count == 0)
                     {
                         Warning = Resources.CvInsufficientFunds;
@@ -218,7 +212,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
                     FeeRate = await Config.GetFeeRateAsync();
 
-                    var maxAmountEstimation = await account.EstimateMaxAmountToSendAsync(
+                    var maxAmountEstimation = await Account.EstimateMaxAmountToSendAsync(
                         from: new FromOutputs(Outputs),
                         to: To,
                         type: BlockchainTransactionType.Output,

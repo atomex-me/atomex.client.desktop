@@ -24,7 +24,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         protected IAtomexApp App { get; }
         protected CurrencyConfig Currency { get; set; }
         public ViewModelBase SelectFromViewModel { get; set; }
-        protected SelectToViewModel SelectToViewModel { get; set; }
+        protected SelectAddressViewModel SelectToViewModel { get; set; }
 
         [Reactive] public bool ConfirmStage { get; set; }
         [Reactive] public CurrencyViewModel CurrencyViewModel { get; set; }
@@ -217,10 +217,11 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             CurrencyViewModel = CurrencyViewModelCreator.CreateViewModel(currency);
             UseDefaultFee = true;
 
-            var updateAmountCommand = ReactiveCommand.CreateFromTask<decimal>(UpdateAmount);
-            var updateFeeCommand = ReactiveCommand.CreateFromTask<decimal>(UpdateFee);
+            var updateAmountCommand = ReactiveCommand.CreateFromTask(UpdateAmount);
+            var updateFeeCommand = ReactiveCommand.CreateFromTask(UpdateFee);
 
             this.WhenAnyValue(
+                    vm => vm.From,
                     vm => vm.To,
                     vm => vm.Amount,
                     vm => vm.Fee
@@ -235,7 +236,11 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 .Select(totalAmount => totalAmount.ToString(CurrencyFormat, CultureInfo.InvariantCulture))
                 .ToPropertyEx(this, vm => vm.TotalAmountString);
 
-            this.WhenAnyValue(vm => vm.Amount)
+            this.WhenAnyValue(
+                    vm => vm.Amount,
+                    vm => vm.From
+                )
+                .Select(_ => Unit.Default)
                 .InvokeCommand(updateAmountCommand);
 
             this.WhenAnyValue(vm => vm.Amount)
@@ -243,6 +248,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 .ToPropertyEx(this, vm => vm.AmountString);
 
             this.WhenAnyValue(vm => vm.Fee)
+                .Select(_ => Unit.Default)
                 .InvokeCommand(updateFeeCommand);
 
             this.WhenAnyValue(vm => vm.Fee)
@@ -251,7 +257,8 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
             this.WhenAnyValue(vm => vm.UseDefaultFee)
                 .Where(useDefaultFee => useDefaultFee)
-                .Subscribe(_ => updateAmountCommand.Execute(Amount));
+                .Select(_ => Unit.Default)
+                .InvokeCommand(updateAmountCommand);
 
             SubscribeToServices();
         }
@@ -262,8 +269,8 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 App.QuotesProvider.QuotesUpdated += OnQuotesUpdatedEventHandler;
         }
 
-        protected abstract Task UpdateAmount(decimal amount);
-        protected abstract Task UpdateFee(decimal fee);
+        protected abstract Task UpdateAmount();
+        protected abstract Task UpdateFee();
 
         private ReactiveCommand<Unit, Unit> _maxCommand;
 
