@@ -67,14 +67,14 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             this.WhenAnyValue(vm => vm.Outputs)
                 .WhereNotNull()
                 .Take(1)
-                .Subscribe(async outputViewModel =>
+                .Subscribe(async outputViewModels =>
                 {
                     var addresses = (await Account
                             .GetAddressesAsync())
-                        .Where(address => outputViewModel.FirstOrDefault(o => o.Address == address.Address) != null)
+                        .Where(address => outputViewModels.FirstOrDefault(o => o.Address == address.Address) != null)
                         .ToList();
 
-                    var outputsWithAddresses = outputViewModel.Select((output, index) =>
+                    var outputsWithAddresses = outputViewModels.Select((output, index) =>
                     {
                         var address = addresses.FirstOrDefault(a => a.Address == output.Address);
                         output.WalletAddress = address ?? null;
@@ -99,13 +99,13 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
                     if (Outputs == null) return;
 
-                    var outputsViewModels = new ObservableCollection<OutputViewModel>(
-                        InitialOutputs
+                    var outputViewModels = new ObservableCollection<OutputViewModel>(
+                        InitialOutputs!
                             .Where(output => output.Address.ToLower().Contains(item3?.ToLower() ?? string.Empty)));
 
                     if (item1)
                     {
-                        var outputsList = outputsViewModels.ToList();
+                        var outputsList = outputViewModels.ToList();
                         if (item2)
                         {
                             outputsList.Sort((a1, a2) =>
@@ -158,8 +158,8 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     else
                     {
                         Outputs = new ObservableCollection<OutputViewModel>(item2
-                            ? outputsViewModels.OrderBy(output => output.BalanceString)
-                            : outputsViewModels.OrderByDescending(output => output.BalanceString));
+                            ? outputViewModels.OrderBy(output => output.BalanceString)
+                            : outputViewModels.OrderByDescending(output => output.BalanceString));
                     }
                 });
 
@@ -310,7 +310,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         [Reactive] public string CopyButtonToolTip { get; set; }
         public BitcoinBasedTxOutput Output { get; set; }
         public BitcoinBasedConfig Config { get; set; }
-        public WalletAddress WalletAddress { get; set; }
+        public WalletAddress? WalletAddress { get; set; }
         public decimal Balance => Config.SatoshiToCoin(Output.Value);
         public string BalanceString => $"{Balance.ToString(Config.Format, CultureInfo.InvariantCulture)} {Config.Name}";
         public string Address => Output.DestinationAddress(Config.Network);

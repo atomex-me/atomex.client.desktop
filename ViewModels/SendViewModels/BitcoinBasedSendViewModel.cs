@@ -7,7 +7,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Atomex.Blockchain.Abstract;
 using Atomex.Blockchain.BitcoinBased;
-using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.Properties;
 using Atomex.Common;
 using Atomex.Core;
