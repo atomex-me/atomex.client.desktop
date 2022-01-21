@@ -14,7 +14,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             {
                 BitcoinBasedConfig _ => new BitcoinBasedSendViewModel(app, currency),
                 // Erc20Config _        => new Erc20SendViewModel(app, currency),
-                // EthereumConfig _     => new EthereumSendViewModel(app, currency),
+                EthereumConfig _     => new EthereumSendViewModel(app, currency),
                 // // Fa2Config _          => new FA2SendViewModel(app, currency),
                 // Fa12Config _         => new Fa12SendViewModel(app, currency),
                 TezosConfig _        => new TezosSendViewModel(app, currency),

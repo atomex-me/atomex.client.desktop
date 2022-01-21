@@ -126,7 +126,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         public ReactiveCommand<Unit, Unit> NextCommand =>
             _nextCommand ??= (_nextCommand = ReactiveCommand.CreateFromTask(OnNextCommand));
 
-        private async Task OnNextCommand()
+        protected virtual async Task OnNextCommand()
         {
             if (string.IsNullOrEmpty(To))
             {
@@ -290,7 +290,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
         protected abstract Task OnMaxClick();
 
-        protected void OnQuotesUpdatedEventHandler(object sender, EventArgs args)
+        protected virtual void OnQuotesUpdatedEventHandler(object sender, EventArgs args)
         {
             if (sender is not ICurrencyQuotesProvider quotesProvider)
                 return;
