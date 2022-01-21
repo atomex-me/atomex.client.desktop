@@ -59,8 +59,8 @@
 
       <!-- From currency view -->
       <views:ConversionCurrencyView Width="486"
-                                   Height="102"
-                                   DataContext="{Binding FromViewModel}"/>
+                                    Height="102"
+                                    DataContext="{Binding FromViewModel}"/>
 
       <!-- Warning and swap currencies button view -->
       <Grid Width="486">

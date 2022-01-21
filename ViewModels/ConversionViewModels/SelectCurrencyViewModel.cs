@@ -144,14 +144,14 @@ namespace Atomex.Client.Desktop.ViewModels.ConversionViewModels
 
         [Reactive] public ObservableCollection<SelectCurrencyViewModelItem> Currencies { get; set; }
         [Reactive] public SelectCurrencyViewModelItem SelectedCurrency { get; set; }
-        [Reactive] public string Title { get; set; }
+        [Reactive] public SelectCurrencyType Type { get; set; }
 
         private ICommand _changeAddressesCommand;
         public ICommand ChangeAddressesCommand => _changeAddressesCommand ??= ReactiveCommand.Create<SelectCurrencyViewModelItem>(async i =>
         {
             var currency = i.CurrencyViewModel.Currency;
 
-            if (i is SelectCurrencyWithOutputsViewModelItem item)
+            if (i is SelectCurrencyWithOutputsViewModelItem itemWithOutputs && Type == SelectCurrencyType.From)
             {
                 var bitcoinBasedAccount = _account
                     .GetCurrencyAccount<BitcoinBasedAccount>(currency.Name);
@@ -165,7 +165,7 @@ namespace Atomex.Client.Desktop.ViewModels.ConversionViewModels
                     {
                         Output = o,
                         Config = (BitcoinBasedConfig)currency,
-                        IsSelected = item?.SelectedOutputs?.Any(so => so.TxId == o.TxId && so.Index == o.Index) ?? true
+                        IsSelected = itemWithOutputs?.SelectedOutputs?.Any(so => so.TxId == o.TxId && so.Index == o.Index) ?? true
                     }),
                     config: (BitcoinBasedConfig)currency,
                     account: bitcoinBasedAccount)
@@ -173,16 +173,29 @@ namespace Atomex.Client.Desktop.ViewModels.ConversionViewModels
                     BackAction = () => { App.DialogService.Show(this); },
                     ConfirmAction = ots =>
                     {
-                        item.SelectedOutputs = ots;
+                        itemWithOutputs.SelectedOutputs = ots;
                         CurrencySelected?.Invoke(i);
                     }
                 };
                 
                 App.DialogService.Show(selectOutputsViewModel);
             }
-            else
+            else if (i is SelectCurrencyWithAddressViewModelItem itemWithAddress)
             {
-                // todo: show select address menu
+                var selectAddressViewModel = new SelectAddressViewModel(
+                    account: _account,
+                    currency: currency,
+                    useToSelectFrom: Type == SelectCurrencyType.From)
+                {
+                    BackAction = () => { App.DialogService.Show(this); },
+                    ConfirmAction = (address, balance) =>
+                    {
+                        itemWithAddress.SelectedAddress = itemWithAddress.AvailableAddresses.FirstOrDefault(a => a.Address == address);
+                        CurrencySelected?.Invoke(i);
+                    }
+                };
+
+                App.DialogService.Show(selectAddressViewModel);
             }
         });
 
@@ -190,13 +203,13 @@ namespace Atomex.Client.Desktop.ViewModels.ConversionViewModels
 
         public SelectCurrencyViewModel(
             IAccount account,
-            string title,
+            SelectCurrencyType type,
             IEnumerable<SelectCurrencyViewModelItem> currencies,
             SelectCurrencyViewModelItem selected = null)
         {
             _account = account ?? throw new ArgumentNullException(nameof(account));
 
-            Title = title ?? throw new ArgumentNullException(nameof(title));
+            Type = type;
             Currencies = new ObservableCollection<SelectCurrencyViewModelItem>(currencies);
             
             if (selected != null)
@@ -240,7 +253,7 @@ namespace Atomex.Client.Desktop.ViewModels.ConversionViewModels
 #if DEBUG
         public void DesignerMode()
         {
-            Title = "Send from";
+            Type = SelectCurrencyType.From;
 
             var currencies = DesignTime.Currencies
                 .Select<CurrencyConfig, SelectCurrencyViewModelItem>(c =>

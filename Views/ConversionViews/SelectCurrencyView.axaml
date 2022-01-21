@@ -5,7 +5,9 @@
              mc:Ignorable="d" d:DesignWidth="700" d:DesignHeight="570"
              x:Class="Atomex.Client.Desktop.Views.ConversionViews.SelectCurrencyView"
              xmlns:svg="clr-namespace:Avalonia.Svg.Skia;assembly=Avalonia.Svg.Skia"
-             xmlns:vm="clr-namespace:Atomex.Client.Desktop.ViewModels.ConversionViewModels">
+             xmlns:vm="clr-namespace:Atomex.Client.Desktop.ViewModels.ConversionViewModels"
+             xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
+             xmlns:ia="clr-namespace:Avalonia.Xaml.Interactions.Core;assembly=Avalonia.Xaml.Interactions">
   <Design.DataContext>
     <vm:SelectCurrencyViewModel/>
   </Design.DataContext>
@@ -14,14 +16,32 @@
           Width="700">
     <Grid RowDefinitions="72,*">
       <!-- title -->
-      <TextBlock FontSize="22"
+      <TextBlock Name="Title"
+                 FontSize="22"
                  FontFamily="{DynamicResource DefaultFontFamily}"
                  HorizontalAlignment="Center"
                  VerticalAlignment="Center"
                  Foreground="{DynamicResource LightDefault}"
                  Text="{Binding Title}"
                  Grid.Column="0"
-                 Grid.ColumnSpan="2"/>
+                 Grid.ColumnSpan="2">
+        <i:Interaction.Behaviors>
+          <ia:DataTriggerBehavior Binding="{Binding Type}"
+                                  ComparisonCondition="Equal"
+                                  Value="From">
+            <ia:ChangePropertyAction TargetObject="{Binding #Title}"
+                                     PropertyName="Text"
+                                     Value="Send from" />
+          </ia:DataTriggerBehavior>
+          <ia:DataTriggerBehavior Binding="{Binding Type}"
+                                  ComparisonCondition="Equal"
+                                  Value="To">
+            <ia:ChangePropertyAction TargetObject="{Binding #Title}"
+                                     PropertyName="Text"
+                                     Value="Receive to" />
+          </ia:DataTriggerBehavior>
+        </i:Interaction.Behaviors>
+      </TextBlock>
 
       <Border Height="1"
               Background="{DynamicResource LightDefaultOpacity10}"

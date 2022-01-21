@@ -188,7 +188,7 @@ namespace Atomex.Client.Desktop.ViewModels
                 {
                     var selectCurrencyViewModel = new SelectCurrencyViewModel(
                         account: _app.Account,
-                        title: "Send from",
+                        type: SelectCurrencyType.From,
                         currencies: await CreateFromCurrencyViewModelItemsAsync(FromCurrencies),
                         selected: FromCurrencyViewModelItem)
                     {
@@ -215,8 +215,8 @@ namespace Atomex.Client.Desktop.ViewModels
                 {
                     var selectCurrencyViewModel = new SelectCurrencyViewModel(
                         account: _app.Account,
-                        title: "Receive to",
-                        currencies: await CreateFromCurrencyViewModelItemsAsync(ToCurrencies),
+                        type: SelectCurrencyType.To,
+                        currencies: await CreateToCurrencyViewModelItemsAsync(ToCurrencies),
                         selected: ToCurrencyViewModelItem)
                     {
                         CurrencySelected = i =>
@@ -242,6 +242,23 @@ namespace Atomex.Client.Desktop.ViewModels
                     ToCurrencies = FromCurrencies
                         ?.Where(fc => Symbols.SymbolByCurrencies(fc.Currency, c.Currency) != null)
                         .ToList();
+                });
+
+            this.WhenAnyValue(vm => vm.ToCurrencies)
+                .Subscribe(c =>
+                {
+                    if (ToViewModel.CurrencyViewModel == null)
+                        return;
+
+                    var existsViewModel = ToCurrencies.FirstOrDefault(c => c.Currency.Name == ToViewModel.CurrencyViewModel.Currency.Name);
+
+                    if (existsViewModel == null)
+                    {
+                        ToCurrencyViewModelItem = null;
+                        ToViewModel.CurrencyViewModel = null;
+                        ToViewModel.Address = null;
+                        return;
+                    }
                 });
 
             // FromCurrencyViewModel currency changed => Update AmountString and AmountInBase if need
@@ -475,7 +492,7 @@ namespace Atomex.Client.Desktop.ViewModels
 
                 result.Add(new SelectCurrencyWithAddressViewModelItem(
                     currencyViewModel: currencyViewModel,
-                    type: SelectCurrencyType.From,
+                    type: SelectCurrencyType.To,
                     availableAddresses: receivingAddresses.Select(a => a.WalletAddress),
                     selectedAddress: selectedAddress));
             }
@@ -634,8 +651,7 @@ namespace Atomex.Client.Desktop.ViewModels
                 .Select(CurrencyViewModelCreator.CreateViewModel)
                 .ToList();
 
-            //FromViewModel.CurrencyViewModel = FromCurrencies.First(c => c.Currency.Name == "BTC");
-            //ToViewModel.CurrencyViewModel = ToCurrencies?.First(c => c.Currency.Name == "LTC");
+            ToCurrencies = FromCurrencies;
 
             OnSwapEventHandler(this, args: null);
         }
