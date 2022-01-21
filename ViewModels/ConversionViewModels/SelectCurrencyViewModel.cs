@@ -161,7 +161,12 @@ namespace Atomex.Client.Desktop.ViewModels.ConversionViewModels
                     .Cast<BitcoinBasedTxOutput>();
 
                 var selectOutputsViewModel = new SelectOutputsViewModel(
-                    outputs: outputs,
+                    outputs: outputs.Select(o => new OutputViewModel()
+                    {
+                        Output = o,
+                        Config = (BitcoinBasedConfig)currency,
+                        IsSelected = item?.SelectedOutputs?.Any(so => so.TxId == o.TxId && so.Index == o.Index) ?? true
+                    }),
                     config: (BitcoinBasedConfig)currency,
                     account: bitcoinBasedAccount)
                 {
@@ -172,7 +177,7 @@ namespace Atomex.Client.Desktop.ViewModels.ConversionViewModels
                         CurrencySelected?.Invoke(i);
                     }
                 };
-
+                
                 App.DialogService.Show(selectOutputsViewModel);
             }
             else

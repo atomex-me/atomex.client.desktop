@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Atomex.Blockchain.Abstract;
 using Atomex.Blockchain.BitcoinBased;
+using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.Properties;
 using Atomex.Common;
 using Atomex.Core;
@@ -72,7 +73,13 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
             Outputs = new ObservableCollection<BitcoinBasedTxOutput>(outputs);
 
-            SelectFromViewModel = new SelectOutputsViewModel(outputs, Config, Account)
+            SelectFromViewModel = new SelectOutputsViewModel(outputs
+                .Select(o => new OutputViewModel
+                {
+                    Output = o,
+                    Config = Config,
+                    IsSelected = true
+                }), Config, Account)
             {
                 BackAction = () => { Desktop.App.DialogService.Show(this); },
                 ConfirmAction = ots =>
@@ -96,15 +103,27 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
         protected override void FromClick()
         {
-            var selectOutputsViewModel = SelectFromViewModel as SelectOutputsViewModel;
+            var outputs = Account.GetAvailableOutputsAsync()
+                .WaitForResult()
+                .Select(o => new OutputViewModel()
+                {
+                    Output = (BitcoinBasedTxOutput)o,
+                    Config = Config,
+                    IsSelected = Outputs.Any(output => output.TxId == o.TxId && output.Index == o.Index)
+                });
 
-            selectOutputsViewModel!.ConfirmAction = ots =>
+            SelectFromViewModel = new SelectOutputsViewModel(outputs, Config, Account)
             {
-                Outputs = new ObservableCollection<BitcoinBasedTxOutput>(ots);
-                Desktop.App.DialogService.Show(this);
+                BackAction = () => { Desktop.App.DialogService.Show(this); },
+                ConfirmAction = ots =>
+                {
+                    Outputs = new ObservableCollection<BitcoinBasedTxOutput>(ots);
+                    Desktop.App.DialogService.Show(this);
+                },
+                Config = Config,
             };
 
-            Desktop.App.DialogService.Show(selectOutputsViewModel);
+            Desktop.App.DialogService.Show(SelectFromViewModel);
         }
 
         protected override void ToClick()
@@ -282,7 +301,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         protected override Task<Error> Send(CancellationToken cancellationToken = default)
         {
             return Account.SendAsync(
-                from: Outputs.ToList(),
+                from: Outputs,
                 to: To,
                 amount: Amount,
                 fee: Fee,

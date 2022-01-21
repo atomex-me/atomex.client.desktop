@@ -25,9 +25,9 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
     public class SelectOutputsViewModel : ViewModelBase
     {
         private BitcoinBasedAccount Account { get; }
+        public BitcoinBasedConfig Config { get; set; }
         public Action BackAction { get; set; }
         public Action<IEnumerable<BitcoinBasedTxOutput>> ConfirmAction { get; set; }
-        public BitcoinBasedConfig Config { get; set; }
         private ObservableCollection<OutputViewModel> InitialOutputs { get; set; }
 
         public SelectOutputsViewModel()
@@ -39,7 +39,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         }
 
         public SelectOutputsViewModel(
-            IEnumerable<BitcoinBasedTxOutput> outputs,
+            IEnumerable<OutputViewModel> outputs,
             BitcoinBasedConfig config,
             BitcoinBasedAccount account)
         {
@@ -50,6 +50,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             this.WhenAnyValue(vm => vm.SelectAll)
                 .Throttle(TimeSpan.FromMilliseconds(1))
                 .Where(_ => Outputs != null && !_checkedFromList)
+                .Skip(1)
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(selectAll =>
                 {
@@ -66,14 +67,14 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             this.WhenAnyValue(vm => vm.Outputs)
                 .WhereNotNull()
                 .Take(1)
-                .Subscribe(async outputs =>
+                .Subscribe(async outputViewModel =>
                 {
                     var addresses = (await Account
                             .GetAddressesAsync())
-                        .Where(address => outputs.FirstOrDefault(o => o.Address == address.Address) != null)
+                        .Where(address => outputViewModel.FirstOrDefault(o => o.Address == address.Address) != null)
                         .ToList();
 
-                    var outputsWithAddresses = outputs.Select((output, index) =>
+                    var outputsWithAddresses = outputViewModel.Select((output, index) =>
                     {
                         var address = addresses.FirstOrDefault(a => a.Address == output.Address);
                         output.WalletAddress = address ?? null;
@@ -95,16 +96,16 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 .Subscribe(value =>
                 {
                     var (item1, item2, item3) = value;
-                    
+
                     if (Outputs == null) return;
 
-                    var outputs = new ObservableCollection<OutputViewModel>(
+                    var outputsViewModels = new ObservableCollection<OutputViewModel>(
                         InitialOutputs
                             .Where(output => output.Address.ToLower().Contains(item3?.ToLower() ?? string.Empty)));
 
                     if (item1)
                     {
-                        var outputsList = outputs.ToList();
+                        var outputsList = outputsViewModels.ToList();
                         if (item2)
                         {
                             outputsList.Sort((a1, a2) =>
@@ -157,21 +158,16 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     else
                     {
                         Outputs = new ObservableCollection<OutputViewModel>(item2
-                            ? outputs.OrderBy(output => output.BalanceString)
-                            : outputs.OrderByDescending(output => output.BalanceString));
+                            ? outputsViewModels.OrderBy(output => output.BalanceString)
+                            : outputsViewModels.OrderByDescending(output => output.BalanceString));
                     }
                 });
 
             Account = account;
             Config = config;
-            Outputs = new ObservableCollection<OutputViewModel>(
-                outputs.Select(output => new OutputViewModel
-                {
-                    Output = output,
-                    Config = config
-                }));
+            Outputs = new ObservableCollection<OutputViewModel>(outputs);
 
-            SelectAll = true;
+            SelectAll = Outputs.Aggregate(true, (res, flag) => res && flag.IsSelected);
         }
 
         [Reactive] public ObservableCollection<OutputViewModel> Outputs { get; set; }
@@ -240,10 +236,14 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         private ReactiveCommand<Unit, Unit> _confirmCommand;
 
         public ReactiveCommand<Unit, Unit> ConfirmCommand => _confirmCommand ??=
-            (_confirmCommand = ReactiveCommand.Create(() =>
-            {
-                ConfirmAction?.Invoke(Outputs.Where(o => o.IsSelected).Select(o => o.Output));
-            }));
+            (_confirmCommand =
+                ReactiveCommand.Create(() =>
+                {
+                    ConfirmAction?.Invoke(Outputs
+                        .Where(o => o.IsSelected)
+                        .Select(o => o.Output)
+                    );
+                }));
 
 
         private ICommand _copyAddressCommand;
