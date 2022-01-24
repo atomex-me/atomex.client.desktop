@@ -45,19 +45,19 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     vm => vm.SearchPattern)
                 .Subscribe(value =>
                 {
-                    var (item1, item2, item3) = value;
+                    var (sortByDate, sortByAscending, searchPattern) = value;
 
                     if (MyAddresses == null) return;
 
                     var myAddresses = new ObservableCollection<WalletAddressViewModel>(
                         InitialMyAddresses
                             .Where(addressViewModel => addressViewModel.WalletAddress.Address.ToLower()
-                                .Contains(item3?.ToLower() ?? string.Empty)));
+                                .Contains(searchPattern?.ToLower() ?? string.Empty)));
 
-                    if (item1)
+                    if (sortByDate)
                     {
                         var myAddressesList = myAddresses.ToList();
-                        if (item2)
+                        if (sortByAscending)
                         {
                             myAddressesList.Sort((a1, a2) =>
                             {
@@ -108,7 +108,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     }
                     else
                     {
-                        MyAddresses = new ObservableCollection<WalletAddressViewModel>(item2
+                        MyAddresses = new ObservableCollection<WalletAddressViewModel>(sortByAscending
                             ? myAddresses.OrderBy(addressViewModel => addressViewModel.AvailableBalance)
                             : myAddresses.OrderByDescending(addressViewModel => addressViewModel.AvailableBalance));
                     }
@@ -164,7 +164,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         public ICommand CopyAddressCommand =>
             _copyAddressCommand ??= (_copyAddressCommand = ReactiveCommand.Create((WalletAddress address) =>
             {
-                _ = Desktop.App.Clipboard.SetTextAsync(address.Address);
+                _ = App.Clipboard.SetTextAsync(address.Address);
 
                 // MyAddresses.ForEachDo(o => o.CopyButtonToolTip = AddressViewModel.DefaultCopyButtonToolTip);
                 // MyAddresses.First(o => o.WalletAddress.Address == address.Address).CopyButtonToolTip =

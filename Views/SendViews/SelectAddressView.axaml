@@ -221,8 +221,8 @@
                                         FontSize="16">
                                         <TextBlock.Text>
                                             <MultiBinding Converter="{StaticResource AmountToStringConverter}">
-                                                <Binding Path="AvailableBalance" Mode="OneWay" />
-                                                <Binding Path="CurrencyFormat" Mode="OneWay" />
+                                                <Binding Path="Balance" Mode="OneWay" />
+                                                <Binding Path="BalanceFormat" Mode="OneWay" />
                                             </MultiBinding>
                                         </TextBlock.Text>
                                     </TextBlock>
@@ -232,7 +232,7 @@
                                         Margin="0 0 20 0"
                                         Foreground="{DynamicResource SecondaryForegroundBrush}"
                                         FontSize="16"
-                                        Text="{Binding CurrencyCode}" />
+                                        Text="{Binding BalanceCode}" />
                                 </StackPanel>
                                 <Border
                                     ToolTip.Placement="AnchorAndGravity"

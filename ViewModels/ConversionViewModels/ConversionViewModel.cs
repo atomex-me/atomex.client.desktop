@@ -474,14 +474,10 @@ namespace Atomex.Client.Desktop.ViewModels
             {
                 var currencyName = currencyViewModel.Currency.Name;
 
-                var isTezosToken = Atomex.Currencies.IsTezosToken(currencyName);
-
                 var receivingAddresses = await AddressesHelper
                     .GetReceivingAddressesAsync(
                         account: _app.Account,
-                        currency: currencyViewModel.Currency,
-                        tokenContract: isTezosToken ? ((Fa12Config)currencyViewModel.Currency).TokenContractAddress : null,
-                        tokenType: isTezosToken ? "FA12" : null)
+                        currency: currencyViewModel.Currency)
                     .ConfigureAwait(false);
 
                 var selectedAddress = ToCurrencyViewModelItem?.CurrencyViewModel.Currency.Name == currencyName
