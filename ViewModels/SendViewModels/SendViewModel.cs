@@ -53,6 +53,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             }
         }
 
+        protected virtual decimal FeeAmount => Fee;
         [Reactive] protected decimal Fee { get; set; }
         [ObservableAsProperty] public string FeeString { get; }
 
@@ -146,15 +147,13 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 return;
             }
 
-            if (Fee <= 0)
+            if (FeeAmount <= 0)
             {
                 Warning = Resources.SvCommissionLessThanZeroError;
                 return;
             }
-
-            var isToken = Currency.FeeCurrencyName != Currency.Name;
-
-            var feeAmount = !isToken ? Fee : 0;
+            
+            var feeAmount = !Currency.IsToken ? FeeAmount : 0;
 
             if (Amount + feeAmount > CurrencyViewModel.AvailableAmount)
             {
@@ -236,12 +235,20 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 )
                 .Select(totalAmount => totalAmount.ToString(CurrencyFormat, CultureInfo.InvariantCulture))
                 .ToPropertyEx(this, vm => vm.TotalAmountString);
+            
+            this.WhenAnyValue(
+                    vm => vm.Amount,
+                    vm => vm.Fee
+                )
+                .Subscribe(_ => OnQuotesUpdatedEventHandler(App.QuotesProvider, EventArgs.Empty));
 
             this.WhenAnyValue(
                     vm => vm.Amount,
                     vm => vm.From,
-                    vm => vm.To
+                    vm => vm.To,
+                    (amount, from, to) => from
                 )
+                .WhereNotNull()
                 .Select(_ => Unit.Default)
                 .InvokeCommand(updateAmountCommand);
 
@@ -263,7 +270,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 .ToPropertyEx(this, vm => vm.FeeString);
 
             this.WhenAnyValue(vm => vm.UseDefaultFee)
-                .Where(useDefaultFee => useDefaultFee)
+                .Where(useDefaultFee => useDefaultFee && !string.IsNullOrEmpty(From))
                 .Select(_ => Unit.Default)
                 .InvokeCommand(updateAmountCommand);
 

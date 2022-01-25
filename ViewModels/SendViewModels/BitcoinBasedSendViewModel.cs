@@ -16,6 +16,7 @@ using Avalonia.Controls;
 using NBitcoin;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
+using Serilog;
 using Network = NBitcoin.Network;
 
 namespace Atomex.Client.Desktop.ViewModels.SendViewModels
@@ -65,6 +66,9 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
                     SelectedFromBalance = Config.SatoshiToCoin(totalOutputsSatoshi);
                 });
+
+            this.WhenAnyValue(vm => vm.FeeRate)
+                .Subscribe(_ => OnQuotesUpdatedEventHandler(App.QuotesProvider, EventArgs.Empty));
 
             var outputs = Account.GetAvailableOutputsAsync()
                 .WaitForResult()
@@ -179,12 +183,10 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
                     FeeRate = transactionParams.FeeRate;
                 }
-
-                OnQuotesUpdatedEventHandler(App.QuotesProvider, EventArgs.Empty);
             }
-            catch
+            catch (Exception e)
             {
-                // ignored
+                Log.Error(e, "{@currency}: update amount error", Currency?.Description);
             }
         }
 
@@ -212,12 +214,10 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     Warning = Resources.CvLowFees;
 
                 FeeRate = transactionParams.FeeRate;
-
-                OnQuotesUpdatedEventHandler(App.QuotesProvider, EventArgs.Empty);
             }
-            catch
+            catch (Exception e)
             {
-                // ignored
+                Log.Error(e, "{@currency}: update fee error", Currency?.Description);
             }
         }
 
@@ -288,12 +288,10 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
                     FeeRate = transactionParams.FeeRate;
                 }
-
-                OnQuotesUpdatedEventHandler(App.QuotesProvider, EventArgs.Empty);
             }
-            catch
+            catch (Exception e)
             {
-                // ignored
+                Log.Error(e, "{@currency}: max click error", Currency?.Description);
             }
         }
 

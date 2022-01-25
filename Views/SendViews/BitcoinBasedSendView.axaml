@@ -242,18 +242,51 @@
                       Margin="0 12 0 0"
                       Width="440">
 
-                    <CheckBox Grid.Row="0"
-                              Grid.Column="0"
-                              Grid.RowSpan="2"
-                              Padding="12 0 0 0"
-                              IsChecked="{Binding UseDefaultFee, Mode=TwoWay}"
-                              FontSize="13"
-                              FontFamily="{DynamicResource DefaultLightFontFamily}"
-                              Foreground="{DynamicResource SecondaryForegroundBrush}">
-                        Use default fee
-                    </CheckBox>
+                    <StackPanel Grid.Row="0"
+                                Grid.Column="0"
+                                Grid.RowSpan="2"
+                                VerticalAlignment="Top">
+                        <CheckBox Padding="12 0 0 0"
+                                  IsChecked="{Binding UseDefaultFee, Mode=TwoWay}"
+                                  FontSize="13"
+                                  FontFamily="{DynamicResource DefaultLightFontFamily}"
+                                  Foreground="{DynamicResource SecondaryForegroundBrush}">
+                            Use default fee
+                        </CheckBox>
+                    </StackPanel>
 
                     <StackPanel Grid.Row="0"
+                                Grid.Column="1"
+                                HorizontalAlignment="Right"
+                                Orientation="Horizontal">
+                        <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
+                                   FontFamily="{DynamicResource DefaultFontFamily}"
+                                   LineHeight="20"
+                                   TextAlignment="Right"
+                                   Text="Fee rate:" />
+
+                        <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
+                                   FontFamily="{DynamicResource DefaultFontFamily}"
+                                   LineHeight="20"
+                                   Margin="3 0 0 0"
+                                   TextAlignment="Right">
+                            <TextBlock.Text>
+                                <MultiBinding Converter="{StaticResource AmountToStringConverter}">
+                                    <Binding Path="FeeRate" Mode="OneWay" />
+                                    <Binding Path="FeeRateFormat" Mode="OneWay" />
+                                </MultiBinding>
+                            </TextBlock.Text>
+                        </TextBlock>
+
+                        <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
+                                   FontFamily="{DynamicResource DefaultFontFamily}"
+                                   LineHeight="20"
+                                   Margin="3 0 0 0"
+                                   TextAlignment="Right"
+                                   Text="sat/byte" />
+                    </StackPanel>
+
+                    <StackPanel Grid.Row="1"
                                 Grid.Column="1"
                                 HorizontalAlignment="Right"
                                 Orientation="Horizontal">
@@ -286,37 +319,6 @@
                                 </MultiBinding>
                             </TextBlock.Text>
                         </TextBlock>
-                    </StackPanel>
-
-                    <StackPanel Grid.Row="1"
-                                Grid.Column="1"
-                                HorizontalAlignment="Right"
-                                Orientation="Horizontal">
-                        <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
-                                   FontFamily="{DynamicResource DefaultFontFamily}"
-                                   LineHeight="20"
-                                   TextAlignment="Right"
-                                   Text="Fee rate:" />
-
-                        <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
-                                   FontFamily="{DynamicResource DefaultFontFamily}"
-                                   LineHeight="20"
-                                   Margin="3 0 0 0"
-                                   TextAlignment="Right">
-                            <TextBlock.Text>
-                                <MultiBinding Converter="{StaticResource AmountToStringConverter}">
-                                    <Binding Path="FeeRate" Mode="OneWay" />
-                                    <Binding Path="FeeRateFormat" Mode="OneWay" />
-                                </MultiBinding>
-                            </TextBlock.Text>
-                        </TextBlock>
-
-                        <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
-                                   FontFamily="{DynamicResource DefaultFontFamily}"
-                                   LineHeight="20"
-                                   Margin="3 0 0 0"
-                                   TextAlignment="Right"
-                                   Text="sat/byte" />
                     </StackPanel>
                 </Grid>
             </StackPanel>

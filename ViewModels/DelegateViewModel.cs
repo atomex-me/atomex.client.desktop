@@ -306,7 +306,7 @@ namespace Atomex.Client.Desktop.ViewModels
                 }
 
                 /*
-                if (xTezos.GetFeeAmount(Fee, FeePrice) > CurrencyViewModel.AvailableAmount) {
+                if (xTezos.GetFeeAmount(Fee, GasPrice) > CurrencyViewModel.AvailableAmount) {
                     Warning = Resources.SvAvailableFundsError;
                     return;
                 }*/

@@ -42,7 +42,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
     //             OnPropertyChanged(nameof(FeeString));
     //
     //             _feePrice = 0;
-    //             OnPropertyChanged(nameof(FeePriceString));
+    //             OnPropertyChanged(nameof(GasPriceString));
     //
     //             OnPropertyChanged(nameof(TotalFeeString));
     //
@@ -55,7 +55,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
     //
     //     public override string TotalFeeCurrencyCode => Currency.FeeCurrencyName;
     //
-    //     public override decimal FeePrice
+    //     public override decimal GasPrice
     //     {
     //         get => _feePrice;
     //         set { UpdateFeePrice(value); }
@@ -118,7 +118,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
     //                 OnPropertyChanged(nameof(GasString));
     //
     //                 _feePrice = await Currency.GetDefaultFeePriceAsync();
-    //                 OnPropertyChanged(nameof(FeePriceString));
+    //                 OnPropertyChanged(nameof(GasPriceString));
     //
     //                 if (_amount > maxAmountEstimation.Amount)
     //                 {
@@ -216,7 +216,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
     //                     return;
     //                 }
     //
-    //                 OnPropertyChanged(nameof(FeePriceString));
+    //                 OnPropertyChanged(nameof(GasPriceString));
     //
     //                 UpdateTotalFeeString();
     //                 OnPropertyChanged(nameof(TotalFeeString));
@@ -286,7 +286,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
     //                     return;
     //                 }
     //
-    //                 OnPropertyChanged(nameof(FeePriceString));
+    //                 OnPropertyChanged(nameof(GasPriceString));
     //
     //                 UpdateTotalFeeString();
     //                 OnPropertyChanged(nameof(TotalFeeString));
@@ -340,7 +340,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
     //                 OnPropertyChanged(nameof(GasString));
     //
     //                 _feePrice = await Currency.GetDefaultFeePriceAsync();
-    //                 OnPropertyChanged(nameof(FeePriceString));
+    //                 OnPropertyChanged(nameof(GasPriceString));
     //
     //                 UpdateTotalFeeString(maxAmountEstimation.Fee);
     //                 OnPropertyChanged(nameof(TotalFeeString));
@@ -394,7 +394,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
     //         var ethQuote = quotesProvider.GetQuote(Currency.FeeCurrencyName, BaseCurrencyCode);
     //
     //         AmountInBase = Amount * (quote?.Bid ?? 0m);
-    //         FeeInBase = Currency.GetFeeAmount(Fee, FeePrice) * (ethQuote?.Bid ?? 0m);
+    //         FeeInBase = Currency.GetFeeAmount(Fee, GasPrice) * (ethQuote?.Bid ?? 0m);
     //     }
     //
     //     protected override Task<Error> Send(
@@ -408,7 +408,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
     //             to: confirmationViewModel.To,
     //             amount: confirmationViewModel.Amount,
     //             gasLimit: confirmationViewModel.Fee,
-    //             gasPrice: confirmationViewModel.FeePrice,
+    //             gasPrice: confirmationViewModel.GasPrice,
     //             useDefaultFee: confirmationViewModel.UseDeafultFee,
     //             cancellationToken: cancellationToken);
     //     }

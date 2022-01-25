@@ -6,6 +6,7 @@ using Atomex.Client.Desktop.Properties;
 using Atomex.Core;
 using Atomex.Wallet.Abstract;
 using Atomex.Wallet.Tezos;
+using Serilog;
 
 namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 {
@@ -105,17 +106,12 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     if (Amount > maxAmountEstimation.Amount || Amount + Fee > availableAmount)
                     {
                         Warning = Resources.CvInsufficientFunds;
-                        return;
                     }
-
-                    // Fee = _fee;
                 }
-
-                OnQuotesUpdatedEventHandler(App.QuotesProvider, EventArgs.Empty);
             }
-            catch
+            catch (Exception e)
             {
-                // ignored
+                Log.Error(e, "{@currency}: update amount error", Currency?.Description);
             }
         }
 
@@ -162,17 +158,16 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                         Warning = Resources.CvInsufficientFunds;
                         return;
                     }
-                    else if (estimatedFeeAmount == null || Fee < estimatedFeeAmount.Value)
+
+                    if (estimatedFeeAmount == null || Fee < estimatedFeeAmount.Value)
                     {
                         Warning = Resources.CvLowFees;
                     }
                 }
-
-                OnQuotesUpdatedEventHandler(App.QuotesProvider, EventArgs.Empty);
             }
-            catch
+            catch (Exception e)
             {
-                // ignored
+                Log.Error(e, "{@currency}: update fee error", Currency?.Description);
             }
         }
 
@@ -233,12 +228,10 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                         Warning = Resources.CvInsufficientFunds;
                     }
                 }
-
-                OnQuotesUpdatedEventHandler(App.QuotesProvider, EventArgs.Empty);
             }
-            catch
+            catch (Exception e)
             {
-                // ignored
+                Log.Error(e, "{@currency}: max click error", Currency?.Description);
             }
         }
 

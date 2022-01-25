@@ -122,7 +122,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                         account: account,
                         currency: currency)
                     .WaitForResult()
-                    .Where(address => !useToSelectFrom || !address.IsFreeAddress)
+                    .Where(address => !useToSelectFrom || address.AvailableBalance != 0)
             );
             InitialMyAddresses = new ObservableCollection<WalletAddressViewModel>(MyAddresses);
         }
