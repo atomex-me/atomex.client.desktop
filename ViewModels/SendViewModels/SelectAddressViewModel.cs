@@ -1,19 +1,16 @@
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive;
-using System.Threading.Tasks;
 using System.Windows.Input;
 using Atomex.Common;
 using Atomex.Core;
 using Atomex.ViewModels;
 using Atomex.Wallet.Abstract;
 using Avalonia.Controls;
-using Avalonia.Threading;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
-using Serilog;
+
 
 namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 {
@@ -116,15 +113,16 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
             UseToSelectFrom = useToSelectFrom;
 
-            MyAddresses = new ObservableCollection<WalletAddressViewModel>(
-                AddressesHelper
-                    .GetReceivingAddressesAsync(
-                        account: account,
-                        currency: currency)
-                    .WaitForResult()
-                    .Where(address => !useToSelectFrom || address.AvailableBalance != 0)
-            );
-            InitialMyAddresses = new ObservableCollection<WalletAddressViewModel>(MyAddresses);
+            var addresses = AddressesHelper
+                .GetReceivingAddressesAsync(
+                    account: account,
+                    currency: currency)
+                .WaitForResult()
+                .Where(address => !useToSelectFrom || address.AvailableBalance != 0)
+                .OrderByDescending(address => address.AvailableBalance);
+
+            MyAddresses = new ObservableCollection<WalletAddressViewModel>(addresses);
+            InitialMyAddresses = new ObservableCollection<WalletAddressViewModel>(addresses);
         }
 
         private ReactiveCommand<Unit, Unit> _backCommand;

@@ -149,9 +149,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                             feePrice: 0,
                             reserve: false);
 
-                    var availableAmount = Currency is BitcoinBasedConfig
-                        ? CurrencyViewModel.AvailableAmount
-                        : maxAmountEstimation.Amount + maxAmountEstimation.Fee;
+                    var availableAmount = maxAmountEstimation.Amount + maxAmountEstimation.Fee;
 
                     if (Amount + Fee > availableAmount)
                     {

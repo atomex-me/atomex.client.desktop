@@ -16,7 +16,6 @@ using Avalonia.Controls;
 using NBitcoin;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
-using Serilog;
 using Network = NBitcoin.Network;
 
 
