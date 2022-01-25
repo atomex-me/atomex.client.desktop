@@ -3,14 +3,15 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive;
 using System.Windows.Input;
-using Atomex.Common;
-using Atomex.Core;
-using Atomex.ViewModels;
-using Atomex.Wallet.Abstract;
+
 using Avalonia.Controls;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
+using Atomex.Common;
+using Atomex.Core;
+using Atomex.ViewModels;
+using Atomex.Wallet.Abstract;
 
 namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 {
@@ -34,7 +35,11 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 #endif
         }
 
-        public SelectAddressViewModel(IAccount account, CurrencyConfig currency, bool useToSelectFrom = false)
+        public SelectAddressViewModel(
+            IAccount account,
+            CurrencyConfig currency,
+            bool useToSelectFrom = false,
+            string selectedAddress = null)
         {
             this.WhenAnyValue(
                     vm => vm.SortByDate,
@@ -123,6 +128,9 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
             MyAddresses = new ObservableCollection<WalletAddressViewModel>(addresses);
             InitialMyAddresses = new ObservableCollection<WalletAddressViewModel>(addresses);
+
+            if (selectedAddress != null)
+                SelectedAddress = MyAddresses.FirstOrDefault(vm => vm.Address == selectedAddress);
         }
 
         private ReactiveCommand<Unit, Unit> _backCommand;

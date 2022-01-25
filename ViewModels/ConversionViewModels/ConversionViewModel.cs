@@ -197,7 +197,7 @@ namespace Atomex.Client.Desktop.ViewModels
                             FromCurrencyViewModelItem = i;
 
                             FromViewModel.CurrencyViewModel = FromCurrencies.First(c => c.Currency.Name == i.CurrencyViewModel.Currency.Name);
-                            FromViewModel.Address = i.Address;
+                            FromViewModel.Address = i.ShortAddressDescription;
 
                             App.DialogService.Close();
                         }
@@ -224,7 +224,7 @@ namespace Atomex.Client.Desktop.ViewModels
                             ToCurrencyViewModelItem = i;
 
                             ToViewModel.CurrencyViewModel = ToCurrencies.First(c => c.Currency.Name == i.CurrencyViewModel.Currency.Name);
-                            ToViewModel.Address = i.Address;
+                            ToViewModel.Address = i.ShortAddressDescription;
 
                             App.DialogService.Close();
                         }
@@ -273,8 +273,10 @@ namespace Atomex.Client.Desktop.ViewModels
                         return;
                     }
 
+                    var item = (SelectCurrencyWithAddressViewModelItem)i;
+
                     UseRedeemAddress = true;
-                    RedeemFromAddress = i.Address;
+                    RedeemFromAddress = item.SelectedAddress?.Address;
                 });
 
             // FromCurrencyViewModel currency changed => Update AmountString and AmountInBase if need
@@ -420,11 +422,11 @@ namespace Atomex.Client.Desktop.ViewModels
 
             FromViewModel.CurrencyViewModel = ToViewModel.CurrencyViewModel;
             FromCurrencyViewModelItem       = await CreateFromCurrencyViewModelItemAsync(FromViewModel.CurrencyViewModel);
-            FromViewModel.Address           = FromCurrencyViewModelItem.Address;
+            FromViewModel.Address           = FromCurrencyViewModelItem.ShortAddressDescription;
 
             ToViewModel.CurrencyViewModel = previousFromCurrency;
             ToCurrencyViewModelItem       = await CreateToCurrencyViewModelItemAsync(ToViewModel.CurrencyViewModel);
-            ToViewModel.Address           = ToCurrencyViewModelItem.Address;
+            ToViewModel.Address           = ToCurrencyViewModelItem.ShortAddressDescription;
         });
 
         private ICommand _changeRedeemAddress;
@@ -447,7 +449,8 @@ namespace Atomex.Client.Desktop.ViewModels
             var selectAddressViewModel = new SelectAddressViewModel(
                 account: _app.Account,
                 currency: feeCurrency,
-                useToSelectFrom: false)
+                useToSelectFrom: false,
+                selectedAddress: RedeemFromAddress)
             {
                 BackAction = () => { App.DialogService.Show(this); },
                 ConfirmAction = (address, balance) =>
@@ -458,7 +461,6 @@ namespace Atomex.Client.Desktop.ViewModels
             };
 
             App.DialogService.Show(selectAddressViewModel);
-
         });
 
         private async Task<SelectCurrencyViewModelItem> CreateFromCurrencyViewModelItemAsync(

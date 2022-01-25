@@ -32,7 +32,7 @@ namespace Atomex.Client.Desktop.ViewModels.ConversionViewModels
     {
         [Reactive] public CurrencyViewModel CurrencyViewModel { get; set; }
         [ObservableAsProperty] public string? SelectedAddressDescription { get; }
-        public abstract string Address { get; }
+        public abstract string ShortAddressDescription { get; }
 
         public SelectCurrencyViewModelItem(CurrencyViewModel currencyViewModel)
         {
@@ -44,7 +44,7 @@ namespace Atomex.Client.Desktop.ViewModels.ConversionViewModels
     {
         public IEnumerable<BitcoinBasedTxOutput> AvailableOutputs { get; set; }
         [Reactive] public IEnumerable<BitcoinBasedTxOutput> SelectedOutputs { get; set; }
-        public override string Address => $"{SelectedOutputs?.Count() ?? 0} outputs";
+        public override string ShortAddressDescription => $"{SelectedOutputs?.Count() ?? 0} outputs";
 
         public SelectCurrencyWithOutputsViewModelItem(
             CurrencyViewModel currencyViewModel,
@@ -56,11 +56,12 @@ namespace Atomex.Client.Desktop.ViewModels.ConversionViewModels
                 .WhereNotNull()
                 .Select(outputs =>
                 {
-                    var currency = (BitcoinBasedConfig)CurrencyViewModel.Currency;
+                    var currency             = (BitcoinBasedConfig)CurrencyViewModel.Currency;
                     var totalAmountInSatoshi = outputs.Sum(o => o.Value);
-                    var totalAmount = currency.SatoshiToCoin(totalAmountInSatoshi);
+                    var totalAmount          = currency.SatoshiToCoin(totalAmountInSatoshi);
+                    var totalAmountString    = totalAmount.ToString(CurrencyViewModel.CurrencyFormat);
 
-                    return $"from {outputs.Count()} outputs ({totalAmount} {currency.Name})";
+                    return $"from {outputs.Count()} outputs ({totalAmountString} {currency.Name})";
                 })
                 .ToPropertyEx(this, vm => vm.SelectedAddressDescription);
 
@@ -99,7 +100,7 @@ namespace Atomex.Client.Desktop.ViewModels.ConversionViewModels
         public IEnumerable<WalletAddress> AvailableAddresses { get; set; }
         [Reactive] public WalletAddress SelectedAddress { get; set; }
         [Reactive] public bool IsNew { get; set; }
-        public override string Address => SelectedAddress?.Address?.TruncateAddress();
+        public override string ShortAddressDescription => SelectedAddress?.Address?.TruncateAddress();
 
         public SelectCurrencyWithAddressViewModelItem(
             CurrencyViewModel currencyViewModel,
@@ -118,7 +119,9 @@ namespace Atomex.Client.Desktop.ViewModels.ConversionViewModels
                         return $"receiving to new address {address.Address.TruncateAddress()}";
 
                     var prefix = _type == SelectCurrencyType.From ? "from" : "to";
-                    return $"{prefix} {address.Address.TruncateAddress()} ({address.Balance} {CurrencyViewModel.Currency.Name})";
+                    var balanceString = address.Balance.ToString(CurrencyViewModel.CurrencyFormat);
+
+                    return $"{prefix} {address.Address.TruncateAddress()} ({balanceString} {CurrencyViewModel.Currency.Name})";
                 })
                 .ToPropertyEx(this, vm => vm.SelectedAddressDescription);
 
@@ -131,7 +134,7 @@ namespace Atomex.Client.Desktop.ViewModels.ConversionViewModels
             if (source is not SelectCurrencyWithAddressViewModelItem sourceWithAddress)
                 return;
 
-            var address = AvailableAddresses.FirstOrDefault(a => a.Address == sourceWithAddress.Address);
+            var address = AvailableAddresses.FirstOrDefault(a => a.Address == sourceWithAddress.ShortAddressDescription);
 
             if (address != null)
                 SelectedAddress = address;
@@ -185,7 +188,8 @@ namespace Atomex.Client.Desktop.ViewModels.ConversionViewModels
                 var selectAddressViewModel = new SelectAddressViewModel(
                     account: _account,
                     currency: currency,
-                    useToSelectFrom: Type == SelectCurrencyType.From)
+                    useToSelectFrom: Type == SelectCurrencyType.From,
+                    selectedAddress: itemWithAddress.SelectedAddress?.Address)
                 {
                     BackAction = () => { App.DialogService.Show(this); },
                     ConfirmAction = (address, balance) =>
