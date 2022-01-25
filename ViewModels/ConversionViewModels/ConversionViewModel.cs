@@ -28,6 +28,7 @@ using Atomex.Swaps;
 using Atomex.ViewModels;
 using Atomex.Wallet.Abstract;
 using Atomex.Wallet.BitcoinBased;
+using Atomex.Client.Desktop.ViewModels.SendViewModels;
 
 namespace Atomex.Client.Desktop.ViewModels
 {
@@ -70,7 +71,7 @@ namespace Atomex.Client.Desktop.ViewModels
         [Reactive] public decimal FromBalance { get; set; }
         [Reactive] public string ToAddress { get; set; }
         [Reactive] public string RedeemFromAddress { get; set; }
-        [Reactive] public bool IsRedeemAddressUsed { get; set; }
+        [Reactive] public bool UseRedeemAddress { get; set; }
 
         [Reactive] public List<CurrencyViewModel>? FromCurrencies { get; set; }
         [Reactive] public List<CurrencyViewModel>? ToCurrencies { get; set; }
@@ -78,8 +79,8 @@ namespace Atomex.Client.Desktop.ViewModels
         [Reactive] public ConversionCurrencyViewModel FromViewModel { get; set; }
         [Reactive] public ConversionCurrencyViewModel ToViewModel { get; set; }
 
-        public SelectCurrencyViewModelItem FromCurrencyViewModelItem { get; set; }
-        public SelectCurrencyViewModelItem ToCurrencyViewModelItem { get; set; }
+        [Reactive] public SelectCurrencyViewModelItem FromCurrencyViewModelItem { get; set; }
+        [Reactive] public SelectCurrencyViewModelItem ToCurrencyViewModelItem { get; set; }
 
         [Reactive] public string FromValidationMessage { get; set; }
         [Reactive] public string FromValidationMessageToolTip { get; set; }
@@ -142,7 +143,7 @@ namespace Atomex.Client.Desktop.ViewModels
         [Reactive] public decimal EstimatedTotalNetworkFeeInBase { get; set; }
         [Reactive] public decimal RewardForRedeem { get; set; }
         [Reactive] public decimal RewardForRedeemInBase { get; set; }
-        [Reactive] public bool HasRewardForRedeem { get; set; }
+        [ObservableAsProperty] public bool HasRewardForRedeem { get; }
 
         [Reactive] public string Warning { get; set; }
         [Reactive] public bool IsCriticalWarning { get; set; }
@@ -225,8 +226,6 @@ namespace Atomex.Client.Desktop.ViewModels
                             ToViewModel.CurrencyViewModel = ToCurrencies.First(c => c.Currency.Name == i.CurrencyViewModel.Currency.Name);
                             ToViewModel.Address = i.Address;
 
-                            // todo: change redeem address
-
                             App.DialogService.Close();
                         }
                     };
@@ -245,6 +244,7 @@ namespace Atomex.Client.Desktop.ViewModels
                         .ToList();
                 });
 
+            // ToCurrencies list changed => check & update ToViewModel and ToCurrencyViewModelItem
             this.WhenAnyValue(vm => vm.ToCurrencies)
                 .Subscribe(c =>
                 {
@@ -260,6 +260,21 @@ namespace Atomex.Client.Desktop.ViewModels
                         ToViewModel.Address = null;
                         return;
                     }
+                });
+
+            this.WhenAnyValue(vm => vm.ToCurrencyViewModelItem)
+                .Subscribe(i =>
+                {
+                    // if To currency not selected or To currency is Bitcoin based
+                    if (i == null || Atomex.Currencies.IsBitcoinBased(i.CurrencyViewModel.Currency.Name))
+                    {
+                        UseRedeemAddress = false;
+                        RedeemFromAddress = null;
+                        return;
+                    }
+
+                    UseRedeemAddress = true;
+                    RedeemFromAddress = i.Address;
                 });
 
             // FromCurrencyViewModel currency changed => Update AmountString and AmountInBase if need
@@ -287,7 +302,11 @@ namespace Atomex.Client.Desktop.ViewModels
                 .ToPropertyEx(this, vm => vm.PriceFormat);
 
             // AmountString, FromCurrencyViewModel or ToCurrencyViewModel changed => estimate swap price and target amount
-            this.WhenAnyValue(vm => vm.AmountString, vm => vm.FromViewModel.CurrencyViewModel, vm => vm.ToViewModel.CurrencyViewModel)
+            this.WhenAnyValue(
+                    vm => vm.AmountString,
+                    vm => vm.FromViewModel.CurrencyViewModel,
+                    vm => vm.ToViewModel.CurrencyViewModel,
+                    vm => vm.RedeemFromAddress)
                 .Throttle(TimeSpan.FromMilliseconds(1))
                 .Subscribe(a =>
                 {
@@ -314,6 +333,11 @@ namespace Atomex.Client.Desktop.ViewModels
             // RewardForRedeem changed => update RewardForRedeemInBase
             this.WhenAnyValue(vm => vm.RewardForRedeem)
                 .Subscribe(amount => UpdateRewardForRedeemInBase());
+
+            // RewardForRedeem changed => update HasRewardForRedeem
+            this.WhenAnyValue(vm => vm.RewardForRedeem)
+                .Select(r => r > 0)
+                .ToPropertyEx(this, vm => vm.HasRewardForRedeem);
 
             // EstimatedMakerNetworkFee changed => update EstimatedMakerNetworkFeeInBase
             this.WhenAnyValue(vm => vm.EstimatedMakerNetworkFee)
@@ -404,8 +428,36 @@ namespace Atomex.Client.Desktop.ViewModels
         });
 
         private ICommand _changeRedeemAddress;
-        public ICommand ChangeRedeemAddress => _changeRedeemAddress ??= ReactiveCommand.Create(() =>
+        public ICommand ChangeRedeemAddress => _changeRedeemAddress ??= ReactiveCommand.Create(async () =>
         {
+            if (ToViewModel.CurrencyViewModel == null)
+                return;
+
+            var item = await CreateToCurrencyViewModelItemAsync(ToViewModel.CurrencyViewModel);
+
+            var feeCurrencyName = ToViewModel
+                .CurrencyViewModel
+                .Currency
+                .FeeCurrencyName;
+
+            var feeCurrency = FromCurrencies
+                .First(c => c.Currency.Name == feeCurrencyName)
+                .Currency;
+
+            var selectAddressViewModel = new SelectAddressViewModel(
+                account: _app.Account,
+                currency: feeCurrency,
+                useToSelectFrom: false)
+            {
+                BackAction = () => { App.DialogService.Show(this); },
+                ConfirmAction = (address, balance) =>
+                {
+                    RedeemFromAddress = address;
+                    App.DialogService.Close();
+                }
+            };
+
+            App.DialogService.Show(selectAddressViewModel);
 
         });
 

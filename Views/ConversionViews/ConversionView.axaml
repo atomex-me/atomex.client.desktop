@@ -57,12 +57,12 @@
                  HorizontalAlignment="Center"
                  Foreground="{DynamicResource DefaultForegroundBrush}"/>
 
-      <!-- From currency view -->
+      <!-- from currency view -->
       <views:ConversionCurrencyView Width="486"
                                     Height="102"
                                     DataContext="{Binding FromViewModel}"/>
 
-      <!-- Warning and swap currencies button view -->
+      <!-- warning and swap currencies button view -->
       <Grid Width="486">
         <StackPanel Orientation="Horizontal"
                     Margin="0 12 0 24"
@@ -131,13 +131,13 @@
         </Button>
       </Grid>
           
-      <!-- To currency view -->
+      <!-- to currency view -->
       <views:ConversionCurrencyView Margin="0 0 0 0"
                                     Width="486"
                                     Height="102"
                                     DataContext="{Binding ToViewModel}"/>
 
-      <!-- Change redeem adderss, price, available volume, fees and warning view -->
+      <!-- change redeem adderss, price, available volume, fees and warning view -->
       <Grid Width="486"
             ColumnDefinitions="Auto,*"
             Margin="0 12 0 16">
@@ -150,8 +150,10 @@
 
         <StackPanel Orientation="Vertical"
                     Grid.Column="0">
+          <!-- change redeem address -->
           <StackPanel Orientation="Horizontal"
-                      Margin="0 0 0 16">
+                      Margin="0 0 0 16"
+                      IsVisible="{Binding UseRedeemAddress}">
             <Button Content="Change redeem address"
                     VerticalAlignment="Bottom"
                     Command="{Binding ChangeRedeemAddress}"
@@ -173,7 +175,7 @@
             </Button>
           </StackPanel>
 
-          <!-- Estimated price -->
+          <!-- estimated price -->
           <StackPanel Orientation="Horizontal">
             <TextBlock Text="Estimated Price 1"
                        Foreground="{DynamicResource SecondaryForegroundBrush}"
@@ -224,7 +226,7 @@
             </Button>
           </StackPanel>
 
-          <!-- Estimated network fees -->
+          <!-- estimated network fees -->
           <StackPanel Orientation="Horizontal">
             <TextBlock Text="Estimated network fees"
                        Foreground="{DynamicResource SecondaryForegroundBrush}"
@@ -413,7 +415,7 @@
                               HorizontalAlignment="Left"
                               VerticalAlignment="Center"
                               IsVisible="{Binding HasRewardForRedeem}">
-                    <TextBlock Foreground="{DynamicResource DefaultAmountInBaseForegroundBrush}"
+                    <TextBlock Foreground="{DynamicResource DefaultForegroundBrush}"
                                Text="Reward for redeem:"/>
 
                     <TextBlock Margin="5 0 0 0"
@@ -484,7 +486,7 @@
           </StackPanel>
         </StackPanel>
 
-        <!-- Available amount -->            
+        <!-- available amount -->            
         <StackPanel Orientation="Horizontal"
                     HorizontalAlignment="Right"
                     VerticalAlignment="Top"
@@ -530,7 +532,7 @@
         </StackPanel>
       </Grid>
 
-      <!-- Warning -->
+      <!-- warning -->
       <StackPanel Orientation="Horizontal"
                   Width="486"
                   Margin="0 0 0 16"
