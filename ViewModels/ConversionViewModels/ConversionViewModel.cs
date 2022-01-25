@@ -25,7 +25,6 @@ using Atomex.MarketData;
 using Atomex.MarketData.Abstract;
 using Atomex.Services;
 using Atomex.Swaps;
-using Atomex.TezosTokens;
 using Atomex.ViewModels;
 using Atomex.Wallet.Abstract;
 using Atomex.Wallet.BitcoinBased;
@@ -226,6 +225,8 @@ namespace Atomex.Client.Desktop.ViewModels
                             ToViewModel.CurrencyViewModel = ToCurrencies.First(c => c.Currency.Name == i.CurrencyViewModel.Currency.Name);
                             ToViewModel.Address = i.Address;
 
+                            // todo: change redeem address
+
                             App.DialogService.Close();
                         }
                     };
@@ -279,7 +280,7 @@ namespace Atomex.Client.Desktop.ViewModels
                 .WhereAllNotNull()
                 .Select(t =>
                 {
-                    var symbol = Symbols.SymbolByCurrencies(t.Item1.Currency, t.Item2.Currency); 
+                    var symbol = Symbols.SymbolByCurrencies(t.Item1.Currency, t.Item2.Currency);
                     return symbol != null ? Currencies.GetByName(symbol.Quote).Format : null;
                 })
                 .WhereNotNull()
@@ -386,7 +387,7 @@ namespace Atomex.Client.Desktop.ViewModels
         });
 
         private ICommand _swapCurrenciesCommand;
-        public ICommand SwapCurrenciesCommand => _swapCurrenciesCommand ??= ReactiveCommand.Create(() =>
+        public ICommand SwapCurrenciesCommand => _swapCurrenciesCommand ??= ReactiveCommand.Create(async () =>
         {
             if (FromViewModel.CurrencyViewModel == null || ToViewModel.CurrencyViewModel == null)
                 return;
@@ -394,12 +395,12 @@ namespace Atomex.Client.Desktop.ViewModels
             var previousFromCurrency = FromViewModel.CurrencyViewModel;
 
             FromViewModel.CurrencyViewModel = ToViewModel.CurrencyViewModel;
-            FromViewModel.Address = null;
-            FromCurrencyViewModelItem = null;
+            FromCurrencyViewModelItem       = await CreateFromCurrencyViewModelItemAsync(FromViewModel.CurrencyViewModel);
+            FromViewModel.Address           = FromCurrencyViewModelItem.Address;
 
             ToViewModel.CurrencyViewModel = previousFromCurrency;
-            ToViewModel.Address = null;
-            ToCurrencyViewModelItem = null;
+            ToCurrencyViewModelItem       = await CreateToCurrencyViewModelItemAsync(ToViewModel.CurrencyViewModel);
+            ToViewModel.Address           = ToCurrencyViewModelItem.Address;
         });
 
         private ICommand _changeRedeemAddress;
@@ -408,89 +409,107 @@ namespace Atomex.Client.Desktop.ViewModels
 
         });
 
-        public async Task<IEnumerable<SelectCurrencyViewModelItem>> CreateFromCurrencyViewModelItemsAsync(
+        private async Task<SelectCurrencyViewModelItem> CreateFromCurrencyViewModelItemAsync(
+            CurrencyViewModel currencyViewModel)
+        {
+            var currencyName = currencyViewModel.Currency.Name;
+
+            if (Atomex.Currencies.IsBitcoinBased(currencyName))
+            {
+                var availableOutputs = (await _app.Account
+                    .GetCurrencyAccount<BitcoinBasedAccount>(currencyName)
+                    .GetAvailableOutputsAsync()
+                    .ConfigureAwait(false))
+                    .Cast<BitcoinBasedTxOutput>();
+
+                var selectedOutputs = FromCurrencyViewModelItem?.CurrencyViewModel.Currency.Name == currencyName
+                    ? (FromCurrencyViewModelItem as SelectCurrencyWithOutputsViewModelItem)?.SelectedOutputs
+                    : null;
+
+                return new SelectCurrencyWithOutputsViewModelItem(
+                    currencyViewModel: currencyViewModel,
+                    availableOutputs: availableOutputs,
+                    selectedOutputs: selectedOutputs);
+            }
+            else
+            {
+                var availableAddresses = await _app.Account
+                    .GetUnspentAddressesAsync(currencyName)
+                    .ConfigureAwait(false);
+
+                if (!availableAddresses.Any())
+                {
+                    availableAddresses = new List<WalletAddress>()
+                    {
+                        await _app.Account
+                            .GetFreeExternalAddressAsync(currencyName)
+                            .ConfigureAwait(false)
+                    };
+                }
+
+                var selectedAddress = FromCurrencyViewModelItem?.CurrencyViewModel.Currency.Name == currencyName
+                    ? (FromCurrencyViewModelItem as SelectCurrencyWithAddressViewModelItem)?.SelectedAddress
+                    : availableAddresses.MaxBy(w => w.AvailableBalance());
+
+                return new SelectCurrencyWithAddressViewModelItem(
+                    currencyViewModel: currencyViewModel,
+                    type: SelectCurrencyType.From,
+                    availableAddresses: availableAddresses,
+                    selectedAddress: selectedAddress);
+            }
+        }
+
+        private async Task<IEnumerable<SelectCurrencyViewModelItem>> CreateFromCurrencyViewModelItemsAsync(
             IEnumerable<CurrencyViewModel> currencyViewModels)
         {
             var result = new List<SelectCurrencyViewModelItem>();
 
             foreach (var currencyViewModel in currencyViewModels)
             {
-                var currencyName = currencyViewModel.Currency.Name;
+                var currencyViewModelItem = await CreateFromCurrencyViewModelItemAsync(currencyViewModel)
+                    .ConfigureAwait(false);
 
-                if (Atomex.Currencies.IsBitcoinBased(currencyName))
-                {
-                    var availableOutputs = (await _app.Account
-                        .GetCurrencyAccount<BitcoinBasedAccount>(currencyName)
-                        .GetAvailableOutputsAsync()
-                        .ConfigureAwait(false))
-                        .Cast<BitcoinBasedTxOutput>();
-
-                    var selectedOutputs = FromCurrencyViewModelItem?.CurrencyViewModel.Currency.Name == currencyName
-                        ? (FromCurrencyViewModelItem as SelectCurrencyWithOutputsViewModelItem)?.SelectedOutputs
-                        : null;
-
-                    result.Add(new SelectCurrencyWithOutputsViewModelItem(
-                        currencyViewModel: currencyViewModel,
-                        availableOutputs: availableOutputs,
-                        selectedOutputs: selectedOutputs));
-                }
-                else
-                {
-                    var availableAddresses = await _app.Account
-                        .GetUnspentAddressesAsync(currencyName)
-                        .ConfigureAwait(false);
-
-                    if (!availableAddresses.Any())
-                    {
-                        availableAddresses = new List<WalletAddress>()
-                        {
-                            await _app.Account
-                                .GetFreeExternalAddressAsync(currencyName)
-                                .ConfigureAwait(false)
-                        };
-                    }
-
-                    var selectedAddress = FromCurrencyViewModelItem?.CurrencyViewModel.Currency.Name == currencyName
-                        ? (FromCurrencyViewModelItem as SelectCurrencyWithAddressViewModelItem)?.SelectedAddress
-                        : availableAddresses.MaxBy(w => w.AvailableBalance());
-
-                    result.Add(new SelectCurrencyWithAddressViewModelItem(
-                        currencyViewModel: currencyViewModel,
-                        type: SelectCurrencyType.From,
-                        availableAddresses: availableAddresses,
-                        selectedAddress: selectedAddress));
-                }
+                result.Add(currencyViewModelItem);
             }
 
             return result;
         }
 
-        public async Task<IEnumerable<SelectCurrencyViewModelItem>> CreateToCurrencyViewModelItemsAsync(
+        private async Task<SelectCurrencyViewModelItem> CreateToCurrencyViewModelItemAsync(
+            CurrencyViewModel currencyViewModel)
+        {
+            var currencyName = currencyViewModel.Currency.Name;
+
+            var receivingAddresses = await AddressesHelper
+                .GetReceivingAddressesAsync(
+                    account: _app.Account,
+                    currency: currencyViewModel.Currency)
+                .ConfigureAwait(false);
+
+            var selectedAddress = ToCurrencyViewModelItem?.CurrencyViewModel.Currency.Name == currencyName
+                ? (ToCurrencyViewModelItem as SelectCurrencyWithAddressViewModelItem)?.SelectedAddress
+                : Atomex.Currencies.IsBitcoinBased(currencyName)
+                    ? receivingAddresses.FirstOrDefault(w => w.IsFreeAddress)?.WalletAddress
+                    : receivingAddresses.MaxByOrDefault(w => w.AvailableBalance)?.WalletAddress;
+
+            return new SelectCurrencyWithAddressViewModelItem(
+                currencyViewModel: currencyViewModel,
+                type: SelectCurrencyType.To,
+                availableAddresses: receivingAddresses.Select(a => a.WalletAddress),
+                selectedAddress: selectedAddress);
+        }
+
+        private async Task<IEnumerable<SelectCurrencyViewModelItem>> CreateToCurrencyViewModelItemsAsync(
             IEnumerable<CurrencyViewModel> currencyViewModels)
         {
             var result = new List<SelectCurrencyViewModelItem>();
 
             foreach (var currencyViewModel in currencyViewModels)
             {
-                var currencyName = currencyViewModel.Currency.Name;
-
-                var receivingAddresses = await AddressesHelper
-                    .GetReceivingAddressesAsync(
-                        account: _app.Account,
-                        currency: currencyViewModel.Currency)
+                var currencyViewModelItem = await CreateToCurrencyViewModelItemAsync(currencyViewModel)
                     .ConfigureAwait(false);
 
-                var selectedAddress = ToCurrencyViewModelItem?.CurrencyViewModel.Currency.Name == currencyName
-                    ? (ToCurrencyViewModelItem as SelectCurrencyWithAddressViewModelItem)?.SelectedAddress
-                    : Atomex.Currencies.IsBitcoinBased(currencyName)
-                        ? receivingAddresses.FirstOrDefault(w => w.IsFreeAddress)?.WalletAddress
-                        : receivingAddresses.MaxByOrDefault(w => w.AvailableBalance)?.WalletAddress;
-
-                result.Add(new SelectCurrencyWithAddressViewModelItem(
-                    currencyViewModel: currencyViewModel,
-                    type: SelectCurrencyType.To,
-                    availableAddresses: receivingAddresses.Select(a => a.WalletAddress),
-                    selectedAddress: selectedAddress));
+                result.Add(currencyViewModelItem);
             }
 
             return result;

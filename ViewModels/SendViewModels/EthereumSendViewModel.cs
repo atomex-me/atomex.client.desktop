@@ -139,6 +139,10 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 if (App.Account.GetCurrencyAccount(Currency.Name) is not IEstimatable account)
                     return; // todo: error?
 
+                var ethereumAccount = App.Account.GetCurrencyAccount<EthereumAccount>("ETH");
+
+                //ethereumAccount.EstimateMaxAmountToSendAsync
+
                 var maxAmountEstimation = await account.EstimateMaxAmountToSendAsync(
                     from: new FromAddress(From),
                     to: To,
@@ -218,22 +222,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         {
             try
             {
-                if (App.Account.GetCurrencyAccount(Currency.Name) is not IEstimatable account)
-                    return; // todo: error?
-
-                var maxAmountEstimation = await account.EstimateMaxAmountToSendAsync(
-                    from: new FromAddress(From),
-                    to: To,
-                    type: BlockchainTransactionType.Output,
-                    fee: UseDefaultFee ? 0 : GasLimit,
-                    feePrice: UseDefaultFee ? 0 : GasPrice,
-                    reserve: false);
-
-                var feeAmount = FeeAmount > 0
-                    ? maxAmountEstimation.Fee
-                    : 0;
-
-                TotalFee = feeAmount;
+                TotalFee = FeeAmount;
             }
             catch (Exception e)
             {
