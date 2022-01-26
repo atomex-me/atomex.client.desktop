@@ -52,7 +52,6 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             : base(app, currency)
         {
             var updateGasPriceCommand = ReactiveCommand.CreateFromTask(UpdateGasPrice);
-            var updateTotalFeeCommand = ReactiveCommand.CreateFromTask(UpdateTotalFeeString);
 
             this.WhenAnyValue(vm => vm.GasPrice)
                 .Subscribe(_ => Warning = string.Empty);
@@ -75,8 +74,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     vm => vm.GasPrice
                 )
                 .Where(_ => !string.IsNullOrEmpty(From))
-                .Select(_ => Unit.Default)
-                .InvokeCommand(updateTotalFeeCommand);
+                .Subscribe(_ => TotalFee = FeeAmount);
 
             this.WhenAnyValue(vm => vm.TotalFee)
                 .Select(totalFee => totalFee.ToString(TotalFeeCurrencyFormat, CultureInfo.InvariantCulture))
@@ -138,10 +136,6 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             {
                 if (App.Account.GetCurrencyAccount(Currency.Name) is not IEstimatable account)
                     return; // todo: error?
-
-                var ethereumAccount = App.Account.GetCurrencyAccount<EthereumAccount>("ETH");
-
-                //ethereumAccount.EstimateMaxAmountToSendAsync
 
                 var maxAmountEstimation = await account.EstimateMaxAmountToSendAsync(
                     from: new FromAddress(From),
@@ -215,18 +209,6 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             catch (Exception e)
             {
                 Log.Error(e, "{@currency}: update gas price error", Currency?.Description);
-            }
-        }
-
-        private async Task UpdateTotalFeeString()
-        {
-            try
-            {
-                TotalFee = FeeAmount;
-            }
-            catch (Exception e)
-            {
-                Log.Error(e, "{@currency}: total fee string error", Currency?.Description);
             }
         }
 
