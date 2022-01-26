@@ -210,9 +210,12 @@ namespace Atomex.Client.Desktop.ViewModels
             {
                 if (await WhetherToCancelClosingAsync() && !_userIgnoreActiveSwaps)
                 {
-                    App.DialogService.Show(new SignOutWarningViewModel
-                    {
-                        OnIgnoreCommand = async () =>
+                    var messageViewModel = MessageViewModel.Message(
+                        title: "Warning",
+                        text: Resources.ActiveSwapsWarning,
+                        nextTitle: "Close",
+                        backAction: () => App.DialogService.Close(),
+                        nextAction: () =>
                         {
                             _userIgnoreActiveSwaps = true;
                             if (withAppUpdate)
@@ -221,10 +224,11 @@ namespace Atomex.Client.Desktop.ViewModels
                             }
                             else
                             {
-                                await SignOut();
+                                _ = SignOut();
                             }
-                        }
-                    });
+                        });
+                    
+                    App.DialogService.Show(messageViewModel);
                     return;
                 }
 

@@ -3,11 +3,9 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive;
 using System.Windows.Input;
-
 using Avalonia.Controls;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
-
 using Atomex.Common;
 using Atomex.Core;
 using Atomex.ViewModels;
@@ -123,7 +121,9 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     account: account,
                     currency: currency)
                 .WaitForResult()
-                .Where(address => !useToSelectFrom || address.AvailableBalance != 0)
+                .Where(address => !useToSelectFrom ||
+                                  address.IsTezosToken && address.TokenBalance != 0 ||
+                                  !address.IsTezosToken && address.AvailableBalance != 0)
                 .OrderByDescending(address => address.AvailableBalance);
 
             MyAddresses = new ObservableCollection<WalletAddressViewModel>(addresses);

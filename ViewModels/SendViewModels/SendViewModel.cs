@@ -259,6 +259,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 .ToPropertyEx(this, vm => vm.AmountString);
 
             this.WhenAnyValue(vm => vm.Fee)
+                .Where(_ => !string.IsNullOrEmpty(From))
                 .Select(_ => Unit.Default)
                 .InvokeCommand(updateFeeCommand);
 

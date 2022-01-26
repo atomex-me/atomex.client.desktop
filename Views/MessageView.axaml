@@ -21,9 +21,9 @@
         </Style>
     </UserControl.Styles>
 
-        <Border Classes="ChildViewBorder"
-                Padding="24 0 24 16"
-                Width="700">
+    <Border Classes="ChildViewBorder"
+            Padding="24 0 24 16"
+            Width="700">
         <StackPanel Orientation="Vertical">
             <Grid ColumnDefinitions="Auto,*"
                   RowDefinitions="Auto"
@@ -96,10 +96,12 @@
                     Classes="PathButtonStyle" />
             </StackPanel>
 
+            <!-- IsVisible="{Binding IsNextVisible}" -->
             <Border Margin="-24 0 -24 16"
                     Height="1"
                     Background="{DynamicResource LightDefaultOpacity10}"
-                    IsVisible="{Binding IsNextVisible}" />
+                    Opacity="0"
+                    IsVisible="True" />
 
             <StackPanel Orientation="Horizontal"
                         HorizontalAlignment="Right"
