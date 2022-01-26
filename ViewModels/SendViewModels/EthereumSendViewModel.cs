@@ -10,6 +10,7 @@ using Atomex.Core;
 using Atomex.MarketData.Abstract;
 using Atomex.Wallet.Abstract;
 using Atomex.Wallet.Ethereum;
+using Avalonia.Controls;
 using Avalonia.Threading;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
@@ -19,14 +20,14 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 {
     public class EthereumSendViewModel : SendViewModel
     {
-        public string TotalFeeCurrencyFormat => CurrencyViewModel.FeeCurrencyFormat;
-        public string TotalFeeCurrencyCode => CurrencyCode;
+        private string TotalFeeCurrencyFormat => CurrencyViewModel.FeeCurrencyFormat;
+        public virtual string TotalFeeCurrencyCode => CurrencyCode;
         public static string GasPriceCode => "GWEI";
         public static string GasLimitCode => "GAS";
 
         [Reactive] public int GasLimit { get; set; }
         [Reactive] public int GasPrice { get; set; }
-        [Reactive] public decimal TotalFee { get; set; }
+        [Reactive] private decimal TotalFee { get; set; }
         [ObservableAsProperty] public string TotalFeeString { get; set; }
         [ObservableAsProperty] public string GasPriceString { get; set; }
         protected override decimal FeeAmount => Currency.GetFeeAmount(GasLimit, GasPrice);
@@ -44,6 +45,10 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
         public EthereumSendViewModel()
         {
+#if DEBUG
+            if (Design.IsDesignMode)
+                DesignerMode();
+#endif
         }
 
         public EthereumSendViewModel(
@@ -171,7 +176,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             }
         }
 
-        private async Task UpdateGasPrice()
+        protected virtual async Task UpdateGasPrice()
         {
             try
             {
@@ -179,7 +184,6 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 {
                     if (FeeAmount > CurrencyViewModel.AvailableAmount)
                         Warning = Resources.CvInsufficientFunds;
-
                     return;
                 }
 
@@ -216,9 +220,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         {
             try
             {
-                var availableAmount = CurrencyViewModel.AvailableAmount;
-
-                if (availableAmount == 0)
+                if (CurrencyViewModel.AvailableAmount == 0)
                     return;
 
                 if (App.Account.GetCurrencyAccount(Currency.Name) is not IEstimatable account)
@@ -270,7 +272,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
                     Amount = maxAmountEstimation.Amount;
 
-                    if (maxAmountEstimation.Amount == 0 && availableAmount > 0)
+                    if (maxAmountEstimation.Amount == 0 && CurrencyViewModel.AvailableAmount > 0)
                         Warning = Resources.CvInsufficientFunds;
                 }
             }

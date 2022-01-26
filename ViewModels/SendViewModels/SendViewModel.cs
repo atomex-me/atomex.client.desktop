@@ -127,30 +127,26 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         public ReactiveCommand<Unit, Unit> NextCommand =>
             _nextCommand ??= (_nextCommand = ReactiveCommand.CreateFromTask(OnNextCommand));
 
-        protected virtual async Task OnNextCommand()
+        private async Task OnNextCommand()
         {
             if (string.IsNullOrEmpty(To))
             {
                 Warning = Resources.SvEmptyAddressError;
-                return;
             }
 
             if (!Currency.IsValidAddress(To))
             {
                 Warning = Resources.SvInvalidAddressError;
-                return;
             }
 
             if (Amount <= 0)
             {
                 Warning = Resources.SvAmountLessThanZeroError;
-                return;
             }
 
             if (FeeAmount <= 0)
             {
                 Warning = Resources.SvCommissionLessThanZeroError;
-                return;
             }
             
             var feeAmount = !Currency.IsToken ? FeeAmount : 0;
@@ -158,8 +154,9 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             if (Amount + feeAmount > CurrencyViewModel.AvailableAmount)
             {
                 Warning = Resources.SvAvailableFundsError;
-                return;
             }
+            
+            if (!string.IsNullOrEmpty(Warning)) return;
 
             if (ConfirmStage)
             {
@@ -316,7 +313,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             return $"{address[..length]}···{address[^length..]}";
         }
 
-        private void DesignerMode()
+        protected void DesignerMode()
         {
             var fromCurrencies = DesignTime.Currencies
                 .Select(c => CurrencyViewModelCreator.CreateViewModel(c, subscribeToUpdates: false))

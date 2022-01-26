@@ -6,6 +6,7 @@ using Atomex.Client.Desktop.Properties;
 using Atomex.Core;
 using Atomex.Wallet.Abstract;
 using Atomex.Wallet.Tezos;
+using Avalonia.Controls;
 using Serilog;
 
 namespace Atomex.Client.Desktop.ViewModels.SendViewModels
@@ -15,6 +16,10 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         public TezosSendViewModel()
             : base()
         {
+#if DEBUG
+            if (Design.IsDesignMode)
+                DesignerMode();
+#endif
         }
 
         public TezosSendViewModel(
