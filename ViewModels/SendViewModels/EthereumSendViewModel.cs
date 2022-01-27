@@ -23,8 +23,8 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
     {
         private string TotalFeeCurrencyFormat => CurrencyViewModel.FeeCurrencyFormat;
         public virtual string TotalFeeCurrencyCode => CurrencyCode;
-        public static string GasPriceCode => "GWEI";
-        public static string GasLimitCode => "GAS";
+        public string GasPriceCode => "GWEI";
+        public string GasLimitCode => "GAS";
 
         [Reactive] public int GasLimit { get; set; }
         [Reactive] public int GasPrice { get; set; }
@@ -94,7 +94,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             this.WhenAnyValue(
                     vm => vm.Amount,
                     vm => vm.TotalFee,
-                    (amount, fee) => amount + fee
+                    (amount, fee) => Currency.IsToken ? amount : amount + fee
                 )
                 .Select(totalAmount => totalAmount.ToString(CurrencyFormat, CultureInfo.InvariantCulture))
                 .ToPropertyEx(this, vm => vm.TotalAmountString);

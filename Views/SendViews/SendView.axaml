@@ -374,7 +374,18 @@
                                FontFamily="{DynamicResource DefaultFontFamily}"
                                Foreground="{DynamicResource SecondaryForegroundBrush}"
                                VerticalAlignment="Center"
-                               FontSize="13" />
+                               FontSize="13"
+                               Name="TotalString">
+                        <i:Interaction.Behaviors>
+                            <ia:DataTriggerBehavior Binding="{Binding Currency.IsToken}"
+                                                    ComparisonCondition="Equal"
+                                                    Value="True">
+                                <ia:ChangePropertyAction TargetObject="{Binding #TotalString}"
+                                                         PropertyName="Text"
+                                                         Value="Total (without fees)" />
+                            </ia:DataTriggerBehavior>
+                        </i:Interaction.Behaviors>
+                    </TextBlock>
 
                     <TextBlock Grid.Column="1"
                                Text="{Binding TotalAmountString}"
