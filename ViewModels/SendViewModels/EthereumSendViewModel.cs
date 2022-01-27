@@ -26,7 +26,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         public string GasPriceCode => "GWEI";
         public string GasLimitCode => "GAS";
 
-        [Reactive] public int GasLimit { get; set; }
+        public int GasLimit => decimal.ToInt32(_currency.GetDefaultFee()); //{ get; set; }
         [Reactive] public int GasPrice { get; set; }
         [Reactive] private decimal TotalFee { get; set; }
         [ObservableAsProperty] public string TotalFeeString { get; set; }
@@ -80,10 +80,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 .Select(_ => Unit.Default)
                 .Subscribe(_ => OnQuotesUpdatedEventHandler(_app.QuotesProvider, EventArgs.Empty));
 
-            this.WhenAnyValue(
-                    vm => vm.GasLimit,
-                    vm => vm.GasPrice
-                )
+            this.WhenAnyValue(vm => vm.GasPrice)
                 .Where(_ => !string.IsNullOrEmpty(From))
                 .Subscribe(_ => TotalFee = FeeAmount);
 
@@ -156,16 +153,18 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     gasPrice: UseDefaultFee ? null : GasPrice,
                     reserve: false);
 
+                if (UseDefaultFee) {
+                    if (maxAmountEstimation.Fee > 0) {
+                        GasPrice = decimal.ToInt32(_currency.GetFeePriceFromFeeAmount(maxAmountEstimation.Fee, GasLimit));
+                    } else {
+                        GasPrice = decimal.ToInt32(await _currency.GetDefaultFeePriceAsync());
+                    }
+                }
+
                 if (maxAmountEstimation.Error != null)
                 {
                     Warning = maxAmountEstimation.Error.Description;
                     return;
-                }
-
-                if (UseDefaultFee)
-                {
-                    GasLimit = decimal.ToInt32(_currency.GetDefaultFee());
-                    GasPrice = decimal.ToInt32(_currency.GetFeePriceFromFeeAmount(maxAmountEstimation.Fee, GasLimit));
                 }
 
                 if (Amount > maxAmountEstimation.Amount)
@@ -225,17 +224,14 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                         gasPrice: UseDefaultFee ? null : GasPrice,
                         reserve: false);
 
+                if (UseDefaultFee && maxAmountEstimation.Fee > 0)
+                    GasPrice = decimal.ToInt32(_currency.GetFeePriceFromFeeAmount(maxAmountEstimation.Fee, GasLimit));
+
                 if (maxAmountEstimation.Error != null)
                 {
                     Warning = maxAmountEstimation.Error.Description;
                     Amount = 0;
                     return;
-                }
-
-                if (UseDefaultFee)
-                {
-                    GasLimit = decimal.ToInt32(_currency.GetDefaultFee());
-                    GasPrice = decimal.ToInt32(_currency.GetFeePriceFromFeeAmount(maxAmountEstimation.Fee, GasLimit));
                 }
 
                 Amount = maxAmountEstimation.Amount > 0
