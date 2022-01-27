@@ -241,7 +241,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                         from: new FromOutputs(Outputs),
                         to: To,
                         type: BlockchainTransactionType.Output,
-                        fee: 0,
+                        fee: null,
                         feePrice: FeeRate,
                         reserve: false);
 
