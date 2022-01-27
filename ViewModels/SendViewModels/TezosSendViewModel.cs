@@ -84,7 +84,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     type: BlockchainTransactionType.Output,
                     fee: UseDefaultFee ? 0 : Fee,
                     feePrice: 0,
-                    reserve: false);
+                    reserve: UseDefaultFee);
 
                 if (UseDefaultFee)
                 {
@@ -94,15 +94,15 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                         return;
                     }
 
-                    var estimatedFeeAmount = Amount != 0
-                        ? await account.EstimateFeeAsync(
-                            from: new FromAddress(From),
-                            to: To,
-                            amount: Amount,
-                            type: BlockchainTransactionType.Output)
-                        : 0;
+                    //var estimatedFeeAmount = Amount != 0
+                    //    ? await account.EstimateFeeAsync(
+                    //        from: new FromAddress(From),
+                    //        to: To,
+                    //        amount: Amount,
+                    //        type: BlockchainTransactionType.Output)
+                    //    : 0;
 
-                    Fee = estimatedFeeAmount ?? Currency.GetDefaultFee();
+                    Fee = maxAmountEstimation.Fee; // estimatedFeeAmount ?? Currency.GetDefaultFee();
                 }
                 else
                 {
@@ -137,14 +137,6 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     if (App.Account.GetCurrencyAccount(Currency.Name) is not IEstimatable account)
                         return; // todo: error?
 
-                    var estimatedFeeAmount = Amount != 0
-                        ? await account.EstimateFeeAsync(
-                            from: new FromAddress(From),
-                            to: To,
-                            amount: Amount,
-                            type: BlockchainTransactionType.Output)
-                        : 0;
-
                     var maxAmountEstimation = await account
                         .EstimateMaxAmountToSendAsync(
                             from: new FromAddress(From),
@@ -162,7 +154,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                         return;
                     }
 
-                    if (estimatedFeeAmount == null || Fee < estimatedFeeAmount.Value)
+                    if (Fee < maxAmountEstimation.Fee)
                     {
                         Warning = Resources.CvLowFees;
                     }
@@ -207,22 +199,9 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     {
                         Amount = availableAmount - Fee;
 
-                        var estimatedFeeAmount = Amount != 0
-                            ? await account.EstimateFeeAsync(
-                                from: new FromAddress(From),
-                                to: To,
-                                amount: Amount,
-                                type: BlockchainTransactionType.Output)
-                            : 0;
-
-                        if (estimatedFeeAmount == null || Fee < estimatedFeeAmount.Value)
+                        if (Fee < maxAmountEstimation.Fee)
                         {
                             Warning = Resources.CvLowFees;
-                            if (Fee == 0)
-                            {
-                                Amount = 0;
-                                return;
-                            }
                         }
                     }
                     else
