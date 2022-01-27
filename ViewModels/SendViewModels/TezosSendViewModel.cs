@@ -75,15 +75,12 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         {
             try
             {
-                if (App.Account.GetCurrencyAccount(Currency.Name) is not IEstimatable account)
-                    return; // todo: error?
+                var tezosAccount = App.Account.GetCurrencyAccount<TezosAccount>(Currency.Name);
 
-                var maxAmountEstimation = await account.EstimateMaxAmountToSendAsync(
-                    from: new FromAddress(From),
+                var maxAmountEstimation = await tezosAccount.EstimateMaxAmountToSendAsync(
+                    from: From,
                     to: To,
                     type: BlockchainTransactionType.Output,
-                    fee: UseDefaultFee ? 0 : Fee,
-                    feePrice: 0,
                     reserve: UseDefaultFee);
 
                 if (UseDefaultFee)
@@ -94,15 +91,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                         return;
                     }
 
-                    //var estimatedFeeAmount = Amount != 0
-                    //    ? await account.EstimateFeeAsync(
-                    //        from: new FromAddress(From),
-                    //        to: To,
-                    //        amount: Amount,
-                    //        type: BlockchainTransactionType.Output)
-                    //    : 0;
-
-                    Fee = maxAmountEstimation.Fee; // estimatedFeeAmount ?? Currency.GetDefaultFee();
+                    Fee = maxAmountEstimation.Fee;
                 }
                 else
                 {
@@ -134,16 +123,13 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
                 if (!UseDefaultFee)
                 {
-                    if (App.Account.GetCurrencyAccount(Currency.Name) is not IEstimatable account)
-                        return; // todo: error?
+                    var tezosAccount = App.Account.GetCurrencyAccount<TezosAccount>(Currency.Name);
 
-                    var maxAmountEstimation = await account
+                    var maxAmountEstimation = await tezosAccount
                         .EstimateMaxAmountToSendAsync(
-                            from: new FromAddress(From),
+                            from: From,
                             to: To,
                             type: BlockchainTransactionType.Output,
-                            fee: 0,
-                            feePrice: 0,
                             reserve: false);
 
                     var availableAmount = maxAmountEstimation.Amount + maxAmountEstimation.Fee;
@@ -170,19 +156,19 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         {
             try
             {
-                if (CurrencyViewModel.AvailableAmount == 0)
-                    return;
+                var tezosAccount = App.Account.GetCurrencyAccount<TezosAccount>(Currency.Name);
 
-                if (App.Account.GetCurrencyAccount(Currency.Name) is not IEstimatable account)
-                    return; // todo: error?
-
-                var maxAmountEstimation = await account.EstimateMaxAmountToSendAsync(
-                    from: new FromAddress(From),
+                var maxAmountEstimation = await tezosAccount.EstimateMaxAmountToSendAsync(
+                    from: From,
                     to: To,
                     type: BlockchainTransactionType.Output,
-                    fee: 0,
-                    feePrice: 0,
                     reserve: UseDefaultFee);
+
+                //if (maxAmountEstimation.Error != null)
+                //{
+                //    Warning = "";
+                //    return;
+                //}
 
                 if (UseDefaultFee)
                 {

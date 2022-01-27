@@ -255,7 +255,9 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 .ToPropertyEx(this, vm => vm.FromBeautified);
 
             this.WhenAnyValue(vm => vm.Amount)
-                .Select(amount => amount.ToString(CurrencyFormat, CultureInfo.InvariantCulture))
+                .Select(amount => amount
+                    .TruncateDecimal(Currency.Digits < 9 ? Currency.Digits : 9)
+                    .ToString(CurrencyFormat, CultureInfo.InvariantCulture))
                 .ToPropertyEx(this, vm => vm.AmountString);
 
             this.WhenAnyValue(vm => vm.Fee)
@@ -282,7 +284,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         }
 
         protected abstract Task UpdateAmount();
-        protected abstract Task UpdateFee();
+        protected virtual Task UpdateFee() { return Task.CompletedTask; }
 
         private ReactiveCommand<Unit, Unit> _maxCommand;
 
