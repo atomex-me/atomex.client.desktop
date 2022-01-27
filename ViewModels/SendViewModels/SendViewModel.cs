@@ -228,7 +228,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             this.WhenAnyValue(
                     vm => vm.Amount,
                     vm => vm.Fee,
-                    (amount, fee) => amount + fee
+                    (amount, fee) => Currency.IsToken ? amount : amount + fee
                 )
                 .Select(totalAmount => totalAmount.ToString(CurrencyFormat, CultureInfo.InvariantCulture))
                 .ToPropertyEx(this, vm => vm.TotalAmountString);

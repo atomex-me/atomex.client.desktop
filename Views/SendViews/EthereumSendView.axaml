@@ -264,8 +264,7 @@
                                    LineHeight="20"
                                    Margin="3 0 0 0"
                                    TextAlignment="Right"
-                                   Text="{Binding GasPrice}">
-                        </TextBlock>
+                                   Text="{Binding GasPrice}" />
 
                         <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
                                    FontFamily="{DynamicResource DefaultFontFamily}"
@@ -374,7 +373,7 @@
                         </TextBlock.Text>
                     </TextBlock>
                 </Grid>
-                
+
                 <Grid ColumnDefinitions="*,Auto,Auto,Auto"
                       Margin="0 6 0 0">
                     <TextBlock Grid.Column="0"
@@ -409,7 +408,7 @@
                         </TextBlock.Text>
                     </TextBlock>
                 </Grid>
-                
+
                 <Grid ColumnDefinitions="*,Auto,Auto"
                       Margin="0 6 0 0">
                     <TextBlock Grid.Column="0"
@@ -424,7 +423,7 @@
                                FontFamily="{DynamicResource DefaultFontFamily}"
                                Foreground="{DynamicResource DefaultForegroundBrush}"
                                FontSize="13" />
-                    
+
                     <TextBlock Grid.Column="2"
                                Margin="3 0 0 0"
                                Text="{Binding GasPriceCode}"
@@ -447,7 +446,7 @@
                                FontFamily="{DynamicResource DefaultFontFamily}"
                                Foreground="{DynamicResource DefaultForegroundBrush}"
                                FontSize="13" />
-                    
+
                     <TextBlock Grid.Column="2"
                                Margin="3 0 0 0"
                                Text="{Binding GasLimitCode}"
@@ -467,7 +466,18 @@
                                FontFamily="{DynamicResource DefaultFontFamily}"
                                Foreground="{DynamicResource SecondaryForegroundBrush}"
                                VerticalAlignment="Center"
-                               FontSize="13" />
+                               FontSize="13"
+                               Name="TotalString">
+                        <i:Interaction.Behaviors>
+                            <ia:DataTriggerBehavior Binding="{Binding Currency.IsToken}"
+                                                    ComparisonCondition="Equal"
+                                                    Value="True">
+                                <ia:ChangePropertyAction TargetObject="{Binding #TotalString}"
+                                                         PropertyName="Text"
+                                                         Value="Total (without fees)" />
+                            </ia:DataTriggerBehavior>
+                        </i:Interaction.Behaviors>
+                    </TextBlock>
 
                     <TextBlock Grid.Column="1"
                                Text="{Binding TotalAmountString}"
