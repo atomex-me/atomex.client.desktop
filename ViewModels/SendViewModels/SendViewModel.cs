@@ -3,26 +3,27 @@ using System.Globalization;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
-using System.Threading.Tasks;
 using System.Threading;
+using System.Threading.Tasks;
+
+using Avalonia.Controls;
+using Avalonia.Threading;
 using ReactiveUI;
+using ReactiveUI.Fody.Helpers;
+using Serilog;
+
 using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.Properties;
 using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
 using Atomex.Core;
 using Atomex.MarketData.Abstract;
-using Avalonia.Controls;
-using Avalonia.Threading;
-using ReactiveUI.Fody.Helpers;
-using Serilog;
-
 
 namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 {
     public abstract class SendViewModel : ViewModelBase
     {
-        protected IAtomexApp App { get; }
-        protected CurrencyConfig Currency { get; set; }
+        protected readonly IAtomexApp _app;
+        protected CurrencyConfig _currency;
         public ViewModelBase SelectFromViewModel { get; set; }
         protected SelectAddressViewModel SelectToViewModel { get; set; }
 
@@ -68,7 +69,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
                 if (truncatedValue != Fee)
                 {
-                    Fee = Math.Min(truncatedValue, Currency.GetMaximumFee());
+                    Fee = Math.Min(truncatedValue, _currency.GetMaximumFee());
                 }
 
                 Dispatcher.UIThread.InvokeAsync(() => this.RaisePropertyChanged(nameof(FeeString)));
@@ -100,7 +101,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
         public ReactiveCommand<Unit, Unit> BackCommand => _backCommand ??= (_backCommand = ReactiveCommand.Create(() =>
         {
-            Desktop.App.DialogService.Close();
+            App.DialogService.Close();
         }));
 
         private ReactiveCommand<Unit, Unit> _undoConfirmStageCommand;
@@ -134,7 +135,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 Warning = Resources.SvEmptyAddressError;
             }
 
-            if (!Currency.IsValidAddress(To))
+            if (!_currency.IsValidAddress(To))
             {
                 Warning = Resources.SvInvalidAddressError;
             }
@@ -149,7 +150,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 Warning = Resources.SvCommissionLessThanZeroError;
             }
             
-            var feeAmount = !Currency.IsToken ? FeeAmount : 0;
+            var feeAmount = !_currency.IsToken ? FeeAmount : 0;
 
             if (Amount + feeAmount > CurrencyViewModel.AvailableAmount)
             {
@@ -162,28 +163,28 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             {
                 try
                 {
-                    Desktop.App.DialogService.Show(new SendingViewModel());
+                    App.DialogService.Show(new SendingViewModel());
 
                     var error = await Send();
 
                     if (error != null)
                     {
-                        Desktop.App.DialogService.Show(MessageViewModel.Error(
+                        App.DialogService.Show(MessageViewModel.Error(
                             text: error.Description,
-                            backAction: () => Desktop.App.DialogService.Show(this)));
+                            backAction: () => App.DialogService.Show(this)));
 
                         return;
                     }
 
-                    Desktop.App.DialogService.Show(MessageViewModel.Success(
+                    App.DialogService.Show(MessageViewModel.Success(
                         text: "Sending was successful",
-                        nextAction: () => { Desktop.App.DialogService.Close(); }));
+                        nextAction: () => { App.DialogService.Close(); }));
                 }
                 catch (Exception e)
                 {
-                    Desktop.App.DialogService.Show(MessageViewModel.Error(
+                    App.DialogService.Show(MessageViewModel.Error(
                         text: "An error has occurred while sending transaction.",
-                        backAction: () => Desktop.App.DialogService.Show(this)));
+                        backAction: () => App.DialogService.Show(this)));
 
                     Log.Error(e, "Transaction send error.");
                 }
@@ -208,8 +209,8 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             IAtomexApp app,
             CurrencyConfig currency)
         {
-            App = app ?? throw new ArgumentNullException(nameof(app));
-            Currency = currency ?? throw new ArgumentNullException(nameof(currency));
+            _app = app ?? throw new ArgumentNullException(nameof(app));
+            _currency = currency ?? throw new ArgumentNullException(nameof(currency));
 
             CurrencyViewModel = CurrencyViewModelCreator.CreateViewModel(currency);
             UseDefaultFee = true;
@@ -228,7 +229,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             this.WhenAnyValue(
                     vm => vm.Amount,
                     vm => vm.Fee,
-                    (amount, fee) => Currency.IsToken ? amount : amount + fee
+                    (amount, fee) => _currency.IsToken ? amount : amount + fee
                 )
                 .Select(totalAmount => totalAmount.ToString(CurrencyFormat, CultureInfo.InvariantCulture))
                 .ToPropertyEx(this, vm => vm.TotalAmountString);
@@ -237,7 +238,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     vm => vm.Amount,
                     vm => vm.Fee
                 )
-                .Subscribe(_ => OnQuotesUpdatedEventHandler(App.QuotesProvider, EventArgs.Empty));
+                .Subscribe(_ => OnQuotesUpdatedEventHandler(_app.QuotesProvider, EventArgs.Empty));
 
             this.WhenAnyValue(
                     vm => vm.Amount,
@@ -256,7 +257,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
             this.WhenAnyValue(vm => vm.Amount)
                 .Select(amount => amount
-                    .TruncateDecimal(Currency.Digits < 9 ? Currency.Digits : 9)
+                    .TruncateDecimal(_currency.Digits < 9 ? _currency.Digits : 9)
                     .ToString(CurrencyFormat, CultureInfo.InvariantCulture))
                 .ToPropertyEx(this, vm => vm.AmountString);
 
@@ -279,8 +280,8 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
         private void SubscribeToServices()
         {
-            if (App.HasQuotesProvider)
-                App.QuotesProvider.QuotesUpdated += OnQuotesUpdatedEventHandler;
+            if (_app.HasQuotesProvider)
+                _app.QuotesProvider.QuotesUpdated += OnQuotesUpdatedEventHandler;
         }
 
         protected abstract Task UpdateAmount();
@@ -322,7 +323,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 .Select(c => CurrencyViewModelCreator.CreateViewModel(c, subscribeToUpdates: false))
                 .ToList();
 
-            Currency = fromCurrencies[0].Currency;
+            _currency = fromCurrencies[0].Currency;
             CurrencyViewModel = fromCurrencies[0];
             To = "1BvBMSEYstWetqTFn5Au4m4GFg7xJaNVN2";
             Amount = 0.00001234m;

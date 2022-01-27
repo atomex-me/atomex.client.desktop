@@ -31,7 +31,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             CurrencyConfig currency)
             : base(app, currency)
         {
-            SelectFromViewModel = new SelectAddressViewModel(App.Account, Currency, true)
+            SelectFromViewModel = new SelectAddressViewModel(_app.Account, _currency, true)
             {
                 BackAction = () => { Desktop.App.DialogService.Show(this); },
                 ConfirmAction = (address, balance) =>
@@ -42,7 +42,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 }
             };
 
-            SelectToViewModel = new SelectAddressViewModel(App.Account, Currency)
+            SelectToViewModel = new SelectAddressViewModel(_app.Account, _currency)
             {
                 BackAction = () => { Desktop.App.DialogService.Show(SelectFromViewModel); },
                 ConfirmAction = (address, _) =>
@@ -79,15 +79,15 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         {
             try
             {
-                if (App.Account.GetCurrencyAccount(Currency.Name) is not IEstimatable account)
+                if (_app.Account.GetCurrencyAccount(_currency.Name) is not IEstimatable account)
                     return; // todo: error?
 
                 var maxAmountEstimation = await account.EstimateMaxAmountToSendAsync(
                     from: new FromAddress(From),
                     to: To,
                     type: BlockchainTransactionType.Output,
-                    fee: 0,
-                    feePrice: 0,
+                    fee: null,
+                    feePrice: null,
                     reserve: false);
 
                 if (Amount > maxAmountEstimation.Amount)
@@ -115,12 +115,12 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                             type: BlockchainTransactionType.Output)
                         : 0;
 
-                    Fee = estimatedFeeAmount ?? Currency.GetDefaultFee();
+                    Fee = estimatedFeeAmount ?? _currency.GetDefaultFee();
                 }
             }
             catch (Exception e)
             {
-                Log.Error(e, "{@currency}: update amount error", Currency?.Description);
+                Log.Error(e, "{@currency}: update amount error", _currency?.Description);
             }
         }
 
@@ -138,15 +138,15 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
                 if (!UseDefaultFee)
                 {
-                    if (App.Account.GetCurrencyAccount(Currency.Name) is not IEstimatable account)
+                    if (_app.Account.GetCurrencyAccount(_currency.Name) is not IEstimatable account)
                         return; // todo: error?
 
                     var maxAmountEstimation = await account.EstimateMaxAmountToSendAsync(
                         from: new FromAddress(From),
                         to: To,
                         type: BlockchainTransactionType.Output,
-                        fee: 0,
-                        feePrice: 0,
+                        fee: null,
+                        feePrice: null,
                         reserve: false);
 
                     var estimatedFeeAmount = Amount != 0
@@ -178,12 +178,12 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
                     if (Fee > maxAmountEstimation.Fee)
                         Warning = string.Format(CultureInfo.InvariantCulture, Resources.CvInsufficientChainFunds,
-                            Currency.FeeCurrencyName);
+                            _currency.FeeCurrencyName);
                 }
             }
             catch (Exception e)
             {
-                Log.Error(e, "{@currency}: update fee error", Currency?.Description);
+                Log.Error(e, "{@currency}: update fee error", _currency?.Description);
             }
         }
 
@@ -194,15 +194,15 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 if (CurrencyViewModel.AvailableAmount == 0)
                     return;
 
-                if (App.Account.GetCurrencyAccount(Currency.Name) is not IEstimatable account)
+                if (_app.Account.GetCurrencyAccount(_currency.Name) is not IEstimatable account)
                     return; // todo: error?
 
                 var maxAmountEstimation = await account.EstimateMaxAmountToSendAsync(
                     from: new FromAddress(From),
                     to: To,
                     type: BlockchainTransactionType.Output,
-                    fee: 0,
-                    feePrice: 0,
+                    fee: null,
+                    feePrice: null,
                     reserve: UseDefaultFee);
 
                 if (UseDefaultFee)
@@ -211,7 +211,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                         Amount = maxAmountEstimation.Amount;
                     else
                         Warning = string.Format(CultureInfo.InvariantCulture, Resources.CvInsufficientChainFunds,
-                            Currency.FeeCurrencyName);
+                            _currency.FeeCurrencyName);
 
                     Fee = maxAmountEstimation.Fee;
                 }
@@ -231,12 +231,12 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
                     if (maxAmountEstimation.Amount < CurrencyViewModel.AvailableAmount || Fee > maxAmountEstimation.Fee)
                         Warning = string.Format(CultureInfo.InvariantCulture, Resources.CvInsufficientChainFunds,
-                            Currency.FeeCurrencyName);
+                            _currency.FeeCurrencyName);
                 }
             }
             catch (Exception e)
             {
-                Log.Error(e, "{@currency}: max click error", Currency?.Description);
+                Log.Error(e, "{@currency}: max click error", _currency?.Description);
             }
         }
 
@@ -254,23 +254,23 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
         protected override async Task<Error> Send(CancellationToken cancellationToken = default)
         {
-            var tokenConfig = (Fa12Config)Currency;
+            var tokenConfig = (Fa12Config)_currency;
             var tokenContract = tokenConfig.TokenContractAddress;
             const int tokenId = 0;
             const string? tokenType = "FA12";
 
             var tokenAddress = await TezosTokensSendViewModel.GetTokenAddressAsync(
-                account: App.Account,
+                account: _app.Account,
                 address: From,
                 tokenContract: tokenContract,
                 tokenId: tokenId,
                 tokenType: tokenType);
 
-            var currencyName = App.Account.Currencies
+            var currencyName = _app.Account.Currencies
                 .FirstOrDefault(c => c is Fa12Config fa12 && fa12.TokenContractAddress == tokenContract)
                 ?.Name ?? "FA12";
 
-            var tokenAccount = App.Account.GetTezosTokenAccount<Fa12Account>(
+            var tokenAccount = _app.Account.GetTezosTokenAccount<Fa12Account>(
                 currency: currencyName,
                 tokenContract: tokenContract,
                 tokenId: tokenId);

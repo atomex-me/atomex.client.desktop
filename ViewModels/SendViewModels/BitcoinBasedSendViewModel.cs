@@ -28,9 +28,9 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
         public string FeeRateFormat => "0.#";
 
-        private BitcoinBasedConfig Config => (BitcoinBasedConfig)Currency;
+        private BitcoinBasedConfig Config => (BitcoinBasedConfig)_currency;
 
-        private BitcoinBasedAccount Account => App.Account.GetCurrencyAccount<BitcoinBasedAccount>(Currency.Name);
+        private BitcoinBasedAccount Account => _app.Account.GetCurrencyAccount<BitcoinBasedAccount>(_currency.Name);
 
         public BitcoinBasedSendViewModel()
             : base()
@@ -68,7 +68,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 });
 
             this.WhenAnyValue(vm => vm.FeeRate)
-                .Subscribe(_ => OnQuotesUpdatedEventHandler(App.QuotesProvider, EventArgs.Empty));
+                .Subscribe(_ => OnQuotesUpdatedEventHandler(_app.QuotesProvider, EventArgs.Empty));
 
             var outputs = Account.GetAvailableOutputsAsync()
                 .WaitForResult()
@@ -93,7 +93,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 Config = Config,
             };
 
-            SelectToViewModel = new SelectAddressViewModel(App.Account, Currency)
+            SelectToViewModel = new SelectAddressViewModel(_app.Account, _currency)
             {
                 BackAction = () => { Desktop.App.DialogService.Show(SelectFromViewModel); },
                 ConfirmAction = (address, _) =>
@@ -187,7 +187,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             }
             catch (Exception e)
             {
-                Log.Error(e, "{@currency}: update amount error", Currency?.Description);
+                Log.Error(e, "{@currency}: update amount error", _currency?.Description);
             }
         }
 
@@ -218,7 +218,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             }
             catch (Exception e)
             {
-                Log.Error(e, "{@currency}: update fee error", Currency?.Description);
+                Log.Error(e, "{@currency}: update fee error", _currency?.Description);
             }
         }
 
@@ -292,7 +292,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             }
             catch (Exception e)
             {
-                Log.Error(e, "{@currency}: max click error", Currency?.Description);
+                Log.Error(e, "{@currency}: max click error", _currency?.Description);
             }
         }
 

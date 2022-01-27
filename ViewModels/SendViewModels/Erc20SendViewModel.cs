@@ -15,7 +15,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 {
     public class Erc20SendViewModel : EthereumSendViewModel
     {
-        public override string TotalFeeCurrencyCode => Currency.FeeCurrencyName;
+        public override string TotalFeeCurrencyCode => _currency.FeeCurrencyName;
 
         public Erc20SendViewModel()
             : base()
@@ -37,15 +37,15 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         {
             try
             {
-                if (App.Account.GetCurrencyAccount(Currency.Name) is not IEstimatable account)
+                if (_app.Account.GetCurrencyAccount(_currency.Name) is not IEstimatable account)
                     return; // todo: error?
 
                 var maxAmountEstimation = await account.EstimateMaxAmountToSendAsync(
                     from: new FromAddress(From),
                     to: To,
                     type: BlockchainTransactionType.Output,
-                    fee: UseDefaultFee ? 0 : GasLimit,
-                    feePrice: UseDefaultFee ? 0 : GasPrice,
+                    fee: UseDefaultFee ? null : GasLimit,
+                    feePrice: UseDefaultFee ? null : GasPrice,
                     reserve: false);
 
                 if (Amount > maxAmountEstimation.Amount)
@@ -62,18 +62,18 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
                 if (UseDefaultFee)
                 {
-                    GasLimit = decimal.ToInt32(Currency.GetDefaultFee());
-                    GasPrice = decimal.ToInt32(await Currency.GetDefaultFeePriceAsync());
+                    GasLimit = decimal.ToInt32(_currency.GetDefaultFee());
+                    GasPrice = decimal.ToInt32(await _currency.GetDefaultFeePriceAsync());
                 }
                 else
                 {
-                    if (GasLimit < Currency.GetDefaultFee() || GasPrice == 0)
+                    if (GasLimit < _currency.GetDefaultFee() || GasPrice == 0)
                         Warning = Resources.CvLowFees;
                 }
             }
             catch (Exception e)
             {
-                Log.Error(e, "{@currency}: update amount error", Currency?.Description);
+                Log.Error(e, "{@currency}: update amount error", _currency?.Description);
             }
         }
 
@@ -96,7 +96,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
                 if (!UseDefaultFee)
                 {
-                    if (App.Account.GetCurrencyAccount(Currency.Name) is not IEstimatable account)
+                    if (_app.Account.GetCurrencyAccount(_currency.Name) is not IEstimatable account)
                         return; // todo: error?
 
                     var maxAmountEstimation = await account.EstimateMaxAmountToSendAsync(
@@ -122,7 +122,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             }
             catch (Exception e)
             {
-                Log.Error(e, "{@currency}: update gas price error", Currency?.Description);
+                Log.Error(e, "{@currency}: update gas price error", _currency?.Description);
             }
         }
 
@@ -133,7 +133,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 if (CurrencyViewModel.AvailableAmount == 0)
                     return;
 
-                if (App.Account.GetCurrencyAccount(Currency.Name) is not IEstimatable account)
+                if (_app.Account.GetCurrencyAccount(_currency.Name) is not IEstimatable account)
                     return; // todo: error?
 
                 if (UseDefaultFee)
@@ -142,22 +142,22 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                         from: new FromAddress(From),
                         to: To,
                         type: BlockchainTransactionType.Output,
-                        fee: 0,
-                        feePrice: 0,
+                        fee: null,
+                        feePrice: null,
                         reserve: false);
 
                     if (maxAmountEstimation.Amount > 0)
                         Amount = maxAmountEstimation.Amount;
                     else if (CurrencyViewModel.AvailableAmount > 0)
                         Warning = string.Format(CultureInfo.InvariantCulture, Resources.CvInsufficientChainFunds,
-                            Currency.FeeCurrencyName);
+                            _currency.FeeCurrencyName);
 
-                    GasLimit = decimal.ToInt32(Currency.GetDefaultFee());
-                    GasPrice = decimal.ToInt32(await Currency.GetDefaultFeePriceAsync());
+                    GasLimit = decimal.ToInt32(_currency.GetDefaultFee());
+                    GasPrice = decimal.ToInt32(await _currency.GetDefaultFeePriceAsync());
                 }
                 else
                 {
-                    if (GasLimit < Currency.GetDefaultFee() || GasPrice == 0)
+                    if (GasLimit < _currency.GetDefaultFee() || GasPrice == 0)
                     {
                         Warning = Resources.CvLowFees;
 
@@ -177,14 +177,14 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
                     if (maxAmountEstimation.Amount < CurrencyViewModel.AvailableAmount)
                         Warning = string.Format(CultureInfo.InvariantCulture, Resources.CvInsufficientChainFunds,
-                            Currency.FeeCurrencyName);
+                            _currency.FeeCurrencyName);
                 }
 
-                OnQuotesUpdatedEventHandler(App.QuotesProvider, EventArgs.Empty);
+                OnQuotesUpdatedEventHandler(_app.QuotesProvider, EventArgs.Empty);
             }
             catch (Exception e)
             {
-                Log.Error(e, "{@currency}: max click error", Currency?.Description);
+                Log.Error(e, "{@currency}: max click error", _currency?.Description);
             }
         }
 
@@ -194,7 +194,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 return;
 
             var quote = quotesProvider.GetQuote(CurrencyCode, BaseCurrencyCode);
-            var ethQuote = quotesProvider.GetQuote(Currency.FeeCurrencyName, BaseCurrencyCode);
+            var ethQuote = quotesProvider.GetQuote(_currency.FeeCurrencyName, BaseCurrencyCode);
 
             AmountInBase = Amount * (quote?.Bid ?? 0m);
             FeeInBase = FeeAmount * (ethQuote?.Bid ?? 0m);
@@ -202,7 +202,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
         protected override Task<Error> Send(CancellationToken cancellationToken = default)
         {
-            var account = App.Account.GetCurrencyAccount<Erc20Account>(Currency.Name);
+            var account = _app.Account.GetCurrencyAccount<Erc20Account>(_currency.Name);
 
             return account.SendAsync(
                 from: From,

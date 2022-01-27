@@ -31,7 +31,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         [Reactive] private decimal TotalFee { get; set; }
         [ObservableAsProperty] public string TotalFeeString { get; set; }
         [ObservableAsProperty] public string GasPriceString { get; set; }
-        protected override decimal FeeAmount => Currency.GetFeeAmount(GasLimit, GasPrice);
+        protected override decimal FeeAmount => _currency.GetFeeAmount(GasLimit, GasPrice);
 
         public void SetGasPriceFromString(string value)
         {
@@ -78,7 +78,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
             this.WhenAnyValue(vm => vm.GasPrice)
                 .Select(_ => Unit.Default)
-                .Subscribe(_ => OnQuotesUpdatedEventHandler(App.QuotesProvider, EventArgs.Empty));
+                .Subscribe(_ => OnQuotesUpdatedEventHandler(_app.QuotesProvider, EventArgs.Empty));
 
             this.WhenAnyValue(
                     vm => vm.GasLimit,
@@ -94,29 +94,29 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             this.WhenAnyValue(
                     vm => vm.Amount,
                     vm => vm.TotalFee,
-                    (amount, fee) => Currency.IsToken ? amount : amount + fee
+                    (amount, fee) => _currency.IsToken ? amount : amount + fee
                 )
                 .Select(totalAmount => totalAmount.ToString(CurrencyFormat, CultureInfo.InvariantCulture))
                 .ToPropertyEx(this, vm => vm.TotalAmountString);
 
-            SelectFromViewModel = new SelectAddressViewModel(App.Account, Currency, true)
+            SelectFromViewModel = new SelectAddressViewModel(_app.Account, _currency, true)
             {
-                BackAction = () => { Desktop.App.DialogService.Show(this); },
+                BackAction = () => { App.DialogService.Show(this); },
                 ConfirmAction = (address, balance) =>
                 {
                     From = address;
                     SelectedFromBalance = balance;
-                    Desktop.App.DialogService.Show(SelectToViewModel);
+                    App.DialogService.Show(SelectToViewModel);
                 }
             };
 
-            SelectToViewModel = new SelectAddressViewModel(App.Account, Currency)
+            SelectToViewModel = new SelectAddressViewModel(_app.Account, _currency)
             {
-                BackAction = () => { Desktop.App.DialogService.Show(SelectFromViewModel); },
+                BackAction = () => { App.DialogService.Show(SelectFromViewModel); },
                 ConfirmAction = (address, _) =>
                 {
                     To = address;
-                    Desktop.App.DialogService.Show(this);
+                    App.DialogService.Show(this);
                 }
             };
         }
@@ -129,31 +129,31 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 From = address;
                 SelectedFromBalance = balance;
 
-                Desktop.App.DialogService.Show(this);
+                App.DialogService.Show(this);
             };
 
-            Desktop.App.DialogService.Show(selectFromViewModel);
+            App.DialogService.Show(selectFromViewModel);
         }
 
         protected override void ToClick()
         {
-            SelectToViewModel.BackAction = () => Desktop.App.DialogService.Show(this);
+            SelectToViewModel.BackAction = () => App.DialogService.Show(this);
 
-            Desktop.App.DialogService.Show(SelectToViewModel);
+            App.DialogService.Show(SelectToViewModel);
         }
 
         protected override async Task UpdateAmount()
         {
             try
             {
-                var account = App.Account
-                    .GetCurrencyAccount<EthereumAccount>(Currency.Name);
+                var account = _app.Account
+                    .GetCurrencyAccount<EthereumAccount>(_currency.Name);
 
                 var maxAmountEstimation = await account.EstimateMaxAmountToSendAsync(
                     from: From,
                     type: BlockchainTransactionType.Output,
-                    gasLimit: UseDefaultFee ? 0 : GasLimit,
-                    gasPrice: UseDefaultFee ? 0 : GasPrice,
+                    gasLimit: UseDefaultFee ? null : GasLimit,
+                    gasPrice: UseDefaultFee ? null : GasPrice,
                     reserve: false);
 
                 if (maxAmountEstimation.Error != null)
@@ -164,8 +164,8 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
                 if (UseDefaultFee)
                 {
-                    GasLimit = decimal.ToInt32(Currency.GetDefaultFee());
-                    GasPrice = decimal.ToInt32(Currency.GetFeePriceFromFeeAmount(maxAmountEstimation.Fee, GasLimit));
+                    GasLimit = decimal.ToInt32(_currency.GetDefaultFee());
+                    GasPrice = decimal.ToInt32(_currency.GetFeePriceFromFeeAmount(maxAmountEstimation.Fee, GasLimit));
                 }
 
                 if (Amount > maxAmountEstimation.Amount)
@@ -173,7 +173,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             }
             catch (Exception e)
             {
-                Log.Error(e, "{@currency}: update amount error", Currency?.Description);
+                Log.Error(e, "{@currency}: update amount error", _currency?.Description);
             }
         }
 
@@ -183,8 +183,8 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             {
                 if (!UseDefaultFee)
                 {
-                    var account = App.Account
-                        .GetCurrencyAccount<EthereumAccount>(Currency.Name);
+                    var account = _app.Account
+                        .GetCurrencyAccount<EthereumAccount>(_currency.Name);
 
                     // estimate max amount with new GasPrice
                     var maxAmountEstimation = await account.EstimateMaxAmountToSendAsync(
@@ -206,7 +206,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             }
             catch (Exception e)
             {
-                Log.Error(e, "{@currency}: update gas price error", Currency?.Description);
+                Log.Error(e, "{@currency}: update gas price error", _currency?.Description);
             }
         }
 
@@ -214,15 +214,15 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         {
             try
             {
-                var account = App.Account
-                    .GetCurrencyAccount<EthereumAccount>(Currency.Name);
+                var account = _app.Account
+                    .GetCurrencyAccount<EthereumAccount>(_currency.Name);
 
                 var maxAmountEstimation = await account
                     .EstimateMaxAmountToSendAsync(
                         from: From,
                         type: BlockchainTransactionType.Output,
-                        gasLimit: UseDefaultFee ? 0 : GasLimit,
-                        gasPrice: UseDefaultFee ? 0 : GasPrice,
+                        gasLimit: UseDefaultFee ? null : GasLimit,
+                        gasPrice: UseDefaultFee ? null : GasPrice,
                         reserve: false);
 
                 if (maxAmountEstimation.Error != null)
@@ -234,8 +234,8 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
                 if (UseDefaultFee)
                 {
-                    GasLimit = decimal.ToInt32(Currency.GetDefaultFee());
-                    GasPrice = decimal.ToInt32(Currency.GetFeePriceFromFeeAmount(maxAmountEstimation.Fee, GasLimit));
+                    GasLimit = decimal.ToInt32(_currency.GetDefaultFee());
+                    GasPrice = decimal.ToInt32(_currency.GetFeePriceFromFeeAmount(maxAmountEstimation.Fee, GasLimit));
                 }
 
                 Amount = maxAmountEstimation.Amount > 0
@@ -244,7 +244,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             }
             catch (Exception e)
             {
-                Log.Error(e, "{@currency}: max click error", Currency?.Description);
+                Log.Error(e, "{@currency}: max click error", _currency?.Description);
             }
         }
 
@@ -261,8 +261,8 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
         protected override Task<Error> Send(CancellationToken cancellationToken = default)
         {
-            var account = App.Account
-                .GetCurrencyAccount<EthereumAccount>(Currency.Name);
+            var account = _app.Account
+                .GetCurrencyAccount<EthereumAccount>(_currency.Name);
 
             return account.SendAsync(
                 from: From,
