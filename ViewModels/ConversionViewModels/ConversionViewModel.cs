@@ -19,6 +19,7 @@ using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.Properties;
 using Atomex.Client.Desktop.ViewModels.ConversionViewModels;
 using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
+using Atomex.Client.Desktop.ViewModels.SendViewModels;
 using Atomex.Common;
 using Atomex.Core;
 using Atomex.MarketData;
@@ -28,7 +29,6 @@ using Atomex.Swaps;
 using Atomex.ViewModels;
 using Atomex.Wallet.Abstract;
 using Atomex.Wallet.BitcoinBased;
-using Atomex.Client.Desktop.ViewModels.SendViewModels;
 
 namespace Atomex.Client.Desktop.ViewModels
 {
@@ -95,40 +95,7 @@ namespace Atomex.Client.Desktop.ViewModels
 
         [ObservableAsProperty] public string PriceFormat { get; }
 
-        private decimal _amount;
-        public string AmountString
-        {
-            get => _amount.ToString(FromViewModel.CurrencyViewModel?.CurrencyFormat ?? "0");
-            set
-            {
-                if (!decimal.TryParse(
-                    s: value,
-                    style: NumberStyles.AllowDecimalPoint,
-                    provider: CultureInfo.CurrentCulture,
-                    result: out var amount))
-                {
-                    _amount = 0;
-                }
-                else
-                {
-                    _amount = amount.TruncateByFormat(FromViewModel.CurrencyViewModel?.CurrencyFormat ?? "0");
-
-                    if (_amount > long.MaxValue)
-                        _amount = long.MaxValue;
-                }
-
-                this.RaisePropertyChanged(nameof(AmountString));
-            }
-        }
-
-        [Reactive] public decimal AmountInBase { get; set; }
-
-        [Reactive] public bool IsSwapParamsEstimating { get; set; }
-
         [Reactive] public bool IsAmountValid { get; set; }
-
-        [Reactive] public decimal TargetAmount { get; set; }
-        [Reactive] public decimal TargetAmountInBase { get; set; }
 
         private decimal _estimatedOrderPrice;
 
@@ -284,16 +251,18 @@ namespace Atomex.Client.Desktop.ViewModels
                 .WhereNotNull()
                 .Subscribe(c =>
                 {
-                    var tempAmountString = AmountString;
+                    var tempAmountString = FromViewModel.AmountString;
 
-                    AmountString = _amount.ToString(); // update amount string with new "from" currency format
+                    FromViewModel.AmountString = FromViewModel.Amount.ToString(); // update amount string with new "from" currency format
 
-                    if (AmountString == tempAmountString)
-                        UpdateAmountInBase(); // force update amount in base in case when amount string not changed
+                    if (FromViewModel.AmountString == tempAmountString)
+                        UpdateFromAmountInBase(); // force update amount in base in case when amount string not changed
                 });
 
             // FromCurrencyViewModel or ToCurrencyViewModel changed => update PriceFormat
-            this.WhenAnyValue(vm => vm.FromViewModel.CurrencyViewModel, vm => vm.ToViewModel.CurrencyViewModel)
+            this.WhenAnyValue(
+                    vm => vm.FromViewModel.CurrencyViewModel,
+                    vm => vm.ToViewModel.CurrencyViewModel)
                 .WhereAllNotNull()
                 .Select(t =>
                 {
@@ -305,24 +274,24 @@ namespace Atomex.Client.Desktop.ViewModels
 
             // AmountString, FromCurrencyViewModel or ToCurrencyViewModel changed => estimate swap price and target amount
             this.WhenAnyValue(
-                    vm => vm.AmountString,
+                    vm => vm.FromViewModel.AmountString,
                     vm => vm.FromViewModel.CurrencyViewModel,
                     vm => vm.ToViewModel.CurrencyViewModel,
                     vm => vm.RedeemFromAddress)
                 .Throttle(TimeSpan.FromMilliseconds(1))
                 .Subscribe(a =>
                 {
-                    _ = EstimateSwapParamsAsync(amount: _amount);
+                    _ = EstimateSwapParamsAsync();
                     OnQuotesUpdatedEventHandler(sender: this, args: null);
                 });
 
-            // Amount changed => update AmountInBase
-            this.WhenAnyValue(vm => vm.AmountString)
-                .Subscribe(amount => UpdateAmountInBase());
+            // From Amount changed => update FromViewModel.AmountInBase
+            this.WhenAnyValue(vm => vm.FromViewModel.AmountString)
+                .Subscribe(amount => UpdateFromAmountInBase());
 
-            // TargetAmount changed => update TargetAmountInBase
-            this.WhenAnyValue(vm => vm.TargetAmount)
-                .Subscribe(amount => UpdateTargetAmountInBase());
+            // To Amount changed => update ToViewModel.AmountInBase
+            this.WhenAnyValue(vm => vm.ToViewModel.AmountString)
+                .Subscribe(amount => UpdateToAmountInBase());
 
             // EstimatedPaymentFee changed => update EstimatedPaymentFeeInBase
             this.WhenAnyValue(vm => vm.EstimatedPaymentFee)
@@ -356,7 +325,9 @@ namespace Atomex.Client.Desktop.ViewModels
                 .Subscribe(t => UpdateTotalNetworkFeeInBase());
 
             // AmountInBase or EstimatedTotalNetworkFeeInBase changed => check the ratio of the fee to the amount
-            this.WhenAnyValue(vm => vm.AmountInBase, vm => vm.EstimatedTotalNetworkFeeInBase)
+            this.WhenAnyValue(
+                    vm => vm.FromViewModel.AmountInBase,
+                    vm => vm.EstimatedTotalNetworkFeeInBase)
                 .Subscribe(t => CheckAmountToFeeRatio());
 
             this.WhenAnyValue(vm => vm.DGSelectedIndex)
@@ -404,7 +375,7 @@ namespace Atomex.Client.Desktop.ViewModels
                 //    TODO: warning?
                 //}
 
-                AmountString = Math.Min(swapParams.Amount, EstimatedMaxAmount).ToString();
+                FromViewModel.AmountString = Math.Min(swapParams.Amount, EstimatedMaxAmount).ToString();
             }
             catch (Exception e)
             {
@@ -582,13 +553,13 @@ namespace Atomex.Client.Desktop.ViewModels
                 _app.QuotesProvider.QuotesUpdated += OnBaseQuotesUpdatedEventHandler;
         }
 
-        protected virtual async Task EstimateSwapParamsAsync(decimal amount)
+        protected virtual async Task EstimateSwapParamsAsync()
         {
             // estimate max payment amount and max fee
             var swapParams = await Atomex.ViewModels.Helpers
                 .EstimateSwapParamsAsync(
                     from: FromSource,
-                    amount: amount,
+                    amount: FromViewModel.Amount,
                     redeemFromAddress: RedeemFromAddress,
                     fromCurrency: FromViewModel.CurrencyViewModel?.Currency,
                     toCurrency: ToViewModel.CurrencyViewModel?.Currency,
@@ -635,7 +606,7 @@ namespace Atomex.Client.Desktop.ViewModels
                 EstimatedMakerNetworkFee = swapParams.MakerNetworkFee;
 
                 if (FromViewModel.CurrencyViewModel?.CurrencyFormat != null)
-                    IsAmountValid = _amount <= swapParams.Amount.TruncateByFormat(FromViewModel.CurrencyViewModel.CurrencyFormat);
+                    IsAmountValid = FromViewModel.Amount <= swapParams.Amount.TruncateByFormat(FromViewModel.CurrencyViewModel.CurrencyFormat);
 
             }, DispatcherPriority.Background);
         }
@@ -654,19 +625,19 @@ namespace Atomex.Client.Desktop.ViewModels
             return amount * (quote?.Bid ?? 0m);
         }
 
-        private void UpdateAmountInBase() => AmountInBase = TryGetAmountInBase(
-            amount: _amount,
+        private void UpdateFromAmountInBase() => FromViewModel.AmountInBase = TryGetAmountInBase(
+            amount: FromViewModel.Amount,
             currency: FromViewModel.CurrencyViewModel?.CurrencyCode,
             baseCurrency: FromViewModel.CurrencyViewModel?.BaseCurrencyCode,
             provider: _app.QuotesProvider,
-            defaultAmountInBase: AmountInBase);
+            defaultAmountInBase: FromViewModel.AmountInBase);
 
-        private void UpdateTargetAmountInBase() => TargetAmountInBase = TryGetAmountInBase(
-            amount: TargetAmount,
+        private void UpdateToAmountInBase() => ToViewModel.AmountInBase = TryGetAmountInBase(
+            amount: ToViewModel.Amount,
             currency: ToViewModel.CurrencyViewModel?.CurrencyCode,
             baseCurrency: FromViewModel.CurrencyViewModel?.BaseCurrencyCode,
             provider: _app.QuotesProvider,
-            defaultAmountInBase: TargetAmountInBase);
+            defaultAmountInBase: ToViewModel.AmountInBase);
 
         private void UpdateEstimatedPaymentFeeInBase() => EstimatedPaymentFeeInBase = TryGetAmountInBase(
             amount: EstimatedPaymentFee,
@@ -727,33 +698,33 @@ namespace Atomex.Client.Desktop.ViewModels
 
         private void CheckAmountToFeeRatio()
         {
-            if (AmountInBase != 0 && EstimatedTotalNetworkFeeInBase / AmountInBase > 0.3m)
+            if (FromViewModel.AmountInBase != 0 && EstimatedTotalNetworkFeeInBase / FromViewModel.AmountInBase > 0.3m)
             {
                 IsCriticalWarning = true;
                 Warning = string.Format(
                     provider: CultureInfo.CurrentCulture,
                     format: Resources.CvTooHighNetworkFee,
                     arg0: FormattableString.Invariant($"{EstimatedTotalNetworkFeeInBase:$0.00}"),
-                    arg1: FormattableString.Invariant($"{EstimatedTotalNetworkFeeInBase / AmountInBase:0.00%}"));
+                    arg1: FormattableString.Invariant($"{EstimatedTotalNetworkFeeInBase / FromViewModel.AmountInBase:0.00%}"));
             }
-            else if (AmountInBase != 0 && EstimatedTotalNetworkFeeInBase / AmountInBase > 0.1m)
+            else if (FromViewModel.AmountInBase != 0 && EstimatedTotalNetworkFeeInBase / FromViewModel.AmountInBase > 0.1m)
             {
                 IsCriticalWarning = false;
                 Warning = string.Format(
                     provider: CultureInfo.CurrentCulture,
                     format: Resources.CvSufficientNetworkFee,
                     arg0: FormattableString.Invariant($"{EstimatedTotalNetworkFeeInBase:$0.00}"),
-                    arg1: FormattableString.Invariant($"{EstimatedTotalNetworkFeeInBase / AmountInBase:0.00%}"));
+                    arg1: FormattableString.Invariant($"{EstimatedTotalNetworkFeeInBase / FromViewModel.AmountInBase:0.00%}"));
             }
 
-            CanConvert = AmountInBase == 0 || EstimatedTotalNetworkFeeInBase / AmountInBase <= 0.75m;
+            CanConvert = FromViewModel.AmountInBase == 0 || EstimatedTotalNetworkFeeInBase / FromViewModel.AmountInBase <= 0.75m;
         }
 
         protected async void OnBaseQuotesUpdatedEventHandler(object? sender, EventArgs args)
         {
             await Dispatcher.UIThread.InvokeAsync(() =>
             {
-                UpdateAmountInBase();
+                UpdateFromAmountInBase();
                 UpdateEstimatedPaymentFeeInBase();
                 UpdateEstimatedRedeemFeeInBase();
                 UpdateRewardForRedeemInBase();
@@ -768,7 +739,7 @@ namespace Atomex.Client.Desktop.ViewModels
             try
             {
                 var swapPriceEstimation = await Atomex.ViewModels.Helpers.EstimateSwapPriceAsync(
-                    amount: _amount,
+                    amount: FromViewModel.Amount,
                     fromCurrency: FromViewModel.CurrencyViewModel?.Currency,
                     toCurrency: ToViewModel.CurrencyViewModel?.Currency,
                     account: _app.Account,
@@ -779,7 +750,7 @@ namespace Atomex.Client.Desktop.ViewModels
                 {
                     if (swapPriceEstimation == null)
                     {
-                        TargetAmount       = 0;
+                        ToViewModel.Amount = 0;
                         EstimatedPrice     = 0;
                         EstimatedMaxAmount = 0;
                         IsNoLiquidity      = false;
@@ -788,7 +759,7 @@ namespace Atomex.Client.Desktop.ViewModels
 
                     _estimatedOrderPrice = swapPriceEstimation.OrderPrice;
 
-                    TargetAmount       = swapPriceEstimation.TargetAmount;
+                    ToViewModel.Amount = swapPriceEstimation.TargetAmount;
                     EstimatedPrice     = swapPriceEstimation.Price;
                     EstimatedMaxAmount = swapPriceEstimation.MaxAmount;
                     IsNoLiquidity      = swapPriceEstimation.IsNoLiquidity;
@@ -868,7 +839,7 @@ namespace Atomex.Client.Desktop.ViewModels
             //    return;
             //}
 
-            if (_amount == 0)
+            if (FromViewModel.Amount == 0)
             {
                 App.DialogService.Show(
                     MessageViewModel.Message(
@@ -924,7 +895,7 @@ namespace Atomex.Client.Desktop.ViewModels
 
             var qty = AmountHelper.AmountToQty(
                 side: side,
-                amount: _amount,
+                amount: FromViewModel.Amount,
                 price: price,
                 digitsMultiplier: baseCurrency.DigitsMultiplier);
 
@@ -960,10 +931,10 @@ namespace Atomex.Client.Desktop.ViewModels
                 RedeemFromAddress              = RedeemFromAddress,
 
                 PriceFormat                    = PriceFormat,
-                Amount                         = _amount,
-                AmountInBase                   = AmountInBase,
-                TargetAmount                   = TargetAmount,
-                TargetAmountInBase             = TargetAmountInBase,
+                Amount                         = FromViewModel.Amount,
+                AmountInBase                   = FromViewModel.AmountInBase,
+                TargetAmount                   = ToViewModel.Amount,
+                TargetAmountInBase             = ToViewModel.AmountInBase,
 
                 EstimatedPrice                 = EstimatedPrice,
                 EstimatedOrderPrice            = _estimatedOrderPrice,
@@ -988,8 +959,8 @@ namespace Atomex.Client.Desktop.ViewModels
 
         private void OnSuccessConvertion(object? sender, EventArgs e)
         {
-            _amount = Math.Min(_amount, EstimatedMaxAmount); // recalculate amount
-            _ = EstimateSwapParamsAsync(_amount);
+            FromViewModel.Amount = Math.Min(FromViewModel.Amount, EstimatedMaxAmount); // recalculate amount
+            _ = EstimateSwapParamsAsync();
         }
 
 #if DEBUG
@@ -1028,7 +999,7 @@ namespace Atomex.Client.Desktop.ViewModels
                 Address            = "bc1q...f3hr",
                 AmountString       = "0.00007881",
                 UnselectedLabel    = "Choose From",
-                AmountInBaseString = "$12.32",
+                AmountInBase       = 12.32m,
             };
 
             ToViewModel = new ConversionCurrencyViewModel
@@ -1037,7 +1008,7 @@ namespace Atomex.Client.Desktop.ViewModels
                 Address            = "ltc1...med6",
                 AmountString       = "558.55271303",
                 UnselectedLabel    = "Choose To",
-                AmountInBaseString = "$123.32",
+                AmountInBase       = 123.32m,
             };
 
             //FromValidationMessage = "Error line Error line Error line Error line Error line Error line " +

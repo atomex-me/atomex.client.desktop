@@ -7,6 +7,7 @@
              d:DesignHeight="102"
              xmlns:vm="clr-namespace:Atomex.Client.Desktop.ViewModels"
              xmlns:views="clr-namespace:Atomex.Client.Desktop.Views"
+             xmlns:converters="clr-namespace:Atomex.Client.Desktop.Converters"
              x:Class="Atomex.Client.Desktop.Views.ConversionCurrencyView"
              Classes="designer">
 
@@ -21,6 +22,7 @@
   </Design.DesignStyle>       
 
   <UserControl.Resources>
+    <converters:AmountToStringConverter x:Key="AmountToStringConverter"/>
     <SolidColorBrush x:Key="CurrencySelectionViewBorderBrush"
                      Color="{DynamicResource LightDefaultOpacity20}"/>
     <SolidColorBrush x:Key="CurrencySelectionViewBackgroundBrush"
@@ -141,7 +143,14 @@
                  Grid.Row="2"
                  Grid.Column="1"
                  Grid.ColumnSpan="3"
-                 IsVisible="{Binding Selected}"/>
+                 IsVisible="{Binding Selected}">
+        <TextBlock.Text>
+          <MultiBinding Converter="{StaticResource AmountToStringConverter}">
+            <Binding Path="AmountInBase"/>
+            <Binding Path="CurrencyViewModel.BaseCurrencyFormat"/>
+          </MultiBinding>
+        </TextBlock.Text>
+      </TextBlock>
 
       <!-- Unselected view -->
       <Button CornerRadius="8"
