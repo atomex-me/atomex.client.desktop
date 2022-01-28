@@ -5,19 +5,19 @@ using System.Linq;
 using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Atomex.Blockchain.Abstract;
-using Atomex.Blockchain.BitcoinBased;
-using Atomex.Client.Desktop.Properties;
-using Atomex.Common;
-using Atomex.Core;
-using Atomex.Wallet.Abstract;
-using Atomex.Wallet.BitcoinBased;
+
 using Avalonia.Controls;
 using NBitcoin;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using Serilog;
 using Network = NBitcoin.Network;
+
+using Atomex.Blockchain.BitcoinBased;
+using Atomex.Client.Desktop.Properties;
+using Atomex.Common;
+using Atomex.Core;
+using Atomex.Wallet.BitcoinBased;
 
 namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 {
@@ -84,22 +84,22 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     IsSelected = true
                 }), Config, Account)
             {
-                BackAction = () => { Desktop.App.DialogService.Show(this); },
+                BackAction = () => { App.DialogService.Show(this); },
                 ConfirmAction = ots =>
                 {
                     Outputs = new ObservableCollection<BitcoinBasedTxOutput>(ots);
-                    Desktop.App.DialogService.Show(SelectToViewModel);
+                    App.DialogService.Show(SelectToViewModel);
                 },
                 Config = Config,
             };
 
             SelectToViewModel = new SelectAddressViewModel(_app.Account, _currency)
             {
-                BackAction = () => { Desktop.App.DialogService.Show(SelectFromViewModel); },
+                BackAction = () => { App.DialogService.Show(SelectFromViewModel); },
                 ConfirmAction = (address, _) =>
                 {
                     To = address;
-                    Desktop.App.DialogService.Show(this);
+                    App.DialogService.Show(this);
                 }
             };
         }
@@ -117,23 +117,23 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
             SelectFromViewModel = new SelectOutputsViewModel(outputs, Config, Account)
             {
-                BackAction = () => { Desktop.App.DialogService.Show(this); },
+                BackAction = () => { App.DialogService.Show(this); },
                 ConfirmAction = ots =>
                 {
                     Outputs = new ObservableCollection<BitcoinBasedTxOutput>(ots);
-                    Desktop.App.DialogService.Show(this);
+                    App.DialogService.Show(this);
                 },
                 Config = Config,
             };
 
-            Desktop.App.DialogService.Show(SelectFromViewModel);
+            App.DialogService.Show(SelectFromViewModel);
         }
 
         protected override void ToClick()
         {
-            SelectToViewModel.BackAction = () => Desktop.App.DialogService.Show(this);
+            SelectToViewModel.BackAction = () => App.DialogService.Show(this);
 
-            Desktop.App.DialogService.Show(SelectToViewModel);
+            App.DialogService.Show(SelectToViewModel);
         }
 
         protected override async Task UpdateAmount()
@@ -238,12 +238,10 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     FeeRate = await Config.GetFeeRateAsync();
 
                     var maxAmountEstimation = await Account.EstimateMaxAmountToSendAsync(
-                        from: new FromOutputs(Outputs),
+                        outputs: Outputs,
                         to: To,
-                        type: BlockchainTransactionType.Output,
                         fee: null,
-                        feePrice: FeeRate,
-                        reserve: false);
+                        feeRate: FeeRate);
 
                     if (maxAmountEstimation.Amount > 0)
                     {

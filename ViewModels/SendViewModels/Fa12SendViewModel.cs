@@ -40,6 +40,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 {
                     From = address;
                     SelectedFromBalance = balance;
+
                     App.DialogService.Show(SelectToViewModel);
                 }
             };
@@ -81,44 +82,32 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         {
             try
             {
-                if (_app.Account.GetCurrencyAccount(_currency.Name) is not IEstimatable account)
-                    return; // todo: error?
+                var account = _app.Account
+                    .GetCurrencyAccount<Fa12Account>(_currency.Name);
 
-                var maxAmountEstimation = await account.EstimateMaxAmountToSendAsync(
-                    from: new FromAddress(From),
-                    to: To,
-                    type: BlockchainTransactionType.Output,
-                    fee: null,
-                    feePrice: null,
-                    reserve: false);
+                var maxAmountEstimation = await account
+                    .EstimateMaxAmountToSendAsync(
+                        from: From,
+                        type: BlockchainTransactionType.Output,
+                        reserve: UseDefaultFee);
+
+                if (UseDefaultFee && maxAmountEstimation.Fee > 0)
+                    Fee = maxAmountEstimation.Fee;
+
+                if (maxAmountEstimation.Error != null)
+                {
+                    Warning = maxAmountEstimation.Error.Description;
+                    return;
+                }
 
                 if (Amount > maxAmountEstimation.Amount)
                 {
-                    if (maxAmountEstimation.Error != null)
-                    {
-                        Warning = maxAmountEstimation.Error.Description;
-                        return;
-                    }
-
-                    if (Amount <= CurrencyViewModel.AvailableAmount)
-                    {
-                        Warning = Resources.CvInsufficientFunds;
-                        return;
-                    }
+                    Warning = Resources.CvInsufficientFunds;
+                    return;
                 }
 
-                if (UseDefaultFee)
-                {
-                    var estimatedFeeAmount = Amount != 0
-                        ? await account.EstimateFeeAsync(
-                            from: new FromAddress(From),
-                            to: To,
-                            amount: Amount,
-                            type: BlockchainTransactionType.Output)
-                        : 0;
-
-                    Fee = estimatedFeeAmount ?? _currency.GetDefaultFee();
-                }
+                if (Fee < maxAmountEstimation.Fee)
+                    Warning = Resources.CvLowFees;
             }
             catch (Exception e)
             {
@@ -130,57 +119,31 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         {
             try
             {
-                if (Amount == 0)
-                {
-                    if (Fee > CurrencyViewModel.AvailableAmount)
-                        Warning = Resources.CvInsufficientFunds;
-
-                    return;
-                }
-
                 if (!UseDefaultFee)
                 {
-                    if (_app.Account.GetCurrencyAccount(_currency.Name) is not IEstimatable account)
-                        return; // todo: error?
+                    var account = _app.Account
+                        .GetCurrencyAccount<Fa12Account>(_currency.Name);
 
-                    var maxAmountEstimation = await account.EstimateMaxAmountToSendAsync(
-                        from: new FromAddress(From),
-                        to: To,
-                        type: BlockchainTransactionType.Output,
-                        fee: null,
-                        feePrice: null,
-                        reserve: false);
+                    var maxAmountEstimation = await account
+                        .EstimateMaxAmountToSendAsync(
+                            from: From,
+                            type: BlockchainTransactionType.Output,
+                            reserve: UseDefaultFee);
 
-                    var estimatedFeeAmount = Amount != 0
-                        ? await account.EstimateFeeAsync(
-                            from: new FromAddress(From),
-                            to: To,
-                            amount: Amount,
-                            type: BlockchainTransactionType.Output)
-                        : 0;
+                    if (maxAmountEstimation.Error != null)
+                    {
+                        Warning = maxAmountEstimation.Error.Description;
+                        return;
+                    }
 
                     if (Amount > maxAmountEstimation.Amount)
                     {
-                        if (maxAmountEstimation.Error != null)
-                        {
-                            Warning = maxAmountEstimation.Error.Description;
-                            return;
-                        }
-
-                        if (Amount <= CurrencyViewModel.AvailableAmount)
-                        {
-                            Warning = Resources.CvInsufficientFunds;
-                            return;
-                        }
+                        Warning = Resources.CvInsufficientFunds;
+                        return;
                     }
-                    else if (estimatedFeeAmount == null || Fee < estimatedFeeAmount.Value)
-                    {
+
+                    if (Fee < maxAmountEstimation.Fee)
                         Warning = Resources.CvLowFees;
-                    }
-
-                    if (Fee > maxAmountEstimation.Fee)
-                        Warning = string.Format(CultureInfo.InvariantCulture, Resources.CvInsufficientChainFunds,
-                            _currency.FeeCurrencyName);
                 }
             }
             catch (Exception e)
@@ -193,48 +156,31 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         {
             try
             {
-                if (CurrencyViewModel.AvailableAmount == 0)
-                    return;
+                var account = _app.Account
+                    .GetCurrencyAccount<Fa12Account>(_currency.Name);
 
-                if (_app.Account.GetCurrencyAccount(_currency.Name) is not IEstimatable account)
-                    return; // todo: error?
+                var maxAmountEstimation = await account
+                    .EstimateMaxAmountToSendAsync(
+                        from: From,
+                        type: BlockchainTransactionType.Output,
+                        reserve: UseDefaultFee);
 
-                var maxAmountEstimation = await account.EstimateMaxAmountToSendAsync(
-                    from: new FromAddress(From),
-                    to: To,
-                    type: BlockchainTransactionType.Output,
-                    fee: null,
-                    feePrice: null,
-                    reserve: UseDefaultFee);
-
-                if (UseDefaultFee)
-                {
-                    if (maxAmountEstimation.Amount > 0)
-                        Amount = maxAmountEstimation.Amount;
-                    else
-                        Warning = string.Format(CultureInfo.InvariantCulture, Resources.CvInsufficientChainFunds,
-                            _currency.FeeCurrencyName);
-
+                if (UseDefaultFee && maxAmountEstimation.Fee > 0)
                     Fee = maxAmountEstimation.Fee;
-                }
-                else
+
+                if (maxAmountEstimation.Error != null)
                 {
-                    if (Fee < maxAmountEstimation.Fee)
-                    {
-                        Warning = Resources.CvLowFees;
-                        if (Fee == 0)
-                        {
-                            Amount = 0;
-                            return;
-                        }
-                    }
-
-                    Amount = maxAmountEstimation.Amount;
-
-                    if (maxAmountEstimation.Amount < CurrencyViewModel.AvailableAmount || Fee > maxAmountEstimation.Fee)
-                        Warning = string.Format(CultureInfo.InvariantCulture, Resources.CvInsufficientChainFunds,
-                            _currency.FeeCurrencyName);
+                    Warning = maxAmountEstimation.Error.Description;
+                    Amount = 0;
+                    return;
                 }
+
+                Amount = maxAmountEstimation.Amount > 0
+                    ? maxAmountEstimation.Amount
+                    : 0;
+
+                if (Fee < maxAmountEstimation.Fee)
+                    Warning = Resources.CvLowFees;
             }
             catch (Exception e)
             {
