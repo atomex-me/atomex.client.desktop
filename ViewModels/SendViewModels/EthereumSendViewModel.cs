@@ -103,6 +103,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 {
                     From = address;
                     SelectedFromBalance = balance;
+
                     App.DialogService.Show(SelectToViewModel);
                 }
             };

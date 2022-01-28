@@ -3,6 +3,10 @@ using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+
+using Avalonia.Controls;
+using Serilog;
+
 using Atomex.Blockchain.Abstract;
 using Atomex.Client.Desktop.Properties;
 using Atomex.Core;
@@ -10,8 +14,6 @@ using Atomex.MarketData.Abstract;
 using Atomex.TezosTokens;
 using Atomex.Wallet.Abstract;
 using Atomex.Wallet.Tezos;
-using Avalonia.Controls;
-using Serilog;
 
 namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 {
@@ -33,22 +35,22 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         {
             SelectFromViewModel = new SelectAddressViewModel(_app.Account, _currency, true)
             {
-                BackAction = () => { Desktop.App.DialogService.Show(this); },
+                BackAction = () => { App.DialogService.Show(this); },
                 ConfirmAction = (address, balance) =>
                 {
                     From = address;
                     SelectedFromBalance = balance;
-                    Desktop.App.DialogService.Show(SelectToViewModel);
+                    App.DialogService.Show(SelectToViewModel);
                 }
             };
 
             SelectToViewModel = new SelectAddressViewModel(_app.Account, _currency)
             {
-                BackAction = () => { Desktop.App.DialogService.Show(SelectFromViewModel); },
+                BackAction = () => { App.DialogService.Show(SelectFromViewModel); },
                 ConfirmAction = (address, _) =>
                 {
                     To = address;
-                    Desktop.App.DialogService.Show(this);
+                    App.DialogService.Show(this);
                 }
             };
         }
@@ -62,17 +64,17 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 From = address;
                 SelectedFromBalance = balance;
 
-                Desktop.App.DialogService.Show(this);
+                App.DialogService.Show(this);
             };
 
-            Desktop.App.DialogService.Show(selectFromViewModel);
+            App.DialogService.Show(selectFromViewModel);
         }
 
         protected override void ToClick()
         {
-            SelectToViewModel.BackAction = () => Desktop.App.DialogService.Show(this);
+            SelectToViewModel.BackAction = () => App.DialogService.Show(this);
 
-            Desktop.App.DialogService.Show(SelectToViewModel);
+            App.DialogService.Show(SelectToViewModel);
         }
 
         protected override async Task UpdateAmount()

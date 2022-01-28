@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+
+using Avalonia.Controls;
+using Serilog;
+
 using Atomex.Blockchain.Abstract;
 using Atomex.Client.Desktop.Properties;
 using Atomex.Core;
-using Atomex.Wallet.Abstract;
 using Atomex.Wallet.Tezos;
-using Avalonia.Controls;
-using Serilog;
 
 namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 {
@@ -29,22 +30,23 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         {
             SelectFromViewModel = new SelectAddressViewModel(_app.Account, _currency, true)
             {
-                BackAction = () => { Desktop.App.DialogService.Show(this); },
+                BackAction = () => { App.DialogService.Show(this); },
                 ConfirmAction = (address, balance) =>
                 {
                     From = address;
                     SelectedFromBalance = balance;
-                    Desktop.App.DialogService.Show(SelectToViewModel);
+
+                    App.DialogService.Show(SelectToViewModel);
                 }
             };
 
             SelectToViewModel = new SelectAddressViewModel(_app.Account, _currency)
             {
-                BackAction = () => { Desktop.App.DialogService.Show(SelectFromViewModel); },
+                BackAction = () => { App.DialogService.Show(SelectFromViewModel); },
                 ConfirmAction = (address, _) =>
                 {
                     To = address;
-                    Desktop.App.DialogService.Show(this);
+                    App.DialogService.Show(this);
                 }
             };
         }
@@ -58,24 +60,25 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 From = address;
                 SelectedFromBalance = balance;
 
-                Desktop.App.DialogService.Show(this);
+                App.DialogService.Show(this);
             };
 
-            Desktop.App.DialogService.Show(selectFromViewModel);
+            App.DialogService.Show(selectFromViewModel);
         }
 
         protected override void ToClick()
         {
-            SelectToViewModel.BackAction = () => Desktop.App.DialogService.Show(this);
+            SelectToViewModel.BackAction = () => App.DialogService.Show(this);
 
-            Desktop.App.DialogService.Show(SelectToViewModel);
+            App.DialogService.Show(SelectToViewModel);
         }
 
         protected override async Task UpdateAmount()
         {
             try
             {
-                var tezosAccount = _app.Account.GetCurrencyAccount<TezosAccount>(_currency.Name);
+                var tezosAccount = _app.Account
+                    .GetCurrencyAccount<TezosAccount>(_currency.Name);
 
                 var maxAmountEstimation = await tezosAccount.EstimateMaxAmountToSendAsync(
                     from: From,
@@ -83,25 +86,19 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     type: BlockchainTransactionType.Output,
                     reserve: UseDefaultFee);
 
-                if (UseDefaultFee)
-                {
-                    if (Amount > maxAmountEstimation.Amount)
-                    {
-                        Warning = Resources.CvInsufficientFunds;
-                        return;
-                    }
-
+                if (UseDefaultFee && maxAmountEstimation.Fee > 0)
                     Fee = maxAmountEstimation.Fee;
-                }
-                else
-                {
-                    var availableAmount = maxAmountEstimation.Amount + maxAmountEstimation.Fee;
 
-                    if (Amount > maxAmountEstimation.Amount || Amount + Fee > availableAmount)
-                    {
-                        Warning = Resources.CvInsufficientFunds;
-                    }
+                if (maxAmountEstimation.Error != null)
+                {
+                    Warning = maxAmountEstimation.Error.Description;
+                    return;
                 }
+
+                var availableAmount = maxAmountEstimation.Amount + maxAmountEstimation.Fee;
+
+                if (Amount + Fee > availableAmount)
+                    Warning = Resources.CvInsufficientFunds;
             }
             catch (Exception e)
             {
@@ -113,17 +110,10 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         {
             try
             {
-                if (Amount == 0)
-                {
-                    if (Fee > CurrencyViewModel.AvailableAmount)
-                        Warning = Resources.CvInsufficientFunds;
-
-                    return;
-                }
-
                 if (!UseDefaultFee)
                 {
-                    var tezosAccount = _app.Account.GetCurrencyAccount<TezosAccount>(_currency.Name);
+                    var tezosAccount = _app.Account
+                        .GetCurrencyAccount<TezosAccount>(_currency.Name);
 
                     var maxAmountEstimation = await tezosAccount
                         .EstimateMaxAmountToSendAsync(
@@ -131,6 +121,12 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                             to: To,
                             type: BlockchainTransactionType.Output,
                             reserve: false);
+
+                    if (maxAmountEstimation.Error != null)
+                    {
+                        Warning = maxAmountEstimation.Error.Description;
+                        return;
+                    }
 
                     var availableAmount = maxAmountEstimation.Amount + maxAmountEstimation.Fee;
 
@@ -141,9 +137,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     }
 
                     if (Fee < maxAmountEstimation.Fee)
-                    {
                         Warning = Resources.CvLowFees;
-                    }
                 }
             }
             catch (Exception e)
@@ -156,7 +150,8 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         {
             try
             {
-                var tezosAccount = _app.Account.GetCurrencyAccount<TezosAccount>(_currency.Name);
+                var tezosAccount = _app.Account
+                    .GetCurrencyAccount<TezosAccount>(_currency.Name);
 
                 var maxAmountEstimation = await tezosAccount.EstimateMaxAmountToSendAsync(
                     from: From,
@@ -164,38 +159,65 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     type: BlockchainTransactionType.Output,
                     reserve: UseDefaultFee);
 
+                if (UseDefaultFee && maxAmountEstimation.Fee > 0)
+                    Fee = maxAmountEstimation.Fee;
+
+                if (maxAmountEstimation.Error != null)
+                {
+                    Warning = maxAmountEstimation.Error.Description;
+                    return;
+                }
+
+                if (UseDefaultFee)
+                {
+                    Amount = maxAmountEstimation.Amount > 0
+                        ? maxAmountEstimation.Amount
+                        : 0;
+                }
+                else
+                {
+                    var availableAmount = maxAmountEstimation.Amount + maxAmountEstimation.Fee;
+
+                    Amount = availableAmount - Fee > 0
+                        ? availableAmount - Fee
+                        : 0;
+
+                    if (Fee < maxAmountEstimation.Fee)
+                        Warning = Resources.CvLowFees;
+                }
+
                 //if (maxAmountEstimation.Error != null)
                 //{
                 //    Warning = "";
                 //    return;
                 //}
 
-                if (UseDefaultFee)
-                {
-                    if (maxAmountEstimation.Amount > 0)
-                        Amount = maxAmountEstimation.Amount;
+                //if (UseDefaultFee)
+                //{
+                //    if (maxAmountEstimation.Amount > 0)
+                //        Amount = maxAmountEstimation.Amount;
 
-                    Fee = maxAmountEstimation.Fee;
-                }
-                else
-                {
-                    var availableAmount = maxAmountEstimation.Amount + maxAmountEstimation.Fee;
+                //    Fee = maxAmountEstimation.Fee;
+                //}
+                //else
+                //{
+                //    var availableAmount = maxAmountEstimation.Amount + maxAmountEstimation.Fee;
 
-                    if (availableAmount - Fee > 0)
-                    {
-                        Amount = availableAmount - Fee;
+                //    if (availableAmount - Fee > 0)
+                //    {
+                //        Amount = availableAmount - Fee;
 
-                        if (Fee < maxAmountEstimation.Fee)
-                        {
-                            Warning = Resources.CvLowFees;
-                        }
-                    }
-                    else
-                    {
-                        Amount = 0;
-                        Warning = Resources.CvInsufficientFunds;
-                    }
-                }
+                //        if (Fee < maxAmountEstimation.Fee)
+                //        {
+                //            Warning = Resources.CvLowFees;
+                //        }
+                //    }
+                //    else
+                //    {
+                //        Amount = 0;
+                //        Warning = Resources.CvInsufficientFunds;
+                //    }
+                //}
             }
             catch (Exception e)
             {
