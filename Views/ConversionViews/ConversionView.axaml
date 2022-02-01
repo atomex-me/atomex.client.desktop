@@ -262,200 +262,248 @@
                   <TextBlock Foreground="{DynamicResource DefaultForegroundBrush}"
                              Text="Network fees for atomic swap:"/>
 
-                  <StackPanel Margin="0 7 0 0"
-                              Orientation="Horizontal"
-                              HorizontalAlignment="Left"
-                              VerticalAlignment="Center">
+                  <Grid Margin="0 7 0 0"
+                        ColumnDefinitions="Auto,15,Auto,5,Auto"
+                        RowDefinitions="Auto,Auto,Auto,Auto">
+
                     <!-- payment fee -->
                     <TextBlock Foreground="{DynamicResource DefaultForegroundBrush}"
-                               Text="Payment fee:"/>
+                               Text="Payment fee:"
+                               Grid.Row="0"
+                               Grid.Column="0"/>
 
-                    <TextBlock Margin="5 0 0 0"
-                               Foreground="{DynamicResource DefaultForegroundBrush}"
-                               FontFamily="{DynamicResource DefaultFontFamily}">
-                      <TextBlock.Text>
-                        <MultiBinding Converter="{StaticResource AmountToStringConverter}">
-                          <Binding Path="EstimatedPaymentFee"
-                                   Mode="TwoWay"/>
-                          <Binding Path="FromViewModel.CurrencyViewModel.FeeCurrencyFormat"
-                                   Mode="OneWay"/>
-                        </MultiBinding>
-                      </TextBlock.Text>
-                    </TextBlock>
+                    <StackPanel Orientation="Horizontal"
+                                HorizontalAlignment="Right"
+                                VerticalAlignment="Center"
+                                Grid.Row="0"
+                                Grid.Column="2">
 
-                    <TextBlock Text="{Binding FromViewModel.CurrencyViewModel.FeeCurrencyCode}"
-                               Margin="3 0 0 2"
-                               FontSize="9"
-                               VerticalAlignment="Bottom"
-                               Foreground="{DynamicResource DefaultForegroundBrush}"
-                               FontFamily="{DynamicResource DefaultFontFamily}"/>
+                      <TextBlock Foreground="{DynamicResource DefaultForegroundBrush}"
+                                 FontFamily="{DynamicResource DefaultFontFamily}">
+                        <TextBlock.Text>
+                          <MultiBinding Converter="{StaticResource AmountToStringConverter}">
+                            <Binding Path="EstimatedPaymentFee"
+                                     Mode="TwoWay"/>
+                            <Binding Path="FromViewModel.CurrencyViewModel.FeeCurrencyFormat"
+                                     Mode="OneWay"/>
+                          </MultiBinding>
+                        </TextBlock.Text>
+                      </TextBlock>
+
+                      <TextBlock Text="{Binding FromViewModel.CurrencyViewModel.FeeCurrencyCode}"
+                                 Margin="3 0 0 1"
+                                 FontSize="9"
+                                 VerticalAlignment="Bottom"
+                                 Foreground="{DynamicResource DefaultForegroundBrush}"
+                                 FontFamily="{DynamicResource DefaultFontFamily}"/>
+                    </StackPanel>
 
                     <!-- payment fee in base -->
-                    <TextBlock Margin="5 0 0 0"
-                               Foreground="{DynamicResource DefaultAmountInBaseForegroundBrush}"
-                               Text="("/>
+                    <StackPanel Orientation="Horizontal"
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Center"
+                                Grid.Row="0"
+                                Grid.Column="4">
 
-                    <TextBlock Foreground="{DynamicResource DefaultAmountInBaseForegroundBrush}"
-                               FontFamily="{DynamicResource DefaultFontFamily}">
-                      <TextBlock.Text>
-                        <MultiBinding Converter="{StaticResource AmountToStringConverter}">
-                          <Binding Path="EstimatedPaymentFeeInBase"
-                                   Mode="TwoWay"/>
-                          <Binding Path="FromViewModel.CurrencyViewModel.BaseCurrencyFormat"
-                                   Mode="OneWay"/>
-                        </MultiBinding>
-                      </TextBlock.Text>
-                    </TextBlock>
+                      <TextBlock Foreground="{DynamicResource DefaultAmountInBaseForegroundBrush}"
+                                 Text="("/>
 
-                    <TextBlock Foreground="{DynamicResource DefaultAmountInBaseForegroundBrush}"
-                               Text=")" />
-                  </StackPanel>
+                      <TextBlock Foreground="{DynamicResource DefaultAmountInBaseForegroundBrush}"
+                                 FontFamily="{DynamicResource DefaultFontFamily}">
+                        <TextBlock.Text>
+                          <MultiBinding Converter="{StaticResource AmountToStringConverter}">
+                            <Binding Path="EstimatedPaymentFeeInBase"
+                                     Mode="TwoWay"/>
+                            <Binding Path="FromViewModel.CurrencyViewModel.BaseCurrencyFormat"
+                                     Mode="OneWay"/>
+                          </MultiBinding>
+                        </TextBlock.Text>
+                      </TextBlock>
 
-                  <!-- redeem fee -->
-                  <StackPanel Orientation="Horizontal"
-                              HorizontalAlignment="Left"
-                              VerticalAlignment="Center"
-                              IsVisible="{Binding !HasRewardForRedeem}">
+                      <TextBlock Foreground="{DynamicResource DefaultAmountInBaseForegroundBrush}"
+                                 Text=")" />
+                    </StackPanel>
+
+                    <!-- redeem fee -->
                     <TextBlock Foreground="{DynamicResource DefaultForegroundBrush}"
-                               Text="Redeem fee:"/>
+                               Text="Redeem fee:"
+                               Grid.Row="1"
+                               Grid.Column="0"
+                               IsVisible="{Binding !HasRewardForRedeem}"/>
 
-                    <TextBlock Margin="5 0 0 0"
-                               Foreground="{DynamicResource DefaultForegroundBrush}"
-                               FontFamily="{DynamicResource DefaultFontFamily}">
-                      <TextBlock.Text>
-                        <MultiBinding Converter="{StaticResource AmountToStringConverter}">
-                          <Binding Path="EstimatedRedeemFee"
-                                   Mode="TwoWay"/>
-                          <Binding Path="ToViewModel.CurrencyViewModel.FeeCurrencyFormat"
-                                   Mode="OneWay"/>
-                        </MultiBinding>
-                      </TextBlock.Text>
-                    </TextBlock>
+                    <StackPanel Orientation="Horizontal"
+                                HorizontalAlignment="Right"
+                                VerticalAlignment="Center"
+                                Grid.Row="1"
+                                Grid.Column="2"
+                                IsVisible="{Binding !HasRewardForRedeem}">
 
-                    <TextBlock Text="{Binding ToViewModel.CurrencyViewModel.FeeCurrencyCode}"
-                               Margin="3 0 0 2"
-                               FontSize="9"
-                               VerticalAlignment="Bottom"
-                               Foreground="{DynamicResource DefaultForegroundBrush}"
-                               FontFamily="{DynamicResource DefaultFontFamily}"/>
+                      <TextBlock Foreground="{DynamicResource DefaultForegroundBrush}"
+                                 FontFamily="{DynamicResource DefaultFontFamily}">
+                        <TextBlock.Text>
+                          <MultiBinding Converter="{StaticResource AmountToStringConverter}">
+                            <Binding Path="EstimatedRedeemFee"
+                                     Mode="TwoWay"/>
+                            <Binding Path="ToViewModel.CurrencyViewModel.FeeCurrencyFormat"
+                                     Mode="OneWay"/>
+                          </MultiBinding>
+                        </TextBlock.Text>
+                      </TextBlock>
+
+                      <TextBlock Text="{Binding ToViewModel.CurrencyViewModel.FeeCurrencyCode}"
+                                 Margin="3 0 0 1"
+                                 FontSize="9"
+                                 VerticalAlignment="Bottom"
+                                 Foreground="{DynamicResource DefaultForegroundBrush}"
+                                 FontFamily="{DynamicResource DefaultFontFamily}"/>
+                    </StackPanel>
 
                     <!-- redeem fee in base -->
-                    <TextBlock Margin="5 0 0 0"
-                               Foreground="{DynamicResource DefaultAmountInBaseForegroundBrush}"
-                               Text="("/>
+                    <StackPanel Orientation="Horizontal"
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Center"
+                                Grid.Row="1"
+                                Grid.Column="4"
+                                IsVisible="{Binding !HasRewardForRedeem}">
 
-                    <TextBlock Foreground="{DynamicResource DefaultAmountInBaseForegroundBrush}"
-                               FontFamily="{DynamicResource DefaultFontFamily}">
-                      <TextBlock.Text>
-                        <MultiBinding Converter="{StaticResource AmountToStringConverter}">
-                          <Binding Path="EstimatedRedeemFeeInBase"
-                                   Mode="TwoWay"/>
-                          <Binding Path="FromViewModel.CurrencyViewModel.BaseCurrencyFormat"
-                                   Mode="OneWay"/>
-                        </MultiBinding>
-                      </TextBlock.Text>
-                    </TextBlock>
+                      <TextBlock Foreground="{DynamicResource DefaultAmountInBaseForegroundBrush}"
+                                 Text="("/>
 
-                    <TextBlock Foreground="{DynamicResource DefaultAmountInBaseForegroundBrush}"
-                               Text=")"/>
-                  </StackPanel>
+                      <TextBlock Foreground="{DynamicResource DefaultAmountInBaseForegroundBrush}"
+                                 FontFamily="{DynamicResource DefaultFontFamily}">
+                        <TextBlock.Text>
+                          <MultiBinding Converter="{StaticResource AmountToStringConverter}">
+                            <Binding Path="EstimatedRedeemFeeInBase"
+                                     Mode="TwoWay"/>
+                            <Binding Path="FromViewModel.CurrencyViewModel.BaseCurrencyFormat"
+                                     Mode="OneWay"/>
+                          </MultiBinding>
+                        </TextBlock.Text>
+                      </TextBlock>
 
-                  <!-- maker fee -->
-                  <StackPanel Orientation="Horizontal"
-                              HorizontalAlignment="Left"
-                              VerticalAlignment="Center">
+                      <TextBlock Foreground="{DynamicResource DefaultAmountInBaseForegroundBrush}"
+                                 Text=")"/>
+                    </StackPanel>
+
+                    <!-- maker fee -->
                     <TextBlock Foreground="{DynamicResource DefaultForegroundBrush}"
-                               Text="Maker fee:"/>
+                               Text="Maker fee:"
+                               Grid.Row="2"
+                               Grid.Column="0"/>
 
-                    <TextBlock Margin="5 0 0 0"
-                               Foreground="{DynamicResource DefaultForegroundBrush}"
-                               FontFamily="{DynamicResource DefaultFontFamily}">
-                      <TextBlock.Text>
-                        <MultiBinding Converter="{StaticResource AmountToStringConverter}">
-                          <Binding Path="EstimatedMakerNetworkFee"
-                                   Mode="TwoWay"/>
-                          <Binding Path="FromViewModel.CurrencyViewModel.CurrencyFormat"
-                                   Mode="OneWay"/>
-                        </MultiBinding>
-                      </TextBlock.Text>
-                    </TextBlock>
+                    <StackPanel Orientation="Horizontal"
+                                HorizontalAlignment="Right"
+                                VerticalAlignment="Center"
+                                Grid.Row="2"
+                                Grid.Column="2">
 
-                    <TextBlock Text="{Binding FromViewModel.CurrencyViewModel.CurrencyCode}"
-                               Margin="3 0 0 2"
-                               FontSize="9"
-                               VerticalAlignment="Bottom"
-                               Foreground="{DynamicResource DefaultForegroundBrush}"
-                               FontFamily="{DynamicResource DefaultFontFamily}"/>
+                      <TextBlock Foreground="{DynamicResource DefaultForegroundBrush}"
+                                 FontFamily="{DynamicResource DefaultFontFamily}">
+                        <TextBlock.Text>
+                          <MultiBinding Converter="{StaticResource AmountToStringConverter}">
+                            <Binding Path="EstimatedMakerNetworkFee"
+                                     Mode="TwoWay"/>
+                            <Binding Path="FromViewModel.CurrencyViewModel.CurrencyFormat"
+                                     Mode="OneWay"/>
+                          </MultiBinding>
+                        </TextBlock.Text>
+                      </TextBlock>
+
+                      <TextBlock Text="{Binding FromViewModel.CurrencyViewModel.CurrencyCode}"
+                                 Margin="3 0 0 1"
+                                 FontSize="9"
+                                 VerticalAlignment="Bottom"
+                                 Foreground="{DynamicResource DefaultForegroundBrush}"
+                                 FontFamily="{DynamicResource DefaultFontFamily}"/>
+                    </StackPanel>
 
                     <!-- maker fee in base -->
-                    <TextBlock Margin="5 0 0 0"
-                               Foreground="{DynamicResource DefaultAmountInBaseForegroundBrush}"
-                               Text="("/>
+                    <StackPanel Orientation="Horizontal"
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Center"
+                                Grid.Row="2"
+                                Grid.Column="4">
 
-                    <TextBlock Foreground="{DynamicResource DefaultAmountInBaseForegroundBrush}"
-                               FontFamily="{DynamicResource DefaultFontFamily}">
-                      <TextBlock.Text>
-                        <MultiBinding Converter="{StaticResource AmountToStringConverter}">
-                          <Binding Path="EstimatedMakerNetworkFeeInBase"
-                                   Mode="TwoWay"/>
-                          <Binding Path="FromViewModel.CurrencyViewModel.BaseCurrencyFormat"
-                                   Mode="OneWay"/>
-                        </MultiBinding>
-                      </TextBlock.Text>
-                    </TextBlock>
+                      <TextBlock Foreground="{DynamicResource DefaultAmountInBaseForegroundBrush}"
+                                 Text="("/>
 
-                    <TextBlock Foreground="{DynamicResource DefaultAmountInBaseForegroundBrush}"
-                               Text=")"/>
-                  </StackPanel>
+                      <TextBlock Foreground="{DynamicResource DefaultAmountInBaseForegroundBrush}"
+                                 FontFamily="{DynamicResource DefaultFontFamily}">
+                        <TextBlock.Text>
+                          <MultiBinding Converter="{StaticResource AmountToStringConverter}">
+                            <Binding Path="EstimatedMakerNetworkFeeInBase"
+                                     Mode="TwoWay"/>
+                            <Binding Path="FromViewModel.CurrencyViewModel.BaseCurrencyFormat"
+                                     Mode="OneWay"/>
+                          </MultiBinding>
+                        </TextBlock.Text>
+                      </TextBlock>
 
-                  <!-- reward for redeem -->
-                  <StackPanel Orientation="Horizontal"
-                              HorizontalAlignment="Left"
-                              VerticalAlignment="Center"
-                              IsVisible="{Binding HasRewardForRedeem}">
+                      <TextBlock Foreground="{DynamicResource DefaultAmountInBaseForegroundBrush}"
+                                 Text=")"/>
+                    </StackPanel>
+
+                    <!-- reward for redeem -->
                     <TextBlock Foreground="{DynamicResource DefaultForegroundBrush}"
-                               Text="Reward for redeem:"/>
+                               Text="Reward for redeem:"
+                               Grid.Row="3"
+                               Grid.Column="0"
+                               IsVisible="{Binding HasRewardForRedeem}"/>
 
-                    <TextBlock Margin="5 0 0 0"
-                               Foreground="{DynamicResource DefaultForegroundBrush}"
-                               FontFamily="{DynamicResource DefaultFontFamily}">
-                      <TextBlock.Text>
-                        <MultiBinding Converter="{StaticResource AmountToStringConverter}">
-                          <Binding Path="RewardForRedeem"
-                                   Mode="TwoWay"/>
-                          <Binding Path="ToViewModel.CurrencyViewModel.CurrencyFormat"
-                                   Mode="OneWay"/>
-                        </MultiBinding>
-                      </TextBlock.Text>
-                    </TextBlock>
+                    <StackPanel Orientation="Horizontal"
+                                HorizontalAlignment="Right"
+                                VerticalAlignment="Center"
+                                Grid.Row="3"
+                                Grid.Column="2"
+                                IsVisible="{Binding HasRewardForRedeem}">
 
-                    <TextBlock Text="{Binding ToViewModel.CurrencyViewModel.CurrencyCode}"
-                               Margin="3 0 0 2"
-                               FontSize="9"
-                               VerticalAlignment="Bottom"
-                               Foreground="{DynamicResource DefaultForegroundBrush}"
-                               FontFamily="{DynamicResource DefaultFontFamily}"/>
+                      <TextBlock Foreground="{DynamicResource DefaultForegroundBrush}"
+                                 FontFamily="{DynamicResource DefaultFontFamily}">
+                        <TextBlock.Text>
+                          <MultiBinding Converter="{StaticResource AmountToStringConverter}">
+                            <Binding Path="RewardForRedeem"
+                                     Mode="TwoWay"/>
+                            <Binding Path="ToViewModel.CurrencyViewModel.CurrencyFormat"
+                                     Mode="OneWay"/>
+                          </MultiBinding>
+                        </TextBlock.Text>
+                      </TextBlock>
+
+                      <TextBlock Text="{Binding ToViewModel.CurrencyViewModel.CurrencyCode}"
+                                 Margin="3 0 0 1"
+                                 FontSize="9"
+                                 VerticalAlignment="Bottom"
+                                 Foreground="{DynamicResource DefaultForegroundBrush}"
+                                 FontFamily="{DynamicResource DefaultFontFamily}"/>
+                    </StackPanel>
 
                     <!-- reward for redeem in base -->
-                    <TextBlock Margin="5 0 0 0"
-                               Foreground="{DynamicResource DefaultAmountInBaseForegroundBrush}"
-                               Text="("/>
+                    <StackPanel Orientation="Horizontal"
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Center"
+                                Grid.Row="3"
+                                Grid.Column="4"
+                                IsVisible="{Binding HasRewardForRedeem}">
 
-                    <TextBlock Foreground="{DynamicResource DefaultAmountInBaseForegroundBrush}"
-                               FontFamily="{DynamicResource DefaultFontFamily}">
-                      <TextBlock.Text>
-                        <MultiBinding Converter="{StaticResource AmountToStringConverter}">
-                          <Binding Path="RewardForRedeemInBase"
-                                   Mode="TwoWay"/>
-                          <Binding Path="FromViewModel.CurrencyViewModel.BaseCurrencyFormat"
-                                   Mode="OneWay"/>
-                        </MultiBinding>
-                      </TextBlock.Text>
-                    </TextBlock>
+                      <TextBlock Foreground="{DynamicResource DefaultAmountInBaseForegroundBrush}"
+                                 Text="("/>
 
-                    <TextBlock Foreground="{DynamicResource DefaultAmountInBaseForegroundBrush}"
-                               Text=")"/>
-                  </StackPanel>
+                      <TextBlock Foreground="{DynamicResource DefaultAmountInBaseForegroundBrush}"
+                                 FontFamily="{DynamicResource DefaultFontFamily}">
+                        <TextBlock.Text>
+                          <MultiBinding Converter="{StaticResource AmountToStringConverter}">
+                            <Binding Path="RewardForRedeemInBase"
+                                     Mode="TwoWay"/>
+                            <Binding Path="FromViewModel.CurrencyViewModel.BaseCurrencyFormat"
+                                     Mode="OneWay"/>
+                          </MultiBinding>
+                        </TextBlock.Text>
+                      </TextBlock>
+
+                      <TextBlock Foreground="{DynamicResource DefaultAmountInBaseForegroundBrush}"
+                                 Text=")"/>
+                    </StackPanel>
+                  </Grid>
 
                   <!-- total network fees -->
                   <StackPanel Margin="0 7 0 0"

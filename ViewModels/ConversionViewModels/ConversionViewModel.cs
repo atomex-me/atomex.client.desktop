@@ -90,7 +90,7 @@ namespace Atomex.Client.Desktop.ViewModels
         [Reactive] public string ValidationMessageToolTip { get; set; }
         [Reactive] public MessageType ValidationMessageType { get; set; }
 
-        [ObservableAsProperty] public string PriceFormat { get; }
+        [Reactive] public string PriceFormat { get; set; }
 
         [Reactive] public bool IsAmountValid { get; set; }
 
@@ -262,18 +262,19 @@ namespace Atomex.Client.Desktop.ViewModels
                         UpdateFromAmountInBase(); // force update amount in base in case when amount string not changed
                 });
 
-            // FromCurrencyViewModel or ToCurrencyViewModel changed => update PriceFormat
+            // FromCurrencyViewModel or ToCurrencyViewModel changed
             this.WhenAnyValue(
                     vm => vm.FromViewModel.CurrencyViewModel,
                     vm => vm.ToViewModel.CurrencyViewModel)
                 .WhereAllNotNull()
-                .Select(t =>
+                .Subscribe(t =>
                 {
                     var symbol = Symbols.SymbolByCurrencies(t.Item1.Currency, t.Item2.Currency);
-                    return symbol != null ? Currencies.GetByName(symbol.Quote).Format : null;
-                })
-                .WhereNotNull()
-                .ToPropertyEx(this, vm => vm.PriceFormat);
+
+                    PriceFormat = symbol != null ? Currencies.GetByName(symbol.Quote).Format : null;
+                    BaseCurrencyCode = symbol?.Base;
+                    QuoteCurrencyCode = symbol?.Quote;
+                });
 
             // AmountStrings, FromCurrencyViewModel or ToCurrencyViewModel changed => estimate swap price and target amount
             this.WhenAnyValue(
