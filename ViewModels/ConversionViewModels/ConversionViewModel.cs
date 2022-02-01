@@ -286,8 +286,8 @@ namespace Atomex.Client.Desktop.ViewModels
                 .Throttle(TimeSpan.FromMilliseconds(1))
                 .Subscribe(a =>
                 {
-                    OnQuotesUpdatedEventHandler(sender: this, args: null);
                     _ = EstimateSwapParamsAsync();
+                    OnQuotesUpdatedEventHandler(sender: this, args: null);
                 });
 
             // From Amount changed => update FromViewModel.AmountInBase
@@ -561,59 +561,66 @@ namespace Atomex.Client.Desktop.ViewModels
 
         protected virtual async Task EstimateSwapParamsAsync()
         {
-            // estimate max payment amount and max fee
-            var swapParams = await Atomex.ViewModels.Helpers
-                .EstimateSwapParamsAsync(
-                    from: FromCurrencyViewModelItem?.FromSource,
-                    fromAmount: FromViewModel.Amount,
-                    redeemFromAddress: RedeemFromAddress,
-                    fromCurrency: FromViewModel.CurrencyViewModel?.Currency,
-                    toCurrency: ToViewModel.CurrencyViewModel?.Currency,
-                    account: _app.Account,
-                    atomexClient: _app.Terminal,
-                    symbolsProvider: _app.SymbolsProvider,
-                    quotesProvider: _app.QuotesProvider);
-
-            await Dispatcher.UIThread.InvokeAsync(() =>
+            try
             {
-                if (swapParams == null)
-                {
-                    EstimatedPaymentFee      = 0;
-                    EstimatedRedeemFee       = 0;
-                    RewardForRedeem          = 0;
-                    EstimatedMakerNetworkFee = 0;
-                    ValidationMessage        = string.Empty;
-                    return;
-                }
+                // estimate max payment amount and max fee
+                var swapParams = await Atomex.ViewModels.Helpers
+                    .EstimateSwapParamsAsync(
+                        from: FromCurrencyViewModelItem?.FromSource,
+                        fromAmount: FromViewModel.Amount,
+                        redeemFromAddress: RedeemFromAddress,
+                        fromCurrency: FromViewModel.CurrencyViewModel?.Currency,
+                        toCurrency: ToViewModel.CurrencyViewModel?.Currency,
+                        account: _app.Account,
+                        atomexClient: _app.Terminal,
+                        symbolsProvider: _app.SymbolsProvider,
+                        quotesProvider: _app.QuotesProvider);
 
-                if (swapParams.Error != null)
+                await Dispatcher.UIThread.InvokeAsync(() =>
                 {
-                    ValidationMessage = swapParams.Error.Code switch
+                    if (swapParams == null)
                     {
-                        Errors.InsufficientFunds      => Resources.CvInsufficientFunds,
-                        Errors.InsufficientChainFunds => string.Format(
-                            provider: CultureInfo.CurrentCulture,
-                            format: Resources.CvInsufficientChainFunds,
-                            arg0: FromViewModel.CurrencyViewModel?.Currency.FeeCurrencyName),
-                        Errors.FromAddressIsNullOrEmpty => Resources.CvFromAddressIsNullOrEmpty,
-                        _ => Resources.CvError
-                    };
-                    ValidationMessageType = MessageType.Error;
-                }
-                else
-                {
-                    ValidationMessage = string.Empty;
-                }
+                        EstimatedPaymentFee = 0;
+                        EstimatedRedeemFee = 0;
+                        RewardForRedeem = 0;
+                        EstimatedMakerNetworkFee = 0;
+                        FromValidationMessage = string.Empty;
+                        return;
+                    }
 
-                EstimatedPaymentFee      = swapParams.PaymentFee;
-                EstimatedRedeemFee       = swapParams.RedeemFee;
-                RewardForRedeem          = swapParams.RewardForRedeem;
-                EstimatedMakerNetworkFee = swapParams.MakerNetworkFee;
+                    if (swapParams.Error != null)
+                    {
+                        FromValidationMessageType = MessageType.Error;
+                        FromValidationMessage = swapParams.Error.Code switch
+                        {
+                            Errors.InsufficientFunds => Resources.CvInsufficientFunds,
+                            Errors.InsufficientChainFunds => string.Format(
+                                provider: CultureInfo.CurrentCulture,
+                                format: Resources.CvInsufficientChainFunds,
+                                arg0: FromViewModel.CurrencyViewModel?.Currency.FeeCurrencyName),
+                            Errors.FromAddressIsNullOrEmpty => Resources.CvFromAddressIsNullOrEmpty,
+                            _ => Resources.CvError
+                        };
+                    }
+                    else
+                    {
+                        FromValidationMessage = string.Empty;
+                    }
 
-                if (FromViewModel.CurrencyViewModel?.CurrencyFormat != null)
-                    IsAmountValid = FromViewModel.Amount <= swapParams.Amount.TruncateByFormat(FromViewModel.CurrencyViewModel.CurrencyFormat);
+                    EstimatedPaymentFee = swapParams.PaymentFee;
+                    EstimatedRedeemFee = swapParams.RedeemFee;
+                    RewardForRedeem = swapParams.RewardForRedeem;
+                    EstimatedMakerNetworkFee = swapParams.MakerNetworkFee;
 
-            }, DispatcherPriority.Background);
+                    if (FromViewModel.CurrencyViewModel?.CurrencyFormat != null)
+                        IsAmountValid = FromViewModel.Amount <= swapParams.Amount.TruncateByFormat(FromViewModel.CurrencyViewModel.CurrencyFormat);
+
+                }, DispatcherPriority.Background);
+            }
+            catch (Exception e)
+            {
+
+            }
         }
 
         private static decimal TryGetAmountInBase(
@@ -726,6 +733,10 @@ namespace Atomex.Client.Desktop.ViewModels
                     format: Resources.CvSufficientNetworkFee,
                     arg0: FormattableString.Invariant($"{EstimatedTotalNetworkFeeInBase:$0.00}"),
                     arg1: FormattableString.Invariant($"{EstimatedTotalNetworkFeeInBase / FromViewModel.AmountInBase:0.00%}"));
+            }
+            else
+            {
+                ValidationMessage = string.Empty;
             }
 
             CanConvert = FromViewModel.AmountInBase == 0 || EstimatedTotalNetworkFeeInBase / FromViewModel.AmountInBase <= 0.75m;
