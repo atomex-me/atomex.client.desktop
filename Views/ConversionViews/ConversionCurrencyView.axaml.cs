@@ -3,6 +3,7 @@ using System.Reactive.Linq;
 
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Input;
 using Avalonia.Markup.Xaml;
 using Avalonia.Threading;
 
@@ -34,6 +35,12 @@ namespace Atomex.Client.Desktop.Views
         private void InitializeComponent()
         {
             AvaloniaXamlLoader.Load(this);
+        }
+
+        public void OnGotFocus(object sender, GotFocusEventArgs args)
+        {
+            if (DataContext is ConversionCurrencyViewModel viewModel)
+                viewModel.RaiseGotInputFocus();
         }
     }
 }

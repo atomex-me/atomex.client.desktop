@@ -132,8 +132,7 @@
       </Grid>
           
       <!-- to currency view -->
-      <views:ConversionCurrencyView Margin="0 0 0 0"
-                                    Width="486"
+      <views:ConversionCurrencyView Width="486"
                                     Height="102"
                                     DataContext="{Binding ToViewModel}"/>
 
@@ -502,7 +501,7 @@
                      FontFamily="{DynamicResource DefaultLightFontFamily}">
             <TextBlock.Text>
               <MultiBinding Converter="{StaticResource AmountToStringConverter}">
-                <Binding Path="EstimatedMaxAmount"/>
+                <Binding Path="EstimatedMaxFromAmount"/>
                 <Binding Path="FromViewModel.CurrencyViewModel.CurrencyFormat"/>
               </MultiBinding>
             </TextBlock.Text>

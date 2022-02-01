@@ -30,8 +30,8 @@ namespace Atomex.Client.Desktop.ViewModels
                     currencyConfig: purchasedCurrency,
                     subscribeToUpdates: false);
 
-                var fromAmount = AmountHelper.QtyToAmount(swap.Side, swap.Qty, swap.Price, soldCurrency.DigitsMultiplier);
-                var toAmount = AmountHelper.QtyToAmount(swap.Side.Opposite(), swap.Qty, swap.Price,
+                var fromAmount = AmountHelper.QtyToSellAmount(swap.Side, swap.Qty, swap.Price, soldCurrency.DigitsMultiplier);
+                var toAmount = AmountHelper.QtyToSellAmount(swap.Side.Opposite(), swap.Qty, swap.Price,
                     purchasedCurrency.DigitsMultiplier);
 
                 var quoteCurrency = swap.Symbol.QuoteCurrency() == swap.SoldCurrency

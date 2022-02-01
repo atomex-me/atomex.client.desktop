@@ -16,6 +16,7 @@ namespace Atomex.Client.Desktop.ViewModels
     {
         public Action MaxClicked { get; set; }
         public Action SelectCurrencyClicked { get; set; }
+        public Action GotInputFocus { get; set; }
 
         [Reactive] public CurrencyViewModel? CurrencyViewModel { get; set; }
 
@@ -58,6 +59,7 @@ namespace Atomex.Client.Desktop.ViewModels
         [ObservableAsProperty] public bool Selected { get; }
 
         [Reactive] public string UnselectedLabel { get; set; }
+        [Reactive] public bool UseMax { get; set; }
 
         public ConversionCurrencyViewModel()
         {
@@ -69,6 +71,11 @@ namespace Atomex.Client.Desktop.ViewModels
                 .ToPropertyEx(this, vm => vm.Selected);
         }
 
+        public void RaiseGotInputFocus()
+        {
+            GotInputFocus?.Invoke();
+        }
+
         private void DesignerMode()
         {
             UnselectedLabel    = "Choose From";
@@ -78,6 +85,7 @@ namespace Atomex.Client.Desktop.ViewModels
             Address            = "13V2gzjUL9DiHZLy1WFk9q6pZ3yBsb4TzP".TruncateAddress();
             AmountString       = "12.000516666";
             AmountInBase       = 3451.43m;
+            UseMax             = true;
         }
     }
 }

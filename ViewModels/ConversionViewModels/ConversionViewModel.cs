@@ -27,7 +27,6 @@ using Atomex.MarketData.Abstract;
 using Atomex.Services;
 using Atomex.Swaps;
 using Atomex.ViewModels;
-using Atomex.Wallet.Abstract;
 using Atomex.Wallet.BitcoinBased;
 
 namespace Atomex.Client.Desktop.ViewModels
@@ -67,9 +66,7 @@ namespace Atomex.Client.Desktop.ViewModels
             }
         }
 
-        private IFromSource FromSource { get; set; }
-        [Reactive] public decimal FromBalance { get; set; }
-        [Reactive] public string ToAddress { get; set; }
+        public string ToAddress => (ToCurrencyViewModelItem as SelectCurrencyWithAddressViewModelItem)?.SelectedAddress?.Address;
         [Reactive] public string RedeemFromAddress { get; set; }
         [Reactive] public bool UseRedeemAddress { get; set; }
 
@@ -97,10 +94,13 @@ namespace Atomex.Client.Desktop.ViewModels
 
         [Reactive] public bool IsAmountValid { get; set; }
 
+        public AmountType _amountType;
+
         private decimal _estimatedOrderPrice;
 
         [Reactive] public decimal EstimatedPrice { get; set; }
-        [Reactive] public decimal EstimatedMaxAmount { get; set; }
+        [Reactive] public decimal EstimatedMaxFromAmount { get; set; }
+        [Reactive] public decimal EstimatedMaxToAmount { get; set; }
         [Reactive] public decimal EstimatedMakerNetworkFee { get; set; }
         [Reactive] public decimal EstimatedMakerNetworkFeeInBase { get; set; }
         [Reactive] public decimal EstimatedPaymentFee { get; set; }
@@ -111,9 +111,6 @@ namespace Atomex.Client.Desktop.ViewModels
         [Reactive] public decimal RewardForRedeem { get; set; }
         [Reactive] public decimal RewardForRedeemInBase { get; set; }
         [ObservableAsProperty] public bool HasRewardForRedeem { get; }
-
-        [Reactive] public string Warning { get; set; }
-        [Reactive] public bool IsCriticalWarning { get; set; }
 
         [Reactive] public bool CanConvert { get; set; }
 
@@ -150,7 +147,8 @@ namespace Atomex.Client.Desktop.ViewModels
             FromViewModel = new ConversionCurrencyViewModel
             {
                 UnselectedLabel = "Choose From",
-                MaxClicked = () => { },
+                UseMax = true,
+                MaxClicked = MaxClicked,
                 SelectCurrencyClicked = async () =>
                 {
                     var selectCurrencyViewModel = new SelectCurrencyViewModel(
@@ -171,13 +169,15 @@ namespace Atomex.Client.Desktop.ViewModels
                     };
 
                     App.DialogService.Show(selectCurrencyViewModel);
+                },
+                GotInputFocus = () => {
+                    _amountType = AmountType.Sold;
                 }
             };
 
             ToViewModel = new ConversionCurrencyViewModel
             {
                 UnselectedLabel = "Choose To",
-                MaxClicked = () => { },
                 SelectCurrencyClicked = async () =>
                 {
                     var selectCurrencyViewModel = new SelectCurrencyViewModel(
@@ -198,6 +198,9 @@ namespace Atomex.Client.Desktop.ViewModels
                     };
 
                     App.DialogService.Show(selectCurrencyViewModel);
+                },
+                GotInputFocus = () => {
+                    _amountType = AmountType.Purchased;
                 }
             };
 
@@ -272,17 +275,18 @@ namespace Atomex.Client.Desktop.ViewModels
                 .WhereNotNull()
                 .ToPropertyEx(this, vm => vm.PriceFormat);
 
-            // AmountString, FromCurrencyViewModel or ToCurrencyViewModel changed => estimate swap price and target amount
+            // AmountStrings, FromCurrencyViewModel or ToCurrencyViewModel changed => estimate swap price and target amount
             this.WhenAnyValue(
                     vm => vm.FromViewModel.AmountString,
                     vm => vm.FromViewModel.CurrencyViewModel,
+                    vm => vm.ToViewModel.AmountString,
                     vm => vm.ToViewModel.CurrencyViewModel,
                     vm => vm.RedeemFromAddress)
                 .Throttle(TimeSpan.FromMilliseconds(1))
                 .Subscribe(a =>
                 {
-                    _ = EstimateSwapParamsAsync();
                     OnQuotesUpdatedEventHandler(sender: this, args: null);
+                    _ = EstimateSwapParamsAsync();
                 });
 
             // From Amount changed => update FromViewModel.AmountInBase
@@ -348,18 +352,19 @@ namespace Atomex.Client.Desktop.ViewModels
         private ICommand _convertCommand;
         public ICommand ConvertCommand => _convertCommand ??= ReactiveCommand.Create(OnConvertClick);
 
-        private ICommand _maxAmountCommand;
-        public ICommand MaxAmountCommand => _maxAmountCommand ??= ReactiveCommand.Create(async () =>
+        public async void MaxClicked()
         {
             try
             {
+                _amountType = AmountType.Sold;
+
                 if (FromViewModel.CurrencyViewModel == null || ToViewModel.CurrencyViewModel == null)
                     return;
 
                 var swapParams = await Atomex.ViewModels.Helpers
                     .EstimateSwapParamsAsync(
-                        from: FromSource,
-                        amount: EstimatedMaxAmount,
+                        from: FromCurrencyViewModelItem?.FromSource,
+                        fromAmount: EstimatedMaxFromAmount,
                         redeemFromAddress: RedeemFromAddress,
                         fromCurrency: FromViewModel.CurrencyViewModel?.Currency,
                         toCurrency: ToViewModel.CurrencyViewModel?.Currency,
@@ -375,13 +380,13 @@ namespace Atomex.Client.Desktop.ViewModels
                 //    TODO: warning?
                 //}
 
-                FromViewModel.AmountString = Math.Min(swapParams.Amount, EstimatedMaxAmount).ToString();
+                FromViewModel.AmountString = Math.Min(swapParams.Amount, EstimatedMaxFromAmount).ToString();
             }
             catch (Exception e)
             {
-                Log.Error(e, "Max amount command error.");
+                Log.Error(e, "Max amount error.");
             }
-        });
+        }
 
         private ICommand _swapCurrenciesCommand;
         public ICommand SwapCurrenciesCommand => _swapCurrenciesCommand ??= ReactiveCommand.Create(async () =>
@@ -558,8 +563,8 @@ namespace Atomex.Client.Desktop.ViewModels
             // estimate max payment amount and max fee
             var swapParams = await Atomex.ViewModels.Helpers
                 .EstimateSwapParamsAsync(
-                    from: FromSource,
-                    amount: FromViewModel.Amount,
+                    from: FromCurrencyViewModelItem?.FromSource,
+                    fromAmount: FromViewModel.Amount,
                     redeemFromAddress: RedeemFromAddress,
                     fromCurrency: FromViewModel.CurrencyViewModel?.Currency,
                     toCurrency: ToViewModel.CurrencyViewModel?.Currency,
@@ -570,21 +575,19 @@ namespace Atomex.Client.Desktop.ViewModels
 
             await Dispatcher.UIThread.InvokeAsync(() =>
             {
-                IsCriticalWarning = false;
-
                 if (swapParams == null)
                 {
                     EstimatedPaymentFee      = 0;
                     EstimatedRedeemFee       = 0;
                     RewardForRedeem          = 0;
                     EstimatedMakerNetworkFee = 0;
-                    Warning                  = string.Empty;
+                    ValidationMessage        = string.Empty;
                     return;
                 }
 
                 if (swapParams.Error != null)
                 {
-                    Warning = swapParams.Error.Code switch
+                    ValidationMessage = swapParams.Error.Code switch
                     {
                         Errors.InsufficientFunds      => Resources.CvInsufficientFunds,
                         Errors.InsufficientChainFunds => string.Format(
@@ -594,10 +597,11 @@ namespace Atomex.Client.Desktop.ViewModels
                         Errors.FromAddressIsNullOrEmpty => Resources.CvFromAddressIsNullOrEmpty,
                         _ => Resources.CvError
                     };
+                    ValidationMessageType = MessageType.Error;
                 }
                 else
                 {
-                    Warning = string.Empty;
+                    ValidationMessage = string.Empty;
                 }
 
                 EstimatedPaymentFee      = swapParams.PaymentFee;
@@ -693,6 +697,12 @@ namespace Atomex.Client.Desktop.ViewModels
 
             ToCurrencies = FromCurrencies;
 
+            FromViewModel.CurrencyViewModel = null;
+            ToViewModel.CurrencyViewModel = null;
+
+            FromCurrencyViewModelItem = null;
+            ToCurrencyViewModelItem = null;
+
             OnSwapEventHandler(this, args: null);
         }
 
@@ -700,8 +710,8 @@ namespace Atomex.Client.Desktop.ViewModels
         {
             if (FromViewModel.AmountInBase != 0 && EstimatedTotalNetworkFeeInBase / FromViewModel.AmountInBase > 0.3m)
             {
-                IsCriticalWarning = true;
-                Warning = string.Format(
+                ValidationMessageType = MessageType.Error;
+                ValidationMessage = string.Format(
                     provider: CultureInfo.CurrentCulture,
                     format: Resources.CvTooHighNetworkFee,
                     arg0: FormattableString.Invariant($"{EstimatedTotalNetworkFeeInBase:$0.00}"),
@@ -709,8 +719,8 @@ namespace Atomex.Client.Desktop.ViewModels
             }
             else if (FromViewModel.AmountInBase != 0 && EstimatedTotalNetworkFeeInBase / FromViewModel.AmountInBase > 0.1m)
             {
-                IsCriticalWarning = false;
-                Warning = string.Format(
+                ValidationMessageType = MessageType.Warning;
+                ValidationMessage = string.Format(
                     provider: CultureInfo.CurrentCulture,
                     format: Resources.CvSufficientNetworkFee,
                     arg0: FormattableString.Invariant($"{EstimatedTotalNetworkFeeInBase:$0.00}"),
@@ -739,7 +749,10 @@ namespace Atomex.Client.Desktop.ViewModels
             try
             {
                 var swapPriceEstimation = await Atomex.ViewModels.Helpers.EstimateSwapPriceAsync(
-                    amount: FromViewModel.Amount,
+                    amount: _amountType == AmountType.Sold
+                        ? FromViewModel.Amount
+                        : ToViewModel.Amount,
+                    amountType: _amountType,
                     fromCurrency: FromViewModel.CurrencyViewModel?.Currency,
                     toCurrency: ToViewModel.CurrencyViewModel?.Currency,
                     account: _app.Account,
@@ -750,19 +763,31 @@ namespace Atomex.Client.Desktop.ViewModels
                 {
                     if (swapPriceEstimation == null)
                     {
-                        ToViewModel.Amount = 0;
-                        EstimatedPrice     = 0;
-                        EstimatedMaxAmount = 0;
-                        IsNoLiquidity      = false;
+                        if (_amountType == AmountType.Sold) {
+                            ToViewModel.AmountString = "0";
+                        } else {
+                            FromViewModel.AmountString = "0";
+                        }
+                        
+                        EstimatedPrice         = 0;
+                        EstimatedMaxFromAmount = 0;
+                        EstimatedMaxToAmount   = 0;
+                        IsNoLiquidity          = false;
                         return;
                     }
 
                     _estimatedOrderPrice = swapPriceEstimation.OrderPrice;
 
-                    ToViewModel.Amount = swapPriceEstimation.TargetAmount;
-                    EstimatedPrice     = swapPriceEstimation.Price;
-                    EstimatedMaxAmount = swapPriceEstimation.MaxAmount;
-                    IsNoLiquidity      = swapPriceEstimation.IsNoLiquidity;
+                    if (_amountType == AmountType.Sold) {
+                        ToViewModel.AmountString = swapPriceEstimation.ToAmount.ToString();
+                    } else {
+                        FromViewModel.AmountString = swapPriceEstimation.FromAmount.ToString();
+                    }
+
+                    EstimatedPrice         = swapPriceEstimation.Price;
+                    EstimatedMaxFromAmount = swapPriceEstimation.MaxFromAmount;
+                    EstimatedMaxToAmount   = swapPriceEstimation.MaxToAmount;
+                    IsNoLiquidity          = swapPriceEstimation.IsNoLiquidity;
 
                 }, DispatcherPriority.Background);
             }
@@ -824,7 +849,7 @@ namespace Atomex.Client.Desktop.ViewModels
                 return;
             }
 
-            if (FromSource == null)
+            if (FromCurrencyViewModelItem.FromSource == null)
             {
                 return;
             }
@@ -893,7 +918,7 @@ namespace Atomex.Client.Desktop.ViewModels
             var price        = EstimatedPrice;
             var baseCurrency = Currencies.GetByName(symbol.Base);
 
-            var qty = AmountHelper.AmountToQty(
+            var qty = AmountHelper.AmountToSellQty(
                 side: side,
                 amount: FromViewModel.Amount,
                 price: price,
@@ -901,7 +926,7 @@ namespace Atomex.Client.Desktop.ViewModels
 
             if (qty < symbol.MinimumQty)
             {
-                var minimumAmount = AmountHelper.QtyToAmount(
+                var minimumAmount = AmountHelper.QtyToSellAmount(
                     side: side,
                     qty: symbol.MinimumQty,
                     price: price,
@@ -926,7 +951,7 @@ namespace Atomex.Client.Desktop.ViewModels
             {
                 FromCurrencyViewModel          = FromViewModel.CurrencyViewModel,
                 ToCurrencyViewModel            = ToViewModel.CurrencyViewModel,
-                FromSource                     = FromSource,
+                FromSource                     = FromCurrencyViewModelItem.FromSource,
                 ToAddress                      = ToAddress,
                 RedeemFromAddress              = RedeemFromAddress,
 
@@ -959,7 +984,8 @@ namespace Atomex.Client.Desktop.ViewModels
 
         private void OnSuccessConvertion(object? sender, EventArgs e)
         {
-            FromViewModel.Amount = Math.Min(FromViewModel.Amount, EstimatedMaxAmount); // recalculate amount
+            // todo: check!!
+            FromViewModel.AmountString = Math.Min(FromViewModel.Amount, EstimatedMaxFromAmount).ToString(); // recalculate amount
             _ = EstimateSwapParamsAsync();
         }
 
@@ -1081,11 +1107,6 @@ namespace Atomex.Client.Desktop.ViewModels
             };
 
             Swaps = new ObservableCollection<SwapViewModel>(swapViewModels);
-
-            Warning = string.Format(
-                CultureInfo.CurrentCulture,
-                Resources.CvInsufficientChainFunds,
-                FromViewModel.CurrencyViewModel.Currency.FeeCurrencyName);
 
             IsAmountValid = true;
             CanConvert = true;
