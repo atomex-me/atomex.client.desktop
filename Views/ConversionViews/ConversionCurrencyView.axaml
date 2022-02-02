@@ -8,8 +8,6 @@
              xmlns:vm="clr-namespace:Atomex.Client.Desktop.ViewModels"
              xmlns:views="clr-namespace:Atomex.Client.Desktop.Views"
              xmlns:converters="clr-namespace:Atomex.Client.Desktop.Converters"
-             xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
-             xmlns:ia="clr-namespace:Avalonia.Xaml.Interactions.Core;assembly=Avalonia.Xaml.Interactions"
              x:Class="Atomex.Client.Desktop.Views.ConversionCurrencyView"
              Classes="designer">
 

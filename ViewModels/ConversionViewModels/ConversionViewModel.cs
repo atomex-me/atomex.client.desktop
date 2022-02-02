@@ -104,12 +104,10 @@ namespace Atomex.Client.Desktop.ViewModels
         [Reactive] public decimal RewardForRedeem { get; set; }
         [Reactive] public decimal RewardForRedeemInBase { get; set; }
         [ObservableAsProperty] public bool HasRewardForRedeem { get; }
-
         [Reactive] public bool CanConvert { get; set; }
-
         [Reactive] public ObservableCollection<SwapViewModel> Swaps { get; set; }
-
         [Reactive] public bool IsNoLiquidity { get; set; }
+        [Reactive] public bool IsInsufficientFunds { get; set; }
 
         [ObservableAsProperty] public int ColumnSpan { get; }
         [ObservableAsProperty] public bool DetailsVisible { get; }
@@ -328,6 +326,16 @@ namespace Atomex.Client.Desktop.ViewModels
                     vm => vm.EstimatedTotalNetworkFeeInBase)
                 .Subscribe(t => CheckAmountToFeeRatio());
 
+            this.WhenAnyValue(
+                    vm => vm.IsInsufficientFunds,
+                    vm => vm.IsNoLiquidity)
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(t =>
+                {
+                    FromViewModel.IsAmountValid = !IsInsufficientFunds && !IsNoLiquidity;
+                    ToViewModel.IsAmountValid = !IsInsufficientFunds && !IsNoLiquidity;
+                });
+
             this.WhenAnyValue(vm => vm.DGSelectedIndex)
                 .Select(i => i != -1)
                 .ToPropertyEx(this, vm => vm.DetailsVisible);
@@ -374,7 +382,9 @@ namespace Atomex.Client.Desktop.ViewModels
                 //    TODO: warning?
                 //}
 
-                FromViewModel.AmountString = Math.Min(swapParams.Amount, EstimatedMaxFromAmount).ToString();
+                FromViewModel.AmountString = Math.Min(swapParams.Amount, EstimatedMaxFromAmount)
+                    .TruncateDecimal(FromViewModel.CurrencyViewModel.Currency.Digits)
+                    .ToString();
             }
             catch (Exception e)
             {
@@ -605,7 +615,8 @@ namespace Atomex.Client.Desktop.ViewModels
                     RewardForRedeem          = swapParams.RewardForRedeem;
                     EstimatedMakerNetworkFee = swapParams.MakerNetworkFee;
 
-                    FromViewModel.IsAmountValid = swapParams.Error?.Code != Errors.InsufficientFunds;
+                    //FromViewModel.IsAmountValid = swapParams.Error?.Code != Errors.InsufficientFunds;
+                    IsInsufficientFunds = swapParams.Error?.Code == Errors.InsufficientFunds;
 
                     //if (FromViewModel.CurrencyViewModel?.CurrencyFormat != null)
                     //    IsAmountValid = FromViewModel.Amount <= swapParams.Amount.TruncateByFormat(FromViewModel.CurrencyViewModel.CurrencyFormat);
