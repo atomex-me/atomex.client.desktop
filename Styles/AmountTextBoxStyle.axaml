@@ -18,21 +18,21 @@
                       BorderBrush="{TemplateBinding BorderBrush}"
                       BorderThickness="{TemplateBinding BorderThickness}">
                   <DockPanel Margin="{TemplateBinding Padding}"
-                              HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                              VerticalAlignment="{TemplateBinding VerticalContentAlignment}">
+                             HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                             VerticalAlignment="{TemplateBinding VerticalContentAlignment}">
 
                       <TextBlock Name="floatingWatermark"
-                                  Foreground="{DynamicResource ThemeAccentBrush}"
-                                  FontSize="{DynamicResource FontSizeSmall}"
-                                  Text="{TemplateBinding Watermark}"
-                                  DockPanel.Dock="Top">
+                                 Foreground="{DynamicResource ThemeAccentBrush}"
+                                 FontSize="{DynamicResource FontSizeSmall}"
+                                 Text="{TemplateBinding Watermark}"
+                                 DockPanel.Dock="Top">
                           <TextBlock.IsVisible>
                               <MultiBinding Converter="{x:Static BoolConverters.And}">
                                   <Binding RelativeSource="{RelativeSource TemplatedParent}"
-                                            Path="UseFloatingWatermark" />
+                                           Path="UseFloatingWatermark" />
                                   <Binding RelativeSource="{RelativeSource TemplatedParent}"
-                                            Path="Text"
-                                            Converter="{x:Static StringConverters.IsNotNullOrEmpty}" />
+                                           Path="Text"
+                                           Converter="{x:Static StringConverters.IsNotNullOrEmpty}" />
                               </MultiBinding>
                           </TextBlock.IsVisible>
                       </TextBlock>
@@ -47,39 +47,39 @@
                                             VerticalScrollBarVisibility="{TemplateBinding (ScrollViewer.VerticalScrollBarVisibility)}">
                                   <Panel>
                                       <TextBlock Name="watermark"
-                                                  Opacity="0.5"
-                                                  Text="{TemplateBinding Watermark}"
-                                                  TextAlignment="{TemplateBinding TextAlignment}"
-                                                  TextWrapping="{TemplateBinding TextWrapping}"
-                                                  IsVisible="{TemplateBinding Text, Converter={x:Static StringConverters.IsNullOrEmpty}}" />
+                                                 Opacity="0.5"
+                                                 Text="{TemplateBinding Watermark}"
+                                                 TextAlignment="{TemplateBinding TextAlignment}"
+                                                 TextWrapping="{TemplateBinding TextWrapping}"
+                                                 IsVisible="{TemplateBinding Text, Converter={x:Static StringConverters.IsNullOrEmpty}}" />
                                       <TextPresenter Name="PART_TextPresenter"
-                                                      Margin="0 0 1 0"
-                                                      Text="{TemplateBinding Text, Mode=TwoWay}"
-                                                      CaretIndex="{TemplateBinding CaretIndex}"
-                                                      SelectionStart="{TemplateBinding SelectionStart}"
-                                                      SelectionEnd="{TemplateBinding SelectionEnd}"
-                                                      TextAlignment="{TemplateBinding TextAlignment}"
-                                                      TextWrapping="{TemplateBinding TextWrapping}"
-                                                      PasswordChar="{TemplateBinding PasswordChar}"
-                                                      RevealPassword="{TemplateBinding RevealPassword}"
-                                                      SelectionBrush="{TemplateBinding SelectionBrush}"
-                                                      SelectionForegroundBrush="{TemplateBinding SelectionForegroundBrush}"
-                                                      CaretBrush="{TemplateBinding CaretBrush}"
-                                                      VerticalAlignment="Center" />
+                                                     Margin="0 0 1 0"
+                                                     Text="{TemplateBinding Text, Mode=TwoWay}"
+                                                     CaretIndex="{TemplateBinding CaretIndex}"
+                                                     SelectionStart="{TemplateBinding SelectionStart}"
+                                                     SelectionEnd="{TemplateBinding SelectionEnd}"
+                                                     TextAlignment="{TemplateBinding TextAlignment}"
+                                                     TextWrapping="{TemplateBinding TextWrapping}"
+                                                     PasswordChar="{TemplateBinding PasswordChar}"
+                                                     RevealPassword="{TemplateBinding RevealPassword}"
+                                                     SelectionBrush="{TemplateBinding SelectionBrush}"
+                                                     SelectionForegroundBrush="{TemplateBinding SelectionForegroundBrush}"
+                                                     CaretBrush="{TemplateBinding CaretBrush}"
+                                                     VerticalAlignment="Center" />
 
                                   </Panel>
                               </ScrollViewer>
                               <ContentPresenter Grid.Column="2">
                                   <ContentPresenter.Content>
                                       <TextBlock x:Name="CurrencyCode"
-                                                  HorizontalAlignment="Left"
-                                                  VerticalAlignment="Center"
-                                                  Margin="3 0 0 2"
-                                                  LineHeight="19"
-                                                  Foreground="{TemplateBinding Foreground}"
-                                                  Text="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type TextBox}}, Path=(helpers:AmountTextBoxHelper.CurrencyCode)}"
-                                                  IsVisible="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type TextBox}}, Path=(helpers:AmountTextBoxHelper.CurrencyCode), Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
-                                                  FontSize="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type TextBox}}, Path=(helpers:AmountTextBoxHelper.CurrencyCodeFontSize)}" />
+                                                 HorizontalAlignment="Left"
+                                                 VerticalAlignment="Center"
+                                                 Margin="3 0 0 2"
+                                                 LineHeight="19"
+                                                 Foreground="{TemplateBinding Foreground}"
+                                                 Text="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type TextBox}}, Path=(helpers:AmountTextBoxHelper.CurrencyCode)}"
+                                                 IsVisible="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type TextBox}}, Path=(helpers:AmountTextBoxHelper.CurrencyCode), Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                                                 FontSize="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type TextBox}}, Path=(helpers:AmountTextBoxHelper.CurrencyCodeFontSize)}" />
                                   </ContentPresenter.Content>
                               </ContentPresenter>
 
@@ -89,18 +89,18 @@
                                                   VerticalAlignment="Center"
                                                   Margin="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type TextBox}}, Path=(helpers:AmountTextBoxHelper.AmountInBaseMargin)}">
                                           <TextBlock HorizontalAlignment="Right"
-                                                      VerticalAlignment="Center"
-                                                      Foreground="{DynamicResource DefaultAmountInBaseForegroundBrush}"
-                                                      LineHeight="16"
-                                                      Text="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type TextBox}}, Path=(helpers:AmountTextBoxHelper.AmountInBase)}"
-                                                      FontSize="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type TextBox}}, Path=(helpers:AmountTextBoxHelper.AmountInBaseFontSize)}" />
+                                                     VerticalAlignment="Center"
+                                                     Foreground="{DynamicResource DefaultAmountInBaseForegroundBrush}"
+                                                     LineHeight="16"
+                                                     Text="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type TextBox}}, Path=(helpers:AmountTextBoxHelper.AmountInBase)}"
+                                                     FontSize="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type TextBox}}, Path=(helpers:AmountTextBoxHelper.AmountInBaseFontSize)}" />
                                           <TextBlock HorizontalAlignment="Right"
-                                                      VerticalAlignment="Bottom"
-                                                      Margin="3 4 10 2"
-                                                      Foreground="{DynamicResource DefaultAmountInBaseForegroundBrush}"
-                                                      IsVisible="False"
-                                                      Text="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type TextBox}}, Path=(helpers:AmountTextBoxHelper.BaseCurrencyCode)}"
-                                                      FontSize="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type TextBox}}, Path=(helpers:AmountTextBoxHelper.BaseCurrencyCodeFontSize)}" />
+                                                     VerticalAlignment="Bottom"
+                                                     Margin="3 4 10 2"
+                                                     Foreground="{DynamicResource DefaultAmountInBaseForegroundBrush}"
+                                                     IsVisible="False"
+                                                     Text="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type TextBox}}, Path=(helpers:AmountTextBoxHelper.BaseCurrencyCode)}"
+                                                     FontSize="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type TextBox}}, Path=(helpers:AmountTextBoxHelper.BaseCurrencyCodeFontSize)}" />
                                       </StackPanel>
                                   </ContentPresenter.Content>
                               </ContentPresenter>
@@ -116,7 +116,7 @@
     <Setter Property="BorderThickness" Value="0"/>
     <Setter Property="CornerRadius" Value="0"/>
     <Setter Property="CaretBrush" Value="{DynamicResource DefaultForegroundBrush}"/>
-    <Setter Property="Foreground" Value="{DynamicResource DefaultForegroundBrush}"/>
+    <!--<Setter Property="Foreground" Value="{DynamicResource DefaultForegroundBrush}"/>-->
     <Setter Property="Background" Value="Transparent"/>
     <Setter Property="FontSize" Value="22"/>
     <Setter Property="FontFamily" Value="{DynamicResource DefaultLightFontFamily}"/>
@@ -126,5 +126,11 @@
     <Setter Property="BorderThickness" Value="0"/>
   </Style>
 
+  <Style Selector="TextBox.ValidAmount">
+    <Setter Property="Foreground" Value="{DynamicResource DefaultForegroundBrush}"/>
+  </Style>
 
+  <Style Selector="TextBox.InvalidAmount">
+    <Setter Property="Foreground" Value="{DynamicResource DarkRed}"/>
+  </Style>
 </Styles>

@@ -8,6 +8,8 @@
              xmlns:vm="clr-namespace:Atomex.Client.Desktop.ViewModels"
              xmlns:views="clr-namespace:Atomex.Client.Desktop.Views"
              xmlns:converters="clr-namespace:Atomex.Client.Desktop.Converters"
+             xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
+             xmlns:ia="clr-namespace:Avalonia.Xaml.Interactions.Core;assembly=Avalonia.Xaml.Interactions"
              x:Class="Atomex.Client.Desktop.Views.ConversionCurrencyView"
              Classes="designer">
 
@@ -115,7 +117,7 @@
       <TextBox Name="AmountString"
                Margin="0 0 0 -3"
                Height="40"
-               Text="{Binding AmountString, Mode=OneWay}"
+               Text="{Binding AmountString}"
                VerticalAlignment="Bottom"
                VerticalContentAlignment="Bottom"
                HorizontalContentAlignment="Right"
@@ -123,7 +125,10 @@
                Grid.Column="2"
                IsVisible="{Binding Selected}"
                GotFocus="OnGotFocus"
-               Classes="Amount"/>
+               Classes="Amount"
+               Classes.ValidAmount="{Binding IsAmountValid}"
+               Classes.InvalidAmount="{Binding !IsAmountValid}">
+      </TextBox>
 
       <TextBlock Margin="0 0 0 2"
                  Text="{Binding CurrencyViewModel.CurrencyCode}"

@@ -72,26 +72,19 @@ namespace Atomex.Client.Desktop.ViewModels
 
         [Reactive] public List<CurrencyViewModel>? FromCurrencies { get; set; }
         [Reactive] public List<CurrencyViewModel>? ToCurrencies { get; set; }
-
         [Reactive] public ConversionCurrencyViewModel FromViewModel { get; set; }
         [Reactive] public ConversionCurrencyViewModel ToViewModel { get; set; }
-
         [Reactive] public SelectCurrencyViewModelItem FromCurrencyViewModelItem { get; set; }
         [Reactive] public SelectCurrencyViewModelItem ToCurrencyViewModelItem { get; set; }
-
         [Reactive] public string FromValidationMessage { get; set; }
         [Reactive] public string FromValidationMessageToolTip { get; set; }
         [Reactive] public MessageType FromValidationMessageType { get; set; }
-
         [Reactive] public string BaseCurrencyCode { get; set; }
         [Reactive] public string QuoteCurrencyCode { get; set; }
-
         [Reactive] public string ValidationMessage { get; set; }
         [Reactive] public string ValidationMessageToolTip { get; set; }
         [Reactive] public MessageType ValidationMessageType { get; set; }
-
         [Reactive] public string PriceFormat { get; set; }
-
         [Reactive] public bool IsAmountValid { get; set; }
 
         public AmountType _amountType;
@@ -580,11 +573,11 @@ namespace Atomex.Client.Desktop.ViewModels
                 {
                     if (swapParams == null)
                     {
-                        EstimatedPaymentFee = 0;
-                        EstimatedRedeemFee = 0;
-                        RewardForRedeem = 0;
+                        EstimatedPaymentFee      = 0;
+                        EstimatedRedeemFee       = 0;
+                        RewardForRedeem          = 0;
                         EstimatedMakerNetworkFee = 0;
-                        FromValidationMessage = string.Empty;
+                        FromValidationMessage    = string.Empty;
                         return;
                     }
 
@@ -593,7 +586,7 @@ namespace Atomex.Client.Desktop.ViewModels
                         FromValidationMessageType = MessageType.Error;
                         FromValidationMessage = swapParams.Error.Code switch
                         {
-                            Errors.InsufficientFunds => Resources.CvInsufficientFunds,
+                            Errors.InsufficientFunds      => Resources.CvInsufficientFunds,
                             Errors.InsufficientChainFunds => string.Format(
                                 provider: CultureInfo.CurrentCulture,
                                 format: Resources.CvInsufficientChainFunds,
@@ -607,19 +600,21 @@ namespace Atomex.Client.Desktop.ViewModels
                         FromValidationMessage = string.Empty;
                     }
 
-                    EstimatedPaymentFee = swapParams.PaymentFee;
-                    EstimatedRedeemFee = swapParams.RedeemFee;
-                    RewardForRedeem = swapParams.RewardForRedeem;
+                    EstimatedPaymentFee      = swapParams.PaymentFee;
+                    EstimatedRedeemFee       = swapParams.RedeemFee;
+                    RewardForRedeem          = swapParams.RewardForRedeem;
                     EstimatedMakerNetworkFee = swapParams.MakerNetworkFee;
 
-                    if (FromViewModel.CurrencyViewModel?.CurrencyFormat != null)
-                        IsAmountValid = FromViewModel.Amount <= swapParams.Amount.TruncateByFormat(FromViewModel.CurrencyViewModel.CurrencyFormat);
+                    FromViewModel.IsAmountValid = swapParams.Error?.Code != Errors.InsufficientFunds;
+
+                    //if (FromViewModel.CurrencyViewModel?.CurrencyFormat != null)
+                    //    IsAmountValid = FromViewModel.Amount <= swapParams.Amount.TruncateByFormat(FromViewModel.CurrencyViewModel.CurrencyFormat);
 
                 }, DispatcherPriority.Background);
             }
             catch (Exception e)
             {
-
+                Log.Error(e, "EstimateSwapParamsAsync error.");
             }
         }
 
@@ -716,30 +711,33 @@ namespace Atomex.Client.Desktop.ViewModels
 
         private void CheckAmountToFeeRatio()
         {
-            if (FromViewModel.AmountInBase != 0 && EstimatedTotalNetworkFeeInBase / FromViewModel.AmountInBase > 0.3m)
+            var estimatedTotalNetworkFeeInBase = EstimatedTotalNetworkFeeInBase;
+            var amountInBase = FromViewModel.AmountInBase;
+
+            if (amountInBase != 0 && estimatedTotalNetworkFeeInBase / amountInBase > 0.3m)
             {
                 ValidationMessageType = MessageType.Error;
                 ValidationMessage = string.Format(
                     provider: CultureInfo.CurrentCulture,
                     format: Resources.CvTooHighNetworkFee,
-                    arg0: FormattableString.Invariant($"{EstimatedTotalNetworkFeeInBase:$0.00}"),
-                    arg1: FormattableString.Invariant($"{EstimatedTotalNetworkFeeInBase / FromViewModel.AmountInBase:0.00%}"));
+                    arg0: FormattableString.Invariant($"{estimatedTotalNetworkFeeInBase:$0.00}"),
+                    arg1: FormattableString.Invariant($"{estimatedTotalNetworkFeeInBase / amountInBase:0.00%}"));
             }
-            else if (FromViewModel.AmountInBase != 0 && EstimatedTotalNetworkFeeInBase / FromViewModel.AmountInBase > 0.1m)
+            else if (amountInBase != 0 && estimatedTotalNetworkFeeInBase / amountInBase > 0.1m)
             {
                 ValidationMessageType = MessageType.Warning;
                 ValidationMessage = string.Format(
                     provider: CultureInfo.CurrentCulture,
                     format: Resources.CvSufficientNetworkFee,
-                    arg0: FormattableString.Invariant($"{EstimatedTotalNetworkFeeInBase:$0.00}"),
-                    arg1: FormattableString.Invariant($"{EstimatedTotalNetworkFeeInBase / FromViewModel.AmountInBase:0.00%}"));
+                    arg0: FormattableString.Invariant($"{estimatedTotalNetworkFeeInBase:$0.00}"),
+                    arg1: FormattableString.Invariant($"{estimatedTotalNetworkFeeInBase / amountInBase:0.00%}"));
             }
             else
             {
                 ValidationMessage = string.Empty;
             }
 
-            CanConvert = FromViewModel.AmountInBase == 0 || EstimatedTotalNetworkFeeInBase / FromViewModel.AmountInBase <= 0.75m;
+            CanConvert = amountInBase == 0 || estimatedTotalNetworkFeeInBase / amountInBase <= 0.75m;
         }
 
         protected async void OnBaseQuotesUpdatedEventHandler(object? sender, EventArgs args)
@@ -760,16 +758,17 @@ namespace Atomex.Client.Desktop.ViewModels
         {
             try
             {
-                var swapPriceEstimation = await Atomex.ViewModels.Helpers.EstimateSwapPriceAsync(
-                    amount: _amountType == AmountType.Sold
-                        ? FromViewModel.Amount
-                        : ToViewModel.Amount,
-                    amountType: _amountType,
-                    fromCurrency: FromViewModel.CurrencyViewModel?.Currency,
-                    toCurrency: ToViewModel.CurrencyViewModel?.Currency,
-                    account: _app.Account,
-                    atomexClient: _app.Terminal,
-                    symbolsProvider: _app.SymbolsProvider);
+                var swapPriceEstimation = await Atomex.ViewModels.Helpers
+                    .EstimateSwapPriceAsync(
+                        amount: _amountType == AmountType.Sold
+                            ? FromViewModel.Amount
+                            : ToViewModel.Amount,
+                        amountType: _amountType,
+                        fromCurrency: FromViewModel.CurrencyViewModel?.Currency,
+                        toCurrency: ToViewModel.CurrencyViewModel?.Currency,
+                        account: _app.Account,
+                        atomexClient: _app.Terminal,
+                        symbolsProvider: _app.SymbolsProvider);
 
                 await Dispatcher.UIThread.InvokeAsync(() =>
                 {

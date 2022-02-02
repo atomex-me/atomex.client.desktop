@@ -19,7 +19,6 @@ namespace Atomex.Client.Desktop.ViewModels
         public Action GotInputFocus { get; set; }
 
         [Reactive] public CurrencyViewModel? CurrencyViewModel { get; set; }
-
         [Reactive] public string Address { get; set; }
 
         public decimal Amount;
@@ -49,6 +48,10 @@ namespace Atomex.Client.Desktop.ViewModels
         }
 
         [Reactive] public decimal AmountInBase { get; set; }
+        [ObservableAsProperty] public bool Selected { get; }
+        [Reactive] public string UnselectedLabel { get; set; }
+        [Reactive] public bool UseMax { get; set; }
+        [Reactive] public bool IsAmountValid { get; set; }
 
         private ICommand _maxCommand;
         public ICommand MaxCommand => _maxCommand ??= ReactiveCommand.Create(() => MaxClicked?.Invoke());
@@ -56,13 +59,10 @@ namespace Atomex.Client.Desktop.ViewModels
         private ICommand _selectCurrencyCommand;
         public ICommand SelectCurrencyCommand => _selectCurrencyCommand ??= ReactiveCommand.Create(() => SelectCurrencyClicked?.Invoke());
 
-        [ObservableAsProperty] public bool Selected { get; }
-
-        [Reactive] public string UnselectedLabel { get; set; }
-        [Reactive] public bool UseMax { get; set; }
-
         public ConversionCurrencyViewModel()
         {
+            IsAmountValid = true;
+
             if (Design.IsDesignMode)
                 DesignerMode();
 
@@ -86,6 +86,7 @@ namespace Atomex.Client.Desktop.ViewModels
             AmountString       = "12.000516666";
             AmountInBase       = 3451.43m;
             UseMax             = true;
+            IsAmountValid      = true;
         }
     }
 }
