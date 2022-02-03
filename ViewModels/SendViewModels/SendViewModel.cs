@@ -42,7 +42,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             if (value == AmountString) return;
             var parsed = decimal.TryParse(value, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture,
                 out var amount);
-            {
+            //{
                 if (!parsed) amount = Amount;
                 var truncatedValue = amount.TruncateByFormat(CurrencyFormat);
                 if (truncatedValue != Amount)
@@ -51,7 +51,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 }
 
                 Dispatcher.UIThread.InvokeAsync(() => this.RaisePropertyChanged(nameof(AmountString)));
-            }
+            //}
         }
 
         protected virtual decimal FeeAmount => Fee;
@@ -60,20 +60,24 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
         public void SetFeeFromString(string value)
         {
-            if (value == FeeString) return;
-            var parsed = decimal.TryParse(value, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture,
+            if (value == FeeString)
+                return;
+
+            var parsed = decimal.TryParse(
+                value,
+                NumberStyles.AllowDecimalPoint,
+                CultureInfo.InvariantCulture,
                 out var fee);
-            {
-                if (!parsed) fee = Fee;
-                var truncatedValue = fee.TruncateByFormat(FeeCurrencyFormat);
 
-                if (truncatedValue != Fee)
-                {
-                    Fee = Math.Min(truncatedValue, _currency.GetMaximumFee());
-                }
+            if (!parsed)
+                fee = Fee;
 
-                Dispatcher.UIThread.InvokeAsync(() => this.RaisePropertyChanged(nameof(FeeString)));
-            }
+            var truncatedValue = fee.TruncateByFormat(FeeCurrencyFormat);
+
+            if (truncatedValue != Fee)
+                Fee = truncatedValue;
+
+            Dispatcher.UIThread.InvokeAsync(() => this.RaisePropertyChanged(nameof(FeeString)));
         }
 
         [Reactive] public bool UseDefaultFee { get; set; }
@@ -85,37 +89,28 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         [Reactive] public string Warning { get; set; }
 
         public string CurrencyCode => CurrencyViewModel.CurrencyCode;
-
         public string FeeCurrencyCode => CurrencyViewModel.FeeCurrencyCode;
-
         public string BaseCurrencyCode => CurrencyViewModel.BaseCurrencyCode;
-
         protected string CurrencyFormat => CurrencyViewModel.CurrencyFormat;
-
         protected string FeeCurrencyFormat => CurrencyViewModel.FeeCurrencyFormat;
-
         public string BaseCurrencyFormat => CurrencyViewModel.BaseCurrencyFormat;
 
 
         private ReactiveCommand<Unit, Unit> _backCommand;
-
         public ReactiveCommand<Unit, Unit> BackCommand => _backCommand ??= (_backCommand = ReactiveCommand.Create(() =>
         {
             App.DialogService.Close();
         }));
 
         private ReactiveCommand<Unit, Unit> _undoConfirmStageCommand;
-
         public ReactiveCommand<Unit, Unit> UndoConfirmStageCommand => _undoConfirmStageCommand ??=
             (_undoConfirmStageCommand = ReactiveCommand.Create(() => { ConfirmStage = false; }));
 
         private ReactiveCommand<Unit, Unit> _selectFromCommand;
-
         public ReactiveCommand<Unit, Unit> SelectFromCommand => _selectFromCommand ??=
             (_selectFromCommand = ReactiveCommand.Create(FromClick));
 
         private ReactiveCommand<Unit, Unit> _selectToCommand;
-
         public ReactiveCommand<Unit, Unit> SelectToCommand => _selectToCommand ??=
             (_selectToCommand = ReactiveCommand.Create(ToClick));
 
@@ -124,7 +119,6 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         protected abstract void ToClick();
 
         private ReactiveCommand<Unit, Unit> _nextCommand;
-
         public ReactiveCommand<Unit, Unit> NextCommand =>
             _nextCommand ??= (_nextCommand = ReactiveCommand.CreateFromTask(OnNextCommand));
 

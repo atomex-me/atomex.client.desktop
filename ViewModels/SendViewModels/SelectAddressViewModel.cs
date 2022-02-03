@@ -3,9 +3,11 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive;
 using System.Windows.Input;
+
 using Avalonia.Controls;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
+
 using Atomex.Common;
 using Atomex.Core;
 using Atomex.ViewModels;
@@ -37,7 +39,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             IAccount account,
             CurrencyConfig currency,
             bool useToSelectFrom = false,
-            string selectedAddress = null)
+            string? selectedAddress = null)
         {
             this.WhenAnyValue(
                     vm => vm.SortByDate,

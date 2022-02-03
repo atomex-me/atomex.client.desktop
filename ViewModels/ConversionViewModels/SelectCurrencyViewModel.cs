@@ -32,8 +32,8 @@ namespace Atomex.Client.Desktop.ViewModels.ConversionViewModels
     {
         [Reactive] public CurrencyViewModel CurrencyViewModel { get; set; }
         [ObservableAsProperty] public string? SelectedAddressDescription { get; }
-        public abstract string ShortAddressDescription { get; }
-        public abstract IFromSource FromSource { get; }
+        public abstract string? ShortAddressDescription { get; }
+        public abstract IFromSource? FromSource { get; }
 
         public SelectCurrencyViewModelItem(CurrencyViewModel currencyViewModel)
         {
@@ -45,8 +45,8 @@ namespace Atomex.Client.Desktop.ViewModels.ConversionViewModels
     {
         public IEnumerable<BitcoinBasedTxOutput> AvailableOutputs { get; set; }
         [Reactive] public IEnumerable<BitcoinBasedTxOutput> SelectedOutputs { get; set; }
-        public override string ShortAddressDescription => $"{SelectedOutputs?.Count() ?? 0} outputs";
-        public override IFromSource FromSource => SelectedOutputs != null
+        public override string? ShortAddressDescription => $"{SelectedOutputs?.Count() ?? 0} outputs";
+        public override IFromSource? FromSource => SelectedOutputs != null
             ? new FromOutputs(SelectedOutputs)
             : null;
 
@@ -106,8 +106,8 @@ namespace Atomex.Client.Desktop.ViewModels.ConversionViewModels
         public IEnumerable<WalletAddress> AvailableAddresses { get; set; }
         [Reactive] public WalletAddress SelectedAddress { get; set; }
         [Reactive] public bool IsNew { get; set; }
-        public override string ShortAddressDescription => SelectedAddress?.Address?.TruncateAddress();
-        public override IFromSource FromSource => SelectedAddress?.Address != null
+        public override string? ShortAddressDescription => SelectedAddress?.Address?.TruncateAddress();
+        public override IFromSource? FromSource => SelectedAddress?.Address != null
             ? new FromAddress(SelectedAddress.Address)
             : null;
 
@@ -155,7 +155,7 @@ namespace Atomex.Client.Desktop.ViewModels.ConversionViewModels
         public Action<SelectCurrencyViewModelItem> CurrencySelected;
 
         [Reactive] public ObservableCollection<SelectCurrencyViewModelItem> Currencies { get; set; }
-        [Reactive] public SelectCurrencyViewModelItem SelectedCurrency { get; set; }
+        [Reactive] public SelectCurrencyViewModelItem? SelectedCurrency { get; set; }
         [Reactive] public SelectCurrencyType Type { get; set; }
 
         private ICommand _changeAddressesCommand;
@@ -218,7 +218,7 @@ namespace Atomex.Client.Desktop.ViewModels.ConversionViewModels
             IAccount account,
             SelectCurrencyType type,
             IEnumerable<SelectCurrencyViewModelItem> currencies,
-            SelectCurrencyViewModelItem selected = null)
+            SelectCurrencyViewModelItem? selected = null)
         {
             _account = account ?? throw new ArgumentNullException(nameof(account));
 

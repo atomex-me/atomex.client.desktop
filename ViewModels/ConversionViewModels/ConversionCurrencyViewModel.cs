@@ -19,7 +19,7 @@ namespace Atomex.Client.Desktop.ViewModels
         public Action GotInputFocus { get; set; }
 
         [Reactive] public CurrencyViewModel? CurrencyViewModel { get; set; }
-        [Reactive] public string Address { get; set; }
+        [Reactive] public string? Address { get; set; }
 
         public decimal Amount;
         public string AmountString

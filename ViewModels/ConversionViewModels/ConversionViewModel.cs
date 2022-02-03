@@ -66,25 +66,31 @@ namespace Atomex.Client.Desktop.ViewModels
             }
         }
 
-        public string ToAddress => (ToCurrencyViewModelItem as SelectCurrencyWithAddressViewModelItem)?.SelectedAddress?.Address;
-        [Reactive] public string RedeemFromAddress { get; set; }
+        public string? ToAddress => (ToCurrencyViewModelItem as SelectCurrencyWithAddressViewModelItem)?.SelectedAddress?.Address;
+        [Reactive] public string? RedeemFromAddress { get; set; }
         [Reactive] public bool UseRedeemAddress { get; set; }
-
         [Reactive] public List<CurrencyViewModel>? FromCurrencies { get; set; }
         [Reactive] public List<CurrencyViewModel>? ToCurrencies { get; set; }
         [Reactive] public ConversionCurrencyViewModel FromViewModel { get; set; }
         [Reactive] public ConversionCurrencyViewModel ToViewModel { get; set; }
-        [Reactive] public SelectCurrencyViewModelItem FromCurrencyViewModelItem { get; set; }
-        [Reactive] public SelectCurrencyViewModelItem ToCurrencyViewModelItem { get; set; }
-        [Reactive] public string FromValidationMessage { get; set; }
-        [Reactive] public string FromValidationMessageToolTip { get; set; }
-        [Reactive] public MessageType FromValidationMessageType { get; set; }
-        [Reactive] public string BaseCurrencyCode { get; set; }
-        [Reactive] public string QuoteCurrencyCode { get; set; }
-        [Reactive] public string ValidationMessage { get; set; }
-        [Reactive] public string ValidationMessageToolTip { get; set; }
-        [Reactive] public MessageType ValidationMessageType { get; set; }
-        [Reactive] public string PriceFormat { get; set; }
+        [Reactive] public SelectCurrencyViewModelItem? FromCurrencyViewModelItem { get; set; }
+        [Reactive] public SelectCurrencyViewModelItem? ToCurrencyViewModelItem { get; set; }
+
+        [Reactive] public string AmountValidationMessage { get; set; }
+        [Reactive] public string AmountValidationMessageToolTip { get; set; }
+        [Reactive] public MessageType AmountValidationMessageType { get; set; }
+        [ObservableAsProperty] public bool IsAmountValidationWarning { get; }
+        [ObservableAsProperty] public bool IsAmountValidationError { get; }
+
+        [Reactive] public string Message { get; set; }
+        [Reactive] public string MessageToolTip { get; set; }
+        [Reactive] public MessageType MessageType { get; set; }
+        [ObservableAsProperty] public bool IsWarning { get; }
+        [ObservableAsProperty] public bool IsError { get; }
+
+        [Reactive] public string? BaseCurrencyCode { get; set; }
+        [Reactive] public string? QuoteCurrencyCode { get; set; }
+        [Reactive] public string? PriceFormat { get; set; }
         [Reactive] public bool IsAmountValid { get; set; }
 
         public AmountType _amountType;
@@ -131,7 +137,6 @@ namespace Atomex.Client.Desktop.ViewModels
         {
             _app = app ?? throw new ArgumentNullException(nameof(app));
 
-            IsAmountValid = true;
             CanConvert = true;
             DGSelectedIndex = -1;
 
@@ -212,7 +217,8 @@ namespace Atomex.Client.Desktop.ViewModels
                     if (ToViewModel.CurrencyViewModel == null)
                         return;
 
-                    var existsViewModel = ToCurrencies.FirstOrDefault(c => c.Currency.Name == ToViewModel.CurrencyViewModel.Currency.Name);
+                    var existsViewModel = ToCurrencies?.FirstOrDefault(
+                        c => c.Currency.Name == ToViewModel.CurrencyViewModel.Currency.Name);
 
                     if (existsViewModel == null)
                     {
@@ -335,6 +341,22 @@ namespace Atomex.Client.Desktop.ViewModels
                     FromViewModel.IsAmountValid = !IsInsufficientFunds && !IsNoLiquidity;
                     ToViewModel.IsAmountValid = !IsInsufficientFunds && !IsNoLiquidity;
                 });
+
+            this.WhenAnyValue(vm => vm.AmountValidationMessageType)
+                .Select(t => t == MessageType.Warning)
+                .ToPropertyEx(this, vm => vm.IsAmountValidationWarning);
+
+            this.WhenAnyValue(vm => vm.AmountValidationMessageType)
+                .Select(t => t == MessageType.Error)
+                .ToPropertyEx(this, vm => vm.IsAmountValidationError);
+
+            this.WhenAnyValue(vm => vm.MessageType)
+                .Select(t => t == MessageType.Warning)
+                .ToPropertyEx(this, vm => vm.IsWarning);
+
+            this.WhenAnyValue(vm => vm.MessageType)
+                .Select(t => t == MessageType.Error)
+                .ToPropertyEx(this, vm => vm.IsError);
 
             this.WhenAnyValue(vm => vm.DGSelectedIndex)
                 .Select(i => i != -1)
@@ -587,14 +609,14 @@ namespace Atomex.Client.Desktop.ViewModels
                         EstimatedRedeemFee       = 0;
                         RewardForRedeem          = 0;
                         EstimatedMakerNetworkFee = 0;
-                        FromValidationMessage    = string.Empty;
+                        AmountValidationMessage    = string.Empty;
                         return;
                     }
 
                     if (swapParams.Error != null)
                     {
-                        FromValidationMessageType = MessageType.Error;
-                        FromValidationMessage = swapParams.Error.Code switch
+                        AmountValidationMessageType = MessageType.Error;
+                        AmountValidationMessage = swapParams.Error.Code switch
                         {
                             Errors.InsufficientFunds      => Resources.CvInsufficientFunds,
                             Errors.InsufficientChainFunds => string.Format(
@@ -607,19 +629,14 @@ namespace Atomex.Client.Desktop.ViewModels
                     }
                     else
                     {
-                        FromValidationMessage = string.Empty;
+                        AmountValidationMessage = string.Empty;
                     }
 
                     EstimatedPaymentFee      = swapParams.PaymentFee;
                     EstimatedRedeemFee       = swapParams.RedeemFee;
                     RewardForRedeem          = swapParams.RewardForRedeem;
                     EstimatedMakerNetworkFee = swapParams.MakerNetworkFee;
-
-                    //FromViewModel.IsAmountValid = swapParams.Error?.Code != Errors.InsufficientFunds;
-                    IsInsufficientFunds = swapParams.Error?.Code == Errors.InsufficientFunds;
-
-                    //if (FromViewModel.CurrencyViewModel?.CurrencyFormat != null)
-                    //    IsAmountValid = FromViewModel.Amount <= swapParams.Amount.TruncateByFormat(FromViewModel.CurrencyViewModel.CurrencyFormat);
+                    IsInsufficientFunds      = swapParams.Error?.Code == Errors.InsufficientFunds;
 
                 }, DispatcherPriority.Background);
             }
@@ -727,8 +744,8 @@ namespace Atomex.Client.Desktop.ViewModels
 
             if (amountInBase != 0 && estimatedTotalNetworkFeeInBase / amountInBase > 0.3m)
             {
-                ValidationMessageType = MessageType.Error;
-                ValidationMessage = string.Format(
+                MessageType = MessageType.Error;
+                Message = string.Format(
                     provider: CultureInfo.CurrentCulture,
                     format: Resources.CvTooHighNetworkFee,
                     arg0: FormattableString.Invariant($"{estimatedTotalNetworkFeeInBase:$0.00}"),
@@ -736,8 +753,8 @@ namespace Atomex.Client.Desktop.ViewModels
             }
             else if (amountInBase != 0 && estimatedTotalNetworkFeeInBase / amountInBase > 0.1m)
             {
-                ValidationMessageType = MessageType.Warning;
-                ValidationMessage = string.Format(
+                MessageType = MessageType.Warning;
+                Message = string.Format(
                     provider: CultureInfo.CurrentCulture,
                     format: Resources.CvSufficientNetworkFee,
                     arg0: FormattableString.Invariant($"{estimatedTotalNetworkFeeInBase:$0.00}"),
@@ -745,7 +762,7 @@ namespace Atomex.Client.Desktop.ViewModels
             }
             else
             {
-                ValidationMessage = string.Empty;
+                Message = string.Empty;
             }
 
             CanConvert = amountInBase == 0 || estimatedTotalNetworkFeeInBase / amountInBase <= 0.75m;
@@ -835,7 +852,7 @@ namespace Atomex.Client.Desktop.ViewModels
                             onCloseSwap: () => {
                                 DGSelectedIndex = -1;
                             }))
-                        .Where(s => s != null)
+                        .WhereNotNull()
                         .ToList()
                         .SortList((s1, s2) =>
                             s2.Time.ToUniversalTime().CompareTo(s1.Time.ToUniversalTime()));
@@ -871,7 +888,7 @@ namespace Atomex.Client.Desktop.ViewModels
                 return;
             }
 
-            if (FromCurrencyViewModelItem.FromSource == null)
+            if (FromCurrencyViewModelItem?.FromSource == null)
             {
                 return;
             }
@@ -896,7 +913,7 @@ namespace Atomex.Client.Desktop.ViewModels
                 return;
             }
 
-            if (!IsAmountValid)
+            if (!FromViewModel.IsAmountValid || !ToViewModel.IsAmountValid)
             {
                 App.DialogService.Show(
                     MessageViewModel.Message(
@@ -926,7 +943,10 @@ namespace Atomex.Client.Desktop.ViewModels
                 return;
             }
 
-            var symbol = Symbols.SymbolByCurrencies(FromViewModel.CurrencyViewModel.Currency, ToViewModel.CurrencyViewModel.Currency);
+            var symbol = Symbols.SymbolByCurrencies(
+                from: FromViewModel.CurrencyViewModel.Currency,
+                to: ToViewModel.CurrencyViewModel.Currency);
+
             if (symbol == null)
             {
                 App.DialogService.Show(
@@ -1014,6 +1034,22 @@ namespace Atomex.Client.Desktop.ViewModels
 #if DEBUG
         private void DesignerMode()
         {
+            this.WhenAnyValue(vm => vm.AmountValidationMessageType)
+                .Select(t => t == MessageType.Warning)
+                .ToPropertyEx(this, vm => vm.IsAmountValidationWarning);
+
+            this.WhenAnyValue(vm => vm.AmountValidationMessageType)
+                .Select(t => t == MessageType.Error)
+                .ToPropertyEx(this, vm => vm.IsAmountValidationError);
+
+            this.WhenAnyValue(vm => vm.MessageType)
+                .Select(t => t == MessageType.Warning)
+                .ToPropertyEx(this, vm => vm.IsWarning);
+
+            this.WhenAnyValue(vm => vm.MessageType)
+                .Select(t => t == MessageType.Error)
+                .ToPropertyEx(this, vm => vm.IsError);
+
             this.WhenAnyValue(vm => vm.DGSelectedIndex)
                 .Select(i => i != -1)
                 .ToPropertyEx(this, vm => vm.DetailsVisible);
@@ -1059,21 +1095,23 @@ namespace Atomex.Client.Desktop.ViewModels
                 AmountInBase       = 123.32m,
             };
 
-            //FromValidationMessage = "Error line Error line Error line Error line Error line Error line " +
+            //AmountValidationMessage = "Error line Error line Error line Error line Error line Error line " +
             //    "Error line Error line Error line Error line Error line Error line Error line";
-            //FromValidationMessageToolTip = "Unknown super mega error description";
-            //FromValidationMessageType = MessageType.Warning;
-
+            AmountValidationMessage = "Error line Error line Error line Error line Error line Error line";
+            AmountValidationMessageToolTip = "Unknown super mega error description";
+            AmountValidationMessageType = MessageType.Warning;
 
             BaseCurrencyCode = "ETH";
             QuoteCurrencyCode = "BTC";
             EstimatedPrice = 0.01235678m;
             EstimatedTotalNetworkFeeInBase = 14.88m;
 
-            //ValidationMessage = "Error line Error line Error line Error line Error line Error line " +
-            //    "Error line Error line Error line Error line Error line Error line Error line";
-            //ValidationMessageToolTip = "Unknown super mega error description";
-            //ValidationMessageType = MessageType.Error;
+            Message = "Error line Error line Error line Error line Error line Error line " +
+                "Error line Error line Error line Error line Error line Error line Error line";
+            MessageToolTip = "Unknown super mega error description";
+            MessageType = MessageType.Error;
+
+            IsNoLiquidity = true;
 
             var swapViewModels = new List<SwapViewModel>()
             {
@@ -1130,7 +1168,6 @@ namespace Atomex.Client.Desktop.ViewModels
 
             Swaps = new ObservableCollection<SwapViewModel>(swapViewModels);
 
-            IsAmountValid = true;
             CanConvert = true;
             DGSelectedIndex = 0; // -1;
         }
