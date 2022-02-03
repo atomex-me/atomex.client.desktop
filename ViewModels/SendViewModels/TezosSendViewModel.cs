@@ -85,7 +85,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                         from: From,
                         to: To,
                         type: BlockchainTransactionType.Output,
-                        reserve: UseDefaultFee);
+                        reserve: false);
 
                 if (UseDefaultFee && maxAmountEstimation.Fee > 0)
                     Fee = maxAmountEstimation.Fee;
@@ -121,7 +121,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                             from: From,
                             to: To,
                             type: BlockchainTransactionType.Output,
-                            reserve: UseDefaultFee);
+                            reserve: false);
 
                     if (maxAmountEstimation.Error != null)
                     {
@@ -159,7 +159,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                         from: From,
                         to: To,
                         type: BlockchainTransactionType.Output,
-                        reserve: UseDefaultFee);
+                        reserve: false);
 
                 if (UseDefaultFee && maxAmountEstimation.Fee > 0)
                     Fee = maxAmountEstimation.Fee;

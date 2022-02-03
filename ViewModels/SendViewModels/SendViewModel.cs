@@ -39,19 +39,24 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
         public void SetAmountFromString(string value)
         {
-            if (value == AmountString) return;
-            var parsed = decimal.TryParse(value, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture,
-                out var amount);
-            //{
-                if (!parsed) amount = Amount;
-                var truncatedValue = amount.TruncateByFormat(CurrencyFormat);
-                if (truncatedValue != Amount)
-                {
-                    Amount = truncatedValue;
-                }
+            if (value == AmountString)
+                return;
 
-                Dispatcher.UIThread.InvokeAsync(() => this.RaisePropertyChanged(nameof(AmountString)));
-            //}
+            var parsed = decimal.TryParse(
+                value,
+                NumberStyles.AllowDecimalPoint,
+                CultureInfo.InvariantCulture,
+                out var amount);
+
+            if (!parsed)
+                amount = Amount;
+
+            var truncatedValue = amount.TruncateByFormat(CurrencyFormat);
+
+            if (truncatedValue != Amount)
+                Amount = truncatedValue;
+
+            Dispatcher.UIThread.InvokeAsync(() => this.RaisePropertyChanged(nameof(AmountString)));
         }
 
         protected virtual decimal FeeAmount => Fee;
@@ -311,19 +316,21 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             return $"{address[..length]}···{address[^length..]}";
         }
 
+#if DEBUG
         protected void DesignerMode()
         {
             var fromCurrencies = DesignTime.Currencies
                 .Select(c => CurrencyViewModelCreator.CreateViewModel(c, subscribeToUpdates: false))
                 .ToList();
 
-            _currency = fromCurrencies[0].Currency;
+            _currency         = fromCurrencies[0].Currency;
             CurrencyViewModel = fromCurrencies[0];
-            To = "1BvBMSEYstWetqTFn5Au4m4GFg7xJaNVN2";
-            Amount = 0.00001234m;
-            AmountInBase = 10.23m;
-            Fee = 0.0001m;
-            FeeInBase = 8.43m;
+            To                = "1BvBMSEYstWetqTFn5Au4m4GFg7xJaNVN2";
+            Amount            = 0.00001234m;
+            AmountInBase      = 10.23m;
+            Fee               = 0.0001m;
+            FeeInBase         = 8.43m;
         }
+#endif
     }
 }

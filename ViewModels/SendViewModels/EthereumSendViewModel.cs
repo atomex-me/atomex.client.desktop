@@ -39,14 +39,13 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 return;
 
             var parsed = int.TryParse(value, out var gasPrice);
-            {
-                if (!parsed)
-                    gasPrice = 0;
 
-                GasPrice = gasPrice;
+            if (!parsed)
+                gasPrice = 0;
 
-                Dispatcher.UIThread.InvokeAsync(() => this.RaisePropertyChanged(nameof(GasPriceString)));
-            }
+            GasPrice = gasPrice;
+
+            Dispatcher.UIThread.InvokeAsync(() => this.RaisePropertyChanged(nameof(GasPriceString)));
         }
 
         public EthereumSendViewModel()
