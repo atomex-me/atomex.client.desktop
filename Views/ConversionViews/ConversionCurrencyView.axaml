@@ -50,12 +50,14 @@
   </UserControl.Styles>
   
   <Border BorderThickness="1"
-          CornerRadius="4"      
+          CornerRadius="6"      
           BorderBrush="{DynamicResource CurrencySelectionViewBorderBrush}"
           Classes="designer">
     <Grid ColumnDefinitions="20,Auto,*,Auto,24"
           RowDefinitions="20,40,*,18"
           Background="{DynamicResource CurrencySelectionViewBackgroundBrush}">
+
+      <!-- select currency button -->
       <Button CornerRadius="8"
               VerticalAlignment="Stretch"
               HorizontalAlignment="Stretch"
@@ -87,7 +89,8 @@
           </StackPanel>
         </Button.Content>
       </Button>
-      
+
+      <!-- address and max button-->
       <StackPanel Orientation="Horizontal"
                   VerticalAlignment="Bottom"
                   Grid.Row="2"
@@ -112,6 +115,7 @@
         </Button>
       </StackPanel>
 
+      <!-- amount text box -->
       <TextBox Name="AmountString"
                Margin="0 0 0 -3"
                Height="40"
@@ -125,9 +129,9 @@
                GotFocus="OnGotFocus"
                Classes="Amount"
                Classes.ValidAmount="{Binding IsAmountValid}"
-               Classes.InvalidAmount="{Binding !IsAmountValid}">
-      </TextBox>
+               Classes.InvalidAmount="{Binding !IsAmountValid}"/>
 
+      <!-- currency code -->
       <TextBlock Margin="0 0 0 2"
                  Text="{Binding CurrencyViewModel.CurrencyCode}"
                  FontSize="22"
@@ -139,6 +143,7 @@
                  Grid.Column="3"
                  IsVisible="{Binding Selected}"/>
 
+      <!-- amount in base -->
       <TextBlock Margin="0 1 0 0"
                  Text="{Binding AmountInBaseString}"
                  HorizontalAlignment="Right"
@@ -157,7 +162,7 @@
         </TextBlock.Text>
       </TextBlock>
 
-      <!-- Unselected view -->
+      <!-- unselected view button -->
       <Button CornerRadius="8"
               Height="40"
               VerticalAlignment="Center"
@@ -174,13 +179,14 @@
               Command="{Binding SelectCurrencyCommand}"
               Classes="Default">
         <Button.Content>
-            <TextBlock Text="{Binding UnselectedLabel}"
-                       FontSize="18"
-                       FontFamily="{DynamicResource DefaultLightFontFamily}"
-                       Foreground="{DynamicResource DefaultForegroundBrush}"/>
+          <TextBlock Text="{Binding UnselectedLabel}"
+                      FontSize="18"
+                      FontFamily="{DynamicResource DefaultLightFontFamily}"
+                      Foreground="{DynamicResource DefaultForegroundBrush}"/>
         </Button.Content>
       </Button>
 
+      <!-- unselected zero amount -->
       <TextBlock Margin="0 -1 0 0"
                  Text="0"
                  FontSize="22"

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
 
+using Avalonia.Controls;
 using ReactiveUI;
 using Serilog;
 
@@ -27,35 +28,51 @@ namespace Atomex.Client.Desktop.ViewModels
         private static readonly TimeSpan SwapCheckInterval = TimeSpan.FromSeconds(3);
 
         private readonly IAtomexApp _app;
-        public IFromSource FromSource { get; init; }
-        public string ToAddress { get; init; }
-        public string RedeemFromAddress { get; init; }
+        public IFromSource FromSource { get; set; }
+        public string? FromAddressDescription
+        {
+            get
+            {
+                if (FromSource is FromAddress fromAddress)
+                    return fromAddress.Address.TruncateAddress();
+
+                if (FromSource is FromOutputs fromOutputs)
+                {
+                    if (fromOutputs.Outputs.Count() > 1)
+                        return $"{fromOutputs.Outputs.Count()} outputs";
+
+                    var network = (FromCurrencyViewModel?.Currency as BitcoinBasedConfig)?.Network;
+
+                    if (network != null)
+                        return fromOutputs.Outputs
+                            .First()
+                            .DestinationAddress(network)
+                            .TruncateAddress();
+                }
+
+                return null;
+            }
+        }
+
+        public string ToAddress { get; set; }
+        public string? ToAddressDescription => ToAddress?.TruncateAddress();
+        public string RedeemFromAddress { get; set; }
 
         public CurrencyViewModel FromCurrencyViewModel { get; set; }
         public CurrencyViewModel ToCurrencyViewModel { get; set; }
+        public string? BaseCurrencyCode { get; set; }
+        public string? QuoteCurrencyCode { get; set; }
         public string PriceFormat { get; set; }
-
         public decimal Amount { get; set; }
         public decimal AmountInBase { get; set; }
         public decimal TargetAmount { get; set; }
         public decimal TargetAmountInBase { get; set; }
-
         public decimal EstimatedPrice { get; set; }
         public decimal EstimatedOrderPrice { get; init; }
-        public decimal EstimatedPaymentFee { get; set; }
-        public decimal EstimatedPaymentFeeInBase { get; set; }
-        public decimal EstimatedRedeemFee { get; set; }
-        public decimal EstimatedRedeemFeeInBase { get; set; }
         public decimal EstimatedMakerNetworkFee { get; init; }
-        public decimal EstimatedMakerNetworkFeeInBase { get; init; }
-        public decimal EstimatedTotalNetworkFeeInBase { get; init; }
-
-        public decimal RewardForRedeem { get; init; }
-        public decimal RewardForRedeemInBase { get; init; }
-        public bool HasRewardForRedeem { get; init; }
+        public decimal EstimatedTotalNetworkFeeInBase { get; set; }
 
         private ICommand _backCommand;
-
         public ICommand BackCommand => _backCommand ??= ReactiveCommand.Create(() =>
         {
             App.DialogService.Close();
@@ -67,7 +84,7 @@ namespace Atomex.Client.Desktop.ViewModels
 #if DEBUG
         public ConversionConfirmationViewModel()
         {
-            if (Env.IsInDesignerMode())
+            if (Design.IsDesignMode)
                 DesignerMode();
         }
 #endif
@@ -277,27 +294,30 @@ namespace Atomex.Client.Desktop.ViewModels
             return string.Join(". ", descriptions) + ". Please update your balance and try again!";
         }
 
+#if DEBUG
         private void DesignerMode()
         {
-            var currencies = DesignTime.Currencies.ToList();
+            var btc = DesignTime.Currencies.Get<BitcoinConfig>("BTC");
+            var ltc = DesignTime.Currencies.Get<LitecoinConfig>("LTC");
 
-            FromCurrencyViewModel     = CurrencyViewModelCreator.CreateViewModel(currencies[0], false);
-            ToCurrencyViewModel       = CurrencyViewModelCreator.CreateViewModel(currencies[1], false);
+            FromCurrencyViewModel     = CurrencyViewModelCreator.CreateViewModel(btc, subscribeToUpdates: false);
+            ToCurrencyViewModel       = CurrencyViewModelCreator.CreateViewModel(ltc, subscribeToUpdates: false);
 
+            FromSource                = new FromAddress("13V2gzjUL9DiHZLy1WFk9q6pZ3yBsb4TzP");
+            ToAddress                 = "13V2gzjUL9DiHZLy1WFk9q6pZ3yBsb4TzP";
+
+            BaseCurrencyCode          = "LTC";
+            QuoteCurrencyCode         = "BTC";
             PriceFormat               = $"F{FromCurrencyViewModel.Currency.Digits}";
             EstimatedPrice            = 0.003m;
 
             Amount                    = 0.00001234m;
             AmountInBase              = 10.23m;
-
             TargetAmount              = Amount / EstimatedPrice;
             TargetAmountInBase        = AmountInBase;
 
-            EstimatedPaymentFee       = 0.0001904m;
-            EstimatedPaymentFeeInBase = 0.22m;
-
-            EstimatedRedeemFee        = 0.001m;
-            EstimatedRedeemFeeInBase  = 0.11m;
+            EstimatedTotalNetworkFeeInBase = 23.43m;
         }
+#endif
     }
 }

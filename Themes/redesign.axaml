@@ -129,6 +129,7 @@
     <Color x:Key="ChildViewShadowColor">Black</Color>
     <Color x:Key="ChildViewBackgroundColor1">#122B50</Color>
     <Color x:Key="ChildViewBackgroundColor2">#11233C</Color>
+    <Color x:Key="ChildViewBackgroundMiddleColor">#122747</Color>
 
     <LinearGradientBrush x:Key="ChildViewBackgroundBrush" StartPoint="100%,0%" EndPoint="0%,100%">
         <LinearGradientBrush.GradientStops>

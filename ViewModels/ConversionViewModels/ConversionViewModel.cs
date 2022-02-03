@@ -997,6 +997,8 @@ namespace Atomex.Client.Desktop.ViewModels
                 ToAddress                      = ToAddress,
                 RedeemFromAddress              = RedeemFromAddress,
 
+                BaseCurrencyCode               = BaseCurrencyCode,
+                QuoteCurrencyCode              = QuoteCurrencyCode,
                 PriceFormat                    = PriceFormat,
                 Amount                         = FromViewModel.Amount,
                 AmountInBase                   = FromViewModel.AmountInBase,
@@ -1005,18 +1007,8 @@ namespace Atomex.Client.Desktop.ViewModels
 
                 EstimatedPrice                 = EstimatedPrice,
                 EstimatedOrderPrice            = _estimatedOrderPrice,
-                EstimatedPaymentFee            = EstimatedPaymentFee,
-                EstimatedRedeemFee             = EstimatedRedeemFee,
                 EstimatedMakerNetworkFee       = EstimatedMakerNetworkFee,
-
-                EstimatedPaymentFeeInBase      = EstimatedPaymentFeeInBase,
-                EstimatedRedeemFeeInBase       = EstimatedRedeemFeeInBase,
-                EstimatedMakerNetworkFeeInBase = EstimatedMakerNetworkFeeInBase,
                 EstimatedTotalNetworkFeeInBase = EstimatedTotalNetworkFeeInBase,
-
-                RewardForRedeem                = RewardForRedeem,
-                RewardForRedeemInBase          = RewardForRedeemInBase,
-                HasRewardForRedeem             = HasRewardForRedeem
             };
 
             viewModel.OnSuccess += OnSuccessConvertion;
