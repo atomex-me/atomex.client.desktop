@@ -250,7 +250,6 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 .InvokeCommand(updateAmountCommand);
 
             this.WhenAnyValue(vm => vm.From)
-                .WhereNotNull()
                 .Select(GetShortenedAddress)
                 .ToPropertyEx(this, vm => vm.FromBeautified);
 
@@ -310,8 +309,9 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
         protected abstract Task<Error> Send(CancellationToken cancellationToken = default);
 
-        protected static string GetShortenedAddress(string address)
+        public static string GetShortenedAddress(string address)
         {
+            if (string.IsNullOrEmpty(address)) return address;
             const int length = 4;
             return $"{address[..length]}···{address[^length..]}";
         }

@@ -145,7 +145,6 @@
 
       <!-- amount in base -->
       <TextBlock Margin="0 1 0 0"
-                 Text="{Binding AmountInBaseString}"
                  HorizontalAlignment="Right"
                  FontSize="13"
                  FontFamily="{DynamicResource DefaultLightFontFamily}"

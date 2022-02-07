@@ -72,7 +72,10 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                             await App.ImageService.LoadImageFromUrl(url, async () =>
                                 {
                                     _isPreviewDownloading = false;
-                                    await Dispatcher.UIThread.InvokeAsync(() => { OnPropertyChanged(nameof(TokenPreview)); });
+                                    await Dispatcher.UIThread.InvokeAsync(() =>
+                                    {
+                                        OnPropertyChanged(nameof(TokenPreview));
+                                    });
                                 })
                                 .ConfigureAwait(false);
                         });
@@ -109,7 +112,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             ? $"http://ipfs.io/ipfs/{RemoveIpfsPrefix(TokenBalance.ArtifactUri)}"
             : null;
 
-        
+
         public IEnumerable<string> GetTokenPreviewUrls()
         {
             yield return $"https://d38roug276qjor.cloudfront.net/{TokenBalance.Contract}/{TokenBalance.TokenId}.png";
@@ -173,13 +176,13 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         public string IconUrl => $"https://services.tzkt.io/v1/avatars/{Contract.Address}";
         public Action PreviewLoadedCallback { get; set; }
         private bool _isPreviewDownloading;
+
         public IBitmap IconPreview
         {
             get
             {
                 if (_isPreviewDownloading)
                     return null;
-                
 
 
                 if (!App.ImageService.GetImageLoaded(IconUrl))
@@ -191,7 +194,10 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                         await App.ImageService.LoadImageFromUrl(IconUrl, async () =>
                             {
                                 _isPreviewDownloading = false;
-                                await Dispatcher.UIThread.InvokeAsync(() => { OnPropertyChanged(nameof(IconPreview)); });
+                                await Dispatcher.UIThread.InvokeAsync(() =>
+                                {
+                                    OnPropertyChanged(nameof(IconPreview));
+                                });
                             })
                             .ConfigureAwait(false);
                     });
@@ -229,6 +235,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         }
 
         public bool HasName => !string.IsNullOrEmpty(_name);
+
         private async Task TryGetAliasAsync()
         {
             try
@@ -300,10 +307,11 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         public bool IsFa2 => TokenContract?.IsFa2 ?? false;
         public string TokenContractAddress => TokenContract?.Contract?.Address ?? "";
         public string TokenContractName => TokenContract?.Name ?? "";
-        
+
         public string TokenContractIconUrl => TokenContract?.IconUrl;
-        
+
         private bool _isPreviewDownloading;
+
         public IBitmap TokenContractIconPreview
         {
             get
@@ -323,7 +331,10 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                         await Desktop.App.ImageService.LoadImageFromUrl(TokenContractIconUrl, async () =>
                             {
                                 _isPreviewDownloading = false;
-                                await Dispatcher.UIThread.InvokeAsync(() => { OnPropertyChanged(nameof(TokenContractIconPreview)); });
+                                await Dispatcher.UIThread.InvokeAsync(() =>
+                                {
+                                    OnPropertyChanged(nameof(TokenContractIconPreview));
+                                });
                             })
                             .ConfigureAwait(false);
                     });
@@ -540,7 +551,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
             SelectedTabIndex = tokenContract.IsFa2 ? 0 : 1;
             OnPropertyChanged(nameof(SelectedTabIndex));
-            
+
             OnPropertyChanged(nameof(TokenContractIconPreview));
 
             _sortInfo = null;
@@ -557,6 +568,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                 tokenContract: TokenContract.Contract.Address,
                 tokenId: 0,
                 tokenType: TokenContract.Contract.GetContractType(),
+                tokenPreview: TokenContract.IconPreview,
                 from: null);
 
             Desktop.App.DialogService.Show(sendViewModel);
@@ -572,6 +584,9 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                 tokenContract: tokenViewModel.TokenBalance.Contract,
                 tokenId: tokenViewModel.TokenBalance.TokenId,
                 tokenType: TokenContract.Contract.GetContractType(),
+                tokenPreview: tokenViewModel.TokenPreview != null
+                    ? tokenViewModel.TokenPreview
+                    : TokenContract.IconPreview,
                 from: tokenViewModel.Address);
 
             Desktop.App.DialogService.Show(sendViewModel);
