@@ -28,9 +28,9 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
         public string FeeRateFormat => "0.#";
 
-        private BitcoinBasedConfig Config => (BitcoinBasedConfig)_currency;
+        private BitcoinBasedConfig Config => (BitcoinBasedConfig)Currency;
 
-        private BitcoinBasedAccount Account => _app.Account.GetCurrencyAccount<BitcoinBasedAccount>(_currency.Name);
+        private BitcoinBasedAccount Account => App.Account.GetCurrencyAccount<BitcoinBasedAccount>(Currency.Name);
 
         public BitcoinBasedSendViewModel()
             : base()
@@ -68,7 +68,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 });
 
             this.WhenAnyValue(vm => vm.FeeRate)
-                .Subscribe(_ => OnQuotesUpdatedEventHandler(_app.QuotesProvider, EventArgs.Empty));
+                .Subscribe(_ => OnQuotesUpdatedEventHandler(App.QuotesProvider, EventArgs.Empty));
 
             var outputs = Account.GetAvailableOutputsAsync()
                 .WaitForResult()
@@ -84,22 +84,22 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     IsSelected = true
                 }), Config, Account)
             {
-                BackAction = () => { App.DialogService.Show(this); },
+                BackAction = () => { Desktop.App.DialogService.Show(this); },
                 ConfirmAction = ots =>
                 {
                     Outputs = new ObservableCollection<BitcoinBasedTxOutput>(ots);
-                    App.DialogService.Show(SelectToViewModel);
+                    Desktop.App.DialogService.Show(SelectToViewModel);
                 },
                 Config = Config,
             };
 
-            SelectToViewModel = new SelectAddressViewModel(_app.Account, _currency)
+            SelectToViewModel = new SelectAddressViewModel(App.Account, Currency)
             {
-                BackAction = () => { App.DialogService.Show(SelectFromViewModel); },
-                ConfirmAction = (address, _) =>
+                BackAction = () => { Desktop.App.DialogService.Show(SelectFromViewModel); },
+                ConfirmAction = (address, _, _) =>
                 {
                     To = address;
-                    App.DialogService.Show(this);
+                    Desktop.App.DialogService.Show(this);
                 }
             };
         }
@@ -117,23 +117,23 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
             SelectFromViewModel = new SelectOutputsViewModel(outputs, Config, Account)
             {
-                BackAction = () => { App.DialogService.Show(this); },
+                BackAction = () => { Desktop.App.DialogService.Show(this); },
                 ConfirmAction = ots =>
                 {
                     Outputs = new ObservableCollection<BitcoinBasedTxOutput>(ots);
-                    App.DialogService.Show(this);
+                    Desktop.App.DialogService.Show(this);
                 },
                 Config = Config,
             };
 
-            App.DialogService.Show(SelectFromViewModel);
+            Desktop.App.DialogService.Show(SelectFromViewModel);
         }
 
         protected override void ToClick()
         {
-            SelectToViewModel.BackAction = () => App.DialogService.Show(this);
+            SelectToViewModel.BackAction = () => Desktop.App.DialogService.Show(this);
 
-            App.DialogService.Show(SelectToViewModel);
+            Desktop.App.DialogService.Show(SelectToViewModel);
         }
 
         protected override async Task UpdateAmount()
@@ -187,7 +187,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             }
             catch (Exception e)
             {
-                Log.Error(e, "{@currency}: update amount error", _currency?.Description);
+                Log.Error(e, "{@currency}: update amount error", Currency?.Description);
             }
         }
 
@@ -218,7 +218,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             }
             catch (Exception e)
             {
-                Log.Error(e, "{@currency}: update fee error", _currency?.Description);
+                Log.Error(e, "{@currency}: update fee error", Currency?.Description);
             }
         }
 
@@ -290,7 +290,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             }
             catch (Exception e)
             {
-                Log.Error(e, "{@currency}: max click error", _currency?.Description);
+                Log.Error(e, "{@currency}: max click error", Currency?.Description);
             }
         }
 

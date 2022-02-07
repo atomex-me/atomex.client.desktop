@@ -20,6 +20,7 @@ using Atomex.Wallet.Abstract;
 using Atomex.ViewModels;
 using Avalonia.Media.Imaging;
 using ReactiveUI.Fody.Helpers;
+using Serilog;
 
 namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 {
@@ -57,11 +58,11 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 var fromAddress = FromAddresses.ElementAt(_fromIndex);
 
                 From = fromAddress.Address;
-                SelectedBalance = fromAddress.TokenBalance;
+                SelectedFromBalance = fromAddress.TokenBalance;
             }
         }
 
-        [Reactive] public decimal SelectedBalance { get; set; }
+        [Reactive] public decimal SelectedFromBalance { get; set; }
         [Reactive] public string FromBeautified { get; set; }
 
         private string _from;
@@ -313,6 +314,9 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
         [Reactive] public bool ConfirmStage { get; set; }
 
+        public SelectAddressViewModel SelectFromViewModel { get; set; }
+        public SelectAddressViewModel SelectToViewModel { get; set; }
+
         public TezosTokensSendViewModel()
         {
 #if DEBUG
@@ -351,10 +355,31 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
             UpdateFromAddressList(from, tokenContract);
             UpdateCurrencyCode();
-
             SubscribeToServices();
-
             UseDefaultFee = true;
+
+            SelectFromViewModel =
+                new SelectAddressViewModel(_app.Account, tezosConfig, true, from, tokenContract)
+                {
+                    BackAction = () => { App.DialogService.Show(this); },
+                    ConfirmAction = (address, balance, tokenId) =>
+                    {
+                        TokenId = tokenId;
+                        From = address;
+                        SelectedFromBalance = balance;
+                        App.DialogService.Show(SelectToViewModel);
+                    }
+                };
+
+            SelectToViewModel = new SelectAddressViewModel(_app.Account, tezosConfig)
+            {
+                BackAction = () => { App.DialogService.Show(SelectFromViewModel); },
+                ConfirmAction = (address, _, _) =>
+                {
+                    To = address;
+                    App.DialogService.Show(this);
+                }
+            };
         }
 
         private void SubscribeToServices()
@@ -363,23 +388,52 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 _app.QuotesProvider.QuotesUpdated += OnQuotesUpdatedEventHandler;
         }
 
-        private ICommand _backCommand;
+        private ReactiveCommand<Unit, Unit> _backCommand;
 
-        public ICommand BackCommand => _backCommand ??= (_backCommand = ReactiveCommand.Create(() =>
+        public ReactiveCommand<Unit, Unit> BackCommand => _backCommand ??= (_backCommand = ReactiveCommand.Create(() =>
         {
             Desktop.App.DialogService.Close();
         }));
 
-        private ICommand _nextCommand;
-        public ICommand NextCommand => _nextCommand ??= ReactiveCommand.Create(OnNextCommand);
+        private ReactiveCommand<Unit, Unit> _nextCommand;
+        public ReactiveCommand<Unit, Unit> NextCommand => _nextCommand ??= ReactiveCommand.Create(OnNextCommand);
 
-        protected ICommand _maxCommand;
-        public ICommand MaxCommand => _maxCommand ??= ReactiveCommand.Create(OnMaxClick);
+        private ReactiveCommand<Unit, Unit> _maxCommand;
+        public ReactiveCommand<Unit, Unit> MaxCommand => _maxCommand ??= ReactiveCommand.Create(OnMaxClick);
 
         private ReactiveCommand<Unit, Unit> _undoConfirmStageCommand;
 
         public ReactiveCommand<Unit, Unit> UndoConfirmStageCommand => _undoConfirmStageCommand ??=
             (_undoConfirmStageCommand = ReactiveCommand.Create(() => { ConfirmStage = false; }));
+
+        private ReactiveCommand<Unit, Unit> _selectFromCommand;
+
+        public ReactiveCommand<Unit, Unit> SelectFromCommand => _selectFromCommand ??=
+            (_selectFromCommand = ReactiveCommand.Create(FromClick));
+
+        private ReactiveCommand<Unit, Unit> _selectToCommand;
+
+        public ReactiveCommand<Unit, Unit> SelectToCommand => _selectToCommand ??=
+            (_selectToCommand = ReactiveCommand.Create(ToClick));
+
+        private void FromClick()
+        {
+            SelectFromViewModel.ConfirmAction = (address, balance, tokenId) =>
+            {
+                TokenId = tokenId;
+                From = address;
+                SelectedFromBalance = balance;
+                App.DialogService.Show(this);
+            };
+
+            App.DialogService.Show(SelectFromViewModel);
+        }
+
+        private void ToClick()
+        {
+            SelectToViewModel.BackAction = () => App.DialogService.Show(this);
+            App.DialogService.Show(SelectToViewModel);
+        }
 
         protected async virtual void OnNextCommand()
         {
@@ -392,7 +446,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 Warning = Resources.SvEmptyAddressError;
                 return;
             }
-            
+
 
             if (!tezosConfig.IsValidAddress(_to))
             {
@@ -816,8 +870,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                         TokenFormat = "F8",
                         TokenCode = tokenCode
                     };
-                })
-                .ToList();
+                });
         }
 
         // protected async Task<Error> Send(CancellationToken cancellationToken = default)

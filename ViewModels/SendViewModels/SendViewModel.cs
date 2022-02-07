@@ -22,8 +22,8 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 {
     public abstract class SendViewModel : ViewModelBase
     {
-        protected readonly IAtomexApp _app;
-        protected CurrencyConfig _currency;
+        protected readonly IAtomexApp App;
+        protected CurrencyConfig Currency;
         public ViewModelBase SelectFromViewModel { get; set; }
         protected SelectAddressViewModel SelectToViewModel { get; set; }
 
@@ -104,7 +104,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         private ReactiveCommand<Unit, Unit> _backCommand;
         public ReactiveCommand<Unit, Unit> BackCommand => _backCommand ??= (_backCommand = ReactiveCommand.Create(() =>
         {
-            App.DialogService.Close();
+            Desktop.App.DialogService.Close();
         }));
 
         private ReactiveCommand<Unit, Unit> _undoConfirmStageCommand;
@@ -134,7 +134,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 Warning = Resources.SvEmptyAddressError;
             }
 
-            if (!_currency.IsValidAddress(To))
+            if (!Currency.IsValidAddress(To))
             {
                 Warning = Resources.SvInvalidAddressError;
             }
@@ -149,7 +149,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 Warning = Resources.SvCommissionLessThanZeroError;
             }
             
-            var feeAmount = !_currency.IsToken ? FeeAmount : 0;
+            var feeAmount = !Currency.IsToken ? FeeAmount : 0;
 
             if (Amount + feeAmount > CurrencyViewModel.AvailableAmount)
             {
@@ -162,28 +162,28 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             {
                 try
                 {
-                    App.DialogService.Show(new SendingViewModel());
+                    Desktop.App.DialogService.Show(new SendingViewModel());
 
                     var error = await Send();
 
                     if (error != null)
                     {
-                        App.DialogService.Show(MessageViewModel.Error(
+                        Desktop.App.DialogService.Show(MessageViewModel.Error(
                             text: error.Description,
-                            backAction: () => App.DialogService.Show(this)));
+                            backAction: () => Desktop.App.DialogService.Show(this)));
 
                         return;
                     }
 
-                    App.DialogService.Show(MessageViewModel.Success(
+                    Desktop.App.DialogService.Show(MessageViewModel.Success(
                         text: "Sending was successful",
-                        nextAction: () => { App.DialogService.Close(); }));
+                        nextAction: () => { Desktop.App.DialogService.Close(); }));
                 }
                 catch (Exception e)
                 {
-                    App.DialogService.Show(MessageViewModel.Error(
+                    Desktop.App.DialogService.Show(MessageViewModel.Error(
                         text: "An error has occurred while sending transaction.",
-                        backAction: () => App.DialogService.Show(this)));
+                        backAction: () => Desktop.App.DialogService.Show(this)));
 
                     Log.Error(e, "Transaction send error.");
                 }
@@ -208,8 +208,8 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             IAtomexApp app,
             CurrencyConfig currency)
         {
-            _app = app ?? throw new ArgumentNullException(nameof(app));
-            _currency = currency ?? throw new ArgumentNullException(nameof(currency));
+            App = app ?? throw new ArgumentNullException(nameof(app));
+            Currency = currency ?? throw new ArgumentNullException(nameof(currency));
 
             CurrencyViewModel = CurrencyViewModelCreator.CreateViewModel(currency);
             UseDefaultFee = true;
@@ -228,7 +228,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             this.WhenAnyValue(
                     vm => vm.Amount,
                     vm => vm.Fee,
-                    (amount, fee) => _currency.IsToken ? amount : amount + fee
+                    (amount, fee) => Currency.IsToken ? amount : amount + fee
                 )
                 .Select(totalAmount => totalAmount.ToString(CurrencyFormat, CultureInfo.InvariantCulture))
                 .ToPropertyEx(this, vm => vm.TotalAmountString);
@@ -237,7 +237,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     vm => vm.Amount,
                     vm => vm.Fee
                 )
-                .Subscribe(_ => OnQuotesUpdatedEventHandler(_app.QuotesProvider, EventArgs.Empty));
+                .Subscribe(_ => OnQuotesUpdatedEventHandler(App.QuotesProvider, EventArgs.Empty));
 
             this.WhenAnyValue(
                     vm => vm.Amount,
@@ -255,7 +255,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
             this.WhenAnyValue(vm => vm.Amount)
                 .Select(amount => amount
-                    .TruncateDecimal(_currency.Digits < 9 ? _currency.Digits : 9)
+                    .TruncateDecimal(Currency.Digits < 9 ? Currency.Digits : 9)
                     .ToString(CurrencyFormat, CultureInfo.InvariantCulture))
                 .ToPropertyEx(this, vm => vm.AmountString);
 
@@ -278,8 +278,8 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
         private void SubscribeToServices()
         {
-            if (_app.HasQuotesProvider)
-                _app.QuotesProvider.QuotesUpdated += OnQuotesUpdatedEventHandler;
+            if (App.HasQuotesProvider)
+                App.QuotesProvider.QuotesUpdated += OnQuotesUpdatedEventHandler;
         }
 
         protected abstract Task UpdateAmount();
@@ -323,7 +323,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 .Select(c => CurrencyViewModelCreator.CreateViewModel(c, subscribeToUpdates: false))
                 .ToList();
 
-            _currency         = fromCurrencies[0].Currency;
+            Currency         = fromCurrencies[0].Currency;
             CurrencyViewModel = fromCurrencies[0];
             To                = "1BvBMSEYstWetqTFn5Au4m4GFg7xJaNVN2";
             Amount            = 0.00001234m;

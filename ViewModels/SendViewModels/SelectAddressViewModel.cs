@@ -18,7 +18,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
     public class SelectAddressViewModel : ViewModelBase
     {
         public Action BackAction { get; set; }
-        public Action<string, decimal> ConfirmAction { get; set; }
+        public Action<string, decimal, decimal> ConfirmAction { get; set; }
         public bool UseToSelectFrom { get; set; }
         private ObservableCollection<WalletAddressViewModel> InitialMyAddresses { get; set; }
         [Reactive] public ObservableCollection<WalletAddressViewModel> MyAddresses { get; set; }
@@ -39,7 +39,8 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             IAccount account,
             CurrencyConfig currency,
             bool useToSelectFrom = false,
-            string? selectedAddress = null)
+            string? selectedAddress = null,
+            string? tokenContract = null)
         {
             this.WhenAnyValue(
                     vm => vm.SortByDate,
@@ -111,8 +112,8 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     else
                     {
                         MyAddresses = new ObservableCollection<WalletAddressViewModel>(sortByAscending
-                            ? myAddresses.OrderBy(addressViewModel => addressViewModel.AvailableBalance)
-                            : myAddresses.OrderByDescending(addressViewModel => addressViewModel.AvailableBalance));
+                            ? myAddresses.OrderBy(addressViewModel => addressViewModel.Balance)
+                            : myAddresses.OrderByDescending(addressViewModel => addressViewModel.Balance));
                     }
                 });
 
@@ -121,12 +122,11 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             var addresses = AddressesHelper
                 .GetReceivingAddressesAsync(
                     account: account,
-                    currency: currency)
+                    currency: currency,
+                    tokenContract: tokenContract)
                 .WaitForResult()
-                .Where(address => !useToSelectFrom ||
-                                  address.IsTezosToken && address.TokenBalance != 0 ||
-                                  !address.IsTezosToken && address.AvailableBalance != 0)
-                .OrderByDescending(address => address.AvailableBalance);
+                .Where(address => !useToSelectFrom || address.Balance != 0)
+                .OrderByDescending(address => address.Balance); 
 
             MyAddresses = new ObservableCollection<WalletAddressViewModel>(addresses);
             InitialMyAddresses = new ObservableCollection<WalletAddressViewModel>(addresses);
@@ -164,7 +164,9 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     ? 0m
                     : SelectedAddress.WalletAddress.AvailableBalance();
 
-                ConfirmAction?.Invoke(selectedAddress, balance);
+                var tokenId = SelectedAddress?.WalletAddress?.TokenBalance?.TokenId ?? 0;
+
+                ConfirmAction?.Invoke(selectedAddress, balance, tokenId);
             }));
 
         private ICommand _copyAddressCommand;

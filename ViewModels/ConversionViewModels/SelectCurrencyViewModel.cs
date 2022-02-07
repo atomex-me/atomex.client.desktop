@@ -201,7 +201,7 @@ namespace Atomex.Client.Desktop.ViewModels.ConversionViewModels
                     selectedAddress: itemWithAddress.SelectedAddress?.Address)
                 {
                     BackAction = () => { App.DialogService.Show(this); },
-                    ConfirmAction = (address, balance) =>
+                    ConfirmAction = (address, balance, _) =>
                     {
                         itemWithAddress.SelectedAddress = itemWithAddress.AvailableAddresses.FirstOrDefault(a => a.Address == address);
                         CurrencySelected?.Invoke(i);

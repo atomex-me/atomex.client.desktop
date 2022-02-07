@@ -571,7 +571,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                 tokenPreview: TokenContract.IconPreview,
                 from: null);
 
-            Desktop.App.DialogService.Show(sendViewModel);
+            Desktop.App.DialogService.Show(sendViewModel.SelectFromViewModel);
         }
 
         private void SendCallback(TezosTokenViewModel tokenViewModel)
@@ -589,7 +589,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                     : TokenContract.IconPreview,
                 from: tokenViewModel.Address);
 
-            Desktop.App.DialogService.Show(sendViewModel);
+            Desktop.App.DialogService.Show(sendViewModel.SelectToViewModel);
         }
 
         protected override void OnReceiveClick()

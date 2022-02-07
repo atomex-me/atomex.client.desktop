@@ -5,13 +5,11 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
-
 using Avalonia.Media.Imaging;
 using Avalonia.Threading;
 using QRCoder;
 using ReactiveUI;
 using Serilog;
-
 using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
 using Atomex.Common;
@@ -27,6 +25,7 @@ namespace Atomex.Client.Desktop.ViewModels.ReceiveViewModels
         private readonly IAtomexApp _app;
 
         protected CurrencyConfig _currency;
+
         public CurrencyConfig Currency
         {
             get => _currency;
@@ -38,12 +37,11 @@ namespace Atomex.Client.Desktop.ViewModels.ReceiveViewModels
                 if (!Env.IsInDesignerMode())
                 {
 #endif
+                    // tokenContract: TokenContract
                     FromAddressList = AddressesHelper
                         .GetReceivingAddressesAsync(
                             account: _app.Account,
-                            currency: _currency,
-                            tokenContract: TokenContract,
-                            tokenType: TokenType)
+                            currency: _currency)
                         .WaitForResult()
                         .ToList();
 #if DEBUG
@@ -51,9 +49,11 @@ namespace Atomex.Client.Desktop.ViewModels.ReceiveViewModels
 #endif
             }
         }
+
         public CurrencyViewModel CurrencyViewModel { get; set; }
 
         private List<WalletAddressViewModel> _fromAddressList;
+
         public List<WalletAddressViewModel> FromAddressList
         {
             get => _fromAddressList;
@@ -63,13 +63,14 @@ namespace Atomex.Client.Desktop.ViewModels.ReceiveViewModels
                 OnPropertyChanged(nameof(FromAddressList));
 
                 SelectedAddress = GetDefaultAddress();
-                
+
                 _selectedAddressIndex = _fromAddressList.FindIndex(wa => wa.Address == SelectedAddress);
                 OnPropertyChanged(nameof(SelectedAddressIndex));
             }
         }
-        
+
         private int _selectedAddressIndex;
+
         public int SelectedAddressIndex
         {
             get => _selectedAddressIndex;
@@ -83,6 +84,7 @@ namespace Atomex.Client.Desktop.ViewModels.ReceiveViewModels
         }
 
         private string _selectedAddress;
+
         public string SelectedAddress
         {
             get => _selectedAddress;
@@ -92,17 +94,22 @@ namespace Atomex.Client.Desktop.ViewModels.ReceiveViewModels
                 OnPropertyChanged(nameof(SelectedAddress));
 
                 if (_selectedAddress != null)
-                   _ =  CreateQrCodeAsync();
+                    _ = CreateQrCodeAsync();
 
                 Warning = string.Empty;
             }
         }
 
         private string _warning;
+
         public string Warning
         {
             get => _warning;
-            set { _warning = value; OnPropertyChanged(nameof(Warning)); }
+            set
+            {
+                _warning = value;
+                OnPropertyChanged(nameof(Warning));
+            }
         }
 
         public IBitmap QrCode { get; private set; }
@@ -114,7 +121,7 @@ namespace Atomex.Client.Desktop.ViewModels.ReceiveViewModels
         {
 #if DEBUG
             if (Env.IsInDesignerMode())
-                DesignerMode();         
+                DesignerMode();
 #endif
         }
 
@@ -171,10 +178,11 @@ namespace Atomex.Client.Desktop.ViewModels.ReceiveViewModels
                     return activeAddressViewModel.Address;
             }
 
-            return FromAddressList.First(vm => vm.IsFreeAddress).Address;
+            return FromAddressList.FirstOrDefault(vm => vm.IsFreeAddress)?.Address ?? FromAddressList.First().Address;
         }
 
         private ICommand _copyCommand;
+
         public ICommand CopyCommand => _copyCommand ??= ReactiveCommand.Create<string>((s) =>
         {
             try
@@ -198,29 +206,29 @@ namespace Atomex.Client.Desktop.ViewModels.ReceiveViewModels
             {
                 new WalletAddressViewModel
                 {
-                    Address          = "tz3bvNMQ95vfAYtG8193ymshqjSvmxiCUuR5",
-                    HasActivity      = true,
+                    Address = "tz3bvNMQ95vfAYtG8193ymshqjSvmxiCUuR5",
+                    HasActivity = true,
                     AvailableBalance = 123.456789m,
-                    CurrencyFormat   = Currency.Format,
-                    CurrencyCode     = Currency.Name,
-                    IsFreeAddress    = false,
+                    CurrencyFormat = Currency.Format,
+                    CurrencyCode = Currency.Name,
+                    IsFreeAddress = false,
                     ShowTokenBalance = true,
-                    TokenBalance     = 100.00000000m,
-                    TokenFormat      = "F8",
-                    TokenCode        = "HEH"
+                    TokenBalance = 100.00000000m,
+                    TokenFormat = "F8",
+                    TokenCode = "HEH"
                 },
                 new WalletAddressViewModel
                 {
-                    Address          = "tz1bvntqQ43vfAYtG1233ymshqjsvmxiCUuR1",
-                    HasActivity      = true,
+                    Address = "tz1bvntqQ43vfAYtG1233ymshqjsvmxiCUuR1",
+                    HasActivity = true,
                     AvailableBalance = 0m,
-                    CurrencyFormat   = Currency.Format,
-                    CurrencyCode     = Currency.Name,
-                    IsFreeAddress    = true,
+                    CurrencyFormat = Currency.Format,
+                    CurrencyCode = Currency.Name,
+                    IsFreeAddress = true,
                     ShowTokenBalance = false,
-                    TokenBalance     = 0m,
-                    TokenFormat      = "F8",
-                    TokenCode        = "HEH"
+                    TokenBalance = 0m,
+                    TokenFormat = "F8",
+                    TokenCode = "HEH"
                 }
             };
         }

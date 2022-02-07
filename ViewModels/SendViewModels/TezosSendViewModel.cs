@@ -28,25 +28,25 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             CurrencyConfig currency)
             : base(app, currency)
         {
-            SelectFromViewModel = new SelectAddressViewModel(_app.Account, _currency, true)
+            SelectFromViewModel = new SelectAddressViewModel(App.Account, Currency, true)
             {
-                BackAction = () => { App.DialogService.Show(this); },
-                ConfirmAction = (address, balance) =>
+                BackAction = () => { Desktop.App.DialogService.Show(this); },
+                ConfirmAction = (address, balance, _) =>
                 {
                     From = address;
                     SelectedFromBalance = balance;
 
-                    App.DialogService.Show(SelectToViewModel);
+                    Desktop.App.DialogService.Show(SelectToViewModel);
                 }
             };
 
-            SelectToViewModel = new SelectAddressViewModel(_app.Account, _currency)
+            SelectToViewModel = new SelectAddressViewModel(App.Account, Currency)
             {
-                BackAction = () => { App.DialogService.Show(SelectFromViewModel); },
-                ConfirmAction = (address, _) =>
+                BackAction = () => { Desktop.App.DialogService.Show(SelectFromViewModel); },
+                ConfirmAction = (address, _, _) =>
                 {
                     To = address;
-                    App.DialogService.Show(this);
+                    Desktop.App.DialogService.Show(this);
                 }
             };
         }
@@ -55,30 +55,30 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         {
             var selectFromViewModel = SelectFromViewModel as SelectAddressViewModel;
 
-            selectFromViewModel!.ConfirmAction = (address, balance) =>
+            selectFromViewModel!.ConfirmAction = (address, balance, _) =>
             {
                 From = address;
                 SelectedFromBalance = balance;
 
-                App.DialogService.Show(this);
+                Desktop.App.DialogService.Show(this);
             };
 
-            App.DialogService.Show(selectFromViewModel);
+            Desktop.App.DialogService.Show(selectFromViewModel);
         }
 
         protected override void ToClick()
         {
-            SelectToViewModel.BackAction = () => App.DialogService.Show(this);
+            SelectToViewModel.BackAction = () => Desktop.App.DialogService.Show(this);
 
-            App.DialogService.Show(SelectToViewModel);
+            Desktop.App.DialogService.Show(SelectToViewModel);
         }
 
         protected override async Task UpdateAmount()
         {
             try
             {
-                var account = _app.Account
-                    .GetCurrencyAccount<TezosAccount>(_currency.Name);
+                var account = App.Account
+                    .GetCurrencyAccount<TezosAccount>(Currency.Name);
 
                 var maxAmountEstimation = await account
                     .EstimateMaxAmountToSendAsync(
@@ -103,7 +103,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             }
             catch (Exception e)
             {
-                Log.Error(e, "{@currency}: update amount error", _currency?.Description);
+                Log.Error(e, "{@currency}: update amount error", Currency?.Description);
             }
         }
 
@@ -113,8 +113,8 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             {
                 if (!UseDefaultFee)
                 {
-                    var account = _app.Account
-                        .GetCurrencyAccount<TezosAccount>(_currency.Name);
+                    var account = App.Account
+                        .GetCurrencyAccount<TezosAccount>(Currency.Name);
 
                     var maxAmountEstimation = await account
                         .EstimateMaxAmountToSendAsync(
@@ -143,7 +143,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             }
             catch (Exception e)
             {
-                Log.Error(e, "{@currency}: update fee error", _currency?.Description);
+                Log.Error(e, "{@currency}: update fee error", Currency?.Description);
             }
         }
 
@@ -151,8 +151,8 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         {
             try
             {
-                var account = _app.Account
-                    .GetCurrencyAccount<TezosAccount>(_currency.Name);
+                var account = App.Account
+                    .GetCurrencyAccount<TezosAccount>(Currency.Name);
 
                 var maxAmountEstimation = await account
                     .EstimateMaxAmountToSendAsync(
@@ -191,13 +191,13 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             }
             catch (Exception e)
             {
-                Log.Error(e, "{@currency}: max click error", _currency?.Description);
+                Log.Error(e, "{@currency}: max click error", Currency?.Description);
             }
         }
 
         protected override Task<Error> Send(CancellationToken cancellationToken = default)
         {
-            var account = _app.Account.GetCurrencyAccount<TezosAccount>(_currency.Name);
+            var account = App.Account.GetCurrencyAccount<TezosAccount>(Currency.Name);
 
             return account.SendAsync(
                 from: From,

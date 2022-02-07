@@ -156,7 +156,7 @@
                                            VerticalAlignment="Center">
                                     <TextBlock.Text>
                                         <MultiBinding Converter="{StaticResource AmountToStringConverter}">
-                                            <Binding Path="SelectedBalance" Mode="OneWay" />
+                                            <Binding Path="SelectedFromBalance" Mode="OneWay" />
                                             <Binding Path="CurrencyFormat" Mode="OneWay" />
                                         </MultiBinding>
                                     </TextBlock.Text>
