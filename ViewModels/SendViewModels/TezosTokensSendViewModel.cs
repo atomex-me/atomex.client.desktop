@@ -435,7 +435,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             App.DialogService.Show(SelectToViewModel);
         }
 
-        protected async virtual void OnNextCommand()
+        private async void OnNextCommand()
         {
             var tezosConfig = _app.Account
                 .Currencies
@@ -513,32 +513,42 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 return;
             }
 
-            // var confirmationViewModel = new SendConfirmationViewModel()
-            // {
-            //     Currency           = tezosConfig,
-            //     From               = _from,
-            //     To                 = _to,
-            //     Amount             = _amount,
-            //     AmountInBase       = _amountInBase,
-            //     BaseCurrencyCode   = _baseCurrencyCode,
-            //     BaseCurrencyFormat = _baseCurrencyFormat,
-            //     Fee                = _fee,
-            //     UseDeafultFee      = _useDefaultFee,
-            //     FeeInBase          = _feeInBase,
-            //     CurrencyCode       = _currencyCode,
-            //     CurrencyFormat     = CurrencyFormat,
-            //
-            //     FeeCurrencyCode    = _feeCurrencyCode,
-            //     FeeCurrencyFormat  = FeeCurrencyFormat,
-            //
-            //     TokenContract      = _tokenContract,
-            //     TokenId            = _tokenId,
-            //     TokenType          = _tokenType,
-            //     
-            //     SendCallback       = Send
-            // };
-            //
-            // App.DialogService.Show(confirmationViewModel);
+            if (ConfirmStage)
+            {
+                try
+                {
+                    App.DialogService.Show(new SendingViewModel());
+
+                    var error = await Send();
+
+                    if (error != null)
+                    {
+                        App.DialogService.Show(MessageViewModel.Error(
+                            text: error.Description,
+                            backAction: () => App.DialogService.Show(this)));
+
+                        return;
+                    }
+
+                    App.DialogService.Show(MessageViewModel.Success(
+                        text: "Sending was successful",
+                        nextAction: () => { App.DialogService.Close(); }));
+                }
+                catch (Exception e)
+                {
+                    App.DialogService.Show(MessageViewModel.Error(
+                        text: "An error has occurred while sending transaction.",
+                        backAction: () => App.DialogService.Show(this)));
+
+                    Log.Error(e, "Tezos tokens transaction send error");
+                }
+                finally
+                {
+                    ConfirmStage = false;
+                }
+            }
+
+            ConfirmStage = true;
         }
 
         protected virtual async void UpdateAmount(decimal amount)
@@ -873,54 +883,56 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 });
         }
 
-        // protected async Task<Error> Send(CancellationToken cancellationToken = default)
-        // {
-        // var tokenAddress = await GetTokenAddressAsync(
-        //     account: App.AtomexApp.Account,
-        //     address: confirmationViewModel.From,
-        //     tokenContract: confirmationViewModel.TokenContract,
-        //     tokenId: confirmationViewModel.TokenId,
-        //     tokenType: confirmationViewModel.TokenType);
-        //
-        // if (tokenAddress.Currency == "FA12")
-        // {
-        //     var currencyName = App.AtomexApp.Account.Currencies
-        //         .FirstOrDefault(c => c is Fa12Config fa12 && fa12.TokenContractAddress == confirmationViewModel.TokenContract)
-        //         ?.Name ?? "FA12";
-        //
-        //     var tokenAccount = App.AtomexApp.Account.GetTezosTokenAccount<Fa12Account>(
-        //         currency: currencyName,
-        //         tokenContract: confirmationViewModel.TokenContract,
-        //         tokenId: confirmationViewModel.TokenId);
-        //
-        //     return await tokenAccount.SendAsync(
-        //         from: tokenAddress.Address,
-        //         to: confirmationViewModel.To,
-        //         amount: confirmationViewModel.Amount,
-        //         fee: confirmationViewModel.Fee,
-        //         useDefaultFee: confirmationViewModel.UseDeafultFee);
-        // }
-        // else
-        // {
-        //     var tokenAccount = App.AtomexApp.Account.GetTezosTokenAccount<Fa2Account>(
-        //         currency: "FA2",
-        //         tokenContract: confirmationViewModel.TokenContract,
-        //         tokenId: confirmationViewModel.TokenId);
-        //
-        //     var decimals = tokenAddress.TokenBalance.Decimals;
-        //     var amount = Amount * (decimal)Math.Pow(10, decimals);
-        //     var fee = (int)confirmationViewModel.Fee.ToMicroTez();
-        //
-        //     return await tokenAccount.SendAsync(
-        //         from: confirmationViewModel.From,
-        //         to: confirmationViewModel.To,
-        //         amount: amount,
-        //         tokenContract: confirmationViewModel.TokenContract,
-        //         tokenId: (int)confirmationViewModel.TokenId,
-        //         fee: fee,
-        //         useDefaultFee: confirmationViewModel.UseDeafultFee);
-        // }
-        // }
+        private async Task<Error> Send(CancellationToken cancellationToken = default)
+        {
+            var tokenAddress = await GetTokenAddressAsync(
+                account: App.AtomexApp.Account,
+                address: From,
+                tokenContract: TokenContract,
+                tokenId: TokenId,
+                tokenType: _tokenType);
+
+            if (tokenAddress.Currency == "FA12")
+            {
+                var currencyName = App.AtomexApp.Account.Currencies
+                    .FirstOrDefault(c => c is Fa12Config fa12 && fa12.TokenContractAddress == TokenContract)
+                    ?.Name ?? "FA12";
+
+                var tokenAccount = App.AtomexApp.Account.GetTezosTokenAccount<Fa12Account>(
+                    currency: currencyName,
+                    tokenContract: TokenContract,
+                    tokenId: TokenId);
+
+                return await tokenAccount.SendAsync(
+                    from: tokenAddress.Address,
+                    to: To,
+                    amount: Amount,
+                    fee: Fee,
+                    useDefaultFee: UseDefaultFee,
+                    cancellationToken: cancellationToken);
+            }
+            else
+            {
+                var tokenAccount = App.AtomexApp.Account.GetTezosTokenAccount<Fa2Account>(
+                    currency: "FA2",
+                    tokenContract: TokenContract,
+                    tokenId: TokenId);
+
+                var decimals = tokenAddress.TokenBalance.Decimals;
+                var amount = Amount * (decimal)Math.Pow(10, decimals);
+                var fee = (int)Fee.ToMicroTez();
+
+                return await tokenAccount.SendAsync(
+                    from: From,
+                    to: To,
+                    amount: amount,
+                    tokenContract: TokenContract,
+                    tokenId: (int)TokenId,
+                    fee: fee,
+                    useDefaultFee: UseDefaultFee,
+                    cancellationToken: cancellationToken);
+            }
+        }
 
         private void DesignerMode()
         {

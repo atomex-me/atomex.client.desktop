@@ -129,29 +129,29 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
         private async Task OnNextCommand()
         {
+            var feeAmount = !Currency.IsToken ? FeeAmount : 0;
+            
             if (string.IsNullOrEmpty(To))
             {
                 Warning = Resources.SvEmptyAddressError;
             }
 
-            if (!Currency.IsValidAddress(To))
+            else if (!Currency.IsValidAddress(To))
             {
                 Warning = Resources.SvInvalidAddressError;
             }
 
-            if (Amount <= 0)
+            else if (Amount <= 0)
             {
                 Warning = Resources.SvAmountLessThanZeroError;
             }
 
-            if (FeeAmount <= 0)
+            else if (FeeAmount <= 0)
             {
                 Warning = Resources.SvCommissionLessThanZeroError;
             }
-            
-            var feeAmount = !Currency.IsToken ? FeeAmount : 0;
 
-            if (Amount + feeAmount > CurrencyViewModel.AvailableAmount)
+            else if (Amount + feeAmount > CurrencyViewModel.AvailableAmount)
             {
                 Warning = Resources.SvAvailableFundsError;
             }

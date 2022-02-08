@@ -512,10 +512,9 @@
                                VerticalAlignment="Center"
                                FontSize="13"
                                Name="TotalString" />
-
-                    <!-- Text="{Binding TotalAmountString}" -->
+                    
                     <TextBlock Grid.Column="1"
-                               Text="123 NFT"
+                               Text="{Binding AmountString}"
                                FontFamily="{DynamicResource DefaultFontFamily}"
                                Foreground="{DynamicResource DefaultForegroundBrush}"
                                VerticalAlignment="Center"
