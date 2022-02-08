@@ -3,11 +3,9 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive;
 using System.Windows.Input;
-
 using Avalonia.Controls;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
-
 using Atomex.Common;
 using Atomex.Core;
 using Atomex.ViewModels;
@@ -40,6 +38,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             CurrencyConfig currency,
             bool useToSelectFrom = false,
             string? selectedAddress = null,
+            decimal? selectedTokenId = null,
             string? tokenContract = null)
         {
             this.WhenAnyValue(
@@ -126,13 +125,14 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     tokenContract: tokenContract)
                 .WaitForResult()
                 .Where(address => !useToSelectFrom || address.Balance != 0)
-                .OrderByDescending(address => address.Balance); 
+                .OrderByDescending(address => address.Balance);
 
             MyAddresses = new ObservableCollection<WalletAddressViewModel>(addresses);
             InitialMyAddresses = new ObservableCollection<WalletAddressViewModel>(addresses);
 
-            if (selectedAddress != null)
-                SelectedAddress = MyAddresses.FirstOrDefault(vm => vm.Address == selectedAddress);
+            if (selectedAddress != null && selectedTokenId != null)
+                SelectedAddress = MyAddresses
+                    .FirstOrDefault(vm => vm.Address == selectedAddress && vm.TokenId == selectedTokenId);
         }
 
         private ReactiveCommand<Unit, Unit> _backCommand;

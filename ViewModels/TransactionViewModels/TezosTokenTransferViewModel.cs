@@ -8,13 +8,14 @@ using Atomex.Blockchain.Abstract;
 using Atomex.Blockchain.Tezos;
 using Atomex.Common;
 using Atomex.Client.Desktop.Common;
+using Atomex.ViewModels;
 using ReactiveUI;
 
 namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
 {
     public class TezosTokenTransferViewModel : ViewModelBase, ITransactionViewModel
     {
-        public const int MaxAmountDecimals = 9;
+        public const int MaxAmountDecimals = AddressesHelper.MaxTokenCurrencyFormatDecimals;
 
         private readonly TezosConfig _tezosConfig;
 
