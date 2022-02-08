@@ -170,7 +170,7 @@
 
             <StackPanel DockPanel.Dock="Bottom">
                 <controls:MenuButton
-                    IsVisible="True"
+                    IsVisible="False"
                     Background="Transparent"
                     Foreground="White"
                     IsSelected="{Binding IsSettingsSectionActive}"
@@ -189,21 +189,6 @@
                             Settings
                         </TextBlock>
                     </StackPanel>
-                </controls:MenuButton>
-            </StackPanel>
-
-            <StackPanel DockPanel.Dock="Bottom">
-                <controls:MenuButton
-                    Height="42"
-                    Background="#ff9500"
-                    Foreground="White"
-                    IsSelected="{Binding IsSettingsSectionActive}"
-                    Width="{DynamicResource WalletMenuItemWidth}"
-                    Command="{Binding SurveyCommand}">
-                    <TextBlock VerticalAlignment="Center"
-                               Margin="8 0 0 0">
-                        ✋ Take the survey
-                    </TextBlock>
                 </controls:MenuButton>
             </StackPanel>
 
