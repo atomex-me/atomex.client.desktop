@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
+using System.Reactive;
 using System.Threading.Tasks;
-using System.Windows.Input;
 using Avalonia.Media.Imaging;
 using Avalonia.Threading;
 using QRCoder;
@@ -15,6 +15,8 @@ using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
 using Atomex.Common;
 using Atomex.Core;
 using Atomex.ViewModels;
+using ReactiveUI.Fody.Helpers;
+using Color = System.Drawing.Color;
 
 namespace Atomex.Client.Desktop.ViewModels.ReceiveViewModels
 {
@@ -64,7 +66,7 @@ namespace Atomex.Client.Desktop.ViewModels.ReceiveViewModels
 
                 SelectedAddress = GetDefaultAddress();
 
-                _selectedAddressIndex = _fromAddressList.FindIndex(wa => wa.Address == SelectedAddress);
+                SelectedAddressIndex = _fromAddressList.FindIndex(wa => wa.Address == SelectedAddress);
                 OnPropertyChanged(nameof(SelectedAddressIndex));
             }
         }
@@ -79,7 +81,10 @@ namespace Atomex.Client.Desktop.ViewModels.ReceiveViewModels
                 _selectedAddressIndex = value;
                 OnPropertyChanged(nameof(SelectedAddressIndex));
 
-                SelectedAddress = FromAddressList.ElementAt(_selectedAddressIndex).Address;
+                var walletAddressViewModel = FromAddressList.ElementAt(_selectedAddressIndex);
+                SelectedAddress = walletAddressViewModel.Address;
+                AddressBalance = walletAddressViewModel.AvailableBalance;
+                AddressIsFree = walletAddressViewModel.IsFreeAddress;
             }
         }
 
@@ -100,6 +105,10 @@ namespace Atomex.Client.Desktop.ViewModels.ReceiveViewModels
             }
         }
 
+        [Reactive] public bool IsCopied { get; set; }
+        [Reactive] public decimal AddressBalance { get; set; }
+        [Reactive] public bool AddressIsFree { get; set; }
+
         private string _warning;
 
         public string Warning
@@ -116,6 +125,8 @@ namespace Atomex.Client.Desktop.ViewModels.ReceiveViewModels
 
         public string TokenContract { get; private set; }
         public string TokenType { get; private set; }
+
+        public string TitleText => $"Your receiving {Currency.Name} address";
 
         public ReceiveViewModel()
         {
@@ -141,14 +152,14 @@ namespace Atomex.Client.Desktop.ViewModels.ReceiveViewModels
 
         private async Task CreateQrCodeAsync()
         {
-            System.Drawing.Bitmap qrCodeBitmap = null;
+            System.Drawing.Bitmap? qrCodeBitmap = null;
 
             await Task.Run(() =>
             {
                 using var qrGenerator = new QRCodeGenerator();
                 using var qrData = qrGenerator.CreateQrCode(_selectedAddress, QRCodeGenerator.ECCLevel.Q);
                 using var qrCode = new QRCode(qrData);
-                qrCodeBitmap = qrCode.GetGraphic(PixelsPerModule);
+                qrCodeBitmap = qrCode.GetGraphic(PixelsPerModule, Color.White, Color.FromArgb(0, 0, 0, 1), false);
             });
 
             await Dispatcher.UIThread.InvokeAsync(() =>
@@ -168,7 +179,7 @@ namespace Atomex.Client.Desktop.ViewModels.ReceiveViewModels
 
         protected virtual string GetDefaultAddress()
         {
-            if (Currency is TezosConfig || Currency is EthereumConfig)
+            if (Currency is TezosConfig or EthereumConfig)
             {
                 var activeAddressViewModel = FromAddressList
                     .Where(vm => vm.HasActivity && vm.AvailableBalance > 0)
@@ -181,21 +192,29 @@ namespace Atomex.Client.Desktop.ViewModels.ReceiveViewModels
             return FromAddressList.FirstOrDefault(vm => vm.IsFreeAddress)?.Address ?? FromAddressList.First().Address;
         }
 
-        private ICommand _copyCommand;
+        private ReactiveCommand<Unit, Unit> _copyCommand;
 
-        public ICommand CopyCommand => _copyCommand ??= ReactiveCommand.Create<string>((s) =>
+        public ReactiveCommand<Unit, Unit> CopyCommand => _copyCommand ??= ReactiveCommand.CreateFromTask(async () =>
         {
             try
             {
-                App.Clipboard.SetTextAsync(SelectedAddress);
-
+                IsCopied = true;
+                _ = App.Clipboard.SetTextAsync(SelectedAddress);
                 Warning = "Address successfully copied to clipboard.";
+
+                await Task.Delay(TimeSpan.FromSeconds(5));
+                IsCopied = false;
             }
             catch (Exception e)
             {
                 Log.Error(e, "Copy to clipboard error");
             }
         });
+
+        private ReactiveCommand<Unit, Unit> _selectAddressCommand;
+
+        public ReactiveCommand<Unit, Unit> SelectAddressCommand =>
+            _selectAddressCommand ??= ReactiveCommand.Create(() => { });
 
         private void DesignerMode()
         {
