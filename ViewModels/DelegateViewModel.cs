@@ -508,7 +508,7 @@ namespace Atomex.Client.Desktop.ViewModels
 
                 var walletAddress = App.Account
                     .GetCurrencyAccount(TezosConfig.Xtz)
-                    .GetAddressAsync(_selectedAddress.Address)
+                    .GetAddressAsync(_selectedAddress.Address, cancellationToken)
                     .WaitForResult();
 
                 using var securePublicKey = App.Account.Wallet.GetPublicKey(
@@ -516,7 +516,7 @@ namespace Atomex.Client.Desktop.ViewModels
                     keyIndex: walletAddress.KeyIndex,
                     keyType: walletAddress.KeyType);
 
-                var (isSuccess, isRunSuccess) = await tx.FillOperationsAsync(
+                var (isSuccess, isRunSuccess, hasReveal) = await tx.FillOperationsAsync(
                     securePublicKey: securePublicKey,
                     tezosConfig: _tezosConfig,
                     headOffset: TezosConfig.HeadOffset,
