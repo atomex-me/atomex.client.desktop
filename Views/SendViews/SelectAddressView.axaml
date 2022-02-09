@@ -208,6 +208,7 @@
                                         IsVisible="{Binding IsFreeAddress}">
                                     <TextBlock Text="new"
                                                FontSize="12"
+                                               LineHeight="16"
                                                VerticalAlignment="Center"
                                                FontFamily="{DynamicResource DefaultFontFamily}"
                                                Foreground="{DynamicResource DefaultForegroundBrush}" />
