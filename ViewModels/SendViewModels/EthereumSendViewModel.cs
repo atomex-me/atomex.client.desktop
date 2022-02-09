@@ -4,13 +4,11 @@ using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-
 using Avalonia.Controls;
 using Avalonia.Threading;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using Serilog;
-
 using Atomex.Blockchain.Abstract;
 using Atomex.Client.Desktop.Properties;
 using Atomex.Core;
@@ -98,11 +96,10 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             SelectFromViewModel = new SelectAddressViewModel(App.Account, Currency, true)
             {
                 BackAction = () => { Desktop.App.DialogService.Show(this); },
-                ConfirmAction = (address, balance, _) =>
+                ConfirmAction = walletAddressViewModel =>
                 {
-                    From = address;
-                    SelectedFromBalance = balance;
-
+                    From = walletAddressViewModel.Address;
+                    SelectedFromBalance = walletAddressViewModel.AvailableBalance;
                     Desktop.App.DialogService.Show(SelectToViewModel);
                 }
             };
@@ -110,9 +107,9 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             SelectToViewModel = new SelectAddressViewModel(App.Account, Currency)
             {
                 BackAction = () => { Desktop.App.DialogService.Show(SelectFromViewModel); },
-                ConfirmAction = (address, _, _) =>
+                ConfirmAction = walletAddressViewModel =>
                 {
-                    To = address;
+                    To = walletAddressViewModel.Address;
                     Desktop.App.DialogService.Show(this);
                 }
             };
@@ -121,11 +118,10 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         protected override void FromClick()
         {
             var selectFromViewModel = SelectFromViewModel as SelectAddressViewModel;
-            selectFromViewModel!.ConfirmAction = (address, balance, _) =>
+            selectFromViewModel!.ConfirmAction = walletAddressViewModel =>
             {
-                From = address;
-                SelectedFromBalance = balance;
-
+                From = walletAddressViewModel.Address;
+                SelectedFromBalance = walletAddressViewModel.AvailableBalance;
                 Desktop.App.DialogService.Show(this);
             };
 
@@ -135,7 +131,6 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         protected override void ToClick()
         {
             SelectToViewModel.BackAction = () => Desktop.App.DialogService.Show(this);
-
             Desktop.App.DialogService.Show(SelectToViewModel);
         }
 
@@ -153,10 +148,15 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     gasPrice: UseDefaultFee ? null : GasPrice,
                     reserve: false);
 
-                if (UseDefaultFee) {
-                    if (maxAmountEstimation.Fee > 0) {
-                        GasPrice = decimal.ToInt32(Currency.GetFeePriceFromFeeAmount(maxAmountEstimation.Fee, GasLimit));
-                    } else {
+                if (UseDefaultFee)
+                {
+                    if (maxAmountEstimation.Fee > 0)
+                    {
+                        GasPrice = decimal.ToInt32(
+                            Currency.GetFeePriceFromFeeAmount(maxAmountEstimation.Fee, GasLimit));
+                    }
+                    else
+                    {
                         GasPrice = decimal.ToInt32(await Currency.GetDefaultFeePriceAsync());
                     }
                 }
@@ -252,7 +252,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             var quote = quotesProvider.GetQuote(CurrencyCode, BaseCurrencyCode);
 
             AmountInBase = Amount * (quote?.Bid ?? 0m);
-            FeeInBase    = FeeAmount * (quote?.Bid ?? 0m);
+            FeeInBase = FeeAmount * (quote?.Bid ?? 0m);
         }
 
         protected override Task<Error> Send(CancellationToken cancellationToken = default)

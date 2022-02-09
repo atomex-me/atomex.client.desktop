@@ -31,11 +31,10 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             SelectFromViewModel = new SelectAddressViewModel(App.Account, Currency, true)
             {
                 BackAction = () => { Desktop.App.DialogService.Show(this); },
-                ConfirmAction = (address, balance, _) =>
+                ConfirmAction = walletAddressViewModel =>
                 {
-                    From = address;
-                    SelectedFromBalance = balance;
-
+                    From = walletAddressViewModel.Address;
+                    SelectedFromBalance = walletAddressViewModel.AvailableBalance;
                     Desktop.App.DialogService.Show(SelectToViewModel);
                 }
             };
@@ -43,9 +42,9 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             SelectToViewModel = new SelectAddressViewModel(App.Account, Currency)
             {
                 BackAction = () => { Desktop.App.DialogService.Show(SelectFromViewModel); },
-                ConfirmAction = (address, _, _) =>
+                ConfirmAction = walletAddressViewModel =>
                 {
-                    To = address;
+                    To = walletAddressViewModel.Address;
                     Desktop.App.DialogService.Show(this);
                 }
             };
@@ -55,11 +54,10 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         {
             var selectFromViewModel = SelectFromViewModel as SelectAddressViewModel;
 
-            selectFromViewModel!.ConfirmAction = (address, balance, _) =>
+            selectFromViewModel!.ConfirmAction = walletAddressViewModel =>
             {
-                From = address;
-                SelectedFromBalance = balance;
-
+                From = walletAddressViewModel.Address;
+                SelectedFromBalance = walletAddressViewModel.AvailableBalance;
                 Desktop.App.DialogService.Show(this);
             };
 
@@ -69,7 +67,6 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         protected override void ToClick()
         {
             SelectToViewModel.BackAction = () => Desktop.App.DialogService.Show(this);
-
             Desktop.App.DialogService.Show(SelectToViewModel);
         }
 

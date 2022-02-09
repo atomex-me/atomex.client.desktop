@@ -455,9 +455,9 @@ namespace Atomex.Client.Desktop.ViewModels
                 selectedAddress: RedeemFromAddress)
             {
                 BackAction = () => { App.DialogService.Show(this); },
-                ConfirmAction = (address, balance, _) =>
+                ConfirmAction = walletAddressViewModel =>
                 {
-                    RedeemFromAddress = address;
+                    RedeemFromAddress = walletAddressViewModel.Address;
                     App.DialogService.Close();
                 }
             };

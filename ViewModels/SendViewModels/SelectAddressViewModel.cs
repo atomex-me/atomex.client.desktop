@@ -16,8 +16,9 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
     public class SelectAddressViewModel : ViewModelBase
     {
         public Action BackAction { get; set; }
-        public Action<string, decimal, decimal> ConfirmAction { get; set; }
+        public Action<WalletAddressViewModel> ConfirmAction { get; set; }
         public bool UseToSelectFrom { get; set; }
+        private CurrencyConfig Currency { get; set; }
         private ObservableCollection<WalletAddressViewModel> InitialMyAddresses { get; set; }
         [Reactive] public ObservableCollection<WalletAddressViewModel> MyAddresses { get; set; }
         [Reactive] public string SearchPattern { get; set; }
@@ -116,6 +117,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     }
                 });
 
+            Currency = currency;
             UseToSelectFrom = useToSelectFrom;
 
             var addresses = AddressesHelper
@@ -130,9 +132,29 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             MyAddresses = new ObservableCollection<WalletAddressViewModel>(addresses);
             InitialMyAddresses = new ObservableCollection<WalletAddressViewModel>(addresses);
 
-            if (selectedAddress != null && selectedTokenId != null)
+            if (selectedAddress != null)
                 SelectedAddress = MyAddresses
-                    .FirstOrDefault(vm => vm.Address == selectedAddress && vm.TokenId == selectedTokenId);
+                    .FirstOrDefault(vm =>
+                        vm.Address == selectedAddress && (selectedTokenId == null || vm.TokenId == selectedTokenId));
+        }
+
+        public WalletAddressViewModel SelectDefaultAddress()
+        {
+            if (Currency is TezosConfig or EthereumConfig)
+            {
+                var activeAddressViewModel = MyAddresses
+                    .Where(vm => vm.HasActivity && vm.AvailableBalance > 0)
+                    .MaxByOrDefault(vm => vm.AvailableBalance);
+
+                if (activeAddressViewModel != null)
+                    SelectedAddress = activeAddressViewModel;
+            }
+            else
+            {
+                SelectedAddress = MyAddresses.FirstOrDefault(vm => vm.IsFreeAddress) ?? MyAddresses.First();
+            }
+
+            return SelectedAddress!;
         }
 
         private ReactiveCommand<Unit, Unit> _backCommand;
@@ -156,17 +178,14 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         public ReactiveCommand<Unit, Unit> ConfirmCommand => _confirmCommand ??=
             (_confirmCommand = ReactiveCommand.Create(() =>
             {
-                var selectedAddress = SelectedAddress == null
-                    ? SearchPattern
-                    : SelectedAddress.WalletAddress.Address;
+                var selectedAddress = SelectedAddress ?? new WalletAddressViewModel
+                {
+                    Address = SearchPattern,
+                    AvailableBalance = 0,
+                    TokenId = 0
+                };
 
-                var balance = SelectedAddress == null
-                    ? 0m
-                    : SelectedAddress.WalletAddress.AvailableBalance();
-
-                var tokenId = SelectedAddress?.WalletAddress?.TokenBalance?.TokenId ?? 0;
-
-                ConfirmAction?.Invoke(selectedAddress, balance, tokenId);
+                ConfirmAction?.Invoke(selectedAddress);
             }));
 
         private ICommand _copyAddressCommand;

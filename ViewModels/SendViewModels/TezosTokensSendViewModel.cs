@@ -140,7 +140,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     vm => vm.Fee
                 )
                 .Subscribe(_ => Warning = string.Empty);
-            
+
             this.WhenAnyValue(vm => vm.Amount)
                 .Select(amount => amount.ToString(CurrencyFormat ?? balanceFormat, CultureInfo.InvariantCulture))
                 .ToPropertyEx(this, vm => vm.AmountString);
@@ -192,7 +192,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             CurrencyCode = string.Empty;
             FeeCurrencyCode = TezosConfig.Xtz;
             BaseCurrencyCode = DefaultBaseCurrencyCode;
-            
+
             FeeCurrencyFormat = tezosConfig.FeeFormat;
             BaseCurrencyFormat = DefaultBaseCurrencyFormat;
 
@@ -207,7 +207,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 From = from;
                 Amount = SelectedFromBalance;
             }
-            
+
             UpdateCurrencyCode();
             SubscribeToServices();
             UseDefaultFee = true;
@@ -216,10 +216,10 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 new SelectAddressViewModel(_app.Account, tezosConfig, true, from, tokenId, tokenContract)
                 {
                     BackAction = () => { App.DialogService.Show(this); },
-                    ConfirmAction = (address, balance, tokenId) =>
+                    ConfirmAction = walletAddressViewModel =>
                     {
-                        TokenId = tokenId;
-                        From = address;
+                        TokenId = walletAddressViewModel.TokenId;
+                        From = walletAddressViewModel.Address;
                         App.DialogService.Show(SelectToViewModel);
                     }
                 };
@@ -227,9 +227,9 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             SelectToViewModel = new SelectAddressViewModel(_app.Account, tezosConfig)
             {
                 BackAction = () => { App.DialogService.Show(SelectFromViewModel); },
-                ConfirmAction = (address, _, _) =>
+                ConfirmAction = walletAddressViewModel =>
                 {
-                    To = address;
+                    To = walletAddressViewModel.Address;
                     App.DialogService.Show(this);
                 }
             };
@@ -271,10 +271,10 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
         private void FromClick()
         {
-            SelectFromViewModel.ConfirmAction = (address, balance, tokenId) =>
+            SelectFromViewModel.ConfirmAction = walletAddressViewModel =>
             {
-                TokenId = tokenId;
-                From = address;
+                TokenId = walletAddressViewModel.TokenId;
+                From = walletAddressViewModel.Address;
                 App.DialogService.Show(this);
             };
 
@@ -609,7 +609,8 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             if (tokenAddress?.TokenBalance?.Symbol != null)
             {
                 CurrencyCode = tokenAddress.TokenBalance.Symbol.ToUpper();
-                CurrencyFormat = $"F{Math.Min(tokenAddress.TokenBalance.Decimals, AddressesHelper.MaxTokenCurrencyFormatDecimals)}";
+                CurrencyFormat =
+                    $"F{Math.Min(tokenAddress.TokenBalance.Decimals, AddressesHelper.MaxTokenCurrencyFormatDecimals)}";
                 SelectedFromBalance = tokenAddress.AvailableBalance();
                 this.RaisePropertyChanged(nameof(AmountString));
             }
