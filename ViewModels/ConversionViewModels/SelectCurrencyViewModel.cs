@@ -135,7 +135,7 @@ namespace Atomex.Client.Desktop.ViewModels.ConversionViewModels
                 .ToPropertyEx(this, vm => vm.SelectedAddressDescription);
 
             AvailableAddresses = availableAddresses ?? throw new ArgumentNullException(nameof(availableAddresses));
-            SelectedAddress = selectedAddress ?? availableAddresses.MaxBy(w => w.Balance);
+            SelectedAddress = selectedAddress ?? availableAddresses.MaxByOrDefault(w => w.Balance);
         }
 
         public void TryInitializeFromItem(SelectCurrencyViewModelItem source)

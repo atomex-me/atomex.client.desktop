@@ -277,8 +277,10 @@ namespace Atomex.Client.Desktop.ViewModels
             this.WhenAnyValue(
                     vm => vm.FromViewModel.AmountString,
                     vm => vm.FromViewModel.CurrencyViewModel,
+                    vm => vm.FromViewModel.Address,
                     vm => vm.ToViewModel.AmountString,
                     vm => vm.ToViewModel.CurrencyViewModel,
+                    vm => vm.ToViewModel.Address,
                     vm => vm.RedeemFromAddress)
                 .Throttle(TimeSpan.FromMilliseconds(1))
                 .Subscribe(a =>
@@ -505,7 +507,7 @@ namespace Atomex.Client.Desktop.ViewModels
 
                 var selectedAddress = FromCurrencyViewModelItem?.CurrencyViewModel.Currency.Name == currencyName
                     ? (FromCurrencyViewModelItem as SelectCurrencyWithAddressViewModelItem)?.SelectedAddress
-                    : availableAddresses.MaxBy(w => w.AvailableBalance());
+                    : availableAddresses.MaxByOrDefault(w => w.AvailableBalance());
 
                 return new SelectCurrencyWithAddressViewModelItem(
                     currencyViewModel: currencyViewModel,
@@ -571,9 +573,15 @@ namespace Atomex.Client.Desktop.ViewModels
             return result;
         }
 
-        public void SetFromCurrency(CurrencyConfig fromCurrency)
+        public async void SetFromCurrency(CurrencyConfig fromCurrency)
         {
             FromViewModel.CurrencyViewModel = FromCurrencies?.FirstOrDefault(vm => vm.Currency.Name == fromCurrency.Name);
+
+            if (FromViewModel.CurrencyViewModel != null)
+            {
+                FromCurrencyViewModelItem = await CreateFromCurrencyViewModelItemAsync(FromViewModel.CurrencyViewModel);
+                FromViewModel.Address = FromCurrencyViewModelItem.ShortAddressDescription;
+            }
         }
 
         private void SubscribeToServices()
