@@ -1,4 +1,3 @@
-
 using System;
 using System.Collections.Concurrent;
 using System.Diagnostics;
@@ -82,8 +81,9 @@ namespace Atomex.Client.Desktop
             if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
             {
                 var mainWindow = new MainWindow();
-                DialogService =
-                    new DialogService(mainWindow, RuntimeInformation.IsOSPlatform(OSPlatform.Linux));
+
+                DialogService = new DialogService(mainWindow, RuntimeInformation.IsOSPlatform(OSPlatform.Linux));
+
                 var mainWindowViewModel = new MainWindowViewModel(AtomexApp, mainWindow);
 
                 mainWindow.DataContext = mainWindowViewModel;
@@ -132,19 +132,14 @@ namespace Atomex.Client.Desktop
             .GetAssemblies()
             .FirstOrDefault(a => a.GetName().Name == "Atomex.Client.Core");
 
-        private static IConfiguration CurrenciesConfiguration { get; } = new ConfigurationBuilder()
-            .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
-            .AddEmbeddedJsonFile(CoreAssembly, "currencies.json")
-            .Build();
-
         private static string CurrenciesConfigurationString
         {
             get
             {
-                var resourceName = "currencies.json";
+                var resourceName  = "currencies.json";
                 var resourceNames = CoreAssembly.GetManifestResourceNames();
-                var fullFileName = resourceNames.FirstOrDefault(n => n.EndsWith(resourceName));
-                var stream = CoreAssembly.GetManifestResourceStream(fullFileName!);
+                var fullFileName  = resourceNames.FirstOrDefault(n => n.EndsWith(resourceName));
+                var stream        = CoreAssembly.GetManifestResourceStream(fullFileName!);
                 using StreamReader reader = new(stream!);
                 return reader.ReadToEnd();
             }
@@ -165,13 +160,13 @@ namespace Atomex.Client.Desktop
             }
             else
             {
-                using (Process process = Process.Start(new ProcessStartInfo
+                using Process process = Process.Start(new ProcessStartInfo
                 {
-                    FileName = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? url : "open",
-                    Arguments = RuntimeInformation.IsOSPlatform(OSPlatform.OSX) ? $"{url}" : "",
-                    CreateNoWindow = true,
+                    FileName        = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? url : "open",
+                    Arguments       = RuntimeInformation.IsOSPlatform(OSPlatform.OSX) ? $"{url}" : "",
+                    CreateNoWindow  = true,
                     UseShellExecute = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
-                })) ;
+                });
             }
         }
 
@@ -179,29 +174,26 @@ namespace Atomex.Client.Desktop
         {
             var escapedArgs = cmd.Replace("\"", "\\\"");
 
-            using (var process = Process.Start(
+            using var process = Process.Start(
                 new ProcessStartInfo
                 {
-                    FileName = "/bin/bash",
-                    Arguments = $"-c \"{escapedArgs}\"",
+                    FileName               = "/bin/bash",
+                    Arguments              = $"-c \"{escapedArgs}\"",
                     RedirectStandardOutput = true,
-                    UseShellExecute = false,
-                    CreateNoWindow = true,
-                    WindowStyle = ProcessWindowStyle.Hidden
+                    UseShellExecute        = false,
+                    CreateNoWindow         = true,
+                    WindowStyle            = ProcessWindowStyle.Hidden
                 }
-            ))
-            {
-                if (waitForExit)
-                {
-                    process.WaitForExit();
-                }
-            }
+            );
+
+            if (waitForExit)
+                process?.WaitForExit();
         }
     }
 
     class InMemorySink : ILogEventSink
     {
-        private Action<string> _logAction;
+        private readonly Action<string> _logAction;
 
         public InMemorySink(Action<string> logAction)
         {
@@ -214,7 +206,9 @@ namespace Atomex.Client.Desktop
 
         public void Emit(LogEvent logEvent)
         {
-            if (logEvent == null) throw new ArgumentNullException(nameof(logEvent));
+            if (logEvent == null)
+                throw new ArgumentNullException(nameof(logEvent));
+
             var renderSpace = new StringWriter();
             _textFormatter.Format(logEvent, renderSpace);
 

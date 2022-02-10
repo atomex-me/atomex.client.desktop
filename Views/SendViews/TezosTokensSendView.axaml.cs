@@ -5,11 +5,11 @@ using System.Reactive.Linq;
 
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Input;
+using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 
 using Atomex.Client.Desktop.ViewModels.SendViewModels;
-using Avalonia.Input;
-using Avalonia.Interactivity;
 
 namespace Atomex.Client.Desktop.Views.SendViews
 {
