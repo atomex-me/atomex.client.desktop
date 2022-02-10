@@ -1,3 +1,4 @@
+using Serilog;
 using System;
 using System.Drawing.Imaging;
 using System.IO;
@@ -5,19 +6,19 @@ using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
-using Atomex.Client.Desktop.Common;
-using Atomex.Client.Desktop.ViewModels.SendViewModels;
-using Atomex.Core;
-using Atomex.ViewModels;
+using Color = System.Drawing.Color;
+
 using Avalonia.Controls;
 using Avalonia.Media.Imaging;
 using Avalonia.Threading;
 using QRCoder;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
-using Serilog;
-using Color = System.Drawing.Color;
 
+using Atomex.Client.Desktop.Common;
+using Atomex.Client.Desktop.ViewModels.SendViewModels;
+using Atomex.Core;
+using Atomex.ViewModels;
 
 namespace Atomex.Client.Desktop.ViewModels
 {
@@ -25,7 +26,6 @@ namespace Atomex.Client.Desktop.ViewModels
     {
         private const int PixelsPerModule = 20;
 
-        private readonly IAtomexApp _app;
         [Reactive] public CurrencyConfig Currency { get; set; }
         [Reactive] public WalletAddressViewModel SelectedAddress { get; set; }
         [Reactive] public bool IsCopied { get; set; }
@@ -50,7 +50,6 @@ namespace Atomex.Client.Desktop.ViewModels
             string tokenContract = null,
             string tokenType = null)
         {
-            _app = app ?? throw new ArgumentNullException(nameof(app));
             var createQrCodeCommand = ReactiveCommand.CreateFromTask(CreateQrCodeAsync);
 
             this.WhenAnyValue(vm => vm.SelectedAddress)
@@ -74,7 +73,7 @@ namespace Atomex.Client.Desktop.ViewModels
                 }
             };
 
-            SelectedAddress = SelectAddressViewModel.SelectDefaultAddress();
+            SelectedAddress = SelectAddressViewModel.SelectDefaultAddress()!;
         }
 
         private async Task CreateQrCodeAsync()

@@ -132,13 +132,19 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             MyAddresses = new ObservableCollection<WalletAddressViewModel>(addresses);
             InitialMyAddresses = new ObservableCollection<WalletAddressViewModel>(addresses);
 
-            if (selectedAddress != null)
-                SelectedAddress = MyAddresses
-                    .FirstOrDefault(vm =>
-                        vm.Address == selectedAddress && (selectedTokenId == null || vm.TokenId == selectedTokenId));
+            //if (selectedAddress != null)
+            //    SelectedAddress = MyAddresses
+            //        .FirstOrDefault(vm =>
+            //            vm.Address == selectedAddress && (selectedTokenId == null || vm.TokenId == selectedTokenId));
+            SelectedAddress = selectedAddress != null
+                ? MyAddresses.FirstOrDefault(vm =>
+                    vm.Address == selectedAddress && (selectedTokenId == null || vm.TokenId == selectedTokenId))
+                : useToSelectFrom
+                    ? SelectDefaultAddress()
+                    : null;
         }
 
-        public WalletAddressViewModel SelectDefaultAddress()
+        public WalletAddressViewModel? SelectDefaultAddress()
         {
             if (Currency is TezosConfig or EthereumConfig)
             {
@@ -152,15 +158,15 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 }
                 else
                 {
-                    SelectedAddress = MyAddresses.FirstOrDefault(vm => vm.IsFreeAddress) ?? MyAddresses.First();
+                    SelectedAddress = MyAddresses.FirstOrDefault(vm => vm.IsFreeAddress) ?? MyAddresses.FirstOrDefault();
                 }
             }
             else
             {
-                SelectedAddress = MyAddresses.FirstOrDefault(vm => vm.IsFreeAddress) ?? MyAddresses.First();
+                SelectedAddress = MyAddresses.FirstOrDefault(vm => vm.IsFreeAddress) ?? MyAddresses.FirstOrDefault();
             }
 
-            return SelectedAddress!;
+            return SelectedAddress;
         }
 
         private ReactiveCommand<Unit, Unit> _backCommand;
