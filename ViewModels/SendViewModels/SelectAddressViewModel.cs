@@ -147,7 +147,13 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     .MaxByOrDefault(vm => vm.AvailableBalance);
 
                 if (activeAddressViewModel != null)
-                    SelectedAddress = activeAddressViewModel;
+                {
+                    SelectedAddress = activeAddressViewModel;   
+                }
+                else
+                {
+                    SelectedAddress = MyAddresses.FirstOrDefault(vm => vm.IsFreeAddress) ?? MyAddresses.First();
+                }
             }
             else
             {
