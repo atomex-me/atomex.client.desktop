@@ -97,7 +97,8 @@ namespace Atomex.Client.Desktop.ViewModels
         {
             try
             {
-                App.DialogService.Show(new SendingViewModel());
+                App.DialogService.Show(
+                    MessageViewModel.Message(title: "Sending, please wait", withProgressBar: true));
 
                 var error = await ConvertAsync();
 

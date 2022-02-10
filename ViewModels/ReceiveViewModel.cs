@@ -33,7 +33,6 @@ namespace Atomex.Client.Desktop.ViewModels
         public string TokenContract { get; private set; }
         public string TokenType { get; private set; }
         public string TitleText => $"Your receiving {Currency.Name} address";
-
         public SelectAddressViewModel SelectAddressViewModel { get; set; }
 
         public ReceiveViewModel()
@@ -57,6 +56,9 @@ namespace Atomex.Client.Desktop.ViewModels
                 .Select(_ => Unit.Default)
                 .InvokeCommand(createQrCodeCommand);
 
+            this.WhenAnyValue(vm => vm.SelectedAddress)
+                .Subscribe(_ => IsCopied = false);
+
             TokenContract = tokenContract;
             TokenType = tokenType;
             Currency = currency;
@@ -68,7 +70,7 @@ namespace Atomex.Client.Desktop.ViewModels
                 {
                     if (!string.IsNullOrEmpty(walletAddressViewModel.Address))
                         SelectedAddress = walletAddressViewModel;
-
+                    
                     App.DialogService.Show(this);
                 }
             };

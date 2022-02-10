@@ -35,7 +35,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         [Reactive] private string TokenContract { get; set; }
         [ObservableAsProperty] public string TokenContractBeautified { get; }
         [Reactive] public decimal TokenId { get; set; }
-        [Reactive] public virtual string To { get; set; }
+        [Reactive] public string To { get; set; }
         [Reactive] public IBitmap TokenPreview { get; set; }
         private readonly string _tokenType;
         public bool IsFa2 => _tokenType == "FA2";
@@ -70,7 +70,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         }
 
         [Reactive] private decimal Fee { get; set; }
-        [ObservableAsProperty] public virtual string FeeString { get; }
+        [ObservableAsProperty] public string FeeString { get; }
 
         public void SetFeeFromString(string value)
         {
@@ -369,7 +369,8 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             {
                 try
                 {
-                    App.DialogService.Show(new SendingViewModel());
+                    App.DialogService.Show(
+                        MessageViewModel.Message(title: "Sending, please wait", withProgressBar: true));
 
                     var error = await Send();
 
@@ -522,7 +523,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             }
         }
 
-        protected virtual async void OnMaxClick()
+        protected async void OnMaxClick()
         {
             try
             {
@@ -565,7 +566,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             }
         }
 
-        protected virtual void OnQuotesUpdatedEventHandler(object sender, EventArgs args)
+        protected void OnQuotesUpdatedEventHandler(object sender, EventArgs args)
         {
             if (sender is not ICurrencyQuotesProvider quotesProvider)
                 return;

@@ -5,13 +5,11 @@ using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-
 using Avalonia.Controls;
 using Avalonia.Threading;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using Serilog;
-
 using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.Properties;
 using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
@@ -102,20 +100,24 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
 
         private ReactiveCommand<Unit, Unit> _backCommand;
+
         public ReactiveCommand<Unit, Unit> BackCommand => _backCommand ??= (_backCommand = ReactiveCommand.Create(() =>
         {
             Desktop.App.DialogService.Close();
         }));
 
         private ReactiveCommand<Unit, Unit> _undoConfirmStageCommand;
+
         public ReactiveCommand<Unit, Unit> UndoConfirmStageCommand => _undoConfirmStageCommand ??=
             (_undoConfirmStageCommand = ReactiveCommand.Create(() => { ConfirmStage = false; }));
 
         private ReactiveCommand<Unit, Unit> _selectFromCommand;
+
         public ReactiveCommand<Unit, Unit> SelectFromCommand => _selectFromCommand ??=
             (_selectFromCommand = ReactiveCommand.Create(FromClick));
 
         private ReactiveCommand<Unit, Unit> _selectToCommand;
+
         public ReactiveCommand<Unit, Unit> SelectToCommand => _selectToCommand ??=
             (_selectToCommand = ReactiveCommand.Create(ToClick));
 
@@ -124,13 +126,14 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         protected abstract void ToClick();
 
         private ReactiveCommand<Unit, Unit> _nextCommand;
+
         public ReactiveCommand<Unit, Unit> NextCommand =>
             _nextCommand ??= (_nextCommand = ReactiveCommand.CreateFromTask(OnNextCommand));
 
         private async Task OnNextCommand()
         {
             var feeAmount = !Currency.IsToken ? FeeAmount : 0;
-            
+
             if (string.IsNullOrEmpty(To))
             {
                 Warning = Resources.SvEmptyAddressError;
@@ -155,26 +158,27 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             {
                 Warning = Resources.SvAvailableFundsError;
             }
-            
+
             if (!string.IsNullOrEmpty(Warning)) return;
 
             if (ConfirmStage)
             {
                 try
                 {
-                    Desktop.App.DialogService.Show(new SendingViewModel());
+                    Desktop.App.DialogService.Show(
+                        MessageViewModel.Message(title: "Sending, please wait", withProgressBar: true));
 
                     var error = await Send();
-
+                    
                     if (error != null)
                     {
                         Desktop.App.DialogService.Show(MessageViewModel.Error(
                             text: error.Description,
                             backAction: () => Desktop.App.DialogService.Show(this)));
-
+                    
                         return;
                     }
-
+                    
                     Desktop.App.DialogService.Show(MessageViewModel.Success(
                         text: "Sending was successful",
                         nextAction: () => { Desktop.App.DialogService.Close(); }));
@@ -232,7 +236,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 )
                 .Select(totalAmount => totalAmount.ToString(CurrencyFormat, CultureInfo.InvariantCulture))
                 .ToPropertyEx(this, vm => vm.TotalAmountString);
-            
+
             this.WhenAnyValue(
                     vm => vm.Amount,
                     vm => vm.Fee
@@ -283,7 +287,11 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         }
 
         protected abstract Task UpdateAmount();
-        protected virtual Task UpdateFee() { return Task.CompletedTask; }
+
+        protected virtual Task UpdateFee()
+        {
+            return Task.CompletedTask;
+        }
 
         private ReactiveCommand<Unit, Unit> _maxCommand;
 
@@ -323,13 +331,13 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 .Select(c => CurrencyViewModelCreator.CreateViewModel(c, subscribeToUpdates: false))
                 .ToList();
 
-            Currency         = fromCurrencies[0].Currency;
+            Currency = fromCurrencies[0].Currency;
             CurrencyViewModel = fromCurrencies[0];
-            To                = "1BvBMSEYstWetqTFn5Au4m4GFg7xJaNVN2";
-            Amount            = 0.00001234m;
-            AmountInBase      = 10.23m;
-            Fee               = 0.0001m;
-            FeeInBase         = 8.43m;
+            To = "1BvBMSEYstWetqTFn5Au4m4GFg7xJaNVN2";
+            Amount = 0.00001234m;
+            AmountInBase = 10.23m;
+            Fee = 0.0001m;
+            FeeInBase = 8.43m;
         }
 #endif
     }

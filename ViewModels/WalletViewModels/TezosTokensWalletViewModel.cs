@@ -626,14 +626,20 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         {
             if (IsBalanceUpdating)
                 return;
-
+ 
             IsBalanceUpdating = true;
 
             _cancellation = new CancellationTokenSource();
-
-            var updatingModalVM = new TezosTokensScanDialogViewModel();
-            updatingModalVM.OnCancel = () => _cancellation.Cancel();
-            Desktop.App.DialogService.Show(updatingModalVM);
+                
+            var updatingModalVm = MessageViewModel.Message(
+                title: "Updating",
+                text: "Tezos tokens balance updating, please wait...",
+                nextAction:() => _cancellation.Cancel(),
+                buttonTitle: "Cancel",
+                withProgressBar: true
+                );
+            
+            Desktop.App.DialogService.Show(updatingModalVm);
 
             try
             {

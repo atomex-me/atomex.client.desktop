@@ -67,7 +67,8 @@ namespace Atomex.Client.Desktop.ViewModels
 
             try
             {
-                Desktop.App.DialogService.Show(new SendingViewModel());
+                Desktop.App.DialogService.Show(
+                    MessageViewModel.Message(title: "Sending, please wait", withProgressBar: true));
 
                 await tezosAccount.AddressLocker
                     .LockAsync(WalletAddress.Address);
