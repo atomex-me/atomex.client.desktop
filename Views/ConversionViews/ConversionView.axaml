@@ -630,7 +630,7 @@
                 VerticalContentAlignment="Center"
                 ToolTip.Tip="{Binding MessageToolTip}"
                 ToolTip.Placement="AnchorAndGravity"
-                ToolTip.VerticalOffset="30"
+                ToolTip.VerticalOffset="60"
                 Click="HelpClickHandler"
                 Classes="ButtonWithIcon">
           <Path HorizontalAlignment="Center"

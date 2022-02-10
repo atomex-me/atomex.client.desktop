@@ -56,7 +56,7 @@ namespace Atomex.Client.Desktop.ViewModels
 
         public string ToAddress { get; set; }
         public string? ToAddressDescription => ToAddress?.TruncateAddress();
-        public string RedeemFromAddress { get; set; }
+        public string? RedeemFromAddress { get; set; }
 
         public CurrencyViewModel FromCurrencyViewModel { get; set; }
         public CurrencyViewModel ToCurrencyViewModel { get; set; }

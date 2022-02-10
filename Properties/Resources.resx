@@ -305,4 +305,7 @@ NOTE: Do not sign out or close the application until the swap is completed, othe
   <data name="CvFromAddressIsNullOrEmpty" xml:space="preserve">
     <value>"From" address is empty</value>
   </data>
+  <data name="CvAmountToFeeRatioToolTip" xml:space="preserve">
+    <value>The commission does not depend on the conversion amount and is determined only by the current network fees. The larger the convertible amount, the smaller the commission to amount ratio. Atomex blocks the conversion if the commission exceeds 75% of the conversion amount</value>
+  </data>
 </root>

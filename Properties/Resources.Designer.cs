@@ -70,6 +70,15 @@ namespace Atomex.Client.Desktop.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на The commission does not depend on the conversion amount and is determined only by the current network fees. The larger the convertible amount, the smaller the commission to amount ratio. Atomex blocks the conversion if the commission exceeds 75% of the conversion amount.
+        /// </summary>
+        internal static string CvAmountToFeeRatioToolTip {
+            get {
+                return ResourceManager.GetString("CvAmountToFeeRatioToolTip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Amount is greater than the available. Please use the Max button to get the maximum available value..
         /// </summary>
         internal static string CvBigAmount {
