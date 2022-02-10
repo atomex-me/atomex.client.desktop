@@ -617,23 +617,15 @@ namespace Atomex.Client.Desktop.ViewModels
                         EstimatedRedeemFee       = 0;
                         RewardForRedeem          = 0;
                         EstimatedMakerNetworkFee = 0;
-                        AmountValidationMessage    = string.Empty;
+                        AmountValidationMessage  = string.Empty;
                         return;
                     }
 
                     if (swapParams.Error != null)
                     {
-                        AmountValidationMessageType = MessageType.Error;
-                        AmountValidationMessage = swapParams.Error.Code switch
-                        {
-                            Errors.InsufficientFunds      => Resources.CvInsufficientFunds,
-                            Errors.InsufficientChainFunds => string.Format(
-                                provider: CultureInfo.CurrentCulture,
-                                format: Resources.CvInsufficientChainFunds,
-                                arg0: FromViewModel.CurrencyViewModel?.Currency.FeeCurrencyName),
-                            Errors.FromAddressIsNullOrEmpty => Resources.CvFromAddressIsNullOrEmpty,
-                            _ => Resources.CvError
-                        };
+                        AmountValidationMessageType    = MessageType.Error;
+                        AmountValidationMessage        = swapParams.Error.Description;
+                        AmountValidationMessageToolTip = swapParams.Error.Details;
                     }
                     else
                     {

@@ -303,6 +303,6 @@ NOTE: Do not sign out or close the application until the swap is completed, othe
     <value>Amount is greater than the available. Please use the Max button to get the maximum available value.</value>
   </data>
   <data name="CvFromAddressIsNullOrEmpty" xml:space="preserve">
-    <value>"From" address is null or empty</value>
+    <value>"From" address is empty</value>
   </data>
 </root>

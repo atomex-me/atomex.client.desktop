@@ -99,7 +99,8 @@
                     ToolTip.Placement="AnchorAndGravity"
                     ToolTip.VerticalOffset="30"
                     Click="HelpClickHandler"
-                    Classes="ButtonWithIcon">
+                    Classes="ButtonWithIcon"
+                    IsVisible="{Binding AmountValidationMessageToolTip, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
               <Path HorizontalAlignment="Center"
                     VerticalAlignment="Center"
                     Width="12"
@@ -244,7 +245,10 @@
                     VerticalAlignment="Center"
                     VerticalContentAlignment="Center"
                     Click="HelpClickHandler"
-                    Classes="ButtonWithIcon">
+                    Classes="ButtonWithIcon"
+                    ToolTip.Placement="AnchorAndGravity"
+                    ToolTip.Tip="Estimated price depends on the conversion amount and may change. A trading order is always sent with a price no worse than agreed by the user. If during the time of sending the order the price has changed for the worse, the trading order is canceled"
+                    ToolTip.VerticalOffset="50">
               <Path HorizontalAlignment="Center"
                     VerticalAlignment="Center"
                     Width="12"
