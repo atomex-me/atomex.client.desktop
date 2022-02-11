@@ -700,7 +700,7 @@
                               FontFamily="{DynamicResource DefaultFontFamily}"
                               FontWeight="Normal"
                               Command="{Binding ConvertCommand}"
-                              IsEnabled="{Binding CanConvert}">
+                              IsEnabled="{Binding CanExchange}">
         <controls:RoundedButton.IsVisible>
           <MultiBinding Converter="{x:Static BoolConverters.And}">
             <Binding Path="FromViewModel.Selected"/>

@@ -110,7 +110,7 @@ namespace Atomex.Client.Desktop.ViewModels
         [Reactive] public decimal RewardForRedeem { get; set; }
         [Reactive] public decimal RewardForRedeemInBase { get; set; }
         [ObservableAsProperty] public bool HasRewardForRedeem { get; }
-        [Reactive] public bool CanConvert { get; set; }
+        [Reactive] public bool CanExchange { get; set; }
         [Reactive] public ObservableCollection<SwapViewModel> Swaps { get; set; }
         [Reactive] public bool IsNoLiquidity { get; set; }
         [Reactive] public bool IsInsufficientFunds { get; set; }
@@ -137,7 +137,7 @@ namespace Atomex.Client.Desktop.ViewModels
         {
             _app = app ?? throw new ArgumentNullException(nameof(app));
 
-            CanConvert = true;
+            CanExchange = true;
             DGSelectedIndex = -1;
 
             FromViewModel = new ConversionCurrencyViewModel
@@ -342,6 +342,34 @@ namespace Atomex.Client.Desktop.ViewModels
                 {
                     FromViewModel.IsAmountValid = !IsInsufficientFunds && !IsNoLiquidity;
                     ToViewModel.IsAmountValid = !IsInsufficientFunds && !IsNoLiquidity;
+                });
+
+            this.WhenAnyValue(
+                    vm => vm.IsInsufficientFunds,
+                    vm => vm.IsNoLiquidity,
+                    vm => vm.FromViewModel.CurrencyViewModel,
+                    vm => vm.FromViewModel.IsAmountValid,
+                    vm => vm.ToViewModel.CurrencyViewModel,
+                    vm => vm.ToViewModel.IsAmountValid,
+                    vm => vm.FromViewModel.AmountInBase)
+                .Throttle(TimeSpan.FromMilliseconds(1))
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(t =>
+                {
+                    var estimatedTotalNetworkFeeInBase = EstimatedTotalNetworkFeeInBase;
+                    var amountInBase = FromViewModel.AmountInBase;
+                    var isGoodAmountToFeeRatio = amountInBase == 0 || estimatedTotalNetworkFeeInBase / amountInBase <= 0.75m;
+
+                    CanExchange = !IsInsufficientFunds &&
+                        !IsNoLiquidity &&
+                        FromViewModel?.CurrencyViewModel != null &&
+                        FromViewModel?.IsAmountValid == true &&
+                        FromCurrencyViewModelItem != null &&
+                        ToViewModel?.CurrencyViewModel != null &&
+                        ToViewModel?.IsAmountValid == true &&
+                        ToCurrencyViewModelItem != null &&
+                        EstimatedPrice > 0 &&
+                        isGoodAmountToFeeRatio;
                 });
 
             this.WhenAnyValue(vm => vm.AmountValidationMessageType)
@@ -767,7 +795,7 @@ namespace Atomex.Client.Desktop.ViewModels
                 Message = string.Empty;
             }
 
-            CanConvert = amountInBase == 0 || estimatedTotalNetworkFeeInBase / amountInBase <= 0.75m;
+            //CanExchange = amountInBase == 0 || estimatedTotalNetworkFeeInBase / amountInBase <= 0.75m;
         }
 
         protected async void OnBaseQuotesUpdatedEventHandler(object? sender, EventArgs args)
@@ -878,32 +906,11 @@ namespace Atomex.Client.Desktop.ViewModels
 
         private void OnConvertClick()
         {
-            if (FromViewModel.CurrencyViewModel == null)
-            {
-                // TODO: warning
+            if (FromViewModel.CurrencyViewModel == null ||
+                ToViewModel.CurrencyViewModel == null ||
+                FromCurrencyViewModelItem?.FromSource == null ||
+                ToAddress == null)
                 return;
-            }
-
-            if (ToViewModel.CurrencyViewModel == null)
-            {
-                // TODO: warning
-                return;
-            }
-
-            if (FromCurrencyViewModelItem?.FromSource == null)
-            {
-                return;
-            }
-
-            if (ToAddress == null)
-            {
-                return;
-            }
-
-            //if (RedeemFromAddress == null)
-            //{
-            //    return;
-            //}
 
             if (FromViewModel.Amount == 0)
             {
@@ -1013,16 +1020,16 @@ namespace Atomex.Client.Desktop.ViewModels
                 EstimatedTotalNetworkFeeInBase = EstimatedTotalNetworkFeeInBase,
             };
 
-            viewModel.OnSuccess += OnSuccessConvertion;
+            viewModel.OnSuccess += OnSwapSuccessfullyStarted;
 
             App.DialogService.Show(viewModel);
         }
 
-        private void OnSuccessConvertion(object? sender, EventArgs e)
+        private void OnSwapSuccessfullyStarted(object? sender, EventArgs e)
         {
-            // todo: check!!
-            FromViewModel.AmountString = Math.Min(FromViewModel.Amount, EstimatedMaxFromAmount).ToString(); // recalculate amount
+            // update all parameters
             _ = EstimateSwapParamsAsync();
+            OnQuotesUpdatedEventHandler(sender: this, args: null);
         }
 
 #if DEBUG
@@ -1162,7 +1169,7 @@ namespace Atomex.Client.Desktop.ViewModels
 
             Swaps = new ObservableCollection<SwapViewModel>(swapViewModels);
 
-            CanConvert = true;
+            CanExchange = true;
             DGSelectedIndex = 0; // -1;
         }
     }
