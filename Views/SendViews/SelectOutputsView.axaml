@@ -15,10 +15,6 @@
         <vm:SelectOutputsViewModel />
     </Design.DataContext>
     
-    <UserControl.Resources>
-        <converters:StringNotEmptyConverter x:Key="StringNotEmptyConverter" />
-    </UserControl.Resources>
-
     <Border Classes="ChildViewBorder"
             Padding="24 20 24 16"
             Width="700">
@@ -63,8 +59,7 @@
                      Classes="SearchTextBox">
                 <TextBox.InnerRightContent>
                     <StackPanel VerticalAlignment="Center"
-                                IsVisible="{Binding SearchPattern,
-                                Converter={StaticResource StringNotEmptyConverter}}">
+                                IsVisible="{Binding SearchPattern, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
                         <Button Margin="0 0 15 0"
                                 Padding="0"
                                 BorderThickness="0"

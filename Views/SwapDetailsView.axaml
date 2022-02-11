@@ -18,8 +18,6 @@
         <SolidColorBrush x:Key="PrimaryTextColor" Color="{DynamicResource LightDefault}" />
         <SolidColorBrush x:Key="SecondaryTextColor" Color="DarkGray" />
 
-        <converters:StringNotEmptyConverter x:Key="StringNotEmptyConverter" />
-        <converters:StringIsEmptyConverter x:Key="StringIsEmptyConverter" />
         <converters:DateTimeToTxTimeConverter x:Key="DateTimeToTxTimeConverter" />
     </UserControl.Resources>
 
@@ -606,8 +604,7 @@
                                        VerticalAlignment="Center" />
 
                             <TextBlock Text="{Binding InitializationSecondStepDescription}"
-                                       IsVisible="{Binding InitializationSecondStepDescription,
-                                       Converter={StaticResource StringNotEmptyConverter}}"
+                                       IsVisible="{Binding InitializationSecondStepDescription, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
                                        TextWrapping="Wrap"
                                        Margin="0 2 0 0"
                                        Foreground="{StaticResource SecondaryTextColor}"
@@ -628,8 +625,7 @@
                                        VerticalAlignment="Center" />
 
                             <WrapPanel
-                                IsVisible="{Binding ExchangingFirstStepDescription,
-                                Converter={StaticResource StringNotEmptyConverter}}">
+                                IsVisible="{Binding ExchangingFirstStepDescription, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
                                 <TextBlock Text="{Binding ExchangingFirstStepDescription}"
                                            TextWrapping="Wrap"
                                            Margin="0 4 4 0"
@@ -643,8 +639,7 @@
                                         ToolTip.VerticalOffset="-42"
                                         VerticalAlignment="Bottom"
                                         Margin="0 2 0 0"
-                                        IsVisible="{Binding ExchangingFirstStepLinkUrl,
-                                        Converter={StaticResource StringNotEmptyConverter}}">
+                                        IsVisible="{Binding ExchangingFirstStepLinkUrl, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
 
                                     <Button HorizontalAlignment="Left"
                                             VerticalAlignment="Bottom"
@@ -671,8 +666,7 @@
                                 </Border>
 
                                 <TextBlock Text="{Binding ExchangingFirstStepLinkText}"
-                                           IsVisible="{Binding ExchangingFirstStepLinkUrl,
-                                           Converter={StaticResource StringIsEmptyConverter}}"
+                                           IsVisible="{Binding ExchangingFirstStepLinkUrl, Converter={x:Static StringConverters.IsNullOrEmpty}}"
                                            TextWrapping="Wrap"
                                            Margin="0 2 0 0"
                                            Foreground="{StaticResource SecondaryTextColor}"
@@ -682,8 +676,7 @@
                                            VerticalAlignment="Center" />
                             </WrapPanel>
                             <WrapPanel
-                                IsVisible="{Binding ExchangingSecondStepDescription,
-                                Converter={StaticResource StringNotEmptyConverter}}">
+                                IsVisible="{Binding ExchangingSecondStepDescription, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
                                 <TextBlock Text="{Binding ExchangingSecondStepDescription}"
                                            TextWrapping="Wrap"
                                            Margin="0 4 4 0"
@@ -697,8 +690,7 @@
                                         ToolTip.VerticalOffset="-42"
                                         VerticalAlignment="Bottom"
                                         Margin="0 2 0 0"
-                                        IsVisible="{Binding ExchangingSecondStepLinkUrl,
-                                        Converter={StaticResource StringNotEmptyConverter}}">
+                                        IsVisible="{Binding ExchangingSecondStepLinkUrl, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
                                     <Button HorizontalAlignment="Left"
                                             VerticalAlignment="Bottom"
                                             Padding="0"
@@ -722,8 +714,7 @@
                                     </ToolTip.Tip>
                                 </Border>
                                 <TextBlock Text="{Binding ExchangingSecondStepLinkText}"
-                                           IsVisible="{Binding ExchangingSecondStepLinkUrl,
-                                           Converter={StaticResource StringIsEmptyConverter}}"
+                                           IsVisible="{Binding ExchangingSecondStepLinkUrl, Converter={x:Static StringConverters.IsNullOrEmpty}}"
                                            TextWrapping="Wrap"
                                            Margin="0 2 0 0"
                                            Foreground="{StaticResource SecondaryTextColor}"
@@ -745,8 +736,7 @@
                                        VerticalAlignment="Center" />
 
                             <WrapPanel
-                                IsVisible="{Binding CompletionFirstStepDescription,
-                                Converter={StaticResource StringNotEmptyConverter}}">
+                                IsVisible="{Binding CompletionFirstStepDescription, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
                                 <TextBlock Text="{Binding CompletionFirstStepDescription}"
                                            TextWrapping="Wrap"
                                            Margin="0 4 4 0"
@@ -760,8 +750,7 @@
                                         ToolTip.VerticalOffset="-42"
                                         VerticalAlignment="Bottom"
                                         Margin="0 2 0 0"
-                                        IsVisible="{Binding CompletionFirstStepLinkUrl,
-                                        Converter={StaticResource StringNotEmptyConverter}}">
+                                        IsVisible="{Binding CompletionFirstStepLinkUrl, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
 
                                     <Button HorizontalAlignment="Left"
                                             VerticalAlignment="Bottom"
@@ -787,8 +776,7 @@
                                 </Border>
 
                                 <TextBlock Text="{Binding CompletionFirstStepLinkText}"
-                                           IsVisible="{Binding CompletionFirstStepLinkUrl,
-                                           Converter={StaticResource StringIsEmptyConverter}}"
+                                           IsVisible="{Binding CompletionFirstStepLinkUrl, Converter={x:Static StringConverters.IsNullOrEmpty}}"
                                            TextWrapping="Wrap"
                                            Margin="0 2 0 0"
                                            Foreground="{StaticResource SecondaryTextColor}"
@@ -798,8 +786,7 @@
                                            VerticalAlignment="Center" />
                             </WrapPanel>
                             <WrapPanel
-                                IsVisible="{Binding CompletionSecondStepDescription,
-                                Converter={StaticResource StringNotEmptyConverter}}">
+                                IsVisible="{Binding CompletionSecondStepDescription, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
                                 <TextBlock Text="{Binding CompletionSecondStepDescription}"
                                            TextWrapping="Wrap"
                                            Margin="0 4 4 0"
@@ -813,8 +800,7 @@
                                         ToolTip.VerticalOffset="-42"
                                         VerticalAlignment="Bottom"
                                         Margin="0 2 0 0"
-                                        IsVisible="{Binding CompletionSecondStepLinkUrl,
-                                        Converter={StaticResource StringNotEmptyConverter}}">
+                                        IsVisible="{Binding CompletionSecondStepLinkUrl, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
 
                                     <Button HorizontalAlignment="Left"
                                             VerticalAlignment="Bottom"
@@ -840,8 +826,7 @@
                                 </Border>
 
                                 <TextBlock Text="{Binding CompletionSecondStepLinkText}"
-                                           IsVisible="{Binding CompletionSecondStepLinkUrl,
-                                           Converter={StaticResource StringIsEmptyConverter}}"
+                                           IsVisible="{Binding CompletionSecondStepLinkUrl, Converter={x:Static StringConverters.IsNullOrEmpty}}"
                                            TextWrapping="Wrap"
                                            Margin="0 2 0 0"
                                            Foreground="{StaticResource SecondaryTextColor}"

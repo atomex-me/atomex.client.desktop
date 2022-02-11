@@ -18,9 +18,8 @@
     </Design.DataContext>
 
     <UserControl.Resources>
-        <converters:AmountToStringConverter x:Key="AmountToStringConverter" />
-        <converters:AmountToStringInBracketsConverter x:Key="AmountToStringInBracketsConverter" />
-        <converters:StringNotEmptyConverter x:Key="StringNotEmptyConverter" />
+        <converters:AmountToStringConverter x:Key="AmountToStringConverter"/>
+        <converters:AmountToStringInBracketsConverter x:Key="AmountToStringInBracketsConverter"/>
     </UserControl.Resources>
 
     <Border Classes="ChildViewBorder"
@@ -126,7 +125,7 @@
                                        Name="ToTextBox">
                                 <i:Interaction.Behaviors>
                                     <ia:DataTriggerBehavior
-                                        Binding="{Binding To, Converter={StaticResource StringNotEmptyConverter}}"
+                                        Binding="{Binding To, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
                                         ComparisonCondition="Equal"
                                         Value="False">
                                         <ia:ChangePropertyAction TargetObject="{Binding #ToTextBox}"
@@ -137,7 +136,7 @@
                                                                  Value="{StaticResource SecondaryForegroundBrush}" />
                                     </ia:DataTriggerBehavior>
                                     <ia:DataTriggerBehavior
-                                        Binding="{Binding To, Converter={StaticResource StringNotEmptyConverter}}"
+                                        Binding="{Binding To, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
                                         ComparisonCondition="Equal"
                                         Value="True">
                                         <ia:ChangePropertyAction TargetObject="{Binding #ToTextBox}"
@@ -215,8 +214,7 @@
                 </StackPanel>
 
                 <StackPanel Orientation="Horizontal"
-                            IsEnabled="{Binding Warning,
-                            Converter={StaticResource StringNotEmptyConverter}}"
+                            IsEnabled="{Binding Warning, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
                             Margin="0 8 0 0"
                             Width="440"
                             MinHeight="16">

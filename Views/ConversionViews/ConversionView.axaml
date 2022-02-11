@@ -38,6 +38,7 @@
   <UserControl.Resources>
     <converters:AmountToStringConverter x:Key="AmountToStringConverter"/>
     <converters:DateTimeToTxTimeConverter x:Key="DateTimeToTxTimeConverter"/>
+    <converters:WidthToHorizontalCenterOffsetConverter x:Key="WidthToHorizontalCenterOffsetConverter"/>
   </UserControl.Resources>
 
   <Grid Background="{DynamicResource ChildViewBackgroundBrush}">
@@ -95,12 +96,20 @@
             <Button Padding="3"
                     VerticalAlignment="Center"
                     VerticalContentAlignment="Center"
-                    ToolTip.Tip="{Binding AmountValidationMessageToolTip}"
-                    ToolTip.Placement="AnchorAndGravity"
-                    ToolTip.VerticalOffset="30"
+                    ToolTip.Placement="Bottom"
+                    ToolTip.VerticalOffset="10"
+                    ToolTip.HorizontalOffset="{Binding ElementName=AmountValidationToolTipGrid,
+                      Path=Bounds.Width,
+                      Converter={StaticResource WidthToHorizontalCenterOffsetConverter}}"
                     Click="HelpClickHandler"
                     Classes="ButtonWithIcon"
                     IsVisible="{Binding AmountValidationMessageToolTip, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+              <ToolTip.Tip>
+                <Grid Name="AmountValidationToolTipGrid">
+                  <TextBlock TextWrapping="Wrap"
+                             Text="{Binding AmountValidationMessageToolTip}"/>
+                </Grid>
+              </ToolTip.Tip>
               <Path HorizontalAlignment="Center"
                     VerticalAlignment="Center"
                     Width="12"
@@ -123,11 +132,19 @@
             <Button Padding="3"
                     VerticalAlignment="Center"
                     VerticalContentAlignment="Center"
-                    ToolTip.Tip="The amount you entered is greater than the available liquidity. Please use 'max' button to accurately determine the maximum amount that can be exchanged"
-                    ToolTip.Placement="AnchorAndGravity"
-                    ToolTip.VerticalOffset="30"
+                    ToolTip.Placement="Bottom"
+                    ToolTip.VerticalOffset="10"
+                    ToolTip.HorizontalOffset="{Binding ElementName=NotEnoughLiquidityToolTipGrid,
+                      Path=Bounds.Width,
+                      Converter={StaticResource WidthToHorizontalCenterOffsetConverter}}"
                     Click="HelpClickHandler"
                     Classes="ButtonWithIcon">
+              <ToolTip.Tip>
+                <Grid Name="NotEnoughLiquidityToolTipGrid">
+                  <TextBlock TextWrapping="Wrap"
+                             Text="The amount you entered is greater than the available liquidity. Please use 'max' button to accurately determine the maximum amount that can be exchanged"/>
+                </Grid>
+              </ToolTip.Tip>
               <Path HorizontalAlignment="Center"
                     VerticalAlignment="Center"
                     Width="12"
@@ -190,11 +207,19 @@
             <Button Padding="3"
                     VerticalAlignment="Center"
                     VerticalContentAlignment="Center"
-                    ToolTip.Placement="AnchorAndGravity"
-                    ToolTip.Tip="By default wallet will send a redeem transaction from the address you use to receive funds. You can change the address to any other that has sufficient funds to send the redeem transaction"
-                    ToolTip.VerticalOffset="50"
+                    ToolTip.Placement="Bottom"
+                    ToolTip.VerticalOffset="10"
+                    ToolTip.HorizontalOffset="{Binding ElementName=ChangeRedeemAddressToolTipGrid,
+                      Path=Bounds.Width,
+                      Converter={StaticResource WidthToHorizontalCenterOffsetConverter}}"
                     Click="HelpClickHandler"
                     Classes="ButtonWithIcon">
+              <ToolTip.Tip>
+                <Grid Name="ChangeRedeemAddressToolTipGrid">
+                  <TextBlock TextWrapping="Wrap"
+                             Text="By default wallet will send a redeem transaction from the address you use to receive funds. You can change the address to any other that has sufficient funds to send the redeem transaction"/>
+                </Grid>
+              </ToolTip.Tip>
               <Path HorizontalAlignment="Center"
                     VerticalAlignment="Center"
                     Width="12"
@@ -246,9 +271,17 @@
                     VerticalContentAlignment="Center"
                     Click="HelpClickHandler"
                     Classes="ButtonWithIcon"
-                    ToolTip.Placement="AnchorAndGravity"
-                    ToolTip.Tip="Estimated price depends on the conversion amount and may change. A trading order is always sent with a price no worse than agreed by the user. If during the time of sending the order the price has changed for the worse, the trading order is canceled"
-                    ToolTip.VerticalOffset="50">
+                    ToolTip.Placement="Bottom"
+                    ToolTip.VerticalOffset="10"
+                    ToolTip.HorizontalOffset="{Binding ElementName=EstimatedPriceToolTipGrid,
+                      Path=Bounds.Width,
+                      Converter={StaticResource WidthToHorizontalCenterOffsetConverter}}">
+              <ToolTip.Tip>
+                <Grid Name="EstimatedPriceToolTipGrid">
+                  <TextBlock TextWrapping="Wrap"
+                             Text="Estimated price depends on the conversion amount and may change. A trading order is always sent with a price no worse than agreed by the user. If during the time of sending the order the price has changed for the worse, the trading order is canceled"/>
+                </Grid>
+              </ToolTip.Tip>
               <Path HorizontalAlignment="Center"
                     VerticalAlignment="Center"
                     Width="12"
@@ -596,11 +629,19 @@
           <Button Padding="3"
                   VerticalAlignment="Center"
                   VerticalContentAlignment="Center"
-                  ToolTip.Placement="AnchorAndGravity"
-                  ToolTip.Tip="The limit applies to a single trade. In case you require more liquidity make multiple trades"
-                  ToolTip.VerticalOffset="40"
+                  ToolTip.Placement="Bottom"
+                  ToolTip.VerticalOffset="10"
+                  ToolTip.HorizontalOffset="{Binding ElementName=AvailableAmountToolTipGrid,
+                    Path=Bounds.Width,
+                    Converter={StaticResource WidthToHorizontalCenterOffsetConverter}}"
                   Click="HelpClickHandler"
                   Classes="ButtonWithIcon">
+            <ToolTip.Tip>
+              <Grid Name="AvailableAmountToolTipGrid">
+                <TextBlock TextWrapping="Wrap"
+                           Text="The limit applies to a single trade. In case you require more liquidity make multiple trades"/>
+              </Grid>
+            </ToolTip.Tip>
             <Path HorizontalAlignment="Center"
                   VerticalAlignment="Center"
                   Width="12"
@@ -628,11 +669,19 @@
         <Button Padding="3"
                 VerticalAlignment="Center"
                 VerticalContentAlignment="Center"
-                ToolTip.Tip="{Binding MessageToolTip}"
-                ToolTip.Placement="AnchorAndGravity"
-                ToolTip.VerticalOffset="60"
+                ToolTip.Placement="Bottom"
+                ToolTip.VerticalOffset="10"
+                ToolTip.HorizontalOffset="{Binding ElementName=MessageToolTipGrid,
+                  Path=Bounds.Width,
+                  Converter={StaticResource WidthToHorizontalCenterOffsetConverter}}"
                 Click="HelpClickHandler"
                 Classes="ButtonWithIcon">
+          <ToolTip.Tip>
+            <Grid Name="MessageToolTipGrid">
+              <TextBlock TextWrapping="Wrap"
+                         Text="{Binding MessageToolTip}"/>
+            </Grid>
+          </ToolTip.Tip>
           <Path HorizontalAlignment="Center"
                 VerticalAlignment="Center"
                 Width="12"
