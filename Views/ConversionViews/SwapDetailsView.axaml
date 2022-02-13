@@ -11,7 +11,7 @@
              xmlns:svg="clr-namespace:Avalonia.Svg.Skia;assembly=Avalonia.Svg.Skia"
              x:Class="Atomex.Client.Desktop.Views.SwapDetailsView">
     <Design.DataContext>
-        <vm:SwapDetailsViewModel />
+        <vm:SwapDetailsViewModel/>
     </Design.DataContext>
 
     <UserControl.Resources>
@@ -54,7 +54,7 @@
                                         DockPanel.Dock="{TemplateBinding TabStripPlacement}">
                                 <Border
                                     BorderThickness="0 1 0 1"
-                                    BorderBrush="{StaticResource SecondaryTextColor}">
+                                    BorderBrush="{StaticResource LightDefaultOpacity50}">
                                     <ItemsPresenter Name="PART_ItemsPresenter"
                                                     HorizontalAlignment="Center"
                                                     Items="{TemplateBinding Items}"
@@ -75,7 +75,7 @@
             </Setter>
         </Style>
         <Style Selector="TabItem">
-            <Setter Property="Foreground" Value="{StaticResource SecondaryTextColor}" />
+            <Setter Property="Foreground" Value="{DynamicResource LightDefaultOpacity50}" />
             <Setter Property="Cursor" Value="Hand" />
             <Setter Property="Template">
                 <ControlTemplate>
@@ -108,7 +108,7 @@
 
         <!-- PointerOver state -->
         <Style Selector="TabItem:pointerover /template/ Border#PART_LayoutRoot">
-            <Setter Property="TextBlock.Foreground" Value="{StaticResource SecondaryTextColor}" />
+            <Setter Property="TextBlock.Foreground" Value="{DynamicResource LightDefaultOpacity20}" />
         </Style>
 
         <!-- Selected PointerOver state -->
@@ -143,7 +143,7 @@
         </Style>
     </UserControl.Styles>
 
-    <Border Background="{DynamicResource HamburgerMenuBackgroundBrush}">
+    <Border Background="{DynamicResource DeepBlue}">
         <StackPanel Orientation="Vertical">
             <Button Width="25"
                     Height="25"
@@ -153,10 +153,10 @@
                     Padding="0"
                     Command="{Binding CloseCommand}"
                     Classes="ButtonWithIcon">
-                <Path Width="11"
-                      Height="11"
+                <Path Width="16"
+                      Height="16"
                       Stretch="Uniform"
-                      Data="{DynamicResource CloseCross}" />
+                      Data="{DynamicResource CloseCross}"/>
             </Button>
 
             <svg:Svg Name="SwapStatusIcon"
@@ -205,7 +205,7 @@
                        Text="{Binding SwapCompactStateTitle}"
                        FontFamily="{DynamicResource DefaultLightFontFamily}"
                        TextAlignment="Center"
-                       FontSize="25"
+                       FontSize="22"
                        Margin="0 14 0 0"
                        HorizontalAlignment="Center"
                        VerticalAlignment="Center">
@@ -252,7 +252,7 @@
                        Text="{Binding SwapCompactStateDescription}"
                        FontFamily="{DynamicResource DefaultLightFontFamily}"
                        TextAlignment="Center"
-                       FontSize="15"
+                       FontSize="13"
                        Margin="0 6 0 0"
                        TextWrapping="Wrap"
                        HorizontalAlignment="Center">
@@ -297,9 +297,11 @@
 
             <Grid Margin="0 32 0 40">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="16" />
-                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="40"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="16"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="40"/>
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
@@ -310,49 +312,50 @@
                 <Image Source="{Binding FromCurrencyViewModel.LargeIconPath}"
                        Width="48"
                        Height="48"
-                       Grid.Column="0"
+                       Grid.Column="1"
                        Grid.Row="0" />
 
-                <svg:Svg
-                    Grid.Column="1"
-                    Grid.Row="0"
-                    Grid.RowSpan="2"
-                    VerticalAlignment="Center"
-                    Path="/Resources/Icons/swap-arrows.svg"
-                    Width="24" />
-
+                <Path Width="14"
+                      Height="14"
+                      Stretch="None"
+                      Grid.Column="2"
+                      Grid.Row="0"
+                      Grid.RowSpan="2"
+                      Data="{DynamicResource SwapArrows}"
+                      Fill="{DynamicResource LightDefaultOpacity50}"/>
+ 
                 <Image Source="{Binding ToCurrencyViewModel.LargeIconPath}"
                        Width="48"
                        Height="48"
-                       Grid.Column="2"
+                       Grid.Column="3"
                        Grid.Row="0" />
 
                 <TextBlock Text="{Binding FromCurrencyCode}"
                            Foreground="{DynamicResource ChildViewHeaderForegroundBrush}"
                            FontFamily="{DynamicResource DefaultLightFontFamily}"
-                           FontSize="20"
+                           FontSize="18"
                            HorizontalAlignment="Center"
                            VerticalAlignment="Center"
-                           Margin="0 14 0 0"
-                           Grid.Column="0"
+                           Margin="0 12 0 2"
+                           Grid.Column="1"
                            Grid.Row="1" />
 
                 <TextBlock Text="{Binding ToCurrencyCode}"
                            Foreground="{DynamicResource ChildViewHeaderForegroundBrush}"
                            FontFamily="{DynamicResource DefaultLightFontFamily}"
-                           FontSize="20"
+                           FontSize="18"
                            HorizontalAlignment="Center"
                            VerticalAlignment="Center"
-                           Margin="0 14 0 0"
-                           Grid.Column="2"
+                           Margin="0 12 0 3"
+                           Grid.Column="3"
                            Grid.Row="1" />
 
-                <TextBlock Grid.Column="0"
+                <TextBlock Grid.Column="1"
                            Grid.Row="2"
                            HorizontalAlignment="Center"
                            FontFamily="{DynamicResource DefaultLightFontFamily}"
-                           FontSize="15"
-                           Foreground="{StaticResource SecondaryTextColor}">
+                           FontSize="13"
+                           Foreground="{StaticResource LightDefaultOpacity50}">
                     <TextBlock.Text>
                         <MultiBinding Converter="{StaticResource AmountToStringConverter}">
                             <Binding Path="FromAmount" Mode="OneWay" />
@@ -361,12 +364,12 @@
                     </TextBlock.Text>
                 </TextBlock>
 
-                <TextBlock Grid.Column="2"
+                <TextBlock Grid.Column="3"
                            Grid.Row="2"
                            HorizontalAlignment="Center"
                            FontFamily="{DynamicResource DefaultLightFontFamily}"
-                           FontSize="15"
-                           Foreground="{StaticResource SecondaryTextColor}">
+                           FontSize="13"
+                           Foreground="{StaticResource LightDefaultOpacity50}">
                     <TextBlock.Text>
                         <MultiBinding Converter="{StaticResource AmountToStringConverter}">
                             <Binding Path="ToAmount" Mode="OneWay" />
@@ -381,9 +384,8 @@
                     <TabItem.Header>
                         <TextBlock VerticalAlignment="Center"
                                    FontFamily="{DynamicResource DefaultFontFamily}"
-                                   FontWeight="DemiBold"
-                                   FontSize="14"
-                                   Text="PROGRESS" />
+                                   FontSize="13"
+                                   Text="Progress"/>
                     </TabItem.Header>
                     <Grid>
                         <Grid.ColumnDefinitions>
@@ -597,7 +599,7 @@
                             <TextBlock Text="{Binding InitializationFirstStepDescription}"
                                        TextWrapping="Wrap"
                                        Margin="0 4 0 0"
-                                       Foreground="{StaticResource SecondaryTextColor}"
+                                       Foreground="{StaticResource LightDefaultOpacity50}"
                                        FontFamily="{DynamicResource DefaultLightFontFamily}"
                                        FontSize="12"
                                        HorizontalAlignment="Left"
@@ -607,7 +609,7 @@
                                        IsVisible="{Binding InitializationSecondStepDescription, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
                                        TextWrapping="Wrap"
                                        Margin="0 2 0 0"
-                                       Foreground="{StaticResource SecondaryTextColor}"
+                                       Foreground="{StaticResource LightDefaultOpacity50}"
                                        FontFamily="{DynamicResource DefaultLightFontFamily}"
                                        FontSize="12"
                                        HorizontalAlignment="Left"
@@ -629,7 +631,7 @@
                                 <TextBlock Text="{Binding ExchangingFirstStepDescription}"
                                            TextWrapping="Wrap"
                                            Margin="0 4 4 0"
-                                           Foreground="{StaticResource SecondaryTextColor}"
+                                           Foreground="{StaticResource LightDefaultOpacity50}"
                                            FontFamily="{DynamicResource DefaultLightFontFamily}"
                                            FontSize="12"
                                            HorizontalAlignment="Left"
@@ -669,7 +671,7 @@
                                            IsVisible="{Binding ExchangingFirstStepLinkUrl, Converter={x:Static StringConverters.IsNullOrEmpty}}"
                                            TextWrapping="Wrap"
                                            Margin="0 2 0 0"
-                                           Foreground="{StaticResource SecondaryTextColor}"
+                                           Foreground="{StaticResource LightDefaultOpacity50}"
                                            FontFamily="{DynamicResource DefaultLightFontFamily}"
                                            FontSize="12"
                                            HorizontalAlignment="Left"
@@ -680,7 +682,7 @@
                                 <TextBlock Text="{Binding ExchangingSecondStepDescription}"
                                            TextWrapping="Wrap"
                                            Margin="0 4 4 0"
-                                           Foreground="{StaticResource SecondaryTextColor}"
+                                           Foreground="{StaticResource LightDefaultOpacity50}"
                                            FontFamily="{DynamicResource DefaultLightFontFamily}"
                                            FontSize="12"
                                            HorizontalAlignment="Left"
@@ -717,7 +719,7 @@
                                            IsVisible="{Binding ExchangingSecondStepLinkUrl, Converter={x:Static StringConverters.IsNullOrEmpty}}"
                                            TextWrapping="Wrap"
                                            Margin="0 2 0 0"
-                                           Foreground="{StaticResource SecondaryTextColor}"
+                                           Foreground="{StaticResource LightDefaultOpacity50}"
                                            FontFamily="{DynamicResource DefaultLightFontFamily}"
                                            FontSize="12"
                                            HorizontalAlignment="Left"
@@ -740,7 +742,7 @@
                                 <TextBlock Text="{Binding CompletionFirstStepDescription}"
                                            TextWrapping="Wrap"
                                            Margin="0 4 4 0"
-                                           Foreground="{StaticResource SecondaryTextColor}"
+                                           Foreground="{StaticResource LightDefaultOpacity50}"
                                            FontFamily="{DynamicResource DefaultLightFontFamily}"
                                            FontSize="12"
                                            HorizontalAlignment="Left"
@@ -779,7 +781,7 @@
                                            IsVisible="{Binding CompletionFirstStepLinkUrl, Converter={x:Static StringConverters.IsNullOrEmpty}}"
                                            TextWrapping="Wrap"
                                            Margin="0 2 0 0"
-                                           Foreground="{StaticResource SecondaryTextColor}"
+                                           Foreground="{StaticResource LightDefaultOpacity50}"
                                            FontFamily="{DynamicResource DefaultLightFontFamily}"
                                            FontSize="12"
                                            HorizontalAlignment="Left"
@@ -790,7 +792,7 @@
                                 <TextBlock Text="{Binding CompletionSecondStepDescription}"
                                            TextWrapping="Wrap"
                                            Margin="0 4 4 0"
-                                           Foreground="{StaticResource SecondaryTextColor}"
+                                           Foreground="{StaticResource LightDefaultOpacity50}"
                                            FontFamily="{DynamicResource DefaultLightFontFamily}"
                                            FontSize="12"
                                            HorizontalAlignment="Left"
@@ -829,7 +831,7 @@
                                            IsVisible="{Binding CompletionSecondStepLinkUrl, Converter={x:Static StringConverters.IsNullOrEmpty}}"
                                            TextWrapping="Wrap"
                                            Margin="0 2 0 0"
-                                           Foreground="{StaticResource SecondaryTextColor}"
+                                           Foreground="{StaticResource LightDefaultOpacity50}"
                                            FontFamily="{DynamicResource DefaultLightFontFamily}"
                                            FontSize="12"
                                            HorizontalAlignment="Left"
@@ -842,9 +844,8 @@
                     <TabItem.Header>
                         <TextBlock VerticalAlignment="Center"
                                    FontFamily="{DynamicResource DefaultFontFamily}"
-                                   FontWeight="DemiBold"
-                                   FontSize="14"
-                                   Text="DETAILS" />
+                                   FontSize="13"
+                                   Text="Details"/>
                     </TabItem.Header>
                     <Grid>
                         <Grid.ColumnDefinitions>
@@ -859,7 +860,7 @@
                         <TextBlock Grid.Column="0"
                                    Grid.Row="0"
                                    Text="Price:"
-                                   Foreground="{StaticResource SecondaryTextColor}"
+                                   Foreground="{StaticResource LightDefaultOpacity50}"
                                    FontFamily="{DynamicResource DefaultFontFamily}"
                                    FontSize="15" />
 
@@ -875,7 +876,7 @@
                         <TextBlock Grid.Column="0"
                                    Grid.Row="1"
                                    Text="Date:"
-                                   Foreground="{StaticResource SecondaryTextColor}"
+                                   Foreground="{StaticResource LightDefaultOpacity50}"
                                    FontFamily="{DynamicResource DefaultFontFamily}"
                                    FontSize="15" />
 

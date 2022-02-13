@@ -2,8 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Input;
-using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
+
 using ReactiveUI;
+
+using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
+using Avalonia.Controls;
+using Atomex.Client.Desktop.Common;
 
 namespace Atomex.Client.Desktop.ViewModels
 {
@@ -32,9 +36,16 @@ namespace Atomex.Client.Desktop.ViewModels
         public string ToCurrencyCode => ToCurrencyViewModel.CurrencyCode;
         public IEnumerable<Atomex.ViewModels.Helpers.SwapDetailingInfo> DetailingInfo { get; set; }
 
+#if DEBUG
+        public SwapDetailsViewModel()
+        {
+
+            if (Design.IsDesignMode)
+                DesignerMode();
+        }
+#endif
 
         private ICommand? _closeCommand;
-
         public ICommand CloseCommand => _closeCommand ??= _closeCommand = ReactiveCommand.Create(() =>
         {
             OnClose?.Invoke();
@@ -91,7 +102,6 @@ namespace Atomex.Client.Desktop.ViewModels
         public string? CompletionSecondStepLinkUrl =>
             GetStatusDescription(Atomex.ViewModels.Helpers.SwapDetailingStatus.Completion, 1)?.ExplorerLink?.Url;
 
-
         private Atomex.ViewModels.Helpers.SwapDetailingInfo? GetStatusDescription(
             Atomex.ViewModels.Helpers.SwapDetailingStatus status, int number)
         {
@@ -113,7 +123,6 @@ namespace Atomex.Client.Desktop.ViewModels
         public static SwapDetailedStepState InProgressState => SwapDetailedStepState.InProgress;
         public static SwapDetailedStepState CompletedState => SwapDetailedStepState.Completed;
         public static SwapDetailedStepState FailedState => SwapDetailedStepState.Failed;
-
         public static SwapCompactState InProgress => SwapCompactState.InProgress;
         public static SwapCompactState Completed => SwapCompactState.Completed;
         public static SwapCompactState Cancelled => SwapCompactState.Canceled;
@@ -142,8 +151,20 @@ namespace Atomex.Client.Desktop.ViewModels
         }
 
         private ICommand? _openTxInExplorerCommand;
-
         public ICommand OpenTxInExplorerCommand =>
             _openTxInExplorerCommand ??= ReactiveCommand.Create<string>(App.OpenBrowser);
+
+#if DEBUG
+        private void DesignerMode()
+        {
+            var btc = DesignTime.Currencies.Get<BitcoinConfig>("BTC");
+            var ltc = DesignTime.Currencies.Get<LitecoinConfig>("LTC");
+
+            FromCurrencyViewModel = CurrencyViewModelCreator.CreateViewModel(btc, subscribeToUpdates: false);
+            ToCurrencyViewModel = CurrencyViewModelCreator.CreateViewModel(ltc, subscribeToUpdates: false);
+
+            CompactState = SwapCompactState.InProgress;
+        }
+#endif
     }
 }
