@@ -10,289 +10,231 @@
              xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
              xmlns:ia="clr-namespace:Avalonia.Xaml.Interactions.Core;assembly=Avalonia.Xaml.Interactions">
 
-    <Design.DataContext>
-        <vm:WalletMainViewModel />
-    </Design.DataContext>
+  <Design.DataContext>
+    <vm:WalletMainViewModel/>
+  </Design.DataContext>
 
-    <UserControl.Resources>
-        <converters:CalcChildHeightConverter x:Key="CalcChildHeightConverter" />
-    </UserControl.Resources>
+  <UserControl.Resources>
+    <converters:CalcChildHeightConverter x:Key="CalcChildHeightConverter"/>
+  </UserControl.Resources>
 
-    <DockPanel x:Name="MainDockerPanel"
-               Width="{Binding $parent[Window].Bounds.Width}"
-               Height="{Binding $parent[Window].Bounds.Height, Converter={StaticResource CalcChildHeightConverter}}">
-        <DockPanel DockPanel.Dock="Bottom"
-                   Background="{DynamicResource MainWindowTitleBrush}">
+  <DockPanel x:Name="MainDockerPanel"
+             Width="{Binding $parent[Window].Bounds.Width}"
+             Height="{Binding $parent[Window].Bounds.Height, Converter={StaticResource CalcChildHeightConverter}}">
+    <!-- status bar -->
+    <DockPanel DockPanel.Dock="Bottom"
+               Background="{DynamicResource MainWindowTitleBrush}">
 
-            <StackPanel Orientation="Horizontal"
-                        DockPanel.Dock="Right"
-                        VerticalAlignment="Center"
-                        Height="20">
+      <StackPanel Orientation="Horizontal"
+                  DockPanel.Dock="Right"
+                  VerticalAlignment="Center"
+                  Height="20">
 
-                <Border ToolTip.Placement="AnchorAndGravity"
-                        ToolTip.VerticalOffset="-32"
-                        VerticalAlignment="Center"
-                        Cursor="Help"
-                        Margin="8 0">
+        <Border ToolTip.Placement="AnchorAndGravity"
+                ToolTip.VerticalOffset="-32"
+                VerticalAlignment="Center"
+                Cursor="Help"
+                Margin="8 0">
 
-                    <TextBlock Text="Exchange"
-                               x:Name="ExchangeTextBox"
-                               Padding="0 0 0 1"
-                               FontSize="11" />
-                    <ToolTip.Tip>
-                        <TextBlock x:Name="ToolTipTextBoxExchange"
-                                   Text="Disconnected" />
-                    </ToolTip.Tip>
-                    <i:Interaction.Behaviors>
-                        <ia:DataTriggerBehavior Binding="{Binding IsExchangeConnected}"
-                                                ComparisonCondition="NotEqual"
-                                                Value="True">
-                            <ia:ChangePropertyAction TargetObject="{Binding #ToolTipTextBoxExchange}"
-                                                     PropertyName="Text"
-                                                     Value="Disconnected" />
-                            <ia:ChangePropertyAction TargetObject="{Binding #ExchangeTextBox}"
-                                                     PropertyName="Foreground"
-                                                     Value="{StaticResource StatusBarDisconnectedForeground}" />
-                        </ia:DataTriggerBehavior>
-                        <ia:DataTriggerBehavior Binding="{Binding IsExchangeConnected}"
-                                                ComparisonCondition="Equal"
-                                                Value="True">
-                            <ia:ChangePropertyAction TargetObject="{Binding #ToolTipTextBoxExchange}"
-                                                     PropertyName="Text"
-                                                     Value="Connected" />
-                            <ia:ChangePropertyAction TargetObject="{Binding #ExchangeTextBox}"
-                                                     PropertyName="Foreground"
-                                                     Value="{StaticResource StatusBarConnectedForeground}" />
-                        </ia:DataTriggerBehavior>
-                    </i:Interaction.Behaviors>
-                </Border>
+            <TextBlock Text="Exchange"
+                       x:Name="ExchangeTextBox"
+                       Padding="0 0 0 1"
+                       FontSize="11"/>
+            <ToolTip.Tip>
+              <TextBlock x:Name="ToolTipTextBoxExchange"
+                         Text="Disconnected"/>
+            </ToolTip.Tip>
+            <i:Interaction.Behaviors>
+              <ia:DataTriggerBehavior Binding="{Binding IsExchangeConnected}"
+                                      ComparisonCondition="NotEqual"
+                                      Value="True">
+                <ia:ChangePropertyAction TargetObject="{Binding #ToolTipTextBoxExchange}"
+                                          PropertyName="Text"
+                                          Value="Disconnected"/>
+                <ia:ChangePropertyAction TargetObject="{Binding #ExchangeTextBox}"
+                                          PropertyName="Foreground"
+                                          Value="{StaticResource StatusBarDisconnectedForeground}"/>
+              </ia:DataTriggerBehavior>
+              <ia:DataTriggerBehavior Binding="{Binding IsExchangeConnected}"
+                                      ComparisonCondition="Equal"
+                                      Value="True">
+                <ia:ChangePropertyAction TargetObject="{Binding #ToolTipTextBoxExchange}"
+                                          PropertyName="Text"
+                                          Value="Connected"/>
+                <ia:ChangePropertyAction TargetObject="{Binding #ExchangeTextBox}"
+                                          PropertyName="Foreground"
+                                          Value="{StaticResource StatusBarConnectedForeground}"/>
+              </ia:DataTriggerBehavior>
+            </i:Interaction.Behaviors>
+        </Border>
 
-                <Rectangle Margin="0 4"
-                           VerticalAlignment="Stretch"
-                           Fill="{DynamicResource StatusBarVersionForeground}"
-                           Width="1" />
+        <Rectangle Margin="0 4"
+                   VerticalAlignment="Stretch"
+                   Fill="{DynamicResource StatusBarVersionForeground}"
+                   Width="1"/>
 
-                <Border ToolTip.Placement="AnchorAndGravity"
-                        ToolTip.VerticalOffset="-32"
-                        VerticalAlignment="Center"
-                        Cursor="Help"
-                        Margin="8 0">
+        <Border ToolTip.Placement="AnchorAndGravity"
+                ToolTip.VerticalOffset="-32"
+                VerticalAlignment="Center"
+                Cursor="Help"
+                Margin="8 0">
 
-                    <TextBlock Text="Market Data"
-                               x:Name="MarketTextBox"
-                               Padding="0 0 0 1"
-                               FontSize="11" />
-                    <ToolTip.Tip>
-                        <TextBlock x:Name="ToolTipTextBoxMarket"
-                                   Text="Disconnected" />
-                    </ToolTip.Tip>
-                    <i:Interaction.Behaviors>
-                        <ia:DataTriggerBehavior Binding="{Binding IsMarketDataConnected}"
-                                                ComparisonCondition="NotEqual"
-                                                Value="True">
-                            <ia:ChangePropertyAction TargetObject="{Binding #ToolTipTextBoxMarket}"
-                                                     PropertyName="Text"
-                                                     Value="Disconnected" />
-                            <ia:ChangePropertyAction TargetObject="{Binding #MarketTextBox}"
-                                                     PropertyName="Foreground"
-                                                     Value="{StaticResource StatusBarDisconnectedForeground}" />
-                        </ia:DataTriggerBehavior>
-                        <ia:DataTriggerBehavior Binding="{Binding IsMarketDataConnected}"
-                                                ComparisonCondition="Equal"
-                                                Value="True">
-                            <ia:ChangePropertyAction TargetObject="{Binding #ToolTipTextBoxMarket}"
-                                                     PropertyName="Text"
-                                                     Value="Connected" />
-                            <ia:ChangePropertyAction TargetObject="{Binding #MarketTextBox}"
-                                                     PropertyName="Foreground"
-                                                     Value="{StaticResource StatusBarConnectedForeground}" />
-                        </ia:DataTriggerBehavior>
-                    </i:Interaction.Behaviors>
-                </Border>
+          <TextBlock Text="Market Data"
+                     x:Name="MarketTextBox"
+                     Padding="0 0 0 1"
+                     FontSize="11"/>
+          <ToolTip.Tip>
+            <TextBlock x:Name="ToolTipTextBoxMarket"
+                       Text="Disconnected"/>
+          </ToolTip.Tip>
+          <i:Interaction.Behaviors>
+            <ia:DataTriggerBehavior Binding="{Binding IsMarketDataConnected}"
+                                    ComparisonCondition="NotEqual"
+                                    Value="True">
+              <ia:ChangePropertyAction TargetObject="{Binding #ToolTipTextBoxMarket}"
+                                       PropertyName="Text"
+                                       Value="Disconnected"/>
+              <ia:ChangePropertyAction TargetObject="{Binding #MarketTextBox}"
+                                       PropertyName="Foreground"
+                                       Value="{StaticResource StatusBarDisconnectedForeground}"/>
+            </ia:DataTriggerBehavior>
+            <ia:DataTriggerBehavior Binding="{Binding IsMarketDataConnected}"
+                                    ComparisonCondition="Equal"
+                                    Value="True">
+              <ia:ChangePropertyAction TargetObject="{Binding #ToolTipTextBoxMarket}"
+                                        PropertyName="Text"
+                                        Value="Connected"/>
+              <ia:ChangePropertyAction TargetObject="{Binding #MarketTextBox}"
+                                        PropertyName="Foreground"
+                                        Value="{StaticResource StatusBarConnectedForeground}"/>
+            </ia:DataTriggerBehavior>
+          </i:Interaction.Behaviors>
+        </Border>
 
-                <Rectangle Margin="0 4"
-                           VerticalAlignment="Stretch"
-                           Fill="{DynamicResource StatusBarVersionForeground}"
-                           Width="1" />
+        <Rectangle Margin="0 4"
+                    VerticalAlignment="Stretch"
+                    Fill="{DynamicResource StatusBarVersionForeground}"
+                    Width="1" />
 
-                <Border ToolTip.Placement="AnchorAndGravity"
-                        ToolTip.VerticalOffset="-32"
-                        VerticalAlignment="Center"
-                        Cursor="Help"
-                        Margin="8 0">
+        <Border ToolTip.Placement="AnchorAndGravity"
+                ToolTip.VerticalOffset="-32"
+                VerticalAlignment="Center"
+                Cursor="Help"
+                Margin="8 0">
 
-                    <TextBlock Text="Rates Provider"
-                               x:Name="RatesTextBox"
-                               Padding="0 0 0 1"
-                               FontSize="11" />
-                    <ToolTip.Tip>
-                        <TextBlock x:Name="ToolTipTextBoxRates"
-                                   Text="Disconnected" />
-                    </ToolTip.Tip>
-                    <i:Interaction.Behaviors>
-                        <ia:DataTriggerBehavior Binding="{Binding IsQuotesProviderAvailable}"
-                                                ComparisonCondition="NotEqual"
-                                                Value="True">
-                            <ia:ChangePropertyAction TargetObject="{Binding #ToolTipTextBoxRates}"
-                                                     PropertyName="Text"
-                                                     Value="Disconnected" />
-                            <ia:ChangePropertyAction TargetObject="{Binding #RatesTextBox}"
-                                                     PropertyName="Foreground"
-                                                     Value="{StaticResource StatusBarDisconnectedForeground}" />
-                        </ia:DataTriggerBehavior>
-                        <ia:DataTriggerBehavior Binding="{Binding IsQuotesProviderAvailable}"
-                                                ComparisonCondition="Equal"
-                                                Value="True">
-                            <ia:ChangePropertyAction TargetObject="{Binding #ToolTipTextBoxRates}"
-                                                     PropertyName="Text"
-                                                     Value="Connected" />
-                            <ia:ChangePropertyAction TargetObject="{Binding #RatesTextBox}"
-                                                     PropertyName="Foreground"
-                                                     Value="{StaticResource StatusBarConnectedForeground}" />
-                        </ia:DataTriggerBehavior>
-                    </i:Interaction.Behaviors>
-                </Border>
-            </StackPanel>
-            <StackPanel Orientation="Horizontal"
-                        VerticalAlignment="Center">
-                <TextBlock Text="Version:"
-                           Margin="8 0 4 0"
-                           FontSize="11"
-                           Foreground="{DynamicResource StatusBarVersionForeground}" />
-                <TextBlock Text="{Binding InstalledVersion}"
-                           FontSize="11"
-                           Foreground="{DynamicResource StatusBarVersionForeground}" />
-            </StackPanel>
-        </DockPanel>
+          <TextBlock Text="Rates Provider"
+                     x:Name="RatesTextBox"
+                     Padding="0 0 0 1"
+                     FontSize="11"/>
+          <ToolTip.Tip>
+            <TextBlock x:Name="ToolTipTextBoxRates"
+                       Text="Disconnected"/>
+          </ToolTip.Tip>
+          <i:Interaction.Behaviors>
+            <ia:DataTriggerBehavior Binding="{Binding IsQuotesProviderAvailable}"
+                                    ComparisonCondition="NotEqual"
+                                    Value="True">
+              <ia:ChangePropertyAction TargetObject="{Binding #ToolTipTextBoxRates}"
+                                       PropertyName="Text"
+                                       Value="Disconnected"/>
+              <ia:ChangePropertyAction TargetObject="{Binding #RatesTextBox}"
+                                       PropertyName="Foreground"
+                                       Value="{StaticResource StatusBarDisconnectedForeground}"/>
+            </ia:DataTriggerBehavior>
+            <ia:DataTriggerBehavior Binding="{Binding IsQuotesProviderAvailable}"
+                                    ComparisonCondition="Equal"
+                                    Value="True">
+              <ia:ChangePropertyAction TargetObject="{Binding #ToolTipTextBoxRates}"
+                                       PropertyName="Text"
+                                       Value="Connected"/>
+              <ia:ChangePropertyAction TargetObject="{Binding #RatesTextBox}"
+                                       PropertyName="Foreground"
+                                       Value="{StaticResource StatusBarConnectedForeground}"/>
+            </ia:DataTriggerBehavior>
+          </i:Interaction.Behaviors>
+        </Border>
+      </StackPanel>
 
-        <DockPanel DockPanel.Dock="Left"
-                   Background="{DynamicResource HamburgerMenuBackgroundBrush}">
-
-            <StackPanel DockPanel.Dock="Bottom">
-                <controls:MenuButton
-                    IsVisible="False"
-                    Background="Transparent"
-                    Foreground="White"
-                    IsSelected="{Binding IsSettingsSectionActive}"
-                    Width="{DynamicResource WalletMenuItemWidth}"
-                    Command="{Binding SelectSettings}">
-                    <StackPanel Orientation="Horizontal">
-                        <Path Stretch="Uniform"
-                              VerticalAlignment="Center"
-                              UseLayoutRounding="False"
-                              Width="30"
-                              Height="30"
-                              Fill="{DynamicResource DefaultForegroundBrush}"
-                              Data="{DynamicResource Material.Settings}" />
-                        <TextBlock VerticalAlignment="Center"
-                                   Margin="8 0 0 0">
-                            Settings
-                        </TextBlock>
-                    </StackPanel>
-                </controls:MenuButton>
-            </StackPanel>
-
-            <StackPanel>
-                <controls:MenuButton
-                    Background="Transparent"
-                    Foreground="White"
-                    IsSelected="{Binding IsPortfolioSectionActive}"
-                    Width="{DynamicResource WalletMenuItemWidth}"
-                    Command="{Binding SelectPortfolio}">
-                    <StackPanel Orientation="Horizontal">
-                        <Path Stretch="Uniform"
-                              VerticalAlignment="Center"
-                              UseLayoutRounding="False"
-                              Width="30"
-                              Height="30"
-                              Fill="{DynamicResource DefaultForegroundBrush}"
-                              Data="{DynamicResource FontAwesome.ChartPieSolid}" />
-                        <Panel Height="30">
-                            <TextBlock VerticalAlignment="Center"
-                                       Margin="8 0 0 0">
-                                Portfolio
-                            </TextBlock>
-                        </Panel>
-                    </StackPanel>
-                </controls:MenuButton>
-
-                <controls:MenuButton
-                    Background="Transparent"
-                    Foreground="White"
-                    IsSelected="{Binding IsWalletsSectionActive}"
-                    Width="{DynamicResource WalletMenuItemWidth}"
-                    Command="{Binding SelectWallets}">
-                    <StackPanel Orientation="Horizontal">
-                        <Path Stretch="Uniform"
-                              VerticalAlignment="Center"
-                              UseLayoutRounding="False"
-                              Width="30"
-                              Height="30"
-                              Fill="{DynamicResource DefaultForegroundBrush}"
-                              Data="{DynamicResource Entypo.Wallet}" />
-                        <Panel Height="30">
-                            <TextBlock VerticalAlignment="Center"
-                                       Margin="8 0 0 0">
-                                Wallets
-                            </TextBlock>
-                        </Panel>
-                    </StackPanel>
-                </controls:MenuButton>
-                <controls:MenuButton
-                    Background="Transparent"
-                    Foreground="White"
-                    IsSelected="{Binding IsConversionSectionActive}"
-                    Width="{DynamicResource WalletMenuItemWidth}"
-                    Command="{Binding SelectConversion}">
-                    <StackPanel Orientation="Horizontal">
-                        <Path Stretch="Uniform"
-                              UseLayoutRounding="False"
-                              VerticalAlignment="Center"
-                              Width="30"
-                              Height="20"
-                              Fill="{DynamicResource DefaultForegroundBrush}"
-                              Data="{DynamicResource Unicons.ExchangeAlt}" />
-                        <Panel Height="30">
-                            <TextBlock VerticalAlignment="Center"
-                                       Margin="8 0 0 0">
-                                DEX
-                            </TextBlock>
-                        </Panel>
-                    </StackPanel>
-                </controls:MenuButton>
-
-                <controls:MenuButton
-                    Background="Transparent"
-                    Foreground="White"
-                    IsSelected="{Binding IsWertSectionActive}"
-                    Width="{DynamicResource WalletMenuItemWidth}"
-                    Command="{Binding SelectWert}">
-                    <StackPanel Orientation="Horizontal">
-                        <Viewbox Stretch="Fill"
-                                 Margin="0 -6 0 0"
-                                 HorizontalAlignment="Center"
-                                 VerticalAlignment="Center"
-                                 Width="30"
-                                 Height="30">
-                            <Panel>
-                                <Path Fill="{DynamicResource DefaultForegroundBrush}"
-                                      Data="{DynamicResource Card.First}" />
-                                <Path Fill="{DynamicResource DefaultForegroundBrush}"
-                                      Data="{DynamicResource Card.Second}" />
-                            </Panel>
-                        </Viewbox>
-                        <Panel Height="30">
-                            <TextBlock VerticalAlignment="Center"
-                                       Margin="8 0 0 0">
-                                Buy with card
-                            </TextBlock>
-                        </Panel>
-                    </StackPanel>
-                </controls:MenuButton>
-            </StackPanel>
-        </DockPanel>
-
-
-        <ContentControl Content="{Binding Content}" />
+      <StackPanel Orientation="Horizontal"
+                  VerticalAlignment="Center">
+        <TextBlock Text="Version:"
+                   Margin="8 0 4 0"
+                   FontSize="11"
+                   Foreground="{DynamicResource StatusBarVersionForeground}"/>
+        <TextBlock Text="{Binding InstalledVersion}"
+                   FontSize="11"
+                   Foreground="{DynamicResource StatusBarVersionForeground}"/>
+      </StackPanel>
     </DockPanel>
+
+    <!-- left menu -->
+    <DockPanel DockPanel.Dock="Left">
+
+      <!--<StackPanel Width="239" DockPanel.Dock="Bottom">
+        <controls:MenuButton
+            IsVisible="False"
+            IsSelected="{Binding IsSettingsSectionActive}"
+            HorizontalAlignment="Stretch"
+            Command="{Binding SelectSettings}">
+          <TextBlock VerticalAlignment="Center"
+                      Margin="32 16 0 16"
+                      Text="Settings"/>
+        </controls:MenuButton>
+      </StackPanel>-->
+
+      <StackPanel Width="239">
+        
+        <Image Source="/Resources/Images/menu_logo.png"
+               Stretch="None"
+               HorizontalAlignment="Left"
+               Margin="32 33 0 55"/>
+        
+        <controls:MenuButton
+            Background="Transparent"
+            Foreground="{DynamicResource LightDefault}"
+            IsSelected="{Binding IsPortfolioSectionActive}"
+            HorizontalAlignment="Stretch"
+            Command="{Binding SelectPortfolio}">
+          <TextBlock VerticalAlignment="Center"
+                     Margin="32 16 0 16"
+                     
+                     Text="Portfolio"/>
+        </controls:MenuButton>
+
+        <controls:MenuButton
+            IsSelected="{Binding IsWalletsSectionActive}"
+            HorizontalAlignment="Stretch"
+            Command="{Binding SelectWallets}">
+          <TextBlock VerticalAlignment="Center"
+                     Margin="32 16 0 16"
+                     Text="Wallets"/>
+        </controls:MenuButton>
+
+        <controls:MenuButton
+            IsSelected="{Binding IsConversionSectionActive}"
+            HorizontalAlignment="Stretch"
+            Command="{Binding SelectConversion}">
+          <TextBlock VerticalAlignment="Center"
+                     Margin="32 16 0 16"
+                     Text="DEX"/>
+        </controls:MenuButton>
+
+        <controls:MenuButton
+            IsSelected="{Binding IsWertSectionActive}"
+            HorizontalAlignment="Stretch"
+            Command="{Binding SelectWert}">
+          <TextBlock VerticalAlignment="Center"
+                     Margin="32 16 0 16"
+                     Text="Buy with card"/>
+        </controls:MenuButton>
+      </StackPanel>
+      
+      <Border Background="{DynamicResource LightDefaultOpacity6}"
+              DockPanel.Dock="Right"
+              Width="1"/>
+    </DockPanel>
+
+    <!-- content -->
+    <ContentControl Content="{Binding Content}"/>
+  </DockPanel>
 </UserControl>

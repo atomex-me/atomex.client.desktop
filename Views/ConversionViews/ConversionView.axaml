@@ -15,6 +15,7 @@
   <Design.DataContext>
     <vm:ConversionViewModel/>
   </Design.DataContext>
+
   <UserControl.Styles>
     <Style Selector="TextBlock.HeaderFieldTextBlockStyle">
       <Setter Property="Margin" Value="0 0 10 0"/>
@@ -41,7 +42,7 @@
     <converters:WidthToHorizontalCenterOffsetConverter x:Key="WidthToHorizontalCenterOffsetConverter"/>
   </UserControl.Resources>
 
-  <Grid Background="{DynamicResource ChildViewBackgroundBrush}">
+  <Grid>
     <Grid.RowDefinitions>
       <RowDefinition Height="Auto"/>
       <RowDefinition Height="Auto"/>

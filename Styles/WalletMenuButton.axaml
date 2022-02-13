@@ -9,15 +9,15 @@
 
 
     <Style Selector="controls|MenuButton">
-        <Setter Property="Background" Value="{DynamicResource HamburgerMenuBackgroundBrush}" />
-        <Setter Property="Foreground" Value="{DynamicResource HamburgerMenuItemForegroundBrush}" />
-        <Setter Property="FontFamily" Value="{DynamicResource HamburgerMenuItemFontFamily}" />
-        <Setter Property="FontSize" Value="14" />
-        <Setter Property="BorderThickness" Value="0" />
-        <Setter Property="HorizontalAlignment" Value="Left" />
-        <Setter Property="VerticalAlignment" Value="Center" />
-        <Setter Property="FontWeight" Value="Normal" />
-        <Setter Property="Padding" Value="8 6" />
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="Foreground" Value="{DynamicResource LightDefault}"/>
+        <Setter Property="FontFamily" Value="{DynamicResource DefaultFontStyle}"/>
+        <Setter Property="FontSize" Value="18"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="HorizontalAlignment" Value="Left"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="FontWeight" Value="Normal"/>
+        <Setter Property="Height" Value="56"/>
 
         <Setter Property="Template">
             <ControlTemplate>
@@ -35,23 +35,22 @@
     </Style>
 
     <Style Selector="controls|MenuButton">
-        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="Cursor" Value="Hand"/>
     </Style>
 
     <Style Selector="controls|MenuButton[IsSelected=true] /template/ ContentPresenter#PART_ContentPresenter">
-        <Setter Property="Background" Value="{DynamicResource HamburgerMenuItemSelectedBackground}" />
+        <Setter Property="Background" Value="{DynamicResource LightDefaultOpacity6}"/>
     </Style>
 
-    <Style
-        Selector="controls|MenuButton[IsSelected=true]:pointerover /template/ ContentPresenter#PART_ContentPresenter">
-        <Setter Property="Background" Value="{DynamicResource HamburgerMenuItemSelectedMouseOverBackground}" />
+    <Style Selector="controls|MenuButton[IsSelected=true]:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource LightDefaultOpacity20}"/>
     </Style>
 
     <Style Selector="controls|MenuButton:pointerover /template/ ContentPresenter#PART_ContentPresenter">
-        <Setter Property="Background" Value="{DynamicResource HamburgerMenuItemUnselectedMouseOverBackground}" />
+        <Setter Property="Background" Value="{DynamicResource LightDefaultOpacity20}"/>
     </Style>
 
     <Style Selector="controls|MenuButton:disabled /template/ ContentPresenter#PART_ContentPresenter">
-        <Setter Property="Background" Value="{DynamicResource HamburgerMenuItemDisabledBackground}" />
+        <Setter Property="Background" Value="{DynamicResource HamburgerMenuItemDisabledBackground}"/>
     </Style>
 </Styles>
