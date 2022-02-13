@@ -3,9 +3,11 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive;
 using System.Windows.Input;
+
 using Avalonia.Controls;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
+
 using Atomex.Common;
 using Atomex.Core;
 using Atomex.ViewModels;
@@ -132,10 +134,6 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             MyAddresses = new ObservableCollection<WalletAddressViewModel>(addresses);
             InitialMyAddresses = new ObservableCollection<WalletAddressViewModel>(addresses);
 
-            //if (selectedAddress != null)
-            //    SelectedAddress = MyAddresses
-            //        .FirstOrDefault(vm =>
-            //            vm.Address == selectedAddress && (selectedTokenId == null || vm.TokenId == selectedTokenId));
             SelectedAddress = selectedAddress != null
                 ? MyAddresses.FirstOrDefault(vm =>
                     vm.Address == selectedAddress && (selectedTokenId == null || vm.TokenId == selectedTokenId))
@@ -170,23 +168,18 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         }
 
         private ReactiveCommand<Unit, Unit> _backCommand;
-
         public ReactiveCommand<Unit, Unit> BackCommand => _backCommand ??=
             (_backCommand = ReactiveCommand.Create(() => { BackAction?.Invoke(); }));
 
         private ReactiveCommand<Unit, Unit> _changeSortTypeCommand;
-
         public ReactiveCommand<Unit, Unit> ChangeSortTypeCommand => _changeSortTypeCommand ??=
             (_changeSortTypeCommand = ReactiveCommand.Create(() => { SortByDate = !SortByDate; }));
 
         private ReactiveCommand<Unit, Unit> _changeSortDirectionCommand;
-
         public ReactiveCommand<Unit, Unit> ChangeSortDirectionCommand => _changeSortDirectionCommand ??=
             (_changeSortDirectionCommand = ReactiveCommand.Create(() => { SortIsAscending = !SortIsAscending; }));
 
-
         private ReactiveCommand<Unit, Unit> _confirmCommand;
-
         public ReactiveCommand<Unit, Unit> ConfirmCommand => _confirmCommand ??=
             (_confirmCommand = ReactiveCommand.Create(() =>
             {
@@ -201,7 +194,6 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             }));
 
         private ICommand _copyAddressCommand;
-
         public ICommand CopyAddressCommand =>
             _copyAddressCommand ??= (_copyAddressCommand = ReactiveCommand.Create((WalletAddress address) =>
             {

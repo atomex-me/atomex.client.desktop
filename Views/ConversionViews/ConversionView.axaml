@@ -85,14 +85,14 @@
           <StackPanel Orientation="Horizontal"
                       IsVisible="{Binding AmountValidationMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
             <TextBlock Text="{Binding AmountValidationMessage}"
-                        MaxWidth="471"
-                        TextWrapping="Wrap"
-                        VerticalAlignment="Center"
-                        FontSize="13"
-                        FontFamily="{DynamicResource DefaultLightFontFamily}"
-                        Classes="Message"
-                        Classes.Warning="{Binding IsAmountValidationWarning}"
-                        Classes.Error="{Binding IsAmountValidationError}"/>
+                       MaxWidth="471"
+                       TextWrapping="Wrap"
+                       VerticalAlignment="Center"
+                       FontSize="13"
+                       FontFamily="{DynamicResource DefaultLightFontFamily}"
+                       Classes="Message"
+                       Classes.Warning="{Binding IsAmountValidationWarning}"
+                       Classes.Error="{Binding IsAmountValidationError}"/>
             <Button Padding="3"
                     VerticalAlignment="Center"
                     VerticalContentAlignment="Center"

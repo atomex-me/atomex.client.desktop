@@ -5,11 +5,13 @@ using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+
 using Avalonia.Controls;
 using Avalonia.Threading;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using Serilog;
+
 using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.Properties;
 using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
@@ -18,14 +20,21 @@ using Atomex.MarketData.Abstract;
 
 namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 {
+    public enum SendStage
+    {
+        Edit,
+        Confirmation,
+        AdditionalConfirmation
+    }
+
     public abstract class SendViewModel : ViewModelBase
     {
-        protected readonly IAtomexApp App;
+        protected readonly IAtomexApp _app;
         protected CurrencyConfig Currency;
         public ViewModelBase SelectFromViewModel { get; set; }
         protected SelectAddressViewModel SelectToViewModel { get; set; }
 
-        [Reactive] public bool ConfirmStage { get; set; }
+        [Reactive] public SendStage Stage { get; set; }
         [Reactive] public CurrencyViewModel CurrencyViewModel { get; set; }
         [Reactive] public string From { get; set; }
         [Reactive] public decimal SelectedFromBalance { get; set; }
@@ -84,12 +93,25 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         }
 
         [Reactive] public bool UseDefaultFee { get; set; }
-
         [Reactive] public decimal AmountInBase { get; set; }
-
         [Reactive] public decimal FeeInBase { get; set; }
+        [Reactive] public string? Warning { get; set; }
+        [Reactive] public string? WarningToolTip { get; set; }
+        [Reactive] public MessageType WarningType { get; set; }
+        [Reactive] public decimal RecommendedMaxAmount { get; set; }
+        [Reactive] public string? RecommendedMaxAmountWarning { get; set; }
+        [Reactive] public string? RecommendedMaxAmountWarningToolTip { get; set; }
+        [Reactive] public MessageType RecommendedMaxAmountWarningType { get; set; }
+        public bool ShowAdditionalConfirmation { get; set; }
+        [Reactive] public bool UseRecommendedAmount { get; set; }
+        [Reactive] public bool UseEnteredAmount { get; set; }
+        [Reactive] public bool CanSend { get; set; }
+        public decimal AmountToSend => UseRecommendedAmount && (RecommendedMaxAmount < Amount)
+            ? RecommendedMaxAmount
+            : Amount;
 
-        [Reactive] public string Warning { get; set; }
+        [Reactive] public string SendRecommendedAmountMenu { get; set; }
+        [Reactive] public string SendEnteredAmountMenu { get; set; }
 
         public string CurrencyCode => CurrencyViewModel.CurrencyCode;
         public string FeeCurrencyCode => CurrencyViewModel.FeeCurrencyCode;
@@ -98,26 +120,26 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         protected string FeeCurrencyFormat => CurrencyViewModel.FeeCurrencyFormat;
         public string BaseCurrencyFormat => CurrencyViewModel.BaseCurrencyFormat;
 
-
         private ReactiveCommand<Unit, Unit> _backCommand;
-
         public ReactiveCommand<Unit, Unit> BackCommand => _backCommand ??= (_backCommand = ReactiveCommand.Create(() =>
         {
-            Desktop.App.DialogService.Close();
+            App.DialogService.Close();
         }));
 
         private ReactiveCommand<Unit, Unit> _undoConfirmStageCommand;
-
         public ReactiveCommand<Unit, Unit> UndoConfirmStageCommand => _undoConfirmStageCommand ??=
-            (_undoConfirmStageCommand = ReactiveCommand.Create(() => { ConfirmStage = false; }));
+            (_undoConfirmStageCommand = ReactiveCommand.Create(() =>
+            {
+                Stage = Stage == SendStage.AdditionalConfirmation
+                    ? SendStage.Confirmation
+                    : SendStage.Edit;
+            }));
 
         private ReactiveCommand<Unit, Unit> _selectFromCommand;
-
         public ReactiveCommand<Unit, Unit> SelectFromCommand => _selectFromCommand ??=
             (_selectFromCommand = ReactiveCommand.Create(FromClick));
 
         private ReactiveCommand<Unit, Unit> _selectToCommand;
-
         public ReactiveCommand<Unit, Unit> SelectToCommand => _selectToCommand ??=
             (_selectToCommand = ReactiveCommand.Create(ToClick));
 
@@ -126,7 +148,6 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         protected abstract void ToClick();
 
         private ReactiveCommand<Unit, Unit> _nextCommand;
-
         public ReactiveCommand<Unit, Unit> NextCommand =>
             _nextCommand ??= (_nextCommand = ReactiveCommand.CreateFromTask(OnNextCommand));
 
@@ -159,45 +180,53 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 Warning = Resources.SvAvailableFundsError;
             }
 
-            if (!string.IsNullOrEmpty(Warning)) return;
+            if (!string.IsNullOrEmpty(Warning))
+                return;
 
-            if (ConfirmStage)
+            if ((Stage == SendStage.Confirmation && !ShowAdditionalConfirmation) ||
+                 Stage == SendStage.AdditionalConfirmation)
             {
                 try
                 {
-                    Desktop.App.DialogService.Show(
+                    App.DialogService.Show(
                         MessageViewModel.Message(title: "Sending, please wait", withProgressBar: true));
 
                     var error = await Send();
-                    
+
                     if (error != null)
                     {
-                        Desktop.App.DialogService.Show(MessageViewModel.Error(
+                        App.DialogService.Show(MessageViewModel.Error(
                             text: error.Description,
-                            backAction: () => Desktop.App.DialogService.Show(this)));
-                    
+                            backAction: () => App.DialogService.Show(this)));
+
                         return;
                     }
-                    
-                    Desktop.App.DialogService.Show(MessageViewModel.Success(
+
+                    App.DialogService.Show(MessageViewModel.Success(
                         text: "Sending was successful",
-                        nextAction: () => { Desktop.App.DialogService.Close(); }));
+                        nextAction: () => { App.DialogService.Close(); }));
                 }
                 catch (Exception e)
                 {
-                    Desktop.App.DialogService.Show(MessageViewModel.Error(
-                        text: "An error has occurred while sending transaction.",
-                        backAction: () => Desktop.App.DialogService.Show(this)));
+                    App.DialogService.Show(MessageViewModel.Error(
+                        text: "An error has occurred while sending transaction",
+                        backAction: () => App.DialogService.Show(this)));
 
                     Log.Error(e, "Transaction send error.");
                 }
                 finally
                 {
-                    ConfirmStage = false;
+                    Stage = SendStage.Edit;
                 }
             }
-
-            ConfirmStage = true;
+            else if (Stage == SendStage.Confirmation && ShowAdditionalConfirmation)
+            {
+                Stage = SendStage.AdditionalConfirmation;
+            }
+            else
+            {
+                Stage = SendStage.Confirmation;
+            }
         }
 
         public SendViewModel()
@@ -212,7 +241,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             IAtomexApp app,
             CurrencyConfig currency)
         {
-            App = app ?? throw new ArgumentNullException(nameof(app));
+            _app = app ?? throw new ArgumentNullException(nameof(app));
             Currency = currency ?? throw new ArgumentNullException(nameof(currency));
 
             CurrencyViewModel = CurrencyViewModelCreator.CreateViewModel(currency);
@@ -225,36 +254,32 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     vm => vm.From,
                     vm => vm.To,
                     vm => vm.Amount,
-                    vm => vm.Fee
-                )
+                    vm => vm.Fee)
                 .Subscribe(_ => Warning = string.Empty);
 
             this.WhenAnyValue(
                     vm => vm.Amount,
                     vm => vm.Fee,
-                    (amount, fee) => Currency.IsToken ? amount : amount + fee
-                )
+                    (amount, fee) => Currency.IsToken ? amount : amount + fee)
                 .Select(totalAmount => totalAmount.ToString(CurrencyFormat, CultureInfo.InvariantCulture))
                 .ToPropertyEx(this, vm => vm.TotalAmountString);
 
             this.WhenAnyValue(
                     vm => vm.Amount,
-                    vm => vm.Fee
-                )
-                .Subscribe(_ => OnQuotesUpdatedEventHandler(App.QuotesProvider, EventArgs.Empty));
+                    vm => vm.Fee)
+                .Subscribe(_ => OnQuotesUpdatedEventHandler(_app.QuotesProvider, EventArgs.Empty));
 
             this.WhenAnyValue(
                     vm => vm.Amount,
                     vm => vm.From,
                     vm => vm.To,
-                    (amount, from, to) => from
-                )
+                    (amount, from, to) => from)
                 .WhereNotNull()
                 .Select(_ => Unit.Default)
                 .InvokeCommand(updateAmountCommand);
 
             this.WhenAnyValue(vm => vm.From)
-                .Select(GetShortenedAddress)
+                .Select(s => s.TruncateAddress())
                 .ToPropertyEx(this, vm => vm.FromBeautified);
 
             this.WhenAnyValue(vm => vm.Amount)
@@ -277,13 +302,75 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 .Select(_ => Unit.Default)
                 .InvokeCommand(updateAmountCommand);
 
+            var canSendObservable1 = this.WhenAnyValue(
+                vm => vm.Amount,
+                vm => vm.Warning,
+                vm => vm.WarningType,
+                vm => vm.RecommendedMaxAmountWarning,
+                vm => vm.RecommendedMaxAmountWarningType);
+
+            var canSendObservable2 = this.WhenAnyValue(
+                vm => vm.UseRecommendedAmount,
+                vm => vm.UseEnteredAmount,
+                vm => vm.Stage);
+
+            canSendObservable1.CombineLatest(canSendObservable2)
+                .Throttle(TimeSpan.FromMilliseconds(1))
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(_ =>
+                {
+                    if (Stage == SendStage.Edit)
+                    {
+                        CanSend = To != null &&
+                                  Amount > 0 &&
+                                  (string.IsNullOrEmpty(Warning) || (Warning != null && WarningType != MessageType.Error)) &&
+                                  (string.IsNullOrEmpty(RecommendedMaxAmountWarning) || (RecommendedMaxAmountWarning != null && RecommendedMaxAmountWarningType != MessageType.Error));
+                    }
+                    else if (Stage == SendStage.Confirmation)
+                    {
+                        CanSend = true;
+                    }
+                    else
+                    {
+                        CanSend = UseRecommendedAmount || UseEnteredAmount;
+                    }
+                });
+
+            this.WhenAnyValue(vm => vm.Stage)
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(s =>
+                {
+                    UseRecommendedAmount = false;
+                    UseEnteredAmount = false;
+                });
+
+            this.WhenAnyValue(vm => vm.RecommendedMaxAmount)
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(a =>
+                {
+                    SendRecommendedAmountMenu = string.Format(
+                        Resources.SendRecommendedAmountMenu,
+                        RecommendedMaxAmount,
+                        Currency.Name);
+                });
+
+            this.WhenAnyValue(vm => vm.Amount)
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(a =>
+                {
+                    SendEnteredAmountMenu = string.Format(
+                        Resources.SendEnteredAmountMenu,
+                        Amount,
+                        Currency.Name);
+                });
+
             SubscribeToServices();
         }
 
         private void SubscribeToServices()
         {
-            if (App.HasQuotesProvider)
-                App.QuotesProvider.QuotesUpdated += OnQuotesUpdatedEventHandler;
+            if (_app.HasQuotesProvider)
+                _app.QuotesProvider.QuotesUpdated += OnQuotesUpdatedEventHandler;
         }
 
         protected abstract Task UpdateAmount();
@@ -294,7 +381,6 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         }
 
         private ReactiveCommand<Unit, Unit> _maxCommand;
-
         public ReactiveCommand<Unit, Unit> MaxCommand =>
             _maxCommand ??= (_maxCommand = ReactiveCommand.CreateFromTask(async () =>
             {
@@ -312,17 +398,10 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             var quote = quotesProvider.GetQuote(CurrencyCode, BaseCurrencyCode);
 
             AmountInBase = Amount * (quote?.Bid ?? 0m);
-            FeeInBase = Fee * (quote?.Bid ?? 0m);
+            FeeInBase    = Fee * (quote?.Bid ?? 0m);
         }
 
         protected abstract Task<Error> Send(CancellationToken cancellationToken = default);
-
-        public static string GetShortenedAddress(string address)
-        {
-            if (string.IsNullOrEmpty(address)) return address;
-            const int length = 4;
-            return $"{address[..length]}···{address[^length..]}";
-        }
 
 #if DEBUG
         protected void DesignerMode()
@@ -331,13 +410,25 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 .Select(c => CurrencyViewModelCreator.CreateViewModel(c, subscribeToUpdates: false))
                 .ToList();
 
-            Currency = fromCurrencies[0].Currency;
+            Currency          = fromCurrencies[0].Currency;
             CurrencyViewModel = fromCurrencies[0];
-            To = "1BvBMSEYstWetqTFn5Au4m4GFg7xJaNVN2";
-            Amount = 0.00001234m;
-            AmountInBase = 10.23m;
-            Fee = 0.0001m;
-            FeeInBase = 8.43m;
+            To                = "1BvBMSEYstWetqTFn5Au4m4GFg7xJaNVN2";
+            Amount            = 0.00001234m;
+            AmountInBase      = 10.23m;
+            Fee               = 0.0001m;
+            FeeInBase         = 8.43m;
+
+            Warning        = "Insufficient funds";
+            WarningToolTip = "";
+            WarningType    = MessageType.Error;
+
+            RecommendedMaxAmountWarning        = "We recommend to send no more than 0.073 ETH";
+            RecommendedMaxAmountWarningToolTip = "You have tokens that require ETH. Sending this will not leave enough ETH to send or exchange your tokens. We recommend to send no more than 0.073 ETH";
+            RecommendedMaxAmountWarningType    = MessageType.Warning;
+
+            Stage = SendStage.Confirmation;
+            SendRecommendedAmountMenu = string.Format(Resources.SendRecommendedAmountMenu, 0.073, "ETH");
+            SendEnteredAmountMenu = string.Format(Resources.SendEnteredAmountMenu, 0.073, "ETH");
         }
 #endif
     }

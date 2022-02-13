@@ -394,11 +394,65 @@ namespace Atomex.Client.Desktop.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на We recommend to send no more than {0} {1}.
+        /// </summary>
+        internal static string MaxAmountToSendRecommendation {
+            get {
+                return ResourceManager.GetString("MaxAmountToSendRecommendation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на You have tokens that require {1}. Sending this will not leave enough {1} to send or exchange your tokens. We recommend to send no more than {0} {1}.
+        /// </summary>
+        internal static string MaxAmountToSendRecommendationDetails {
+            get {
+                return ResourceManager.GetString("MaxAmountToSendRecommendationDetails", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Maximum available amount to send is {0} {1}.
+        /// </summary>
+        internal static string MaxAmountToSendWithActiveSwaps {
+            get {
+                return ResourceManager.GetString("MaxAmountToSendWithActiveSwaps", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на You have swaps in process. Your app requires {1} to process them. Safe maximum amount to send is {0} {1}.
+        /// </summary>
+        internal static string MaxAmountToSendWithActiveSwapsDetails {
+            get {
+                return ResourceManager.GetString("MaxAmountToSendWithActiveSwapsDetails", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на No tokens.
         /// </summary>
         internal static string PwNoTokens {
             get {
                 return ResourceManager.GetString("PwNoTokens", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Send {0} {1} anyway.
+        /// </summary>
+        internal static string SendEnteredAmountMenu {
+            get {
+                return ResourceManager.GetString("SendEnteredAmountMenu", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Send recommended amount {0} {1}.
+        /// </summary>
+        internal static string SendRecommendedAmountMenu {
+            get {
+                return ResourceManager.GetString("SendRecommendedAmountMenu", resourceCulture);
             }
         }
         

@@ -31,13 +31,6 @@ using Atomex.Wallet.BitcoinBased;
 
 namespace Atomex.Client.Desktop.ViewModels
 {
-    public enum MessageType
-    {
-        Regular,
-        Warning,
-        Error
-    }
-
     public class ConversionViewModel : ViewModelBase
     {
         private readonly IAtomexApp _app;

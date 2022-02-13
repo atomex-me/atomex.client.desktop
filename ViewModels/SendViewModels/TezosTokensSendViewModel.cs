@@ -5,7 +5,13 @@ using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+
+using Avalonia.Media.Imaging;
+using Avalonia.Threading;
 using ReactiveUI;
+using ReactiveUI.Fody.Helpers;
+using Serilog;
+
 using Atomex.Blockchain.Tezos;
 using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.Properties;
@@ -13,12 +19,8 @@ using Atomex.Core;
 using Atomex.MarketData.Abstract;
 using Atomex.TezosTokens;
 using Atomex.ViewModels;
-using Atomex.Wallet.Tezos;
 using Atomex.Wallet.Abstract;
-using Avalonia.Media.Imaging;
-using Avalonia.Threading;
-using ReactiveUI.Fody.Helpers;
-using Serilog;
+using Atomex.Wallet.Tezos;
 
 namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 {
@@ -146,11 +148,11 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 .ToPropertyEx(this, vm => vm.AmountString);
 
             this.WhenAnyValue(vm => vm.From)
-                .Select(SendViewModel.GetShortenedAddress)
+                .Select(s => s.TruncateAddress())
                 .ToPropertyEx(this, vm => vm.FromBeautified);
 
             this.WhenAnyValue(vm => vm.TokenContract)
-                .Select(SendViewModel.GetShortenedAddress)
+                .Select(s => s.TruncateAddress())
                 .ToPropertyEx(this, vm => vm.TokenContractBeautified);
 
             this.WhenAnyValue(
@@ -242,10 +244,9 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         }
 
         private ReactiveCommand<Unit, Unit> _backCommand;
-
         public ReactiveCommand<Unit, Unit> BackCommand => _backCommand ??= (_backCommand = ReactiveCommand.Create(() =>
         {
-            Desktop.App.DialogService.Close();
+            App.DialogService.Close();
         }));
 
         private ReactiveCommand<Unit, Unit> _nextCommand;
@@ -255,17 +256,14 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         public ReactiveCommand<Unit, Unit> MaxCommand => _maxCommand ??= ReactiveCommand.Create(OnMaxClick);
 
         private ReactiveCommand<Unit, Unit> _undoConfirmStageCommand;
-
         public ReactiveCommand<Unit, Unit> UndoConfirmStageCommand => _undoConfirmStageCommand ??=
             (_undoConfirmStageCommand = ReactiveCommand.Create(() => { ConfirmStage = false; }));
 
         private ReactiveCommand<Unit, Unit> _selectFromCommand;
-
         public ReactiveCommand<Unit, Unit> SelectFromCommand => _selectFromCommand ??=
             (_selectFromCommand = ReactiveCommand.Create(FromClick));
 
         private ReactiveCommand<Unit, Unit> _selectToCommand;
-
         public ReactiveCommand<Unit, Unit> SelectToCommand => _selectToCommand ??=
             (_selectToCommand = ReactiveCommand.Create(ToClick));
 
@@ -298,7 +296,6 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 Warning = Resources.SvEmptyAddressError;
                 return;
             }
-
 
             if (!tezosConfig.IsValidAddress(To))
             {

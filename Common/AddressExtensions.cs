@@ -7,7 +7,7 @@
             if (string.IsNullOrEmpty(address))
                 return address;
 
-            return address[..4] + "···" + address[^5..];
+            return $"{address[..4]}···{address[^5..]}";
         }
     }
 }

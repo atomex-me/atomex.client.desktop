@@ -2,13 +2,14 @@ using System;
 using System.Globalization;
 using System.Linq;
 using System.Reactive.Linq;
-using Atomex.Client.Desktop.ViewModels.SendViewModels;
+
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 
+using Atomex.Client.Desktop.ViewModels.SendViewModels;
 
 namespace Atomex.Client.Desktop.Views.SendViews
 {
@@ -69,6 +70,13 @@ namespace Atomex.Client.Desktop.Views.SendViews
         private void InitializeComponent()
         {
             AvaloniaXamlLoader.Load(this);
+        }
+
+        private void HelpClickHandler(object sender, RoutedEventArgs e)
+        {
+            var source = e.Source as Button;
+
+            source?.SetValue(ToolTip.IsOpenProperty, true);
         }
     }
 }

@@ -37,7 +37,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         {
             try
             {
-                var account = App.Account
+                var account = _app.Account
                     .GetCurrencyAccount<Erc20Account>(Currency.Name);
 
                 var maxAmountEstimation = await account.EstimateMaxAmountToSendAsync(
@@ -58,11 +58,17 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 if (maxAmountEstimation.Error != null)
                 {
                     Warning = maxAmountEstimation.Error.Description;
+                    WarningToolTip = maxAmountEstimation.Error.Details;
+                    WarningType = MessageType.Error;
                     return;
                 }
 
                 if (Amount > maxAmountEstimation.Amount)
+                {
                     Warning = Resources.CvInsufficientFunds;
+                    WarningToolTip = "";
+                    WarningType = MessageType.Error;
+                }
             }
             catch (Exception e)
             {
@@ -76,7 +82,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             {
                 if (!UseDefaultFee)
                 {
-                    var account = App.Account
+                    var account = _app.Account
                         .GetCurrencyAccount<Erc20Account>(Currency.Name);
 
                     // estimate max amount with new GasPrice
@@ -90,11 +96,17 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     if (maxAmountEstimation.Error != null)
                     {
                         Warning = maxAmountEstimation.Error.Description;
+                        WarningToolTip = maxAmountEstimation.Error.Details;
+                        WarningType = MessageType.Error;
                         return;
                     }
 
                     if (Amount > maxAmountEstimation.Amount)
+                    {
                         Warning = Resources.CvInsufficientFunds;
+                        WarningToolTip = "";
+                        WarningType = MessageType.Error;
+                    }
                 }
             }
             catch (Exception e)
@@ -107,7 +119,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         {
             try
             {
-                var account = App.Account
+                var account = _app.Account
                     .GetCurrencyAccount<Erc20Account>(Currency.Name);
 
                 var maxAmountEstimation = await account
@@ -124,6 +136,8 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 if (maxAmountEstimation.Error != null)
                 {
                     Warning = maxAmountEstimation.Error.Description;
+                    WarningToolTip = maxAmountEstimation.Error.Details;
+                    WarningType = MessageType.Error;
                     Amount = 0;
                     return;
                 }
@@ -152,12 +166,12 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
         protected override Task<Error> Send(CancellationToken cancellationToken = default)
         {
-            var account = App.Account.GetCurrencyAccount<Erc20Account>(Currency.Name);
+            var account = _app.Account.GetCurrencyAccount<Erc20Account>(Currency.Name);
 
             return account.SendAsync(
                 from: From,
                 to: To,
-                amount: Amount,
+                amount: AmountToSend,
                 gasLimit: GasLimit,
                 gasPrice: GasPrice,
                 useDefaultFee: UseDefaultFee,

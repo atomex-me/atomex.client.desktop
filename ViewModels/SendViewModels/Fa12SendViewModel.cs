@@ -31,27 +31,27 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             CurrencyConfig currency)
             : base(app, currency)
         {
-            SelectFromViewModel = new SelectAddressViewModel(App.Account, Currency, true)
+            SelectFromViewModel = new SelectAddressViewModel(_app.Account, Currency, true)
             {
-                BackAction = () => { Desktop.App.DialogService.Show(this); },
+                BackAction = () => { App.DialogService.Show(this); },
                 ConfirmAction = walletAddressViewModel =>
                 {
                     From = walletAddressViewModel.Address;
                     SelectedFromBalance = walletAddressViewModel.AvailableBalance;
 
-                    Desktop.App.DialogService.Show(SelectToViewModel);
+                    App.DialogService.Show(SelectToViewModel);
                 }
             };
 
             SelectToViewModel = new SelectAddressViewModel(
-                App.Account,
-                App.Account.Currencies.Get<TezosConfig>(TezosConfig.Xtz))
+                _app.Account,
+                _app.Account.Currencies.Get<TezosConfig>(TezosConfig.Xtz))
             {
-                BackAction = () => { Desktop.App.DialogService.Show(SelectFromViewModel); },
+                BackAction = () => { App.DialogService.Show(SelectFromViewModel); },
                 ConfirmAction = walletAddressViewModel =>
                 {
                     To = walletAddressViewModel.Address;
-                    Desktop.App.DialogService.Show(this);
+                    App.DialogService.Show(this);
                 }
             };
         }
@@ -64,23 +64,23 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             {
                 From = walletAddressViewModel.Address;
                 SelectedFromBalance = walletAddressViewModel.AvailableBalance;
-                Desktop.App.DialogService.Show(this);
+                App.DialogService.Show(this);
             };
 
-            Desktop.App.DialogService.Show(selectFromViewModel);
+            App.DialogService.Show(selectFromViewModel);
         }
 
         protected override void ToClick()
         {
-            SelectToViewModel.BackAction = () => Desktop.App.DialogService.Show(this);
-            Desktop.App.DialogService.Show(SelectToViewModel);
+            SelectToViewModel.BackAction = () => App.DialogService.Show(this);
+            App.DialogService.Show(SelectToViewModel);
         }
 
         protected override async Task UpdateAmount()
         {
             try
             {
-                var account = App.Account
+                var account = _app.Account
                     .GetCurrencyAccount<Fa12Account>(Currency.Name);
 
                 var maxAmountEstimation = await account
@@ -95,17 +95,25 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 if (maxAmountEstimation.Error != null)
                 {
                     Warning = maxAmountEstimation.Error.Description;
+                    WarningToolTip = maxAmountEstimation.Error.Details;
+                    WarningType = MessageType.Error;
                     return;
                 }
 
                 if (Amount > maxAmountEstimation.Amount)
                 {
                     Warning = Resources.CvInsufficientFunds;
+                    WarningToolTip = "";
+                    WarningType = MessageType.Error;
                     return;
                 }
 
                 if (Fee < maxAmountEstimation.Fee)
+                {
                     Warning = Resources.CvLowFees;
+                    WarningToolTip = "";
+                    WarningType = MessageType.Error;
+                }
             }
             catch (Exception e)
             {
@@ -119,7 +127,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             {
                 if (!UseDefaultFee)
                 {
-                    var account = App.Account
+                    var account = _app.Account
                         .GetCurrencyAccount<Fa12Account>(Currency.Name);
 
                     var maxAmountEstimation = await account
@@ -131,17 +139,25 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     if (maxAmountEstimation.Error != null)
                     {
                         Warning = maxAmountEstimation.Error.Description;
+                        WarningToolTip = maxAmountEstimation.Error.Details;
+                        WarningType = MessageType.Error;
                         return;
                     }
 
                     if (Amount > maxAmountEstimation.Amount)
                     {
                         Warning = Resources.CvInsufficientFunds;
+                        WarningToolTip = "";
+                        WarningType = MessageType.Error;
                         return;
                     }
 
                     if (Fee < maxAmountEstimation.Fee)
+                    {
                         Warning = Resources.CvLowFees;
+                        WarningToolTip = "";
+                        WarningType = MessageType.Error;
+                    }
                 }
             }
             catch (Exception e)
@@ -154,7 +170,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         {
             try
             {
-                var account = App.Account
+                var account = _app.Account
                     .GetCurrencyAccount<Fa12Account>(Currency.Name);
 
                 var maxAmountEstimation = await account
@@ -169,6 +185,8 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 if (maxAmountEstimation.Error != null)
                 {
                     Warning = maxAmountEstimation.Error.Description;
+                    WarningToolTip = maxAmountEstimation.Error.Details;
+                    WarningType = MessageType.Error;
                     Amount = 0;
                     return;
                 }
@@ -178,7 +196,11 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     : 0;
 
                 if (Fee < maxAmountEstimation.Fee)
+                {
                     Warning = Resources.CvLowFees;
+                    WarningToolTip = "";
+                    WarningType = MessageType.Error;
+                }
             }
             catch (Exception e)
             {
@@ -206,17 +228,17 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             const string? tokenType = "FA12";
 
             var tokenAddress = await TezosTokensSendViewModel.GetTokenAddressAsync(
-                account: App.Account,
+                account: _app.Account,
                 address: From,
                 tokenContract: tokenContract,
                 tokenId: tokenId,
                 tokenType: tokenType);
 
-            var currencyName = App.Account.Currencies
+            var currencyName = _app.Account.Currencies
                 .FirstOrDefault(c => c is Fa12Config fa12 && fa12.TokenContractAddress == tokenContract)
                 ?.Name ?? "FA12";
 
-            var tokenAccount = App.Account.GetTezosTokenAccount<Fa12Account>(
+            var tokenAccount = _app.Account.GetTezosTokenAccount<Fa12Account>(
                 currency: currencyName,
                 tokenContract: tokenContract,
                 tokenId: tokenId);
@@ -224,7 +246,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             return await tokenAccount.SendAsync(
                 from: tokenAddress.Address,
                 to: To,
-                amount: Amount,
+                amount: AmountToSend,
                 fee: Fee,
                 useDefaultFee: UseDefaultFee,
                 cancellationToken: cancellationToken);

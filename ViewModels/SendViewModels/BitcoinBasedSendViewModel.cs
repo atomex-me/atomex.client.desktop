@@ -5,15 +5,16 @@ using System.Linq;
 using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Network = NBitcoin.Network;
 
 using Avalonia.Controls;
 using NBitcoin;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using Serilog;
-using Network = NBitcoin.Network;
 
 using Atomex.Blockchain.BitcoinBased;
+using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.Properties;
 using Atomex.Common;
 using Atomex.Core;
@@ -29,8 +30,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         public string FeeRateFormat => "0.#";
 
         private BitcoinBasedConfig Config => (BitcoinBasedConfig)Currency;
-
-        private BitcoinBasedAccount Account => App.Account.GetCurrencyAccount<BitcoinBasedAccount>(Currency.Name);
+        private BitcoinBasedAccount Account => _app.Account.GetCurrencyAccount<BitcoinBasedAccount>(Currency.Name);
 
         public BitcoinBasedSendViewModel()
             : base()
@@ -50,7 +50,9 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 .WhereNotNull()
                 .Select(outputs => outputs.Count != 1
                     ? $"{outputs.Count} outputs"
-                    : GetShortenedAddress(outputs.ElementAt(0).DestinationAddress(Config.Network)))
+                    : outputs.ElementAt(0)
+                        .DestinationAddress(Config.Network)
+                        .TruncateAddress())
                 .ToPropertyEx(this, vm => vm.FromBeautified);
 
             this.WhenAnyValue(vm => vm.Outputs)
@@ -59,7 +61,9 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 {
                     From = outputs.Count != 1
                         ? $"{outputs.Count} outputs"
-                        : GetShortenedAddress(outputs.ElementAt(0).DestinationAddress(Config.Network));
+                        : outputs.ElementAt(0)
+                            .DestinationAddress(Config.Network)
+                            .TruncateAddress();
 
                     var totalOutputsSatoshi = outputs
                         .Aggregate((long)0, (sum, output) => sum + output.Value);
@@ -68,7 +72,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 });
 
             this.WhenAnyValue(vm => vm.FeeRate)
-                .Subscribe(_ => OnQuotesUpdatedEventHandler(App.QuotesProvider, EventArgs.Empty));
+                .Subscribe(_ => OnQuotesUpdatedEventHandler(_app.QuotesProvider, EventArgs.Empty));
 
             var outputs = Account.GetAvailableOutputsAsync()
                 .WaitForResult()
@@ -84,22 +88,22 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     IsSelected = true
                 }), Config, Account)
             {
-                BackAction = () => { Desktop.App.DialogService.Show(this); },
+                BackAction = () => { App.DialogService.Show(this); },
                 ConfirmAction = ots =>
                 {
                     Outputs = new ObservableCollection<BitcoinBasedTxOutput>(ots);
-                    Desktop.App.DialogService.Show(SelectToViewModel);
+                    App.DialogService.Show(SelectToViewModel);
                 },
                 Config = Config,
             };
 
-            SelectToViewModel = new SelectAddressViewModel(App.Account, Currency)
+            SelectToViewModel = new SelectAddressViewModel(_app.Account, Currency)
             {
-                BackAction = () => { Desktop.App.DialogService.Show(SelectFromViewModel); },
+                BackAction = () => { App.DialogService.Show(SelectFromViewModel); },
                 ConfirmAction = walletAddressViewModel =>
                 {
                     To = walletAddressViewModel.Address;
-                    Desktop.App.DialogService.Show(this);
+                    App.DialogService.Show(this);
                 }
             };
         }
@@ -117,23 +121,23 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
             SelectFromViewModel = new SelectOutputsViewModel(outputs, Config, Account)
             {
-                BackAction = () => { Desktop.App.DialogService.Show(this); },
+                BackAction = () => { App.DialogService.Show(this); },
                 ConfirmAction = ots =>
                 {
                     Outputs = new ObservableCollection<BitcoinBasedTxOutput>(ots);
-                    Desktop.App.DialogService.Show(this);
+                    App.DialogService.Show(this);
                 },
                 Config = Config,
             };
 
-            Desktop.App.DialogService.Show(SelectFromViewModel);
+            App.DialogService.Show(SelectFromViewModel);
         }
 
         protected override void ToClick()
         {
             SelectToViewModel.BackAction = () => Desktop.App.DialogService.Show(this);
 
-            Desktop.App.DialogService.Show(SelectToViewModel);
+            App.DialogService.Show(SelectToViewModel);
         }
 
         protected override async Task UpdateAmount()
@@ -155,6 +159,8 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     if (transactionParams == null)
                     {
                         Warning = Resources.CvInsufficientFunds;
+                        WarningToolTip = "";
+                        WarningType = MessageType.Error;
                         return;
                     }
 
@@ -173,6 +179,8 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     if (transactionParams == null)
                     {
                         Warning = Resources.CvInsufficientFunds;
+                        WarningToolTip = "";
+                        WarningType = MessageType.Error;
                         return;
                     }
 
@@ -180,7 +188,11 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     var minimumFee = Config.SatoshiToCoin(minimumFeeInSatoshi);
 
                     if (Fee < minimumFee)
+                    {
                         Warning = Resources.CvLowFees;
+                        WarningToolTip = "";
+                        WarningType = MessageType.Error;
+                    }
 
                     FeeRate = transactionParams.FeeRate;
                 }
@@ -205,6 +217,8 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 if (transactionParams == null)
                 {
                     Warning = Resources.CvInsufficientFunds;
+                    WarningToolTip = "";
+                    WarningType = MessageType.Error;
                     return;
                 }
 
@@ -212,7 +226,11 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 var minimumFee = Config.SatoshiToCoin(minimumFeeInSatoshi);
 
                 if (Fee < minimumFee)
+                {
                     Warning = Resources.CvLowFees;
+                    WarningToolTip = "";
+                    WarningType = MessageType.Error;
+                }
 
                 FeeRate = transactionParams.FeeRate;
             }
@@ -231,6 +249,8 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     if (Outputs.Count == 0)
                     {
                         Warning = Resources.CvInsufficientFunds;
+                        WarningToolTip = "";
+                        WarningType = MessageType.Error;
                         Amount = 0;
                         return;
                     }
@@ -268,6 +288,8 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     if (transactionParams == null)
                     {
                         Warning = Resources.CvInsufficientFunds;
+                        WarningToolTip = "";
+                        WarningType = MessageType.Error;
                         Amount = 0;
                         return;
                     }
@@ -282,7 +304,11 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                         var minimumFee = Config.SatoshiToCoin(minimumFeeInSatoshi);
 
                         if (Fee < minimumFee)
+                        {
                             Warning = Resources.CvLowFees;
+                            WarningToolTip = "";
+                            WarningType = MessageType.Error;
+                        }
                     }
 
                     FeeRate = transactionParams.FeeRate;
@@ -299,7 +325,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             return Account.SendAsync(
                 from: Outputs,
                 to: To,
-                amount: Amount,
+                amount: AmountToSend,
                 fee: Fee,
                 dustUsagePolicy: DustUsagePolicy.AddToFee,
                 cancellationToken: cancellationToken);

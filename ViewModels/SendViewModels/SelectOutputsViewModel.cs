@@ -7,17 +7,18 @@ using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
-using Atomex.Blockchain.BitcoinBased;
-using Atomex.Client.Desktop.Common;
-using Atomex.Common;
-using Atomex.Core;
-using Atomex.Wallet.BitcoinBased;
+
 using Avalonia.Controls;
 using NBitcoin;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using Network = NBitcoin.Network;
 
+using Atomex.Blockchain.BitcoinBased;
+using Atomex.Client.Desktop.Common;
+using Atomex.Common;
+using Atomex.Core;
+using Atomex.Wallet.BitcoinBased;
 
 namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 {
@@ -195,7 +196,6 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         private bool _checkedFromList;
 
         private ReactiveCommand<Unit, Unit> _outputCheckCommand;
-
         public ReactiveCommand<Unit, Unit> OutputCheckCommand => _outputCheckCommand ??=
             (_outputCheckCommand = ReactiveCommand.Create(() =>
             {
@@ -208,32 +208,26 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             }));
 
         private ReactiveCommand<Unit, Unit> _selectAllCommand;
-
         public ReactiveCommand<Unit, Unit> SelectAllCommand => _selectAllCommand ??=
             (_selectAllCommand = ReactiveCommand.Create(() => { _checkedFromList = false; }));
 
         private ReactiveCommand<Unit, Unit> _closeCommand;
-
         public ReactiveCommand<Unit, Unit> CloseCommand => _closeCommand ??=
-            (_closeCommand = ReactiveCommand.Create(() => { Desktop.App.DialogService.Close(); }));
+            (_closeCommand = ReactiveCommand.Create(() => { App.DialogService.Close(); }));
 
         private ReactiveCommand<Unit, Unit> _backCommand;
-
         public ReactiveCommand<Unit, Unit> BackCommand => _backCommand ??=
             (_backCommand = ReactiveCommand.Create(() => { BackAction?.Invoke(); }));
 
         private ReactiveCommand<Unit, Unit> _changeSortTypeCommand;
-
         public ReactiveCommand<Unit, Unit> ChangeSortTypeCommand => _changeSortTypeCommand ??=
             (_changeSortTypeCommand = ReactiveCommand.Create(() => { SortByDate = !SortByDate; }));
 
         private ReactiveCommand<Unit, Unit> _changeSortDirectionCommand;
-
         public ReactiveCommand<Unit, Unit> ChangeSortDirectionCommand => _changeSortDirectionCommand ??=
             (_changeSortDirectionCommand = ReactiveCommand.Create(() => { SortIsAscending = !SortIsAscending; }));
 
         private ReactiveCommand<Unit, Unit> _confirmCommand;
-
         public ReactiveCommand<Unit, Unit> ConfirmCommand => _confirmCommand ??=
             (_confirmCommand =
                 ReactiveCommand.Create(() =>
@@ -246,11 +240,10 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
 
         private ICommand _copyAddressCommand;
-
         public ICommand CopyAddressCommand =>
             _copyAddressCommand ??= (_copyAddressCommand = ReactiveCommand.Create((OutputViewModel output) =>
             {
-                _ = Desktop.App.Clipboard.SetTextAsync(output.Address);
+                _ = App.Clipboard.SetTextAsync(output.Address);
 
                 Outputs.ForEachDo(o => o.CopyButtonToolTip = OutputViewModel.DefaultCopyButtonToolTip);
                 Outputs.First(o => o.Id == output.Id).CopyButtonToolTip =
