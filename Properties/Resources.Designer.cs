@@ -547,6 +547,15 @@ namespace Atomex.Client.Desktop.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Insufficient {0} to cover token transfer fee. Minimum {1} is required.
+        /// </summary>
+        internal static string SvInsufficientChainFundsWithDetails {
+            get {
+                return ResourceManager.GetString("SvInsufficientChainFundsWithDetails", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Insufficient funds for default fee..
         /// </summary>
         internal static string SvInsufficientFundsForDefaultFeeError {
@@ -561,6 +570,24 @@ namespace Atomex.Client.Desktop.Properties {
         internal static string SvInvalidAddressError {
             get {
                 return ResourceManager.GetString("SvInvalidAddressError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Invalid &apos;From&apos; address.
+        /// </summary>
+        internal static string SvInvalidFromAddress {
+            get {
+                return ResourceManager.GetString("SvInvalidFromAddress", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Invalid token contract address.
+        /// </summary>
+        internal static string SvInvalidTokenContract {
+            get {
+                return ResourceManager.GetString("SvInvalidTokenContract", resourceCulture);
             }
         }
         

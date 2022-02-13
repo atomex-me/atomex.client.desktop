@@ -326,4 +326,13 @@ NOTE: Do not sign out or close the application until the swap is completed, othe
   <data name="SendRecommendedAmountMenu" xml:space="preserve">
     <value>Send recommended amount {0} {1}</value>
   </data>
+  <data name="SvInsufficientChainFundsWithDetails" xml:space="preserve">
+    <value>Insufficient {0} to cover token transfer fee. Minimum {1} is required</value>
+  </data>
+  <data name="SvInvalidFromAddress" xml:space="preserve">
+    <value>Invalid 'From' address</value>
+  </data>
+  <data name="SvInvalidTokenContract" xml:space="preserve">
+    <value>Invalid token contract address</value>
+  </data>
 </root>

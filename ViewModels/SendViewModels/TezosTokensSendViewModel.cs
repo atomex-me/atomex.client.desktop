@@ -45,7 +45,6 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         [Reactive] public string CurrencyFormat { get; set; }
         private string FeeCurrencyFormat { get; set; }
         [Reactive] public string BaseCurrencyFormat { get; set; }
-
         [Reactive] private decimal Amount { get; set; }
         [ObservableAsProperty] public string AmountString { get; }
 
@@ -102,8 +101,11 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         [Reactive] public string CurrencyCode { get; set; }
         [Reactive] public string FeeCurrencyCode { get; set; }
         public string BaseCurrencyCode { get; set; }
-        [Reactive] public string Warning { get; set; }
+        [Reactive] public string? Warning { get; set; }
+        [Reactive] public string? WarningToolTip { get; set; }
+        [Reactive] public MessageType WarningType { get; set; }
         [Reactive] public bool ConfirmStage { get; set; }
+        [Reactive] public bool CanSend { get; set; }
 
         public SelectAddressViewModel SelectFromViewModel { get; set; }
         public SelectAddressViewModel SelectToViewModel { get; set; }
@@ -139,8 +141,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             this.WhenAnyValue(
                     vm => vm.From,
                     vm => vm.Amount,
-                    vm => vm.Fee
-                )
+                    vm => vm.Fee)
                 .Subscribe(_ => Warning = string.Empty);
 
             this.WhenAnyValue(vm => vm.Amount)
@@ -157,8 +158,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
             this.WhenAnyValue(
                     vm => vm.From,
-                    vm => vm.TokenId
-                )
+                    vm => vm.TokenId)
                 .Select(_ => Unit.Default)
                 .InvokeCommand(updateCurrencyCodeCommand);
 
@@ -166,8 +166,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     vm => vm.Amount,
                     vm => vm.From,
                     vm => vm.To,
-                    vm => vm.TokenId
-                )
+                    vm => vm.TokenId)
                 .Select(_ => Unit.Default)
                 .InvokeCommand(updateAmountCommand);
 
@@ -175,20 +174,40 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     vm => vm.Fee,
                     vm => vm.From,
                     vm => vm.TokenId,
-                    vm => vm.UseDefaultFee
-                )
+                    vm => vm.UseDefaultFee)
                 .Select(_ => Unit.Default)
                 .InvokeCommand(updateFeeCommand);
 
             this.WhenAnyValue(
                     vm => vm.Amount,
-                    vm => vm.Fee
-                )
+                    vm => vm.Fee)
                 .Subscribe(_ => OnQuotesUpdatedEventHandler(_app.QuotesProvider, EventArgs.Empty));
 
             this.WhenAnyValue(vm => vm.Fee)
                 .Select(fee => fee.ToString(FeeCurrencyFormat, CultureInfo.InvariantCulture))
                 .ToPropertyEx(this, vm => vm.FeeString);
+
+            this.WhenAnyValue(
+                    vm => vm.Amount,
+                    vm => vm.Warning,
+                    vm => vm.WarningType,
+                    vm => vm.ConfirmStage)
+                .Throttle(TimeSpan.FromMilliseconds(1))
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(_ =>
+                {
+                    if (!ConfirmStage)
+                    {
+                        CanSend = To != null &&
+                                  Amount > 0 &&
+                                  (string.IsNullOrEmpty(Warning) || (Warning != null && WarningType != MessageType.Error));
+                    }
+                    else
+                    {
+                        CanSend = true;
+                    }
+                });
+
 
 
             CurrencyCode = string.Empty;
@@ -300,30 +319,35 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             if (!tezosConfig.IsValidAddress(To))
             {
                 Warning = Resources.SvInvalidAddressError;
+                WarningType = MessageType.Error;
                 return;
             }
 
             if (Amount <= 0)
             {
                 Warning = Resources.SvAmountLessThanZeroError;
+                WarningType = MessageType.Error;
                 return;
             }
 
             if (Fee <= 0)
             {
                 Warning = Resources.SvCommissionLessThanZeroError;
+                WarningType = MessageType.Error;
                 return;
             }
 
             if (TokenContract == null || From == null)
             {
                 Warning = "Invalid 'From' address or token contract address!";
+                WarningType = MessageType.Error;
                 return;
             }
 
             if (!tezosConfig.IsValidAddress(TokenContract))
             {
                 Warning = "Invalid token contract address!";
+                WarningType = MessageType.Error;
                 return;
             }
 
@@ -342,8 +366,8 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
             if (Amount > fromTokenAddress.Balance)
             {
-                Warning =
-                    $"Insufficient token funds on address {fromTokenAddress.Address}! Please use Max button to find out how many tokens you can send!";
+                Warning = $"Insufficient token funds on address {fromTokenAddress.Address}! " +
+                    $"Please use Max button to find out how many tokens you can send!";
                 return;
             }
 
@@ -409,35 +433,41 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     .Currencies
                     .Get<TezosConfig>(TezosConfig.Xtz);
 
-                if (TokenContract == null || From == null)
+                if (From == null)
                 {
-                    Warning = "Invalid 'From' address or token contract address!";
-                    return;
+                    Warning        = Resources.SvInvalidFromAddress;
+                    WarningToolTip = "";
+                    WarningType    = MessageType.Error;
                 }
 
-                if (!tezosConfig.IsValidAddress(TokenContract))
+                if (TokenContract == null || !tezosConfig.IsValidAddress(TokenContract))
                 {
-                    Warning = "Invalid token contract address!";
+                    Warning        = Resources.SvInvalidTokenContract;
+                    WarningToolTip = "";
+                    WarningType    = MessageType.Error;
                     return;
                 }
 
                 var fromTokenAddress = await GetTokenAddressAsync(
                     account: _app.Account,
-                    address: From,
+                    address: From!,
                     tokenContract: TokenContract,
                     tokenId: TokenId,
                     tokenType: _tokenType);
 
                 if (fromTokenAddress == null)
                 {
-                    Warning = $"Insufficient token funds on address {From}! Please update your balance!";
+                    Warning        = Resources.CvInsufficientFunds;
+                    WarningToolTip = "";
+                    WarningType    = MessageType.Error;
                     return;
                 }
 
                 if (Amount > fromTokenAddress.Balance)
                 {
-                    Warning =
-                        $"Insufficient token funds on address {fromTokenAddress.Address}! Please use Max button to find out how many tokens you can send!";
+                    Warning        = Resources.CvInsufficientFunds;
+                    WarningToolTip = Resources.CvBigAmount;
+                    WarningType    = MessageType.Error;
                 }
             }
             catch (Exception e)
@@ -454,15 +484,18 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     .Currencies
                     .Get<TezosConfig>(TezosConfig.Xtz);
 
-                if (TokenContract == null || From == null)
+                if (From == null)
                 {
-                    Warning = "Invalid 'From' address or token contract address!";
-                    return;
+                    Warning        = Resources.SvInvalidFromAddress;
+                    WarningToolTip = "";
+                    WarningType    = MessageType.Error;
                 }
 
-                if (!tezosConfig.IsValidAddress(TokenContract))
+                if (TokenContract == null || !tezosConfig.IsValidAddress(TokenContract))
                 {
-                    Warning = "Invalid token contract address!";
+                    Warning        = Resources.SvInvalidTokenContract;
+                    WarningToolTip = "";
+                    WarningType    = MessageType.Error;
                     return;
                 }
 
@@ -470,14 +503,16 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 {
                     var fromTokenAddress = await GetTokenAddressAsync(
                         account: _app.Account,
-                        address: From,
+                        address: From!,
                         tokenContract: TokenContract,
                         tokenId: TokenId,
                         tokenType: _tokenType);
 
                     if (fromTokenAddress == null)
                     {
-                        Warning = $"Insufficient token funds on address {From}! Please update your balance!";
+                        Warning        = Resources.CvInsufficientFunds;
+                        WarningToolTip = "";
+                        WarningType    = MessageType.Error;
                         return;
                     }
 
@@ -489,7 +524,9 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
                     if (!isEnougth)
                     {
-                        Warning = $"Insufficient funds for fee. Minimum {estimatedFee} XTZ is required!";
+                        Warning        = string.Format(Resources.SvInsufficientChainFundsWithDetails, "XTZ", estimatedFee);
+                        WarningToolTip = "";
+                        WarningType    = MessageType.Error;
                         return;
                     }
 
@@ -502,7 +539,9 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
                     if (xtzAddress == null)
                     {
-                        Warning = $"Insufficient funds for fee. Please update your balance for address {From}!";
+                        Warning        = string.Format(Resources.CvInsufficientChainFunds, "XTZ");
+                        WarningToolTip = "";
+                        WarningType    = MessageType.Error;
                         return;
                     }
 
@@ -510,7 +549,10 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
                     if (xtzAddress.AvailableBalance() < Fee)
                     {
-                        Warning = "Insufficient funds for fee!";
+                        Warning        = string.Format(Resources.CvInsufficientChainFunds, "XTZ");
+                        WarningToolTip = "";
+                        WarningType    = MessageType.Error;
+                        return;
                     }
                 }
             }
@@ -528,16 +570,18 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     .Currencies
                     .Get<TezosConfig>(TezosConfig.Xtz);
 
-                if (TokenContract == null || From == null)
+                if (From == null)
                 {
                     Amount = 0;
                     return;
                 }
 
-                if (!tezosConfig.IsValidAddress(TokenContract))
+                if (TokenContract == null || !tezosConfig.IsValidAddress(TokenContract))
                 {
-                    Amount = 0;
-                    Warning = "Invalid token contract address!";
+                    Warning        = Resources.SvInvalidTokenContract;
+                    WarningToolTip = "";
+                    WarningType    = MessageType.Error;
+                    Amount         = 0;
                     return;
                 }
 
@@ -550,8 +594,10 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
                 if (fromTokenAddress == null)
                 {
-                    Amount = 0;
-                    Warning = $"Insufficient token funds on address {From}! Please update your balance!";
+                    Warning        = Resources.CvInsufficientFunds;
+                    WarningToolTip = "";
+                    WarningType    = MessageType.Error;
+                    Amount         = 0;
                     return;
                 }
 
@@ -676,8 +722,10 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             }
         }
 
+#if DEBUG
         private void DesignerMode()
         {
         }
+#endif
     }
 }
