@@ -878,10 +878,10 @@ namespace Atomex.Client.Desktop.ViewModels
                         .WhereNotNull()
                         .ToList()
                         .SortList((s1, s2) =>
-                            s2.Time.ToUniversalTime().CompareTo(s1.Time.ToUniversalTime()));
+                            s2!.Time.ToUniversalTime().CompareTo(s1!.Time.ToUniversalTime()));
 
                     var previousSwapsCount = Swaps?.Count;
-                    Swaps = new ObservableCollection<SwapViewModel>(swapViewModels);
+                    Swaps = new ObservableCollection<SwapViewModel>(swapViewModels!);
 
                     if (previousSwapsCount < swapViewModels?.Count)
                         DGSelectedIndex = 0;
