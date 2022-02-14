@@ -847,7 +847,7 @@ namespace Atomex.Client.Desktop.ViewModels
                     if (_amountType == AmountType.Sold) {
                         ToViewModel.AmountString = swapPriceEstimation.ToAmount.ToString(ToViewModel.CurrencyFormat, CultureInfo.CurrentCulture);
                     } else {
-                        FromViewModel.AmountString = swapPriceEstimation.FromAmount.ToString(ToViewModel.CurrencyFormat, CultureInfo.CurrentCulture);
+                        FromViewModel.AmountString = swapPriceEstimation.FromAmount.ToString(FromViewModel.CurrencyFormat, CultureInfo.CurrentCulture);
                     }
 
                     EstimatedPrice         = swapPriceEstimation.Price;
