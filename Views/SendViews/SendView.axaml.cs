@@ -29,15 +29,26 @@ namespace Atomex.Client.Desktop.Views.SendViews
 
                 if (amountStringTextBox.SelectionStart != amountStringTextBox.SelectionEnd)
                 {
-                    sendViewModel.SetAmountFromString(0m.ToString(CultureInfo.InvariantCulture));
+                    sendViewModel.SetAmountFromString(0.ToString(CultureInfo.CurrentCulture));
                     args.Handled = true;
                     return;
                 }
 
                 var dotSymbol = sendViewModel.AmountString.FirstOrDefault(c => !char.IsDigit(c));
                 var dotIndex = sendViewModel.AmountString.IndexOf(dotSymbol);
-                if (dotIndex != amountStringTextBox.CaretIndex - 1) return;
-                amountStringTextBox.CaretIndex -= 1;
+                switch (args.Key)
+                {
+                    case Key.Back when dotIndex != amountStringTextBox.CaretIndex - 1:
+                        return;
+                    case Key.Back:
+                        amountStringTextBox.CaretIndex -= 1;
+                        break;
+                    case Key.Delete when dotIndex != amountStringTextBox.CaretIndex:
+                        return;
+                    case Key.Delete:
+                        amountStringTextBox.CaretIndex += 1;
+                        break;
+                }
             }, RoutingStrategies.Tunnel);
 
             feeStringTextBox.AddHandler(KeyDownEvent, (_, args) =>
@@ -47,15 +58,27 @@ namespace Atomex.Client.Desktop.Views.SendViews
 
                 if (feeStringTextBox.SelectionStart != feeStringTextBox.SelectionEnd)
                 {
-                    sendViewModel.SetFeeFromString(0m.ToString(CultureInfo.InvariantCulture));
+                    sendViewModel.SetFeeFromString(0.ToString(CultureInfo.CurrentCulture));
                     args.Handled = true;
                     return;
                 }
 
                 var dotSymbol = sendViewModel.FeeString.FirstOrDefault(c => !char.IsDigit(c));
                 var dotIndex = sendViewModel.FeeString.IndexOf(dotSymbol);
-                if (dotIndex != feeStringTextBox.CaretIndex - 1) return;
-                feeStringTextBox.CaretIndex -= 1;
+                
+                switch (args.Key)
+                {
+                    case Key.Back when dotIndex != amountStringTextBox.CaretIndex - 1:
+                        return;
+                    case Key.Back:
+                        amountStringTextBox.CaretIndex -= 1;
+                        break;
+                    case Key.Delete when dotIndex != amountStringTextBox.CaretIndex:
+                        return;
+                    case Key.Delete:
+                        amountStringTextBox.CaretIndex += 1;
+                        break;
+                }
             }, RoutingStrategies.Tunnel);
 
             amountStringTextBox.GetObservable(TextBox.TextProperty)

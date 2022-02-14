@@ -74,7 +74,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 .Subscribe(_ => Warning = string.Empty);
 
             this.WhenAnyValue(vm => vm.GasPrice)
-                .Select(gasPrice => gasPrice.ToString(CultureInfo.InvariantCulture))
+                .Select(gasPrice => gasPrice.ToString(CultureInfo.CurrentCulture))
                 .ToPropertyEx(this, vm => vm.GasPriceString);
 
             this.WhenAnyValue(vm => vm.GasPrice)
@@ -91,14 +91,14 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 .Subscribe(_ => TotalFee = FeeAmount);
 
             this.WhenAnyValue(vm => vm.TotalFee)
-                .Select(totalFee => totalFee.ToString(TotalFeeCurrencyFormat, CultureInfo.InvariantCulture))
+                .Select(totalFee => totalFee.ToString(TotalFeeCurrencyFormat, CultureInfo.CurrentCulture))
                 .ToPropertyEx(this, vm => vm.TotalFeeString);
 
             this.WhenAnyValue(
                     vm => vm.Amount,
                     vm => vm.TotalFee,
                     (amount, fee) => Currency.IsToken ? amount : amount + fee)
-                .Select(totalAmount => totalAmount.ToString(CurrencyFormat, CultureInfo.InvariantCulture))
+                .Select(totalAmount => totalAmount.ToString(CurrencyFormat, CultureInfo.CurrentCulture))
                 .ToPropertyEx(this, vm => vm.TotalAmountString);
 
             CheckAmountCommand = ReactiveCommand.Create<MaxAmountEstimation, MaxAmountEstimation>(estimation => estimation);

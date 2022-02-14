@@ -52,7 +52,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             var parsed = decimal.TryParse(
                 value,
                 NumberStyles.AllowDecimalPoint,
-                CultureInfo.InvariantCulture,
+                CultureInfo.CurrentCulture,
                 out var amount);
 
             if (!parsed)
@@ -78,7 +78,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             var parsed = decimal.TryParse(
                 value,
                 NumberStyles.AllowDecimalPoint,
-                CultureInfo.InvariantCulture,
+                CultureInfo.CurrentCulture,
                 out var fee);
 
             if (!parsed)
@@ -261,7 +261,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     vm => vm.Amount,
                     vm => vm.Fee,
                     (amount, fee) => Currency.IsToken ? amount : amount + fee)
-                .Select(totalAmount => totalAmount.ToString(CurrencyFormat, CultureInfo.InvariantCulture))
+                .Select(totalAmount => totalAmount.ToString(CurrencyFormat, CultureInfo.CurrentCulture))
                 .ToPropertyEx(this, vm => vm.TotalAmountString);
 
             this.WhenAnyValue(
@@ -285,7 +285,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             this.WhenAnyValue(vm => vm.Amount)
                 .Select(amount => amount
                     .TruncateDecimal(Currency.Digits < 9 ? Currency.Digits : 9)
-                    .ToString(CurrencyFormat, CultureInfo.InvariantCulture))
+                    .ToString(CurrencyFormat, CultureInfo.CurrentCulture))
                 .ToPropertyEx(this, vm => vm.AmountString);
 
             this.WhenAnyValue(vm => vm.Fee)
@@ -294,7 +294,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 .InvokeCommand(updateFeeCommand);
 
             this.WhenAnyValue(vm => vm.Fee)
-                .Select(fee => fee.ToString(FeeCurrencyFormat, CultureInfo.InvariantCulture))
+                .Select(fee => fee.ToString(FeeCurrencyFormat, CultureInfo.CurrentCulture))
                 .ToPropertyEx(this, vm => vm.FeeString);
 
             this.WhenAnyValue(vm => vm.UseDefaultFee)

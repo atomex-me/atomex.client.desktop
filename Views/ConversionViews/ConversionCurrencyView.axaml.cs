@@ -35,8 +35,19 @@ namespace Atomex.Client.Desktop.Views
 
                 var dotSymbol = conversionCurrencyViewModel.AmountString.FirstOrDefault(c => !char.IsDigit(c));
                 var dotIndex = conversionCurrencyViewModel.AmountString.IndexOf(dotSymbol);
-                if (dotIndex != amountStringTextBox.CaretIndex - 1) return;
-                amountStringTextBox.CaretIndex -= 1;
+                switch (args.Key)
+                {
+                    case Key.Back when dotIndex != amountStringTextBox.CaretIndex - 1:
+                        return;
+                    case Key.Back:
+                        amountStringTextBox.CaretIndex -= 1;
+                        break;
+                    case Key.Delete when dotIndex != amountStringTextBox.CaretIndex:
+                        return;
+                    case Key.Delete:
+                        amountStringTextBox.CaretIndex += 1;
+                        break;
+                }
             }, RoutingStrategies.Tunnel);
 
             amountStringTextBox.GetObservable(TextBox.TextProperty)

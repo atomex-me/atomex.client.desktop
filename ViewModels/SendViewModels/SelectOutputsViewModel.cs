@@ -189,7 +189,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     (result, output) => output.IsSelected ? result + output.Balance : result);
 
                 TotalCoinAmountSelected =
-                    $"Total {totalCoinAmount.ToString(Config.Format, CultureInfo.InvariantCulture)} {Config.Name}";
+                    $"Total {totalCoinAmount.ToString(Config.Format, CultureInfo.CurrentCulture)} {Config.Name}";
             });
         }
 
@@ -304,7 +304,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         public BitcoinBasedConfig Config { get; set; }
         public WalletAddress? WalletAddress { get; set; }
         public decimal Balance => Config.SatoshiToCoin(Output.Value);
-        public string BalanceString => $"{Balance.ToString(Config.Format, CultureInfo.InvariantCulture)} {Config.Name}";
+        public string BalanceString => $"{Balance.ToString(Config.Format, CultureInfo.CurrentCulture)} {Config.Name}";
         public string Address => Output.DestinationAddress(Config.Network);
     }
 }

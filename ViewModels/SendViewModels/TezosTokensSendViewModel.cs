@@ -56,7 +56,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             var parsed = decimal.TryParse(
                 value,
                 NumberStyles.AllowDecimalPoint,
-                CultureInfo.InvariantCulture,
+                CultureInfo.CurrentCulture,
                 out var amount);
 
             if (!parsed)
@@ -81,7 +81,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             var parsed = decimal.TryParse(
                 value,
                 NumberStyles.AllowDecimalPoint,
-                CultureInfo.InvariantCulture,
+                CultureInfo.CurrentCulture,
                 out var fee);
 
             if (!parsed)
@@ -145,7 +145,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 .Subscribe(_ => Warning = string.Empty);
 
             this.WhenAnyValue(vm => vm.Amount)
-                .Select(amount => amount.ToString(CurrencyFormat ?? balanceFormat, CultureInfo.InvariantCulture))
+                .Select(amount => amount.ToString(CurrencyFormat ?? balanceFormat, CultureInfo.CurrentCulture))
                 .ToPropertyEx(this, vm => vm.AmountString);
 
             this.WhenAnyValue(vm => vm.From)
@@ -184,7 +184,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 .Subscribe(_ => OnQuotesUpdatedEventHandler(_app.QuotesProvider, EventArgs.Empty));
 
             this.WhenAnyValue(vm => vm.Fee)
-                .Select(fee => fee.ToString(FeeCurrencyFormat, CultureInfo.InvariantCulture))
+                .Select(fee => fee.ToString(FeeCurrencyFormat, CultureInfo.CurrentCulture))
                 .ToPropertyEx(this, vm => vm.FeeString);
 
             this.WhenAnyValue(

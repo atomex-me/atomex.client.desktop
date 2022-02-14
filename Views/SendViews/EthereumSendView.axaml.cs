@@ -29,15 +29,26 @@ namespace Atomex.Client.Desktop.Views.SendViews
 
                 if (amountStringTextBox.SelectionStart != amountStringTextBox.SelectionEnd)
                 {
-                    sendViewModel.SetAmountFromString(0m.ToString(CultureInfo.InvariantCulture));
+                    sendViewModel.SetAmountFromString(0.ToString(CultureInfo.CurrentCulture));
                     args.Handled = true;
                     return;
                 }
 
                 var dotSymbol = sendViewModel.AmountString.FirstOrDefault(c => !char.IsDigit(c));
                 var dotIndex = sendViewModel.AmountString.IndexOf(dotSymbol);
-                if (dotIndex != amountStringTextBox.CaretIndex - 1) return;
-                amountStringTextBox.CaretIndex -= 1;
+                switch (args.Key)
+                {
+                    case Key.Back when dotIndex != amountStringTextBox.CaretIndex - 1:
+                        return;
+                    case Key.Back:
+                        amountStringTextBox.CaretIndex -= 1;
+                        break;
+                    case Key.Delete when dotIndex != amountStringTextBox.CaretIndex:
+                        return;
+                    case Key.Delete:
+                        amountStringTextBox.CaretIndex += 1;
+                        break;
+                }
             }, RoutingStrategies.Tunnel);
 
             gasPriceStringTextBox.AddHandler(KeyDownEvent, (_, args) =>
@@ -46,7 +57,7 @@ namespace Atomex.Client.Desktop.Views.SendViews
                     args.Key is not (Key.Back or Key.Delete)) return;
 
                 if (gasPriceStringTextBox.SelectionStart == gasPriceStringTextBox.SelectionEnd) return;
-                sendViewModel.SetGasPriceFromString(0m.ToString(CultureInfo.InvariantCulture));
+                sendViewModel.SetGasPriceFromString(0.ToString(CultureInfo.CurrentCulture));
                 args.Handled = true;
             }, RoutingStrategies.Tunnel);
 
