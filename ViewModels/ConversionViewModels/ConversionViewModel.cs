@@ -1170,6 +1170,6 @@ namespace Atomex.Client.Desktop.ViewModels
             CanExchange = true;
             DGSelectedIndex = 0; // -1;
         }
-    }
 #endif
+    }
 }
