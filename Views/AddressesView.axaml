@@ -101,7 +101,7 @@
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
-                        <DataGridTextColumn Header="Type"
+                        <DataGridTextColumn Header="TYPE"
                                             Binding="{Binding Type}"
                                             Width="Auto"
                                             FontSize="12"/>
@@ -119,7 +119,7 @@
                                             Width="Auto"
                                             Foreground="White"
                                             FontSize="12" />
-                        <DataGridTemplateColumn Header="UPDATE" Width="80">
+                        <DataGridTemplateColumn Header="UPDATE" Width="90">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
                                     <Border Padding="10 0 0 0">
@@ -227,7 +227,7 @@
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
-                        <DataGridTextColumn Header="Type"
+                        <DataGridTextColumn Header="TYPE"
                                             Binding="{Binding Type}"
                                             Width="Auto"
                                             FontSize="12"/>
@@ -240,7 +240,7 @@
                                             Width="Auto"
                                             Foreground="Gold"
                                             FontSize="12" />
-                        <DataGridTemplateColumn Header="UPDATE" Width="80">
+                        <DataGridTemplateColumn Header="UPDATE" Width="90">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
                                     <Border Padding="10 0 0 0">

@@ -304,6 +304,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
             var canSendObservable1 = this.WhenAnyValue(
                 vm => vm.Amount,
+                vm => vm.To,
                 vm => vm.Warning,
                 vm => vm.WarningType,
                 vm => vm.RecommendedMaxAmountWarning,

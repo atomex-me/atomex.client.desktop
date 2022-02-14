@@ -189,6 +189,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
             this.WhenAnyValue(
                     vm => vm.Amount,
+                    vm => vm.To,
                     vm => vm.Warning,
                     vm => vm.WarningType,
                     vm => vm.ConfirmStage)
@@ -207,8 +208,6 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                         CanSend = true;
                     }
                 });
-
-
 
             CurrencyCode = string.Empty;
             FeeCurrencyCode = TezosConfig.Xtz;
@@ -241,7 +240,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     {
                         TokenId = walletAddressViewModel.TokenId;
                         From = walletAddressViewModel.Address;
-                        App.DialogService.Show(SelectToViewModel);
+                        App.DialogService.Show(SelectToViewModel!);
                     }
                 };
 
