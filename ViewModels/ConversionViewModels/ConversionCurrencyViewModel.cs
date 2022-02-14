@@ -71,7 +71,7 @@ namespace Atomex.Client.Desktop.ViewModels
                 .ToPropertyEx(this, vm => vm.Selected);
 
             this.WhenAnyValue(vm => vm.Amount)
-                .Select(amount => amount.ToString(CurrencyFormat, CultureInfo.InvariantCulture))
+                .Select(amount => amount.ToString(CurrencyFormat, CultureInfo.CurrentCulture))
                 .Subscribe(amount => AmountString = amount);
         }
 

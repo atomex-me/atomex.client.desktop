@@ -28,7 +28,7 @@ namespace Atomex.Client.Desktop.Views
 
                 if (amountStringTextBox.SelectionStart != amountStringTextBox.SelectionEnd)
                 {
-                    conversionCurrencyViewModel.SetAmountFromString(0m.ToString(CultureInfo.InvariantCulture));
+                    conversionCurrencyViewModel.SetAmountFromString(0.ToString(CultureInfo.CurrentCulture));
                     args.Handled = true;
                     return;
                 }

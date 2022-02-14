@@ -246,7 +246,7 @@ namespace Atomex.Client.Desktop.ViewModels
                 {
                     var tempAmountString = FromViewModel.AmountString;
 
-                    FromViewModel.AmountString = FromViewModel.Amount.ToString(FromViewModel.CurrencyFormat, CultureInfo.InvariantCulture); // update amount string with new "from" currency format
+                    FromViewModel.AmountString = FromViewModel.Amount.ToString(FromViewModel.CurrencyFormat, CultureInfo.CurrentCulture); // update amount string with new "from" currency format
 
                     if (FromViewModel.AmountString == tempAmountString)
                         UpdateFromAmountInBase(); // force update amount in base in case when amount string not changed
@@ -830,9 +830,9 @@ namespace Atomex.Client.Desktop.ViewModels
                     if (swapPriceEstimation == null)
                     {
                         if (_amountType == AmountType.Sold) {
-                            ToViewModel.AmountString = "0";
+                            ToViewModel.AmountString = 0.ToString(ToViewModel.CurrencyFormat, CultureInfo.CurrentCulture);
                         } else {
-                            FromViewModel.AmountString = "0";
+                            FromViewModel.AmountString = 0.ToString(FromViewModel.CurrencyFormat, CultureInfo.CurrentCulture);
                         }
                         
                         EstimatedPrice         = 0;
