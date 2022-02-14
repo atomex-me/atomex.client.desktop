@@ -44,7 +44,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             CheckAmountCommand.Throttle(TimeSpan.FromMilliseconds(1))
                 .Subscribe(estimation => CheckAmount(estimation));
 
-            SelectFromViewModel = new SelectAddressViewModel(_app.Account, Currency, true)
+            SelectFromViewModel = new SelectAddressViewModel(_app.Account, Currency, SelectAddressMode.SendFrom)
             {
                 BackAction = () => { App.DialogService.Show(this); },
                 ConfirmAction = walletAddressViewModel =>

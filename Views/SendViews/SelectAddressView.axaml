@@ -39,23 +39,26 @@
                            FontWeight="400"
                            Margin="-28 0 0 0"
                            HorizontalAlignment="Center"
-                           Foreground="{DynamicResource LightDefault}"
-                           Name="Title">
+                           Foreground="{DynamicResource LightDefault}">
                     <i:Interaction.Behaviors>
-                        <ia:DataTriggerBehavior Binding="{Binding UseToSelectFrom}"
+                        <ia:DataTriggerBehavior Binding="{Binding SelectAddressMode}"
                                                 ComparisonCondition="Equal"
-                                                Value="True">
-                            <ia:ChangePropertyAction TargetObject="{Binding #Title}"
-                                                     PropertyName="Text"
-                                                     Value="Send from" />
+                                                Value="SendFrom">
+                            <ia:ChangePropertyAction PropertyName="Text"
+                                                     Value="Send from"/>
                         </ia:DataTriggerBehavior>
-                        <ia:DataTriggerBehavior Binding="{Binding UseToSelectFrom}"
-                                                ComparisonCondition="NotEqual"
-                                                Value="True">
-                            <ia:ChangePropertyAction TargetObject="{Binding #Title}"
-                                                     PropertyName="Text"
-                                                     Value="Receive to" />
+                        <ia:DataTriggerBehavior Binding="{Binding SelectAddressMode}"
+                                                ComparisonCondition="Equal"
+                                                Value="ReceiveTo">
+                            <ia:ChangePropertyAction PropertyName="Text"
+                                                     Value="Receive to"/>
                         </ia:DataTriggerBehavior>
+                      <ia:DataTriggerBehavior Binding="{Binding SelectAddressMode}"
+                                              ComparisonCondition="Equal"
+                                              Value="ChangeRedeemAddress">
+                        <ia:ChangePropertyAction PropertyName="Text"
+                                                 Value="Change redeem address"/>
+                      </ia:DataTriggerBehavior>
                     </i:Interaction.Behaviors>
                 </TextBlock>
             </Grid>

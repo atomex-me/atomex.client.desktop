@@ -474,7 +474,7 @@ namespace Atomex.Client.Desktop.ViewModels
             var selectAddressViewModel = new SelectAddressViewModel(
                 account: _app.Account,
                 currency: feeCurrency,
-                useToSelectFrom: false,
+                mode: SelectAddressMode.ChangeRedeemAddress,
                 selectedAddress: RedeemFromAddress)
             {
                 BackAction = () => { App.DialogService.Show(this); },

@@ -15,11 +15,18 @@ using Atomex.Wallet.Abstract;
 
 namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 {
+    public enum SelectAddressMode
+    {
+        SendFrom,
+        ReceiveTo,
+        ChangeRedeemAddress
+    }
+
     public class SelectAddressViewModel : ViewModelBase
     {
         public Action BackAction { get; set; }
         public Action<WalletAddressViewModel> ConfirmAction { get; set; }
-        public bool UseToSelectFrom { get; set; }
+        public SelectAddressMode SelectAddressMode { get; set; }
         private CurrencyConfig Currency { get; set; }
         private ObservableCollection<WalletAddressViewModel> InitialMyAddresses { get; set; }
         [Reactive] public ObservableCollection<WalletAddressViewModel> MyAddresses { get; set; }
@@ -39,7 +46,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         public SelectAddressViewModel(
             IAccount account,
             CurrencyConfig currency,
-            bool useToSelectFrom = false,
+            SelectAddressMode mode = SelectAddressMode.ReceiveTo,
             string? selectedAddress = null,
             decimal? selectedTokenId = null,
             string? tokenContract = null)
@@ -120,7 +127,8 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 });
 
             Currency = currency;
-            UseToSelectFrom = useToSelectFrom;
+            SelectAddressMode = mode;
+            //UseToSelectFrom = useToSelectFrom;
 
             var addresses = AddressesHelper
                 .GetReceivingAddressesAsync(
@@ -128,7 +136,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     currency: currency,
                     tokenContract: tokenContract)
                 .WaitForResult()
-                .Where(address => !useToSelectFrom || address.Balance != 0)
+                .Where(address => SelectAddressMode != SelectAddressMode.SendFrom || address.Balance != 0)
                 .OrderByDescending(address => address.Balance);
 
             MyAddresses = new ObservableCollection<WalletAddressViewModel>(addresses);
@@ -137,7 +145,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             SelectedAddress = selectedAddress != null
                 ? MyAddresses.FirstOrDefault(vm =>
                     vm.Address == selectedAddress && (selectedTokenId == null || vm.TokenId == selectedTokenId))
-                : useToSelectFrom
+                : SelectAddressMode == SelectAddressMode.SendFrom
                     ? SelectDefaultAddress()
                     : null;
         }

@@ -197,7 +197,7 @@ namespace Atomex.Client.Desktop.ViewModels.ConversionViewModels
                 var selectAddressViewModel = new SelectAddressViewModel(
                     account: _account,
                     currency: currency,
-                    useToSelectFrom: Type == SelectCurrencyType.From,
+                    mode: Type == SelectCurrencyType.From ? SelectAddressMode.SendFrom : SelectAddressMode.ReceiveTo,
                     selectedAddress: itemWithAddress.SelectedAddress?.Address)
                 {
                     BackAction = () => { App.DialogService.Show(this); },
