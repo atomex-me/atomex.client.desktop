@@ -246,7 +246,7 @@ namespace Atomex.Client.Desktop.ViewModels
                 {
                     var tempAmountString = FromViewModel.AmountString;
 
-                    FromViewModel.AmountString = FromViewModel.Amount.ToString(); // update amount string with new "from" currency format
+                    FromViewModel.AmountString = FromViewModel.Amount.ToString(FromViewModel.CurrencyFormat, CultureInfo.InvariantCulture); // update amount string with new "from" currency format
 
                     if (FromViewModel.AmountString == tempAmountString)
                         UpdateFromAmountInBase(); // force update amount in base in case when amount string not changed
