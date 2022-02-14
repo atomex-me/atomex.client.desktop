@@ -433,7 +433,7 @@ namespace Atomex.Client.Desktop.ViewModels
 
                 FromViewModel.AmountString = Math.Min(swapParams.Amount, EstimatedMaxFromAmount)
                     .TruncateDecimal(FromViewModel.CurrencyViewModel!.Currency.Digits)
-                    .ToString();
+                    .ToString(FromViewModel.CurrencyFormat, CultureInfo.CurrentCulture);
             }
             catch (Exception e)
             {
