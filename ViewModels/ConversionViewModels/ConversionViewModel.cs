@@ -381,17 +381,21 @@ namespace Atomex.Client.Desktop.ViewModels
                 .Select(t => t == MessageType.Error)
                 .ToPropertyEx(this, vm => vm.IsError);
 
-            this.WhenAnyValue(vm => vm.DGSelectedIndex)
-                .Select(i => i != -1)
-                .ToPropertyEx(this, vm => vm.DetailsVisible);
+             this.WhenAnyValue(vm => vm.DGSelectedIndex)
+                 .Select(i => i != -1)
+                 .ToPropertyEx(this, vm => vm.DetailsVisible);
 
-            this.WhenAnyValue(vm => vm.DGSelectedIndex)
-                .Select(i => i != -1 ? Swaps?[i]?.Details : null)
-                .ToPropertyEx(this, vm => vm.SwapDetailsViewModel);
+             this.WhenAnyValue(vm => vm.DetailsVisible)
+                 .Select(dv => dv ? 1 : 2)
+                 .ToPropertyEx(this, vm => vm.ColumnSpan);
 
-            this.WhenAnyValue(vm => vm.DetailsVisible)
-                .Select(dv => dv ? 1 : 2)
-                .ToPropertyEx(this, vm => vm.ColumnSpan);
+             this.WhenAnyValue(
+                     vm => vm.DGSelectedIndex, 
+                     vm => vm.Swaps,
+                     (selectedSwapIndex, _) => selectedSwapIndex
+                     )
+                 .Select(selectedSwapIndex => selectedSwapIndex != -1 ? Swaps?[selectedSwapIndex]?.Details : null)
+                 .ToPropertyEx(this, vm => vm.SwapDetailsViewModel);
 
             SubscribeToServices();
         }
@@ -886,9 +890,6 @@ namespace Atomex.Client.Desktop.ViewModels
                     if (previousSwapsCount < swapViewModels?.Count)
                         DGSelectedIndex = 0;
 
-                    if (DetailsVisible)
-                        OnPropertyChanged(nameof(SwapDetailsViewModel));
-
                 }, DispatcherPriority.Background);
             }
             catch (Exception e)
@@ -1052,8 +1053,12 @@ namespace Atomex.Client.Desktop.ViewModels
                 .Select(dv => dv ? 1 : 2)
                 .ToPropertyEx(this, vm => vm.ColumnSpan);
 
-            this.WhenAnyValue(vm => vm.DetailsVisible)
-                .Select(dv => dv ? Swaps?[DGSelectedIndex]?.Details : null)
+            this.WhenAnyValue(
+                    vm => vm.DetailsVisible, 
+                    vm => vm.Swaps,
+                    (detailsVisible, _) => detailsVisible
+                    )
+                .Select(detailsVisible => detailsVisible ? Swaps?[DGSelectedIndex]?.Details : null)
                 .ToPropertyEx(this, vm => vm.SwapDetailsViewModel);
 
             var btc = DesignTime.Currencies.Get<BitcoinConfig>("BTC");

@@ -119,6 +119,10 @@ namespace Atomex.Client.Desktop.ViewModels
         public SwapDetailedStepState CompletionStepStatus =>
             GetSwapDetailedStepState(Atomex.ViewModels.Helpers.SwapDetailingStatus.Completion);
 
+        public bool InitializationStepInProgress => InitializationStepStatus == SwapDetailedStepState.InProgress;
+        public bool ExchangingStepInProgress => ExchangingStepStatus == SwapDetailedStepState.InProgress;
+        public bool CompletionStepInProgress => CompletionStepStatus == SwapDetailedStepState.InProgress;
+
         public static SwapDetailedStepState ToBeDoneState => SwapDetailedStepState.ToBeDone;
         public static SwapDetailedStepState InProgressState => SwapDetailedStepState.InProgress;
         public static SwapDetailedStepState CompletedState => SwapDetailedStepState.Completed;
