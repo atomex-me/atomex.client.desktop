@@ -144,11 +144,18 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         {
             try
             {
+                if (string.IsNullOrEmpty(To) || !Config.IsValidAddress(To))
+                {
+                    Warning        = Resources.SvInvalidAddressError;
+                    WarningToolTip = "";
+                    WarningType    = MessageType.Error;
+                    return;
+                }
+
                 if (UseDefaultFee)
                 {
                     FeeRate = await Config.GetFeeRateAsync();
 
-                    if (string.IsNullOrEmpty(To)) return;
                     var transactionParams = await BitcoinTransactionParams.SelectTransactionParamsByFeeRateAsync(
                         availableOutputs: Outputs,
                         to: To,
@@ -158,9 +165,9 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
                     if (transactionParams == null)
                     {
-                        Warning = Resources.CvInsufficientFunds;
+                        Warning        = Resources.CvInsufficientFunds;
                         WarningToolTip = "";
-                        WarningType = MessageType.Error;
+                        WarningType    = MessageType.Error;
                         return;
                     }
 
@@ -178,9 +185,9 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
                     if (transactionParams == null)
                     {
-                        Warning = Resources.CvInsufficientFunds;
+                        Warning        = Resources.CvInsufficientFunds;
                         WarningToolTip = "";
-                        WarningType = MessageType.Error;
+                        WarningType    = MessageType.Error;
                         return;
                     }
 
@@ -189,9 +196,9 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
                     if (Fee < minimumFee)
                     {
-                        Warning = Resources.CvLowFees;
+                        Warning        = Resources.CvLowFees;
                         WarningToolTip = "";
-                        WarningType = MessageType.Error;
+                        WarningType    = MessageType.Error;
                     }
 
                     FeeRate = transactionParams.FeeRate;
@@ -207,6 +214,14 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         {
             try
             {
+                if (string.IsNullOrEmpty(To) || !Config.IsValidAddress(To))
+                {
+                    Warning        = Resources.SvInvalidAddressError;
+                    WarningToolTip = "";
+                    WarningType    = MessageType.Error;
+                    return;
+                }
+
                 var transactionParams = await BitcoinTransactionParams.SelectTransactionParamsByFeeAsync(
                     availableOutputs: Outputs,
                     to: To,
@@ -216,9 +231,9 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
                 if (transactionParams == null)
                 {
-                    Warning = Resources.CvInsufficientFunds;
+                    Warning        = Resources.CvInsufficientFunds;
                     WarningToolTip = "";
-                    WarningType = MessageType.Error;
+                    WarningType    = MessageType.Error;
                     return;
                 }
 
@@ -227,9 +242,9 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
                 if (Fee < minimumFee)
                 {
-                    Warning = Resources.CvLowFees;
+                    Warning        = Resources.CvLowFees;
                     WarningToolTip = "";
-                    WarningType = MessageType.Error;
+                    WarningType    = MessageType.Error;
                 }
 
                 FeeRate = transactionParams.FeeRate;
@@ -278,6 +293,15 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     var maxAmountInSatoshi = Math.Max(availableInSatoshi - feeInSatoshi, 0);
                     var maxAmount = Config.SatoshiToCoin(maxAmountInSatoshi);
 
+                    if (string.IsNullOrEmpty(To) || !Config.IsValidAddress(To))
+                    {
+                        Warning        = Resources.SvInvalidAddressError;
+                        WarningToolTip = "";
+                        WarningType    = MessageType.Error;
+                        Amount         = 0;
+                        return;
+                    }
+
                     var transactionParams = await BitcoinTransactionParams.SelectTransactionParamsByFeeAsync(
                         availableOutputs: Outputs,
                         to: To,
@@ -287,10 +311,10 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
                     if (transactionParams == null)
                     {
-                        Warning = Resources.CvInsufficientFunds;
+                        Warning        = Resources.CvInsufficientFunds;
                         WarningToolTip = "";
-                        WarningType = MessageType.Error;
-                        Amount = 0;
+                        WarningType    = MessageType.Error;
+                        Amount         = 0;
                         return;
                     }
 
@@ -305,9 +329,9 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
                         if (Fee < minimumFee)
                         {
-                            Warning = Resources.CvLowFees;
+                            Warning        = Resources.CvLowFees;
                             WarningToolTip = "";
-                            WarningType = MessageType.Error;
+                            WarningType    = MessageType.Error;
                         }
                     }
 

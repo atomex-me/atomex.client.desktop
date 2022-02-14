@@ -79,7 +79,7 @@ namespace Atomex.Client.Desktop.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Amount is greater than the available. Please use the Max button to get the maximum available value..
+        ///   Ищет локализованную строку, похожую на Amount is greater than the available. Please use the Max button to get the maximum available value.
         /// </summary>
         internal static string CvBigAmount {
             get {
@@ -142,7 +142,7 @@ namespace Atomex.Client.Desktop.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на The amount must be greater than or equal to the minimum allowed amount {0} {1}..
+        ///   Ищет локализованную строку, похожую на The amount must be greater than or equal to the minimum allowed amount {0} {1}.
         /// </summary>
         internal static string CvMinimumAllowedQtyWarning {
             get {
@@ -151,7 +151,7 @@ namespace Atomex.Client.Desktop.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Not enough liquidity to convert a specified amount. In case you require more liquidity make multiple trades..
+        ///   Ищет локализованную строку, похожую на Not enough liquidity to convert a specified amount. In case you require more liquidity make multiple trades.
         /// </summary>
         internal static string CvNoLiquidity {
             get {
@@ -160,7 +160,7 @@ namespace Atomex.Client.Desktop.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на This symbol does not support direct conversion..
+        ///   Ищет локализованную строку, похожую на This symbol does not support direct conversion.
         /// </summary>
         internal static string CvNotSupportedSymbol {
             get {
@@ -187,7 +187,7 @@ namespace Atomex.Client.Desktop.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Atomex services unavailable. Please check your network connection or contact technical support..
+        ///   Ищет локализованную строку, похожую на Atomex services unavailable. Please check your network connection or contact technical support.
         /// </summary>
         internal static string CvServicesUnavailable {
             get {
@@ -196,7 +196,7 @@ namespace Atomex.Client.Desktop.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Sufficient network fee for this amount ({0} is {1})..
+        ///   Ищет локализованную строку, похожую на Sufficient network fee for this amount ({0} is {1}).
         /// </summary>
         internal static string CvSufficientNetworkFee {
             get {
@@ -214,7 +214,7 @@ namespace Atomex.Client.Desktop.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Wallet locked. Please unlock the wallet to continue..
+        ///   Ищет локализованную строку, похожую на Wallet locked. Please unlock the wallet to continue.
         /// </summary>
         internal static string CvWalletLocked {
             get {
@@ -232,7 +232,7 @@ namespace Atomex.Client.Desktop.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Amount to convert must be greater than zero..
+        ///   Ищет локализованную строку, похожую на Amount to convert must be greater than zero.
         /// </summary>
         internal static string CvWrongAmount {
             get {
@@ -241,7 +241,7 @@ namespace Atomex.Client.Desktop.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Amount must be greater than zero..
+        ///   Ищет локализованную строку, похожую на Amount must be greater than zero.
         /// </summary>
         internal static string CvZeroAmount {
             get {
@@ -277,7 +277,7 @@ namespace Atomex.Client.Desktop.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Wallet name must be not empty..
+        ///   Ищет локализованную строку, похожую на Wallet name must be not empty.
         /// </summary>
         internal static string CwvEmptyWalletName {
             get {
@@ -295,7 +295,7 @@ namespace Atomex.Client.Desktop.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Invalid wallet name..
+        ///   Ищет локализованную строку, похожую на Invalid wallet name.
         /// </summary>
         internal static string CwvInvalidWalletName {
             get {
@@ -304,7 +304,7 @@ namespace Atomex.Client.Desktop.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Invalid mnemonic phrase..
+        ///   Ищет локализованную строку, похожую на Invalid mnemonic phrase.
         /// </summary>
         internal static string CwvMnemonicInvalidError {
             get {
@@ -313,7 +313,7 @@ namespace Atomex.Client.Desktop.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Word count should be 12,15,18,21 or 24..
+        ///   Ищет локализованную строку, похожую на Word count should be 12,15,18,21 or 24.
         /// </summary>
         internal static string CwvMnemonicInvalidWordcountError {
             get {
@@ -322,7 +322,7 @@ namespace Atomex.Client.Desktop.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Word {0} is not in the wordlist for this language..
+        ///   Ищет локализованную строку, похожую на Word {0} is not in the wordlist for this language.
         /// </summary>
         internal static string CwvMnemonicInvalidWordError {
             get {
@@ -349,7 +349,7 @@ namespace Atomex.Client.Desktop.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Password has insufficient complexity..
+        ///   Ищет локализованную строку, похожую на Password has insufficient complexity.
         /// </summary>
         internal static string CwvPasswordInsufficientComplexity {
             get {
@@ -358,7 +358,7 @@ namespace Atomex.Client.Desktop.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Passwords do not match..
+        ///   Ищет локализованную строку, похожую на Passwords do not match.
         /// </summary>
         internal static string CwvPasswordsDoNotMatch {
             get {
@@ -385,7 +385,7 @@ namespace Atomex.Client.Desktop.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Wallet with the same name already exists..
+        ///   Ищет локализованную строку, похожую на Wallet with the same name already exists.
         /// </summary>
         internal static string CwvWalletAlreadyExists {
             get {
@@ -457,7 +457,7 @@ namespace Atomex.Client.Desktop.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Amount must be greater than zero..
+        ///   Ищет локализованную строку, похожую на Amount must be greater than zero.
         /// </summary>
         internal static string SvAmountLessThanZeroError {
             get {
@@ -502,7 +502,7 @@ namespace Atomex.Client.Desktop.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Commission must be a positive value..
+        ///   Ищет локализованную строку, похожую на Commission must be a positive value.
         /// </summary>
         internal static string SvCommissionLessThanZeroError {
             get {
@@ -511,7 +511,7 @@ namespace Atomex.Client.Desktop.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Address must be not empty..
+        ///   Ищет локализованную строку, похожую на Address must be not empty.
         /// </summary>
         internal static string SvEmptyAddressError {
             get {
@@ -556,7 +556,7 @@ namespace Atomex.Client.Desktop.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Insufficient funds for default fee..
+        ///   Ищет локализованную строку, похожую на Insufficient funds for default fee.
         /// </summary>
         internal static string SvInsufficientFundsForDefaultFeeError {
             get {
@@ -565,7 +565,7 @@ namespace Atomex.Client.Desktop.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Address is invalid..
+        ///   Ищет локализованную строку, похожую на Address is invalid.
         /// </summary>
         internal static string SvInvalidAddressError {
             get {
@@ -630,7 +630,7 @@ namespace Atomex.Client.Desktop.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Order rejected..
+        ///   Ищет локализованную строку, похожую на Order rejected.
         /// </summary>
         internal static string SvOrderRejected {
             get {
@@ -639,7 +639,7 @@ namespace Atomex.Client.Desktop.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Oops, the price has changed during the order sending. Please try again..
+        ///   Ищет локализованную строку, похожую на Oops, the price has changed during the order sending. Please try again.
         /// </summary>
         internal static string SvPriceHasChanged {
             get {
@@ -684,7 +684,7 @@ namespace Atomex.Client.Desktop.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Atomex is not responding for a long time..
+        ///   Ищет локализованную строку, похожую на Atomex is not responding for a long time.
         /// </summary>
         internal static string SvTimeoutReached {
             get {
