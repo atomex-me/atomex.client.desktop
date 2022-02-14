@@ -228,8 +228,6 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
         private async void CheckAmount(MaxAmountEstimation maxAmountEstimation)
         {
-            Console.WriteLine("Call CheckAmount");
-
             if (maxAmountEstimation.Error != null)
             {
                 Warning = maxAmountEstimation.Error.Description;
