@@ -17,6 +17,7 @@ using Serilog.Core;
 using Serilog.Events;
 using Serilog.Formatting;
 using Serilog.Formatting.Display;
+using Sentry;
 
 using Atomex.Client.Desktop.Services;
 using Atomex.Client.Desktop.ViewModels;
