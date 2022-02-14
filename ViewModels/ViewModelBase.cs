@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
-using Atomex.Client.Desktop.Common;
-using DynamicData;
-using ReactiveUI;
+﻿using ReactiveUI;
 
 namespace Atomex.Client.Desktop.ViewModels
 {

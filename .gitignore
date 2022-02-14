@@ -12,3 +12,6 @@ release/
 
 .DS_Store
 *.pfx
+FodyWeavers.*
+global.json
+UpgradeLog.htm

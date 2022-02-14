@@ -148,7 +148,7 @@
                 </StackPanel>
 
                 <TextBlock Foreground="{DynamicResource CopyrightForegroundBrush}"
-                           Text="© 2021 Atomex OÜ, All rights reserved"
+                           Text="© 2022 Atomex OÜ, All rights reserved"
                            Margin="0 0 0 7"
                            FontSize="11"
                            FontFamily="{DynamicResource DefaultFontFamily}"

@@ -2,240 +2,700 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             mc:Ignorable="d"
              xmlns:helpers="clr-namespace:Atomex.Client.Desktop.Helpers"
              xmlns:vm="clr-namespace:Atomex.Client.Desktop.ViewModels.SendViewModels"
              xmlns:controls="clr-namespace:Atomex.Client.Desktop.Controls"
              xmlns:converters="clr-namespace:Atomex.Client.Desktop.Converters"
+             xmlns:svg="clr-namespace:Avalonia.Svg.Skia;assembly=Avalonia.Svg.Skia"
+             xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
+             xmlns:ia="clr-namespace:Avalonia.Xaml.Interactions.Core;assembly=Avalonia.Xaml.Interactions"
              x:Class="Atomex.Client.Desktop.Views.SendViews.EthereumSendView"
-             Height="580"
-             Width="560">
+             Width="700">
 
-    <UserControl.Resources>
-        <converters:AmountToStringConverter x:Key="AmountToStringConverter" />
-    </UserControl.Resources>
+  <Design.DataContext>
+      <vm:EthereumSendViewModel/>
+  </Design.DataContext>
 
-    <Design.DataContext>
-        <vm:EthereumSendViewModel />
-    </Design.DataContext>
+  <UserControl.Styles>
+    <Style Selector="TextBlock.Message">
+      <Setter Property="Foreground" Value="{DynamicResource LightDefaultOpacity50}"/>
+    </Style>
+    <Style Selector="TextBlock.Warning">
+      <Setter Property="Foreground" Value="{DynamicResource Orange}"/>
+    </Style>
+    <Style Selector="TextBlock.Error">
+      <Setter Property="Foreground" Value="{DynamicResource DarkRed}"/>
+    </Style>
+    <Style Selector="TextBlock.ToolTipMessage">
+      <Setter Property="Foreground" Value="{DynamicResource DefaultForegroundColor}"/>
+    </Style>
+    <Style Selector="TextBlock.SendTitle">
+      <Setter Property="Foreground" Value="{DynamicResource ChildViewHeaderForegroundBrush}"/>
+    </Style>
+    <Style Selector="TextBlock.ConfirmationTitle">
+      <Setter Property="Foreground" Value="{DynamicResource ChildViewHeaderForegroundBrush}"/>
+    </Style>
+    <Style Selector="TextBlock.AdditionalConfirmationTitle">
+      <Setter Property="Foreground" Value="{DynamicResource Orange}"/>
+    </Style>
+  </UserControl.Styles>
 
-    <Border Classes="ChildViewBorder">
-        <Grid Width="560">
-            <StackPanel Orientation="Vertical">
+  <UserControl.Resources>
+    <converters:AmountToStringConverter x:Key="AmountToStringConverter"/>
+    <converters:AmountToStringInBracketsConverter x:Key="AmountToStringInBracketsConverter"/>
+    <converters:EnumToStringEqualConverter x:Key="EnumToStringEqualConverter"/>
+    <converters:EnumToStringNotEqualConverter x:Key="EnumToStringNotEqualConverter"/>
+    <converters:WidthToHorizontalCenterOffsetConverter x:Key="WidthToHorizontalCenterOffsetConverter"/>
+  </UserControl.Resources>
 
-                <Border Margin="0 10 0 10"
-                        Height="33"
-                        VerticalAlignment="Top"
-                        HorizontalAlignment="Stretch"
-                        Background="{DynamicResource ChildViewHeaderBackgroundBrush}">
-                    <TextBlock Text="Send"
-                               Foreground="{DynamicResource ChildViewHeaderForegroundBrush}"
-                               FontFamily="{DynamicResource DefaultLightFontFamily}"
-                               FontSize="25"
-                               HorizontalAlignment="Center"
-                               VerticalAlignment="Center" />
-                </Border>
+  <Border Classes="ChildViewBorder"
+          Padding="24 0 24 0"
+          Width="700">
+    <StackPanel Orientation="Vertical">
+      <Grid ColumnDefinitions="Auto,*"
+            RowDefinitions="72">
+        <!-- back button -->
+        <Button Grid.Column="0"
+                Width="28"
+                Height="28"
+                Padding="3"
+                BorderThickness="0"
+                VerticalContentAlignment="Center"
+                IsVisible="{Binding Stage,
+                  Converter={StaticResource EnumToStringNotEqualConverter},
+                  ConverterParameter=Edit}"
+                Command="{Binding UndoConfirmStageCommand}"
+                Classes="ButtonWithIcon">
 
-                <TextBlock Text="Instantly sending of currency."
-                           Foreground="{DynamicResource DefaultForegroundBrush}"
-                           FontFamily="{DynamicResource DefaultLightFontFamily}"
-                           FontSize="15"
-                           Margin="40 20 40 15"
-                           TextWrapping="Wrap"
-                           HorizontalAlignment="Center" />
+          <svg:Svg Width="28"
+                   Path="/Resources/Icons/back.svg"
+                   HorizontalAlignment="Left"/>
+        </Button>
 
-                <ComboBox Classes="CurrencyComboBox"
-                          HorizontalAlignment="Center"
-                          Width="480"
-                          MinHeight="68"
-                          Margin="0 5 0 5"
-                          Items="{Binding FromCurrencies}"
-                          SelectedIndex="{Binding CurrencyIndex}"
-                          helpers:ComboBoxHelper.CornerRadius="20" />
+        <!-- window title -->
+        <TextBlock Grid.Column="1"
+                   FontFamily="{DynamicResource DefaultLightFontFamily}"
+                   Margin="-28 0 0 0"
+                   FontSize="22"
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Center"
+                   Classes="SendTitle"
+                   Classes.ConfirmationTitle="{Binding Stage,
+                     Converter={StaticResource EnumToStringEqualConverter},
+                     ConverterParameter=Confirmation}"
+                   Classes.AdditionalConfirmationTitle="{Binding Stage,
+                     Converter={StaticResource EnumToStringEqualConverter},
+                     ConverterParameter=AdditionalConfirmation}">
+          <i:Interaction.Behaviors>
+            <ia:DataTriggerBehavior Binding="{Binding Stage}"
+                                    ComparisonCondition="Equal"
+                                    Value="Edit">
+              <ia:ChangePropertyAction PropertyName="Text"
+                                       Value="Send"/>
+            </ia:DataTriggerBehavior>
+            <ia:DataTriggerBehavior Binding="{Binding Stage}"
+                                    ComparisonCondition="Equal"
+                                    Value="Confirmation">
+              <ia:ChangePropertyAction PropertyName="Text"
+                                       Value="Confirm sending"/>
+            </ia:DataTriggerBehavior>
+            <ia:DataTriggerBehavior Binding="{Binding Stage}"
+                                    ComparisonCondition="Equal"
+                                    Value="AdditionalConfirmation">
+              <ia:ChangePropertyAction PropertyName="Text"
+                                       Value="Warning"/>
+            </ia:DataTriggerBehavior>
+          </i:Interaction.Behaviors>
+        </TextBlock>
+      </Grid>
 
-                <StackPanel Orientation="Horizontal"
-                            HorizontalAlignment="Center">
-                    <Border Classes="FieldHeader">
-                        <TextBlock Text="To Address:"
-                                   Margin="0 0 7 0"
-                                   Foreground="{DynamicResource DefaultForegroundBrush}"
-                                   FontFamily="{DynamicResource DefaultMediumFontFamily}"
-                                   FontSize="13"
-                                   VerticalAlignment="Center"
-                                   HorizontalAlignment="Right" />
-                    </Border>
-                    <TextBox Width="380"
-                             Height="40"
-                             Margin="0 5 0 5"
-                             Text="{Binding To, Mode=TwoWay}"
-                             Background="{DynamicResource DefaultSubstrateBrush}"
-                             Foreground="{DynamicResource DefaultForegroundBrush}"
-                             helpers:TextBoxHelper.CornerRadius="0 20 20 0"
-                             Classes="CustomTextBox AmountTextBox" />
-                </StackPanel>
+      <!-- separator -->
+      <Border Height="1"
+              Margin="-24 0 -24 0"
+              Background="{DynamicResource LightDefaultOpacity10}"/>
 
-                <StackPanel Orientation="Horizontal"
-                            HorizontalAlignment="Center">
-                    <Border Classes="FieldHeader">
-                        <TextBlock Text="Amount:"
-                                   Margin="0 0 7 0"
-                                   Foreground="{DynamicResource DefaultForegroundBrush}"
-                                   FontFamily="{DynamicResource DefaultMediumFontFamily}"
-                                   FontSize="13"
-                                   VerticalAlignment="Center"
-                                   HorizontalAlignment="Right" />
-                    </Border>
+      <!-- from -->
+      <ContentControl Content="{Binding}"
+                      ContentTemplate="{StaticResource CurrencySendItemTemplate}"
+                      Margin="0 32 0 0"
+                      IsVisible="{Binding Stage,
+                        Converter={StaticResource EnumToStringNotEqualConverter},
+                        ConverterParameter=AdditionalConfirmation}"
+                      IsEnabled="{Binding Stage,
+                        Converter={StaticResource EnumToStringEqualConverter},
+                        ConverterParameter=Edit}"/>
 
-                    <TextBox Width="318"
-                             Height="40"
-                             Margin="0 5 0 5"
-                             FontSize="18"
-                             Background="{DynamicResource DefaultSubstrateBrush}"
-                             Foreground="{DynamicResource DefaultForegroundBrush}"
-                             Text="{Binding AmountString, Mode=OneWay}"
-                             Name="AmountString"
-                             helpers:AmountTextBoxHelper.CurrencyCode="{Binding CurrencyCode}"
-                             helpers:AmountTextBoxHelper.BaseCurrencyCode="{Binding BaseCurrencyCode}"
-                             helpers:TextBoxHelper.CornerRadius="0"
-                             Classes="CustomTextBox AmountTextBox">
-                        <helpers:AmountTextBoxHelper.AmountInBase>
-                            <MultiBinding Converter="{StaticResource AmountToStringConverter}">
-                                <Binding Path="AmountInBase" Mode="OneWay" />
-                                <Binding Path="BaseCurrencyFormat" Mode="OneWay" />
-                            </MultiBinding>
-                        </helpers:AmountTextBoxHelper.AmountInBase>
-                    </TextBox>
-                    <controls:RoundedButton Width="60"
-                                            Height="40"
-                                            Margin="2 0 0 0"
-                                            CornerRadius="0 20 20 0"
-                                            Content="Max"
-                                            Command="{Binding MaxCommand}" />
-                </StackPanel>
+      <!-- to -->
+      <StackPanel Orientation="Horizontal"
+                  HorizontalAlignment="Center"
+                  Margin="0 12 0 0"
+                  IsVisible="{Binding Stage,
+                    Converter={StaticResource EnumToStringNotEqualConverter},
+                    ConverterParameter=AdditionalConfirmation}">
+        <Border Width="50"
+                Margin="-50 0 0 0">
+          <TextBlock Text="To"
+                     Margin="0 0 12 0"
+                     Foreground="{DynamicResource SecondaryForegroundBrush}"
+                     FontFamily="{DynamicResource DefaultMediumFontFamily}"
+                     FontSize="13"
+                     VerticalAlignment="Center"
+                     HorizontalAlignment="Right"/>
+        </Border>
 
-                <StackPanel Orientation="Horizontal"
-                            HorizontalAlignment="Center"
-                            IsEnabled="{Binding !UseDefaultFee}"
-                            Classes="BaseDisabledStyle">
-                    <Border Classes="FieldHeader">
-                        <TextBlock Text="Gas price:"
-                                   Margin="0 0 7 0"
-                                   Foreground="{DynamicResource DefaultForegroundBrush}"
-                                   FontFamily="{DynamicResource DefaultMediumFontFamily}"
-                                   FontSize="13"
-                                   VerticalAlignment="Center"
-                                   HorizontalAlignment="Right" />
-                    </Border>
+        <Border Background="{DynamicResource LightDefaultOpacity6}"
+                CornerRadius="6"
+                Width="440"
+                Height="80"
+                VerticalAlignment="Center">
+          <Button Padding="20 0"
+                  Width="440"
+                  Height="80"
+                  Command="{Binding SelectToCommand}"
+                  IsEnabled="{Binding Stage,
+                    Converter={StaticResource EnumToStringEqualConverter},
+                    ConverterParameter=Edit}"
+                  VerticalContentAlignment="Center"
+                  Classes="EmptyBtnWithContent">
+            <Grid ColumnDefinitions="24,*">
+              <Image Width="36"
+                     Height="36"
+                     Source="{Binding CurrencyViewModel.LargeIconPath}"
+                     UseLayoutRounding="True"
+                     Grid.Row="0"
+                     Grid.Column="0"/>
 
-                    <TextBox Width="380"
-                             Height="40"
-                             Margin="0 5 0 5"
-                             FontSize="18"
-                             Text="{Binding FeePriceString, Mode=OneWay}"
-                             Name="FeePriceString"
-                             Background="{DynamicResource DefaultSubstrateBrush}"
-                             Foreground="{DynamicResource DefaultForegroundBrush}"
-                             helpers:TextBoxHelper.CornerRadius="0 20 20 0"
-                             helpers:AmountTextBoxHelper.CurrencyCode="{Binding FeePriceCode}"
-                             Classes="CustomTextBox AmountTextBox" />
-                </StackPanel>
+              <TextBlock Grid.Column="1"
+                         FontFamily="{DynamicResource DefaultMediumFontFamily}"
+                         Text="{Binding To}"
+                         FontSize="16"
+                         LineHeight="24"
+                         MaxHeight="347"
+                         TextWrapping="Wrap"
+                         Margin="17 0 0 0"
+                         VerticalAlignment="Center">
+                <i:Interaction.Behaviors>
+                  <ia:DataTriggerBehavior Binding="{Binding To, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                                          ComparisonCondition="Equal"
+                                          Value="False">
+                    <ia:ChangePropertyAction PropertyName="Text"
+                                             Value="Select destination address..."/>
+                    <ia:ChangePropertyAction TargetObject="{Binding #ToTextBox}"
+                                             PropertyName="Foreground"
+                                             Value="{StaticResource SecondaryForegroundBrush}"/>
+                  </ia:DataTriggerBehavior>
+                  <ia:DataTriggerBehavior Binding="{Binding To, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                                          ComparisonCondition="Equal"
+                                          Value="True">
+                    <ia:ChangePropertyAction PropertyName="Foreground"
+                                             Value="{StaticResource DefaultForegroundBrush}"/>
+                  </ia:DataTriggerBehavior>
+                </i:Interaction.Behaviors>
+              </TextBlock>
+            </Grid>
+          </Button>
+        </Border>
+      </StackPanel>
 
-                <StackPanel Orientation="Horizontal"
-                            HorizontalAlignment="Center"
-                            IsEnabled="{Binding !UseDefaultFee}"
-                            Classes="BaseDisabledStyle">
-                    <Border Classes="FieldHeader">
-                        <TextBlock Text="Gas limit / tx:"
-                                   Margin="0 0 7 0"
-                                   Foreground="{DynamicResource DefaultForegroundBrush}"
-                                   FontFamily="{DynamicResource DefaultMediumFontFamily}"
-                                   FontSize="13"
-                                   VerticalAlignment="Center"
-                                   HorizontalAlignment="Right" />
-                    </Border>
+      <!-- edit stage -->
+      <StackPanel Margin="0 12 0 0"
+                  IsVisible="{Binding Stage,
+                    Converter={StaticResource EnumToStringEqualConverter},
+                    ConverterParameter=Edit}">
+        <!-- amount -->
+        <StackPanel Orientation="Horizontal"
+                    HorizontalAlignment="Center">
 
-                    <TextBox Width="380"
-                             Height="40"
-                             Margin="0 5 0 5"
-                             FontSize="18"
-                             Background="{DynamicResource DefaultSubstrateBrush}"
-                             Foreground="{DynamicResource DefaultForegroundBrush}"
-                             Text="{Binding GasString, Mode=OneWay}"
-                             Name="GasString"
-                             helpers:TextBoxHelper.CornerRadius="0 20 20 0"
-                             helpers:AmountTextBoxHelper.CurrencyCode="{Binding GasCode}"
-                             Classes="CustomTextBox AmountTextBox" />
-                </StackPanel>
+          <Border Width="60"
+                  Margin="-60 0 0 0">
+            <TextBlock Text="Amount"
+                       Margin="0 0 12 0"
+                       Foreground="{DynamicResource SecondaryForegroundBrush}"
+                       FontFamily="{DynamicResource DefaultMediumFontFamily}"
+                       FontSize="13"
+                       VerticalAlignment="Center"
+                       HorizontalAlignment="Right"/>
+          </Border>
 
-                <StackPanel Orientation="Horizontal"
-                            HorizontalAlignment="Center"
-                            IsEnabled="false"
-                            Classes="BaseDisabledStyle">
-                    <Border Classes="FieldHeader">
-                        <TextBlock Text="Fee:"
-                                   Margin="0 0 7 0"
-                                   Foreground="{DynamicResource DefaultForegroundBrush}"
-                                   FontFamily="{DynamicResource DefaultMediumFontFamily}"
-                                   FontSize="13"
-                                   VerticalAlignment="Center"
-                                   HorizontalAlignment="Right" />
-                    </Border>
+          <TextBox Width="440"
+                   Text="{Binding AmountString, Mode=OneWay}"
+                   helpers:AmountTextBoxHelper.CurrencyCode="{Binding CurrencyCode}"
+                   helpers:AmountTextBoxHelper.BaseCurrencyCode="{Binding BaseCurrencyCode}"
+                   helpers:AmountTextBoxHelper.AmountInBaseMargin="0 0 45 0"
+                   Name="AmountString"
+                   Classes="AtomexTextBox AmountTextBox">
+            <helpers:AmountTextBoxHelper.AmountInBase>
+              <MultiBinding Converter="{StaticResource AmountToStringConverter}">
+                <Binding Path="AmountInBase" Mode="OneWay"/>
+                <Binding Path="BaseCurrencyFormat" Mode="OneWay"/>
+              </MultiBinding>
+            </helpers:AmountTextBoxHelper.AmountInBase>
+          </TextBox>
 
-                    <TextBox Width="380"
-                             Height="40"
-                             Margin="0 5 0 5"
-                             FontSize="18"
-                             Background="{DynamicResource DefaultSubstrateBrush}"
-                             Foreground="{DynamicResource DefaultForegroundBrush}"
-                             Text="{Binding TotalFeeString, Mode=OneWay}"
-                             helpers:TextBoxHelper.CornerRadius="0 20 20 0"
-                             helpers:AmountTextBoxHelper.CurrencyCode="{Binding TotalFeeCurrencyCode}"
-                             helpers:AmountTextBoxHelper.BaseCurrencyCode="{Binding BaseCurrencyCode}"
-                             Classes="CustomTextBox AmountTextBox">
-                        <helpers:AmountTextBoxHelper.AmountInBase>
-                            <MultiBinding Converter="{StaticResource AmountToStringConverter}">
-                                <Binding Path="FeeInBase" Mode="OneWay" />
-                                <Binding Path="BaseCurrencyFormat" Mode="OneWay" />
-                            </MultiBinding>
-                        </helpers:AmountTextBoxHelper.AmountInBase>
-                    </TextBox>
-                </StackPanel>
+          <Button Classes="LinkButton Underlined"
+                  Margin="-67 0 0 0"
+                  Command="{Binding MaxCommand}"
+                  Content="max"/>
+        </StackPanel>
 
-                <ToggleSwitch HorizontalAlignment="Center"
-                              OffContent="Use default fee"
-                              OnContent="Use default fee"
-                              BorderBrush="{DynamicResource DefaultForegroundBrush}"
-                              FontFamily="{DynamicResource DefaultLightFontFamily}"
-                              Foreground="{DynamicResource DefaultForegroundBrush}"
-                              FontSize="13"
-                              Margin="10"
-                              IsChecked="{Binding UseDefaultFee, Mode=TwoWay}" />
+        <!-- Classes="AnimationCollapsed" -->
+        <!-- IsEnabled="{Binding !UseDefaultFee}" -->
 
-                <TextBlock Text="{Binding Warning}"
-                           Foreground="{DynamicResource WarningForegroundBrush}"
-                           FontFamily="{DynamicResource DefaultLightFontFamily}"
-                           FontSize="13"
-                           Margin="20 5 20 0"
-                           TextWrapping="Wrap"
-                           HorizontalAlignment="Center"
-                           VerticalAlignment="Bottom" />
+        <!-- gas price -->
+        <StackPanel Orientation="Horizontal"
+                    HorizontalAlignment="Center"
+                    IsVisible="{Binding !UseDefaultFee}"
+                    Margin="0 12 0 0"
+                    Height="50">
+          <Border Width="80"
+                  Margin="-80 0 0 0">
+            <TextBlock Text="Gas Price"
+                       Margin="0 0 12 0"
+                       Foreground="{DynamicResource SecondaryForegroundBrush}"
+                       FontFamily="{DynamicResource DefaultMediumFontFamily}"
+                       FontSize="13"
+                       VerticalAlignment="Center"
+                       HorizontalAlignment="Right"/>
+          </Border>
 
-                <StackPanel Orientation="Horizontal"
-                            HorizontalAlignment="Center"
-                            Margin="0 20 0 20">
-                    <controls:RoundedButton Width="100"
-                                            Height="40"
-                                            Margin="0 0 3 0"
-                                            CornerRadius="20 0 0 20"
-                                            Content="Cancel"
-                                            Command="{Binding BackCommand}" />
-                    <controls:RoundedButton Width="100"
-                                            Height="40"
-                                            CornerRadius="0 20 20 0"
-                                            Content="Send"
-                                            Command="{Binding NextCommand}" />
-                </StackPanel>
-            </StackPanel>
+          <TextBox Width="440"
+                   FontSize="16"
+                   Text="{Binding GasPriceString, Mode=OneWay}"
+                   helpers:AmountTextBoxHelper.AmountInBase="{Binding GasPriceCode}"
+                   Name="GasPriceString"
+                   Classes="AtomexTextBox AmountTextBox"/>
+        </StackPanel>
+
+        <!-- warning -->
+        <StackPanel Orientation="Horizontal"
+                    Margin="0 8 0 0"
+                    Width="440"
+                    HorizontalAlignment="Center"
+                    IsVisible="{Binding Warning, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+          <TextBlock Text="{Binding Warning}"
+                     MaxWidth="420"
+                     TextWrapping="Wrap"
+                     VerticalAlignment="Center"
+                     FontSize="13"
+                     LineHeight="16"
+                     FontFamily="{DynamicResource DefaultLightFontFamily}"
+                     Classes="Message"
+                     Classes.Warning="{Binding WarningType,
+                       Converter={StaticResource EnumToStringEqualConverter},
+                       ConverterParameter=Warning}"
+                     Classes.Error="{Binding WarningType,
+                       Converter={StaticResource EnumToStringEqualConverter},
+                       ConverterParameter=Error}"/>
+          <Button Padding="3"
+                  VerticalAlignment="Center"
+                  VerticalContentAlignment="Center"
+                  ToolTip.Placement="Bottom"
+                  ToolTip.VerticalOffset="10"
+                  ToolTip.HorizontalOffset="{Binding ElementName=WarningToolTipGrid,
+                    Path=Bounds.Width,
+                    Converter={StaticResource WidthToHorizontalCenterOffsetConverter}}"
+                  Click="HelpClickHandler"
+                  Classes="ButtonWithIcon"
+                  IsVisible="{Binding WarningToolTip, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+            <ToolTip.Tip>
+              <Grid Name="WarningToolTipGrid">
+                <TextBlock TextWrapping="Wrap"
+                           Text="{Binding WarningToolTip}"
+                           Classes.Warning="{Binding WarningType,
+                             Converter={StaticResource EnumToStringEqualConverter},
+                             ConverterParameter=Warning}"
+                           Classes.Error="{Binding WarningType,
+                             Converter={StaticResource EnumToStringEqualConverter},
+                             ConverterParameter=Error}"/>
+              </Grid>
+            </ToolTip.Tip>
+            <Path HorizontalAlignment="Center"
+                  VerticalAlignment="Center"
+                  Width="12"
+                  Height="12"
+                  Data="{DynamicResource Help}"
+                  Fill="{DynamicResource LightDefaultOpacity20}"/>
+          </Button>
+        </StackPanel>
+
+        <!-- recommended max amount warning -->
+        <StackPanel Orientation="Horizontal"
+                    Margin="0 8 0 0"
+                    Width="440"
+                    HorizontalAlignment="Center"
+                    IsVisible="{Binding RecommendedMaxAmountWarning, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+          <TextBlock Text="{Binding RecommendedMaxAmountWarning}"
+                     MaxWidth="420"
+                     TextWrapping="Wrap"
+                     VerticalAlignment="Center"
+                     FontSize="13"
+                     LineHeight="16"
+                     FontFamily="{DynamicResource DefaultLightFontFamily}"
+                     Classes="Message"
+                     Classes.Warning="{Binding RecommendedMaxAmountWarningType,
+                       Converter={StaticResource EnumToStringEqualConverter},
+                       ConverterParameter=Warning}"
+                     Classes.Error="{Binding RecommendedMaxAmountWarningType,
+                       Converter={StaticResource EnumToStringEqualConverter},
+                       ConverterParameter=Error}"/>
+          <Button Padding="3"
+                  VerticalAlignment="Center"
+                  VerticalContentAlignment="Center"
+                  ToolTip.Placement="Bottom"
+                  ToolTip.VerticalOffset="10"
+                  ToolTip.HorizontalOffset="{Binding ElementName=RecommendedMaxAmountWarningToolTipGrid,
+                    Path=Bounds.Width,
+                    Converter={StaticResource WidthToHorizontalCenterOffsetConverter}}"
+                  Click="HelpClickHandler"
+                  Classes="ButtonWithIcon"
+                  IsVisible="{Binding RecommendedMaxAmountWarningToolTip, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+            <ToolTip.Tip>
+              <Grid Name="RecommendedMaxAmountWarningToolTipGrid">
+                <TextBlock TextWrapping="Wrap"
+                           Text="{Binding RecommendedMaxAmountWarningToolTip}"
+                           Classes.Warning="{Binding RecommendedMaxAmountWarningType,
+                             Converter={StaticResource EnumToStringEqualConverter},
+                             ConverterParameter=Warning}"
+                           Classes.Error="{Binding RecommendedMaxAmountWarningType,
+                             Converter={StaticResource EnumToStringEqualConverter},
+                             ConverterParameter=Error}"/>
+              </Grid>
+            </ToolTip.Tip>
+            <Path HorizontalAlignment="Center"
+                  VerticalAlignment="Center"
+                  Width="12"
+                  Height="12"
+                  Data="{DynamicResource Help}"
+                  Fill="{DynamicResource LightDefaultOpacity20}"/>
+          </Button>
+        </StackPanel>
+
+        <Grid ColumnDefinitions="*,Auto"
+              RowDefinitions="Auto,Auto,Auto"
+              Margin="0 12 0 0"
+              Width="440">
+
+          <!-- use default fee -->
+          <CheckBox Grid.Row="0"
+                    Grid.Column="0"
+                    Grid.RowSpan="3"
+                    Padding="12 0 0 0"
+                    VerticalAlignment="Top"
+                    IsChecked="{Binding UseDefaultFee, Mode=TwoWay}"
+                    FontSize="13"
+                    FontFamily="{DynamicResource DefaultLightFontFamily}"
+                    Foreground="{DynamicResource SecondaryForegroundBrush}"
+                    Content="Use default fee"/>
+
+          <!-- gas price -->
+          <StackPanel Grid.Row="0"
+                      Grid.Column="1"
+                      HorizontalAlignment="Right"
+                      Orientation="Horizontal">
+            <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
+                       FontFamily="{DynamicResource DefaultFontFamily}"
+                       LineHeight="20"
+                       TextAlignment="Right"
+                       Text="Gas price:"/>
+
+            <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
+                       FontFamily="{DynamicResource DefaultFontFamily}"
+                       LineHeight="20"
+                       Margin="3 0 0 0"
+                       TextAlignment="Right"
+                       Text="{Binding GasPrice}"/>
+
+            <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
+                       FontFamily="{DynamicResource DefaultFontFamily}"
+                       LineHeight="20"
+                       Margin="3 0 0 0"
+                       TextAlignment="Right"
+                       Text="{Binding GasPriceCode}"/>
+          </StackPanel>
+
+          <!-- gas limit -->
+          <StackPanel Grid.Row="1"
+                      Grid.Column="1"
+                      HorizontalAlignment="Right"
+                      Orientation="Horizontal">
+            <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
+                       FontFamily="{DynamicResource DefaultFontFamily}"
+                       LineHeight="20"
+                       TextAlignment="Right"
+                       Text="Gas limit:"/>
+
+            <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
+                       FontFamily="{DynamicResource DefaultFontFamily}"
+                       LineHeight="20"
+                       Margin="3 0 0 0"
+                       Text="{Binding GasLimit}"
+                       TextAlignment="Right"/>
+
+            <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
+                       FontFamily="{DynamicResource DefaultFontFamily}"
+                       LineHeight="20"
+                       Margin="3 0 0 0"
+                       TextAlignment="Right"
+                       Text="{Binding GasLimitCode}"/>
+          </StackPanel>
+
+          <!-- fee -->
+          <StackPanel Grid.Row="2"
+                      Grid.Column="1"
+                      HorizontalAlignment="Right"
+                      Orientation="Horizontal">
+            <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
+                       FontFamily="{DynamicResource DefaultFontFamily}"
+                       LineHeight="20"
+                       TextAlignment="Right"
+                       Text="Fee:"/>
+            <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
+                       FontFamily="{DynamicResource DefaultFontFamily}"
+                       LineHeight="20"
+                       Margin="3 0 0 0"
+                       TextAlignment="Right"
+                       Text="{Binding TotalFeeString}"/>
+            <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
+                       FontFamily="{DynamicResource DefaultFontFamily}"
+                       LineHeight="20"
+                       Margin="3 0 0 0"
+                       TextAlignment="Right"
+                       Text="{Binding FeeCurrencyCode}"/>
+            <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
+                       FontFamily="{DynamicResource DefaultFontFamily}"
+                       LineHeight="20"
+                       Margin="3 0 0 0"
+                       TextAlignment="Right">
+              <TextBlock.Text>
+                <MultiBinding Converter="{StaticResource AmountToStringInBracketsConverter}">
+                  <Binding Path="FeeInBase" Mode="OneWay"/>
+                  <Binding Path="BaseCurrencyFormat" Mode="OneWay"/>
+                </MultiBinding>
+              </TextBlock.Text>
+            </TextBlock>
+          </StackPanel>
         </Grid>
-    </Border>
+      </StackPanel>
+
+      <!-- confirmation stage -->
+      <StackPanel Margin="0 18 0 0"
+                  IsVisible="{Binding Stage,
+                    Converter={StaticResource EnumToStringEqualConverter},
+                    ConverterParameter=Confirmation}"
+                  Width="440"
+                  HorizontalAlignment="Center">
+        <Grid ColumnDefinitions="*,Auto,Auto,Auto">
+          <TextBlock Grid.Column="0"
+                     Text="Amount"
+                     FontFamily="{DynamicResource DefaultFontFamily}"
+                     Foreground="{DynamicResource SecondaryForegroundBrush}"
+                     FontSize="13"/>
+
+          <TextBlock Grid.Column="1"
+                     Text="{Binding AmountString}"
+                     FontFamily="{DynamicResource DefaultFontFamily}"
+                     Foreground="{DynamicResource DefaultForegroundBrush}"
+                     FontSize="13"/>
+
+          <TextBlock Grid.Column="2"
+                     Margin="3 0 0 0"
+                     Text="{Binding CurrencyCode}"
+                     FontFamily="{DynamicResource DefaultFontFamily}"
+                     Foreground="{DynamicResource DefaultForegroundBrush}"
+                     FontSize="13"/>
+
+          <TextBlock Grid.Column="3"
+                     Foreground="{DynamicResource DefaultForegroundBrush}"
+                     FontFamily="{DynamicResource DefaultFontFamily}"
+                     FontSize="13"
+                     Margin="3 0 0 0">
+            <TextBlock.Text>
+              <MultiBinding Converter="{StaticResource AmountToStringInBracketsConverter}">
+                  <Binding Path="AmountInBase" Mode="OneWay"/>
+                  <Binding Path="BaseCurrencyFormat" Mode="OneWay"/>
+              </MultiBinding>
+            </TextBlock.Text>
+          </TextBlock>
+        </Grid>
+
+        <Grid ColumnDefinitions="*,Auto,Auto,Auto"
+              Margin="0 6 0 0">
+          <TextBlock Grid.Column="0"
+                     Text="Fee"
+                     FontFamily="{DynamicResource DefaultFontFamily}"
+                     Foreground="{DynamicResource SecondaryForegroundBrush}"
+                     FontSize="13"/>
+
+          <TextBlock Grid.Column="1"
+                     Text="{Binding TotalFeeString}"
+                     FontFamily="{DynamicResource DefaultFontFamily}"
+                     Foreground="{DynamicResource DefaultForegroundBrush}"
+                     FontSize="13"/>
+
+          <TextBlock Grid.Column="2"
+                     Margin="3 0 0 0"
+                     Text="{Binding  TotalFeeCurrencyCode}"
+                     FontFamily="{DynamicResource DefaultFontFamily}"
+                     Foreground="{DynamicResource DefaultForegroundBrush}"
+                     FontSize="13"/>
+
+          <TextBlock Grid.Column="3"
+                     Foreground="{DynamicResource DefaultForegroundBrush}"
+                     FontFamily="{DynamicResource DefaultFontFamily}"
+                     FontSize="13"
+                     Margin="3 0 0 0">
+            <TextBlock.Text>
+              <MultiBinding Converter="{StaticResource AmountToStringInBracketsConverter}">
+                <Binding Path="FeeInBase" Mode="OneWay"/>
+                <Binding Path="BaseCurrencyFormat" Mode="OneWay"/>
+              </MultiBinding>
+            </TextBlock.Text>
+          </TextBlock>
+        </Grid>
+
+        <Grid ColumnDefinitions="*,Auto,Auto"
+              Margin="0 6 0 0">
+          <TextBlock Grid.Column="0"
+                     Text="Gas price"
+                     FontFamily="{DynamicResource DefaultFontFamily}"
+                     Foreground="{DynamicResource SecondaryForegroundBrush}"
+                     FontSize="13"/>
+
+          <TextBlock Grid.Column="1"
+                     Margin="3 0 0 0"
+                     Text="{Binding GasPrice}"
+                     FontFamily="{DynamicResource DefaultFontFamily}"
+                     Foreground="{DynamicResource DefaultForegroundBrush}"
+                     FontSize="13"/>
+
+          <TextBlock Grid.Column="2"
+                     Margin="3 0 0 0"
+                     Text="{Binding GasPriceCode}"
+                     FontFamily="{DynamicResource DefaultFontFamily}"
+                     Foreground="{DynamicResource DefaultForegroundBrush}"
+                     FontSize="13"/>
+        </Grid>
+
+        <Grid ColumnDefinitions="*,Auto,Auto"
+              Margin="0 6 0 0">
+          <TextBlock Grid.Column="0"
+                     Text="Gas limit"
+                     FontFamily="{DynamicResource DefaultFontFamily}"
+                     Foreground="{DynamicResource SecondaryForegroundBrush}"
+                     FontSize="13"/>
+
+          <TextBlock Grid.Column="1"
+                     Margin="3 0 0 0"
+                     Text="{Binding GasLimit}"
+                     FontFamily="{DynamicResource DefaultFontFamily}"
+                     Foreground="{DynamicResource DefaultForegroundBrush}"
+                     FontSize="13"/>
+
+          <TextBlock Grid.Column="2"
+                     Margin="3 0 0 0"
+                     Text="{Binding GasLimitCode}"
+                     FontFamily="{DynamicResource DefaultFontFamily}"
+                     Foreground="{DynamicResource DefaultForegroundBrush}"
+                     FontSize="13"/>
+        </Grid>
+
+        <Border Height="1"
+                Margin="0 18 0 18"
+                Background="{DynamicResource LightDefaultOpacity10}"/>
+
+        <Grid ColumnDefinitions="*,Auto,Auto"
+              Margin="0 6 0 0">
+          <TextBlock Grid.Column="0"
+                     Text="Total (include fees)"
+                     FontFamily="{DynamicResource DefaultFontFamily}"
+                     Foreground="{DynamicResource SecondaryForegroundBrush}"
+                     VerticalAlignment="Center"
+                     FontSize="13">
+            <i:Interaction.Behaviors>
+              <ia:DataTriggerBehavior Binding="{Binding Currency.IsToken}"
+                                      ComparisonCondition="Equal"
+                                      Value="True">
+                <ia:ChangePropertyAction PropertyName="Text"
+                                         Value="Total (without fees)"/>
+              </ia:DataTriggerBehavior>
+            </i:Interaction.Behaviors>
+          </TextBlock>
+
+          <TextBlock Grid.Column="1"
+                     Text="{Binding TotalAmountString}"
+                     FontFamily="{DynamicResource DefaultFontFamily}"
+                     Foreground="{DynamicResource DefaultForegroundBrush}"
+                     VerticalAlignment="Center"
+                     FontSize="22"/>
+
+          <TextBlock Grid.Column="2"
+                     Margin="4 0 0 0"
+                     Text="{Binding CurrencyCode}"
+                     FontFamily="{DynamicResource DefaultFontFamily}"
+                     Foreground="{DynamicResource DefaultForegroundBrush}"
+                     VerticalAlignment="Center"
+                     FontSize="22"/>
+        </Grid>
+      </StackPanel>
+
+      <!-- additional confirmation with warning -->
+      <StackPanel Margin="0 40 0 0"
+                  IsVisible="{Binding Stage,
+                    Converter={StaticResource EnumToStringEqualConverter},
+                    ConverterParameter=AdditionalConfirmation}"
+                  Width="440"
+                  HorizontalAlignment="Center">
+        <TextBlock Text="{Binding RecommendedMaxAmountWarningToolTip}"
+                   TextWrapping="Wrap"
+                   FontFamily="{DynamicResource DefaultFontFamily}"
+                   Foreground="{DynamicResource DefaultForegroundBrush}"
+                   FontSize="16"/>
+
+        <RadioButton Margin="0 26 0 0"
+                     IsChecked="{Binding UseRecommendedAmount}"
+                     Content="{Binding SendRecommendedAmountMenu}"
+                     Classes="Default"/>
+        <RadioButton Margin="0 16 0 10"
+                     IsChecked="{Binding UseEnteredAmount}"
+                     Content="{Binding SendEnteredAmountMenu}"
+                     Classes="Default"/>
+      </StackPanel>
+      
+      <!-- send button -->
+      <StackPanel Orientation="Horizontal"
+                  HorizontalAlignment="Center"
+                  Margin="0 32 0 60">
+        <controls:RoundedButton Width="440"
+                                Height="50"
+                                CornerRadius="6"
+                                FontSize="18"
+                                FontFamily="{DynamicResource DefaultFontFamily}"
+                                FontWeight="Normal"
+                                Command="{Binding NextCommand}"
+                                IsEnabled="{Binding CanSend}">
+          <i:Interaction.Behaviors>
+            <ia:DataTriggerBehavior Binding="{Binding Stage}"
+                                    ComparisonCondition="Equal"
+                                    Value="Edit">
+              <ia:ChangePropertyAction PropertyName="Content"
+                                       Value="Send"/>
+            </ia:DataTriggerBehavior>
+            <ia:DataTriggerBehavior Binding="{Binding Stage}"
+                                    ComparisonCondition="Equal"
+                                    Value="Confirmation">
+              <ia:ChangePropertyAction PropertyName="Content"
+                                       Value="Confirm sending"/>
+            </ia:DataTriggerBehavior>
+            <ia:DataTriggerBehavior Binding="{Binding Stage}"
+                                    ComparisonCondition="Equal"
+                                    Value="AdditionalConfirmation">
+              <ia:ChangePropertyAction PropertyName="Content"
+                                       Value="Confirm sending"/>
+            </ia:DataTriggerBehavior>
+          </i:Interaction.Behaviors>
+        </controls:RoundedButton>
+      </StackPanel>
+    </StackPanel>
+  </Border>
 </UserControl>

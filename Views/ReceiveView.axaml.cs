@@ -2,7 +2,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 
-namespace Atomex.Client.Desktop.Views.ReceiveViews
+namespace Atomex.Client.Desktop.Views
 {
     public class ReceiveView : UserControl
     {

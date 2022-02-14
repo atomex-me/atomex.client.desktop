@@ -1,365 +1,238 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Reactive;
+using System.Reactive.Linq;
+using System.Threading;
 using System.Threading.Tasks;
-using System.Windows.Input;
-using Atomex.Blockchain.Abstract;
+
+using Avalonia.Controls;
+using Avalonia.Threading;
+using ReactiveUI;
+using ReactiveUI.Fody.Helpers;
+using Serilog;
+
 using Atomex.Client.Desktop.Common;
-using Atomex.Client.Desktop.Controls;
 using Atomex.Client.Desktop.Properties;
-using Atomex.Client.Desktop.ViewModels.Abstract;
 using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
 using Atomex.Core;
 using Atomex.MarketData.Abstract;
-using Atomex.Wallet.Abstract;
-using ReactiveUI;
 
 namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 {
-    public class SendViewModel : ViewModelBase
+    public enum SendStage
     {
-        protected IAtomexApp App { get; set; }
+        Edit,
+        Confirmation,
+        AdditionalConfirmation
+    }
 
-        private List<CurrencyViewModel> _fromCurrencies;
+    public abstract class SendViewModel : ViewModelBase
+    {
+        protected readonly IAtomexApp _app;
+        protected CurrencyConfig Currency;
+        public ViewModelBase SelectFromViewModel { get; set; }
+        protected SelectAddressViewModel SelectToViewModel { get; set; }
 
-        public virtual List<CurrencyViewModel> FromCurrencies
+        [Reactive] public SendStage Stage { get; set; }
+        [Reactive] public CurrencyViewModel CurrencyViewModel { get; set; }
+        [Reactive] public string From { get; set; }
+        [Reactive] public decimal SelectedFromBalance { get; set; }
+        [Reactive] public string To { get; set; }
+        [Reactive] protected decimal Amount { get; set; }
+        [ObservableAsProperty] public string FromBeautified { get; }
+        [ObservableAsProperty] public string AmountString { get; }
+        [ObservableAsProperty] public string TotalAmountString { get; }
+
+        public void SetAmountFromString(string value)
         {
-            get => _fromCurrencies;
-            set
-            {
-                _fromCurrencies = value;
-                OnPropertyChanged(nameof(FromCurrencies));
-            }
+            if (value == AmountString)
+                return;
+
+            var parsed = decimal.TryParse(
+                value,
+                NumberStyles.AllowDecimalPoint,
+                CultureInfo.CurrentCulture,
+                out var amount);
+
+            if (!parsed)
+                amount = Amount;
+
+            var truncatedValue = amount.TruncateByFormat(CurrencyFormat);
+
+            if (truncatedValue != Amount)
+                Amount = truncatedValue;
+
+            Dispatcher.UIThread.InvokeAsync(() => this.RaisePropertyChanged(nameof(AmountString)));
         }
 
-        private int _currencyIndex;
-        public int CurrencyIndex
-        {
-            get => _currencyIndex;
-            set
-            {
-                _currencyIndex = value;
-                OnPropertyChanged(nameof(CurrencyIndex));
+        protected virtual decimal FeeAmount => Fee;
+        [Reactive] protected decimal Fee { get; set; }
+        [ObservableAsProperty] public string FeeString { get; }
 
-                Currency = FromCurrencies.ElementAt(_currencyIndex).Currency;
-            }
+        public void SetFeeFromString(string value)
+        {
+            if (value == FeeString)
+                return;
+
+            var parsed = decimal.TryParse(
+                value,
+                NumberStyles.AllowDecimalPoint,
+                CultureInfo.CurrentCulture,
+                out var fee);
+
+            if (!parsed)
+                fee = Fee;
+
+            var truncatedValue = fee.TruncateByFormat(FeeCurrencyFormat);
+
+            if (truncatedValue != Fee)
+                Fee = truncatedValue;
+
+            Dispatcher.UIThread.InvokeAsync(() => this.RaisePropertyChanged(nameof(FeeString)));
         }
 
-        protected CurrencyConfig _currency;
+        [Reactive] public bool UseDefaultFee { get; set; }
+        [Reactive] public decimal AmountInBase { get; set; }
+        [Reactive] public decimal FeeInBase { get; set; }
+        [Reactive] public string? Warning { get; set; }
+        [Reactive] public string? WarningToolTip { get; set; }
+        [Reactive] public MessageType WarningType { get; set; }
+        [Reactive] public decimal RecommendedMaxAmount { get; set; }
+        [Reactive] public string? RecommendedMaxAmountWarning { get; set; }
+        [Reactive] public string? RecommendedMaxAmountWarningToolTip { get; set; }
+        [Reactive] public MessageType RecommendedMaxAmountWarningType { get; set; }
+        public bool ShowAdditionalConfirmation { get; set; }
+        [Reactive] public bool UseRecommendedAmount { get; set; }
+        [Reactive] public bool UseEnteredAmount { get; set; }
+        [Reactive] public bool CanSend { get; set; }
+        public decimal AmountToSend => UseRecommendedAmount && (RecommendedMaxAmount < Amount)
+            ? RecommendedMaxAmount
+            : Amount;
 
-        public virtual CurrencyConfig Currency
+        [Reactive] public string SendRecommendedAmountMenu { get; set; }
+        [Reactive] public string SendEnteredAmountMenu { get; set; }
+
+        public string CurrencyCode => CurrencyViewModel.CurrencyCode;
+        public string FeeCurrencyCode => CurrencyViewModel.FeeCurrencyCode;
+        public string BaseCurrencyCode => CurrencyViewModel.BaseCurrencyCode;
+        protected string CurrencyFormat => CurrencyViewModel.CurrencyFormat;
+        protected string FeeCurrencyFormat => CurrencyViewModel.FeeCurrencyFormat;
+        public string BaseCurrencyFormat => CurrencyViewModel.BaseCurrencyFormat;
+
+        private ReactiveCommand<Unit, Unit> _backCommand;
+        public ReactiveCommand<Unit, Unit> BackCommand => _backCommand ??= (_backCommand = ReactiveCommand.Create(() =>
         {
-            get => _currency;
-            set
-            {
-                if (_currency != null && _currency != value)
-                {
-                    var sendViewModel = SendViewModelCreator.CreateViewModel(App, value);
-
-                    Desktop.App.DialogService.Show(sendViewModel);
-                    return;
-                }
-
-                _currency = value;
-                OnPropertyChanged(nameof(Currency));
-
-                CurrencyViewModel = FromCurrencies.FirstOrDefault(c => c.Currency.Name == Currency.Name);
-
-                _amount = 0;
-                OnPropertyChanged(nameof(AmountString));
-
-                _fee = 0;
-                OnPropertyChanged(nameof(FeeString));
-
-                Warning = string.Empty;
-            }
-        }
-
-        protected CurrencyViewModel _currencyViewModel;
-
-        public virtual CurrencyViewModel CurrencyViewModel
-        {
-            get => _currencyViewModel;
-            set
-            {
-                _currencyViewModel = value;
-
-                CurrencyCode = _currencyViewModel?.CurrencyCode;
-                FeeCurrencyCode = _currencyViewModel?.FeeCurrencyCode;
-                BaseCurrencyCode = _currencyViewModel?.BaseCurrencyCode;
-
-                CurrencyFormat = _currencyViewModel?.CurrencyFormat;
-                FeeCurrencyFormat = CurrencyViewModel?.FeeCurrencyFormat;
-                BaseCurrencyFormat = _currencyViewModel?.BaseCurrencyFormat;
-            }
-        }
-
-        protected string _to;
-
-        public virtual string To
-        {
-            get => _to;
-            set
-            {
-                _to = value;
-                OnPropertyChanged(nameof(To));
-                Warning = string.Empty;
-            }
-        }
-
-        protected string CurrencyFormat { get; set; }
-        protected string FeeCurrencyFormat { get; set; }
-
-        private string _baseCurrencyFormat;
-
-        public virtual string BaseCurrencyFormat
-        {
-            get => _baseCurrencyFormat;
-            set
-            {
-                _baseCurrencyFormat = value;
-                OnPropertyChanged(nameof(BaseCurrencyFormat));
-            }
-        }
-
-        protected decimal _amount;
-
-        public decimal Amount
-        {
-            get => _amount;
-            set { UpdateAmount(value); }
-        }
-
-        private bool _isAmountUpdating;
-
-        public bool IsAmountUpdating
-        {
-            get => _isAmountUpdating;
-            set
-            {
-                _isAmountUpdating = value;
-                OnPropertyChanged(nameof(IsAmountUpdating));
-            }
-        }
-
-        public string AmountString
-        {
-            get => Amount.ToString(CurrencyFormat, CultureInfo.InvariantCulture);
-            set
-            {
-                if (!decimal.TryParse(value, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture,
-                    out var amount))
-                {
-                    if (amount == 0)
-                        Amount = amount;
-                    OnPropertyChanged(nameof(AmountString));
-                    return;
-                }
-
-
-                Amount = amount.TruncateByFormat(CurrencyFormat);
-                OnPropertyChanged(nameof(AmountString));
-            }
-        }
-
-        private bool _isFeeUpdating;
-
-        public bool IsFeeUpdating
-        {
-            get => _isFeeUpdating;
-            set
-            {
-                _isFeeUpdating = value;
-                OnPropertyChanged(nameof(IsFeeUpdating));
-            }
-        }
-
-        protected decimal _fee;
-
-        public decimal Fee
-        {
-            get => _fee;
-            set { UpdateFee(value); }
-        }
-
-        public virtual string FeeString
-        {
-            get => Fee.ToString(FeeCurrencyFormat, CultureInfo.InvariantCulture);
-            set
-            {
-                if (!decimal.TryParse(value, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out var fee))
-                {
-                    if (fee == 0)
-                        Fee = fee;
-                    OnPropertyChanged(nameof(FeeString));
-                    return;
-                }
-
-                Fee = fee.TruncateByFormat(FeeCurrencyFormat);
-                OnPropertyChanged(nameof(FeeString));
-            }
-        }
-
-        protected bool _useDefaultFee;
-
-        public virtual bool UseDefaultFee
-        {
-            get => _useDefaultFee;
-            set
-            {
-                _useDefaultFee = value;
-                OnPropertyChanged(nameof(UseDefaultFee));
-
-                if (_useDefaultFee)
-                    Amount = _amount; // recalculate amount and fee using default fee
-            }
-        }
-
-        protected decimal _amountInBase;
-
-        public decimal AmountInBase
-        {
-            get => _amountInBase;
-            set
-            {
-                _amountInBase = value;
-                OnPropertyChanged(nameof(AmountInBase));
-            }
-        }
-
-        protected decimal _feeInBase;
-
-        public decimal FeeInBase
-        {
-            get => _feeInBase;
-            set
-            {
-                _feeInBase = value;
-                OnPropertyChanged(nameof(FeeInBase));
-            }
-        }
-
-        protected string _currencyCode;
-
-        public string CurrencyCode
-        {
-            get => _currencyCode;
-            set
-            {
-                _currencyCode = value;
-                OnPropertyChanged(nameof(CurrencyCode));
-            }
-        }
-
-        protected string _feeCurrencyCode;
-
-        public string FeeCurrencyCode
-        {
-            get => _feeCurrencyCode;
-            set
-            {
-                _feeCurrencyCode = value;
-                OnPropertyChanged(nameof(FeeCurrencyCode));
-            }
-        }
-
-        protected string _baseCurrencyCode;
-
-        public string BaseCurrencyCode
-        {
-            get => _baseCurrencyCode;
-            set
-            {
-                _baseCurrencyCode = value;
-                OnPropertyChanged(nameof(BaseCurrencyCode));
-            }
-        }
-
-        protected string _warning;
-
-        public string Warning
-        {
-            get => _warning;
-            set
-            {
-                _warning = value;
-                OnPropertyChanged(nameof(Warning));
-            }
-        }
-
-        private ICommand _backCommand;
-
-        public ICommand BackCommand => _backCommand ??= (_backCommand = ReactiveCommand.Create(() =>
-        {
-            Desktop.App.DialogService.Close();
+            App.DialogService.Close();
         }));
 
-        private ICommand _nextCommand;
-        public ICommand NextCommand => _nextCommand ??= (_nextCommand = ReactiveCommand.Create(OnNextCommand));
+        private ReactiveCommand<Unit, Unit> _undoConfirmStageCommand;
+        public ReactiveCommand<Unit, Unit> UndoConfirmStageCommand => _undoConfirmStageCommand ??=
+            (_undoConfirmStageCommand = ReactiveCommand.Create(() =>
+            {
+                Stage = Stage == SendStage.AdditionalConfirmation
+                    ? SendStage.Confirmation
+                    : SendStage.Edit;
+            }));
 
-        protected virtual void OnNextCommand()
+        private ReactiveCommand<Unit, Unit> _selectFromCommand;
+        public ReactiveCommand<Unit, Unit> SelectFromCommand => _selectFromCommand ??=
+            (_selectFromCommand = ReactiveCommand.Create(FromClick));
+
+        private ReactiveCommand<Unit, Unit> _selectToCommand;
+        public ReactiveCommand<Unit, Unit> SelectToCommand => _selectToCommand ??=
+            (_selectToCommand = ReactiveCommand.Create(ToClick));
+
+        protected abstract void FromClick();
+
+        protected abstract void ToClick();
+
+        private ReactiveCommand<Unit, Unit> _nextCommand;
+        public ReactiveCommand<Unit, Unit> NextCommand =>
+            _nextCommand ??= (_nextCommand = ReactiveCommand.CreateFromTask(OnNextCommand));
+
+        private async Task OnNextCommand()
         {
+            var feeAmount = !Currency.IsToken ? FeeAmount : 0;
+
             if (string.IsNullOrEmpty(To))
             {
                 Warning = Resources.SvEmptyAddressError;
-                return;
             }
 
-            if (!Currency.IsValidAddress(To))
+            else if (!Currency.IsValidAddress(To))
             {
                 Warning = Resources.SvInvalidAddressError;
-                return;
             }
 
-            if (Amount <= 0)
+            else if (Amount <= 0)
             {
                 Warning = Resources.SvAmountLessThanZeroError;
-                return;
             }
 
-            if (Fee <= 0)
+            else if (FeeAmount <= 0)
             {
                 Warning = Resources.SvCommissionLessThanZeroError;
-                return;
             }
 
-            var isToken = Currency.FeeCurrencyName != Currency.Name;
-
-            var feeAmount = !isToken ? Fee : 0;
-
-            if (Amount + feeAmount > CurrencyViewModel.AvailableAmount)
+            else if (Amount + feeAmount > CurrencyViewModel.AvailableAmount)
             {
                 Warning = Resources.SvAvailableFundsError;
-                return;
             }
 
-            var confirmationViewModel = new SendConfirmationViewModel
+            if (!string.IsNullOrEmpty(Warning))
+                return;
+
+            if ((Stage == SendStage.Confirmation && !ShowAdditionalConfirmation) ||
+                 Stage == SendStage.AdditionalConfirmation)
             {
-                Currency = Currency,
-                To = To,
-                Amount = Amount,
-                AmountInBase = AmountInBase,
-                BaseCurrencyCode = BaseCurrencyCode,
-                BaseCurrencyFormat = BaseCurrencyFormat,
-                Fee = Fee,
-                UseDeafultFee = UseDefaultFee,
-                FeeInBase = FeeInBase,
-                CurrencyCode = CurrencyCode,
-                CurrencyFormat = CurrencyFormat,
-            
-                FeeCurrencyCode = FeeCurrencyCode,
-                FeeCurrencyFormat = FeeCurrencyFormat,
-                BackView = this
-            };
-            
-            Desktop.App.DialogService.Show(confirmationViewModel);
+                try
+                {
+                    App.DialogService.Show(
+                        MessageViewModel.Message(title: "Sending, please wait", withProgressBar: true));
+
+                    var error = await Send();
+
+                    if (error != null)
+                    {
+                        App.DialogService.Show(MessageViewModel.Error(
+                            text: error.Description,
+                            backAction: () => App.DialogService.Show(this)));
+
+                        return;
+                    }
+
+                    App.DialogService.Show(MessageViewModel.Success(
+                        text: "Sending was successful",
+                        nextAction: () => { App.DialogService.Close(); }));
+                }
+                catch (Exception e)
+                {
+                    App.DialogService.Show(MessageViewModel.Error(
+                        text: "An error has occurred while sending transaction",
+                        backAction: () => App.DialogService.Show(this)));
+
+                    Log.Error(e, "Transaction send error.");
+                }
+                finally
+                {
+                    Stage = SendStage.Edit;
+                }
+            }
+            else if (Stage == SendStage.Confirmation && ShowAdditionalConfirmation)
+            {
+                Stage = SendStage.AdditionalConfirmation;
+            }
+            else
+            {
+                Stage = SendStage.Confirmation;
+            }
         }
 
         public SendViewModel()
         {
 #if DEBUG
-            if (Env.IsInDesignerMode())
+            if (Design.IsDesignMode)
                 DesignerMode();
 #endif
         }
@@ -368,285 +241,195 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             IAtomexApp app,
             CurrencyConfig currency)
         {
-            App = app ?? throw new ArgumentNullException(nameof(app));
+            _app = app ?? throw new ArgumentNullException(nameof(app));
+            Currency = currency ?? throw new ArgumentNullException(nameof(currency));
 
-            FromCurrencies = App.Account.Currencies
-                .Select(CurrencyViewModelCreator.CreateViewModel)
-                .ToList();
+            CurrencyViewModel = CurrencyViewModelCreator.CreateViewModel(currency);
+            UseDefaultFee = true;
 
-            var CurrencyVM = FromCurrencies
-                .FirstOrDefault(c => c.Currency.Name == currency.Name);
+            var updateAmountCommand = ReactiveCommand.CreateFromTask(UpdateAmount);
+            var updateFeeCommand = ReactiveCommand.CreateFromTask(UpdateFee);
 
-            CurrencyIndex = FromCurrencies.IndexOf(CurrencyVM);
-            
-            UseDefaultFee = true; // use default fee by default
+            this.WhenAnyValue(
+                    vm => vm.From,
+                    vm => vm.To,
+                    vm => vm.Amount,
+                    vm => vm.Fee)
+                .Subscribe(_ => Warning = string.Empty);
+
+            this.WhenAnyValue(
+                    vm => vm.Amount,
+                    vm => vm.Fee,
+                    (amount, fee) => Currency.IsToken ? amount : amount + fee)
+                .Select(totalAmount => totalAmount.ToString(CurrencyFormat, CultureInfo.CurrentCulture))
+                .ToPropertyEx(this, vm => vm.TotalAmountString);
+
+            this.WhenAnyValue(
+                    vm => vm.Amount,
+                    vm => vm.Fee)
+                .Subscribe(_ => OnQuotesUpdatedEventHandler(_app.QuotesProvider, EventArgs.Empty));
+
+            this.WhenAnyValue(
+                    vm => vm.Amount,
+                    vm => vm.From,
+                    vm => vm.To,
+                    (amount, from, to) => from)
+                .WhereNotNull()
+                .Select(_ => Unit.Default)
+                .InvokeCommand(updateAmountCommand);
+
+            this.WhenAnyValue(vm => vm.From)
+                .Select(s => s.TruncateAddress())
+                .ToPropertyEx(this, vm => vm.FromBeautified);
+
+            this.WhenAnyValue(vm => vm.Amount)
+                .Select(amount => amount
+                    .TruncateDecimal(Currency.Digits < 9 ? Currency.Digits : 9)
+                    .ToString(CurrencyFormat, CultureInfo.CurrentCulture))
+                .ToPropertyEx(this, vm => vm.AmountString);
+
+            this.WhenAnyValue(vm => vm.Fee)
+                .Where(_ => !string.IsNullOrEmpty(From))
+                .Select(_ => Unit.Default)
+                .InvokeCommand(updateFeeCommand);
+
+            this.WhenAnyValue(vm => vm.Fee)
+                .Select(fee => fee.ToString(FeeCurrencyFormat, CultureInfo.CurrentCulture))
+                .ToPropertyEx(this, vm => vm.FeeString);
+
+            this.WhenAnyValue(vm => vm.UseDefaultFee)
+                .Where(useDefaultFee => useDefaultFee && !string.IsNullOrEmpty(From))
+                .Select(_ => Unit.Default)
+                .InvokeCommand(updateAmountCommand);
+
+            var canSendObservable1 = this.WhenAnyValue(
+                vm => vm.Amount,
+                vm => vm.Warning,
+                vm => vm.WarningType,
+                vm => vm.RecommendedMaxAmountWarning,
+                vm => vm.RecommendedMaxAmountWarningType);
+
+            var canSendObservable2 = this.WhenAnyValue(
+                vm => vm.UseRecommendedAmount,
+                vm => vm.UseEnteredAmount,
+                vm => vm.Stage);
+
+            canSendObservable1.CombineLatest(canSendObservable2)
+                .Throttle(TimeSpan.FromMilliseconds(1))
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(_ =>
+                {
+                    if (Stage == SendStage.Edit)
+                    {
+                        CanSend = To != null &&
+                                  Amount > 0 &&
+                                  (string.IsNullOrEmpty(Warning) || (Warning != null && WarningType != MessageType.Error)) &&
+                                  (string.IsNullOrEmpty(RecommendedMaxAmountWarning) || (RecommendedMaxAmountWarning != null && RecommendedMaxAmountWarningType != MessageType.Error));
+                    }
+                    else if (Stage == SendStage.Confirmation)
+                    {
+                        CanSend = true;
+                    }
+                    else
+                    {
+                        CanSend = UseRecommendedAmount || UseEnteredAmount;
+                    }
+                });
+
+            this.WhenAnyValue(vm => vm.Stage)
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(s =>
+                {
+                    UseRecommendedAmount = false;
+                    UseEnteredAmount = false;
+                });
+
+            this.WhenAnyValue(vm => vm.RecommendedMaxAmount)
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(a =>
+                {
+                    SendRecommendedAmountMenu = string.Format(
+                        Resources.SendRecommendedAmountMenu,
+                        RecommendedMaxAmount,
+                        Currency.Name);
+                });
+
+            this.WhenAnyValue(vm => vm.Amount)
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(a =>
+                {
+                    SendEnteredAmountMenu = string.Format(
+                        Resources.SendEnteredAmountMenu,
+                        Amount,
+                        Currency.Name);
+                });
 
             SubscribeToServices();
         }
 
         private void SubscribeToServices()
         {
-            if (App.HasQuotesProvider)
-                App.QuotesProvider.QuotesUpdated += OnQuotesUpdatedEventHandler;
+            if (_app.HasQuotesProvider)
+                _app.QuotesProvider.QuotesUpdated += OnQuotesUpdatedEventHandler;
         }
 
-        protected virtual async void UpdateAmount(decimal amount)
+        protected abstract Task UpdateAmount();
+
+        protected virtual Task UpdateFee()
         {
-            if (IsAmountUpdating)
-                return;
-
-            IsAmountUpdating = true;
-
-            Warning = string.Empty;
-            
-            _amount = amount;
-
-            try
-            {
-                var defaultFeePrice = await Currency.GetDefaultFeePriceAsync();
-
-                var account = App.Account
-                    .GetCurrencyAccount<ILegacyCurrencyAccount>(Currency.Name);
-
-                if (UseDefaultFee)
-                {
-                    var (maxAmount, _, _) = await account
-                        .EstimateMaxAmountToSendAsync(
-                            to: To,
-                            type: BlockchainTransactionType.Output,
-                            fee: 0,
-                            feePrice: 0,
-                            reserve: true);
-
-                    if (_amount > maxAmount)
-                    {
-                        Warning = Resources.CvInsufficientFunds;
-                        IsAmountUpdating = false;
-                        return;
-                    }
-
-                    var estimatedFeeAmount = _amount != 0
-                        ? await account.EstimateFeeAsync(To, _amount, BlockchainTransactionType.Output)
-                        : 0;
-
-                    OnPropertyChanged(nameof(AmountString));
-
-                    _fee = Currency.GetFeeFromFeeAmount(estimatedFeeAmount ?? Currency.GetDefaultFee(), defaultFeePrice);
-                    OnPropertyChanged(nameof(FeeString));
-                }
-                else
-                {
-                    var (maxAmount, maxFeeAmount, _) = await account
-                        .EstimateMaxAmountToSendAsync(
-                            to: To,
-                            type: BlockchainTransactionType.Output,
-                            fee: 0,
-                            feePrice: 0,
-                            reserve: false);
-
-                    var availableAmount = Currency is BitcoinBasedConfig
-                        ? CurrencyViewModel.AvailableAmount
-                        : maxAmount + maxFeeAmount;
-
-                    var feeAmount = Currency.GetFeeAmount(_fee, defaultFeePrice);
-
-                    if (_amount > maxAmount || _amount + feeAmount > availableAmount)
-                    {
-                        Warning = Resources.CvInsufficientFunds;
-                        IsAmountUpdating = false;
-                        return;
-                    }
-
-                    OnPropertyChanged(nameof(AmountString));
-
-                    Fee = _fee;
-                }
-
-                OnQuotesUpdatedEventHandler(App.QuotesProvider, EventArgs.Empty);
-            }
-            finally
-            {
-                IsAmountUpdating = false;
-            }
+            return Task.CompletedTask;
         }
 
-        protected virtual async void UpdateFee(decimal fee)
-        {
-            if (IsFeeUpdating)
-                return;
-
-            IsFeeUpdating = true;
-
-            _fee = Math.Min(fee, Currency.GetMaximumFee());
-
-            Warning = string.Empty;
-
-            try
+        private ReactiveCommand<Unit, Unit> _maxCommand;
+        public ReactiveCommand<Unit, Unit> MaxCommand =>
+            _maxCommand ??= (_maxCommand = ReactiveCommand.CreateFromTask(async () =>
             {
-                var defaultFeePrice = await Currency.GetDefaultFeePriceAsync();
+                Warning = string.Empty;
+                await OnMaxClick();
+            }));
 
-                if (_amount == 0)
-                {
-                    if (Currency.GetFeeAmount(_fee, defaultFeePrice) > CurrencyViewModel.AvailableAmount)
-                        Warning = Resources.CvInsufficientFunds;
-
-                    return;
-                }
-
-                if (!UseDefaultFee)
-                {
-                    var account = App.Account
-                        .GetCurrencyAccount<ILegacyCurrencyAccount>(Currency.Name);
-
-                    var estimatedFeeAmount = _amount != 0
-                        ? await account.EstimateFeeAsync(To, _amount, BlockchainTransactionType.Output)
-                        : 0;
-
-                    var (maxAmount, maxFeeAmount, _) = await account
-                        .EstimateMaxAmountToSendAsync(
-                            to: To,
-                            type: BlockchainTransactionType.Output,
-                            fee: 0,
-                            feePrice: 0,
-                            reserve: false);
-
-                    var availableAmount = Currency is BitcoinBasedConfig
-                        ? CurrencyViewModel.AvailableAmount
-                        : maxAmount + maxFeeAmount;
-
-                    var feeAmount = Currency.GetFeeAmount(_fee, defaultFeePrice);
-
-                    if (_amount + feeAmount > availableAmount)
-                    {
-                        Warning = Resources.CvInsufficientFunds;
-                        IsAmountUpdating = false;
-                        return;
-                    }
-                    else if (estimatedFeeAmount == null || feeAmount < estimatedFeeAmount.Value)
-                    {
-                        Warning = Resources.CvLowFees;
-                    }
-
-                    OnPropertyChanged(nameof(FeeString));
-                }
-
-                OnQuotesUpdatedEventHandler(App.QuotesProvider, EventArgs.Empty);
-            }
-            finally
-            {
-                IsFeeUpdating = false;
-            }
-        }
-
-        protected ICommand _maxCommand;
-        public ICommand MaxCommand => _maxCommand ??= (_maxCommand = ReactiveCommand.Create(OnMaxClick));
-
-        protected virtual async void OnMaxClick()
-        {
-            if (IsAmountUpdating)
-                return;
-
-            IsAmountUpdating = true;
-
-            Warning = string.Empty;
-
-            try
-            {
-                if (CurrencyViewModel.AvailableAmount == 0)
-                    return;
-
-                var defaultFeePrice = await Currency
-                    .GetDefaultFeePriceAsync();
-
-                var account = App.Account
-                    .GetCurrencyAccount<ILegacyCurrencyAccount>(Currency.Name);
-
-                if (UseDefaultFee)
-                {
-                    var (maxAmount, maxFeeAmount, _) = await account
-                        .EstimateMaxAmountToSendAsync(To, BlockchainTransactionType.Output, 0, 0, true);
-
-                    if (maxAmount > 0)
-                        _amount = maxAmount;
-
-                    OnPropertyChanged(nameof(AmountString));
-
-                    _fee = Currency.GetFeeFromFeeAmount(maxFeeAmount, defaultFeePrice);
-                    OnPropertyChanged(nameof(FeeString));
-                }
-                else
-                {
-                    var (maxAmount, maxFeeAmount, _) = await account
-                        .EstimateMaxAmountToSendAsync( To, BlockchainTransactionType.Output, 0, 0, false);
-
-                    var availableAmount = Currency is BitcoinBasedConfig
-                        ? CurrencyViewModel.AvailableAmount
-                        : maxAmount + maxFeeAmount;
-
-                    var feeAmount = Currency.GetFeeAmount(_fee, defaultFeePrice);
-
-                    if (availableAmount - feeAmount > 0)
-                    {
-                        _amount = availableAmount - feeAmount;
-
-                        var estimatedFeeAmount = _amount != 0
-                            ? await account.EstimateFeeAsync(To, _amount, BlockchainTransactionType.Output)
-                            : 0;
-
-                        if (estimatedFeeAmount == null || feeAmount < estimatedFeeAmount.Value)
-                        {
-                            Warning = Resources.CvLowFees;
-                            if (_fee == 0)
-                            {
-                                _amount = 0;
-                                OnPropertyChanged(nameof(AmountString));
-                                return;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        _amount = 0;
-
-                        Warning = Resources.CvInsufficientFunds;
-                    }
-
-                    OnPropertyChanged(nameof(AmountString));
-
-                    OnPropertyChanged(nameof(FeeString));
-                }
-
-                OnQuotesUpdatedEventHandler(App.QuotesProvider, EventArgs.Empty);
-            }
-            finally
-            {
-                IsAmountUpdating = false;
-            }
-        }
+        protected abstract Task OnMaxClick();
 
         protected virtual void OnQuotesUpdatedEventHandler(object sender, EventArgs args)
         {
-            if (!(sender is ICurrencyQuotesProvider quotesProvider))
+            if (sender is not ICurrencyQuotesProvider quotesProvider)
                 return;
 
             var quote = quotesProvider.GetQuote(CurrencyCode, BaseCurrencyCode);
 
             AmountInBase = Amount * (quote?.Bid ?? 0m);
-            FeeInBase = Fee * (quote?.Bid ?? 0m);
+            FeeInBase    = Fee * (quote?.Bid ?? 0m);
         }
 
-        private void DesignerMode()
+        protected abstract Task<Error> Send(CancellationToken cancellationToken = default);
+
+#if DEBUG
+        protected void DesignerMode()
         {
-            FromCurrencies = DesignTime.Currencies
+            var fromCurrencies = DesignTime.Currencies
                 .Select(c => CurrencyViewModelCreator.CreateViewModel(c, subscribeToUpdates: false))
                 .ToList();
 
-            _currency = FromCurrencies[0].Currency;
-            _to = "1BvBMSEYstWetqTFn5Au4m4GFg7xJaNVN2";
-            _amount = 0.00001234m;
-            _amountInBase = 10.23m;
-            _fee = 0.0001m;
-            _feeInBase = 8.43m;
+            Currency          = fromCurrencies[0].Currency;
+            CurrencyViewModel = fromCurrencies[0];
+            To                = "1BvBMSEYstWetqTFn5Au4m4GFg7xJaNVN2";
+            Amount            = 0.00001234m;
+            AmountInBase      = 10.23m;
+            Fee               = 0.0001m;
+            FeeInBase         = 8.43m;
+
+            Warning        = "Insufficient funds";
+            WarningToolTip = "";
+            WarningType    = MessageType.Error;
+
+            RecommendedMaxAmountWarning        = "We recommend to send no more than 0.073 ETH";
+            RecommendedMaxAmountWarningToolTip = "You have tokens that require ETH. Sending this will not leave enough ETH to send or exchange your tokens. We recommend to send no more than 0.073 ETH";
+            RecommendedMaxAmountWarningType    = MessageType.Warning;
+
+            Stage = SendStage.Confirmation;
+            SendRecommendedAmountMenu = string.Format(Resources.SendRecommendedAmountMenu, 0.073, "ETH");
+            SendEnteredAmountMenu = string.Format(Resources.SendEnteredAmountMenu, 0.073, "ETH");
         }
+#endif
     }
 }

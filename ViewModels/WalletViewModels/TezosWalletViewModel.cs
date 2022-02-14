@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 using Atomex.Blockchain.Tezos;
 using Atomex.Blockchain.Tezos.Internal;
-using Atomex.Client.Desktop.ViewModels.ReceiveViewModels;
 using Atomex.Core;
 using Atomex.Wallet;
 using Avalonia.Media.Imaging;

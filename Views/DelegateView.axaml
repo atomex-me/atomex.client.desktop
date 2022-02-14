@@ -4,15 +4,16 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="Atomex.Client.Desktop.Views.DelegateView"
-             xmlns:vm="clr-namespace:Atomex.Client.Desktop.ViewModels"
+             xmlns:vm="clr-namespace:Atomex.ViewModels;assembly=Atomex.Client.Core"
              xmlns:controls="clr-namespace:Atomex.Client.Desktop.Controls"
              xmlns:helpers="clr-namespace:Atomex.Client.Desktop.Helpers"
              xmlns:converters="clr-namespace:Atomex.Client.Desktop.Converters"
              xmlns:mah="clr-namespace:AvaloniaProgressRing;assembly=AvaloniaProgressRing"
+             xmlns:viewModels="clr-namespace:Atomex.Client.Desktop.ViewModels"
              Height="500"
              Width="600">
     <Design.DataContext>
-        <vm:DelegateViewModel />
+        <viewModels:DelegateViewModel />
     </Design.DataContext>
 
     <UserControl.Resources>
@@ -53,7 +54,7 @@
                            Margin="40 20 40 40"
                            TextWrapping="Wrap"
                            HorizontalAlignment="Center" />
-
+                
                 <ComboBox IsVisible="{Binding !BakersLoading}"
                           Width="510"
                           MinHeight="68"
@@ -61,7 +62,6 @@
                           Margin="0 5 0 5"
                           Items="{Binding FromBakersList}"
                           SelectedItem="{Binding BakerViewModel}"
-                          VirtualizationMode="Simple"
                           helpers:ComboBoxHelper.CornerRadius="20"
                           Classes="BakersComboBox" />
 

@@ -5,8 +5,12 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
+
+using Avalonia.Threading;
 using Newtonsoft.Json.Linq;
+using ReactiveUI;
 using Serilog;
+
 using Atomex.Blockchain.Tezos;
 using Atomex.Blockchain.Tezos.Internal;
 using Atomex.Client.Desktop.Common;
@@ -14,8 +18,7 @@ using Atomex.Client.Desktop.Properties;
 using Atomex.Common;
 using Atomex.Core;
 using Atomex.MarketData.Abstract;
-using Avalonia.Threading;
-using ReactiveUI;
+using Atomex.ViewModels;
 
 namespace Atomex.Client.Desktop.ViewModels
 {
@@ -303,7 +306,7 @@ namespace Atomex.Client.Desktop.ViewModels
                 }
 
                 /*
-                if (xTezos.GetFeeAmount(Fee, FeePrice) > CurrencyViewModel.AvailableAmount) {
+                if (xTezos.GetFeeAmount(Fee, GasPrice) > CurrencyViewModel.AvailableAmount) {
                     Warning = Resources.SvAvailableFundsError;
                     return;
                 }*/

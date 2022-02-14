@@ -1,0 +1,250 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="700" d:DesignHeight="650"
+             x:Class="Atomex.Client.Desktop.Views.SendViews.SelectOutputsView"
+             xmlns:svg="clr-namespace:Avalonia.Svg.Skia;assembly=Avalonia.Svg.Skia"
+             xmlns:vm="clr-namespace:Atomex.Client.Desktop.ViewModels.SendViewModels"
+             xmlns:controls="clr-namespace:Atomex.Client.Desktop.Controls"
+             xmlns:converters="clr-namespace:Atomex.Client.Desktop.Converters"
+             xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
+             xmlns:ia="clr-namespace:Avalonia.Xaml.Interactions.Core;assembly=Avalonia.Xaml.Interactions">
+
+    <Design.DataContext>
+        <vm:SelectOutputsViewModel />
+    </Design.DataContext>
+    
+    <Border Classes="ChildViewBorder"
+            Padding="24 20 24 16"
+            Width="700">
+
+        <StackPanel Orientation="Vertical">
+            <Grid ColumnDefinitions="Auto,*"
+                  RowDefinitions="Auto">
+                <Button Grid.Column="0"
+                        Width="28"
+                        Height="28"
+                        Padding="3"
+                        BorderThickness="0"
+                        VerticalContentAlignment="Center"
+                        Command="{Binding BackCommand}"
+                        Classes="ButtonWithIcon">
+
+                    <svg:Svg Width="28"
+                             Path="/Resources/Icons/back.svg"
+                             HorizontalAlignment="Left" />
+                </Button>
+
+                <TextBlock Grid.Column="1"
+                           FontSize="22"
+                           FontWeight="400"
+                           Margin="-28 0 0 0"
+                           HorizontalAlignment="Center"
+                           Foreground="{DynamicResource LightDefault}">
+                    Send from
+                </TextBlock>
+            </Grid>
+
+            <Border Margin="-24 16 -24 0"
+                    Height="1"
+                    Background="{DynamicResource LightDefaultOpacity10}" />
+
+            <TextBox Margin="0 16 0 0"
+                     Height="44"
+                     CornerRadius="8"
+                     Watermark="Search"
+                     FontSize="16"
+                     Text="{Binding SearchPattern, Mode=TwoWay}"
+                     Classes="SearchTextBox">
+                <TextBox.InnerRightContent>
+                    <StackPanel VerticalAlignment="Center"
+                                IsVisible="{Binding SearchPattern, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+                        <Button Margin="0 0 15 0"
+                                Padding="0"
+                                BorderThickness="0"
+                                VerticalContentAlignment="Center"
+                                Command="{ReflectionBinding $parent[TextBox].Clear}"
+                                Classes="ButtonWithIcon WithoutEffects">
+
+                            <svg:Svg HorizontalAlignment="Center"
+                                     Width="18"
+                                     Height="18"
+                                     Path="/Resources/Icons/subtract.svg" />
+                        </Button>
+                    </StackPanel>
+                </TextBox.InnerRightContent>
+            </TextBox>
+
+            <Grid Margin="0 18 0 0"
+                  ColumnDefinitions="Auto,*,Auto,Auto"
+                  RowDefinitions="Auto">
+                <CheckBox Grid.Row="0"
+                          Grid.Column="0"
+                          Margin="12 0 0 0"
+                          Padding="12 0 0 0"
+                          IsChecked="{Binding SelectAll, Mode=TwoWay}"
+                          Command="{Binding SelectAllCommand}"
+                          FontSize="13"
+                          FontFamily="{DynamicResource DefaultLightFontFamily}"
+                          Foreground="{DynamicResource SecondaryForegroundBrush}">
+                    Select all
+                </CheckBox>
+
+                <Button Grid.Row="0"
+                        Grid.Column="1"
+                        HorizontalAlignment="Right"
+                        Command="{Binding ChangeSortTypeCommand}"
+                        Classes="SecondaryButton"
+                        Name="SortTypeButton">
+                    <i:Interaction.Behaviors>
+                        <ia:DataTriggerBehavior Binding="{Binding SortByDate}"
+                                                ComparisonCondition="Equal"
+                                                Value="True">
+                            <ia:ChangePropertyAction TargetObject="{Binding #SortTypeButton}"
+                                                     PropertyName="Content"
+                                                     Value="Sort by date" />
+                        </ia:DataTriggerBehavior>
+                        <ia:DataTriggerBehavior Binding="{Binding SortByDate}"
+                                                ComparisonCondition="NotEqual"
+                                                Value="True">
+                            <ia:ChangePropertyAction TargetObject="{Binding #SortTypeButton}"
+                                                     PropertyName="Content"
+                                                     Value="Sort by balance" />
+                        </ia:DataTriggerBehavior>
+                    </i:Interaction.Behaviors>
+                </Button>
+
+                <Button Grid.Row="0"
+                        Grid.Column="2"
+                        Width="24"
+                        Height="26"
+                        Background="{DynamicResource LightDefaultOpacity4}"
+                        CornerRadius="8"
+                        Padding="4 5"
+                        Margin="8 0 12 0"
+                        Command="{Binding ChangeSortDirectionCommand}"
+                        Classes.Rotated="{Binding SortIsAscending}"
+                        Classes.NotRotated="{Binding !SortIsAscending}"
+                        Classes="SecondaryButton Sort">
+                    <svg:Svg HorizontalAlignment="Center"
+                             Width="16"
+                             Height="16"
+                             Path="/Resources/Icons/sort.svg" />
+                </Button>
+            </Grid>
+
+            <Border Margin="0 10 0 0"
+                    Height="1"
+                    Background="{StaticResource LightDefaultOpacity10}" />
+
+            <ListBox Height="300"
+                     Background="{DynamicResource AlmostTransparentBrush}"
+                     ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                     Items="{Binding Outputs}"
+                     SelectionMode="Single">
+                <ListBox.Styles>
+                    <Style Selector="ListBoxItem">
+                        <Setter Property="Padding" Value="0" />
+                        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                    </Style>
+                    <Style Selector="ListBoxItem:pointerover /template/ ContentPresenter">
+                        <Setter Property="Background" Value="{DynamicResource ListBoxItemPointeroverBrush}" />
+                        <Setter Property="CornerRadius" Value="8" />
+                    </Style>
+                    <Style Selector="ListBoxItem:not(:pointerover) /template/ ContentPresenter">
+                        <Setter Property="Background" Value="{DynamicResource AlmostTransparentBrush}" />
+                    </Style>
+                </ListBox.Styles>
+
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <Grid ColumnDefinitions="*,Auto,Auto"
+                              Margin="0 10 0 10"
+                              Background="Transparent"
+                              HorizontalAlignment="Stretch"
+                              RowDefinitions="Auto">
+                            <CheckBox Grid.Column="0"
+                                      Margin="12 0 0 0"
+                                      Padding="12 0 0 0"
+                                      VerticalContentAlignment="Center"
+                                      VerticalAlignment="Center"
+                                      Content="{Binding Address}"
+                                      IsChecked="{Binding IsSelected, Mode=TwoWay}"
+                                      Command="{Binding $parent[ListBox].DataContext.OutputCheckCommand}"
+                                      FontSize="16"
+                                      FontFamily="{DynamicResource DefaultLightFontFamily}"
+                                      Foreground="{DynamicResource DefaultForegroundBrush}"
+                                      Classes="Primary" />
+
+                            <TextBlock Grid.Column="1"
+                                       VerticalAlignment="Center"
+                                       Margin="0 0 20 0"
+                                       Foreground="{DynamicResource SecondaryForegroundBrush}"
+                                       FontSize="16"
+                                       Text="{Binding BalanceString}" />
+
+                            <Border Grid.Column="2"
+                                    ToolTip.Placement="AnchorAndGravity"
+                                    ToolTip.VerticalOffset="-32">
+                                <Button Margin="0 0 9 0"
+                                        Padding="3"
+                                        BorderThickness="0"
+                                        VerticalContentAlignment="Center"
+                                        Command="{Binding $parent[ListBox].DataContext.CopyAddressCommand}"
+                                        CommandParameter="{Binding}"
+                                        Classes="ButtonWithIcon">
+
+                                    <svg:Svg HorizontalAlignment="Center"
+                                             VerticalAlignment="Center"
+                                             Width="24"
+                                             Height="24"
+                                             Path="/Resources/Icons/copy.svg" />
+                                </Button>
+                                <ToolTip.Tip>
+                                    <TextBlock Text="{Binding CopyButtonToolTip}" />
+                                </ToolTip.Tip>
+                            </Border>
+                        </Grid>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+
+            <Border Margin="-24 0 -24 16"
+                    Height="1"
+                    Background="{DynamicResource LightDefaultOpacity10}" />
+
+            <Grid ColumnDefinitions="*,Auto">
+                <StackPanel Grid.Column="0"
+                            Margin="0 0 24 0"
+                            VerticalAlignment="Center"
+                            Orientation="Vertical">
+                    <TextBlock HorizontalAlignment="Right"
+                               Margin="0 0 0 2"
+                               LineHeight="16"
+                               FontSize="13"
+                               FontFamily="{DynamicResource DefaultFontFamily}"
+                               Foreground="{DynamicResource SecondaryForegroundBrush}"
+                               Text="{Binding TotalSelected}" />
+                    <TextBlock HorizontalAlignment="Right"
+                               Margin="0 2 0 0"
+                               LineHeight="16"
+                               FontSize="13"
+                               FontFamily="{DynamicResource DefaultFontFamily}"
+                               Foreground="{DynamicResource SecondaryForegroundBrush}"
+                               Text="{Binding TotalCoinAmountSelected}" />
+                </StackPanel>
+
+                <controls:RoundedButton Grid.Column="1"
+                                        Width="200"
+                                        Height="50"
+                                        CornerRadius="6"
+                                        Content="Confirm"
+                                        FontSize="18"
+                                        FontFamily="{DynamicResource DefaultFontFamily}"
+                                        FontWeight="Normal"
+                                        Command="{Binding ConfirmCommand}" />
+            </Grid>
+        </StackPanel>
+    </Border>
+</UserControl>

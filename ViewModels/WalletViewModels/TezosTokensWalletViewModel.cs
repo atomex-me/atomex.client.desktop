@@ -22,12 +22,12 @@ using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.Controls;
 using Atomex.Client.Desktop.ViewModels.Abstract;
 using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
-using Atomex.Client.Desktop.ViewModels.ReceiveViewModels;
 using Atomex.Client.Desktop.ViewModels.SendViewModels;
 using Atomex.Client.Desktop.ViewModels.TransactionViewModels;
 using Atomex.Core;
 using Atomex.Services;
 using Atomex.TezosTokens;
+using Atomex.ViewModels;
 using Atomex.Wallet;
 using Atomex.Wallet.Tezos;
 using ReactiveUI;
@@ -72,7 +72,10 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                             await App.ImageService.LoadImageFromUrl(url, async () =>
                                 {
                                     _isPreviewDownloading = false;
-                                    await Dispatcher.UIThread.InvokeAsync(() => { OnPropertyChanged(nameof(TokenPreview)); });
+                                    await Dispatcher.UIThread.InvokeAsync(() =>
+                                    {
+                                        OnPropertyChanged(nameof(TokenPreview));
+                                    });
                                 })
                                 .ConfigureAwait(false);
                         });
@@ -88,7 +91,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         }
 
         public string Balance => TokenBalance.Balance != "1"
-            ? $"{TokenBalance.GetTokenBalance().ToString(CultureInfo.InvariantCulture)}  {TokenBalance.Symbol}"
+            ? $"{TokenBalance.GetTokenBalance().ToString($"F{Math.Min(TokenBalance.Decimals, AddressesHelper.MaxTokenCurrencyFormatDecimals)}", CultureInfo.InvariantCulture)}  {TokenBalance.Symbol}"
             : "";
 
         private ICommand _openInBrowser;
@@ -109,7 +112,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             ? $"http://ipfs.io/ipfs/{RemoveIpfsPrefix(TokenBalance.ArtifactUri)}"
             : null;
 
-        
+
         public IEnumerable<string> GetTokenPreviewUrls()
         {
             yield return $"https://d38roug276qjor.cloudfront.net/{TokenBalance.Contract}/{TokenBalance.TokenId}.png";
@@ -173,13 +176,13 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         public string IconUrl => $"https://services.tzkt.io/v1/avatars/{Contract.Address}";
         public Action PreviewLoadedCallback { get; set; }
         private bool _isPreviewDownloading;
+
         public IBitmap IconPreview
         {
             get
             {
                 if (_isPreviewDownloading)
                     return null;
-                
 
 
                 if (!App.ImageService.GetImageLoaded(IconUrl))
@@ -191,7 +194,10 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                         await App.ImageService.LoadImageFromUrl(IconUrl, async () =>
                             {
                                 _isPreviewDownloading = false;
-                                await Dispatcher.UIThread.InvokeAsync(() => { OnPropertyChanged(nameof(IconPreview)); });
+                                await Dispatcher.UIThread.InvokeAsync(() =>
+                                {
+                                    OnPropertyChanged(nameof(IconPreview));
+                                });
                             })
                             .ConfigureAwait(false);
                     });
@@ -229,6 +235,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         }
 
         public bool HasName => !string.IsNullOrEmpty(_name);
+
         private async Task TryGetAliasAsync()
         {
             try
@@ -267,7 +274,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
     public class TezosTokensWalletViewModel : WalletViewModel, IWalletViewModel
     {
-        private const int MaxAmountDecimals = 9;
+        private const int MaxAmountDecimals = AddressesHelper.MaxTokenCurrencyFormatDecimals;
         private const string Fa12 = "FA12";
 
         public ObservableCollection<TezosTokenContractViewModel> TokensContracts { get; set; }
@@ -300,10 +307,11 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         public bool IsFa2 => TokenContract?.IsFa2 ?? false;
         public string TokenContractAddress => TokenContract?.Contract?.Address ?? "";
         public string TokenContractName => TokenContract?.Name ?? "";
-        
+
         public string TokenContractIconUrl => TokenContract?.IconUrl;
-        
+
         private bool _isPreviewDownloading;
+
         public IBitmap TokenContractIconPreview
         {
             get
@@ -323,7 +331,10 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                         await Desktop.App.ImageService.LoadImageFromUrl(TokenContractIconUrl, async () =>
                             {
                                 _isPreviewDownloading = false;
-                                await Dispatcher.UIThread.InvokeAsync(() => { OnPropertyChanged(nameof(TokenContractIconPreview)); });
+                                await Dispatcher.UIThread.InvokeAsync(() =>
+                                {
+                                    OnPropertyChanged(nameof(TokenContractIconPreview));
+                                });
                             })
                             .ConfigureAwait(false);
                     });
@@ -540,7 +551,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
             SelectedTabIndex = tokenContract.IsFa2 ? 0 : 1;
             OnPropertyChanged(nameof(SelectedTabIndex));
-            
+
             OnPropertyChanged(nameof(TokenContractIconPreview));
 
             _sortInfo = null;
@@ -557,24 +568,35 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                 tokenContract: TokenContract.Contract.Address,
                 tokenId: 0,
                 tokenType: TokenContract.Contract.GetContractType(),
+                getTokenPreview: GetTokenPreview,
+                balanceFormat: BalanceFormat,
                 from: null);
 
-            Desktop.App.DialogService.Show(sendViewModel);
+            Desktop.App.DialogService.Show(sendViewModel.SelectFromViewModel);
         }
 
         private void SendCallback(TezosTokenViewModel tokenViewModel)
         {
             if (tokenViewModel?.TokenBalance == null)
                 return;
-
+            
             var sendViewModel = new TezosTokensSendViewModel(
                 app: App,
                 tokenContract: tokenViewModel.TokenBalance.Contract,
                 tokenId: tokenViewModel.TokenBalance.TokenId,
                 tokenType: TokenContract.Contract.GetContractType(),
+                getTokenPreview: GetTokenPreview,
                 from: tokenViewModel.Address);
 
-            Desktop.App.DialogService.Show(sendViewModel);
+            Desktop.App.DialogService.Show(sendViewModel.SelectToViewModel);
+        }
+
+        private IBitmap GetTokenPreview(string address, decimal tokenId)
+        {
+            return Tokens.FirstOrDefault(tokenViewModel =>
+                           tokenViewModel.Address == address && tokenViewModel.TokenBalance.TokenId == tokenId)
+                       ?.TokenPreview ??
+                   TokenContract.IconPreview;
         }
 
         protected override void OnReceiveClick()
@@ -586,7 +608,8 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             var receiveViewModel = new ReceiveViewModel(
                 app: App,
                 currency: tezosConfig,
-                tokenContract: TokenContract?.Contract?.Address);
+                tokenContract: TokenContract?.Contract?.Address,
+                tokenType: TokenContract?.Contract?.GetContractType());
 
             Desktop.App.DialogService.Show(receiveViewModel);
         }
@@ -603,14 +626,20 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         {
             if (IsBalanceUpdating)
                 return;
-
+ 
             IsBalanceUpdating = true;
 
             _cancellation = new CancellationTokenSource();
-
-            var updatingModalVM = new TezosTokensScanDialogViewModel();
-            updatingModalVM.OnCancel = () => _cancellation.Cancel();
-            Desktop.App.DialogService.Show(updatingModalVM);
+                
+            var updatingModalVm = MessageViewModel.Message(
+                title: "Updating",
+                text: "Tezos tokens balance updating, please wait...",
+                nextAction:() => _cancellation.Cancel(),
+                buttonTitle: "Cancel",
+                withProgressBar: true
+                );
+            
+            Desktop.App.DialogService.Show(updatingModalVm);
 
             try
             {
@@ -722,7 +751,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                         Network = "mainnet",
                         Name = "kUSD",
                         Description = "FA1.2 Implementation of kUSD",
-                        Interfaces = new List<string> {"TZIP-007-2021-01-29"}
+                        Interfaces = new List<string> { "TZIP-007-2021-01-29" }
                     }
                 },
                 new TezosTokenContractViewModel
@@ -733,7 +762,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                         Network = "mainnet",
                         Name = "tzBTC",
                         Description = "Wrapped Bitcon",
-                        Interfaces = new List<string> {"TZIP-7", "TZIP-16", "TZIP-20"}
+                        Interfaces = new List<string> { "TZIP-7", "TZIP-16", "TZIP-20" }
                     }
                 },
                 new TezosTokenContractViewModel
@@ -744,7 +773,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                         Network = "mainnet",
                         Name = "Hedgehoge",
                         Description = "such cute, much hedge!",
-                        Interfaces = new List<string> {"TZIP-007", "TZIP-016"}
+                        Interfaces = new List<string> { "TZIP-007", "TZIP-016" }
                     }
                 },
                 new TezosTokenContractViewModel
@@ -755,7 +784,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                         Network = "mainent",
                         Name = "hic et nunc NFTs",
                         Description = "NFT token for digital assets.",
-                        Interfaces = new List<string> {"TZIP-12"}
+                        Interfaces = new List<string> { "TZIP-12" }
                     }
                 }
             };

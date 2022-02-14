@@ -1,11 +1,17 @@
 ﻿using System;
-using System.Globalization;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+
+using Avalonia.Controls;
+using Serilog;
 
 using Atomex.Blockchain.Abstract;
 using Atomex.Client.Desktop.Properties;
 using Atomex.Core;
 using Atomex.MarketData.Abstract;
-using Atomex.Wallet.Abstract;
+using Atomex.TezosTokens;
+using Atomex.Wallet.Tezos;
 
 namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 {
@@ -14,6 +20,10 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         public Fa12SendViewModel()
             : base()
         {
+#if DEBUG
+            if (Design.IsDesignMode)
+                DesignerMode();
+#endif
         }
 
         public Fa12SendViewModel(
@@ -21,239 +31,186 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             CurrencyConfig currency)
             : base(app, currency)
         {
-        }
-
-        public override bool UseDefaultFee
-        {
-            get => _useDefaultFee;
-            set
+            SelectFromViewModel = new SelectAddressViewModel(_app.Account, Currency, SelectAddressMode.SendFrom)
             {
-                Warning = string.Empty;
+                BackAction = () => { App.DialogService.Show(this); },
+                ConfirmAction = walletAddressViewModel =>
+                {
+                    From = walletAddressViewModel.Address;
+                    SelectedFromBalance = walletAddressViewModel.AvailableBalance;
 
-                _useDefaultFee = value;
-                OnPropertyChanged(nameof(UseDefaultFee));
+                    App.DialogService.Show(SelectToViewModel);
+                }
+            };
 
-                Amount = _amount; // recalculate amount
-            }
+            SelectToViewModel = new SelectAddressViewModel(
+                _app.Account,
+                _app.Account.Currencies.Get<TezosConfig>(TezosConfig.Xtz))
+            {
+                BackAction = () => { App.DialogService.Show(SelectFromViewModel); },
+                ConfirmAction = walletAddressViewModel =>
+                {
+                    To = walletAddressViewModel.Address;
+                    App.DialogService.Show(this);
+                }
+            };
         }
 
-        protected override async void UpdateAmount(decimal amount)
+        protected override void FromClick()
         {
-            IsAmountUpdating = true;
+            var selectFromViewModel = SelectFromViewModel as SelectAddressViewModel;
 
-            var availableAmount = CurrencyViewModel.AvailableAmount;
-            _amount = amount;
+            selectFromViewModel!.ConfirmAction = walletAddressViewModel =>
+            {
+                From = walletAddressViewModel.Address;
+                SelectedFromBalance = walletAddressViewModel.AvailableBalance;
+                App.DialogService.Show(this);
+            };
 
-            Warning = string.Empty;
+            App.DialogService.Show(selectFromViewModel);
+        }
 
+        protected override void ToClick()
+        {
+            SelectToViewModel.BackAction = () => App.DialogService.Show(this);
+            App.DialogService.Show(SelectToViewModel);
+        }
+
+        protected override async Task UpdateAmount()
+        {
             try
             {
-                var account = App.Account
-                    .GetCurrencyAccount<ILegacyCurrencyAccount>(Currency.Name);
+                var account = _app.Account
+                    .GetCurrencyAccount<Fa12Account>(Currency.Name);
 
-                if (UseDefaultFee)
+                var maxAmountEstimation = await account
+                    .EstimateMaxAmountToSendAsync(
+                        from: From,
+                        type: BlockchainTransactionType.Output,
+                        reserve: false);
+
+                if (UseDefaultFee && maxAmountEstimation.Fee > 0)
+                    Fee = maxAmountEstimation.Fee;
+
+                if (maxAmountEstimation.Error != null)
                 {
-                    var (maxAmount, _, _) = await account
-                        .EstimateMaxAmountToSendAsync(To, BlockchainTransactionType.Output, 0, 0, false);
-
-                    if (_amount > maxAmount)
-                    {
-                        if (_amount <= availableAmount)
-                            Warning = string.Format(CultureInfo.InvariantCulture, Resources.CvInsufficientChainFunds, Currency.FeeCurrencyName);
-                        else
-                            Warning = Resources.CvInsufficientFunds;
-
-                        IsAmountUpdating = false;
-                        return;
-                    }
-
-                    var estimatedFeeAmount = _amount != 0
-                        ? await account.EstimateFeeAsync(To, _amount, BlockchainTransactionType.Output)
-                        : 0;
-
-                    OnPropertyChanged(nameof(AmountString));
-
-                    var defaultFeePrice = await Currency.GetDefaultFeePriceAsync();
-
-                    _fee = Currency.GetFeeFromFeeAmount(estimatedFeeAmount ?? Currency.GetDefaultFee(), defaultFeePrice);
-                    OnPropertyChanged(nameof(FeeString));
-                }
-                else
-                {
-                    var (maxAmount, _, _) = await account
-                        .EstimateMaxAmountToSendAsync(To, BlockchainTransactionType.Output, 0, 0, false);
-
-                    if (_amount > maxAmount)
-                    {
-                        if (_amount <= availableAmount)
-                            Warning = string.Format(CultureInfo.InvariantCulture, Resources.CvInsufficientChainFunds, Currency.FeeCurrencyName);
-                        else
-                            Warning = Resources.CvInsufficientFunds;
-
-                        IsAmountUpdating = false;
-                        return;
-                    }
-
-                    OnPropertyChanged(nameof(AmountString));
-
-                    Fee = _fee;
-                }
-
-                OnQuotesUpdatedEventHandler(App.QuotesProvider, EventArgs.Empty);
-            }
-            finally
-            {
-                IsAmountUpdating = false;
-            }
-        }
-
-        protected override async void UpdateFee(decimal fee)
-        {
-            if (IsFeeUpdating)
-                return;
-
-            IsFeeUpdating = true;
-
-            _fee = Math.Min(fee, Currency.GetMaximumFee());
-
-            Warning = string.Empty;
-
-            try
-            {
-                if (_amount == 0)
-                {
-                    var defaultFeePrice = await Currency.GetDefaultFeePriceAsync();
-
-                    if (Currency.GetFeeAmount(_fee, defaultFeePrice) > CurrencyViewModel.AvailableAmount)
-                        Warning = Resources.CvInsufficientFunds;
-
+                    Warning = maxAmountEstimation.Error.Description;
+                    WarningToolTip = maxAmountEstimation.Error.Details;
+                    WarningType = MessageType.Error;
                     return;
                 }
 
+                if (Amount > maxAmountEstimation.Amount)
+                {
+                    Warning = Resources.CvInsufficientFunds;
+                    WarningToolTip = "";
+                    WarningType = MessageType.Error;
+                    return;
+                }
+
+                if (Fee < maxAmountEstimation.Fee)
+                {
+                    Warning = Resources.CvLowFees;
+                    WarningToolTip = "";
+                    WarningType = MessageType.Error;
+                }
+            }
+            catch (Exception e)
+            {
+                Log.Error(e, "{@currency}: update amount error", Currency?.Description);
+            }
+        }
+
+        protected override async Task UpdateFee()
+        {
+            try
+            {
                 if (!UseDefaultFee)
                 {
-                    var availableAmount = CurrencyViewModel.AvailableAmount;
+                    var account = _app.Account
+                        .GetCurrencyAccount<Fa12Account>(Currency.Name);
 
-                    var account = App.Account
-                        .GetCurrencyAccount<ILegacyCurrencyAccount>(Currency.Name);
+                    var maxAmountEstimation = await account
+                        .EstimateMaxAmountToSendAsync(
+                            from: From,
+                            type: BlockchainTransactionType.Output,
+                            reserve: false);
 
-                    var (maxAmount, maxAvailableFee, _) = await account
-                        .EstimateMaxAmountToSendAsync(To, BlockchainTransactionType.Output, decimal.MaxValue, 0, false);
-
-                    var defaultFeePrice = await Currency.GetDefaultFeePriceAsync();
-
-                    var feeAmount = Currency.GetFeeAmount(_fee, defaultFeePrice);
-
-                    var estimatedFeeAmount = _amount != 0
-                        ? await account.EstimateFeeAsync(To, _amount, BlockchainTransactionType.Output)
-                        : 0;
-
-                    if (_amount > maxAmount)
+                    if (maxAmountEstimation.Error != null)
                     {
-                        if (_amount <= availableAmount)
-                            Warning = string.Format(CultureInfo.InvariantCulture, Resources.CvInsufficientChainFunds, Currency.FeeCurrencyName);
-                        else
-                            Warning = Resources.CvInsufficientFunds;
-
+                        Warning = maxAmountEstimation.Error.Description;
+                        WarningToolTip = maxAmountEstimation.Error.Details;
+                        WarningType = MessageType.Error;
                         return;
                     }
-                    else if (estimatedFeeAmount == null || feeAmount < estimatedFeeAmount.Value)
+
+                    if (Amount > maxAmountEstimation.Amount)
                     {
-                        Warning = Resources.CvLowFees;
+                        Warning = Resources.CvInsufficientFunds;
+                        WarningToolTip = "";
+                        WarningType = MessageType.Error;
+                        return;
                     }
 
-                    if (feeAmount > maxAvailableFee)
-                        Warning = string.Format(CultureInfo.InvariantCulture, Resources.CvInsufficientChainFunds, Currency.FeeCurrencyName);
-
-                    OnPropertyChanged(nameof(FeeString));
+                    if (Fee < maxAmountEstimation.Fee)
+                    {
+                        Warning = Resources.CvLowFees;
+                        WarningToolTip = "";
+                        WarningType = MessageType.Error;
+                    }
                 }
-
-                OnQuotesUpdatedEventHandler(App.QuotesProvider, EventArgs.Empty);
             }
-            finally
+            catch (Exception e)
             {
-                IsFeeUpdating = false;
+                Log.Error(e, "{@currency}: update fee error", Currency?.Description);
             }
         }
 
-        protected override async void OnMaxClick()
+        protected override async Task OnMaxClick()
         {
-            if (IsAmountUpdating)
-                return;
-
-            IsAmountUpdating = true;
-
-            Warning = string.Empty;
-
             try
             {
-                var availableAmount = CurrencyViewModel.AvailableAmount;
+                var account = _app.Account
+                    .GetCurrencyAccount<Fa12Account>(Currency.Name);
 
-                if (availableAmount == 0)
+                var maxAmountEstimation = await account
+                    .EstimateMaxAmountToSendAsync(
+                        from: From,
+                        type: BlockchainTransactionType.Output,
+                        reserve: false);
+
+                if (UseDefaultFee && maxAmountEstimation.Fee > 0)
+                    Fee = maxAmountEstimation.Fee;
+
+                if (maxAmountEstimation.Error != null)
+                {
+                    Warning = maxAmountEstimation.Error.Description;
+                    WarningToolTip = maxAmountEstimation.Error.Details;
+                    WarningType = MessageType.Error;
+                    Amount = 0;
                     return;
-
-                var defaultFeePrice = await Currency.GetDefaultFeePriceAsync();
-
-                var account = App.Account
-                    .GetCurrencyAccount<ILegacyCurrencyAccount>(Currency.Name);
-
-                if (UseDefaultFee)
-                {
-                    var (maxAmount, maxFeeAmount, _) = await account
-                        .EstimateMaxAmountToSendAsync(To, BlockchainTransactionType.Output, 0, 0, true);
-
-                    if (maxAmount > 0)
-                        _amount = maxAmount;
-                    else
-                        Warning = string.Format(CultureInfo.InvariantCulture, Resources.CvInsufficientChainFunds, Currency.FeeCurrencyName);
-
-                    OnPropertyChanged(nameof(AmountString));
-
-                    _fee = Currency.GetFeeFromFeeAmount(maxFeeAmount, defaultFeePrice);
-                    OnPropertyChanged(nameof(FeeString));
-                }
-                else
-                {
-                    var (maxAmount, maxFee, _) = await account
-                        .EstimateMaxAmountToSendAsync(To, BlockchainTransactionType.Output, 0, 0, false);
-
-                    var feeAmount = Currency.GetFeeAmount(_fee, defaultFeePrice);
-
-                    if (_fee < maxFee)
-                    {
-                        Warning = Resources.CvLowFees;
-                        if (_fee == 0)
-                        {
-                            _amount = 0;
-                            OnPropertyChanged(nameof(AmountString));
-                            return;
-                        }
-                    }
-
-                    _amount = maxAmount;
-
-                    var (_, maxAvailableFee, _) = await account
-                        .EstimateMaxAmountToSendAsync(To, BlockchainTransactionType.Output, decimal.MaxValue, 0, false);
-
-                    if (maxAmount < availableAmount || feeAmount > maxAvailableFee)
-                        Warning = string.Format(CultureInfo.InvariantCulture, Resources.CvInsufficientChainFunds, Currency.FeeCurrencyName);
-
-                    OnPropertyChanged(nameof(AmountString));
-
-                    OnPropertyChanged(nameof(FeeString));
                 }
 
-                OnQuotesUpdatedEventHandler(App.QuotesProvider, EventArgs.Empty);
+                Amount = maxAmountEstimation.Amount > 0
+                    ? maxAmountEstimation.Amount
+                    : 0;
+
+                if (Fee < maxAmountEstimation.Fee)
+                {
+                    Warning = Resources.CvLowFees;
+                    WarningToolTip = "";
+                    WarningType = MessageType.Error;
+                }
             }
-            finally
+            catch (Exception e)
             {
-                IsAmountUpdating = false;
+                Log.Error(e, "{@currency}: max click error", Currency?.Description);
             }
         }
 
         protected override void OnQuotesUpdatedEventHandler(object sender, EventArgs args)
         {
-            if (!(sender is ICurrencyQuotesProvider quotesProvider))
+            if (sender is not ICurrencyQuotesProvider quotesProvider)
                 return;
 
             var quote = quotesProvider.GetQuote(CurrencyCode, BaseCurrencyCode);
@@ -261,6 +218,38 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
             AmountInBase = Amount * (quote?.Bid ?? 0m);
             FeeInBase = Fee * (xtzQuote?.Bid ?? 0m);
+        }
+
+        protected override async Task<Error> Send(CancellationToken cancellationToken = default)
+        {
+            var tokenConfig = (Fa12Config)Currency;
+            var tokenContract = tokenConfig.TokenContractAddress;
+            const int tokenId = 0;
+            const string? tokenType = "FA12";
+
+            var tokenAddress = await TezosTokensSendViewModel.GetTokenAddressAsync(
+                account: _app.Account,
+                address: From,
+                tokenContract: tokenContract,
+                tokenId: tokenId,
+                tokenType: tokenType);
+
+            var currencyName = _app.Account.Currencies
+                .FirstOrDefault(c => c is Fa12Config fa12 && fa12.TokenContractAddress == tokenContract)
+                ?.Name ?? "FA12";
+
+            var tokenAccount = _app.Account.GetTezosTokenAccount<Fa12Account>(
+                currency: currencyName,
+                tokenContract: tokenContract,
+                tokenId: tokenId);
+
+            return await tokenAccount.SendAsync(
+                from: tokenAddress.Address,
+                to: To,
+                amount: AmountToSend,
+                fee: Fee,
+                useDefaultFee: UseDefaultFee,
+                cancellationToken: cancellationToken);
         }
     }
 }

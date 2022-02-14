@@ -13,7 +13,6 @@ using Avalonia.Media;
 using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.ViewModels.Abstract;
 using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
-using Atomex.Client.Desktop.ViewModels.ReceiveViewModels;
 using Atomex.Client.Desktop.ViewModels.SendViewModels;
 using Atomex.Client.Desktop.ViewModels.TransactionViewModels;
 using Atomex.Common;
@@ -94,7 +93,13 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         protected override void OnReceiveClick()
         {
             var tezosConfig = App.Account.Currencies.GetByName(TezosConfig.Xtz);
-            var receiveViewModel = new ReceiveViewModel(App, tezosConfig, Currency.TokenContractAddress);
+
+            var receiveViewModel = new ReceiveViewModel(
+                app: App,
+                currency: tezosConfig,
+                tokenContract: Currency.TokenContractAddress,
+                tokenType: "FA12");
+
             Desktop.App.DialogService.Show(receiveViewModel);
         }
 

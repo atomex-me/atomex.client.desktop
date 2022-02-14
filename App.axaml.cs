@@ -2,6 +2,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.IO;
+using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
@@ -44,6 +45,9 @@ namespace Atomex.Client.Desktop
             TemplateService = new TemplateService();
             ImageService = new ImageService();
             Clipboard = AvaloniaLocator.Current.GetService<IClipboard>();
+
+            // set invariant culture by default
+            CultureInfo.CurrentCulture = CultureInfo.InvariantCulture;
 
             // init logger
             Log.Logger = new LoggerConfiguration()
@@ -162,7 +166,7 @@ namespace Atomex.Client.Desktop
                     Arguments       = RuntimeInformation.IsOSPlatform(OSPlatform.OSX) ? $"{url}" : "",
                     CreateNoWindow  = true,
                     UseShellExecute = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
-                }); ;
+                });
             }
         }
 

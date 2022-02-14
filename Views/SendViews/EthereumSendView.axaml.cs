@@ -1,10 +1,15 @@
 using System;
+using System.Globalization;
+using System.Linq;
 using System.Reactive.Linq;
-using Atomex.Client.Desktop.ViewModels.SendViewModels;
+
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Input;
+using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
-using Avalonia.Threading;
+
+using Atomex.Client.Desktop.ViewModels.SendViewModels;
 
 namespace Atomex.Client.Desktop.Views.SendViews
 {
@@ -13,48 +18,76 @@ namespace Atomex.Client.Desktop.Views.SendViews
         public EthereumSendView()
         {
             InitializeComponent();
-            
+
             var amountStringTextBox = this.FindControl<TextBox>("AmountString");
-            var feePriceTextBox = this.FindControl<TextBox>("FeePriceString");
-            var gasStringTextBox = this.FindControl<TextBox>("GasString");
+            var gasPriceStringTextBox = this.FindControl<TextBox>("GasPriceString");
+
+            amountStringTextBox.AddHandler(KeyDownEvent, (_, args) =>
+            {
+                if (DataContext is not EthereumSendViewModel sendViewModel ||
+                    args.Key is not (Key.Back or Key.Delete)) return;
+
+                if (amountStringTextBox.SelectionStart != amountStringTextBox.SelectionEnd)
+                {
+                    sendViewModel.SetAmountFromString(0.ToString(CultureInfo.CurrentCulture));
+                    args.Handled = true;
+                    return;
+                }
+
+                var dotSymbol = sendViewModel.AmountString.FirstOrDefault(c => !char.IsDigit(c));
+                var dotIndex = sendViewModel.AmountString.IndexOf(dotSymbol);
+                switch (args.Key)
+                {
+                    case Key.Back when dotIndex != amountStringTextBox.CaretIndex - 1:
+                        return;
+                    case Key.Back:
+                        amountStringTextBox.CaretIndex -= 1;
+                        break;
+                    case Key.Delete when dotIndex != amountStringTextBox.CaretIndex:
+                        return;
+                    case Key.Delete:
+                        amountStringTextBox.CaretIndex += 1;
+                        break;
+                }
+            }, RoutingStrategies.Tunnel);
+
+            gasPriceStringTextBox.AddHandler(KeyDownEvent, (_, args) =>
+            {
+                if (DataContext is not EthereumSendViewModel sendViewModel ||
+                    args.Key is not (Key.Back or Key.Delete)) return;
+
+                if (gasPriceStringTextBox.SelectionStart == gasPriceStringTextBox.SelectionEnd) return;
+                sendViewModel.SetGasPriceFromString(0.ToString(CultureInfo.CurrentCulture));
+                args.Handled = true;
+            }, RoutingStrategies.Tunnel);
 
             amountStringTextBox.GetObservable(TextBox.TextProperty)
-                .Throttle(TimeSpan.FromMilliseconds(1))
+                .Where(_ => amountStringTextBox.SelectionStart == amountStringTextBox.SelectionEnd)
                 .Subscribe(text =>
                 {
-                    Dispatcher.UIThread.InvokeAsync(() =>
-                    {
-                        if (DataContext is EthereumSendViewModel sendViewModel)
-                            sendViewModel.AmountString = text;
-                    });
+                    if (DataContext is not EthereumSendViewModel sendViewModel) return;
+                    sendViewModel.SetAmountFromString(text);
                 });
-            
-            feePriceTextBox.GetObservable(TextBox.TextProperty)
-                .Throttle(TimeSpan.FromMilliseconds(1))
+
+            gasPriceStringTextBox.GetObservable(TextBox.TextProperty)
+                .Where(_ => gasPriceStringTextBox.SelectionStart == gasPriceStringTextBox.SelectionEnd)
                 .Subscribe(text =>
                 {
-                    Dispatcher.UIThread.InvokeAsync(() =>
-                    {
-                        if (DataContext is EthereumSendViewModel sendViewModel)
-                            sendViewModel.FeePriceString = text;
-                    });
-                });
-            
-            gasStringTextBox.GetObservable(TextBox.TextProperty)
-                .Throttle(TimeSpan.FromMilliseconds(1))
-                .Subscribe(text =>
-                {
-                    Dispatcher.UIThread.InvokeAsync(() =>
-                    {
-                        if (DataContext is EthereumSendViewModel sendViewModel)
-                            sendViewModel.GasString = text;
-                    });
+                    if (DataContext is not EthereumSendViewModel sendViewModel) return;
+                    sendViewModel.SetGasPriceFromString(text);
                 });
         }
 
         private void InitializeComponent()
         {
             AvaloniaXamlLoader.Load(this);
+        }
+
+        private void HelpClickHandler(object sender, RoutedEventArgs e)
+        {
+            var source = e.Source as Button;
+
+            source?.SetValue(ToolTip.IsOpenProperty, true);
         }
     }
 }

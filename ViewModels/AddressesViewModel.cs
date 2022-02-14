@@ -4,20 +4,17 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Globalization;
 using System.Windows.Input;
+
 using Serilog;
-using Atomex.Core;
-using Atomex.Client.Desktop.Common;
-using System.Diagnostics;
-using Atomex.Blockchain.Tezos.Internal;
-using Atomex.Client.Desktop.Controls;
-using Atomex.Wallet;
-using Atomex.Common;
-using Atomex.Cryptography;
-using Atomex.Wallet.Tezos;
-using Avalonia;
-using Avalonia.Input.Platform;
-using Avalonia.Threading;
 using ReactiveUI;
+
+using Atomex.Blockchain.Tezos.Internal;
+using Atomex.Client.Desktop.Common;
+using Atomex.Common;
+using Atomex.Core;
+using Atomex.Cryptography;
+using Atomex.Wallet;
+using Atomex.Wallet.Tezos;
 
 namespace Atomex.Client.Desktop.ViewModels
 {
@@ -100,7 +97,6 @@ namespace Atomex.Client.Desktop.ViewModels
     {
         private readonly IAtomexApp _app;
         private CurrencyConfig _currency;
-        private bool _isBalanceUpdating;
         private readonly string _tokenContract;
 
         public ObservableCollection<AddressInfo> Addresses { get; set; }
@@ -149,7 +145,7 @@ namespace Atomex.Client.Desktop.ViewModels
                     .GetCurrencyAccount(_currency.Name);
 
                 var addresses = (await account
-                        .GetAddressesAsync())
+                    .GetAddressesAsync())
                     .ToList();
 
                 addresses.Sort((a1, a2) =>
@@ -199,8 +195,8 @@ namespace Atomex.Client.Desktop.ViewModels
                     var tezosAccount = account as TezosAccount;
 
                     var addressesWithTokens = (await tezosAccount
-                            .DataRepository
-                            .GetTezosTokenAddressesByContractAsync(_tokenContract))
+                        .DataRepository
+                        .GetTezosTokenAddressesByContractAsync(_tokenContract))
                         .Where(w => w.Balance != 0)
                         .GroupBy(w => w.Address);
                         

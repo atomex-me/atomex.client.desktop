@@ -1,63 +1,29 @@
 ﻿using System;
-using System.Globalization;
-using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+
+using Avalonia.Controls;
+using Serilog;
+
 using Atomex.Blockchain.Abstract;
 using Atomex.Client.Desktop.Properties;
 using Atomex.Core;
 using Atomex.MarketData.Abstract;
-using Atomex.Wallet.Abstract;
+using Atomex.Wallet.Ethereum;
 
 namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 {
     public class Erc20SendViewModel : EthereumSendViewModel
     {
-        public override CurrencyConfig Currency
-        {
-            get => _currency;
-            set
-            {
-                if (_currency != null && _currency != value)
-                {
-                    var sendViewModel = SendViewModelCreator.CreateViewModel(App, value);
-
-                    Desktop.App.DialogService.Show(sendViewModel);
-                    return;
-                }
-
-                _currency = value;
-                OnPropertyChanged(nameof(Currency));
-
-                CurrencyViewModel = FromCurrencies.FirstOrDefault(c => c.Currency.Name == Currency.Name);
-
-                _amount = 0;
-                OnPropertyChanged(nameof(AmountString));
-
-                _fee = 0;
-                OnPropertyChanged(nameof(FeeString));
-
-                _feePrice = 0;
-                OnPropertyChanged(nameof(FeePriceString));
-
-                OnPropertyChanged(nameof(TotalFeeString));
-
-                FeePriceFormat = _currency.FeePriceFormat;
-                FeePriceCode = _currency.FeePriceCode;
-
-                Warning = string.Empty;
-            }
-        }
-
         public override string TotalFeeCurrencyCode => Currency.FeeCurrencyName;
-
-        public override decimal FeePrice
-        {
-            get => _feePrice;
-            set { UpdateFeePrice(value); }
-        }
 
         public Erc20SendViewModel()
             : base()
         {
+#if DEBUG
+            if (Design.IsDesignMode)
+                DesignerMode();
+#endif
         }
 
         public Erc20SendViewModel(
@@ -67,306 +33,149 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         {
         }
 
-        public override bool UseDefaultFee
+        protected override async Task UpdateAmount()
         {
-            get => _useDefaultFee;
-            set
-            {
-                Warning = string.Empty;
-
-                _useDefaultFee = value;
-                OnPropertyChanged(nameof(UseDefaultFee));
-
-                Amount = _amount; // recalculate amount
-            }
-        }
-
-        protected override async void UpdateAmount(decimal amount)
-        {
-            if (IsAmountUpdating)
-                return;
-
-            IsAmountUpdating = true;
-
-            var availableAmount = CurrencyViewModel.AvailableAmount;
-            _amount = amount;
-
-            Warning = string.Empty;
-
             try
             {
-                var account = App.Account
-                    .GetCurrencyAccount<ILegacyCurrencyAccount>(Currency.Name);
+                var account = _app.Account
+                    .GetCurrencyAccount<Erc20Account>(Currency.Name);
 
-                if (UseDefaultFee)
-                {
-                    var (maxAmount, _, _) = await account
-                        .EstimateMaxAmountToSendAsync(To, BlockchainTransactionType.Output, 0, 0, false);
+                var maxAmountEstimation = await account.EstimateMaxAmountToSendAsync(
+                    from: From,
+                    type: BlockchainTransactionType.Output,
+                    gasLimit: UseDefaultFee ? null : GasLimit,
+                    gasPrice: UseDefaultFee ? null : GasPrice,
+                    reserve: false);
 
-                    _fee = Currency.GetDefaultFee();
-                    OnPropertyChanged(nameof(GasString));
-
-                    _feePrice = await Currency.GetDefaultFeePriceAsync();
-                    OnPropertyChanged(nameof(FeePriceString));
-
-                    if (_amount > maxAmount)
-                    {
-                        if (_amount <= availableAmount)
-                            Warning = string.Format(CultureInfo.InvariantCulture, Resources.CvInsufficientChainFunds, Currency.FeeCurrencyName);
-                        else
-                            Warning = Resources.CvInsufficientFunds;
-    
-                        IsAmountUpdating = false;
-                        return;
+                if (UseDefaultFee) {
+                    if (maxAmountEstimation.Fee > 0) {
+                        GasPrice = decimal.ToInt32(Currency.GetFeePriceFromFeeAmount(maxAmountEstimation.Fee, GasLimit));
+                    } else {
+                        GasPrice = decimal.ToInt32(await Currency.GetDefaultFeePriceAsync());
                     }
-
-                    OnPropertyChanged(nameof(AmountString));
-
-                    UpdateTotalFeeString();
-                    OnPropertyChanged(nameof(TotalFeeString));
-                }
-                else
-                {
-                    var (maxAmount, _, _) = await account
-                        .EstimateMaxAmountToSendAsync(To, BlockchainTransactionType.Output, _fee, _feePrice, false);
-
-                    if (_amount > maxAmount)
-                    {
-                        if (_amount <= availableAmount)
-                            Warning = string.Format(CultureInfo.InvariantCulture, Resources.CvInsufficientChainFunds, Currency.FeeCurrencyName);
-                        else
-                            Warning = Resources.CvInsufficientFunds;
-
-                        IsAmountUpdating = false;
-                        return;
-                    }
-
-                    OnPropertyChanged(nameof(AmountString));
-
-                    if (_fee < Currency.GetDefaultFee() || _feePrice == 0)
-                        Warning = Resources.CvLowFees;
                 }
 
-                OnQuotesUpdatedEventHandler(App.QuotesProvider, EventArgs.Empty);
-            }
-            finally
-            {
-                IsAmountUpdating = false;
-            }
-        }
-
-        private async void UpdateFeePrice(decimal value)
-        {
-            if (IsFeeUpdating)
-                return;
-
-            IsFeeUpdating = true;
-
-            _feePrice = value;
-
-            Warning = string.Empty;
-
-            try
-            {
-                if (_amount == 0)
+                if (maxAmountEstimation.Error != null)
                 {
-                    if (Currency.GetFeeAmount(_fee, _feePrice) > CurrencyViewModel.AvailableAmount)
-                        Warning = Resources.CvInsufficientFunds;
+                    Warning = maxAmountEstimation.Error.Description;
+                    WarningToolTip = maxAmountEstimation.Error.Details;
+                    WarningType = MessageType.Error;
                     return;
                 }
 
-                if (value == 0)
+                if (Amount > maxAmountEstimation.Amount)
                 {
-                    Warning = Resources.CvLowFees;
-                    UpdateTotalFeeString();
-                    OnPropertyChanged(nameof(TotalFeeString));
-                    return;
+                    Warning = Resources.CvInsufficientFunds;
+                    WarningToolTip = "";
+                    WarningType = MessageType.Error;
                 }
+            }
+            catch (Exception e)
+            {
+                Log.Error(e, "{@currency}: update amount error", Currency?.Description);
+            }
+        }
 
+        protected override async Task UpdateGasPrice()
+        {
+            try
+            {
                 if (!UseDefaultFee)
                 {
-                    var account = App.Account
-                        .GetCurrencyAccount<ILegacyCurrencyAccount>(Currency.Name);
+                    var account = _app.Account
+                        .GetCurrencyAccount<Erc20Account>(Currency.Name);
 
-                    var (maxAmount, _, _) = await account
-                        .EstimateMaxAmountToSendAsync(To, BlockchainTransactionType.Output, _fee, _feePrice, false);
+                    // estimate max amount with new GasPrice
+                    var maxAmountEstimation = await account.EstimateMaxAmountToSendAsync(
+                        from: From,
+                        type: BlockchainTransactionType.Output,
+                        gasLimit: GasLimit,
+                        gasPrice: GasPrice,
+                        reserve: false);
 
-                    if (_amount > maxAmount)
+                    if (maxAmountEstimation.Error != null)
                     {
-                        var availableAmount = CurrencyViewModel.AvailableAmount;
-
-                        if(_amount <= availableAmount)
-                            Warning = string.Format(CultureInfo.InvariantCulture, Resources.CvInsufficientChainFunds, Currency.FeeCurrencyName);
-                        else
-                            Warning = Resources.CvInsufficientFunds;
-
+                        Warning = maxAmountEstimation.Error.Description;
+                        WarningToolTip = maxAmountEstimation.Error.Details;
+                        WarningType = MessageType.Error;
                         return;
                     }
 
-                    OnPropertyChanged(nameof(FeePriceString));
-
-                    UpdateTotalFeeString();
-                    OnPropertyChanged(nameof(TotalFeeString));
+                    if (Amount > maxAmountEstimation.Amount)
+                    {
+                        Warning = Resources.CvInsufficientFunds;
+                        WarningToolTip = "";
+                        WarningType = MessageType.Error;
+                    }
                 }
-
-                OnQuotesUpdatedEventHandler(App.QuotesProvider, EventArgs.Empty);
             }
-            finally
+            catch (Exception e)
             {
-                IsFeeUpdating = false;
+                Log.Error(e, "{@currency}: update gas price error", Currency?.Description);
             }
         }
 
-        protected override async void UpdateFee(decimal fee)
+        protected override async Task OnMaxClick()
         {
-            if (IsFeeUpdating)
-                return;
-
-            IsFeeUpdating = true;
-
-            _fee = Math.Min(fee, Currency.GetMaximumFee());
-
-            Warning = string.Empty;
-
             try
             {
-                if (_amount == 0)
+                var account = _app.Account
+                    .GetCurrencyAccount<Erc20Account>(Currency.Name);
+
+                var maxAmountEstimation = await account
+                    .EstimateMaxAmountToSendAsync(
+                        from: From,
+                        type: BlockchainTransactionType.Output,
+                        gasLimit: UseDefaultFee ? null : GasLimit,
+                        gasPrice: UseDefaultFee ? null : GasPrice,
+                        reserve: false);
+
+                if (UseDefaultFee && maxAmountEstimation.Fee > 0)
+                    GasPrice = decimal.ToInt32(Currency.GetFeePriceFromFeeAmount(maxAmountEstimation.Fee, GasLimit));
+
+                if (maxAmountEstimation.Error != null)
                 {
-                    if (Currency.GetFeeAmount(_fee, _feePrice) > CurrencyViewModel.AvailableAmount)
-                        Warning = Resources.CvInsufficientFunds;
+                    Warning = maxAmountEstimation.Error.Description;
+                    WarningToolTip = maxAmountEstimation.Error.Details;
+                    WarningType = MessageType.Error;
+                    Amount = 0;
                     return;
                 }
 
-                if (_fee < Currency.GetDefaultFee())
-                {
-                    Warning = Resources.CvLowFees;
-                    if (fee == 0)
-                    {
-                        UpdateTotalFeeString();
-                        OnPropertyChanged(nameof(TotalFeeString));
-                        return;
-                    }
-                }
-
-                if (!UseDefaultFee)
-                {
-                    var account = App.Account
-                        .GetCurrencyAccount<ILegacyCurrencyAccount>(Currency.Name);
-
-                    var (maxAmount, _, _) = await account
-                        .EstimateMaxAmountToSendAsync(To, BlockchainTransactionType.Output, _fee, _feePrice, false);
-
-                    if (_amount > maxAmount)
-                    {
-                        var availableAmount = CurrencyViewModel.AvailableAmount;
-
-                        if (_amount <= availableAmount)
-                            Warning = string.Format(CultureInfo.InvariantCulture, Resources.CvInsufficientChainFunds, Currency.FeeCurrencyName);
-                        else
-                            Warning = Resources.CvInsufficientFunds;
-
-                        return;
-                    }
-
-                    OnPropertyChanged(nameof(FeePriceString));
-
-                    UpdateTotalFeeString();
-                    OnPropertyChanged(nameof(TotalFeeString));
-                }
-
-                OnQuotesUpdatedEventHandler(App.QuotesProvider, EventArgs.Empty);
+                Amount = maxAmountEstimation.Amount > 0
+                    ? maxAmountEstimation.Amount
+                    : 0;
             }
-            finally
+            catch (Exception e)
             {
-                IsFeeUpdating = false;
-            }
-        }        
-
-        protected override async void OnMaxClick()
-        {
-            if (IsAmountUpdating)
-                return;
-
-            IsAmountUpdating = true;
-
-            Warning = string.Empty;
-
-            try
-            {
-                var availableAmount = CurrencyViewModel.AvailableAmount;
-
-                if (availableAmount == 0)
-                    return;
-
-                var account = App.Account
-                    .GetCurrencyAccount<ILegacyCurrencyAccount>(Currency.Name);
-
-                if (UseDefaultFee)
-                {
-                    var (maxAmount, maxFeeAmount, _) = await account
-                        .EstimateMaxAmountToSendAsync(To, BlockchainTransactionType.Output, 0, 0, false);
-
-                    if (maxAmount > 0)
-                        _amount = maxAmount;
-                    else if(CurrencyViewModel.AvailableAmount > 0)
-                        Warning = string.Format(CultureInfo.InvariantCulture, Resources.CvInsufficientChainFunds, Currency.FeeCurrencyName);
-
-                    OnPropertyChanged(nameof(AmountString));
-
-                    _fee = Currency.GetDefaultFee();
-                    OnPropertyChanged(nameof(GasString));
-
-                    _feePrice = await Currency.GetDefaultFeePriceAsync();
-                    OnPropertyChanged(nameof(FeePriceString));
-
-                    UpdateTotalFeeString(maxFeeAmount);
-                    OnPropertyChanged(nameof(TotalFeeString));
-                }
-                else
-                {
-                    if (_fee < Currency.GetDefaultFee() || _feePrice == 0)
-                    {
-                        Warning = Resources.CvLowFees;
-                        if (_fee == 0 || _feePrice == 0)
-                        {
-                            _amount = 0;
-                            OnPropertyChanged(nameof(AmountString));
-                            return;
-                        }
-                    }
-
-                    var (maxAmount, maxFeeAmount, _) = await account
-                        .EstimateMaxAmountToSendAsync(To, BlockchainTransactionType.Output, _fee, _feePrice, false);
-
-                    _amount = maxAmount;
-
-                    if (maxAmount < availableAmount)
-                        Warning = string.Format(CultureInfo.InvariantCulture, Resources.CvInsufficientChainFunds, Currency.FeeCurrencyName);
-
-                    OnPropertyChanged(nameof(AmountString));
-
-                    UpdateTotalFeeString(maxFeeAmount);
-                    OnPropertyChanged(nameof(TotalFeeString));
-                }
-
-                OnQuotesUpdatedEventHandler(App.QuotesProvider, EventArgs.Empty);
-            }
-            finally
-            {
-                IsAmountUpdating = false;
+                Log.Error(e, "{@currency}: max click error", Currency?.Description);
             }
         }
 
         protected override void OnQuotesUpdatedEventHandler(object sender, EventArgs args)
         {
-            if (!(sender is ICurrencyQuotesProvider quotesProvider))
+            if (sender is not ICurrencyQuotesProvider quotesProvider)
                 return;
 
             var quote = quotesProvider.GetQuote(CurrencyCode, BaseCurrencyCode);
             var ethQuote = quotesProvider.GetQuote(Currency.FeeCurrencyName, BaseCurrencyCode);
 
             AmountInBase = Amount * (quote?.Bid ?? 0m);
-            FeeInBase = Currency.GetFeeAmount(Fee, FeePrice) * (ethQuote?.Bid ?? 0m);
+            FeeInBase = FeeAmount * (ethQuote?.Bid ?? 0m);
+        }
+
+        protected override Task<Error> Send(CancellationToken cancellationToken = default)
+        {
+            var account = _app.Account.GetCurrencyAccount<Erc20Account>(Currency.Name);
+
+            return account.SendAsync(
+                from: From,
+                to: To,
+                amount: AmountToSend,
+                gasLimit: GasLimit,
+                gasPrice: GasPrice,
+                useDefaultFee: UseDefaultFee,
+                cancellationToken: cancellationToken);
         }
     }
 }

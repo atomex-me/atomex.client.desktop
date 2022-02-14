@@ -27,6 +27,10 @@ namespace Atomex.Client.Desktop.ViewModels
 
     public class PasswordControlViewModel : ViewModelBase
     {
+        public PasswordControlViewModel()
+        {
+        }
+
         public PasswordControlViewModel(
             Action onPasswordChanged = null,
             string placeholder = "Password",

@@ -7,40 +7,41 @@
         <UseAppHost>true</UseAppHost>
         <ApplicationIcon>Resources/Images/logo_dark_256x256.ico</ApplicationIcon>
 
-        <AssemblyVersion>1.1.60</AssemblyVersion>
-        <Version>1.1.60</Version>
+        <AssemblyVersion>1.2.0</AssemblyVersion>
+        <Version>1.2.0</Version>
     </PropertyGroup>
     <ItemGroup>
-        <AvaloniaResource Include="Assets\**"/>
-        <AvaloniaResource Include="Resources\*"/>
-        <AvaloniaResource Include="Resources\Fonts\*"/>
-        <AvaloniaResource Include="Resources\Icons\*"/>
-        <AvaloniaResource Include="Resources\Images\*"/>
+        <AvaloniaResource Include="Assets\**" />
+        <AvaloniaResource Include="Resources\*" />
+        <AvaloniaResource Include="Resources\Fonts\*" />
+        <AvaloniaResource Include="Resources\Icons\*" />
+        <AvaloniaResource Include="Resources\Images\*" />
     </ItemGroup>
     <ItemGroup>
-        <PackageReference Include="Avalonia" Version="0.10.10"/>
-        <PackageReference Include="Avalonia.Controls.DataGrid" Version="0.10.10"/>
-        <PackageReference Include="Avalonia.Desktop" Version="0.10.10"/>
-        <PackageReference Include="Avalonia.Diagnostics" Version="0.10.10"/>
-        <PackageReference Include="Avalonia.ReactiveUI" Version="0.10.10"/>
-        <PackageReference Include="Avalonia.Xaml.Behaviors" Version="0.10.10.3"/>
-        <PackageReference Include="Avalonia.Svg.Skia" Version="0.10.10"/>
-        <PackageReference Include="DialogHost.Avalonia" Version="0.3.1"/>
-        <PackageReference Include="Deadpikle.AvaloniaProgressRing" Version="0.9.0"/>
-        <PackageReference Include="NetSparkleUpdater.SparkleUpdater" Version="2.0.7"/>
-        <PackageReference Include="NetSparkleUpdater.UI.Avalonia" Version="2.0.8"/>
-        <PackageReference Include="OxyPlot.Avalonia" Version="2.1.0-20201211.2"/>
-        <PackageReference Include="QRCoder" Version="1.4.1"/>
-        <PackageReference Include="runtime.osx.10.10-x64.CoreCompat.System.Drawing" Version="5.8.64"/>
-        <PackageReference Include="Sentry.Serilog" Version="2.1.4"/>
-        <PackageReference Include="Serilog.Settings.Configuration" Version="3.1.0"/>
-        <PackageReference Include="Serilog.Sinks.Console" Version="3.1.1"/>
+        <PackageReference Include="Avalonia" Version="0.10.10" />
+        <PackageReference Include="Avalonia.Controls.DataGrid" Version="0.10.10" />
+        <PackageReference Include="Avalonia.Desktop" Version="0.10.10" />
+        <PackageReference Include="Avalonia.Diagnostics" Version="0.10.10" />
+        <PackageReference Include="Avalonia.ReactiveUI" Version="0.10.10" />
+        <PackageReference Include="Avalonia.Xaml.Behaviors" Version="0.10.10.3" />
+        <PackageReference Include="Avalonia.Svg.Skia" Version="0.10.10" />
+        <PackageReference Include="DialogHost.Avalonia" Version="0.3.1" />
+        <PackageReference Include="Deadpikle.AvaloniaProgressRing" Version="0.9.0" />
+        <PackageReference Include="NetSparkleUpdater.SparkleUpdater" Version="2.0.7" />
+        <PackageReference Include="NetSparkleUpdater.UI.Avalonia" Version="2.0.8" />
+        <PackageReference Include="OxyPlot.Avalonia" Version="2.1.0-20201211.2" />
+        <PackageReference Include="QRCoder" Version="1.4.1" />
+        <PackageReference Include="runtime.osx.10.10-x64.CoreCompat.System.Drawing" Version="5.8.64" />
+        <PackageReference Include="Sentry.Serilog" Version="2.1.4" />
+        <PackageReference Include="Serilog.Settings.Configuration" Version="3.1.0" />
+        <PackageReference Include="Serilog.Sinks.Console" Version="3.1.1" />
+        <PackageReference Include="ReactiveUI.Fody" Version="16.4.1" />
     </ItemGroup>
 
 
     <ItemGroup>
-        <None Remove="config.debug.json"/>
-        <None Remove="config.json"/>
+        <None Remove="config.debug.json" />
+        <None Remove="config.json" />
     </ItemGroup>
     <ItemGroup>
         <EmbeddedResource Include="config.debug.json">
@@ -54,6 +55,14 @@
     <ItemGroup>
         <Compile Update="Dialogs\Views\DialogServiceView.axaml.cs">
             <DependentUpon>UnsavedChangesDialogView.axaml</DependentUpon>
+        </Compile>
+        <Compile Update="Properties\Resources.Designer.cs">
+          <DesignTime>True</DesignTime>
+          <AutoGen>True</AutoGen>
+          <DependentUpon>Resources.resx</DependentUpon>
+        </Compile>
+        <Compile Update="Views\ConversionViews\ConversionCurrencyView.axaml.cs">
+          <DependentUpon>ConversionCurrencyView.axaml</DependentUpon>
         </Compile>
         <Compile Update="Views\StartView.axaml.cs">
             <DependentUpon>StartView.axaml</DependentUpon>
@@ -101,7 +110,7 @@
         <Compile Update="Views\WalletMainView.axaml.cs">
             <DependentUpon>WalletMainView.axaml</DependentUpon>
         </Compile>
-        <Compile Update="Views\ConversionView.axaml.cs">
+        <Compile Update="Views\ConversionViews\ConversionView.axaml.cs">
             <DependentUpon>ConversionView.axaml</DependentUpon>
         </Compile>
         <Compile Update="Views\WalletViews\WalletView.axaml.cs">
@@ -124,14 +133,6 @@
             <DependentUpon>BitcoinBasedSendView.axaml</DependentUpon>
             <SubType>Code</SubType>
         </Compile>
-        <Compile Update="Views\SendViews\SendConfirmationView.axaml.cs">
-            <DependentUpon>SendConfirmationView.axaml</DependentUpon>
-            <SubType>Code</SubType>
-        </Compile>
-        <Compile Update="Views\SendViews\SendingView.axaml.cs">
-            <DependentUpon>SendingView.axaml</DependentUpon>
-            <SubType>Code</SubType>
-        </Compile>
         <Compile Update="Views\MessageView.axaml.cs">
             <DependentUpon>MessageView.axaml</DependentUpon>
         </Compile>
@@ -147,7 +148,7 @@
             <DependentUpon>EthereumTransactionDetailsView.axaml</DependentUpon>
             <SubType>Code</SubType>
         </Compile>
-        <Compile Update="Views\ConversionConfirmationView.axaml.cs">
+        <Compile Update="Views\ConversionViews\ConversionConfirmationView.axaml.cs">
             <DependentUpon>ConversionConfirmationView.axaml</DependentUpon>
         </Compile>
         <Compile Update="Views\AddressesView.axaml.cs">
@@ -183,5 +184,11 @@
         <ProjectReference Include="atomex.client.core\Atomex.Client.Core\Atomex.Client.Core.csproj">
             <GlobalPropertiesToRemove></GlobalPropertiesToRemove>
         </ProjectReference>
+    </ItemGroup>
+    <ItemGroup>
+      <EmbeddedResource Update="Properties\Resources.resx">
+        <Generator>ResXFileCodeGenerator</Generator>
+        <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      </EmbeddedResource>
     </ItemGroup>
 </Project>

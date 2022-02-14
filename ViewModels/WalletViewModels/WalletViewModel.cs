@@ -10,7 +10,6 @@ using Atomex.Blockchain.BitcoinBased;
 using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.ViewModels.Abstract;
 using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
-using Atomex.Client.Desktop.ViewModels.ReceiveViewModels;
 using Atomex.Client.Desktop.ViewModels.SendViewModels;
 using Atomex.Client.Desktop.ViewModels.TransactionViewModels;
 using Atomex.Common;
@@ -219,12 +218,13 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         protected virtual void OnSendClick()
         {
             var sendViewModel = SendViewModelCreator.CreateViewModel(App, Currency);
-            Desktop.App.DialogService.Show(sendViewModel);
+            Desktop.App.DialogService.Show(sendViewModel.SelectFromViewModel);
         }
 
         protected virtual void OnReceiveClick()
         {
             var receiveViewModel = new ReceiveViewModel(App, Currency);
+
             Desktop.App.DialogService.Show(receiveViewModel);
         }
 

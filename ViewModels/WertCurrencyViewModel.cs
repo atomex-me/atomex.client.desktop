@@ -1,5 +1,3 @@
-using Avalonia.Media;
-using ReactiveUI;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -9,14 +7,17 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
 
+using Avalonia.Media;
+using ReactiveUI;
+
 using Atomex.Client.Desktop.Api;
 using Atomex.Client.Desktop.Common;
 using Atomex.Core;
-using Atomex.Client.Desktop.ViewModels.Abstract;
 using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
 using Atomex.Common;
 using Atomex.Cryptography;
 using Atomex.Wallet.Abstract;
+using Atomex.ViewModels;
 
 namespace Atomex.Client.Desktop.ViewModels
 {
@@ -30,14 +31,14 @@ namespace Atomex.Client.Desktop.ViewModels
                                  $"&{GetConvertAmount}" +
                                  $"&click_id=user:{GetUserId()}/network:{_app.Account.Network}";
 
-        private IAtomexApp _app { get; }
-        private WertApi _api { get; }
+        private readonly IAtomexApp _app;
+        private readonly WertApi _api;
 
         private string GetConvertAmount => FromAmountChangedFromKeyboard
             ? $"currency_amount={FromAmount}"
             : $"commodity_amount={ToAmount}";
 
-        protected CancellationTokenSource cancellationTokenSource { get; set; }
+        protected CancellationTokenSource _cancellationTokenSource;
 
         private CurrencyViewModel _currencyViewModel;
 
@@ -84,19 +85,23 @@ namespace Atomex.Client.Desktop.ViewModels
             return Sha256.Compute(Sha256.Compute(publicKey)).ToHexString();
         }
 
+        public WertCurrencyViewModel()
+        {
+        }
+
         public WertCurrencyViewModel(CurrencyConfig currency, IAtomexApp app, WertApi wertApi)
         {
             _app = app ?? throw new ArgumentNullException(nameof(app));
             _api = wertApi ?? throw new ArgumentNullException(nameof(wertApi));
             CurrencyViewModel = CurrencyViewModelCreator.CreateViewModel(currency);
-            cancellationTokenSource = new CancellationTokenSource();
+            _cancellationTokenSource = new CancellationTokenSource();
 
             // get all addresses with tokens (if exists)
             var tokenAddresses = Currencies.HasTokens(Currency.Name)
-                ? _app.Account
-                    .GetCurrencyAccount<ILegacyCurrencyAccount>(Currency.Name)
-                    .GetUnspentTokenAddressesAsync()
-                    .WaitForResult()
+                ? (_app.Account
+                    .GetCurrencyAccount(Currency.Name) as IHasTokens)
+                    ?.GetUnspentTokenAddressesAsync()
+                    .WaitForResult() ?? new List<WalletAddress>()
                 : new List<WalletAddress>();
 
             // get all active addresses
@@ -184,8 +189,8 @@ namespace Atomex.Client.Desktop.ViewModels
             OnPropertyChanged(nameof(FromAmountString));
             OnPropertyChanged(nameof(ToAmountString));
 
-            cancellationTokenSource.Cancel();
-            cancellationTokenSource = new CancellationTokenSource();
+            _cancellationTokenSource.Cancel();
+            _cancellationTokenSource = new CancellationTokenSource();
         }
 
         protected virtual string GetDefaultAddress()
@@ -257,7 +262,6 @@ namespace Atomex.Client.Desktop.ViewModels
                 OnPropertyChanged(nameof(FromAmount));
             }
         }
-
 
         public bool FromAmountChangedFromKeyboard { get; set; }
 
@@ -341,8 +345,8 @@ namespace Atomex.Client.Desktop.ViewModels
             {
                 Task.Run(async () =>
                 {
-                    cancellationTokenSource.Cancel();
-                    cancellationTokenSource = new CancellationTokenSource();
+                    _cancellationTokenSource.Cancel();
+                    _cancellationTokenSource = new CancellationTokenSource();
                     await Task.Delay(500);
                     StartAsyncRatesCheck(side);
                 });
@@ -355,7 +359,7 @@ namespace Atomex.Client.Desktop.ViewModels
             {
                 while (attempt < 10)
                 {
-                    await Task.Delay(25 * 1000, cancellationTokenSource.Token)
+                    await Task.Delay(25 * 1000, _cancellationTokenSource.Token)
                         .ConfigureAwait(false);
 
                     if (side == Side.From)
@@ -371,7 +375,7 @@ namespace Atomex.Client.Desktop.ViewModels
                 }
 
                 OldRates = true;
-            }, cancellationTokenSource.Token);
+            }, _cancellationTokenSource.Token);
         }
 
         private async Task GetFromCurrencyRequest()
@@ -406,7 +410,7 @@ namespace Atomex.Client.Desktop.ViewModels
 
         public ICommand BuyCommand => _buyCommand ??= (_buyCommand = ReactiveCommand.Create(() =>
         {
-            Desktop.App.OpenBrowser(BuyUrl);
+            App.OpenBrowser(BuyUrl);
         }));
     }
 }

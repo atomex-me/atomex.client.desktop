@@ -2,48 +2,55 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="using:Atomex.Client.Desktop"
              x:Class="Atomex.Client.Desktop.App">
-    <Application.DataTemplates>
-        <local:ViewLocator />
-    </Application.DataTemplates>
+  <Application.DataTemplates>
+    <local:ViewLocator/>
+  </Application.DataTemplates>
 
-    <Application.Resources>
-        <ResourceDictionary>
-            <ResourceDictionary.MergedDictionaries>
-                <ResourceInclude Source="/Resources/Icons.axaml" />
-                <ResourceInclude Source="/Themes/blue.axaml" />
-            </ResourceDictionary.MergedDictionaries>
-        </ResourceDictionary>
-    </Application.Resources>
+  <Application.Resources>
+    <ResourceDictionary>
+      <ResourceDictionary.MergedDictionaries>
+        <ResourceInclude Source="/Resources/Icons.axaml"/>
+        <ResourceInclude Source="/Themes/blue.axaml"/>
+        <ResourceInclude Source="/Themes/redesign.axaml"/>
+      </ResourceDictionary.MergedDictionaries>
+    </ResourceDictionary>
+  </Application.Resources>
 
-    <Application.Styles>
-        <FluentTheme Mode="Light" />
+  <Application.Styles>
+    <FluentTheme Mode="Light"/>
         
-        <StyleInclude Source="avares://AvaloniaProgressRing/Styles/ProgressRing.xaml" />
-        <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml" />
-        <StyleInclude Source="resm:OxyPlot.Avalonia.Themes.Default.xaml?assembly=OxyPlot.Avalonia" />
-        <StyleInclude Source="/Styles/Styles.axaml" />
-        <StyleInclude Source="/Styles/MainWindowStyle.axaml" />
-        <StyleInclude Source="/Styles/ChildViewStyle.axaml" />
-        <StyleInclude Source="/Styles/DefaultButtonStyle.axaml" />
-        <StyleInclude Source="/Styles/GenerateButtonStyle.axaml" />
-        <StyleInclude Source="/Styles/IconButtonStyle.axaml" />
-        <StyleInclude Source="/Styles/LinkButtonStyle.axaml" />
-        <StyleInclude Source="/Styles/CustomComboBoxStyle.axaml" />
-        <StyleInclude Source="/Styles/BakersComboBoxStyle.axaml" />
-        <StyleInclude Source="/Styles/CustomTextBoxStyle.axaml" />
-        <StyleInclude Source="/Styles/AmountTextBoxStyle.axaml" />
-        <StyleInclude Source="/Styles/PasswordTextBoxStyle.axaml" />
-        <StyleInclude Source="/Styles/TabControl.axaml" />
-        <!-- <StyleInclude Source="/Styles/WalletTabControlStyle.axaml" /> -->
-        <StyleInclude Source="/Styles/CustomTooltipStyle.axaml" />
-        <StyleInclude Source="/Styles/WalletMenuButton.axaml" />
-        <StyleInclude Source="/Styles/CustomDataGridStyle.axaml" />
-        <StyleInclude Source="/Styles/WalletViewStyle.axaml" />
-        <StyleInclude Source="/Styles/SwapViewStyle.axaml" />
-        <StyleInclude Source="/Styles/CurrencyComboBoxStyle.axaml" />
-        <StyleInclude Source="/Styles/ToggleSwitchStyle.axaml" />
-        <StyleInclude Source="/Styles/CustomTitlebarStyle.axaml" />
-        <StyleInclude Source="/Styles/TypeTest.axaml" />
-        <StyleInclude Source="/Styles/DialogHostCustomStyle.axaml" />
-    </Application.Styles>
+    <StyleInclude Source="avares://AvaloniaProgressRing/Styles/ProgressRing.xaml"/>
+    <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml"/>
+    <StyleInclude Source="resm:OxyPlot.Avalonia.Themes.Default.xaml?assembly=OxyPlot.Avalonia"/>
+    <StyleInclude Source="/Styles/Styles.axaml"/>
+    <StyleInclude Source="/Styles/MainWindowStyle.axaml"/>
+    <StyleInclude Source="/Styles/ChildViewStyle.axaml"/>
+    <StyleInclude Source="/Styles/ButtonStyle.axaml"/>
+    <StyleInclude Source="/Styles/RoundedButtonStyle.axaml"/>
+    <StyleInclude Source="/Styles/IconButtonStyle.axaml"/>
+    <StyleInclude Source="/Styles/LinkButtonStyle.axaml"/>
+    <StyleInclude Source="/Styles/CustomComboBoxStyle.axaml"/>
+    <StyleInclude Source="/Styles/BakersComboBoxStyle.axaml"/>
+    <StyleInclude Source="/Styles/CustomTextBoxStyle.axaml"/>
+    <StyleInclude Source="/Styles/AtomexTextBoxStyle.axaml"/>
+    <StyleInclude Source="/Styles/AmountTextBoxStyle.axaml"/>
+    <StyleInclude Source="/Styles/PasswordTextBoxStyle.axaml"/>
+    <StyleInclude Source="/Styles/TabControl.axaml"/>
+    <!-- <StyleInclude Source="/Styles/WalletTabControlStyle.axaml" /> -->
+    <StyleInclude Source="/Styles/CustomTooltipStyle.axaml"/>
+    <StyleInclude Source="/Styles/WalletMenuButton.axaml"/>
+    <StyleInclude Source="/Styles/OldCustomDataGridStyle.axaml"/>
+    <StyleInclude Source="/Styles/RedesignDataGridStyle.axaml"/>
+    <StyleInclude Source="/Styles/WalletViewStyle.axaml"/>
+    <StyleInclude Source="/Styles/SwapViewStyle.axaml"/>
+    <StyleInclude Source="/Styles/CurrencyComboBoxStyle.axaml"/>
+    <StyleInclude Source="/Styles/CurrencySendControlStyle.axaml"/>
+    <StyleInclude Source="/Styles/ToggleSwitchStyle.axaml"/>
+    <StyleInclude Source="/Styles/CustomTitlebarStyle.axaml"/>
+    <StyleInclude Source="/Styles/TypeTest.axaml"/>
+    <StyleInclude Source="/Styles/DialogHostCustomStyle.axaml"/>
+    <StyleInclude Source="/Styles/CustomCheckBoxStyle.axaml"/>
+    <StyleInclude Source="/Styles/CollapsedAnimation.axaml"/>
+    <StyleInclude Source="/Styles/RadioButtonStyle.axaml"/>
+  </Application.Styles>
 </Application>

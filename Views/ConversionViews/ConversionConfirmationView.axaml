@@ -1,0 +1,289 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="Atomex.Client.Desktop.Views.ConversionConfirmationView"
+             xmlns:vm="clr-namespace:Atomex.Client.Desktop.ViewModels"
+             xmlns:controls="clr-namespace:Atomex.Client.Desktop.Controls"
+             xmlns:converters="clr-namespace:Atomex.Client.Desktop.Converters"
+             Height="434"
+             Width="700">
+
+  <Design.DataContext>
+    <vm:ConversionConfirmationViewModel/>
+  </Design.DataContext>
+
+  <UserControl.Resources>
+    <converters:AmountToStringConverter x:Key="AmountToStringConverter"/>
+  </UserControl.Resources>
+
+  <Border Classes="ChildViewBorder"
+          Width="700">
+    <StackPanel Orientation="Vertical">
+      <!-- title -->
+      <Border Height="72">
+        <TextBlock FontSize="22"
+                   FontFamily="{DynamicResource DefaultFontFamily}"
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Center"
+                   Foreground="{DynamicResource LightDefault}"
+                   Text="Confirm exchange"/>
+      </Border>
+
+      <!-- line separator -->
+      <Border Height="1"
+              Background="{DynamicResource LightDefaultOpacity10}"
+              VerticalAlignment="Bottom"/>
+
+      <!-- from currency view -->
+      <Border Margin="0 30 0 0"
+              Width="400"
+              Height="82"
+              BorderThickness="1"
+              CornerRadius="6"
+              BorderBrush="{DynamicResource LightDefaultOpacity20}">
+        <Grid ColumnDefinitions="20,Auto,*,Auto,24"
+              RowDefinitions="20,Auto,*,18">
+
+          <!-- currency icon and name -->
+          <StackPanel Orientation="Horizontal"
+                      Grid.Row="1"
+                      Grid.Column="1">
+            <Image Width="24"
+                   Height="24"
+                   VerticalAlignment="Center"
+                   Source="{Binding FromCurrencyViewModel.LargeIconPath}"
+                   UseLayoutRounding="True"/>
+
+            <TextBlock Margin="8 0 0 0"
+                       Text="{Binding FromCurrencyViewModel.Header}"
+                       FontSize="18"
+                       FontFamily="{DynamicResource DefaultLightFontFamily}"
+                       Foreground="{DynamicResource DefaultForegroundBrush}"
+                       VerticalAlignment="Center"/>
+          </StackPanel>
+
+          <!-- address description -->
+          <TextBlock Text="{Binding FromAddressDescription}"
+                     FontSize="13"
+                     FontFamily="{DynamicResource DefaultLightFontFamily}"
+                     Foreground="{DynamicResource SecondaryForegroundBrush}"
+                     VerticalAlignment="Bottom"
+                     Grid.Row="2"
+                     Grid.Column="1"/>
+
+          <!-- amount -->
+          <StackPanel Orientation="Horizontal"
+                      VerticalAlignment="Center"
+                      HorizontalAlignment="Right"
+                      Grid.Row="1"
+                      Grid.Column="2">
+            <TextBlock FontSize="18"
+                       FontFamily="{DynamicResource DefaultLightFontFamily}"
+                       Foreground="{DynamicResource DefaultForegroundBrush}">
+              <TextBlock.Text>
+                <MultiBinding Converter="{StaticResource AmountToStringConverter}">
+                  <Binding Path="Amount"/>
+                  <Binding Path="FromCurrencyViewModel.CurrencyFormat"/>
+                </MultiBinding>
+              </TextBlock.Text>          
+            </TextBlock>
+
+            <TextBlock Margin="6 0 0 0"
+                       Text="{Binding FromCurrencyViewModel.CurrencyCode}"
+                       FontSize="18"
+                       FontFamily="{DynamicResource DefaultLightFontFamily}"
+                       Foreground="{DynamicResource DefaultForegroundBrush}">         
+            </TextBlock>
+          </StackPanel>
+
+          <!-- amount in base -->
+          <TextBlock FontSize="13"
+                     FontFamily="{DynamicResource DefaultLightFontFamily}"
+                     Foreground="{DynamicResource SecondaryForegroundBrush}"
+                     VerticalAlignment="Bottom"
+                     HorizontalAlignment="Right"
+                     Grid.Row="2"
+                     Grid.Column="2">
+            <TextBlock.Text>
+              <MultiBinding Converter="{StaticResource AmountToStringConverter}">
+                <Binding Path="AmountInBase"/>
+                <Binding Path="FromCurrencyViewModel.BaseCurrencyFormat"/>
+              </MultiBinding>
+            </TextBlock.Text>
+          </TextBlock>
+        </Grid>
+      </Border>
+
+      <!-- arrow -->
+      <Border Width="32"
+              Height="32"
+              Margin="0 -9 0 -9"
+              CornerRadius="16"
+              BorderThickness="1"
+              BorderBrush="{DynamicResource LightDefaultOpacity20}"
+              ZIndex="1"
+              Background="{DynamicResource ChildViewBackgroundMiddleColor}">
+        <Path Width="8"
+              Height="14"
+              Stretch="Fill"
+              Data="{DynamicResource Arrow}"
+              Fill="{DynamicResource LightDefaultOpacity50}"/>
+      </Border>
+      
+      <!-- to currency view -->
+      <Border Margin="0 0 0 12"
+              Width="400"
+              Height="82"
+              BorderThickness="1"
+              CornerRadius="6"
+              BorderBrush="{DynamicResource LightDefaultOpacity20}">
+        <Grid ColumnDefinitions="20,Auto,*,Auto,24"
+              RowDefinitions="20,Auto,*,18">
+
+          <!-- currency icon and name -->
+          <StackPanel Orientation="Horizontal"
+                      Grid.Row="1"
+                      Grid.Column="1">
+            <Image Width="24"
+                   Height="24"
+                   VerticalAlignment="Center"
+                   Source="{Binding ToCurrencyViewModel.LargeIconPath}"
+                   UseLayoutRounding="True"/>
+
+            <TextBlock Margin="8 0 0 0"
+                       Text="{Binding ToCurrencyViewModel.Header}"
+                       FontSize="18"
+                       FontFamily="{DynamicResource DefaultLightFontFamily}"
+                       Foreground="{DynamicResource DefaultForegroundBrush}"
+                       VerticalAlignment="Center"/>
+          </StackPanel>
+
+          <!-- address description -->
+          <TextBlock Text="{Binding ToAddressDescription}"
+                     FontSize="13"
+                     FontFamily="{DynamicResource DefaultLightFontFamily}"
+                     Foreground="{DynamicResource SecondaryForegroundBrush}"
+                     VerticalAlignment="Bottom"
+                     Grid.Row="2"
+                     Grid.Column="1"/>
+
+          <!-- amount -->
+          <StackPanel Orientation="Horizontal"
+                      VerticalAlignment="Center"
+                      HorizontalAlignment="Right"
+                      Grid.Row="1"
+                      Grid.Column="2">
+            <TextBlock FontSize="18"
+                       FontFamily="{DynamicResource DefaultLightFontFamily}"
+                       Foreground="{DynamicResource DefaultForegroundBrush}">
+              <TextBlock.Text>
+                <MultiBinding Converter="{StaticResource AmountToStringConverter}">
+                  <Binding Path="TargetAmount"/>
+                  <Binding Path="ToCurrencyViewModel.CurrencyFormat"/>
+                </MultiBinding>
+              </TextBlock.Text>          
+            </TextBlock>
+
+            <TextBlock Margin="6 0 0 0"
+                       Text="{Binding ToCurrencyViewModel.CurrencyCode}"
+                       FontSize="18"
+                       FontFamily="{DynamicResource DefaultLightFontFamily}"
+                       Foreground="{DynamicResource DefaultForegroundBrush}">         
+            </TextBlock>
+          </StackPanel>
+
+          <!-- amount in base -->
+          <TextBlock FontSize="13"
+                     FontFamily="{DynamicResource DefaultLightFontFamily}"
+                     Foreground="{DynamicResource SecondaryForegroundBrush}"
+                     VerticalAlignment="Bottom"
+                     HorizontalAlignment="Right"
+                     Grid.Row="2"
+                     Grid.Column="2">
+            <TextBlock.Text>
+              <MultiBinding Converter="{StaticResource AmountToStringConverter}">
+                <Binding Path="TargetAmountInBase"/>
+                <Binding Path="ToCurrencyViewModel.BaseCurrencyFormat"/>
+              </MultiBinding>
+            </TextBlock.Text>
+          </TextBlock>
+        </Grid>
+      </Border>
+
+      <!-- estimated price -->
+      <StackPanel Orientation="Horizontal"
+                  Width="400">
+        <TextBlock Text="Estimated Price 1"
+                   Foreground="{DynamicResource SecondaryForegroundBrush}"
+                   VerticalAlignment="Center"
+                   FontSize="13"
+                   FontFamily="{DynamicResource DefaultLightFontFamily}"/>
+        <TextBlock Margin="4 0 0 0"
+                   Text="{Binding BaseCurrencyCode}"
+                   VerticalAlignment="Center"
+                   Foreground="{DynamicResource SecondaryForegroundBrush}"
+                   FontSize="13"
+                   FontFamily="{DynamicResource DefaultLightFontFamily}"/>
+        <TextBlock Margin="4 0 0 0"
+                   Text="="
+                   Foreground="{DynamicResource SecondaryForegroundBrush}"
+                   VerticalAlignment="Center"
+                   FontSize="13"
+                   FontFamily="{DynamicResource DefaultLightFontFamily}"/>
+        <TextBlock Margin="4 0 0 0"
+                   Foreground="{DynamicResource SecondaryForegroundBrush}"
+                   VerticalAlignment="Center"
+                   FontSize="13"
+                   FontFamily="{DynamicResource DefaultLightFontFamily}">
+          <TextBlock.Text>
+            <MultiBinding Converter="{StaticResource AmountToStringConverter}">
+              <Binding Path="EstimatedPrice"/>
+              <Binding Path="PriceFormat"/>
+            </MultiBinding>
+          </TextBlock.Text>
+        </TextBlock>
+        <TextBlock Margin="4 0 0 0"
+                   Text="{Binding QuoteCurrencyCode}"
+                   Foreground="{DynamicResource SecondaryForegroundBrush}"
+                   VerticalAlignment="Center"
+                   FontSize="13"
+                   FontFamily="{DynamicResource DefaultLightFontFamily}"/>
+      </StackPanel>
+
+      <!-- estimated network fees -->
+      <StackPanel Orientation="Horizontal"
+                  Width="400">
+        <TextBlock Text="Estimated network fees"
+                    Foreground="{DynamicResource SecondaryForegroundBrush}"
+                    VerticalAlignment="Center"
+                    FontSize="13"
+                    FontFamily="{DynamicResource DefaultLightFontFamily}"/>
+        <TextBlock Margin="4 0 0 0"
+                    Foreground="{DynamicResource SecondaryForegroundBrush}"
+                    VerticalAlignment="Center"
+                    FontSize="13"
+                    FontFamily="{DynamicResource DefaultLightFontFamily}">
+          <TextBlock.Text>
+            <MultiBinding Converter="{StaticResource AmountToStringConverter}">
+              <Binding Path="EstimatedTotalNetworkFeeInBase"/>
+              <Binding Path="FromCurrencyViewModel.BaseCurrencyFormat"/>
+            </MultiBinding>
+          </TextBlock.Text>
+        </TextBlock>  
+      </StackPanel>
+
+      <!-- confirm exchange button -->
+      <controls:RoundedButton Margin="0 16 0 0"
+                              Width="400"
+                              Height="52"
+                              CornerRadius="6"
+                              Content="Confirm exchange"
+                              FontSize="18"
+                              FontFamily="{DynamicResource DefaultFontFamily}"
+                              FontWeight="Normal"
+                              Command="{Binding NextCommand}"/>
+    </StackPanel>
+  </Border>
+</UserControl>

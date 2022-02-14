@@ -104,7 +104,6 @@ namespace Atomex.Client.Desktop.ViewModels
 
             foreach (var currency in AllCurrencies)
             {
-                // Console.WriteLine($"{currency.Currency.Name} is {currency.TotalAmountInBase}");
                 series.Slices.Add(
                     new PieSlice(currency.Currency.Name, (double) currency.TotalAmountInBase)
                     {

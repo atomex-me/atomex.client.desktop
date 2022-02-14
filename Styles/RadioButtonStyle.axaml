@@ -1,0 +1,51 @@
+﻿<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <Design.PreviewWith>
+    <Border Padding="20">
+        <!-- Add Controls for Previewer Here -->
+    </Border>
+  </Design.PreviewWith>
+
+  <Style Selector="RadioButton.Default">
+    <Setter Property="FontFamily" Value="{DynamicResource DefaultFontFamily}"/>
+    <Setter Property="FontSize" Value="13"/>
+    <Setter Property="Foreground" Value="{DynamicResource LightDefaultOpacity50}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource LightDefaultOpacity20}"/>
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate>
+          <Grid ColumnDefinitions="Auto,*" Background="{TemplateBinding Background}">
+            <Ellipse Name="border"
+                     Stroke="{TemplateBinding BorderBrush}"
+                     StrokeThickness="1"
+                     Width="20"
+                     Height="20"
+                     VerticalAlignment="Center"/>
+            <Path Width="12"
+                  Height="9"
+                  Stretch="Fill"
+                  Data="{DynamicResource CheckMark}"
+                  Fill="{DynamicResource LightDefault}"
+                  IsVisible="{TemplateBinding IsChecked}"/>
+            <ContentPresenter Name="PART_ContentPresenter"
+                              ContentTemplate="{TemplateBinding ContentTemplate}"
+                              Content="{TemplateBinding Content}"
+                              Margin="14 0 0 0"
+                              RecognizesAccessKey="True"
+                              VerticalAlignment="Center"
+                              Grid.Column="1"/>
+          </Grid>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+  <Style Selector="RadioButton.Default:pointerover /template/ ContentPresenter">
+    <Setter Property="TextBlock.Foreground" Value="{DynamicResource LightDefault}"/>
+  </Style>
+  <Style Selector="RadioButton.Default:checked /template/ ContentPresenter">
+    <Setter Property="TextBlock.Foreground" Value="{DynamicResource LightDefault}"/>
+  </Style>
+  <Style Selector="RadioButton.Default:pointerover /template/ Ellipse">
+    <Setter Property="Stroke" Value="{DynamicResource LightDefaultOpacity50}"/>
+  </Style>
+</Styles>
