@@ -9,7 +9,7 @@ ICON_FILE="logo.icns"
 
 dotnet clean -c Release
 dotnet restore
-dotnet publish -r osx-x64 --configuration Release
+dotnet publish Atomex.Client.Desktop.csproj -r osx-x64 --configuration Release
 dotnet tool install --global NetSparkleUpdater.Tools.AppCastGenerator --version 2.0.6
 
 rm -rf "$BASE_DIR/$DIST_FOLDER"
