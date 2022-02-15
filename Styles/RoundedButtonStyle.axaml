@@ -46,4 +46,10 @@
         <Setter Property="Background" Value="{DynamicResource RoundedButtonDisabledBrush}" />
         <Setter Property="Foreground" Value="{DynamicResource RoundedButtonDisabledForegroundBrush}" />
     </Style>
+    
+    <Style Selector="controls|RoundedButton.StartPage:disabled">
+        <Setter Property="Background" Value="{DynamicResource RoundedButtonBackgroundBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource RoundedButtonForegroundBrush}" />
+        <Setter Property="Opacity" Value="0.75"></Setter>
+    </Style>
 </Styles>
