@@ -18,10 +18,10 @@ namespace Atomex.Client.Desktop.ViewModels
         public Action GotInputFocus { get; set; }
 
         [Reactive] public CurrencyViewModel? CurrencyViewModel { get; set; }
-        public string CurrencyFormat => CurrencyViewModel?.CurrencyFormat ?? "0";
+        [ObservableAsProperty] public string CurrencyFormat { get; } // => CurrencyViewModel?.CurrencyFormat ?? "0";
         [Reactive] public string? Address { get; set; }
         [Reactive] public decimal Amount { get; set; }
-        [Reactive] public string AmountString { get; set; }
+        [ObservableAsProperty] public string AmountString { get; }
 
         public void SetAmountFromString(string value)
         {
@@ -55,7 +55,6 @@ namespace Atomex.Client.Desktop.ViewModels
         public ICommand MaxCommand => _maxCommand ??= ReactiveCommand.Create(() => MaxClicked?.Invoke());
 
         private ICommand _selectCurrencyCommand;
-
         public ICommand SelectCurrencyCommand =>
             _selectCurrencyCommand ??= ReactiveCommand.Create(() => SelectCurrencyClicked?.Invoke());
 
@@ -70,9 +69,16 @@ namespace Atomex.Client.Desktop.ViewModels
                 .Select(i => i != null)
                 .ToPropertyEx(this, vm => vm.Selected);
 
-            this.WhenAnyValue(vm => vm.Amount)
-                .Select(amount => amount.ToString(CurrencyFormat, CultureInfo.CurrentCulture))
-                .Subscribe(amount => AmountString = amount);
+            this.WhenAnyValue(vm => vm.CurrencyViewModel)
+                .Select(vm => vm?.CurrencyFormat ?? "0")
+                .ToPropertyEx(this, vm => vm.CurrencyFormat);
+
+            this.WhenAnyValue(vm => vm.Amount,
+                              vm => vm.CurrencyFormat,
+                              (amount, currencyFormat) => {
+                                  return amount.ToString(currencyFormat, CultureInfo.CurrentCulture);
+                              })
+                .ToPropertyEx(this, vm => vm.AmountString);
         }
 
         public void RaiseGotInputFocus()

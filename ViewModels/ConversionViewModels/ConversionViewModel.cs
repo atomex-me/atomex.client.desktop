@@ -240,17 +240,17 @@ namespace Atomex.Client.Desktop.ViewModels
                 });
 
             // FromCurrencyViewModel currency changed => Update AmountString and AmountInBase if need
-            this.WhenAnyValue(vm => vm.FromViewModel.CurrencyViewModel)
-                .WhereNotNull()
-                .Subscribe(c =>
-                {
-                    var tempAmountString = FromViewModel.AmountString;
+            //this.WhenAnyValue(vm => vm.FromViewModel.CurrencyViewModel)
+            //    .WhereNotNull()
+            //    .Subscribe(c =>
+            //    {
+            //        var tempAmountString = FromViewModel.AmountString;
 
-                    FromViewModel.AmountString = FromViewModel.Amount.ToString(FromViewModel.CurrencyFormat, CultureInfo.CurrentCulture); // update amount string with new "from" currency format
+            //        FromViewModel.AmountString = FromViewModel.Amount.ToString(FromViewModel.CurrencyFormat, CultureInfo.CurrentCulture); // update amount string with new "from" currency format
 
-                    if (FromViewModel.AmountString == tempAmountString)
-                        UpdateFromAmountInBase(); // force update amount in base in case when amount string not changed
-                });
+            //        if (FromViewModel.AmountString == tempAmountString)
+            //            UpdateFromAmountInBase(); // force update amount in base in case when amount string not changed
+            //    });
 
             // FromCurrencyViewModel or ToCurrencyViewModel changed
             this.WhenAnyValue(
@@ -431,9 +431,8 @@ namespace Atomex.Client.Desktop.ViewModels
                 //    TODO: warning?
                 //}
 
-                FromViewModel.AmountString = Math.Min(swapParams.Amount, EstimatedMaxFromAmount)
-                    .TruncateDecimal(FromViewModel.CurrencyViewModel!.Currency.Digits)
-                    .ToString(FromViewModel.CurrencyFormat, CultureInfo.CurrentCulture);
+                FromViewModel.Amount = Math.Min(swapParams.Amount, EstimatedMaxFromAmount)
+                    .TruncateDecimal(FromViewModel.CurrencyViewModel!.Currency.Digits);
             }
             catch (Exception e)
             {
@@ -830,9 +829,9 @@ namespace Atomex.Client.Desktop.ViewModels
                     if (swapPriceEstimation == null)
                     {
                         if (_amountType == AmountType.Sold) {
-                            ToViewModel.AmountString = 0.ToString(ToViewModel.CurrencyFormat, CultureInfo.CurrentCulture);
+                            ToViewModel.Amount = 0;
                         } else {
-                            FromViewModel.AmountString = 0.ToString(FromViewModel.CurrencyFormat, CultureInfo.CurrentCulture);
+                            FromViewModel.Amount = 0;
                         }
                         
                         EstimatedPrice         = 0;
@@ -845,9 +844,9 @@ namespace Atomex.Client.Desktop.ViewModels
                     _estimatedOrderPrice = swapPriceEstimation.OrderPrice;
 
                     if (_amountType == AmountType.Sold) {
-                        ToViewModel.AmountString = swapPriceEstimation.ToAmount.ToString(ToViewModel.CurrencyFormat, CultureInfo.CurrentCulture);
+                        ToViewModel.Amount = swapPriceEstimation.ToAmount;
                     } else {
-                        FromViewModel.AmountString = swapPriceEstimation.FromAmount.ToString(FromViewModel.CurrencyFormat, CultureInfo.CurrentCulture);
+                        FromViewModel.Amount = swapPriceEstimation.FromAmount;
                     }
 
                     EstimatedPrice         = swapPriceEstimation.Price;
@@ -1080,7 +1079,7 @@ namespace Atomex.Client.Desktop.ViewModels
             {
                 CurrencyViewModel  = btcViewModel,
                 Address            = "bc1q...f3hr",
-                AmountString       = "0.00007881",
+                Amount             = 0.00007881m,
                 UnselectedLabel    = "Choose From",
                 AmountInBase       = 12.32m,
             };
@@ -1089,7 +1088,7 @@ namespace Atomex.Client.Desktop.ViewModels
             {
                 CurrencyViewModel  = ltcViewModel,
                 Address            = "ltc1...med6",
-                AmountString       = "558.55271303",
+                Amount             = 558.55271303m,
                 UnselectedLabel    = "Choose To",
                 AmountInBase       = 123.32m,
             };
