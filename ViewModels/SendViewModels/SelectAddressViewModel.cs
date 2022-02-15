@@ -128,7 +128,6 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
             Currency = currency;
             SelectAddressMode = mode;
-            //UseToSelectFrom = useToSelectFrom;
 
             var addresses = AddressesHelper
                 .GetReceivingAddressesAsync(
@@ -211,9 +210,10 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 // MyAddresses.First(o => o.WalletAddress.Address == address.Address).CopyButtonToolTip =
                 //     AddressViewModel.CopiedButtonToolTip;
             }));
-
+#if DEBUG
         private void DesignerMode()
         {
         }
+#endif
     }
 }

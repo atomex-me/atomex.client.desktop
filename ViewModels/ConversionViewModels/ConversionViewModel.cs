@@ -239,19 +239,6 @@ namespace Atomex.Client.Desktop.ViewModels
                     RedeemFromAddress = item.SelectedAddress?.Address;
                 });
 
-            // FromCurrencyViewModel currency changed => Update AmountString and AmountInBase if need
-            //this.WhenAnyValue(vm => vm.FromViewModel.CurrencyViewModel)
-            //    .WhereNotNull()
-            //    .Subscribe(c =>
-            //    {
-            //        var tempAmountString = FromViewModel.AmountString;
-
-            //        FromViewModel.AmountString = FromViewModel.Amount.ToString(FromViewModel.CurrencyFormat, CultureInfo.CurrentCulture); // update amount string with new "from" currency format
-
-            //        if (FromViewModel.AmountString == tempAmountString)
-            //            UpdateFromAmountInBase(); // force update amount in base in case when amount string not changed
-            //    });
-
             // FromCurrencyViewModel or ToCurrencyViewModel changed
             this.WhenAnyValue(
                     vm => vm.FromViewModel.CurrencyViewModel,
@@ -751,6 +738,9 @@ namespace Atomex.Client.Desktop.ViewModels
                 .ToList();
 
             ToCurrencies = FromCurrencies;
+
+            FromViewModel.Amount = 0;
+            ToViewModel.Amount = 0;
 
             FromViewModel.CurrencyViewModel = null;
             ToViewModel.CurrencyViewModel = null;

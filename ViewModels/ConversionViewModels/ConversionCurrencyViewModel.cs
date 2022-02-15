@@ -18,7 +18,7 @@ namespace Atomex.Client.Desktop.ViewModels
         public Action GotInputFocus { get; set; }
 
         [Reactive] public CurrencyViewModel? CurrencyViewModel { get; set; }
-        [ObservableAsProperty] public string CurrencyFormat { get; } // => CurrencyViewModel?.CurrencyFormat ?? "0";
+        [ObservableAsProperty] public string CurrencyFormat { get; }
         [Reactive] public string? Address { get; set; }
         [Reactive] public decimal Amount { get; set; }
         [ObservableAsProperty] public string AmountString { get; }

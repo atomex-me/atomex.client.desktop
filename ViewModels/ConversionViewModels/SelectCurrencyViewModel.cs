@@ -201,9 +201,10 @@ namespace Atomex.Client.Desktop.ViewModels.ConversionViewModels
                     selectedAddress: itemWithAddress.SelectedAddress?.Address)
                 {
                     BackAction = () => { App.DialogService.Show(this); },
-                    ConfirmAction = walletAdddressViewModel =>
+                    ConfirmAction = walletAddressViewModel =>
                     {
-                        itemWithAddress.SelectedAddress = itemWithAddress.AvailableAddresses.FirstOrDefault(a => a.Address == walletAdddressViewModel.Address);
+                        itemWithAddress.SelectedAddress = itemWithAddress.AvailableAddresses
+                            .FirstOrDefault(a => a.Address == walletAddressViewModel.Address) ?? itemWithAddress.SelectedAddress;
                         CurrencySelected?.Invoke(i);
                     }
                 };

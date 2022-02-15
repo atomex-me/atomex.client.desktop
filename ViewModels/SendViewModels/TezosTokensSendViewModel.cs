@@ -654,8 +654,6 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 CurrencyCode = tokenAddress.TokenBalance.Symbol.ToUpper();
                 CurrencyFormat =
                     $"F{Math.Min(tokenAddress.TokenBalance.Decimals, AddressesHelper.MaxTokenCurrencyFormatDecimals)}";
-                SelectedFromBalance = tokenAddress.AvailableBalance();
-                this.RaisePropertyChanged(nameof(AmountString));
             }
             else
             {
@@ -663,9 +661,10 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     .FirstOrDefault(c => c is Fa12Config fa12 && fa12.TokenContractAddress == TokenContract)
                     ?.Name.ToUpper() ?? "TOKENS";
                 CurrencyFormat = DefaultCurrencyFormat;
-                this.RaisePropertyChanged(nameof(AmountString));
             }
 
+            SelectedFromBalance = tokenAddress?.AvailableBalance() ?? 0;
+            this.RaisePropertyChanged(nameof(AmountString));
 
             TokenPreview = GetTokenPreview(From, TokenId);
         }
