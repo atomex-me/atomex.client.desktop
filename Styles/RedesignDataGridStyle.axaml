@@ -1,14 +1,12 @@
 ﻿<Styles xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:helpers="clr-namespace:Atomex.Client.Desktop.Helpers"
-        xmlns:dialogHost="clr-namespace:DialogHost;assembly=DialogHost.Avalonia"
         xmlns:converters="clr-namespace:Atomex.Client.Desktop.Converters">
 
   <Styles.Resources>
     <converters:ShouldShowSort x:Key="ShouldShowSort"/>
     <converters:AddAscToStringConverter x:Key="AddAscToStringConverter"/>
     <converters:AddDescToStringConverter x:Key="AddDescToStringConverter"/>
-    <converters:DialogOpenedToBorderThicknessConverter x:Key="DialogOpenedToBorderThicknessConverter"/>
   </Styles.Resources>
 
   <Style Selector="Path.SortPath[IsEnabled=False]">

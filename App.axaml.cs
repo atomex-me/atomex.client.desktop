@@ -82,14 +82,12 @@ namespace Atomex.Client.Desktop
             if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
             {
                 var mainWindow = new MainWindow();
-
-                DialogService = new DialogService(mainWindow, RuntimeInformation.IsOSPlatform(OSPlatform.Linux));
+                DialogService = new DialogService();
 
                 var mainWindowViewModel = new MainWindowViewModel(AtomexApp, mainWindow);
 
                 mainWindow.DataContext = mainWindowViewModel;
                 desktop.MainWindow = mainWindow;
-
                 desktop.Exit += OnExit;
 
                 // var sink = new InMemorySink(mainWindowViewModel.LogEvent);

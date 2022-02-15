@@ -268,7 +268,6 @@ namespace Atomex.Client.Desktop.Common
 
         private bool IsZipDownload(string downloadFilePath)
         {
-            string installerExt = Path.GetExtension(downloadFilePath);
             bool isMacOS = RuntimeInformation.IsOSPlatform(OSPlatform.OSX);
             bool isLinux = RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
             if ((isMacOS && IsZipValid(downloadFilePath)) ||
