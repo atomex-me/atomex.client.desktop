@@ -76,7 +76,8 @@
                                             VerticalAlignment="Bottom"
                                             FontSize="11"
                                             Command="{Binding MyWalletsCommand}"
-                                            IsEnabled="{Binding HasWallets}" />
+                                            IsEnabled="{Binding HasWallets}"
+                                            Classes="StartPage" />
 
                     <controls:RoundedButton Width="200"
                                             Height="40"
@@ -85,7 +86,8 @@
                                             Content="CREATE NEW WALLET"
                                             VerticalAlignment="Bottom"
                                             FontSize="11"
-                                            Command="{Binding CreateNewCommand}" />
+                                            Command="{Binding CreateNewCommand}"
+                                            Classes="StartPage" />
 
                     <Button Content="I want to restore my wallet"
                             Margin="0 5 0 0"
