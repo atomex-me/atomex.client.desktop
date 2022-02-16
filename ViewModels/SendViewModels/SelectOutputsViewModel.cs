@@ -83,7 +83,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     });
 
                     Outputs = new ObservableCollection<OutputViewModel>(
-                        outputsWithAddresses.OrderByDescending(output => output.BalanceString));
+                        outputsWithAddresses.OrderByDescending(output => output.Balance));
                     InitialOutputs = new ObservableCollection<OutputViewModel>(Outputs);
 
                     RecalculateTotalStats();
@@ -158,8 +158,8 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     else
                     {
                         Outputs = new ObservableCollection<OutputViewModel>(item2
-                            ? outputViewModels.OrderBy(output => output.BalanceString)
-                            : outputViewModels.OrderByDescending(output => output.BalanceString));
+                            ? outputViewModels.OrderBy(output => output.Balance)
+                            : outputViewModels.OrderByDescending(output => output.Balance));
                     }
                 });
 
