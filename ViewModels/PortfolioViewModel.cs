@@ -5,8 +5,8 @@ using System.Linq;
 using Atomex.Common;
 using Atomex.Services;
 using Atomex.Client.Desktop.Common;
-using Atomex.Client.Desktop.ViewModels.Abstract;
 using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
+using Avalonia.Controls;
 using Avalonia.Media;
 using ReactiveUI;
 using OxyPlot;
@@ -40,7 +40,7 @@ namespace Atomex.Client.Desktop.ViewModels
         public PortfolioViewModel()
         {
 #if DEBUG
-            if (Env.IsInDesignerMode())
+            if (Design.IsDesignMode)
                 DesignerMode();
 #endif
         }
@@ -52,7 +52,7 @@ namespace Atomex.Client.Desktop.ViewModels
             SubscribeToServices();
         }
 
-        private async void SubscribeToServices()
+        private void SubscribeToServices()
         {
             App.AtomexClientChanged += OnTerminalChangedEventHandler;
         }
@@ -93,8 +93,6 @@ namespace Atomex.Client.Desktop.ViewModels
                 StrokeThickness = 0,
                 StartAngle = 0,
                 AngleSpan = 360,
-                //ExplodedDistance = 0.1,
-                InnerDiameter = 0.6,
                 TickHorizontalLength = 0,
                 TickRadialLength = 0,
                 OutsideLabelFormat = string.Empty,
@@ -136,6 +134,8 @@ namespace Atomex.Client.Desktop.ViewModels
         private void DesignerMode()
         {
             var random = new Random();
+
+            PortfolioValue = 423432.23m;
             
             AllCurrencies = DesignTime.Currencies
                 .Select(c =>

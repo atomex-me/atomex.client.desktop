@@ -104,7 +104,6 @@
                                         Padding="26 0"
                                         CornerRadius="6"
                                         FontFamily="{DynamicResource DefaultFontFamily}"
-                                        FontWeight="Normal"
                                         Command="{Binding CopyCommand}"
                                         IsEnabled="{Binding !IsCopied}"
                                         Classes.Copied="{Binding IsCopied}"

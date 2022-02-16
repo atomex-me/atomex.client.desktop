@@ -69,4 +69,9 @@
     <Style Selector="Button.Sort.NotRotated">
         <Setter Property="RenderTransform" Value="none" />
     </Style>
+    
+    <Style
+        Selector="Button.ButtonWithIcon.Alert /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource LightDefaultOpacity10}" />
+    </Style>
 </Styles>

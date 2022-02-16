@@ -2,12 +2,14 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             mc:Ignorable="d" d:DesignWidth="900" d:DesignHeight="850"
              x:Class="Atomex.Client.Desktop.Views.PortfolioView"
              xmlns:vm="clr-namespace:Atomex.Client.Desktop.ViewModels"
              xmlns:currencyViewModels="clr-namespace:Atomex.Client.Desktop.ViewModels.CurrencyViewModels"
              xmlns:converters="clr-namespace:Atomex.Client.Desktop.Converters"
-             xmlns:oxy="http://oxyplot.org/avalonia">
+             xmlns:controls="clr-namespace:Atomex.Client.Desktop.Controls"
+             xmlns:oxy="http://oxyplot.org/avalonia"
+             xmlns:svg="clr-namespace:Avalonia.Svg.Skia;assembly=Avalonia.Svg.Skia">
 
     <Design.DataContext>
         <vm:PortfolioViewModel />
@@ -18,129 +20,273 @@
         <converters:StringToUpperCaseConverter x:Key="StringToUpperCaseConverter" />
         <converters:PortfolioToTotalConverter x:Key="PortfolioToTotalConverter" />
         <converters:PercentConverter x:Key="PercentConverter" />
+        <converters:PortfolioTooltipPositionXConverter x:Key="PortfolioTooltipPositionXConverter" />
+        <converters:PortfolioTooltipPositionYConverter x:Key="PortfolioTooltipPositionYConverter" />
     </UserControl.Resources>
-    
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition MaxHeight="500" MinHeight="300" />
-            <RowDefinition />
-        </Grid.RowDefinitions>
 
-        <Grid Grid.Row="0"
-              Margin="0 30 0 30">
+    <!-- todo: remove background-->
+    <Border Background="#0F2139"
+            Padding="48 16 48 0">
+        <StackPanel>
+            <Canvas>
+                <Button Canvas.Right="0"
+                        Background="Green"
+                        Width="44"
+                        Height="44"
+                        BorderThickness="0"
+                        VerticalContentAlignment="Center"
+                        HorizontalContentAlignment="Center"
+                        CornerRadius="50"
+                        Classes="ButtonWithIcon Alert">
+                    <svg:Svg Width="22"
+                             Path="/Resources/Icons/notification-bell.svg" />
+                </Button>
+            </Canvas>
 
-            <oxy:PlotView Background="Transparent"
-                          Model="{Binding PlotModel}"
-                          Controller="{Binding ActualController, Mode=TwoWay}"
-                          Opacity="1"
-                          x:Name="PlotView">
-
-                <oxy:PlotView.DefaultTrackerTemplate>
-                    <ControlTemplate>
-                        <Canvas>
-                            <Border Canvas.Left="{Binding Position.X}"
-                                    Canvas.Top="{Binding Position.Y}"
+            <Grid Margin="95 76 0 42"
+                  RowDefinitions="Auto,Auto"
+                  ColumnDefinitions="Auto,*">
+                <oxy:PlotView Grid.Row="0"
+                              Grid.Column="0"
+                              Grid.RowSpan="2"
+                              Height="150"
+                              Width="430"
+                              Margin="-145 0 -105 0"
+                              Background="Transparent"
+                              Model="{Binding PlotModel}"
+                              Controller="{Binding ActualController, Mode=TwoWay}"
+                              x:Name="PlotView"
+                              ClipToBounds="False"
+                              ZIndex="1">
+                    <oxy:PlotView.DefaultTrackerTemplate>
+                        <ControlTemplate>
+                            <Canvas ClipToBounds="False">
+                                <Border
+                                    Name="TooltipBorder"
                                     CornerRadius="5"
                                     Background="{DynamicResource DefaultTooltipBackgroundBrush}">
-                                <TextBlock Text="{Binding}"
-                                           Padding="16 8"
-                                           Foreground="White"
-                                           VerticalAlignment="Center"
-                                           FontFamily="{DynamicResource DefaultFontFamily}"
-                                           FontSize="12" />
-                            </Border>
-                        </Canvas>
-                    </ControlTemplate>
-                </oxy:PlotView.DefaultTrackerTemplate>
-
-            </oxy:PlotView>
-
-            <TextBlock Foreground="White"
-                       Text="{Binding PortfolioValue, Converter={StaticResource PortfolioToTotalConverter}}"
-                       FontFamily="{DynamicResource DefaultFontFamily}"
-                       FontSize="30"
-                       VerticalAlignment="Center"
-                       HorizontalAlignment="Center" />
-        </Grid>
-
-        <!-- Style="{StaticResource CustomDataGrid}" -->
-        <DataGrid Margin="10"
-                  AutoGenerateColumns="False"
-                  IsReadOnly="True"
-                  Items="{Binding AllCurrencies}"
-                  Grid.Row="1">
-            <DataGrid.Columns>
-                <DataGridTemplateColumn Header="CURRENCY" Width="*">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate DataType="{x:Type currencyViewModels:CurrencyViewModel}">
-                            <Grid Margin="5 5 5 5" Background="Transparent">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="48" />
-                                    <ColumnDefinition Width="*" />
-                                </Grid.ColumnDefinitions>
-                                
-                                <Image Source="{Binding LargeIconPath}"
-                                       Grid.Column="0" />
-
-                                <!-- Style="{StaticResource BaseTextBlockStyle}" -->
-                                <TextBlock
-                                    Text="{Binding Header, Converter={StaticResource StringToUpperCaseConverter}}"
-                                    FontFamily="{DynamicResource DefaultBoldFontFamily}"
-                                    FontWeight="Bold"
-                                    FontSize="14"
-                                    Margin="7 0 0 0"
-                                    VerticalAlignment="Center"
-                                    Grid.Column="1" />
-                            </Grid>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
-                <DataGridTemplateColumn Header="BALANCE">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate DataType="{x:Type currencyViewModels:CurrencyViewModel}">
-                            <StackPanel Orientation="Horizontal"
-                                        HorizontalAlignment="Left"
-                                        Margin="0 0 10 0">
-
-                                <TextBlock FontFamily="{DynamicResource DefaultFontFamily}"
-                                           VerticalAlignment="Center">
-                                    <TextBlock.Text>
-                                        <MultiBinding Converter="{StaticResource AmountToStringConverter}">
-                                            <Binding Path="AvailableAmount" Mode="OneWay" />
-                                            <Binding Path="CurrencyFormat" Mode="OneWay" />
+                                    <Canvas.Left>
+                                        <MultiBinding Converter="{StaticResource PortfolioTooltipPositionXConverter}">
+                                            <Binding Path="Position.X" Mode="OneWay"/>
+                                            <Binding Path="#TooltipBorder.Bounds.Width" Mode="OneWay"/>
                                         </MultiBinding>
-                                    </TextBlock.Text>
-                                </TextBlock>
-                                <TextBlock Margin="3 0 0 2"
-                                           Text="{Binding CurrencyCode}"
-                                           FontSize="10"
-                                           VerticalAlignment="Center" />
-                            </StackPanel>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
-                <DataGridTemplateColumn Header="VALUE">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate DataType="{x:Type currencyViewModels:CurrencyViewModel}">
-                            <TextBlock Margin="0 0 10 0"
+                                    </Canvas.Left>
+                                    <Canvas.Top>
+                                        <MultiBinding Converter="{StaticResource PortfolioTooltipPositionYConverter}">
+                                            <Binding Path="Position.Y" Mode="OneWay"/>
+                                            <Binding Path="#TooltipBorder.Bounds.Height" Mode="OneWay"/>
+                                        </MultiBinding>
+                                    </Canvas.Top>
+                                    <TextBlock Text="{Binding}"
+                                               Padding="16 8"
+                                               Foreground="White"
+                                               VerticalAlignment="Center"
+                                               FontFamily="{DynamicResource DefaultFontFamily}"
+                                               FontSize="12" />
+                                </Border>
+                            </Canvas>
+                        </ControlTemplate>
+                    </oxy:PlotView.DefaultTrackerTemplate>
+                </oxy:PlotView>
+
+
+                <StackPanel Grid.Column="1"
+                            Grid.Row="0">
+                    <TextBlock FontFamily="{DynamicResource DefaultFontFamily}"
+                               Foreground="{DynamicResource SecondaryForegroundBrush}"
+                               Margin="0 5 0 0"
+                               FontSize="13"
+                               Text="Total Balance" />
+                    <TextBlock FontFamily="{DynamicResource DefaultFontFamily}"
+                               Foreground="{DynamicResource DefaultForegroundBrush}"
+                               FontSize="40"
+                               Text="{Binding PortfolioValue, Converter={StaticResource PortfolioToTotalConverter}}" />
+                </StackPanel>
+
+                <StackPanel Grid.Column="1"
+                            Grid.Row="1"
+                            Margin="0 16 0 0"
+                            Orientation="Horizontal"
+                            VerticalAlignment="Top">
+
+                    <controls:RoundedButton Height="46"
+                                            Padding="26 0"
+                                            CornerRadius="6"
+                                            FontFamily="{DynamicResource DefaultFontFamily}">
+                        <StackPanel Orientation="Horizontal">
+                            <svg:Svg HorizontalAlignment="Center"
+                                     Width="24"
+                                     Height="24"
+                                     Path="/Resources/Icons/top-right-arrow.svg" />
+                            <TextBlock Margin="8 0 0 0"
+                                       Text="Send"
                                        FontFamily="{DynamicResource DefaultFontFamily}"
-                                       VerticalAlignment="Center"
-                                       HorizontalAlignment="Left">
-                                <TextBlock.Text>
-                                    <MultiBinding Converter="{StaticResource AmountToStringConverter}">
-                                        <Binding Path="AvailableAmountInBase" Mode="OneWay" />
-                                        <Binding Path="BaseCurrencyFormat" Mode="OneWay" />
-                                    </MultiBinding>
-                                </TextBlock.Text>
-                            </TextBlock>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
-                <DataGridTextColumn Header="% IN PORTFOLIO"
-                                    Binding="{Binding PortfolioPercent, Converter={StaticResource PercentConverter}, Mode=TwoWay}">
-                    
-                </DataGridTextColumn>
-            </DataGrid.Columns>
-        </DataGrid>
-    </Grid>
+                                       FontWeight="Light"
+                                       FontSize="18"
+                                       Foreground="{DynamicResource RoundedButtonForegroundBrush}" />
+                        </StackPanel>
+                    </controls:RoundedButton>
+                    <controls:RoundedButton Height="46"
+                                            Padding="26 0"
+                                            CornerRadius="6"
+                                            FontFamily="{DynamicResource DefaultFontFamily}"
+                                            Margin="12 0 0 0">
+                        <StackPanel Orientation="Horizontal">
+                            <svg:Svg HorizontalAlignment="Center"
+                                     Width="24"
+                                     Height="24"
+                                     Path="/Resources/Icons/bottom-right-arrow.svg" />
+                            <TextBlock Margin="8 0 0 0"
+                                       Text="Receive"
+                                       FontFamily="{DynamicResource DefaultFontFamily}"
+                                       FontWeight="Light"
+                                       FontSize="18"
+                                       Foreground="{DynamicResource RoundedButtonForegroundBrush}" />
+                        </StackPanel>
+                    </controls:RoundedButton>
+                    <controls:RoundedButton Height="46"
+                                            Padding="26 0"
+                                            CornerRadius="6"
+                                            FontFamily="{DynamicResource DefaultFontFamily}"
+                                            Background="{DynamicResource Emerald}"
+                                            Margin="12 0 0 0">
+                        <StackPanel Orientation="Horizontal">
+                            <svg:Svg HorizontalAlignment="Center"
+                                     Width="24"
+                                     Height="24"
+                                     Path="/Resources/Icons/exchange-arrows.svg" />
+                            <TextBlock Margin="8 0 0 0"
+                                       Text="Exchange"
+                                       FontFamily="{DynamicResource DefaultFontFamily}"
+                                       FontWeight="Light"
+                                       FontSize="18"
+                                       Foreground="{DynamicResource DeepBlue}" />
+                        </StackPanel>
+                    </controls:RoundedButton>
+                </StackPanel>
+            </Grid>
+        </StackPanel>
+
+
+        <!-- <Grid.RowDefinitions> -->
+        <!--     <RowDefinition MaxHeight="500" MinHeight="300" /> -->
+        <!--     <RowDefinition /> -->
+        <!-- </Grid.RowDefinitions> -->
+        <!-- -->
+        <!-- <Grid Grid.Row="0"> -->
+        <!-- -->
+        <!--     <oxy:PlotView Background="Transparent" -->
+        <!--                   Model="{Binding PlotModel}" -->
+        <!--                   Controller="{Binding ActualController, Mode=TwoWay}" -->
+        <!--                   Opacity="1" -->
+        <!--                   x:Name="PlotView"> -->
+        <!-- -->
+        <!--         <oxy:PlotView.DefaultTrackerTemplate> -->
+        <!--             <ControlTemplate> -->
+        <!--                 <Canvas> -->
+        <!--                     <Border Canvas.Left="{Binding Position.X}" -->
+        <!--                             Canvas.Top="{Binding Position.Y}" -->
+        <!--                             CornerRadius="5" -->
+        <!--                             Background="{DynamicResource DefaultTooltipBackgroundBrush}"> -->
+        <!--                         <TextBlock Text="{Binding}" -->
+        <!--                                    Padding="16 8" -->
+        <!--                                    Foreground="White" -->
+        <!--                                    VerticalAlignment="Center" -->
+        <!--                                    FontFamily="{DynamicResource DefaultFontFamily}" -->
+        <!--                                    FontSize="12" /> -->
+        <!--                     </Border> -->
+        <!--                 </Canvas> -->
+        <!--             </ControlTemplate> -->
+        <!--         </oxy:PlotView.DefaultTrackerTemplate> -->
+        <!-- -->
+        <!--     </oxy:PlotView> -->
+        <!-- -->
+        <!--     <TextBlock Foreground="White" -->
+        <!--                Text="{Binding PortfolioValue, Converter={StaticResource PortfolioToTotalConverter}}" -->
+        <!--                FontFamily="{DynamicResource DefaultFontFamily}" -->
+        <!--                FontSize="30" -->
+        <!--                VerticalAlignment="Center" -->
+        <!--                HorizontalAlignment="Center" /> -->
+        <!-- </Grid> -->
+        <!-- -->
+        <!-- ~1~ Style="{StaticResource CustomDataGrid}" @1@ -->
+        <!-- <DataGrid Margin="10" -->
+        <!--           AutoGenerateColumns="False" -->
+        <!--           IsReadOnly="True" -->
+        <!--           Items="{Binding AllCurrencies}" -->
+        <!--           Grid.Row="1"> -->
+        <!--     <DataGrid.Columns> -->
+        <!--         <DataGridTemplateColumn Header="CURRENCY" Width="*"> -->
+        <!--             <DataGridTemplateColumn.CellTemplate> -->
+        <!--                 <DataTemplate DataType="{x:Type currencyViewModels:CurrencyViewModel}"> -->
+        <!--                     <Grid Margin="5 5 5 5" Background="Transparent"> -->
+        <!--                         <Grid.ColumnDefinitions> -->
+        <!--                             <ColumnDefinition Width="48" /> -->
+        <!--                             <ColumnDefinition Width="*" /> -->
+        <!--                         </Grid.ColumnDefinitions> -->
+        <!--                          -->
+        <!--                         <Image Source="{Binding LargeIconPath}" -->
+        <!--                                Grid.Column="0" /> -->
+        <!-- -->
+        <!--                         ~1~ Style="{StaticResource BaseTextBlockStyle}" @1@ -->
+        <!--                         <TextBlock -->
+        <!--                             Text="{Binding Header, Converter={StaticResource StringToUpperCaseConverter}}" -->
+        <!--                             FontFamily="{DynamicResource DefaultBoldFontFamily}" -->
+        <!--                             FontWeight="Bold" -->
+        <!--                             FontSize="14" -->
+        <!--                             Margin="7 0 0 0" -->
+        <!--                             VerticalAlignment="Center" -->
+        <!--                             Grid.Column="1" /> -->
+        <!--                     </Grid> -->
+        <!--                 </DataTemplate> -->
+        <!--             </DataGridTemplateColumn.CellTemplate> -->
+        <!--         </DataGridTemplateColumn> -->
+        <!--         <DataGridTemplateColumn Header="BALANCE"> -->
+        <!--             <DataGridTemplateColumn.CellTemplate> -->
+        <!--                 <DataTemplate DataType="{x:Type currencyViewModels:CurrencyViewModel}"> -->
+        <!--                     <StackPanel Orientation="Horizontal" -->
+        <!--                                 HorizontalAlignment="Left" -->
+        <!--                                 Margin="0 0 10 0"> -->
+        <!-- -->
+        <!--                         <TextBlock FontFamily="{DynamicResource DefaultFontFamily}" -->
+        <!--                                    VerticalAlignment="Center"> -->
+        <!--                             <TextBlock.Text> -->
+        <!--                                 <MultiBinding Converter="{StaticResource AmountToStringConverter}"> -->
+        <!--                                     <Binding Path="AvailableAmount" Mode="OneWay" /> -->
+        <!--                                     <Binding Path="CurrencyFormat" Mode="OneWay" /> -->
+        <!--                                 </MultiBinding> -->
+        <!--                             </TextBlock.Text> -->
+        <!--                         </TextBlock> -->
+        <!--                         <TextBlock Margin="3 0 0 2" -->
+        <!--                                    Text="{Binding CurrencyCode}" -->
+        <!--                                    FontSize="10" -->
+        <!--                                    VerticalAlignment="Center" /> -->
+        <!--                     </StackPanel> -->
+        <!--                 </DataTemplate> -->
+        <!--             </DataGridTemplateColumn.CellTemplate> -->
+        <!--         </DataGridTemplateColumn> -->
+        <!--         <DataGridTemplateColumn Header="VALUE"> -->
+        <!--             <DataGridTemplateColumn.CellTemplate> -->
+        <!--                 <DataTemplate DataType="{x:Type currencyViewModels:CurrencyViewModel}"> -->
+        <!--                     <TextBlock Margin="0 0 10 0" -->
+        <!--                                FontFamily="{DynamicResource DefaultFontFamily}" -->
+        <!--                                VerticalAlignment="Center" -->
+        <!--                                HorizontalAlignment="Left"> -->
+        <!--                         <TextBlock.Text> -->
+        <!--                             <MultiBinding Converter="{StaticResource AmountToStringConverter}"> -->
+        <!--                                 <Binding Path="AvailableAmountInBase" Mode="OneWay" /> -->
+        <!--                                 <Binding Path="BaseCurrencyFormat" Mode="OneWay" /> -->
+        <!--                             </MultiBinding> -->
+        <!--                         </TextBlock.Text> -->
+        <!--                     </TextBlock> -->
+        <!--                 </DataTemplate> -->
+        <!--             </DataGridTemplateColumn.CellTemplate> -->
+        <!--         </DataGridTemplateColumn> -->
+        <!--         <DataGridTextColumn Header="% IN PORTFOLIO" -->
+        <!--                             Binding="{Binding PortfolioPercent, Converter={StaticResource PercentConverter}, Mode=TwoWay}"> -->
+        <!--              -->
+        <!--         </DataGridTextColumn> -->
+        <!--     </DataGrid.Columns> -->
+        <!-- </DataGrid> -->
+    </Border>
 </UserControl>
