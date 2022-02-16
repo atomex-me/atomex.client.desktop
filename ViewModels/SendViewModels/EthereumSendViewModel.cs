@@ -13,6 +13,7 @@ using ReactiveUI.Fody.Helpers;
 using Serilog;
 
 using Atomex.Blockchain.Abstract;
+using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.Properties;
 using Atomex.Core;
 using Atomex.EthereumTokens;
@@ -377,8 +378,8 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
             var quote = quotesProvider.GetQuote(CurrencyCode, BaseCurrencyCode);
 
-            AmountInBase = Amount * (quote?.Bid ?? 0m);
-            FeeInBase = FeeAmount * (quote?.Bid ?? 0m);
+            AmountInBase = Amount.SafeMultiply(quote?.Bid ?? 0m);
+            FeeInBase = FeeAmount.SafeMultiply(quote?.Bid ?? 0m);
         }
 
         protected override Task<Error> Send(CancellationToken cancellationToken = default)

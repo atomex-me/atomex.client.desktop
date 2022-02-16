@@ -16,6 +16,7 @@ using Atomex.Core;
 using Atomex.MarketData.Abstract;
 using Atomex.Wallet;
 using Atomex.Wallet.Abstract;
+using Atomex.Client.Desktop.Common;
 
 namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
 {
@@ -134,9 +135,9 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
         {
             var quote = quotesProvider.GetQuote(CurrencyCode, BaseCurrencyCode);
 
-            TotalAmountInBase = TotalAmount * (quote?.Bid ?? 0m);
-            AvailableAmountInBase = AvailableAmount * (quote?.Bid ?? 0m);
-            UnconfirmedAmountInBase = UnconfirmedAmount * (quote?.Bid ?? 0m);
+            TotalAmountInBase = TotalAmount.SafeMultiply(quote?.Bid ?? 0m);
+            AvailableAmountInBase = AvailableAmount.SafeMultiply(quote?.Bid ?? 0m);
+            UnconfirmedAmountInBase = UnconfirmedAmount.SafeMultiply(quote?.Bid ?? 0m);
 
             AmountUpdated?.Invoke(this, EventArgs.Empty);
         }
