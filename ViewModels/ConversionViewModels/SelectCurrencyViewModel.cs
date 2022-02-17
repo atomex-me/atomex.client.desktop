@@ -67,7 +67,7 @@ namespace Atomex.Client.Desktop.ViewModels.ConversionViewModels
 
                     return $"from {outputs.Count()} outputs ({totalAmountString} {currency.Name})";
                 })
-                .ToPropertyEx(this, vm => vm.SelectedAddressDescription);
+                .ToPropertyExInMainThread(this, vm => vm.SelectedAddressDescription);
 
             AvailableOutputs = availableOutputs ?? throw new ArgumentNullException(nameof(availableOutputs));
             SelectedOutputs = selectedOutputs ?? availableOutputs;
@@ -132,7 +132,7 @@ namespace Atomex.Client.Desktop.ViewModels.ConversionViewModels
 
                     return $"{prefix} {address.Address.TruncateAddress()} ({balanceString} {CurrencyViewModel.Currency.Name})";
                 })
-                .ToPropertyEx(this, vm => vm.SelectedAddressDescription);
+                .ToPropertyExInMainThread(this, vm => vm.SelectedAddressDescription);
 
             AvailableAddresses = availableAddresses ?? throw new ArgumentNullException(nameof(availableAddresses));
             SelectedAddress = selectedAddress ?? availableAddresses.MaxByOrDefault(w => w.Balance);
@@ -245,7 +245,7 @@ namespace Atomex.Client.Desktop.ViewModels.ConversionViewModels
 
             this.WhenAnyValue(vm => vm.SelectedCurrency)
                 .WhereNotNull()
-                .Subscribe(i => {
+                .SubscribeInMainThread(i => {
                     CurrencySelected?.Invoke(i);
                 });
         }
@@ -258,7 +258,7 @@ namespace Atomex.Client.Desktop.ViewModels.ConversionViewModels
 
             this.WhenAnyValue(vm => vm.SelectedCurrency)
                 .WhereNotNull()
-                .Subscribe(i => {
+                .SubscribeInMainThread(i => {
                     CurrencySelected?.Invoke(i);
                 });
         }

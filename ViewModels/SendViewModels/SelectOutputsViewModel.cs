@@ -51,8 +51,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 .Throttle(TimeSpan.FromMilliseconds(1))
                 .Where(_ => Outputs != null && !_checkedFromList)
                 .Skip(1)
-                .ObserveOn(RxApp.MainThreadScheduler)
-                .Subscribe(selectAll =>
+                .SubscribeInMainThread(selectAll =>
                 {
                     Outputs = new ObservableCollection<OutputViewModel>(
                         Outputs.Select(output =>
@@ -67,7 +66,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             this.WhenAnyValue(vm => vm.Outputs)
                 .WhereNotNull()
                 .Take(1)
-                .Subscribe(async outputViewModels =>
+                .SubscribeInMainThread(async outputViewModels =>
                 {
                     var addresses = (await Account
                             .GetAddressesAsync())
@@ -93,7 +92,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     vm => vm.SortByDate,
                     vm => vm.SortIsAscending,
                     vm => vm.SearchPattern)
-                .Subscribe(value =>
+                .SubscribeInMainThread(value =>
                 {
                     var (item1, item2, item3) = value;
 

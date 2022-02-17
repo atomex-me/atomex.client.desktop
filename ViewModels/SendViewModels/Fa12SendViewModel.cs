@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 
 using Avalonia.Controls;
+using Avalonia.Threading;
 using Serilog;
 
 using Atomex.Blockchain.Abstract;
@@ -217,8 +218,11 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             var quote = quotesProvider.GetQuote(CurrencyCode, BaseCurrencyCode);
             var xtzQuote = quotesProvider.GetQuote("XTZ", BaseCurrencyCode);
 
-            AmountInBase = Amount.SafeMultiply(quote?.Bid ?? 0m);
-            FeeInBase = Fee.SafeMultiply(xtzQuote?.Bid ?? 0m);
+            Dispatcher.UIThread.InvokeAsync(() =>
+            {
+                AmountInBase = Amount.SafeMultiply(quote?.Bid ?? 0m);
+                FeeInBase = Fee.SafeMultiply(xtzQuote?.Bid ?? 0m);
+            });
         }
 
         protected override async Task<Error> Send(CancellationToken cancellationToken = default)

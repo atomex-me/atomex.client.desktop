@@ -54,10 +54,10 @@ namespace Atomex.Client.Desktop.ViewModels
             this.WhenAnyValue(vm => vm.SelectedAddress)
                 .WhereNotNull()
                 .Select(_ => Unit.Default)
-                .InvokeCommand(createQrCodeCommand);
+                .InvokeCommandInMainThread(createQrCodeCommand);
 
             this.WhenAnyValue(vm => vm.SelectedAddress)
-                .Subscribe(_ => IsCopied = false);
+                .SubscribeInMainThread(_ => IsCopied = false);
 
             TokenContract = tokenContract;
             TokenType = tokenType;

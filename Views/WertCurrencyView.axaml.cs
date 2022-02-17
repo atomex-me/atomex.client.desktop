@@ -1,12 +1,14 @@
 using System;
 using System.Reactive.Linq;
-using Atomex.Client.Desktop.ViewModels;
+
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.Threading;
+
+using Atomex.Client.Desktop.ViewModels;
 
 namespace Atomex.Client.Desktop.Views
 {

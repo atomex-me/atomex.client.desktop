@@ -1,9 +1,11 @@
-using System;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
+
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
+
+using Atomex.Client.Desktop.Common;
 
 namespace Atomex.Client.Desktop.Views.CustomTitleBars
 {
@@ -94,7 +96,7 @@ namespace Atomex.Client.Desktop.Views.CustomTitleBars
             }
 
             hostWindow.ExtendClientAreaTitleBarHeightHint = 30;
-            hostWindow.GetObservable(Window.WindowStateProperty).Subscribe(s =>
+            hostWindow.GetObservable(Window.WindowStateProperty).SubscribeInMainThread(s =>
             {
                 hostWindow.SystemDecorations = SystemDecorations.None;
                 

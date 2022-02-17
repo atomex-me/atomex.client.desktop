@@ -11,6 +11,7 @@ using ReactiveUI.Fody.Helpers;
 using Serilog;
 
 using Atomex.Blockchain.Abstract;
+using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.Properties;
 using Atomex.Core;
 using Atomex.Wallet.Abstract;
@@ -42,7 +43,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             CheckAmountCommand = ReactiveCommand.Create<MaxAmountEstimation, MaxAmountEstimation>(estimation => estimation);
 
             CheckAmountCommand.Throttle(TimeSpan.FromMilliseconds(1))
-                .Subscribe(estimation => CheckAmount(estimation));
+                .SubscribeInMainThread(estimation => CheckAmount(estimation));
 
             SelectFromViewModel = new SelectAddressViewModel(_app.Account, Currency, SelectAddressMode.SendFrom)
             {

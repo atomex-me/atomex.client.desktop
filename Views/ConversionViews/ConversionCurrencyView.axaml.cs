@@ -1,4 +1,3 @@
-using System;
 using System.Globalization;
 using System.Linq;
 using System.Reactive.Linq;
@@ -10,6 +9,7 @@ using Avalonia.Markup.Xaml;
 using Avalonia.Interactivity;
 
 using Atomex.Client.Desktop.ViewModels;
+using Atomex.Client.Desktop.Common;
 
 namespace Atomex.Client.Desktop.Views
 {
@@ -52,7 +52,7 @@ namespace Atomex.Client.Desktop.Views
 
             amountStringTextBox.GetObservable(TextBox.TextProperty)
                 .Where(_ => amountStringTextBox.SelectionStart == amountStringTextBox.SelectionEnd)
-                .Subscribe(text =>
+                .SubscribeInMainThread(text =>
                 {
                     if (DataContext is not ConversionCurrencyViewModel conversionCurrencyViewModel) return;
                     conversionCurrencyViewModel.SetAmountFromString(text);

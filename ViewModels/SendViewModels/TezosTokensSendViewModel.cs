@@ -142,25 +142,25 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     vm => vm.From,
                     vm => vm.Amount,
                     vm => vm.Fee)
-                .Subscribe(_ => Warning = string.Empty);
+                .SubscribeInMainThread(_ => Warning = string.Empty);
 
             this.WhenAnyValue(vm => vm.Amount)
                 .Select(amount => amount.ToString(CurrencyFormat ?? balanceFormat, CultureInfo.CurrentCulture))
-                .ToPropertyEx(this, vm => vm.AmountString);
+                .ToPropertyExInMainThread(this, vm => vm.AmountString);
 
             this.WhenAnyValue(vm => vm.From)
                 .Select(s => s.TruncateAddress())
-                .ToPropertyEx(this, vm => vm.FromBeautified);
+                .ToPropertyExInMainThread(this, vm => vm.FromBeautified);
 
             this.WhenAnyValue(vm => vm.TokenContract)
                 .Select(s => s.TruncateAddress())
-                .ToPropertyEx(this, vm => vm.TokenContractBeautified);
+                .ToPropertyExInMainThread(this, vm => vm.TokenContractBeautified);
 
             this.WhenAnyValue(
                     vm => vm.From,
                     vm => vm.TokenId)
                 .Select(_ => Unit.Default)
-                .InvokeCommand(updateCurrencyCodeCommand);
+                .InvokeCommandInMainThread(updateCurrencyCodeCommand);
 
             this.WhenAnyValue(
                     vm => vm.Amount,
@@ -168,7 +168,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     vm => vm.To,
                     vm => vm.TokenId)
                 .Select(_ => Unit.Default)
-                .InvokeCommand(updateAmountCommand);
+                .InvokeCommandInMainThread(updateAmountCommand);
 
             this.WhenAnyValue(
                     vm => vm.Fee,
@@ -176,7 +176,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     vm => vm.TokenId,
                     vm => vm.UseDefaultFee)
                 .Select(_ => Unit.Default)
-                .InvokeCommand(updateFeeCommand);
+                .InvokeCommandInMainThread(updateFeeCommand);
 
             this.WhenAnyValue(
                     vm => vm.Amount,
@@ -185,7 +185,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
             this.WhenAnyValue(vm => vm.Fee)
                 .Select(fee => fee.ToString(FeeCurrencyFormat, CultureInfo.CurrentCulture))
-                .ToPropertyEx(this, vm => vm.FeeString);
+                .ToPropertyExInMainThread(this, vm => vm.FeeString);
 
             this.WhenAnyValue(
                     vm => vm.Amount,
@@ -194,8 +194,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     vm => vm.WarningType,
                     vm => vm.ConfirmStage)
                 .Throttle(TimeSpan.FromMilliseconds(1))
-                .ObserveOn(RxApp.MainThreadScheduler)
-                .Subscribe(_ =>
+                .SubscribeInMainThread(_ =>
                 {
                     if (!ConfirmStage)
                     {
@@ -613,13 +612,16 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             if (sender is not ICurrencyQuotesProvider quotesProvider)
                 return;
 
-            AmountInBase = !string.IsNullOrEmpty(CurrencyCode)
-                ? Amount.SafeMultiply(quotesProvider.GetQuote(CurrencyCode, BaseCurrencyCode)?.Bid ?? 0m)
-                : 0;
+            Dispatcher.UIThread.InvokeAsync(() =>
+            {
+                AmountInBase = !string.IsNullOrEmpty(CurrencyCode)
+                    ? Amount.SafeMultiply(quotesProvider.GetQuote(CurrencyCode, BaseCurrencyCode)?.Bid ?? 0m)
+                    : 0;
 
-            FeeInBase = !string.IsNullOrEmpty(FeeCurrencyCode)
-                ? Fee.SafeMultiply(quotesProvider.GetQuote(FeeCurrencyCode, BaseCurrencyCode)?.Bid ?? 0m)
-                : 0;
+                FeeInBase = !string.IsNullOrEmpty(FeeCurrencyCode)
+                    ? Fee.SafeMultiply(quotesProvider.GetQuote(FeeCurrencyCode, BaseCurrencyCode)?.Bid ?? 0m)
+                    : 0;
+            });
         }
 
         public static async Task<WalletAddress> GetTokenAddressAsync(

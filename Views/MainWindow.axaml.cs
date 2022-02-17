@@ -73,7 +73,7 @@ namespace Atomex.Client.Desktop.Views
 
             InputManager.Instance.PreProcess.OfType<RawInputEventArgs>()
                 .Throttle(TimeSpan.FromMilliseconds(500))
-                .Subscribe(
+                .SubscribeInMainThread(
                     (_) =>
                     {
                         if (_inactivityControlEnabled && _activityTimer != null)

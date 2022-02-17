@@ -12,6 +12,7 @@ using Atomex.Common;
 using Atomex.Core;
 using Atomex.ViewModels;
 using Atomex.Wallet.Abstract;
+using Atomex.Client.Desktop.Common;
 
 namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 {
@@ -55,7 +56,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     vm => vm.SortByDate,
                     vm => vm.SortIsAscending,
                     vm => vm.SearchPattern)
-                .Subscribe(value =>
+                .SubscribeInMainThread(value =>
                 {
                     var (sortByDate, sortByAscending, searchPattern) = value;
 

@@ -255,14 +255,14 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     vm => vm.To,
                     vm => vm.Amount,
                     vm => vm.Fee)
-                .Subscribe(_ => Warning = string.Empty);
+                .SubscribeInMainThread(_ => Warning = string.Empty);
 
             this.WhenAnyValue(
                     vm => vm.Amount,
                     vm => vm.Fee,
                     (amount, fee) => Currency.IsToken ? amount : amount + fee)
                 .Select(totalAmount => totalAmount.ToString(CurrencyFormat, CultureInfo.CurrentCulture))
-                .ToPropertyEx(this, vm => vm.TotalAmountString);
+                .ToPropertyExInMainThread(this, vm => vm.TotalAmountString);
 
             this.WhenAnyValue(
                     vm => vm.Amount,
@@ -276,31 +276,31 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     (amount, from, to) => from)
                 .WhereNotNull()
                 .Select(_ => Unit.Default)
-                .InvokeCommand(updateAmountCommand);
+                .InvokeCommandInMainThread(updateAmountCommand);
 
             this.WhenAnyValue(vm => vm.From)
                 .Select(s => s.TruncateAddress())
-                .ToPropertyEx(this, vm => vm.FromBeautified);
+                .ToPropertyExInMainThread(this, vm => vm.FromBeautified);
 
             this.WhenAnyValue(vm => vm.Amount)
                 .Select(amount => amount
                     .TruncateDecimal(Currency.Digits < 9 ? Currency.Digits : 9)
                     .ToString(CurrencyFormat, CultureInfo.CurrentCulture))
-                .ToPropertyEx(this, vm => vm.AmountString);
+                .ToPropertyExInMainThread(this, vm => vm.AmountString);
 
             this.WhenAnyValue(vm => vm.Fee)
                 .Where(_ => !string.IsNullOrEmpty(From))
                 .Select(_ => Unit.Default)
-                .InvokeCommand(updateFeeCommand);
+                .InvokeCommandInMainThread(updateFeeCommand);
 
             this.WhenAnyValue(vm => vm.Fee)
                 .Select(fee => fee.ToString(FeeCurrencyFormat, CultureInfo.CurrentCulture))
-                .ToPropertyEx(this, vm => vm.FeeString);
+                .ToPropertyExInMainThread(this, vm => vm.FeeString);
 
             this.WhenAnyValue(vm => vm.UseDefaultFee)
                 .Where(useDefaultFee => useDefaultFee && !string.IsNullOrEmpty(From))
                 .Select(_ => Unit.Default)
-                .InvokeCommand(updateAmountCommand);
+                .InvokeCommandInMainThread(updateAmountCommand);
 
             var canSendObservable1 = this.WhenAnyValue(
                 vm => vm.Amount,
@@ -317,8 +317,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
             canSendObservable1.CombineLatest(canSendObservable2)
                 .Throttle(TimeSpan.FromMilliseconds(1))
-                .ObserveOn(RxApp.MainThreadScheduler)
-                .Subscribe(_ =>
+                .SubscribeInMainThread(_ =>
                 {
                     if (Stage == SendStage.Edit)
                     {
@@ -338,16 +337,14 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 });
 
             this.WhenAnyValue(vm => vm.Stage)
-                .ObserveOn(RxApp.MainThreadScheduler)
-                .Subscribe(s =>
+                .SubscribeInMainThread(s =>
                 {
                     UseRecommendedAmount = false;
                     UseEnteredAmount = false;
                 });
 
             this.WhenAnyValue(vm => vm.RecommendedMaxAmount)
-                .ObserveOn(RxApp.MainThreadScheduler)
-                .Subscribe(a =>
+                .SubscribeInMainThread(a =>
                 {
                     SendRecommendedAmountMenu = string.Format(
                         Resources.SendRecommendedAmountMenu,
@@ -356,8 +353,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 });
 
             this.WhenAnyValue(vm => vm.Amount)
-                .ObserveOn(RxApp.MainThreadScheduler)
-                .Subscribe(a =>
+                .SubscribeInMainThread(a =>
                 {
                     SendEnteredAmountMenu = string.Format(
                         Resources.SendEnteredAmountMenu,
@@ -398,8 +394,11 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
             var quote = quotesProvider.GetQuote(CurrencyCode, BaseCurrencyCode);
 
-            AmountInBase = Amount * (quote?.Bid ?? 0m);
-            FeeInBase    = Fee * (quote?.Bid ?? 0m);
+            Dispatcher.UIThread.InvokeAsync(() =>
+            {
+                AmountInBase = Amount.SafeMultiply(quote?.Bid ?? 0m);
+                FeeInBase = Fee.SafeMultiply(quote?.Bid ?? 0m);
+            });
         }
 
         protected abstract Task<Error> Send(CancellationToken cancellationToken = default);
