@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Globalization;
+using Atomex.Client.Desktop.ViewModels;
 using Avalonia.Data.Converters;
 
 namespace Atomex.Client.Desktop.Converters
@@ -10,8 +11,9 @@ namespace Atomex.Client.Desktop.Converters
 
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value is decimal str && targetType == typeof(string))
-                return $"${str:F}";
+            if (value is decimal totalValue && targetType == typeof(string))
+                return
+                    $"${totalValue.ToString(PortfolioViewModel.GetAmountFormat(totalValue), CultureInfo.CurrentCulture)}";
 
             return value;
         }

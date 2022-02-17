@@ -26,7 +26,7 @@
 
     <!-- todo: remove background-->
     <Border Background="#0F2139"
-            Padding="48 16 48 0">
+            Padding="50 16 50 0">
         <StackPanel>
             <Canvas>
                 <Button Canvas.Right="0"
@@ -49,15 +49,14 @@
                 <oxy:PlotView Grid.Row="0"
                               Grid.Column="0"
                               Grid.RowSpan="2"
-                              Height="150"
-                              Width="430"
-                              Margin="-145 0 -105 0"
+                              Height="166"
+                              Width="440"
+                              Margin="-144 0 -104 0"
                               Background="Transparent"
                               Model="{Binding PlotModel}"
                               Controller="{Binding ActualController, Mode=TwoWay}"
                               x:Name="PlotView"
-                              ClipToBounds="False"
-                              ZIndex="1">
+                              ClipToBounds="False">
                     <oxy:PlotView.DefaultTrackerTemplate>
                         <ControlTemplate>
                             <Canvas ClipToBounds="False">
@@ -69,6 +68,8 @@
                                         <MultiBinding Converter="{StaticResource PortfolioTooltipPositionXConverter}">
                                             <Binding Path="Position.X" Mode="OneWay"/>
                                             <Binding Path="#TooltipBorder.Bounds.Width" Mode="OneWay"/>
+                                            <Binding Path="#PlotView.Bounds.Width" Mode="OneWay"/>
+                                            <Binding Path="#PlotView.Bounds.Height" Mode="OneWay"/>
                                         </MultiBinding>
                                     </Canvas.Left>
                                     <Canvas.Top>
