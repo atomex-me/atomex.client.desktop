@@ -6,6 +6,7 @@ using Avalonia.Controls;
 using Serilog;
 
 using Atomex.Blockchain.Abstract;
+using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.Properties;
 using Atomex.Core;
 using Atomex.MarketData.Abstract;
@@ -160,8 +161,8 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             var quote = quotesProvider.GetQuote(CurrencyCode, BaseCurrencyCode);
             var ethQuote = quotesProvider.GetQuote(Currency.FeeCurrencyName, BaseCurrencyCode);
 
-            AmountInBase = Amount * (quote?.Bid ?? 0m);
-            FeeInBase = FeeAmount * (ethQuote?.Bid ?? 0m);
+            AmountInBase = Amount.SafeMultiply(quote?.Bid ?? 0m);
+            FeeInBase = FeeAmount.SafeMultiply(ethQuote?.Bid ?? 0m);
         }
 
         protected override Task<Error> Send(CancellationToken cancellationToken = default)

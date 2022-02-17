@@ -614,11 +614,11 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 return;
 
             AmountInBase = !string.IsNullOrEmpty(CurrencyCode)
-                ? Amount * (quotesProvider.GetQuote(CurrencyCode, BaseCurrencyCode)?.Bid ?? 0m)
+                ? Amount.SafeMultiply(quotesProvider.GetQuote(CurrencyCode, BaseCurrencyCode)?.Bid ?? 0m)
                 : 0;
 
             FeeInBase = !string.IsNullOrEmpty(FeeCurrencyCode)
-                ? Fee * (quotesProvider.GetQuote(FeeCurrencyCode, BaseCurrencyCode)?.Bid ?? 0m)
+                ? Fee.SafeMultiply(quotesProvider.GetQuote(FeeCurrencyCode, BaseCurrencyCode)?.Bid ?? 0m)
                 : 0;
         }
 
