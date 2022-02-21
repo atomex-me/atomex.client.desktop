@@ -72,7 +72,7 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
 
             this.WhenAnyValue(vm => vm.UnconfirmedAmount)
                 .Select(ua => ua != 0)
-                .ToPropertyEx(this, vm => vm.HasUnconfirmedAmount);
+                .ToPropertyExInMainThread(this, vm => vm.HasUnconfirmedAmount);
         }
 
         protected virtual async Task UpdateAsync()

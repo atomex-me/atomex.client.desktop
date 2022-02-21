@@ -10,6 +10,7 @@ using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 
 using Atomex.Client.Desktop.ViewModels.SendViewModels;
+using Atomex.Client.Desktop.Common;
 
 namespace Atomex.Client.Desktop.Views.SendViews
 {
@@ -83,7 +84,7 @@ namespace Atomex.Client.Desktop.Views.SendViews
 
             amountStringTextBox.GetObservable(TextBox.TextProperty)
                 .Where(_ => amountStringTextBox.SelectionStart == amountStringTextBox.SelectionEnd)
-                .Subscribe(text =>
+                .SubscribeInMainThread(text =>
                 {
                     if (DataContext is not SendViewModel sendViewModel) return;
                     sendViewModel.SetAmountFromString(text);
@@ -91,7 +92,7 @@ namespace Atomex.Client.Desktop.Views.SendViews
 
             feeStringTextBox.GetObservable(TextBox.TextProperty)
                 .Where(_ => feeStringTextBox.SelectionStart == feeStringTextBox.SelectionEnd)
-                .Subscribe(text =>
+                .SubscribeInMainThread(text =>
                 {
                     if (DataContext is not SendViewModel sendViewModel) return;
                     sendViewModel.SetFeeFromString(text);

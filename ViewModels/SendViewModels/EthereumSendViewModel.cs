@@ -72,16 +72,16 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             var updateGasPriceCommand = ReactiveCommand.CreateFromTask(UpdateGasPrice);
 
             this.WhenAnyValue(vm => vm.GasPrice)
-                .Subscribe(_ => Warning = string.Empty);
+                .SubscribeInMainThread(_ => Warning = string.Empty);
 
             this.WhenAnyValue(vm => vm.GasPrice)
                 .Select(gasPrice => gasPrice.ToString(CultureInfo.CurrentCulture))
-                .ToPropertyEx(this, vm => vm.GasPriceString);
+                .ToPropertyExInMainThread(this, vm => vm.GasPriceString);
 
             this.WhenAnyValue(vm => vm.GasPrice)
                 .Where(_ => !string.IsNullOrEmpty(From))
                 .Select(_ => Unit.Default)
-                .InvokeCommand(updateGasPriceCommand);
+                .InvokeCommandInMainThread(updateGasPriceCommand);
 
             this.WhenAnyValue(vm => vm.GasPrice)
                 .Select(_ => Unit.Default)
@@ -89,23 +89,23 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
             this.WhenAnyValue(vm => vm.GasPrice)
                 .Where(_ => !string.IsNullOrEmpty(From))
-                .Subscribe(_ => TotalFee = FeeAmount);
+                .SubscribeInMainThread(_ => TotalFee = FeeAmount);
 
             this.WhenAnyValue(vm => vm.TotalFee)
                 .Select(totalFee => totalFee.ToString(TotalFeeCurrencyFormat, CultureInfo.CurrentCulture))
-                .ToPropertyEx(this, vm => vm.TotalFeeString);
+                .ToPropertyExInMainThread(this, vm => vm.TotalFeeString);
 
             this.WhenAnyValue(
                     vm => vm.Amount,
                     vm => vm.TotalFee,
                     (amount, fee) => Currency.IsToken ? amount : amount + fee)
                 .Select(totalAmount => totalAmount.ToString(CurrencyFormat, CultureInfo.CurrentCulture))
-                .ToPropertyEx(this, vm => vm.TotalAmountString);
+                .ToPropertyExInMainThread(this, vm => vm.TotalAmountString);
 
             CheckAmountCommand = ReactiveCommand.Create<MaxAmountEstimation, MaxAmountEstimation>(estimation => estimation);
 
             CheckAmountCommand.Throttle(TimeSpan.FromMilliseconds(1))
-                .Subscribe(estimation => CheckAmount(estimation));
+                .SubscribeInMainThread(estimation => CheckAmount(estimation));
 
             SelectFromViewModel = new SelectAddressViewModel(_app.Account, Currency, SelectAddressMode.SendFrom)
             {
@@ -378,8 +378,11 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
             var quote = quotesProvider.GetQuote(CurrencyCode, BaseCurrencyCode);
 
-            AmountInBase = Amount.SafeMultiply(quote?.Bid ?? 0m);
-            FeeInBase = FeeAmount.SafeMultiply(quote?.Bid ?? 0m);
+            Dispatcher.UIThread.InvokeAsync(() =>
+            {
+                AmountInBase = Amount.SafeMultiply(quote?.Bid ?? 0m);
+                FeeInBase = FeeAmount.SafeMultiply(quote?.Bid ?? 0m);
+            });
         }
 
         protected override Task<Error> Send(CancellationToken cancellationToken = default)

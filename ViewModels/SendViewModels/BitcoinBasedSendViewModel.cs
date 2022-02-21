@@ -53,11 +53,11 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     : outputs.ElementAt(0)
                         .DestinationAddress(Config.Network)
                         .TruncateAddress())
-                .ToPropertyEx(this, vm => vm.FromBeautified);
+                .ToPropertyExInMainThread(this, vm => vm.FromBeautified);
 
             this.WhenAnyValue(vm => vm.Outputs)
                 .WhereNotNull()
-                .Subscribe(outputs =>
+                .SubscribeInMainThread(outputs =>
                 {
                     From = outputs.Count != 1
                         ? $"{outputs.Count} outputs"
@@ -135,7 +135,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
         protected override void ToClick()
         {
-            SelectToViewModel.BackAction = () => Desktop.App.DialogService.Show(this);
+            SelectToViewModel.BackAction = () => App.DialogService.Show(this);
 
             App.DialogService.Show(SelectToViewModel);
         }

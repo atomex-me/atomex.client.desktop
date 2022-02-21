@@ -143,7 +143,7 @@ namespace Atomex.Client.Desktop.ViewModels
             this.WhenAnyValue(vm => vm.FromAmount)
                 .Throttle(TimeSpan.FromMilliseconds(500))
                 .Where(_ => FromAmountChangedFromKeyboard)
-                .Subscribe(async fromAmount =>
+                .SubscribeInMainThread(async fromAmount =>
                 {
                     if (fromAmount == 0)
                     {
@@ -157,7 +157,7 @@ namespace Atomex.Client.Desktop.ViewModels
             this.WhenAnyValue(vm => vm.ToAmount)
                 .Throttle(TimeSpan.FromMilliseconds(500))
                 .Where(_ => ToAmountChangedFromKeyboard)
-                .Subscribe(async (toAmount) =>
+                .SubscribeInMainThread(async (toAmount) =>
                 {
                     if (toAmount == 0)
                     {
