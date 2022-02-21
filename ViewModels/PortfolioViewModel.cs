@@ -26,6 +26,7 @@ namespace Atomex.Client.Desktop.ViewModels
         public IList<CurrencyViewModel> AllCurrencies { get; set; }
         private Color NoTokensColor { get; } = Color.FromArgb(50, 0, 0, 0);
         [Reactive] public decimal PortfolioValue { get; set; }
+        [Reactive] public string SearchPattern { get; set; }
 
 
         public PortfolioViewModel()
@@ -80,7 +81,6 @@ namespace Atomex.Client.Desktop.ViewModels
         {
             var maxCurrencyBalance = AllCurrencies.OrderByDescending(cvm => cvm.TotalAmountInBase);
             var currencyFormat = GetAmountFormat(maxCurrencyBalance.ElementAtOrDefault(0)?.TotalAmountInBase);
-            Console.WriteLine($"Format is {currencyFormat}");
 
             var series = new PieSeries
             {
@@ -150,6 +150,8 @@ namespace Atomex.Client.Desktop.ViewModels
                     return vm;
                 })
                 .ToList();
+
+            SearchPattern = "BTC";
 
             OnAmountUpdatedEventHandler(this, EventArgs.Empty);
         }

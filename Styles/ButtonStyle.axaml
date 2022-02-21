@@ -9,6 +9,9 @@
         <Setter Property="FontFamily" Value="{DynamicResource DefaultFontFamily}" />
     </Style>
 
+    <Style Selector="Button.ButtonWithIcon">
+        <Setter Property="Padding" Value="0" />
+    </Style>
     <Style
         Selector="Button.ButtonWithIcon:not(:pointerover) /template/ ContentPresenter#PART_ContentPresenter">
         <Setter Property="Background" Value="Transparent" />

@@ -52,4 +52,26 @@
         <Setter Property="Foreground" Value="{DynamicResource RoundedButtonForegroundBrush}" />
         <Setter Property="Opacity" Value="0.75"></Setter>
     </Style>
+    
+    
+    <Style Selector="controls|RoundedButton.AccentButton">
+        <Setter Property="Background" Value="{DynamicResource AccentButtonBackgroundBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource AccentButtonForegroundBrush}" />
+    </Style>
+    <Style Selector="controls|RoundedButton.AccentButton:focus">
+        <Setter Property="Background" Value="{DynamicResource AccentButtonMouseOverBrush}" />
+    </Style>
+    <!-- IsMouseOver -->
+    <Style Selector="controls|RoundedButton.AccentButton:pointerover">
+        <Setter Property="Background" Value="{DynamicResource AccentButtonMouseOverBrush}" />
+    </Style>
+    <!-- IsPressed -->
+    <Style Selector="controls|RoundedButton.AccentButton:pressed">
+        <Setter Property="Background" Value="{DynamicResource AccentButtonPressedBrush}" />
+    </Style>
+    <!-- IsDisabled -->
+    <Style Selector="controls|RoundedButton.AccentButton:disabled">
+        <Setter Property="Background" Value="{DynamicResource AccentButtonDisabledBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource AccentButtonDisabledForegroundBrush}" />
+    </Style>
 </Styles>

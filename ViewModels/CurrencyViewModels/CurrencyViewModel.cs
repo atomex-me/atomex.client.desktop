@@ -39,18 +39,13 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
         public Color AmountColor { get; set; }
         public IImage IconPath { get; set; }
         public IImage LargeIconPath { get; set; }
-        [Reactive]
-        public decimal TotalAmount { get; set; }
-        [Reactive]
-        public decimal TotalAmountInBase { get; set; }
-        [Reactive]
-        public decimal AvailableAmount { get; set; }
-        [Reactive]
-        public decimal AvailableAmountInBase { get; set; }
-        [Reactive]
-        public decimal UnconfirmedAmount { get; set; }
-        [Reactive]
-        public decimal UnconfirmedAmountInBase { get; set; }
+        [Reactive] public decimal CurrentQuote { get; set; }
+        [Reactive] public decimal TotalAmount { get; set; }
+        [Reactive] public decimal TotalAmountInBase { get; set; }
+        [Reactive] public decimal AvailableAmount { get; set; }
+        [Reactive] public decimal AvailableAmountInBase { get; set; }
+        [Reactive] public decimal UnconfirmedAmount { get; set; }
+        [Reactive] public decimal UnconfirmedAmountInBase { get; set; }
 
         public string CurrencyCode => Currency.Name;
         public string FeeCurrencyCode => Currency.FeeCode;
@@ -60,11 +55,8 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
         public string BaseCurrencyFormat => "$0.00"; // todo: use base currency format from settings
         public string FeeName { get; set; }
 
-        [ObservableAsProperty]
-        public bool HasUnconfirmedAmount { get; }
-
-        [Reactive]
-        public decimal PortfolioPercent { get; set; }
+        [ObservableAsProperty] public bool HasUnconfirmedAmount { get; }
+        [Reactive] public decimal PortfolioPercent { get; set; }
 
         protected CurrencyViewModel(CurrencyConfig currency)
         {
@@ -138,6 +130,7 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
             TotalAmountInBase = TotalAmount.SafeMultiply(quote?.Bid ?? 0m);
             AvailableAmountInBase = AvailableAmount.SafeMultiply(quote?.Bid ?? 0m);
             UnconfirmedAmountInBase = UnconfirmedAmount.SafeMultiply(quote?.Bid ?? 0m);
+            CurrentQuote = quote?.Bid ?? 0m;
 
             AmountUpdated?.Invoke(this, EventArgs.Empty);
         }
