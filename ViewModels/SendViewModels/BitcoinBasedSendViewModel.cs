@@ -74,6 +74,10 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             this.WhenAnyValue(vm => vm.FeeRate)
                 .Subscribe(_ => OnQuotesUpdatedEventHandler(_app.QuotesProvider, EventArgs.Empty));
 
+            this.WhenAnyValue(vm => vm.UseDefaultFee)
+                .Where(useDefaultFee => !useDefaultFee)
+                .SubscribeInMainThread((useDefaultFee) => { _ = UpdateFee(); });
+
             var outputs = Account.GetAvailableOutputsAsync()
                 .WaitForResult()
                 .Select(output => (BitcoinBasedTxOutput)output);
@@ -171,8 +175,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                         return;
                     }
 
-                    var feeVal = Config.SatoshiToCoin((long)transactionParams.FeeInSatoshi);
-                    Fee = feeVal;
+                    Fee = Config.SatoshiToCoin((long)transactionParams.FeeInSatoshi);
                 }
                 else
                 {
@@ -263,26 +266,33 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 {
                     if (Outputs.Count == 0)
                     {
-                        Warning = Resources.CvInsufficientFunds;
+                        Warning        = Resources.CvInsufficientFunds;
                         WarningToolTip = "";
-                        WarningType = MessageType.Error;
-                        Amount = 0;
+                        WarningType    = MessageType.Error;
+                        Amount         = 0;
                         return;
                     }
 
                     FeeRate = await Config.GetFeeRateAsync();
 
-                    var maxAmountEstimation = await Account.EstimateMaxAmountToSendAsync(
-                        outputs: Outputs,
-                        to: To,
-                        fee: null,
-                        feeRate: FeeRate);
+                    var maxAmountEstimation = await Account
+                        .EstimateMaxAmountToSendAsync(
+                            outputs: Outputs,
+                            to: To,
+                            fee: null,
+                            feeRate: FeeRate);
 
-                    if (maxAmountEstimation.Amount > 0)
+                    if (maxAmountEstimation.Error != null)
                     {
-                        Amount = maxAmountEstimation.Amount;
+                        Warning        = maxAmountEstimation.Error.Description;
+                        WarningToolTip = maxAmountEstimation.Error.Details;
+                        WarningType    = MessageType.Error;
+                        Amount         = 0;
                         return;
                     }
+
+                    if (maxAmountEstimation.Amount > 0)
+                        Amount = maxAmountEstimation.Amount;
 
                     Fee = maxAmountEstimation.Fee;
                 }
@@ -355,6 +365,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 cancellationToken: cancellationToken);
         }
 
+#if DEBUG
         private void BitcoinBasedDesignerMode()
         {
             FeeRate = 98765;
@@ -376,5 +387,6 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
             Outputs = new ObservableCollection<BitcoinBasedTxOutput>(outputs);
         }
+#endif
     }
 }

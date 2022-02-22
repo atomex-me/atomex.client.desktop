@@ -150,8 +150,7 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
         protected static IBitmap GetBitmap(string uri)
         {
             var assets = AvaloniaLocator.Current.GetService<IAssetLoader>();
-            var bitmap = new Bitmap(assets.Open(new Uri(uri)));
-            return bitmap;
+            return new Bitmap(assets.Open(new Uri(uri)));
         }
 
         #region IDisposable Support

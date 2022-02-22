@@ -3,24 +3,17 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows.Input;
 
 using Serilog;
-using ReactiveUI;
 using Avalonia.Threading;
-using Avalonia.Media;
 
 using Atomex.Client.Desktop.Common;
-using Atomex.Client.Desktop.ViewModels.Abstract;
 using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
-using Atomex.Client.Desktop.ViewModels.SendViewModels;
 using Atomex.Client.Desktop.ViewModels.TransactionViewModels;
 using Atomex.Common;
 using Atomex.Core;
 using Atomex.TezosTokens;
-using Atomex.Wallet;
 using Atomex.Wallet.Tezos;
-
 
 namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 {
@@ -52,7 +45,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
         protected override void SubscribeToServices()
         {
-            App.Account.BalanceUpdated += OnBalanceUpdatedEventHandler;
+            _app.Account.BalanceUpdated += OnBalanceUpdatedEventHandler;
         }
 
         protected sealed override async Task LoadTransactionsAsync()
@@ -61,10 +54,10 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
             try
             {
-                if (App.Account == null)
+                if (_app.Account == null)
                     return;
 
-                var transactions = (await App.Account
+                var transactions = (await _app.Account
                     .GetCurrencyAccount<Fa12Account>(Currency.Name)
                     .DataRepository
                     .GetTezosTokenTransfersAsync(Currency.TokenContractAddress)
@@ -92,15 +85,15 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         
         protected override void OnReceiveClick()
         {
-            var tezosConfig = App.Account.Currencies.GetByName(TezosConfig.Xtz);
+            var tezosConfig = _app.Account.Currencies.GetByName(TezosConfig.Xtz);
 
             var receiveViewModel = new ReceiveViewModel(
-                app: App,
+                app: _app,
                 currency: tezosConfig,
                 tokenContract: Currency.TokenContractAddress,
                 tokenType: "FA12");
 
-            Desktop.App.DialogService.Show(receiveViewModel);
+            App.DialogService.Show(receiveViewModel);
         }
 
         protected override async void OnUpdateClick()
@@ -114,7 +107,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
             try
             {
-                await App.Account
+                await _app.Account
                     .GetCurrencyAccount<Fa12Account>(Currency.Name)
                     .UpdateBalanceAsync(_cancellation.Token);
             }
@@ -133,20 +126,21 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
         protected override void OnAddressesClick()
         {
-            var tezosConfig = App.Account
+            var tezosConfig = _app.Account
                 .Currencies
                 .Get<TezosConfig>(TezosConfig.Xtz);
 
             var addressesViewModel = new AddressesViewModel(
-                app: App,
+                app: _app,
                 currency: tezosConfig,
                 tokenContract: Currency.TokenContractAddress);
 
-            Desktop.App.DialogService.Show(addressesViewModel);
+            App.DialogService.Show(addressesViewModel);
         }
-
+#if DEBUG
         protected virtual void DesignerMode()
         {
         }
+#endif
     }
 }
