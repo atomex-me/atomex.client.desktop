@@ -82,7 +82,8 @@ namespace Atomex.Client.Desktop.ViewModels.ConversionViewModels
 
             foreach (var output in sourceWithOutputs.SelectedOutputs)
             {
-                var selectedOutput = AvailableOutputs.FirstOrDefault(o => o.TxId == output.TxId && o.Index == output.Index && o.Value == output.Value);
+                var selectedOutput = AvailableOutputs
+                    .FirstOrDefault(o => o.TxId == output.TxId && o.Index == output.Index && o.Value == output.Value);
 
                 if (selectedOutput == null)
                 {
@@ -95,8 +96,6 @@ namespace Atomex.Client.Desktop.ViewModels.ConversionViewModels
 
             SelectedOutputs = selectedOutputs;
         }
-
-        
     }
 
     public class SelectCurrencyWithAddressViewModelItem : SelectCurrencyViewModelItem
@@ -143,7 +142,8 @@ namespace Atomex.Client.Desktop.ViewModels.ConversionViewModels
             if (source is not SelectCurrencyWithAddressViewModelItem sourceWithAddress)
                 return;
 
-            var address = AvailableAddresses.FirstOrDefault(a => a.Address == sourceWithAddress.ShortAddressDescription);
+            var address = AvailableAddresses
+                .FirstOrDefault(a => a.Address == sourceWithAddress.ShortAddressDescription);
 
             if (address != null)
                 SelectedAddress = address;
@@ -203,8 +203,10 @@ namespace Atomex.Client.Desktop.ViewModels.ConversionViewModels
                     BackAction = () => { App.DialogService.Show(this); },
                     ConfirmAction = walletAddressViewModel =>
                     {
-                        itemWithAddress.SelectedAddress = itemWithAddress.AvailableAddresses
+                        itemWithAddress.SelectedAddress = itemWithAddress
+                            .AvailableAddresses
                             .FirstOrDefault(a => a.Address == walletAddressViewModel.Address) ?? itemWithAddress.SelectedAddress;
+
                         CurrencySelected?.Invoke(i);
                     }
                 };
@@ -255,12 +257,6 @@ namespace Atomex.Client.Desktop.ViewModels.ConversionViewModels
         {
             if (Design.IsDesignMode)
                 DesignerMode();
-
-            this.WhenAnyValue(vm => vm.SelectedCurrency)
-                .WhereNotNull()
-                .SubscribeInMainThread(i => {
-                    CurrencySelected?.Invoke(i);
-                });
         }
 #endif
 
@@ -314,6 +310,12 @@ namespace Atomex.Client.Desktop.ViewModels.ConversionViewModels
                  });
 
             Currencies = new ObservableCollection<SelectCurrencyViewModelItem>(currencies);
+
+            this.WhenAnyValue(vm => vm.SelectedCurrency)
+                .WhereNotNull()
+                .SubscribeInMainThread(i => {
+                    CurrencySelected?.Invoke(i);
+                });
         }
 #endif
     }

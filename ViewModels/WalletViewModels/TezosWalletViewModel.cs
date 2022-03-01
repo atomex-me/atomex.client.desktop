@@ -2,14 +2,16 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Windows.Input;
-using Atomex.Blockchain.Tezos;
-using Atomex.Blockchain.Tezos.Internal;
-using Atomex.Core;
-using Atomex.Wallet;
+
 using Avalonia.Media.Imaging;
 using Avalonia.Threading;
 using Serilog;
 using ReactiveUI;
+
+using Atomex.Blockchain.Tezos;
+using Atomex.Blockchain.Tezos.Internal;
+using Atomex.Core;
+using Atomex.Wallet;
 
 namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 {
@@ -60,7 +62,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             
             _ = LoadDelegationInfoAsync();
             
-            DelegateVM = new DelegateViewModel(App, async () =>
+            DelegateVM = new DelegateViewModel(_app, async () =>
             {
                 await Task.Delay(TimeSpan.FromSeconds(DelegationCheckIntervalInSec))
                     .ConfigureAwait(false);
@@ -94,11 +96,11 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             {
                 var tezos = Currency as TezosConfig;
 
-                var balance = await App.Account
+                var balance = await _app.Account
                     .GetBalanceAsync(tezos.Name)
                     .ConfigureAwait(false);
 
-                var addresses = await App.Account
+                var addresses = await _app.Account
                     .GetUnspentAddressesAsync(tezos.Name)
                     .ConfigureAwait(false);
 
@@ -118,7 +120,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                         continue;
 
                     var baker = await BbApi
-                        .GetBaker(@delegate, App.Account.Network)
+                        .GetBaker(@delegate, _app.Account.Network)
                         .ConfigureAwait(false) ?? new BakerData { Address = @delegate };
 
                     delegations.Add(new Delegation
@@ -132,7 +134,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                     {
                         _ = Task.Run(() =>
                         {
-                            _ = Desktop.App.ImageService.LoadImageFromUrl(baker.Logo);
+                            _ = App.ImageService.LoadImageFromUrl(baker.Logo);
                         });
                     }
                 }
@@ -158,18 +160,12 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         private ICommand _delegateCommand;
         public ICommand DelegateCommand => _delegateCommand ??= (_delegateCommand = ReactiveCommand.Create(OnDelegateClick));
 
-        //private ICommand _undelegateCommand;
-        //public ICommand UndelegateCommand => _undelegateCommand ?? (_undelegateCommand = new Command(OnUndelegateClick));
-
         private void OnDelegateClick()
         {
-            Desktop.App.DialogService.Show(DelegateVM);
+            App.DialogService.Show(DelegateVM);
         }
 
-        //private void OnUndelegateClick()
-        //{
-        //}
-
+#if DEBUG
         protected override void DesignerMode()
         {
             base.DesignerMode();
@@ -220,5 +216,6 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
             HasDelegations = true;
         }
+#endif
     }
 }

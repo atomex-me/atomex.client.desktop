@@ -1,6 +1,5 @@
 ﻿using System;
 
-using Atomex.Client.Desktop.ViewModels.Abstract;
 using Atomex.Core;
 using Atomex.EthereumTokens;
 using Atomex.TezosTokens;

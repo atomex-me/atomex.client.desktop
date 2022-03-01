@@ -5,30 +5,29 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
+
+using Avalonia.Media;
+using Avalonia.Threading;
+using NBitcoin;
+using ReactiveUI;
+using Serilog;
+using Network = NBitcoin.Network;
+
 using Atomex.Blockchain;
 using Atomex.Blockchain.BitcoinBased;
 using Atomex.Client.Desktop.Common;
-using Atomex.Client.Desktop.ViewModels.Abstract;
 using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
 using Atomex.Client.Desktop.ViewModels.SendViewModels;
 using Atomex.Client.Desktop.ViewModels.TransactionViewModels;
 using Atomex.Common;
 using Atomex.Core;
 using Atomex.Wallet;
-using Avalonia.Media;
-using Avalonia.Threading;
-using NBitcoin;
-using ReactiveUI;
-using Serilog;
-using DialogHost;
-using Network = NBitcoin.Network;
 
 namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 {
     public class WalletViewModel : ViewModelBase, IWalletViewModel
     {
         private ObservableCollection<TransactionViewModel> _transactions;
-
         public ObservableCollection<TransactionViewModel> Transactions
         {
             get => _transactions;
@@ -40,7 +39,6 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         }
 
         private CurrencyViewModel _currencyViewModel;
-
         public CurrencyViewModel CurrencyViewModel
         {
             get => _currencyViewModel;
@@ -51,7 +49,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             }
         }
 
-        protected IAtomexApp App { get; set; }
+        protected IAtomexApp _app;
         protected Action<CurrencyConfig> SetConversionTab { get; set; }
 
         public string Header => CurrencyViewModel.Header;
@@ -107,8 +105,9 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             Action<CurrencyConfig> setConversionTab,
             CurrencyConfig currency)
         {
-            App = app ?? throw new ArgumentNullException(nameof(app));
+            _app = app ?? throw new ArgumentNullException(nameof(app));
             SetConversionTab = setConversionTab ?? throw new ArgumentNullException(nameof(setConversionTab));
+
             if (currency != null)
                 CurrencyViewModel = CurrencyViewModelCreator.CreateViewModel(currency);
 
@@ -120,8 +119,8 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
         protected virtual void SubscribeToServices()
         {
-            App.Account.BalanceUpdated += OnBalanceUpdatedEventHandler;
-            App.Account.UnconfirmedTransactionAdded += OnUnconfirmedTransactionAdded;
+            _app.Account.BalanceUpdated += OnBalanceUpdatedEventHandler;
+            _app.Account.UnconfirmedTransactionAdded += OnUnconfirmedTransactionAdded;
         }
 
         protected virtual async void OnBalanceUpdatedEventHandler(object sender, CurrencyEventArgs args)
@@ -162,27 +161,27 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
             try
             {
-                if (App.Account == null)
+                if (_app.Account == null)
                     return;
 
-                var transactions = (await App.Account
-                        .GetTransactionsAsync(Currency.Name))
+                var transactions = (await _app.Account
+                    .GetTransactionsAsync(Currency.Name))
                     .ToList();
 
                 await Dispatcher.UIThread.InvokeAsync(() =>
-                    {
-                        Transactions = new ObservableCollection<TransactionViewModel>(
-                            transactions.Select(t => TransactionViewModelCreator
-                                    .CreateViewModel(t, Currency))
-                                .ToList()
-                                .SortList((t1, t2) => t2.Time.CompareTo(t1.Time))
-                                .ForEachDo(t =>
-                                {
-                                    t.UpdateClicked += UpdateTransactonEventHandler;
-                                    t.RemoveClicked += RemoveTransactonEventHandler;
-                                }));
-                    },
-                    DispatcherPriority.Background);
+                {
+                    Transactions = new ObservableCollection<TransactionViewModel>(
+                        transactions.Select(t => TransactionViewModelCreator
+                            .CreateViewModel(t, Currency))
+                            .ToList()
+                            .SortList((t1, t2) => t2.Time.CompareTo(t1.Time))
+                            .ForEachDo(t =>
+                            {
+                                t.UpdateClicked += UpdateTransactonEventHandler;
+                                t.RemoveClicked += RemoveTransactonEventHandler;
+                            }));
+                },
+                DispatcherPriority.Background);
             }
             catch (OperationCanceledException)
             {
@@ -217,15 +216,16 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
         protected virtual void OnSendClick()
         {
-            var sendViewModel = SendViewModelCreator.CreateViewModel(App, Currency);
-            Desktop.App.DialogService.Show(sendViewModel.SelectFromViewModel);
+            var sendViewModel = SendViewModelCreator.CreateViewModel(_app, Currency);
+
+            App.DialogService.Show(sendViewModel.SelectFromViewModel);
         }
 
         protected virtual void OnReceiveClick()
         {
-            var receiveViewModel = new ReceiveViewModel(App, Currency);
+            var receiveViewModel = new ReceiveViewModel(_app, Currency);
 
-            Desktop.App.DialogService.Show(receiveViewModel);
+            App.DialogService.Show(receiveViewModel);
         }
 
         protected virtual void OnConvertClick()
@@ -244,7 +244,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
             try
             {
-                var scanner = new HdWalletScanner(App.Account);
+                var scanner = new HdWalletScanner(_app.Account);
 
                 await scanner.ScanAsync(
                     currency: Currency.Name,
@@ -268,7 +268,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
         protected virtual void OnAddressesClick()
         {
-            Desktop.App.DialogService.Show(new AddressesViewModel(App, Currency));
+            App.DialogService.Show(new AddressesViewModel(_app, Currency));
         }
 
         private void UpdateTransactonEventHandler(object sender, TransactionEventArgs args)
@@ -278,14 +278,14 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
         private async void RemoveTransactonEventHandler(object sender, TransactionEventArgs args)
         {
-            if (App.Account == null)
+            if (_app.Account == null)
                 return;
 
             try
             {
                 var txId = $"{args.Transaction.Id}:{args.Transaction.Currency}";
 
-                var isRemoved = await App.Account
+                var isRemoved = await _app.Account
                     .RemoveTransactionAsync(txId);
 
                 if (isRemoved)
@@ -362,15 +362,19 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             set
             {
                 SortType newSortType = SortType.Asc;
-                if (!String.IsNullOrEmpty(_sortInfo))
+
+                if (!string.IsNullOrEmpty(_sortInfo))
                 {
                     var lastSortType = _sortInfo.Split(Convert.ToChar("/"))[1];
                     var lastSortedColumn = _sortInfo.Split(Convert.ToChar("/"))[0];
 
-                    if (String.Equals(lastSortedColumn, value))
+                    if (string.Equals(lastSortedColumn, value))
                     {
-                        if (lastSortType == SortType.Asc.ToString()) newSortType = SortType.Desc;
-                        if (lastSortType == SortType.Desc.ToString()) newSortType = SortType.Asc;
+                        if (lastSortType == SortType.Asc.ToString())
+                            newSortType = SortType.Desc;
+
+                        if (lastSortType == SortType.Desc.ToString())
+                            newSortType = SortType.Asc;
                     }
                 }
 
@@ -384,48 +388,53 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         protected virtual void SortTransactions(string columnName, SortType sortType)
         {
             DGSelectedIndex = -1;
+
             if (columnName.ToLower() == "time" && sortType == SortType.Asc)
             {
-                Transactions = new ObservableCollection<TransactionViewModel>(Transactions.OrderBy(tx => tx.LocalTime));
+                Transactions = new ObservableCollection<TransactionViewModel>(
+                    Transactions.OrderBy(tx => tx.LocalTime));
             }
 
             if (columnName.ToLower() == "time" && sortType == SortType.Desc)
             {
-                Transactions =
-                    new ObservableCollection<TransactionViewModel>(Transactions.OrderByDescending(tx => tx.LocalTime));
+                Transactions = new ObservableCollection<TransactionViewModel>(
+                    Transactions.OrderByDescending(tx => tx.LocalTime));
             }
 
             if (columnName.ToLower() == "amount" && sortType == SortType.Asc)
             {
-                Transactions = new ObservableCollection<TransactionViewModel>(Transactions.OrderBy(tx => tx.Amount));
+                Transactions = new ObservableCollection<TransactionViewModel>(
+                    Transactions.OrderBy(tx => tx.Amount));
             }
 
             if (columnName.ToLower() == "amount" && sortType == SortType.Desc)
             {
-                Transactions =
-                    new ObservableCollection<TransactionViewModel>(Transactions.OrderByDescending(tx => tx.Amount));
+                Transactions = new ObservableCollection<TransactionViewModel>(
+                    Transactions.OrderByDescending(tx => tx.Amount));
             }
 
             if (columnName.ToLower() == "state" && sortType == SortType.Asc)
             {
-                Transactions = new ObservableCollection<TransactionViewModel>(Transactions.OrderBy(tx => tx.State));
+                Transactions = new ObservableCollection<TransactionViewModel>(
+                    Transactions.OrderBy(tx => tx.State));
             }
 
             if (columnName.ToLower() == "state" && sortType == SortType.Desc)
             {
-                Transactions =
-                    new ObservableCollection<TransactionViewModel>(Transactions.OrderByDescending(tx => tx.State));
+                Transactions = new ObservableCollection<TransactionViewModel>(
+                    Transactions.OrderByDescending(tx => tx.State));
             }
 
             if (columnName.ToLower() == "type" && sortType == SortType.Asc)
             {
-                Transactions = new ObservableCollection<TransactionViewModel>(Transactions.OrderBy(tx => tx.Type));
+                Transactions = new ObservableCollection<TransactionViewModel>(
+                    Transactions.OrderBy(tx => tx.Type));
             }
 
             if (columnName.ToLower() == "type" && sortType == SortType.Desc)
             {
-                Transactions =
-                    new ObservableCollection<TransactionViewModel>(Transactions.OrderByDescending(tx => tx.Type));
+                Transactions = new ObservableCollection<TransactionViewModel>(
+                    Transactions.OrderByDescending(tx => tx.Type));
             }
         }
     }
