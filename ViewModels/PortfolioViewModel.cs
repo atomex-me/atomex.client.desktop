@@ -2,10 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Reactive;
 using Atomex.Common;
 using Atomex.Services;
 using Atomex.Client.Desktop.Common;
+using Atomex.Client.Desktop.ViewModels.ConversionViewModels;
 using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
+using Atomex.Client.Desktop.ViewModels.SendViewModels;
 using Avalonia.Controls;
 using Avalonia.Media;
 using ReactiveUI;
@@ -23,10 +26,11 @@ namespace Atomex.Client.Desktop.ViewModels
         private const string DefaultPortfolioFormat = "0.00";
         private IAtomexApp App { get; }
         public PlotModel PlotModel { get; set; }
-        public IList<CurrencyViewModel> AllCurrencies { get; set; }
+        public IList<CurrencyViewModel> ChoosenCurrencies { get; set; }
         private Color NoTokensColor { get; } = Color.FromArgb(50, 0, 0, 0);
         [Reactive] public decimal PortfolioValue { get; set; }
         [Reactive] public string SearchPattern { get; set; }
+        [Reactive] public CurrencyViewModel? SelectedCurrency { get; set; }
 
 
         public PortfolioViewModel()
@@ -39,6 +43,15 @@ namespace Atomex.Client.Desktop.ViewModels
 
         public PortfolioViewModel(IAtomexApp app)
         {
+            this.WhenAnyValue(vm => vm.SelectedCurrency)
+                .WhereNotNull()
+                .SubscribeInMainThread(selectedCurrency =>
+                {
+                    var sendViewModel = SendViewModelCreator.CreateViewModel(App, selectedCurrency.Currency);
+
+                    Desktop.App.DialogService.Show(sendViewModel.SelectFromViewModel);
+                });
+            
             App = app ?? throw new ArgumentNullException(nameof(app));
             SubscribeToServices();
         }
@@ -50,7 +63,7 @@ namespace Atomex.Client.Desktop.ViewModels
 
         private void OnTerminalChangedEventHandler(object sender, AtomexClientChangedEventArgs e)
         {
-            AllCurrencies = e.AtomexClient?.Account?.Currencies
+            ChoosenCurrencies = e.AtomexClient?.Account?.Currencies
                 .Select(c =>
                 {
                     var vm = CurrencyViewModelCreator.CreateViewModel(c);
@@ -65,21 +78,21 @@ namespace Atomex.Client.Desktop.ViewModels
         private void OnAmountUpdatedEventHandler(object sender, EventArgs args)
         {
             // update total portfolio value
-            PortfolioValue = AllCurrencies.Sum(c => c.TotalAmountInBase);
+            PortfolioValue = ChoosenCurrencies.Sum(c => c.TotalAmountInBase);
 
             // update currency portfolio percent
-            AllCurrencies.ForEachDo(c => c.PortfolioPercent = PortfolioValue != 0
+            ChoosenCurrencies.ForEachDo(c => c.PortfolioPercent = PortfolioValue != 0
                 ? c.TotalAmountInBase / PortfolioValue
                 : 0);
 
-            this.RaisePropertyChanged(nameof(AllCurrencies));
+            this.RaisePropertyChanged(nameof(ChoosenCurrencies));
 
             UpdatePlotModel();
         }
 
         private void UpdatePlotModel()
         {
-            var maxCurrencyBalance = AllCurrencies.OrderByDescending(cvm => cvm.TotalAmountInBase);
+            var maxCurrencyBalance = ChoosenCurrencies.OrderByDescending(cvm => cvm.TotalAmountInBase);
             var currencyFormat = GetAmountFormat(maxCurrencyBalance.ElementAtOrDefault(0)?.TotalAmountInBase);
 
             var series = new PieSeries
@@ -94,7 +107,7 @@ namespace Atomex.Client.Desktop.ViewModels
                 TrackerFormatString = "{1}: ${2:" + currencyFormat + "} ({3:P2})"
             };
 
-            foreach (var currency in AllCurrencies)
+            foreach (var currency in ChoosenCurrencies)
             {
                 series.Slices.Add(
                     new PieSlice(currency.Currency.Name, (double)currency.TotalAmountInBase)
@@ -115,6 +128,35 @@ namespace Atomex.Client.Desktop.ViewModels
 
             this.RaisePropertyChanged(nameof(PlotModel));
         }
+
+        private ReactiveCommand<Unit, Unit> _sendCommand;
+
+        public ReactiveCommand<Unit, Unit> SendCommand => _sendCommand ??= (_sendCommand = ReactiveCommand.Create(() =>
+        {
+            var selectFromCurrencyViewModel =
+                new SelectCurrencyInPortfolioViewModel(SelectCurrencyType.From, ChoosenCurrencies)
+                {
+                    OnSelected = currencyViewModel => SelectedCurrency = currencyViewModel
+                };
+
+            SelectedCurrency = null;
+            Desktop.App.DialogService.Show(selectFromCurrencyViewModel);
+        }));
+
+        private ReactiveCommand<Unit, Unit> _receiveCommand;
+
+        public ReactiveCommand<Unit, Unit> ReceiveCommand => _receiveCommand ??= _receiveCommand =
+            ReactiveCommand.Create(() =>
+            {
+                var selectReceiveCurrencyViewModel =
+                    new SelectCurrencyInPortfolioViewModel(SelectCurrencyType.To, ChoosenCurrencies)
+                    {
+                        OnSelected = currencyViewModel => SelectedCurrency = currencyViewModel
+                    };
+
+                SelectedCurrency = null;
+                Desktop.App.DialogService.Show(selectReceiveCurrencyViewModel);
+            });
 
         private IController _actualController;
 
@@ -142,7 +184,7 @@ namespace Atomex.Client.Desktop.ViewModels
 
             PortfolioValue = 423394932.23m;
 
-            AllCurrencies = DesignTime.Currencies
+            ChoosenCurrencies = DesignTime.Currencies
                 .Select(c =>
                 {
                     var vm = CurrencyViewModelCreator.CreateViewModel(c, subscribeToUpdates: false);
