@@ -22,11 +22,10 @@ using Atomex.Wallet.BitcoinBased;
 
 namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 {
-    public class SelectOutputsViewModel : ViewModelBase
+    public class SelectOutputsViewModel : NavigatableSelectAddress
     {
         private BitcoinBasedAccount Account { get; }
         public BitcoinBasedConfig Config { get; set; }
-        public Action BackAction { get; set; }
         public Action<IEnumerable<BitcoinBasedTxOutput>> ConfirmAction { get; set; }
         private ObservableCollection<OutputViewModel> InitialOutputs { get; set; }
 

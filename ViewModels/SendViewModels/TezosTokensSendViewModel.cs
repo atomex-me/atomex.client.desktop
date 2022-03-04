@@ -292,7 +292,8 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 From = walletAddressViewModel.Address;
                 App.DialogService.Show(this);
             };
-
+            
+            SelectFromViewModel.BackAction = () => App.DialogService.Show(this);
             App.DialogService.Show(SelectFromViewModel);
         }
 

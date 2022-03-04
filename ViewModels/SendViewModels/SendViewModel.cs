@@ -31,7 +31,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
     {
         protected readonly IAtomexApp _app;
         protected CurrencyConfig Currency;
-        public ViewModelBase SelectFromViewModel { get; set; }
+        public NavigatableSelectAddress SelectFromViewModel { get; set; }
         protected SelectAddressViewModel SelectToViewModel { get; set; }
 
         [Reactive] public SendStage Stage { get; set; }

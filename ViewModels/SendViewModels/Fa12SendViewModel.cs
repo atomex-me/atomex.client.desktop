@@ -68,7 +68,8 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 SelectedFromBalance = walletAddressViewModel.Balance;
                 App.DialogService.Show(this);
             };
-
+            
+            selectFromViewModel.BackAction = () => App.DialogService.Show(this);
             App.DialogService.Show(selectFromViewModel);
         }
 

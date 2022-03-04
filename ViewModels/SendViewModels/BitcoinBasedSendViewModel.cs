@@ -133,7 +133,8 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 },
                 Config = Config,
             };
-
+            
+            SelectFromViewModel.BackAction = () => App.DialogService.Show(this);
             App.DialogService.Show(SelectFromViewModel);
         }
 

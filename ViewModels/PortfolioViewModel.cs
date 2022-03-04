@@ -54,6 +54,7 @@ namespace Atomex.Client.Desktop.ViewModels
                     {
                         case SelectCurrencyType.From:
                             var sendViewModel = SendViewModelCreator.CreateViewModel(App, selectedCurrency.Currency);
+                            sendViewModel.SelectFromViewModel.BackAction = () => SendCommand.Execute().Subscribe();
                             Desktop.App.DialogService.Show(sendViewModel.SelectFromViewModel);
                             break;
                         case SelectCurrencyType.To:
