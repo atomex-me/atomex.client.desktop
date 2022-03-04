@@ -47,7 +47,8 @@
             <StackPanel Orientation="Horizontal"
                         HorizontalAlignment="Center"
                         Margin="0 30 0 0">
-                <Image Width="150"
+                <Image MinHeight="150"
+                       Height="150"
                        Source="{Binding QrCode}" />
             </StackPanel>
 

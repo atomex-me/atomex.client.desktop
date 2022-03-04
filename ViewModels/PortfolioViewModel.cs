@@ -28,6 +28,7 @@ namespace Atomex.Client.Desktop.ViewModels
         public PlotModel PlotModel { get; set; }
         public IList<CurrencyViewModel> ChoosenCurrencies { get; set; }
         private Color NoTokensColor { get; } = Color.FromArgb(50, 0, 0, 0);
+        public SelectCurrencyType SelectCurrencyUseCase { get; set; }
         [Reactive] public decimal PortfolioValue { get; set; }
         [Reactive] public string SearchPattern { get; set; }
         [Reactive] public CurrencyViewModel? SelectedCurrency { get; set; }
@@ -43,16 +44,24 @@ namespace Atomex.Client.Desktop.ViewModels
 
         public PortfolioViewModel(IAtomexApp app)
         {
+            App = app ?? throw new ArgumentNullException(nameof(app));
+
             this.WhenAnyValue(vm => vm.SelectedCurrency)
                 .WhereNotNull()
                 .SubscribeInMainThread(selectedCurrency =>
                 {
-                    var sendViewModel = SendViewModelCreator.CreateViewModel(App, selectedCurrency.Currency);
-
-                    Desktop.App.DialogService.Show(sendViewModel.SelectFromViewModel);
+                    switch (SelectCurrencyUseCase)
+                    {
+                        case SelectCurrencyType.From:
+                            var sendViewModel = SendViewModelCreator.CreateViewModel(App, selectedCurrency.Currency);
+                            Desktop.App.DialogService.Show(sendViewModel.SelectFromViewModel);
+                            break;
+                        case SelectCurrencyType.To:
+                            Desktop.App.DialogService.Show(new ReceiveViewModel(App, selectedCurrency.Currency));
+                            break;
+                    }
                 });
-            
-            App = app ?? throw new ArgumentNullException(nameof(app));
+
             SubscribeToServices();
         }
 
@@ -136,7 +145,11 @@ namespace Atomex.Client.Desktop.ViewModels
             var selectFromCurrencyViewModel =
                 new SelectCurrencyInPortfolioViewModel(SelectCurrencyType.From, ChoosenCurrencies)
                 {
-                    OnSelected = currencyViewModel => SelectedCurrency = currencyViewModel
+                    OnSelected = currencyViewModel =>
+                    {
+                        SelectCurrencyUseCase = SelectCurrencyType.From;
+                        SelectedCurrency = currencyViewModel;
+                    }
                 };
 
             SelectedCurrency = null;
@@ -151,20 +164,18 @@ namespace Atomex.Client.Desktop.ViewModels
                 var selectReceiveCurrencyViewModel =
                     new SelectCurrencyInPortfolioViewModel(SelectCurrencyType.To, ChoosenCurrencies)
                     {
-                        OnSelected = currencyViewModel => SelectedCurrency = currencyViewModel
+                        OnSelected = currencyViewModel =>
+                        {
+                            SelectCurrencyUseCase = SelectCurrencyType.To;
+                            SelectedCurrency = currencyViewModel;
+                        }
                     };
 
                 SelectedCurrency = null;
                 Desktop.App.DialogService.Show(selectReceiveCurrencyViewModel);
             });
 
-        private IController _actualController;
-
-        public IController ActualController
-        {
-            get => _actualController;
-            set { _actualController = value; }
-        }
+        public IController ActualController { get; set; }
 
         public static string GetAmountFormat(decimal? amount)
         {

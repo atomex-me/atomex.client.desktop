@@ -11,7 +11,7 @@
         <Setter Property="HorizontalAlignment" Value="Stretch" />
         <Setter Property="VerticalAlignment" Value="Stretch" />
         <Setter Property="DialogMargin" Value="0" />
-        <Setter Property="OverlayBackground" Value="White" />
+        <Setter Property="OverlayBackground" Value="{DynamicResource SystemControlBackgroundBaseHighBrush}" />
         <Setter Property="dialogHost:DialogHostStyle.CornerRadius" Value="14" />
         <Setter Property="Template">
             <ControlTemplate>
@@ -43,16 +43,6 @@
                             BoxShadow="1.5 1.5 8 #4c000000" ClipToBounds="False">
                         <Grid>
                             <Canvas ZIndex="1">
-                                <!-- <Button Classes="ChildViewCloseButtonLight" -->
-                                <!--         Canvas.Right="-13" -->
-                                <!--         Canvas.Top="-17" -->
-                                <!--         Width="24" -->
-                                <!--         Height="24" -->
-                                <!--         Margin="0 5 2 0" -->
-                                <!--         HorizontalAlignment="Right" -->
-                                <!--         VerticalAlignment="Top" -->
-                                <!--         Command="{Binding CloseDialog}" /> -->
-                                
                                 <Button
                                     Canvas.Right="24"
                                     Canvas.Top="21"
@@ -79,81 +69,5 @@
                 </VisualLayerManager>
             </ControlTemplate>
         </Setter>
-    </Style>
-
-    <!-- AvaloniaUI fluent inverse color -->
-    <!-- Will be white for dark theme -->
-    <!-- And black for light theme -->
-    <Style Selector="dialogHost|DialogHost">
-        <Setter Property="OverlayBackground" Value="{DynamicResource SystemControlBackgroundBaseHighBrush}" />
-    </Style>
-
-    <!-- Fallback color if avalonia theme not presented -->
-    <Style Selector="dialogHost|DialogHost Border#PART_ContentBackground">
-        <Setter Property="Background" Value="{DynamicResource AlmostTransparentBrush}" />
-    </Style>
-    <!-- AvaloniaUI fluent background color -->
-    <Style Selector="dialogHost|DialogHost Border#PART_ContentBackground">
-        <Setter Property="Background" Value="{DynamicResource SystemControlBackgroundAltHighBrush}" />
-    </Style>
-
-    <Style Selector="dialogHost|DialogHost[IsOpen=True] /template/ Grid#PART_ContentCoverGrid">
-        <Setter Property="IsHitTestVisible" Value="True" />
-        <Setter Property="Opacity" Value="0.56" />
-    </Style>
-    <Style Selector="dialogHost|DialogHost[IsOpen=False] /template/ Grid#PART_ContentCoverGrid">
-        <Setter Property="IsHitTestVisible" Value="False" />
-        <Setter Property="Opacity" Value="0" />
-    </Style>
-
-    <Style Selector="dialogHost|DialogOverlayPopupHost">
-        <Setter Property="Background" Value="{DynamicResource AlmostTransparentBrush}" />
-        <Setter Property="Template">
-            <ControlTemplate>
-                <VisualLayerManager IsPopup="True" Name="PART_DialogPopupRoot">
-                    <ContentPresenter Name="PART_ContentPresenter"
-                                      Background="{TemplateBinding Background}"
-                                      ContentTemplate="{TemplateBinding ContentTemplate}"
-                                      Content="{TemplateBinding Content}"
-                                      Padding="{TemplateBinding Padding}" />
-                </VisualLayerManager>
-            </ControlTemplate>
-        </Setter>
-    </Style>
-
-    <Style Selector="dialogHost|DialogOverlayPopupHost[IsOpen=True]">
-        <Style.Animations>
-            <Animation Duration="0:0:0.01" Easing="SineEaseInOut" FillMode="Both">
-                <KeyFrame Cue="0%">
-                    <Setter Property="ScaleTransform.ScaleY" Value="0" />
-                    <Setter Property="ScaleTransform.ScaleX" Value="0" />
-                    <Setter Property="Opacity" Value="0" />
-                </KeyFrame>
-                <KeyFrame Cue="100%">
-                    <Setter Property="ScaleTransform.ScaleY" Value="1" />
-                    <Setter Property="ScaleTransform.ScaleX" Value="1" />
-                    <Setter Property="Opacity" Value="1" />
-                </KeyFrame>
-            </Animation>
-        </Style.Animations>
-    </Style>
-
-    <Style Selector="dialogHost|DialogOverlayPopupHost[IsOpen=False]">
-        <Style.Animations>
-            <Animation Duration="0:0:0.01" Easing="SineEaseInOut" FillMode="Both">
-                <KeyFrame Cue="0%">
-                    <Setter Property="ScaleTransform.ScaleY" Value="1" />
-                    <Setter Property="ScaleTransform.ScaleX" Value="1" />
-                    <Setter Property="Opacity" Value="1" />
-                    <Setter Property="InternalIsShown" Value="True" />
-                </KeyFrame>
-                <KeyFrame Cue="100%">
-                    <Setter Property="ScaleTransform.ScaleY" Value="0.5" />
-                    <Setter Property="ScaleTransform.ScaleX" Value="0.5" />
-                    <Setter Property="Opacity" Value="0" />
-                    <Setter Property="InternalIsShown" Value="False" />
-                </KeyFrame>
-            </Animation>
-        </Style.Animations>
     </Style>
 </Styles>
