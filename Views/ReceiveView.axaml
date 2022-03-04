@@ -29,10 +29,26 @@
             <Grid ColumnDefinitions="Auto,*"
                   RowDefinitions="Auto"
                   Margin="0 20 0 20">
+                <Button Grid.Column="0"
+                        Width="28"
+                        Height="28"
+                        Padding="3"
+                        BorderThickness="0"
+                        VerticalContentAlignment="Center"
+                        IsVisible="{Binding IsBackVisible}"
+                        Command="{Binding BackCommand}"
+                        Classes="ButtonWithIcon">
+
+                    <svg:Svg Width="28"
+                             Path="/Resources/Icons/back.svg"
+                             HorizontalAlignment="Left" />
+                </Button>
 
                 <TextBlock Grid.Column="1"
                            Foreground="{DynamicResource ChildViewHeaderForegroundBrush}"
                            FontFamily="{DynamicResource DefaultLightFontFamily}"
+                           Classes.withBack="{Binding IsBackVisible}"
+                           Classes.withoutBack="{Binding !IsBackVisible}"
                            FontSize="22"
                            HorizontalAlignment="Center"
                            VerticalAlignment="Center"
@@ -147,7 +163,8 @@
                 <Button Classes="LinkButton Underlined"
                         Foreground="{DynamicResource SecondaryForegroundBrush}"
                         Command="{Binding SelectAddressCommand}"
-                        Content="Choose from my addresses" />
+                        FontSize="16"
+                        Content="{Binding MyAddressesText}" />
             </StackPanel>
         </StackPanel>
     </Border>

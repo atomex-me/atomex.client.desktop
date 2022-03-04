@@ -20,8 +20,11 @@ namespace Atomex.Client.Desktop.ViewModels
         public WalletMainViewModel(IAtomexApp app)
         {
             AtomexApp = app ?? throw new ArgumentNullException(nameof(app));
-            
-            PortfolioViewModel = new PortfolioViewModel(AtomexApp);
+
+            PortfolioViewModel = new PortfolioViewModel(AtomexApp)
+            {
+                SetDexTab = SelectConversion
+            };
             ConversionViewModel = new ConversionViewModel(AtomexApp);
             WalletsViewModel = new WalletsViewModel(AtomexApp, SelectConversion);
             SettingsViewModel = new SettingsViewModel(AtomexApp);

@@ -13,15 +13,7 @@
     <Design.DataContext>
         <vm:MessageViewModel />
     </Design.DataContext>
-    <UserControl.Styles>
-        <Style Selector="TextBlock.withBack">
-            <Setter Property="Margin" Value="-28 0 0 0" />
-        </Style>
-        <Style Selector="TextBlock.withoutBack">
-            <Setter Property="Margin" Value="0 0 0 0" />
-        </Style>
-    </UserControl.Styles>
-
+    
     <Border Classes="ChildViewBorder"
             Padding="24 0 24 16"
             Width="700">

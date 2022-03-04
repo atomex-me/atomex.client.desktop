@@ -7,14 +7,12 @@ using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using Color = System.Drawing.Color;
-
 using Avalonia.Controls;
 using Avalonia.Media.Imaging;
 using Avalonia.Threading;
 using QRCoder;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
-
 using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.ViewModels.SendViewModels;
 using Atomex.Core;
@@ -33,7 +31,10 @@ namespace Atomex.Client.Desktop.ViewModels
         public string TokenContract { get; private set; }
         public string TokenType { get; private set; }
         public string TitleText => $"Your receiving {Currency.Name} address";
+        public string MyAddressesText => $"My {Currency.Name} addresses";
         public SelectAddressViewModel SelectAddressViewModel { get; set; }
+        public Action? OnBack { get; set; }
+        public bool IsBackVisible => OnBack != null;
 
         public ReceiveViewModel()
         {
@@ -70,7 +71,7 @@ namespace Atomex.Client.Desktop.ViewModels
                 {
                     if (!string.IsNullOrEmpty(walletAddressViewModel.Address))
                         SelectedAddress = walletAddressViewModel;
-                    
+
                     App.DialogService.Show(this);
                 }
             };
@@ -125,6 +126,12 @@ namespace Atomex.Client.Desktop.ViewModels
 
         public ReactiveCommand<Unit, Unit> SelectAddressCommand =>
             _selectAddressCommand ??= ReactiveCommand.Create(() => { App.DialogService.Show(SelectAddressViewModel); });
+
+
+        private ReactiveCommand<Unit, Unit> _backCommand;
+
+        public ReactiveCommand<Unit, Unit> BackCommand =>
+            _backCommand ??= ReactiveCommand.Create(() => { OnBack?.Invoke(); });
 
         private void DesignerMode()
         {

@@ -9,6 +9,7 @@ using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.ViewModels.ConversionViewModels;
 using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
 using Atomex.Client.Desktop.ViewModels.SendViewModels;
+using Atomex.Core;
 using Avalonia.Controls;
 using Avalonia.Media;
 using ReactiveUI;
@@ -29,6 +30,7 @@ namespace Atomex.Client.Desktop.ViewModels
         public IList<CurrencyViewModel> ChoosenCurrencies { get; set; }
         private Color NoTokensColor { get; } = Color.FromArgb(50, 0, 0, 0);
         public SelectCurrencyType SelectCurrencyUseCase { get; set; }
+        public Action<CurrencyConfig?> SetDexTab { get; set; }
         [Reactive] public decimal PortfolioValue { get; set; }
         [Reactive] public string SearchPattern { get; set; }
         [Reactive] public CurrencyViewModel? SelectedCurrency { get; set; }
@@ -58,7 +60,11 @@ namespace Atomex.Client.Desktop.ViewModels
                             Desktop.App.DialogService.Show(sendViewModel.SelectFromViewModel);
                             break;
                         case SelectCurrencyType.To:
-                            Desktop.App.DialogService.Show(new ReceiveViewModel(App, selectedCurrency.Currency));
+                            var receiveViewModel = new ReceiveViewModel(App, selectedCurrency.Currency)
+                            {
+                                OnBack = () => ReceiveCommand.Execute().Subscribe()
+                            };
+                            Desktop.App.DialogService.Show(receiveViewModel);
                             break;
                     }
                 });
@@ -174,6 +180,13 @@ namespace Atomex.Client.Desktop.ViewModels
 
                 SelectedCurrency = null;
                 Desktop.App.DialogService.Show(selectReceiveCurrencyViewModel);
+            });
+        
+        private ReactiveCommand<Unit, Unit> _exchangeCommand;
+        public ReactiveCommand<Unit, Unit> ExchangeCommand => _exchangeCommand ??= _exchangeCommand =
+            ReactiveCommand.Create(() =>
+            {
+                SetDexTab?.Invoke(null);
             });
 
         public IController ActualController { get; set; }

@@ -149,6 +149,7 @@
                         <controls:RoundedButton Height="46"
                                                 Padding="26 0"
                                                 CornerRadius="6"
+                                                Command="{Binding ExchangeCommand}"
                                                 FontFamily="{DynamicResource DefaultFontFamily}"
                                                 Margin="12 0 0 0"
                                                 Classes="AccentButton">
