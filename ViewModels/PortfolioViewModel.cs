@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Linq;
 using System.Reactive;
@@ -150,7 +151,7 @@ namespace Atomex.Client.Desktop.ViewModels
         public ReactiveCommand<Unit, Unit> SendCommand => _sendCommand ??= (_sendCommand = ReactiveCommand.Create(() =>
         {
             var selectFromCurrencyViewModel =
-                new SelectCurrencyInPortfolioViewModel(SelectCurrencyType.From, ChoosenCurrencies)
+                new SelectCurrencyWithoutAddressesViewModel(SelectCurrencyType.From, ChoosenCurrencies)
                 {
                     OnSelected = currencyViewModel =>
                     {
@@ -169,7 +170,7 @@ namespace Atomex.Client.Desktop.ViewModels
             ReactiveCommand.Create(() =>
             {
                 var selectReceiveCurrencyViewModel =
-                    new SelectCurrencyInPortfolioViewModel(SelectCurrencyType.To, ChoosenCurrencies)
+                    new SelectCurrencyWithoutAddressesViewModel(SelectCurrencyType.To, ChoosenCurrencies)
                     {
                         OnSelected = currencyViewModel =>
                         {
@@ -181,12 +182,22 @@ namespace Atomex.Client.Desktop.ViewModels
                 SelectedCurrency = null;
                 Desktop.App.DialogService.Show(selectReceiveCurrencyViewModel);
             });
-        
+
         private ReactiveCommand<Unit, Unit> _exchangeCommand;
+
         public ReactiveCommand<Unit, Unit> ExchangeCommand => _exchangeCommand ??= _exchangeCommand =
+            ReactiveCommand.Create(() => { SetDexTab?.Invoke(null); });
+
+        private ReactiveCommand<Unit, Unit> _manageAssetsCommand;
+
+        public ReactiveCommand<Unit, Unit> ManageAssetsCommand => _manageAssetsCommand ??= _manageAssetsCommand =
             ReactiveCommand.Create(() =>
             {
-                SetDexTab?.Invoke(null);
+                var vm = new ManageAssetsViewModel()
+                {
+                    AvailableCurrencies = new ObservableCollection<CurrencyViewModel>(ChoosenCurrencies)
+                };
+                Desktop.App.DialogService.Show(vm);
             });
 
         public IController ActualController { get; set; }

@@ -192,6 +192,7 @@
                             VerticalContentAlignment="Center"
                             HorizontalContentAlignment="Center"
                             Margin="0 0 12 0"
+                            Command="{Binding ManageAssetsCommand}"
                             Classes="ButtonWithIcon">
                         <svg:Svg Width="22"
                                  Path="/Resources/Icons/settings.svg" />

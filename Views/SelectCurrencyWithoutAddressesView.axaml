@@ -3,12 +3,12 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             x:Class="Atomex.Client.Desktop.Views.SelectCurrencyInPortfolioView"
+             x:Class="Atomex.Client.Desktop.Views.SelectCurrencyWithoutAddressesView"
              xmlns:vm="clr-namespace:Atomex.Client.Desktop.ViewModels"
              xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
              xmlns:ia="clr-namespace:Avalonia.Xaml.Interactions.Core;assembly=Avalonia.Xaml.Interactions">
     <Design.DataContext>
-        <vm:SelectCurrencyInPortfolioViewModel />
+        <vm:SelectCurrencyWithoutAddressesViewModel />
     </Design.DataContext>
 
     <Border Classes="ChildViewBorder"
@@ -51,31 +51,8 @@
                      Items="{Binding Currencies}"
                      SelectionMode="Single"
                      SelectedItem="{Binding SelectedCurrency}"
-                     Grid.Row="1">
-                <ListBox.Styles>
-                    <Style Selector="ListBoxItem">
-                        <Setter Property="Padding" Value="0" />
-                        <Setter Property="CornerRadius" Value="8" />
-                        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-                    </Style>
-
-                    <Style Selector="ListBoxItem:pointerover Border#BottomLine">
-                        <Setter Property="IsVisible" Value="False" />
-                    </Style>
-                    <Style Selector="ListBoxItem:pointerover /template/ ContentPresenter">
-                        <Setter Property="Background" Value="{DynamicResource ListBoxItemPointeroverBrush}" />
-                    </Style>
-                    <Style Selector="ListBoxItem:pressed /template/ ContentPresenter">
-                        <Setter Property="Background" Value="{DynamicResource LightDefaultOpacity4}" />
-                    </Style>
-                    <Style Selector="ListBoxItem:selected /template/ ContentPresenter">
-                        <Setter Property="Background" Value="{DynamicResource ListBoxItemSelectedBrush}" />
-                    </Style>
-                    <Style Selector="ListBoxItem:selected Border#BottomLine">
-                        <Setter Property="IsVisible" Value="False" />
-                    </Style>
-                </ListBox.Styles>
-
+                     Grid.Row="1"
+                     Classes="SelectCurrencyListBox">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <Grid ColumnDefinitions="*,Auto">
@@ -113,6 +90,12 @@
                                            Foreground="{DynamicResource LightDefaultOpacity50}"
                                            VerticalAlignment="Center" />
                             </StackPanel>
+                            <Border Name="BottomLine"
+                                    Margin="16 0 16 0"
+                                    Height="1"
+                                    VerticalAlignment="Bottom"
+                                    Background="{DynamicResource LightDefaultOpacity10}"
+                                    Grid.ColumnSpan="2" />
                         </Grid>
                     </DataTemplate>
                 </ListBox.ItemTemplate>

@@ -11,14 +11,14 @@ using ReactiveUI.Fody.Helpers;
 
 namespace Atomex.Client.Desktop.ViewModels
 {
-    public class SelectCurrencyInPortfolioViewModel : ViewModelBase
+    public class SelectCurrencyWithoutAddressesViewModel : ViewModelBase
     {
         public SelectCurrencyType Type { get; set; }
         public ObservableCollection<CurrencyViewModel> Currencies { get; set; }
         [Reactive] public CurrencyViewModel? SelectedCurrency { get; set; }
         public Action<CurrencyViewModel> OnSelected { get; set; }
 
-        public SelectCurrencyInPortfolioViewModel(SelectCurrencyType type, IEnumerable<CurrencyViewModel> currencies)
+        public SelectCurrencyWithoutAddressesViewModel(SelectCurrencyType type, IEnumerable<CurrencyViewModel> currencies)
         {
             Type = type;
             Currencies = new ObservableCollection<CurrencyViewModel>(currencies);
@@ -28,7 +28,7 @@ namespace Atomex.Client.Desktop.ViewModels
         }
 
 #if DEBUG
-        public SelectCurrencyInPortfolioViewModel()
+        public SelectCurrencyWithoutAddressesViewModel()
         {
             if (Design.IsDesignMode)
                 DesignerMode();

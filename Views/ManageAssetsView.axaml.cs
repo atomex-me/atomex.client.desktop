@@ -4,9 +4,9 @@ using Avalonia.Markup.Xaml;
 
 namespace Atomex.Client.Desktop.Views
 {
-    public partial class SelectCurrencyInPortfolioView : UserControl
+    public partial class ManageAssetsView : UserControl
     {
-        public SelectCurrencyInPortfolioView()
+        public ManageAssetsView()
         {
             InitializeComponent();
         }
