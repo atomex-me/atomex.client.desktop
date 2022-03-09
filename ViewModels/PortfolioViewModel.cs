@@ -195,7 +195,13 @@ namespace Atomex.Client.Desktop.ViewModels
             {
                 var vm = new ManageAssetsViewModel()
                 {
-                    AvailableCurrencies = new ObservableCollection<CurrencyViewModel>(ChoosenCurrencies)
+                    AvailableCurrencies = new ObservableCollection<CurrencyWithSelection>(
+                        ChoosenCurrencies.Select(currency => new CurrencyWithSelection()
+                        {
+                            Currency = currency,
+                            IsSelected = false
+                        })
+                    )
                 };
                 Desktop.App.DialogService.Show(vm);
             });
