@@ -60,8 +60,6 @@
                      ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                      Background="{DynamicResource AlmostTransparentBrush}"
                      Items="{Binding AvailableCurrencies}"
-                     SelectedItems="{Binding SelectedCurrencies}"
-                     SelectionMode="Multiple"
                      Grid.Row="2"
                      Classes="SelectCurrencyListBox">
                 <ListBox.Styles>
