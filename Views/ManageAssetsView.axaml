@@ -57,10 +57,11 @@
 
             <ListBox Margin="16"
                      MaxHeight="460"
+                     MinHeight="300"
+                     Grid.Row="2"
                      ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                      Background="{DynamicResource AlmostTransparentBrush}"
                      Items="{Binding AvailableCurrencies}"
-                     Grid.Row="2"
                      Classes="SelectCurrencyListBox">
                 <ListBox.Styles>
                     <Style Selector="ListBoxItem:selected /template/ ContentPresenter">
@@ -70,6 +71,9 @@
                         <Setter Property="Background" Value="{DynamicResource ListBoxItemPointeroverBrush}" />
                     </Style>
                     <Style Selector="ListBoxItem Border#BottomLine">
+                        <Setter Property="IsVisible" Value="True" />
+                    </Style>
+                    <Style Selector="ListBoxItem:selected Border#BottomLine">
                         <Setter Property="IsVisible" Value="True" />
                     </Style>
                     <Style Selector="TextBlock.IsSelected">

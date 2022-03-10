@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
@@ -18,6 +19,7 @@ using OxyPlot;
 using OxyPlot.Avalonia;
 using OxyPlot.Series;
 using ReactiveUI.Fody.Helpers;
+using Serilog;
 using PieSeries = OxyPlot.Series.PieSeries;
 
 
@@ -28,7 +30,9 @@ namespace Atomex.Client.Desktop.ViewModels
         private const string DefaultPortfolioFormat = "0.00";
         private IAtomexApp App { get; }
         public PlotModel PlotModel { get; set; }
-        public IList<CurrencyViewModel> ChoosenCurrencies { get; set; }
+        [Reactive] public IList<CurrencyViewModel> AllCurrencies { get; set; }
+        [Reactive] public IList<CurrencyViewModel> ChoosenCurrencies { get; set; }
+        [Reactive] public IList<CurrencyViewModel> InitialChoosenCurrencies { get; set; }
         private Color NoTokensColor { get; } = Color.FromArgb(50, 0, 0, 0);
         public SelectCurrencyType SelectCurrencyUseCase { get; set; }
         public Action<CurrencyConfig?> SetDexTab { get; set; }
@@ -70,6 +74,23 @@ namespace Atomex.Client.Desktop.ViewModels
                     }
                 });
 
+            this.WhenAnyValue(vm => vm.ChoosenCurrencies)
+                .WhereNotNull()
+                .SubscribeInMainThread(_ => OnAmountUpdatedEventHandler(this, EventArgs.Empty));
+
+            this.WhenAnyValue(vm => vm.SearchPattern)
+                .WhereNotNull()
+                .SubscribeInMainThread(searchPattern =>
+                {
+                    var filteredCurrencies = InitialChoosenCurrencies
+                        .Where(c => c.Currency.Name.ToLower()
+                                        .Contains(searchPattern?.ToLower() ?? string.Empty) ||
+                                    c.Currency.Description.ToLower()
+                                        .Contains(searchPattern?.ToLower() ?? string.Empty));
+
+                    ChoosenCurrencies = new List<CurrencyViewModel>(filteredCurrencies);
+                });
+
             SubscribeToServices();
         }
 
@@ -80,7 +101,7 @@ namespace Atomex.Client.Desktop.ViewModels
 
         private void OnTerminalChangedEventHandler(object sender, AtomexClientChangedEventArgs e)
         {
-            ChoosenCurrencies = e.AtomexClient?.Account?.Currencies
+            AllCurrencies = e.AtomexClient?.Account?.Currencies
                 .Select(c =>
                 {
                     var vm = CurrencyViewModelCreator.CreateViewModel(c);
@@ -88,6 +109,10 @@ namespace Atomex.Client.Desktop.ViewModels
                     return vm;
                 })
                 .ToList() ?? new List<CurrencyViewModel>();
+
+            // todo: select from settings
+            ChoosenCurrencies = new List<CurrencyViewModel>(AllCurrencies);
+            InitialChoosenCurrencies = new List<CurrencyViewModel>(ChoosenCurrencies);
 
             OnAmountUpdatedEventHandler(this, EventArgs.Empty);
         }
@@ -193,16 +218,22 @@ namespace Atomex.Client.Desktop.ViewModels
         public ReactiveCommand<Unit, Unit> ManageAssetsCommand => _manageAssetsCommand ??= _manageAssetsCommand =
             ReactiveCommand.Create(() =>
             {
-                var vm = new ManageAssetsViewModel()
+                var vm = new ManageAssetsViewModel
                 {
                     AvailableCurrencies = new ObservableCollection<CurrencyWithSelection>(
-                        ChoosenCurrencies.Select(currency => new CurrencyWithSelection()
+                        AllCurrencies.Select(currency => new CurrencyWithSelection
                         {
                             Currency = currency,
-                            IsSelected = false
+                            IsSelected = InitialChoosenCurrencies.Contains(currency)
                         })
-                    )
+                    ),
+                    OnAssetsChanged = currencies =>
+                    {
+                        ChoosenCurrencies = new List<CurrencyViewModel>(currencies);
+                        InitialChoosenCurrencies = new List<CurrencyViewModel>(ChoosenCurrencies);
+                    }
                 };
+                
                 Desktop.App.DialogService.Show(vm);
             });
 
