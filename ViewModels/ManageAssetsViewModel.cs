@@ -28,6 +28,7 @@ namespace Atomex.Client.Desktop.ViewModels
     public class ManageAssetsViewModel : ViewModelBase
     {
         private ObservableCollection<CurrencyWithSelection> InitialCurrencies { get; set; }
+        private ObservableCollection<CurrencyWithSelection> BeforeSearchCurrencies { get; set; }
         [Reactive] public ObservableCollection<CurrencyWithSelection> AvailableCurrencies { get; set; }
         [Reactive] public string SearchPattern { get; set; }
         public Action<IEnumerable<CurrencyViewModel>> OnAssetsChanged { get; set; }
@@ -53,6 +54,9 @@ namespace Atomex.Client.Desktop.ViewModels
                 .WhereNotNull()
                 .SubscribeInMainThread(searchPattern =>
                 {
+                    if (searchPattern == string.Empty)
+                        BeforeSearchCurrencies = new ObservableCollection<CurrencyWithSelection>(AvailableCurrencies);
+
                     var filteredCurrencies = InitialCurrencies
                         .Where(c => c.Currency.Currency.Name.ToLower()
                                         .Contains(searchPattern?.ToLower() ?? string.Empty) ||
@@ -61,6 +65,8 @@ namespace Atomex.Client.Desktop.ViewModels
 
                     AvailableCurrencies = new ObservableCollection<CurrencyWithSelection>(filteredCurrencies);
                 });
+
+            SearchPattern = string.Empty;
         }
     }
 }
