@@ -110,8 +110,13 @@ namespace Atomex.Client.Desktop.ViewModels
                 })
                 .ToList() ?? new List<CurrencyViewModel>();
 
-            // todo: select from settings
-            ChoosenCurrencies = new List<CurrencyViewModel>(AllCurrencies);
+            var savedCurrenciesArr =
+                e.AtomexClient?.Account?.UserSettings?.InitializedCurrencies ??
+                AllCurrencies.Select(c => c.Currency.Name).ToArray();
+
+            ChoosenCurrencies = new List<CurrencyViewModel>(AllCurrencies)
+                .Where(c => savedCurrenciesArr.Contains(c.Currency.Name))
+                .ToList();
             InitialChoosenCurrencies = new List<CurrencyViewModel>(ChoosenCurrencies);
 
             OnAmountUpdatedEventHandler(this, EventArgs.Empty);
@@ -231,9 +236,15 @@ namespace Atomex.Client.Desktop.ViewModels
                     {
                         ChoosenCurrencies = new List<CurrencyViewModel>(currencies);
                         InitialChoosenCurrencies = new List<CurrencyViewModel>(ChoosenCurrencies);
+
+                        App.Account.UserSettings.InitializedCurrencies = ChoosenCurrencies
+                            .Select(currency => currency.Currency.Name)
+                            .ToArray();
+
+                        App.Account.UserSettings.SaveToFile(App.Account.SettingsFilePath);
                     }
                 };
-                
+
                 Desktop.App.DialogService.Show(vm);
             });
 
