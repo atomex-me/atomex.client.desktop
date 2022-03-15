@@ -68,7 +68,6 @@ namespace Atomex.Client.Desktop.ViewModels
         [Reactive] public ConversionCurrencyViewModel ToViewModel { get; set; }
         [Reactive] public SelectCurrencyViewModelItem? FromCurrencyViewModelItem { get; set; }
         [Reactive] public SelectCurrencyViewModelItem? ToCurrencyViewModelItem { get; set; }
-
         [Reactive] public string AmountValidationMessage { get; set; }
         [Reactive] public string AmountValidationMessageToolTip { get; set; }
         [Reactive] public MessageType AmountValidationMessageType { get; set; }
@@ -255,10 +254,10 @@ namespace Atomex.Client.Desktop.ViewModels
 
             // AmountStrings, FromCurrencyViewModel or ToCurrencyViewModel changed => estimate swap price and target amount
             this.WhenAnyValue(
-                    vm => vm.FromViewModel.AmountString,
+                    vm => vm.FromViewModel.Amount,
                     vm => vm.FromViewModel.CurrencyViewModel,
                     vm => vm.FromViewModel.Address,
-                    vm => vm.ToViewModel.AmountString,
+                    vm => vm.ToViewModel.Amount,
                     vm => vm.ToViewModel.CurrencyViewModel,
                     vm => vm.ToViewModel.Address,
                     vm => vm.RedeemFromAddress)
@@ -270,11 +269,11 @@ namespace Atomex.Client.Desktop.ViewModels
                 });
 
             // From Amount changed => update FromViewModel.AmountInBase
-            this.WhenAnyValue(vm => vm.FromViewModel.AmountString)
+            this.WhenAnyValue(vm => vm.FromViewModel.Amount)
                 .SubscribeInMainThread(amount => UpdateFromAmountInBase());
 
             // To Amount changed => update ToViewModel.AmountInBase
-            this.WhenAnyValue(vm => vm.ToViewModel.AmountString)
+            this.WhenAnyValue(vm => vm.ToViewModel.Amount)
                 .SubscribeInMainThread(amount => UpdateToAmountInBase());
 
             // EstimatedPaymentFee changed => update EstimatedPaymentFeeInBase

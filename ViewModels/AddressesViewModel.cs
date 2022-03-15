@@ -95,6 +95,7 @@ namespace Atomex.Client.Desktop.ViewModels
 
     public class AddressesViewModel : ViewModelBase
     {
+        private const int DefaultTokenPrecision = 9;
         private readonly IAtomexApp _app;
         private CurrencyConfig _currency;
         private readonly string _tokenContract;
@@ -211,7 +212,7 @@ namespace Atomex.Client.Desktop.ViewModels
                         {
                             var tokenAddress = addressWithTokens.First();
 
-                            addressInfo.TokenBalance = tokenAddress.Balance.ToString("F8", CultureInfo.InvariantCulture);
+                            addressInfo.TokenBalance = tokenAddress.Balance.FormatWithPrecision(DefaultTokenPrecision);
 
                             var tokenCode = tokenAddress?.TokenBalance?.Symbol;
 

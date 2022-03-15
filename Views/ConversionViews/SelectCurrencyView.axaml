@@ -55,6 +55,10 @@
                SelectionMode="Single"
                SelectedItem="{Binding SelectedCurrency}"
                Grid.Row="1">
+        <!--<i:Interaction.Behaviors>
+          <ia:EventTriggerBehavior EventName="Pressed">
+        </i:Interaction.Behaviors>-->
+
         <ListBox.Styles>
           <Style Selector="ListBoxItem">
             <Setter Property="Padding" Value="0"/>

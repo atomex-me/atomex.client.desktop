@@ -34,27 +34,11 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         [Reactive] public int GasPrice { get; set; }
         [Reactive] private decimal TotalFee { get; set; }
         [ObservableAsProperty] public string TotalFeeString { get; set; }
-        [ObservableAsProperty] public string GasPriceString { get; set; }
         protected override decimal FeeAmount => Currency.GetFeeAmount(GasLimit, GasPrice);
         [Reactive] public bool HasTokens { get; set; }
         [Reactive] public bool HasActiveSwaps { get; set; }
 
         private ReactiveCommand<MaxAmountEstimation, MaxAmountEstimation> CheckAmountCommand;
-
-        public void SetGasPriceFromString(string value)
-        {
-            if (value == GasPriceString)
-                return;
-
-            var parsed = int.TryParse(value, out var gasPrice);
-
-            if (!parsed)
-                gasPrice = 0;
-
-            GasPrice = gasPrice;
-
-            Dispatcher.UIThread.InvokeAsync(() => this.RaisePropertyChanged(nameof(GasPriceString)));
-        }
 
         public EthereumSendViewModel()
         {
@@ -73,10 +57,6 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
             this.WhenAnyValue(vm => vm.GasPrice)
                 .SubscribeInMainThread(_ => Warning = string.Empty);
-
-            this.WhenAnyValue(vm => vm.GasPrice)
-                .Select(gasPrice => gasPrice.ToString(CultureInfo.CurrentCulture))
-                .ToPropertyExInMainThread(this, vm => vm.GasPriceString);
 
             this.WhenAnyValue(vm => vm.GasPrice)
                 .Where(_ => !string.IsNullOrEmpty(From))

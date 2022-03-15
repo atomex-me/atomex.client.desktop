@@ -9,146 +9,142 @@
              xmlns:viewModels="clr-namespace:Atomex.Client.Desktop.ViewModels"
              Width="700">
 
-    <Design.DataContext>
-        <viewModels:ReceiveViewModel />
-    </Design.DataContext>
+  <Design.DataContext>
+    <viewModels:ReceiveViewModel/>
+  </Design.DataContext>
 
-    <UserControl.Styles>
-        <Style Selector="controls|RoundedButton.NotCopied">
-            <Setter Property="Background" Value="{DynamicResource RoundedButtonBackgroundBrush}" />
-        </Style>
-        <Style Selector="controls|RoundedButton.Copied">
-            <Setter Property="Background" Value="{DynamicResource Emerald}" />
-        </Style>
-    </UserControl.Styles>
+  <UserControl.Styles>
+    <Style Selector="controls|RoundedButton.NotCopied">
+      <Setter Property="Background"
+              Value="{DynamicResource RoundedButtonBackgroundBrush}"/>
+    </Style>
+    <Style Selector="controls|RoundedButton.Copied">
+      <Setter Property="Background"
+              Value="{DynamicResource Emerald}"/>
+    </Style>
+  </UserControl.Styles>
 
-    <Border Classes="ChildViewBorder"
-            Padding="24 0 24 0"
-            Width="700">
-        <StackPanel Orientation="Vertical">
-            <Grid ColumnDefinitions="Auto,*"
-                  RowDefinitions="Auto"
-                  Margin="0 20 0 20">
+  <Border Classes="ChildViewBorder"
+          Width="700">
+    <StackPanel Orientation="Vertical">
+      <Border Height="72">
+        <TextBlock Foreground="{DynamicResource ChildViewHeaderForegroundBrush}"
+                   FontFamily="{DynamicResource DefaultLightFontFamily}"
+                   FontSize="22"
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Center"
+                   Text="{Binding TitleText}"
+                   Name="WindowTitle"/>
+      </Border>
 
-                <TextBlock Grid.Column="1"
-                           Foreground="{DynamicResource ChildViewHeaderForegroundBrush}"
-                           FontFamily="{DynamicResource DefaultLightFontFamily}"
-                           FontSize="22"
-                           HorizontalAlignment="Center"
-                           VerticalAlignment="Center"
-                           Text="{Binding TitleText}"
-                           Name="WindowTitle" />
-            </Grid>
+      <Border Height="1"
+              Background="{DynamicResource LightDefaultOpacity10}"/>
 
-            <Border Height="1"
-                    Margin="-24 0 -24 0"
-                    Background="{DynamicResource LightDefaultOpacity10}" />
+      <StackPanel Orientation="Horizontal"
+                  HorizontalAlignment="Center"
+                  Margin="0 30 0 0">
+        <Image Width="150"
+               Source="{Binding QrCode}"/>
+      </StackPanel>
 
-            <StackPanel Orientation="Horizontal"
-                        HorizontalAlignment="Center"
-                        Margin="0 30 0 0">
-                <Image Width="150"
-                       Source="{Binding QrCode}" />
-            </StackPanel>
+      <StackPanel Orientation="Horizontal"
+                  HorizontalAlignment="Center"
+                  Margin="0 16 0 3">
+        <TextBlock Text="{Binding SelectedAddress.Address}"
+                   FontFamily="{DynamicResource DefaultFontFamily}"
+                   FontSize="16"
+                   LineHeight="24"
+                   Foreground="{DynamicResource DefaultForegroundBrush}"/>
+      </StackPanel>
 
-            <StackPanel Orientation="Horizontal"
-                        HorizontalAlignment="Center"
-                        Margin="0 16 0 3">
-                <TextBlock Text="{Binding SelectedAddress.Address}"
+      <StackPanel Orientation="Horizontal"
+                  HorizontalAlignment="Center">
+        <Border Background="{DynamicResource RoundedButtonDisabledForegroundBrush}"
+                CornerRadius="4"
+                VerticalAlignment="Center"
+                Padding="6 0"
+                Height="20"
+                IsVisible="{Binding SelectedAddress.IsFreeAddress}">
+          <TextBlock Text="new"
+                     FontSize="12"
+                     LineHeight="16"
+                     VerticalAlignment="Center"
+                     FontFamily="{DynamicResource DefaultFontFamily}"
+                     Foreground="{DynamicResource DefaultForegroundBrush}"/>
+        </Border>
+        <TextBlock IsVisible="{Binding !SelectedAddress.IsFreeAddress}"
+                   FontFamily="{DynamicResource DefaultFontFamily}"
+                   FontSize="16"
+                   LineHeight="24"
+                   Foreground="{DynamicResource SecondaryForegroundBrush}">
+          <TextBlock.Text>
+            <MultiBinding Converter="{StaticResource AmountToStringConverter}">
+              <Binding Path="SelectedAddress.AvailableBalance" Mode="OneWay"/>
+              <Binding Path="Currency.Format" Mode="OneWay"/>
+            </MultiBinding>
+          </TextBlock.Text>
+        </TextBlock>
+
+        <TextBlock Margin="3 0 0 0"
+                   IsVisible="{Binding !SelectedAddress.IsFreeAddress}"
+                   Text="{Binding Currency.Name}"
+                   FontFamily="{DynamicResource DefaultFontFamily}"
+                   FontSize="16"
+                   Foreground="{DynamicResource SecondaryForegroundBrush}"/>
+      </StackPanel>
+
+      <StackPanel Orientation="Horizontal"
+                  HorizontalAlignment="Center"
+                  Margin="0 16 0 0">
+        <controls:RoundedButton Height="46"
+                                Padding="26 0"
+                                CornerRadius="6"
+                                FontFamily="{DynamicResource DefaultFontFamily}"
+                                FontWeight="Normal"
+                                Command="{Binding CopyCommand}"
+                                IsEnabled="{Binding !IsCopied}"
+                                Classes.Copied="{Binding IsCopied}"
+                                Classes.NotCopied="{Binding !IsCopied}">
+          <StackPanel>
+              <StackPanel Orientation="Horizontal"
+                          IsVisible="{Binding !IsCopied}">
+                <svg:Svg HorizontalAlignment="Center"
+                         Width="24"
+                         Height="24"
+                         Path="/Resources/Icons/copy-white.svg"/>
+                <TextBlock Margin="8 0 0 0"
+                           Text="Copy address"
                            FontFamily="{DynamicResource DefaultFontFamily}"
-                           FontSize="16"
-                           LineHeight="24"
-                           Foreground="{DynamicResource DefaultForegroundBrush}" />
-            </StackPanel>
+                           FontWeight="Light"
+                           FontSize="18"
+                           Foreground="{DynamicResource RoundedButtonForegroundBrush}"/>
+              </StackPanel>
 
-            <StackPanel Orientation="Horizontal"
-                        HorizontalAlignment="Center">
-                <Border Background="{DynamicResource RoundedButtonDisabledForegroundBrush}"
-                        CornerRadius="4"
-                        VerticalAlignment="Center"
-                        Padding="6 0"
-                        Height="20"
-                        IsVisible="{Binding SelectedAddress.IsFreeAddress}">
-                    <TextBlock Text="new"
-                               FontSize="12"
-                               LineHeight="16"
-                               VerticalAlignment="Center"
-                               FontFamily="{DynamicResource DefaultFontFamily}"
-                               Foreground="{DynamicResource DefaultForegroundBrush}" />
-                </Border>
-                <TextBlock IsVisible="{Binding !SelectedAddress.IsFreeAddress}"
+              <StackPanel Orientation="Horizontal"
+                          IsVisible="{Binding IsCopied}">
+                <svg:Svg HorizontalAlignment="Center"
+                         Width="24"
+                         Height="24"
+                         Path="/Resources/Icons/check-darkblue.svg"/>
+                <TextBlock Margin="8 0 0 0"
+                           Text="Copied"
                            FontFamily="{DynamicResource DefaultFontFamily}"
-                           FontSize="16"
-                           LineHeight="24"
-                           Foreground="{DynamicResource SecondaryForegroundBrush}">
-                    <TextBlock.Text>
-                        <MultiBinding Converter="{StaticResource AmountToStringConverter}">
-                            <Binding Path="SelectedAddress.AvailableBalance" Mode="OneWay" />
-                            <Binding Path="Currency.Format" Mode="OneWay" />
-                        </MultiBinding>
-                    </TextBlock.Text>
-                </TextBlock>
+                           FontWeight="Light"
+                           FontSize="18"
+                           Foreground="{DynamicResource DeepBlue}"/>
+              </StackPanel>
+          </StackPanel>
+        </controls:RoundedButton>
+      </StackPanel>
 
-                <TextBlock Margin="3 0 0 0"
-                           IsVisible="{Binding !SelectedAddress.IsFreeAddress}"
-                           Text="{Binding Currency.Name}"
-                           FontFamily="{DynamicResource DefaultFontFamily}"
-                           FontSize="16"
-                           Foreground="{DynamicResource SecondaryForegroundBrush}" />
-            </StackPanel>
-
-            <StackPanel Orientation="Horizontal"
-                        HorizontalAlignment="Center"
-                        Margin="0 16 0 0">
-                <controls:RoundedButton Height="46"
-                                        Padding="26 0"
-                                        CornerRadius="6"
-                                        FontFamily="{DynamicResource DefaultFontFamily}"
-                                        FontWeight="Normal"
-                                        Command="{Binding CopyCommand}"
-                                        IsEnabled="{Binding !IsCopied}"
-                                        Classes.Copied="{Binding IsCopied}"
-                                        Classes.NotCopied="{Binding !IsCopied}">
-                    <StackPanel>
-                        <StackPanel Orientation="Horizontal"
-                                    IsVisible="{Binding !IsCopied}">
-                            <svg:Svg HorizontalAlignment="Center"
-                                     Width="24"
-                                     Height="24"
-                                     Path="/Resources/Icons/copy-white.svg" />
-                            <TextBlock Margin="8 0 0 0"
-                                       Text="Copy address"
-                                       FontFamily="{DynamicResource DefaultFontFamily}"
-                                       FontWeight="Light"
-                                       FontSize="18"
-                                       Foreground="{DynamicResource RoundedButtonForegroundBrush}" />
-                        </StackPanel>
-
-                        <StackPanel Orientation="Horizontal"
-                                    IsVisible="{Binding IsCopied}">
-                            <svg:Svg HorizontalAlignment="Center"
-                                     Width="24"
-                                     Height="24"
-                                     Path="/Resources/Icons/check-darkblue.svg" />
-                            <TextBlock Margin="8 0 0 0"
-                                       Text="Copied"
-                                       FontFamily="{DynamicResource DefaultFontFamily}"
-                                       FontWeight="Light"
-                                       FontSize="18"
-                                       Foreground="{DynamicResource DeepBlue}" />
-                        </StackPanel>
-                    </StackPanel>
-                </controls:RoundedButton>
-            </StackPanel>
-
-            <StackPanel Orientation="Horizontal"
-                        HorizontalAlignment="Center"
-                        Margin="0 44 0 40">
-                <Button Classes="LinkButton Underlined"
-                        Foreground="{DynamicResource SecondaryForegroundBrush}"
-                        Command="{Binding SelectAddressCommand}"
-                        Content="Choose from my addresses" />
-            </StackPanel>
-        </StackPanel>
-    </Border>
+      <StackPanel Orientation="Horizontal"
+                  HorizontalAlignment="Center"
+                  Margin="0 44 0 40">
+        <Button Classes="LinkButton Underlined"
+                Foreground="{DynamicResource SecondaryForegroundBrush}"
+                Command="{Binding SelectAddressCommand}"
+                Content="Choose from my addresses"/>
+      </StackPanel>
+    </StackPanel>
+  </Border>
 </UserControl>
