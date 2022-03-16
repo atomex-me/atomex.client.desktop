@@ -335,4 +335,16 @@ NOTE: Do not sign out or close the application until the swap is completed, othe
   <data name="SvInvalidTokenContract" xml:space="preserve">
     <value>Invalid token contract address</value>
   </data>
+  <data name="CvAddressIsNotAtomex" xml:space="preserve">
+    <value>Warning: address {0} is extrenal and is not an Atomex wallet's address. Make sure it's entered correctly!</value>
+  </data>
+  <data name="CvAddressIsNotAtomexToolTip" xml:space="preserve">
+    <value>You can receive funds to an extrenal address (eg hardware wallet like Ledger). Using this mechanism make sure that you enter the correct address, because your Atomex wallet will not have access to the private key of the extrenal address and in case of an error access to the funds may be lost!</value>
+  </data>
+  <data name="CvRedeemFromAddressNote" xml:space="preserve">
+    <value>Note: the redeem transaction will be sent from the address {0}</value>
+  </data>
+  <data name="CvRedeemFromAddressNoteToolTip" xml:space="preserve">
+    <value>The redeem transaction will be sent from the address {0} if it has enough funds. Otherwise the transaction will be sent by an extrenal service for a fee</value>
+  </data>
 </root>

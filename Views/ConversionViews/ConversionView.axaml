@@ -579,8 +579,82 @@
             <Binding Path="IsNoLiquidity"/>
             <Binding Path="Message"
                      Converter="{x:Static StringConverters.IsNotNullOrEmpty}"/>
+            <Binding Path="IsToAddressExtrenal"/>
+            <Binding Path="IsRedeemFromAddressWithMaxBalance"/>
           </MultiBinding>
         </StackPanel.IsVisible>
+
+        <!-- is extrenal address warning -->
+        <StackPanel Orientation="Horizontal"
+                    IsVisible="{Binding IsToAddressExtrenal}">
+          <TextBlock Text="{Binding ExternalAddressWarning}"
+                     MaxWidth="471"
+                     Padding="0 2 0 2"
+                     TextWrapping="Wrap"
+                     VerticalAlignment="Center"
+                     FontSize="13"
+                     FontFamily="{DynamicResource DefaultLightFontFamily}"
+                     Classes="Message Warning"/>
+          <Button Padding="3"
+                  VerticalAlignment="Center"
+                  VerticalContentAlignment="Center"
+                  ToolTip.Placement="Bottom"
+                  ToolTip.VerticalOffset="10"
+                  ToolTip.HorizontalOffset="{Binding ElementName=ExternalAddressToolTipGrid,
+                      Path=Bounds.Width,
+                      Converter={StaticResource WidthToHorizontalCenterOffsetConverter}}"
+                  Click="HelpClickHandler"
+                  Classes="ButtonWithIcon">
+            <ToolTip.Tip>
+              <Grid Name="ExternalAddressToolTipGrid">
+                <TextBlock TextWrapping="Wrap"
+                           Text="{Binding ExternalAddressWarningToolTip}"/>
+              </Grid>
+            </ToolTip.Tip>
+            <Path HorizontalAlignment="Center"
+                  VerticalAlignment="Center"
+                  Width="12"
+                  Height="12"
+                  Data="{DynamicResource Help}"
+                  Fill="{DynamicResource LightDefaultOpacity20}"/>
+          </Button>
+        </StackPanel>
+
+        <!-- is redeem from address with max balance note -->
+        <StackPanel Orientation="Horizontal"
+                    IsVisible="{Binding IsRedeemFromAddressWithMaxBalance}">
+          <TextBlock Text="{Binding RedeemFromAddressNote}"
+                     MaxWidth="471"
+                     Padding="0 2 0 2"
+                     TextWrapping="Wrap"
+                     VerticalAlignment="Center"
+                     FontSize="13"
+                     FontFamily="{DynamicResource DefaultLightFontFamily}"
+                     Classes="Message"/>
+          <Button Padding="3"
+                  VerticalAlignment="Center"
+                  VerticalContentAlignment="Center"
+                  ToolTip.Placement="Bottom"
+                  ToolTip.VerticalOffset="10"
+                  ToolTip.HorizontalOffset="{Binding ElementName=RedeemFromAddressNoteToolTipGrid,
+                      Path=Bounds.Width,
+                      Converter={StaticResource WidthToHorizontalCenterOffsetConverter}}"
+                  Click="HelpClickHandler"
+                  Classes="ButtonWithIcon">
+            <ToolTip.Tip>
+              <Grid Name="RedeemFromAddressNoteToolTipGrid">
+                <TextBlock TextWrapping="Wrap"
+                           Text="{Binding RedeemFromAddressNoteToolTip}"/>
+              </Grid>
+            </ToolTip.Tip>
+            <Path HorizontalAlignment="Center"
+                  VerticalAlignment="Center"
+                  Width="12"
+                  Height="12"
+                  Data="{DynamicResource Help}"
+                  Fill="{DynamicResource LightDefaultOpacity20}"/>
+          </Button>
+        </StackPanel>
 
         <!-- amount validation message -->
         <StackPanel Orientation="Horizontal"

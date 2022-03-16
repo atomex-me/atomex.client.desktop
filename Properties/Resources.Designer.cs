@@ -70,6 +70,24 @@ namespace Atomex.Client.Desktop.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Warning: address {0} is extrenal and is not an Atomex wallet&apos;s address. Make sure it&apos;s entered correctly!.
+        /// </summary>
+        internal static string CvAddressIsNotAtomex {
+            get {
+                return ResourceManager.GetString("CvAddressIsNotAtomex", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на You can receive funds to an extrenal address (eg hardware wallet like Ledger). Using this mechanism make sure that you enter the correct address, because your Atomex wallet will not have access to the private key of the extrenal address and in case of an error access to the funds may be lost!.
+        /// </summary>
+        internal static string CvAddressIsNotAtomexToolTip {
+            get {
+                return ResourceManager.GetString("CvAddressIsNotAtomexToolTip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на The commission does not depend on the conversion amount and is determined only by the current network fees. The larger the convertible amount, the smaller the commission to amount ratio. Atomex blocks the conversion if the commission exceeds 75% of the conversion amount.
         /// </summary>
         internal static string CvAmountToFeeRatioToolTip {
@@ -183,6 +201,24 @@ namespace Atomex.Client.Desktop.Properties {
         internal static string CvOrderTypeStandardWithFixedFee {
             get {
                 return ResourceManager.GetString("CvOrderTypeStandardWithFixedFee", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Note: the redeem transaction will be sent from the address {0}.
+        /// </summary>
+        internal static string CvRedeemFromAddressNote {
+            get {
+                return ResourceManager.GetString("CvRedeemFromAddressNote", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на The redeem transaction will be sent from the address {0} if it has enough funds. Otherwise the transaction will be sent by an extrenal service for a fee.
+        /// </summary>
+        internal static string CvRedeemFromAddressNoteToolTip {
+            get {
+                return ResourceManager.GetString("CvRedeemFromAddressNoteToolTip", resourceCulture);
             }
         }
         
