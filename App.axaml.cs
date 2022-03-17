@@ -57,7 +57,7 @@ namespace Atomex.Client.Desktop
 #else
                 .WriteTo.Sentry(o =>
                 {
-                    o.Dsn = new Dsn("https://793b3e5e430143be9f9c240d83b9ff3f@sentry.baking-bad.org/8");
+                    o.Dsn = "https://e6728d16ed934432b6dd6735df8bd37b@newsentry.baking-bad.org/3";
                     // Debug and higher are stored as breadcrumbs (default is Information)
                     o.MinimumBreadcrumbLevel = LogEventLevel.Information;
                     // Warning and higher is sent as event (default is Error)
