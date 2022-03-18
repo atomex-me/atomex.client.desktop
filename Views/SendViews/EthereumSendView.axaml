@@ -503,7 +503,7 @@
                      FontSize="13"/>
 
           <TextBlock Grid.Column="1"
-                     Text="{Binding AmountString}"
+                     Text="{Binding Amount}"
                      FontFamily="{DynamicResource DefaultFontFamily}"
                      Foreground="{DynamicResource DefaultForegroundBrush}"
                      FontSize="13"/>

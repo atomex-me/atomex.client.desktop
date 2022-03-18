@@ -138,12 +138,12 @@
         <Border Width="50"
                 Margin="-50 0 0 0">
           <TextBlock Text="To"
-                      Margin="0 0 12 0"
-                      Foreground="{DynamicResource SecondaryForegroundBrush}"
-                      FontFamily="{DynamicResource DefaultMediumFontFamily}"
-                      FontSize="13"
-                      VerticalAlignment="Center"
-                      HorizontalAlignment="Right"/>
+                     Margin="0 0 12 0"
+                     Foreground="{DynamicResource SecondaryForegroundBrush}"
+                     FontFamily="{DynamicResource DefaultMediumFontFamily}"
+                     FontSize="13"
+                     VerticalAlignment="Center"
+                     HorizontalAlignment="Right"/>
         </Border>
 
         <Border CornerRadius="6"
@@ -413,7 +413,7 @@
                        LineHeight="20"
                        Margin="3 0 0 0"
                        TextAlignment="Right"
-                       Text="{Binding FeeString}"/>
+                       Text="{Binding Fee}"/>
             <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
                        FontFamily="{DynamicResource DefaultFontFamily}"
                        LineHeight="20"
@@ -451,7 +451,7 @@
                      FontSize="13"/>
 
           <TextBlock Grid.Column="1"
-                     Text="{Binding AmountString}"
+                     Text="{Binding Amount}"
                      FontFamily="{DynamicResource DefaultFontFamily}"
                      Foreground="{DynamicResource DefaultForegroundBrush}"
                      FontSize="13"/>
@@ -486,7 +486,7 @@
                      FontSize="13"/>
 
           <TextBlock Grid.Column="1"
-                     Text="{Binding FeeString}"
+                     Text="{Binding Fee}"
                      FontFamily="{DynamicResource DefaultFontFamily}"
                      Foreground="{DynamicResource DefaultForegroundBrush}"
                      FontSize="13"/>

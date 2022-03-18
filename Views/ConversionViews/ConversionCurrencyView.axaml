@@ -107,6 +107,16 @@
                    FontFamily="{DynamicResource DefaultLightFontFamily}"
                    Foreground="{DynamicResource SecondaryForegroundBrush}"
                    VerticalAlignment="Bottom"/>
+        <!--<TextBlock Text="/"
+                   FontSize="13"
+                   FontFamily="{DynamicResource DefaultLightFontFamily}"
+                   Foreground="{DynamicResource SecondaryForegroundBrush}"
+                   VerticalAlignment="Bottom"/>
+        <TextBlock Text="{Binding AddressBalance}"
+                   FontSize="13"
+                   FontFamily="{DynamicResource DefaultLightFontFamily}"
+                   Foreground="{DynamicResource SecondaryForegroundBrush}"
+                   VerticalAlignment="Bottom"/>-->
         <Button Margin="7 0 0 -3"
                 Command="{Binding MaxCommand}"
                 Content="max"

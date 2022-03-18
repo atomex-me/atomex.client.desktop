@@ -464,7 +464,7 @@
                        LineHeight="20"
                        Margin="3 0 0 0"
                        TextAlignment="Right"
-                       Text="{Binding FeeString}"/>
+                       Text="{Binding Fee}"/>
             <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
                        FontFamily="{DynamicResource DefaultFontFamily}"
                        LineHeight="20"
@@ -500,7 +500,7 @@
                      FontSize="13" />
 
           <TextBlock Grid.Column="1"
-                     Text="{Binding AmountString}"
+                     Text="{Binding Amount}"
                      FontFamily="{DynamicResource DefaultFontFamily}"
                      Foreground="{DynamicResource DefaultForegroundBrush}"
                      FontSize="13" />
@@ -535,7 +535,7 @@
                      FontSize="13" />
 
           <TextBlock Grid.Column="1"
-                     Text="{Binding FeeString}"
+                     Text="{Binding Fee}"
                      FontFamily="{DynamicResource DefaultFontFamily}"
                      Foreground="{DynamicResource DefaultForegroundBrush}"
                      FontSize="13" />
@@ -576,7 +576,7 @@
                      Name="TotalString"/>
                     
           <TextBlock Grid.Column="1"
-                     Text="{Binding AmountString}"
+                     Text="{Binding Amount}"
                      FontFamily="{DynamicResource DefaultFontFamily}"
                      Foreground="{DynamicResource DefaultForegroundBrush}"
                      VerticalAlignment="Center"

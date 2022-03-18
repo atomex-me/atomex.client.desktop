@@ -585,7 +585,7 @@
         </StackPanel.IsVisible>
 
         <!-- is extrenal address warning -->
-        <StackPanel Orientation="Horizontal"
+        <!--<StackPanel Orientation="Horizontal"
                     IsVisible="{Binding IsToAddressExtrenal}">
           <TextBlock Text="{Binding ExternalAddressWarning}"
                      MaxWidth="471"
@@ -618,10 +618,10 @@
                   Data="{DynamicResource Help}"
                   Fill="{DynamicResource LightDefaultOpacity20}"/>
           </Button>
-        </StackPanel>
+        </StackPanel>-->
 
         <!-- is redeem from address with max balance note -->
-        <StackPanel Orientation="Horizontal"
+        <!--<StackPanel Orientation="Horizontal"
                     IsVisible="{Binding IsRedeemFromAddressWithMaxBalance}">
           <TextBlock Text="{Binding RedeemFromAddressNote}"
                      MaxWidth="471"
@@ -654,7 +654,7 @@
                   Data="{DynamicResource Help}"
                   Fill="{DynamicResource LightDefaultOpacity20}"/>
           </Button>
-        </StackPanel>
+        </StackPanel>-->
 
         <!-- amount validation message -->
         <StackPanel Orientation="Horizontal"

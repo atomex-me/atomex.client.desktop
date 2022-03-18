@@ -258,6 +258,8 @@ namespace Atomex.Client.Desktop.ViewModels
                                 .GetFreeInternalAddressAsync()
                                 .WaitForResult()
                                 .Address;
+
+                            IsRedeemFromAddressWithMaxBalance = false;
                         }
                         else
                         {
@@ -266,10 +268,11 @@ namespace Atomex.Client.Desktop.ViewModels
                                 .WaitForResult()
                                 .MaxByOrDefault(w => w.Balance)
                                 ?.Address;
+
+                            IsRedeemFromAddressWithMaxBalance = RedeemFromAddress != null;
                         }
 
                         IsToAddressExtrenal = true;
-                        IsRedeemFromAddressWithMaxBalance = !isBtcBased;
                     }
                 });
 
