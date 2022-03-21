@@ -52,6 +52,7 @@ namespace Atomex.Client.Desktop.ViewModels
 
             this.WhenAnyValue(vm => vm.SearchPattern)
                 .WhereNotNull()
+                .Where(_ => AvailableCurrencies != null)
                 .SubscribeInMainThread(searchPattern =>
                 {
                     if (searchPattern == string.Empty)
