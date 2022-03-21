@@ -8,6 +8,9 @@
              xmlns:vm="clr-namespace:Atomex.Client.Desktop.ViewModels"
              xmlns:views="clr-namespace:Atomex.Client.Desktop.Views"
              xmlns:converters="clr-namespace:Atomex.Client.Desktop.Converters"
+             xmlns:behaviors="clr-namespace:Atomex.Client.Desktop.Helpers"
+             xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
+             xmlns:ia="clr-namespace:Avalonia.Xaml.Interactions.Core;assembly=Avalonia.Xaml.Interactions"
              x:Class="Atomex.Client.Desktop.Views.ConversionCurrencyView"
              Classes="designer">
 
@@ -23,6 +26,7 @@
 
   <UserControl.Resources>
     <converters:AmountToStringConverter x:Key="AmountToStringConverter"/>
+    <converters:StringToDecimalConverter x:Key="StringToDecimalConverter"/>
     <SolidColorBrush x:Key="CurrencySelectionViewBorderBrush"
                      Color="{DynamicResource LightDefaultOpacity20}"/>
     <SolidColorBrush x:Key="CurrencySelectionViewBackgroundBrush"
@@ -50,16 +54,11 @@
     <Style Selector="Border.Default">
       <Setter Property="BorderBrush" Value="{DynamicResource CurrencySelectionViewBorderBrush}"/>     
     </Style>
-    <Style Selector="Border.Error">
-      <Setter Property="BorderBrush" Value="{DynamicResource DarkRed}"/>
-    </Style>
   </UserControl.Styles>
   
   <Border BorderThickness="1"
           CornerRadius="6"
-          Classes="designer"
-          Classes.Default="{Binding IsAmountValid}"
-          Classes.Error="{Binding !IsAmountValid}">
+          Classes="designer Default">
     <Grid ColumnDefinitions="20,Auto,*,Auto,24"
           RowDefinitions="20,40,*,18"
           Background="{DynamicResource CurrencySelectionViewBackgroundBrush}">
@@ -108,6 +107,16 @@
                    FontFamily="{DynamicResource DefaultLightFontFamily}"
                    Foreground="{DynamicResource SecondaryForegroundBrush}"
                    VerticalAlignment="Bottom"/>
+        <!--<TextBlock Text="/"
+                   FontSize="13"
+                   FontFamily="{DynamicResource DefaultLightFontFamily}"
+                   Foreground="{DynamicResource SecondaryForegroundBrush}"
+                   VerticalAlignment="Bottom"/>
+        <TextBlock Text="{Binding AddressBalance}"
+                   FontSize="13"
+                   FontFamily="{DynamicResource DefaultLightFontFamily}"
+                   Foreground="{DynamicResource SecondaryForegroundBrush}"
+                   VerticalAlignment="Bottom"/>-->
         <Button Margin="7 0 0 -3"
                 Command="{Binding MaxCommand}"
                 Content="max"
@@ -123,10 +132,9 @@
       </StackPanel>
 
       <!-- amount text box -->
-      <TextBox Name="AmountString"
-               Margin="0 0 0 -3"
+      <TextBox Padding="0 0 0 2"
                Height="40"
-               Text="{Binding AmountString, Mode=OneWay}"
+               Text="{Binding Amount, Converter={StaticResource StringToDecimalConverter}}"
                VerticalAlignment="Bottom"
                VerticalContentAlignment="Bottom"
                HorizontalContentAlignment="Right"
@@ -136,19 +144,11 @@
                GotFocus="OnGotFocus"
                Classes="Amount"
                Classes.ValidAmount="{Binding IsAmountValid}"
-               Classes.InvalidAmount="{Binding !IsAmountValid}"/>
-
-      <!-- currency code -->
-      <TextBlock Margin="0 0 0 2"
-                 Text="{Binding CurrencyViewModel.CurrencyCode}"
-                 FontSize="22"
-                 FontFamily="{DynamicResource DefaultLightFontFamily}"
-                 Foreground="{DynamicResource DefaultForegroundBrush}"
-                 VerticalAlignment="Bottom"
-                 HorizontalAlignment="Right"
-                 Grid.Row="1"
-                 Grid.Column="3"
-                 IsVisible="{Binding Selected}"/>
+               Classes.InvalidAmount="{Binding !IsAmountValid}">
+        <i:Interaction.Behaviors>
+          <behaviors:AmountBehavior Format="{Binding CurrencyFormat}"/>
+        </i:Interaction.Behaviors>
+      </TextBox>
 
       <!-- amount in base -->
       <TextBlock Margin="0 1 0 0"
@@ -186,9 +186,9 @@
               Classes="Default">
         <Button.Content>
           <TextBlock Text="{Binding UnselectedLabel}"
-                      FontSize="18"
-                      FontFamily="{DynamicResource DefaultLightFontFamily}"
-                      Foreground="{DynamicResource DefaultForegroundBrush}"/>
+                     FontSize="18"
+                     FontFamily="{DynamicResource DefaultLightFontFamily}"
+                     Foreground="{DynamicResource DefaultForegroundBrush}"/>
         </Button.Content>
       </Button>
 

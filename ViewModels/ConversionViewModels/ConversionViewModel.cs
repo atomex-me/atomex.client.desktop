@@ -68,7 +68,6 @@ namespace Atomex.Client.Desktop.ViewModels
         [Reactive] public ConversionCurrencyViewModel ToViewModel { get; set; }
         [Reactive] public SelectCurrencyViewModelItem? FromCurrencyViewModelItem { get; set; }
         [Reactive] public SelectCurrencyViewModelItem? ToCurrencyViewModelItem { get; set; }
-
         [Reactive] public string AmountValidationMessage { get; set; }
         [Reactive] public string AmountValidationMessageToolTip { get; set; }
         [Reactive] public MessageType AmountValidationMessageType { get; set; }
@@ -107,6 +106,13 @@ namespace Atomex.Client.Desktop.ViewModels
         [Reactive] public ObservableCollection<SwapViewModel> Swaps { get; set; }
         [Reactive] public bool IsNoLiquidity { get; set; }
         [Reactive] public bool IsInsufficientFunds { get; set; }
+        [Reactive] public bool IsToAddressExtrenal { get; set; }
+        [Reactive] public bool IsRedeemFromAddressWithMaxBalance { get; set; }
+
+        [Reactive] public string ExternalAddressWarning { get; set; }
+        [Reactive] public string ExternalAddressWarningToolTip { get; set; }
+        [Reactive] public string RedeemFromAddressNote { get; set; }
+        [Reactive] public string RedeemFromAddressNoteToolTip { get; set; }
 
         [ObservableAsProperty] public int ColumnSpan { get; }
         [ObservableAsProperty] public bool DetailsVisible { get; }
@@ -225,18 +231,71 @@ namespace Atomex.Client.Desktop.ViewModels
             this.WhenAnyValue(vm => vm.ToCurrencyViewModelItem)
                 .SubscribeInMainThread(i =>
                 {
-                    // if To currency not selected or To currency is Bitcoin based
-                    if (i == null || Atomex.Currencies.IsBitcoinBased(i.CurrencyViewModel.Currency.Name))
+                    if (i == null || i is not SelectCurrencyWithAddressViewModelItem item || item.SelectedAddress == null)
                     {
                         UseRedeemAddress = false;
                         RedeemFromAddress = null;
+                        IsToAddressExtrenal = false;
+                        IsRedeemFromAddressWithMaxBalance = false;
                         return;
                     }
 
-                    var item = (SelectCurrencyWithAddressViewModelItem)i;
+                    var isBtcBased = Atomex.Currencies.IsBitcoinBased(i.CurrencyViewModel.Currency.Name);
+                    UseRedeemAddress = !isBtcBased;
 
-                    UseRedeemAddress = true;
-                    RedeemFromAddress = item.SelectedAddress?.Address;
+                    if (item.SelectedAddress.KeyIndex != null) // is atomex address
+                    {
+                        RedeemFromAddress = ToAddress;
+                        IsToAddressExtrenal = false;
+                        IsRedeemFromAddressWithMaxBalance = false;
+                    }
+                    else // is external address
+                    {
+                        if (isBtcBased)
+                        {
+                            RedeemFromAddress = _app.Account
+                                .GetCurrencyAccount<BitcoinBasedAccount>(i.CurrencyViewModel.Currency.Name)
+                                .GetFreeInternalAddressAsync()
+                                .WaitForResult()
+                                .Address;
+
+                            IsRedeemFromAddressWithMaxBalance = false;
+                        }
+                        else
+                        {
+                            RedeemFromAddress = _app.Account
+                                .GetUnspentAddressesAsync(i.CurrencyViewModel.Currency.FeeCurrencyName)
+                                .WaitForResult()
+                                .MaxByOrDefault(w => w.Balance)
+                                ?.Address;
+
+                            IsRedeemFromAddressWithMaxBalance = RedeemFromAddress != null;
+                        }
+
+                        IsToAddressExtrenal = true;
+                    }
+                });
+
+            this.WhenAnyValue(vm => vm.IsToAddressExtrenal)
+                .SubscribeInMainThread(t =>
+                {
+                    if (IsToAddressExtrenal)
+                    {
+                        ExternalAddressWarning = string.Format(Resources.CvAddressIsNotAtomex, ToAddress);
+                        ExternalAddressWarningToolTip = Resources.CvAddressIsNotAtomexToolTip;
+                    }
+                });
+
+            this.WhenAnyValue(
+                    vm => vm.IsRedeemFromAddressWithMaxBalance,
+                    vm => vm.RedeemFromAddress)
+                .SubscribeInMainThread(t =>
+                {
+                    if (IsRedeemFromAddressWithMaxBalance)
+                    {
+                        RedeemFromAddressNote = string.Format(Resources.CvRedeemFromAddressNote, RedeemFromAddress);
+                        RedeemFromAddressNoteToolTip = string.Format(Resources.CvRedeemFromAddressNoteToolTip, RedeemFromAddress);
+                    }
                 });
 
             // FromCurrencyViewModel or ToCurrencyViewModel changed
@@ -255,10 +314,10 @@ namespace Atomex.Client.Desktop.ViewModels
 
             // AmountStrings, FromCurrencyViewModel or ToCurrencyViewModel changed => estimate swap price and target amount
             this.WhenAnyValue(
-                    vm => vm.FromViewModel.AmountString,
+                    vm => vm.FromViewModel.Amount,
                     vm => vm.FromViewModel.CurrencyViewModel,
                     vm => vm.FromViewModel.Address,
-                    vm => vm.ToViewModel.AmountString,
+                    vm => vm.ToViewModel.Amount,
                     vm => vm.ToViewModel.CurrencyViewModel,
                     vm => vm.ToViewModel.Address,
                     vm => vm.RedeemFromAddress)
@@ -270,11 +329,11 @@ namespace Atomex.Client.Desktop.ViewModels
                 });
 
             // From Amount changed => update FromViewModel.AmountInBase
-            this.WhenAnyValue(vm => vm.FromViewModel.AmountString)
+            this.WhenAnyValue(vm => vm.FromViewModel.Amount)
                 .SubscribeInMainThread(amount => UpdateFromAmountInBase());
 
             // To Amount changed => update ToViewModel.AmountInBase
-            this.WhenAnyValue(vm => vm.ToViewModel.AmountString)
+            this.WhenAnyValue(vm => vm.ToViewModel.Amount)
                 .SubscribeInMainThread(amount => UpdateToAmountInBase());
 
             // EstimatedPaymentFee changed => update EstimatedPaymentFeeInBase

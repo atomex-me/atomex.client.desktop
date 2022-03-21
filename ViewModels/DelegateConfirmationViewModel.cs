@@ -1,21 +1,21 @@
 ﻿using System;
 using System.Windows.Input;
+
 using Serilog;
+using ReactiveUI;
+
 using Atomex.Blockchain.Tezos;
 using Atomex.Blockchain.Tezos.Internal;
 using Atomex.Client.Desktop.Common;
-using Atomex.Client.Desktop.Controls;
-using Atomex.Client.Desktop.ViewModels.SendViewModels;
 using Atomex.Core;
 using Atomex.Wallet;
 using Atomex.Wallet.Tezos;
-using ReactiveUI;
 
 namespace Atomex.Client.Desktop.ViewModels
 {
     public class DelegateConfirmationViewModel : ViewModelBase
     {
-        private IAtomexApp App { get; }
+        private readonly IAtomexApp _app;
         public TezosConfig Currency { get; set; }
         public WalletAddress WalletAddress { get; set; }
         public bool UseDefaultFee { get; set; }
@@ -30,10 +30,9 @@ namespace Atomex.Client.Desktop.ViewModels
         public string BaseCurrencyCode { get; set; }
 
         private ICommand _backCommand;
-
         public ICommand BackCommand => _backCommand ??= ReactiveCommand.Create(() =>
         {
-            Desktop.App.DialogService.Show(DelegationVM);
+            App.DialogService.Show(DelegationVM);
         });
 
         private ICommand _nextCommand;
@@ -51,23 +50,23 @@ namespace Atomex.Client.Desktop.ViewModels
 #endif
         public DelegateConfirmationViewModel(IAtomexApp app, Action onDelegate = null)
         {
-            App = app ?? throw new ArgumentNullException(nameof(app));
+            _app = app ?? throw new ArgumentNullException(nameof(app));
 
             _onDelegate = onDelegate;
         }
 
         private async void Send()
         {
-            var wallet = (HdWallet) App.Account.Wallet;
+            var wallet = (HdWallet) _app.Account.Wallet;
             var keyStorage = wallet.KeyStorage;
             var tezos = Currency;
 
-            var tezosAccount = App.Account
+            var tezosAccount = _app.Account
                 .GetCurrencyAccount<TezosAccount>("XTZ");
 
             try
             {
-                Desktop.App.DialogService.Show(
+                App.DialogService.Show(
                     MessageViewModel.Message(title: "Sending, please wait", withProgressBar: true));
 
                 await tezosAccount.AddressLocker
@@ -76,19 +75,19 @@ namespace Atomex.Client.Desktop.ViewModels
                 var tx = new TezosTransaction
                 {
                     StorageLimit = Currency.StorageLimit,
-                    GasLimit = Currency.GasLimit,
-                    From = WalletAddress.Address,
-                    To = To,
-                    Fee = Fee.ToMicroTez(),
-                    Currency = Currency.Name,
+                    GasLimit     = Currency.GasLimit,
+                    From         = WalletAddress.Address,
+                    To           = To,
+                    Fee          = Fee.ToMicroTez(),
+                    Currency     = Currency.Name,
                     CreationTime = DateTime.UtcNow,
 
-                    UseRun = true,
+                    UseRun            = true,
                     UseOfflineCounter = true,
-                    OperationType = OperationType.Delegation
+                    OperationType     = OperationType.Delegation
                 };
 
-                using var securePublicKey = App.Account.Wallet.GetPublicKey(
+                using var securePublicKey = _app.Account.Wallet.GetPublicKey(
                     currency: Currency,
                     keyIndex: WalletAddress.KeyIndex,
                     keyType: WalletAddress.KeyType);
@@ -105,11 +104,10 @@ namespace Atomex.Client.Desktop.ViewModels
                 {
                     Log.Error("Transaction signing error");
 
-                    Desktop.App.DialogService.Show(
+                    App.DialogService.Show(
                         MessageViewModel.Error(
                             text: "Transaction signing error",
-                            backAction: BackToConfirmation)
-                    );
+                            backAction: BackToConfirmation));
 
                     return;
                 }
@@ -119,7 +117,7 @@ namespace Atomex.Client.Desktop.ViewModels
 
                 if (result.Error != null)
                 {
-                    Desktop.App.DialogService.Show(
+                    App.DialogService.Show(
                         MessageViewModel.Error(
                             text: result.Error.Description,
                             backAction: BackToConfirmation));
@@ -127,25 +125,24 @@ namespace Atomex.Client.Desktop.ViewModels
                     return;
                 }
 
-                Desktop.App.DialogService.Show(
+                App.DialogService.Show(
                     MessageViewModel.Success(
                         text: $"Successful delegation!",
                         tezos.TxExplorerUri,
                         result.Value,
                         nextAction: () =>
                         {
-                            Desktop.App.DialogService.Close();
+                            App.DialogService.Close();
 
                             _onDelegate?.Invoke();
                         }));
             }
             catch (Exception e)
             {
-                Desktop.App.DialogService.Show(
+                App.DialogService.Show(
                     MessageViewModel.Error(
                         text: "An error has occurred while delegation.",
                         backAction: BackToConfirmation));
-
 
                 Log.Error(e, "delegation send error.");
             }
@@ -157,7 +154,7 @@ namespace Atomex.Client.Desktop.ViewModels
 
         private void BackToConfirmation()
         {
-            Desktop.App.DialogService.Show(this);
+            App.DialogService.Show(this);
         }
 
         private void DesignerMode()

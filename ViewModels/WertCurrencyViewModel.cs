@@ -275,6 +275,7 @@ namespace Atomex.Client.Desktop.ViewModels
                 {
                     if (fromAmount == 0)
                         FromAmount = fromAmount;
+
                     OnPropertyChanged(nameof(FromAmountString));
                     return;
                 }

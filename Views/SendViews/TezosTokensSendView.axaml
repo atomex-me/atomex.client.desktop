@@ -9,6 +9,7 @@
              xmlns:controls="clr-namespace:Atomex.Client.Desktop.Controls"
              xmlns:converters="clr-namespace:Atomex.Client.Desktop.Converters"
              xmlns:svg="clr-namespace:Avalonia.Svg.Skia;assembly=Avalonia.Svg.Skia"
+             xmlns:behaviors="clr-namespace:Atomex.Client.Desktop.Helpers"
              xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
              xmlns:ia="clr-namespace:Avalonia.Xaml.Interactions.Core;assembly=Avalonia.Xaml.Interactions"
              Width="700">
@@ -44,6 +45,7 @@
     <converters:EnumToStringEqualConverter x:Key="EnumToStringEqualConverter"/>
     <converters:EnumToStringNotEqualConverter x:Key="EnumToStringNotEqualConverter"/>
     <converters:WidthToHorizontalCenterOffsetConverter x:Key="WidthToHorizontalCenterOffsetConverter"/>
+    <converters:StringToDecimalConverter x:Key="StringToDecimalConverter"/>
   </UserControl.Resources>
 
   <Border Classes="ChildViewBorder"
@@ -113,11 +115,12 @@
                      HorizontalAlignment="Right"/>
         </Border>
 
-        <Border Background="{DynamicResource LightDefaultOpacity6}"
-                CornerRadius="6"
+        <Border CornerRadius="6"
                 Width="440"
                 Height="80"
-                VerticalAlignment="Center">
+                VerticalAlignment="Center"
+                Classes="Editable"
+                Classes.ReadOnly="{Binding ConfirmStage}">
           <Button Padding="20 0"
                   Width="440"
                   Height="80"
@@ -126,9 +129,9 @@
                   Classes="EmptyBtnWithContent">
             <Grid ColumnDefinitions="24,*, Auto">
               <Ellipse Grid.Column="0"
-                        Grid.Row="0"
-                        Width="36"
-                        Height="36">
+                       Grid.Row="0"
+                       Width="24"
+                       Height="24">
                 <Ellipse.Fill>
                   <ImageBrush Source="{Binding TokenPreview}"
                               BitmapInterpolationMode="HighQuality"
@@ -141,7 +144,6 @@
                          Text="{Binding FromBeautified}"
                          FontFamily="{DynamicResource DefaultMediumFontFamily}"
                          FontSize="16"
-                         LineHeight="24"
                          Margin="17 0 0 0"
                          VerticalAlignment="Center">
                 <i:Interaction.Behaviors>
@@ -208,11 +210,12 @@
                       HorizontalAlignment="Right"/>
         </Border>
 
-        <Border Background="{DynamicResource LightDefaultOpacity6}"
-                CornerRadius="6"
+        <Border CornerRadius="6"
                 Width="440"
                 Height="80"
-                VerticalAlignment="Center">
+                VerticalAlignment="Center"
+                Classes="Editable"
+                Classes.ReadOnly="{Binding ConfirmStage}">
           <Button Padding="20 0"
                   Width="440"
                   Height="80"
@@ -222,9 +225,9 @@
                   Classes="EmptyBtnWithContent">
             <Grid ColumnDefinitions="24,*">
               <Ellipse Grid.Column="0"
-                        Grid.Row="0"
-                        Width="36"
-                        Height="36">
+                       Grid.Row="0"
+                       Width="24"
+                       Height="24">
                 <Ellipse.Fill>
                   <ImageBrush Source="{Binding TokenPreview}"
                               BitmapInterpolationMode="HighQuality"
@@ -236,7 +239,6 @@
                           FontFamily="{DynamicResource DefaultMediumFontFamily}"
                           Text="{Binding To}"
                           FontSize="16"
-                          LineHeight="24"
                           Margin="17 0 0 0"
                           VerticalAlignment="Center"
                           Name="ToTextBox">
@@ -280,11 +282,10 @@
           </Border>
 
           <TextBox Width="440"
-                   Text="{Binding AmountString, Mode=OneWay}"
+                   Text="{Binding Amount, Converter={StaticResource StringToDecimalConverter}}"
                    helpers:AmountTextBoxHelper.CurrencyCode="{Binding CurrencyCode}"
                    helpers:AmountTextBoxHelper.BaseCurrencyCode="{Binding BaseCurrencyCode}"
                    helpers:AmountTextBoxHelper.AmountInBaseMargin="0 0 45 0"
-                   Name="AmountString"
                    Classes="AtomexTextBox AmountTextBox">
             <helpers:AmountTextBoxHelper.AmountInBase>
               <MultiBinding Converter="{StaticResource AmountToStringConverter}">
@@ -292,6 +293,9 @@
                 <Binding Path="BaseCurrencyFormat" Mode="OneWay"/>
               </MultiBinding>
             </helpers:AmountTextBoxHelper.AmountInBase>
+            <i:Interaction.Behaviors>
+              <behaviors:AmountBehavior Format="{Binding CurrencyFormat}"/>
+            </i:Interaction.Behaviors>
           </TextBox>
 
           <Button Classes="LinkButton Underlined"
@@ -320,10 +324,9 @@
 
           <TextBox Width="440"
                    FontSize="16"
-                   Text="{Binding FeeString, Mode=OneWay}"
+                   Text="{Binding Fee, Converter={StaticResource StringToDecimalConverter}}"
                    helpers:AmountTextBoxHelper.CurrencyCode="{Binding FeeCurrencyCode}"
                    helpers:AmountTextBoxHelper.BaseCurrencyCode="{Binding BaseCurrencyCode}"
-                   Name="FeeString"
                    Classes="AtomexTextBox AmountTextBox">
             <helpers:AmountTextBoxHelper.AmountInBase>
               <MultiBinding Converter="{StaticResource AmountToStringConverter}">
@@ -331,6 +334,9 @@
                 <Binding Path="BaseCurrencyFormat" Mode="OneWay"/>
               </MultiBinding>
             </helpers:AmountTextBoxHelper.AmountInBase>
+            <i:Interaction.Behaviors>
+              <behaviors:AmountBehavior Format="{Binding FeeCurrencyFormat}"/>
+            </i:Interaction.Behaviors>
           </TextBox>
         </StackPanel>
 
@@ -458,7 +464,7 @@
                        LineHeight="20"
                        Margin="3 0 0 0"
                        TextAlignment="Right"
-                       Text="{Binding FeeString}"/>
+                       Text="{Binding Fee}"/>
             <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
                        FontFamily="{DynamicResource DefaultFontFamily}"
                        LineHeight="20"
@@ -494,7 +500,7 @@
                      FontSize="13" />
 
           <TextBlock Grid.Column="1"
-                     Text="{Binding AmountString}"
+                     Text="{Binding Amount}"
                      FontFamily="{DynamicResource DefaultFontFamily}"
                      Foreground="{DynamicResource DefaultForegroundBrush}"
                      FontSize="13" />
@@ -529,7 +535,7 @@
                      FontSize="13" />
 
           <TextBlock Grid.Column="1"
-                     Text="{Binding FeeString}"
+                     Text="{Binding Fee}"
                      FontFamily="{DynamicResource DefaultFontFamily}"
                      Foreground="{DynamicResource DefaultForegroundBrush}"
                      FontSize="13" />
@@ -570,7 +576,7 @@
                      Name="TotalString"/>
                     
           <TextBlock Grid.Column="1"
-                     Text="{Binding AmountString}"
+                     Text="{Binding Amount}"
                      FontFamily="{DynamicResource DefaultFontFamily}"
                      Foreground="{DynamicResource DefaultForegroundBrush}"
                      VerticalAlignment="Center"

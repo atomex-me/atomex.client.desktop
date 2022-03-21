@@ -10,8 +10,8 @@ namespace Atomex.Client.Desktop.Converters
 
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value is decimal str && targetType == typeof(string))
-                return str.ToString("0.000000", CultureInfo.InvariantCulture);
+            if (value is decimal d && targetType == typeof(string))
+                return d.ToString("0.######", CultureInfo.CurrentCulture);
 
             return value;
         }

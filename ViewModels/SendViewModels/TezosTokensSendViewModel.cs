@@ -46,55 +46,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         private string FeeCurrencyFormat { get; set; }
         [Reactive] public string BaseCurrencyFormat { get; set; }
         [Reactive] private decimal Amount { get; set; }
-        [ObservableAsProperty] public string AmountString { get; }
-
-        public void SetAmountFromString(string value)
-        {
-            if (value == AmountString)
-                return;
-
-            var parsed = decimal.TryParse(
-                value,
-                NumberStyles.AllowDecimalPoint,
-                CultureInfo.CurrentCulture,
-                out var amount);
-
-            if (!parsed)
-                amount = Amount;
-
-            var truncatedValue = amount.TruncateByFormat(CurrencyFormat);
-
-            if (truncatedValue != Amount)
-                Amount = truncatedValue;
-
-            Dispatcher.UIThread.InvokeAsync(() => this.RaisePropertyChanged(nameof(AmountString)));
-        }
-
         [Reactive] private decimal Fee { get; set; }
-        [ObservableAsProperty] public string FeeString { get; }
-
-        public void SetFeeFromString(string value)
-        {
-            if (value == FeeString)
-                return;
-
-            var parsed = decimal.TryParse(
-                value,
-                NumberStyles.AllowDecimalPoint,
-                CultureInfo.CurrentCulture,
-                out var fee);
-
-            if (!parsed)
-                fee = Fee;
-
-            var truncatedValue = fee.TruncateByFormat(FeeCurrencyFormat);
-
-            if (truncatedValue != Fee)
-                Fee = truncatedValue;
-
-            Dispatcher.UIThread.InvokeAsync(() => this.RaisePropertyChanged(nameof(FeeString)));
-        }
-
         [Reactive] public bool UseDefaultFee { get; set; }
         [Reactive] public decimal AmountInBase { get; set; }
         [Reactive] public decimal FeeInBase { get; set; }
@@ -144,10 +96,6 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     vm => vm.Fee)
                 .SubscribeInMainThread(_ => Warning = string.Empty);
 
-            this.WhenAnyValue(vm => vm.Amount)
-                .Select(amount => amount.ToString(CurrencyFormat ?? balanceFormat, CultureInfo.CurrentCulture))
-                .ToPropertyExInMainThread(this, vm => vm.AmountString);
-
             this.WhenAnyValue(vm => vm.From)
                 .Select(s => s.TruncateAddress())
                 .ToPropertyExInMainThread(this, vm => vm.FromBeautified);
@@ -182,10 +130,6 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     vm => vm.Amount,
                     vm => vm.Fee)
                 .Subscribe(_ => OnQuotesUpdatedEventHandler(_app.QuotesProvider, EventArgs.Empty));
-
-            this.WhenAnyValue(vm => vm.Fee)
-                .Select(fee => fee.ToString(FeeCurrencyFormat, CultureInfo.CurrentCulture))
-                .ToPropertyExInMainThread(this, vm => vm.FeeString);
 
             this.WhenAnyValue(
                     vm => vm.Amount,
@@ -667,7 +611,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             }
 
             SelectedFromBalance = tokenAddress?.AvailableBalance() ?? 0;
-            this.RaisePropertyChanged(nameof(AmountString));
+            this.RaisePropertyChanged(nameof(Amount));
 
             TokenPreview = GetTokenPreview(From, TokenId);
         }

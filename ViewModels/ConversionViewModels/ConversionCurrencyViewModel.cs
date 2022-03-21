@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Reactive.Linq;
 using System.Windows.Input;
-using System.Globalization;
+
 using Avalonia.Controls;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
+
 using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
-using Avalonia.Threading;
 
 namespace Atomex.Client.Desktop.ViewModels
 {
@@ -21,30 +21,6 @@ namespace Atomex.Client.Desktop.ViewModels
         [ObservableAsProperty] public string CurrencyFormat { get; }
         [Reactive] public string? Address { get; set; }
         [Reactive] public decimal Amount { get; set; }
-        [ObservableAsProperty] public string AmountString { get; }
-
-        public void SetAmountFromString(string value)
-        {
-            if (value == AmountString)
-                return;
-
-            var parsed = decimal.TryParse(
-                s: value,
-                style: NumberStyles.AllowDecimalPoint,
-                provider: CultureInfo.CurrentCulture,
-                result: out var amount);
-
-            if (!parsed)
-                amount = Amount;
-
-            var truncatedValue = amount.TruncateByFormat(CurrencyFormat);
-
-            if (truncatedValue != Amount)
-                Amount = truncatedValue;
-
-            Dispatcher.UIThread.InvokeAsync(() => this.RaisePropertyChanged(nameof(AmountString)));
-        }
-
         [Reactive] public decimal AmountInBase { get; set; }
         [ObservableAsProperty] public bool Selected { get; }
         [Reactive] public string UnselectedLabel { get; set; }
@@ -73,12 +49,9 @@ namespace Atomex.Client.Desktop.ViewModels
                 .Select(vm => vm?.CurrencyFormat ?? "0")
                 .ToPropertyExInMainThread(this, vm => vm.CurrencyFormat);
 
-            this.WhenAnyValue(vm => vm.Amount,
-                              vm => vm.CurrencyFormat,
-                              (amount, currencyFormat) => {
-                                  return amount.ToString(currencyFormat, CultureInfo.CurrentCulture);
-                              })
-                .ToPropertyExInMainThread(this, vm => vm.AmountString);
+            this.WhenAnyValue(vm => vm.CurrencyFormat)
+                .WhereNotNull()
+                .SubscribeInMainThread(f => Amount = Amount.TruncateByFormat(CurrencyFormat!));
         }
 
         public void RaiseGotInputFocus()
@@ -88,15 +61,15 @@ namespace Atomex.Client.Desktop.ViewModels
 
         private void DesignerMode()
         {
-            UnselectedLabel = "Choose From";
+            UnselectedLabel   = "Choose From";
             CurrencyViewModel = CurrencyViewModelCreator.CreateViewModel(
                 currencyConfig: DesignTime.Currencies.Get<BitcoinConfig>("BTC"),
                 subscribeToUpdates: false);
-            Address = "13V2gzjUL9DiHZLy1WFk9q6pZ3yBsb4TzP".TruncateAddress();
-            Amount = 12.000516666m;
-            AmountInBase = 3451.43m;
-            UseMax = true;
-            IsAmountValid = true;
+            Address           = "13V2gzjUL9DiHZLy1WFk9q6pZ3yBsb4TzP".TruncateAddress();
+            Amount            = 12.000516666m;
+            AmountInBase      = 3451.43m;
+            UseMax            = true;
+            IsAmountValid     = true;
         }
     }
 }

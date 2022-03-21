@@ -2,6 +2,7 @@
 dotnet restore
 dotnet publish Atomex.Client.Desktop.csproj -c Release -r linux-x64
 
+sudo apt update
 sudo apt install libxml2-utils
 dotnet tool install --global NetSparkleUpdater.Tools.AppCastGenerator --version 2.0.6
 

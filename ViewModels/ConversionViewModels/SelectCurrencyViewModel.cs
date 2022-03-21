@@ -103,7 +103,7 @@ namespace Atomex.Client.Desktop.ViewModels.ConversionViewModels
         private readonly SelectCurrencyType _type;
 
         public IEnumerable<WalletAddress> AvailableAddresses { get; set; }
-        [Reactive] public WalletAddress SelectedAddress { get; set; }
+        [Reactive] public WalletAddress? SelectedAddress { get; set; }
         [Reactive] public bool IsNew { get; set; }
         public override string? ShortAddressDescription => SelectedAddress?.Address?.TruncateAddress();
         public override IFromSource? FromSource => SelectedAddress?.Address != null
@@ -203,9 +203,22 @@ namespace Atomex.Client.Desktop.ViewModels.ConversionViewModels
                     BackAction = () => { App.DialogService.Show(this); },
                     ConfirmAction = walletAddressViewModel =>
                     {
-                        itemWithAddress.SelectedAddress = itemWithAddress
+                        var selectedAvaialbleAddress = itemWithAddress
                             .AvailableAddresses
-                            .FirstOrDefault(a => a.Address == walletAddressViewModel.Address) ?? itemWithAddress.SelectedAddress;
+                            .FirstOrDefault(a => a.Address == walletAddressViewModel.Address);
+
+                        if (Type == SelectCurrencyType.From)
+                        {
+                            itemWithAddress.SelectedAddress = selectedAvaialbleAddress ?? itemWithAddress.SelectedAddress;
+                        }
+                        else
+                        {
+                            itemWithAddress.SelectedAddress = selectedAvaialbleAddress ?? new WalletAddress
+                            {
+                                Address = walletAddressViewModel.Address,
+                                Currency = currency.Name
+                            };
+                        }
 
                         CurrencySelected?.Invoke(i);
                     }

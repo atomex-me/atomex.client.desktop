@@ -52,7 +52,7 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
         public string BaseCurrencyCode => "USD"; // todo: use base currency from settings
         public string CurrencyFormat => Currency.Format;
         public string FeeCurrencyFormat => Currency.FeeFormat;
-        public string BaseCurrencyFormat => "$0.00"; // todo: use base currency format from settings
+        public string BaseCurrencyFormat => "$0.##"; // todo: use base currency format from settings
         public string FeeName { get; set; }
 
         [ObservableAsProperty] public bool HasUnconfirmedAmount { get; }

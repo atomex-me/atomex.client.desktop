@@ -12,7 +12,6 @@ using Serilog;
 using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.Properties;
 using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
-using Atomex.Client.Desktop.ViewModels.SendViewModels;
 using Atomex.Common;
 using Atomex.Core;
 using Atomex.ViewModels;
@@ -193,6 +192,8 @@ namespace Atomex.Client.Desktop.ViewModels
                     return new Error(Errors.SwapError, message);
                 }
 
+                var isToBitcoinBased = Currencies.IsBitcoinBased(ToCurrencyViewModel.Currency.Name);
+
                 var order = new Order
                 {
                     Symbol            = symbol.Name,
@@ -204,10 +205,16 @@ namespace Atomex.Client.Desktop.ViewModels
                     FromWallets       = fromWallets.ToList(),
                     MakerNetworkFee   = EstimatedMakerNetworkFee,
 
-                    FromAddress       = FromSource is FromAddress fromAddress ? fromAddress.Address : null,
-                    FromOutputs       = FromSource is FromOutputs fromOutputs ? fromOutputs.Outputs.ToList() : null,
-                    ToAddress         = ToAddress,
-                    RedeemFromAddress = RedeemFromAddress
+                    FromAddress = FromSource is FromAddress fromAddress ? fromAddress.Address : null,
+                    FromOutputs = FromSource is FromOutputs fromOutputs ? fromOutputs.Outputs.ToList() : null,
+
+                    // for Bitcoin based currencies ToAddress must be Atomex wallet's address!
+                    ToAddress = isToBitcoinBased
+                        ? RedeemFromAddress
+                        : ToAddress,
+                    RedeemFromAddress = isToBitcoinBased
+                        ? ToAddress
+                        : RedeemFromAddress
                 };
 
                 await order.CreateProofOfPossessionAsync(account);

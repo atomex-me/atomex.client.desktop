@@ -72,90 +72,6 @@
                                     DataContext="{Binding FromViewModel}"/>
 
       <Grid Width="486">
-        <StackPanel Orientation="Vertical"
-                    Margin="0 12 0 24">
-          <StackPanel.IsVisible>
-            <MultiBinding Converter="{x:Static BoolConverters.Or}">
-              <Binding Path="AmountValidationMessage"
-                       Converter="{x:Static StringConverters.IsNotNullOrEmpty}"/>
-              <Binding Path="IsNoLiquidity"/>
-            </MultiBinding>
-          </StackPanel.IsVisible>
-
-          <!-- amount validation message -->
-          <StackPanel Orientation="Horizontal"
-                      IsVisible="{Binding AmountValidationMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
-            <TextBlock Text="{Binding AmountValidationMessage}"
-                       MaxWidth="471"
-                       TextWrapping="Wrap"
-                       VerticalAlignment="Center"
-                       FontSize="13"
-                       FontFamily="{DynamicResource DefaultLightFontFamily}"
-                       Classes="Message"
-                       Classes.Warning="{Binding IsAmountValidationWarning}"
-                       Classes.Error="{Binding IsAmountValidationError}"/>
-            <Button Padding="3"
-                    VerticalAlignment="Center"
-                    VerticalContentAlignment="Center"
-                    ToolTip.Placement="Bottom"
-                    ToolTip.VerticalOffset="10"
-                    ToolTip.HorizontalOffset="{Binding ElementName=AmountValidationToolTipGrid,
-                      Path=Bounds.Width,
-                      Converter={StaticResource WidthToHorizontalCenterOffsetConverter}}"
-                    Click="HelpClickHandler"
-                    Classes="ButtonWithIcon"
-                    IsVisible="{Binding AmountValidationMessageToolTip, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
-              <ToolTip.Tip>
-                <Grid Name="AmountValidationToolTipGrid">
-                  <TextBlock TextWrapping="Wrap"
-                             Text="{Binding AmountValidationMessageToolTip}"/>
-                </Grid>
-              </ToolTip.Tip>
-              <Path HorizontalAlignment="Center"
-                    VerticalAlignment="Center"
-                    Width="12"
-                    Height="12"
-                    Data="{DynamicResource Help}"
-                    Fill="{DynamicResource LightDefaultOpacity20}"/>
-            </Button>
-          </StackPanel>
-
-          <!-- not enough liquidity message -->
-          <StackPanel Orientation="Horizontal"
-                      IsVisible="{Binding IsNoLiquidity}">
-            <TextBlock Text="Not enough liquidity"
-                       MaxWidth="471"
-                       TextWrapping="Wrap"
-                       VerticalAlignment="Center"
-                       FontSize="13"
-                       FontFamily="{DynamicResource DefaultLightFontFamily}"
-                       Classes="Error"/>
-            <Button Padding="3"
-                    VerticalAlignment="Center"
-                    VerticalContentAlignment="Center"
-                    ToolTip.Placement="Bottom"
-                    ToolTip.VerticalOffset="10"
-                    ToolTip.HorizontalOffset="{Binding ElementName=NotEnoughLiquidityToolTipGrid,
-                      Path=Bounds.Width,
-                      Converter={StaticResource WidthToHorizontalCenterOffsetConverter}}"
-                    Click="HelpClickHandler"
-                    Classes="ButtonWithIcon">
-              <ToolTip.Tip>
-                <Grid Name="NotEnoughLiquidityToolTipGrid">
-                  <TextBlock TextWrapping="Wrap"
-                             Text="The amount you entered is greater than the available liquidity. Please use 'max' button to accurately determine the maximum amount that can be exchanged"/>
-                </Grid>
-              </ToolTip.Tip>
-              <Path HorizontalAlignment="Center"
-                    VerticalAlignment="Center"
-                    Width="12"
-                    Height="12"
-                    Data="{DynamicResource Help}"
-                    Fill="{DynamicResource LightDefaultOpacity20}"/>
-            </Button>
-          </StackPanel>
-        </StackPanel>
-
         <!-- swap currencies button -->
         <Button HorizontalAlignment="Right"
                 HorizontalContentAlignment="Center"
@@ -653,45 +569,206 @@
         </StackPanel>
       </Grid>
 
-      <!-- warning -->
-      <StackPanel Orientation="Horizontal"
+      <StackPanel Orientation="Vertical"
                   Width="486"
-                  Margin="0 0 0 16"
-                  IsVisible="{Binding Message, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
-        <TextBlock Text="{Binding Message}"
-                   MaxWidth="471"
-                   TextWrapping="Wrap"
-                   VerticalAlignment="Center"
-                   FontSize="13"
-                   FontFamily="{DynamicResource DefaultLightFontFamily}"
-                   Classes="Message"
-                   Classes.Warning="{Binding IsWarning}"
-                   Classes.Error="{Binding IsError}"/>
-        <Button Padding="3"
-                VerticalAlignment="Center"
-                VerticalContentAlignment="Center"
-                ToolTip.Placement="Bottom"
-                ToolTip.VerticalOffset="10"
-                ToolTip.HorizontalOffset="{Binding ElementName=MessageToolTipGrid,
-                  Path=Bounds.Width,
-                  Converter={StaticResource WidthToHorizontalCenterOffsetConverter}}"
-                Click="HelpClickHandler"
-                Classes="ButtonWithIcon">
-          <ToolTip.Tip>
-            <Grid Name="MessageToolTipGrid">
-              <TextBlock TextWrapping="Wrap"
-                         Text="{Binding MessageToolTip}"/>
-            </Grid>
-          </ToolTip.Tip>
-          <Path HorizontalAlignment="Center"
-                VerticalAlignment="Center"
-                Width="12"
-                Height="12"
-                Data="{DynamicResource Help}"
-                Fill="{DynamicResource LightDefaultOpacity20}"/>
-        </Button>
-      </StackPanel>
+                  Margin="0 0 0 16">
+        <StackPanel.IsVisible>
+          <MultiBinding Converter="{x:Static BoolConverters.Or}">
+            <Binding Path="AmountValidationMessage"
+                     Converter="{x:Static StringConverters.IsNotNullOrEmpty}"/>
+            <Binding Path="IsNoLiquidity"/>
+            <Binding Path="Message"
+                     Converter="{x:Static StringConverters.IsNotNullOrEmpty}"/>
+            <Binding Path="IsToAddressExtrenal"/>
+            <Binding Path="IsRedeemFromAddressWithMaxBalance"/>
+          </MultiBinding>
+        </StackPanel.IsVisible>
 
+        <!-- is extrenal address warning -->
+        <!--<StackPanel Orientation="Horizontal"
+                    IsVisible="{Binding IsToAddressExtrenal}">
+          <TextBlock Text="{Binding ExternalAddressWarning}"
+                     MaxWidth="471"
+                     Padding="0 2 0 2"
+                     TextWrapping="Wrap"
+                     VerticalAlignment="Center"
+                     FontSize="13"
+                     FontFamily="{DynamicResource DefaultLightFontFamily}"
+                     Classes="Message Warning"/>
+          <Button Padding="3"
+                  VerticalAlignment="Center"
+                  VerticalContentAlignment="Center"
+                  ToolTip.Placement="Bottom"
+                  ToolTip.VerticalOffset="10"
+                  ToolTip.HorizontalOffset="{Binding ElementName=ExternalAddressToolTipGrid,
+                      Path=Bounds.Width,
+                      Converter={StaticResource WidthToHorizontalCenterOffsetConverter}}"
+                  Click="HelpClickHandler"
+                  Classes="ButtonWithIcon">
+            <ToolTip.Tip>
+              <Grid Name="ExternalAddressToolTipGrid">
+                <TextBlock TextWrapping="Wrap"
+                           Text="{Binding ExternalAddressWarningToolTip}"/>
+              </Grid>
+            </ToolTip.Tip>
+            <Path HorizontalAlignment="Center"
+                  VerticalAlignment="Center"
+                  Width="12"
+                  Height="12"
+                  Data="{DynamicResource Help}"
+                  Fill="{DynamicResource LightDefaultOpacity20}"/>
+          </Button>
+        </StackPanel>-->
+
+        <!-- is redeem from address with max balance note -->
+        <!--<StackPanel Orientation="Horizontal"
+                    IsVisible="{Binding IsRedeemFromAddressWithMaxBalance}">
+          <TextBlock Text="{Binding RedeemFromAddressNote}"
+                     MaxWidth="471"
+                     Padding="0 2 0 2"
+                     TextWrapping="Wrap"
+                     VerticalAlignment="Center"
+                     FontSize="13"
+                     FontFamily="{DynamicResource DefaultLightFontFamily}"
+                     Classes="Message"/>
+          <Button Padding="3"
+                  VerticalAlignment="Center"
+                  VerticalContentAlignment="Center"
+                  ToolTip.Placement="Bottom"
+                  ToolTip.VerticalOffset="10"
+                  ToolTip.HorizontalOffset="{Binding ElementName=RedeemFromAddressNoteToolTipGrid,
+                      Path=Bounds.Width,
+                      Converter={StaticResource WidthToHorizontalCenterOffsetConverter}}"
+                  Click="HelpClickHandler"
+                  Classes="ButtonWithIcon">
+            <ToolTip.Tip>
+              <Grid Name="RedeemFromAddressNoteToolTipGrid">
+                <TextBlock TextWrapping="Wrap"
+                           Text="{Binding RedeemFromAddressNoteToolTip}"/>
+              </Grid>
+            </ToolTip.Tip>
+            <Path HorizontalAlignment="Center"
+                  VerticalAlignment="Center"
+                  Width="12"
+                  Height="12"
+                  Data="{DynamicResource Help}"
+                  Fill="{DynamicResource LightDefaultOpacity20}"/>
+          </Button>
+        </StackPanel>-->
+
+        <!-- amount validation message -->
+        <StackPanel Orientation="Horizontal"
+                    IsVisible="{Binding AmountValidationMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+          <TextBlock Text="{Binding AmountValidationMessage}"
+                     MaxWidth="471"
+                     Padding="0 2 0 2"
+                     TextWrapping="Wrap"
+                     VerticalAlignment="Center"
+                     FontSize="13"
+                     FontFamily="{DynamicResource DefaultLightFontFamily}"
+                     Classes="Message"
+                     Classes.Warning="{Binding IsAmountValidationWarning}"
+                     Classes.Error="{Binding IsAmountValidationError}"/>
+          <Button Padding="3"
+                  VerticalAlignment="Center"
+                  VerticalContentAlignment="Center"
+                  ToolTip.Placement="Bottom"
+                  ToolTip.VerticalOffset="10"
+                  ToolTip.HorizontalOffset="{Binding ElementName=AmountValidationToolTipGrid,
+                      Path=Bounds.Width,
+                      Converter={StaticResource WidthToHorizontalCenterOffsetConverter}}"
+                  Click="HelpClickHandler"
+                  Classes="ButtonWithIcon"
+                  IsVisible="{Binding AmountValidationMessageToolTip, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+            <ToolTip.Tip>
+              <Grid Name="AmountValidationToolTipGrid">
+                <TextBlock TextWrapping="Wrap"
+                           Text="{Binding AmountValidationMessageToolTip}"/>
+              </Grid>
+            </ToolTip.Tip>
+            <Path HorizontalAlignment="Center"
+                  VerticalAlignment="Center"
+                  Width="12"
+                  Height="12"
+                  Data="{DynamicResource Help}"
+                  Fill="{DynamicResource LightDefaultOpacity20}"/>
+          </Button>
+        </StackPanel>
+
+        <!-- not enough liquidity message -->
+        <StackPanel Orientation="Horizontal"
+                    IsVisible="{Binding IsNoLiquidity}">
+          <TextBlock Text="Not enough liquidity"
+                     Padding="0 2 0 2"
+                     MaxWidth="471"
+                     TextWrapping="Wrap"
+                     VerticalAlignment="Center"
+                     FontSize="13"
+                     FontFamily="{DynamicResource DefaultLightFontFamily}"
+                     Classes="Error"/>
+          <Button Padding="3"
+                  VerticalAlignment="Center"
+                  VerticalContentAlignment="Center"
+                  ToolTip.Placement="Bottom"
+                  ToolTip.VerticalOffset="10"
+                  ToolTip.HorizontalOffset="{Binding ElementName=NotEnoughLiquidityToolTipGrid,
+                      Path=Bounds.Width,
+                      Converter={StaticResource WidthToHorizontalCenterOffsetConverter}}"
+                  Click="HelpClickHandler"
+                  Classes="ButtonWithIcon">
+            <ToolTip.Tip>
+              <Grid Name="NotEnoughLiquidityToolTipGrid">
+                <TextBlock TextWrapping="Wrap"
+                           Text="The amount you entered is greater than the available liquidity. Please use 'max' button to accurately determine the maximum amount that can be exchanged"/>
+              </Grid>
+            </ToolTip.Tip>
+            <Path HorizontalAlignment="Center"
+                  VerticalAlignment="Center"
+                  Width="12"
+                  Height="12"
+                  Data="{DynamicResource Help}"
+                  Fill="{DynamicResource LightDefaultOpacity20}"/>
+          </Button>
+        </StackPanel>
+
+        <!-- warning -->
+        <StackPanel Orientation="Horizontal"
+                    IsVisible="{Binding Message, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+          <TextBlock Text="{Binding Message}"
+                     Padding="0 2 0 2"
+                     MaxWidth="471"
+                     TextWrapping="Wrap"
+                     VerticalAlignment="Center"
+                     FontSize="13"
+                     FontFamily="{DynamicResource DefaultLightFontFamily}"
+                     Classes="Message"
+                     Classes.Warning="{Binding IsWarning}"
+                     Classes.Error="{Binding IsError}"/>
+          <Button Padding="3"
+                  VerticalAlignment="Center"
+                  VerticalContentAlignment="Center"
+                  ToolTip.Placement="Bottom"
+                  ToolTip.VerticalOffset="10"
+                  ToolTip.HorizontalOffset="{Binding ElementName=MessageToolTipGrid,
+                    Path=Bounds.Width,
+                    Converter={StaticResource WidthToHorizontalCenterOffsetConverter}}"
+                  Click="HelpClickHandler"
+                  Classes="ButtonWithIcon">
+            <ToolTip.Tip>
+              <Grid Name="MessageToolTipGrid">
+                <TextBlock TextWrapping="Wrap"
+                           Text="{Binding MessageToolTip}"/>
+              </Grid>
+            </ToolTip.Tip>
+            <Path HorizontalAlignment="Center"
+                  VerticalAlignment="Center"
+                  Width="12"
+                  Height="12"
+                  Data="{DynamicResource Help}"
+                  Fill="{DynamicResource LightDefaultOpacity20}"/>
+          </Button>
+        </StackPanel>
+      </StackPanel>
       <!-- exchange button -->
       <controls:RoundedButton Width="486"
                               Height="52"
@@ -712,7 +789,7 @@
     </StackPanel>
 
     <TextBlock Margin="48 64 48 0"
-               Text="Swap History"    
+               Text="Exchange History"
                Foreground="{DynamicResource DefaultForegroundBrush}"
                FontSize="22"
                FontFamily="{DynamicResource DefaultLightFontFamily}"

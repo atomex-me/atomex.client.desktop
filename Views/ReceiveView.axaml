@@ -15,26 +15,30 @@
 
     <UserControl.Styles>
         <Style Selector="controls|RoundedButton.NotCopied">
-            <Setter Property="Background" Value="{DynamicResource RoundedButtonBackgroundBrush}" />
+            <Setter Property="Background"
+                    Value="{DynamicResource RoundedButtonBackgroundBrush}" />
         </Style>
         <Style Selector="controls|RoundedButton.Copied">
-            <Setter Property="Background" Value="{DynamicResource Emerald}" />
+            <Setter Property="Background"
+                    Value="{DynamicResource Emerald}" />
         </Style>
     </UserControl.Styles>
 
     <Border Classes="ChildViewBorder"
-            Padding="24 0 24 0"
             Width="700">
         <StackPanel Orientation="Vertical">
             <Grid ColumnDefinitions="Auto,*"
-                  RowDefinitions="Auto"
-                  Margin="0 20 0 20">
+                  RowDefinitions="*"
+                  VerticalAlignment="Stretch"
+                  Margin="24 0"
+                  Height="72">
                 <Button Grid.Column="0"
                         Width="28"
                         Height="28"
                         Padding="3"
                         BorderThickness="0"
                         VerticalContentAlignment="Center"
+                        VerticalAlignment="Center"
                         IsVisible="{Binding IsBackVisible}"
                         Command="{Binding BackCommand}"
                         Classes="ButtonWithIcon">
@@ -57,7 +61,6 @@
             </Grid>
 
             <Border Height="1"
-                    Margin="-24 0 -24 0"
                     Background="{DynamicResource LightDefaultOpacity10}" />
 
             <StackPanel Orientation="Horizontal"
@@ -121,6 +124,7 @@
                                         Padding="26 0"
                                         CornerRadius="6"
                                         FontFamily="{DynamicResource DefaultFontFamily}"
+                                        FontWeight="Normal"
                                         Command="{Binding CopyCommand}"
                                         IsEnabled="{Binding !IsCopied}"
                                         Classes.Copied="{Binding IsCopied}"
@@ -163,8 +167,8 @@
                 <Button Classes="LinkButton Underlined"
                         Foreground="{DynamicResource SecondaryForegroundBrush}"
                         Command="{Binding SelectAddressCommand}"
-                        FontSize="16"
-                        Content="{Binding MyAddressesText}" />
+                        Content="{Binding MyAddressesText}"
+                        FontSize="16" />
             </StackPanel>
         </StackPanel>
     </Border>
