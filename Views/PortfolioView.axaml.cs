@@ -18,8 +18,8 @@ namespace Atomex.Client.Desktop.Views
 #if DEBUG
             if (!Design.IsDesignMode) return;
 
-            var parentBorder = this.FindControl<Border>("ParentBorder");
-            parentBorder.Background = new SolidColorBrush(Color.FromRgb(0x0F, 0x21, 0x39));
+            var designGrid = this.FindControl<Grid>("DesignGrid");
+            designGrid.Background = new SolidColorBrush(Color.FromRgb(0x0F, 0x21, 0x39));
 #endif
         }
 

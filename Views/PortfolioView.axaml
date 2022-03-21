@@ -23,338 +23,348 @@
         <converters:PortfolioTooltipPositionYConverter x:Key="PortfolioTooltipPositionYConverter" />
     </UserControl.Resources>
 
-    <Border Name="ParentBorder"
-            Padding="50 16 50 0">
-        <Grid RowDefinitions="Auto,*">
-            <StackPanel Grid.Row="0">
-                <Canvas>
-                    <Button Canvas.Right="0"
-                            Width="44"
-                            Height="44"
-                            BorderThickness="0"
-                            VerticalContentAlignment="Center"
-                            HorizontalContentAlignment="Center"
-                            CornerRadius="50"
-                            Classes="ButtonWithIcon Alert">
-                        <svg:Svg Width="22"
-                                 Path="/Resources/Icons/notification-bell.svg" />
-                    </Button>
-                </Canvas>
+    <Grid RowDefinitions="Auto,*"
+          Name="DesignGrid">
+        <StackPanel Grid.Row="0">
+            <Canvas>
+                <Button Canvas.Right="0"
+                        Width="44"
+                        Height="44"
+                        BorderThickness="0"
+                        VerticalContentAlignment="Center"
+                        HorizontalContentAlignment="Center"
+                        CornerRadius="50"
+                        Classes="ButtonWithIcon Alert">
+                    <svg:Svg Width="22"
+                             Path="/Resources/Icons/notification-bell.svg" />
+                </Button>
+            </Canvas>
 
-                <Grid Margin="95 76 0 34"
-                      RowDefinitions="Auto,Auto"
-                      ColumnDefinitions="Auto,*">
-                    <oxy:PlotView Grid.Row="0"
-                                  Grid.Column="0"
-                                  Grid.RowSpan="2"
-                                  Height="166"
-                                  Width="440"
-                                  Margin="-144 0 -104 0"
-                                  Background="Transparent"
-                                  Model="{Binding PlotModel}"
-                                  Controller="{Binding ActualController, Mode=TwoWay}"
-                                  x:Name="PlotView"
-                                  ClipToBounds="False">
-                        <oxy:PlotView.DefaultTrackerTemplate>
-                            <ControlTemplate>
-                                <Canvas ClipToBounds="False">
-                                    <Border Name="TooltipBorder"
-                                            CornerRadius="5"
-                                            Background="{DynamicResource DefaultTooltipBackgroundBrush}">
-                                        <Canvas.Left>
-                                            <MultiBinding
-                                                Converter="{StaticResource PortfolioTooltipPositionXConverter}">
-                                                <Binding Path="Position.X" Mode="OneWay" />
-                                                <Binding Path="#TooltipBorder.Bounds.Width" Mode="OneWay" />
-                                                <Binding Path="#PlotView.Bounds.Width" Mode="OneWay" />
-                                                <Binding Path="#PlotView.Bounds.Height" Mode="OneWay" />
-                                            </MultiBinding>
-                                        </Canvas.Left>
-                                        <Canvas.Top>
-                                            <MultiBinding
-                                                Converter="{StaticResource PortfolioTooltipPositionYConverter}">
-                                                <Binding Path="Position.Y" Mode="OneWay" />
-                                                <Binding Path="#TooltipBorder.Bounds.Height" Mode="OneWay" />
-                                            </MultiBinding>
-                                        </Canvas.Top>
-                                        <TextBlock Text="{Binding}"
-                                                   Padding="16 8"
-                                                   Foreground="White"
-                                                   VerticalAlignment="Center"
-                                                   FontFamily="{DynamicResource DefaultFontFamily}"
-                                                   FontSize="12" />
-                                    </Border>
-                                </Canvas>
-                            </ControlTemplate>
-                        </oxy:PlotView.DefaultTrackerTemplate>
-                    </oxy:PlotView>
-
-
-                    <StackPanel Grid.Column="1"
-                                Grid.Row="0">
-                        <TextBlock FontFamily="{DynamicResource DefaultFontFamily}"
-                                   Foreground="{DynamicResource SecondaryForegroundBrush}"
-                                   Margin="0 5 0 0"
-                                   FontSize="13"
-                                   Text="Total Balance" />
-                        <TextBlock FontFamily="{DynamicResource DefaultFontFamily}"
-                                   Foreground="{DynamicResource DefaultForegroundBrush}"
-                                   FontSize="40"
-                                   Text="{Binding PortfolioValue, Converter={StaticResource PortfolioToTotalConverter}}" />
-                    </StackPanel>
-
-                    <StackPanel Grid.Column="1"
-                                Grid.Row="1"
-                                Margin="0 16 0 0"
-                                Orientation="Horizontal"
-                                VerticalAlignment="Top">
-
-                        <controls:RoundedButton Height="46"
-                                                Padding="26 0"
-                                                CornerRadius="6"
-                                                Command="{Binding SendCommand}"
-                                                FontFamily="{DynamicResource DefaultFontFamily}">
-                            <StackPanel Orientation="Horizontal">
-                                <svg:Svg HorizontalAlignment="Center"
-                                         Width="24"
-                                         Height="24"
-                                         Path="/Resources/Icons/top-right-arrow.svg" />
-                                <TextBlock Margin="8 0 0 0"
-                                           Text="Send"
-                                           FontFamily="{DynamicResource DefaultFontFamily}"
-                                           FontWeight="Light"
-                                           FontSize="18"
-                                           Foreground="{DynamicResource RoundedButtonForegroundBrush}" />
-                            </StackPanel>
-                        </controls:RoundedButton>
-                        <controls:RoundedButton Height="46"
-                                                Padding="26 0"
-                                                CornerRadius="6"
-                                                Command="{Binding ReceiveCommand}"
-                                                FontFamily="{DynamicResource DefaultFontFamily}"
-                                                Margin="12 0 0 0">
-                            <StackPanel Orientation="Horizontal">
-                                <svg:Svg HorizontalAlignment="Center"
-                                         Width="24"
-                                         Height="24"
-                                         Path="/Resources/Icons/bottom-right-arrow.svg" />
-                                <TextBlock Margin="8 0 0 0"
-                                           Text="Receive"
-                                           FontFamily="{DynamicResource DefaultFontFamily}"
-                                           FontWeight="Light"
-                                           FontSize="18"
-                                           Foreground="{DynamicResource RoundedButtonForegroundBrush}" />
-                            </StackPanel>
-                        </controls:RoundedButton>
-                        <controls:RoundedButton Height="46"
-                                                Padding="26 0"
-                                                CornerRadius="6"
-                                                Command="{Binding ExchangeCommand}"
-                                                FontFamily="{DynamicResource DefaultFontFamily}"
-                                                Margin="12 0 0 0"
-                                                Classes="AccentButton">
-                            <StackPanel Orientation="Horizontal">
-                                <svg:Svg HorizontalAlignment="Center"
-                                         Width="24"
-                                         Height="24"
-                                         Path="/Resources/Icons/exchange-arrows.svg" />
-                                <TextBlock Margin="8 0 0 0"
-                                           Text="Exchange"
-                                           FontFamily="{DynamicResource DefaultFontFamily}"
-                                           FontWeight="Light"
-                                           FontSize="18"
-                                           Foreground="{DynamicResource DeepBlue}" />
-                            </StackPanel>
-                        </controls:RoundedButton>
-                    </StackPanel>
-                </Grid>
-
-                <Border Height="1"
-                        Background="{DynamicResource LightDefaultOpacity20}" />
-            </StackPanel>
-
-            <Grid Grid.Row="1"
-                  Margin="95 24 95 0"
-                  RowDefinitions="Auto,Auto,*">
-                <Grid Grid.Row="0"
-                      ColumnDefinitions="*,Auto">
-                    <TextBlock Grid.Column="0"
-                               VerticalAlignment="Center"
-                               FontFamily="{DynamicResource DefaultFontFamily}"
-                               Foreground="{DynamicResource DefaultForegroundBrush}"
-                               FontSize="22"
-                               Text="Coins &amp; Tokens" />
-                    <Button Grid.Column="1"
-                            Width="26"
-                            Height="26"
-                            Padding="3"
-                            BorderThickness="0"
-                            VerticalContentAlignment="Center"
-                            HorizontalContentAlignment="Center"
-                            Margin="0 0 12 0"
-                            Command="{Binding ManageAssetsCommand}"
-                            Classes="ButtonWithIcon">
-                        <svg:Svg Width="22"
-                                 Path="/Resources/Icons/settings.svg" />
-                    </Button>
-                </Grid>
-
-                <TextBox Grid.Row="1"
-                         Margin="0 16 0 0"
-                         Height="44"
-                         CornerRadius="8"
-                         Watermark="Search"
-                         FontSize="16"
-                         Text="{Binding SearchPattern, Mode=TwoWay}"
-                         Classes="SearchTextBox">
-                    <TextBox.InnerRightContent>
-                        <StackPanel VerticalAlignment="Center"
-                                    IsVisible="{Binding SearchPattern, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
-                            <Button Margin="0 0 15 0"
-                                    Padding="0"
-                                    BorderThickness="0"
-                                    VerticalContentAlignment="Center"
-                                    Command="{ReflectionBinding $parent[TextBox].Clear}"
-                                    Classes="ButtonWithIcon WithoutEffects">
-
-                                <svg:Svg HorizontalAlignment="Center"
-                                         Width="18"
-                                         Height="18"
-                                         Path="/Resources/Icons/subtract.svg" />
-                            </Button>
-                        </StackPanel>
-                    </TextBox.InnerRightContent>
-                </TextBox>
-
-                <ListBox Grid.Row="2"
-                         Background="{DynamicResource AlmostTransparentBrush}"
-                         Margin="0 8 0 0"
-                         Items="{Binding ChoosenCurrencies}"
-                         HorizontalAlignment="Stretch"
-                         SelectionMode="Toggle">
-                    <ListBox.Styles>
-                        <Style Selector="ListBoxItem">
-                            <Setter Property="Padding" Value="0" />
-                            <Setter Property="Height" Value="60" />
-                            <Setter Property="VerticalContentAlignment" Value="Center" />
-                            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-                            <Setter Property="Cursor" Value="Hand" />
-                            <Setter Property="BorderThickness" Value="0 0 0 1" />
-                            <Setter Property="BorderBrush" Value="{DynamicResource LightDefaultOpacity10}" />
-                        </Style>
-                        <Style Selector="ListBoxItem:pointerover /template/ ContentPresenter">
-                            <Setter Property="Background" Value="{DynamicResource ListBoxItemPointeroverBrush}" />
-                            <Setter Property="CornerRadius" Value="8" />
-                        </Style>
-
-                        <Style Selector="ListBoxItem:not(:pointerover) /template/ ContentPresenter">
-                            <Setter Property="Background" Value="{DynamicResource AlmostTransparentBrush}" />
-                        </Style>
-                    </ListBox.Styles>
-
-                    <ListBox.ItemTemplate>
-                        <DataTemplate>
-                            <Grid ColumnDefinitions="*,Auto"
-                                  RowDefinitions="Auto">
-                                <StackPanel Orientation="Horizontal"
-                                            Grid.Column="0">
-                                    <Image Source="{Binding LargeIconPath}"
-                                           Margin="16 0"
-                                           Width="24" />
-                                    <TextBlock VerticalAlignment="Center"
+            <Grid Margin="95 76 0 34"
+                  RowDefinitions="Auto,Auto"
+                  ColumnDefinitions="Auto,*">
+                <oxy:PlotView Grid.Row="0"
+                              Grid.Column="0"
+                              Grid.RowSpan="2"
+                              Height="166"
+                              Width="440"
+                              Margin="-144 0 -104 0"
+                              Background="Transparent"
+                              Model="{Binding PlotModel}"
+                              Controller="{Binding ActualController, Mode=TwoWay}"
+                              x:Name="PlotView"
+                              ClipToBounds="False">
+                    <oxy:PlotView.DefaultTrackerTemplate>
+                        <ControlTemplate>
+                            <Canvas ClipToBounds="False">
+                                <Border Name="TooltipBorder"
+                                        CornerRadius="5"
+                                        Background="{DynamicResource DefaultTooltipBackgroundBrush}">
+                                    <Canvas.Left>
+                                        <MultiBinding
+                                            Converter="{StaticResource PortfolioTooltipPositionXConverter}">
+                                            <Binding Path="Position.X" Mode="OneWay" />
+                                            <Binding Path="#TooltipBorder.Bounds.Width" Mode="OneWay" />
+                                            <Binding Path="#PlotView.Bounds.Width" Mode="OneWay" />
+                                            <Binding Path="#PlotView.Bounds.Height" Mode="OneWay" />
+                                        </MultiBinding>
+                                    </Canvas.Left>
+                                    <Canvas.Top>
+                                        <MultiBinding
+                                            Converter="{StaticResource PortfolioTooltipPositionYConverter}">
+                                            <Binding Path="Position.Y" Mode="OneWay" />
+                                            <Binding Path="#TooltipBorder.Bounds.Height" Mode="OneWay" />
+                                        </MultiBinding>
+                                    </Canvas.Top>
+                                    <TextBlock Text="{Binding}"
+                                               Padding="16 8"
+                                               Foreground="White"
+                                               VerticalAlignment="Center"
                                                FontFamily="{DynamicResource DefaultFontFamily}"
-                                               Foreground="{DynamicResource DefaultForegroundBrush}"
-                                               FontSize="18"
-                                               Text="{Binding Currency.Description}" />
-                                    <TextBlock VerticalAlignment="Center"
-                                               Margin="24 0 8 0"
+                                               FontSize="12" />
+                                </Border>
+                            </Canvas>
+                        </ControlTemplate>
+                    </oxy:PlotView.DefaultTrackerTemplate>
+                </oxy:PlotView>
+
+
+                <StackPanel Grid.Column="1"
+                            Grid.Row="0">
+                    <TextBlock FontFamily="{DynamicResource DefaultFontFamily}"
+                               Foreground="{DynamicResource SecondaryForegroundBrush}"
+                               Margin="0 5 0 0"
+                               FontSize="13"
+                               Text="Total Balance" />
+                    <TextBlock FontFamily="{DynamicResource DefaultFontFamily}"
+                               Foreground="{DynamicResource DefaultForegroundBrush}"
+                               FontSize="40"
+                               Text="{Binding PortfolioValue, Converter={StaticResource PortfolioToTotalConverter}}" />
+                </StackPanel>
+
+                <StackPanel Grid.Column="1"
+                            Grid.Row="1"
+                            Margin="0 16 0 0"
+                            Orientation="Horizontal"
+                            VerticalAlignment="Top">
+
+                    <controls:RoundedButton Height="46"
+                                            Padding="26 0"
+                                            CornerRadius="6"
+                                            Command="{Binding SendCommand}"
+                                            FontFamily="{DynamicResource DefaultFontFamily}">
+                        <StackPanel Orientation="Horizontal">
+                            <svg:Svg HorizontalAlignment="Center"
+                                     Width="24"
+                                     Height="24"
+                                     Path="/Resources/Icons/top-right-arrow.svg" />
+                            <TextBlock Margin="8 0 0 0"
+                                       Text="Send"
+                                       FontFamily="{DynamicResource DefaultFontFamily}"
+                                       FontWeight="Light"
+                                       FontSize="18"
+                                       Foreground="{DynamicResource RoundedButtonForegroundBrush}" />
+                        </StackPanel>
+                    </controls:RoundedButton>
+                    <controls:RoundedButton Height="46"
+                                            Padding="26 0"
+                                            CornerRadius="6"
+                                            Command="{Binding ReceiveCommand}"
+                                            FontFamily="{DynamicResource DefaultFontFamily}"
+                                            Margin="12 0 0 0">
+                        <StackPanel Orientation="Horizontal">
+                            <svg:Svg HorizontalAlignment="Center"
+                                     Width="24"
+                                     Height="24"
+                                     Path="/Resources/Icons/bottom-right-arrow.svg" />
+                            <TextBlock Margin="8 0 0 0"
+                                       Text="Receive"
+                                       FontFamily="{DynamicResource DefaultFontFamily}"
+                                       FontWeight="Light"
+                                       FontSize="18"
+                                       Foreground="{DynamicResource RoundedButtonForegroundBrush}" />
+                        </StackPanel>
+                    </controls:RoundedButton>
+                    <controls:RoundedButton Height="46"
+                                            Padding="26 0"
+                                            CornerRadius="6"
+                                            Command="{Binding ExchangeCommand}"
+                                            FontFamily="{DynamicResource DefaultFontFamily}"
+                                            Margin="12 0 0 0"
+                                            Classes="AccentButton">
+                        <StackPanel Orientation="Horizontal">
+                            <svg:Svg HorizontalAlignment="Center"
+                                     Width="24"
+                                     Height="24"
+                                     Path="/Resources/Icons/exchange-arrows.svg" />
+                            <TextBlock Margin="8 0 0 0"
+                                       Text="Exchange"
+                                       FontFamily="{DynamicResource DefaultFontFamily}"
+                                       FontWeight="Light"
+                                       FontSize="18"
+                                       Foreground="{DynamicResource DeepBlue}" />
+                        </StackPanel>
+                    </controls:RoundedButton>
+                </StackPanel>
+            </Grid>
+
+            <Border Height="1"
+                    Background="{DynamicResource LightDefaultOpacity20}" />
+        </StackPanel>
+
+        <Grid Grid.Row="1"
+              Margin="95 24 95 0"
+              RowDefinitions="Auto,Auto,*">
+            <Grid Grid.Row="0"
+                  ColumnDefinitions="*,Auto">
+                <TextBlock Grid.Column="0"
+                           VerticalAlignment="Center"
+                           FontFamily="{DynamicResource DefaultFontFamily}"
+                           Foreground="{DynamicResource DefaultForegroundBrush}"
+                           FontSize="22"
+                           Text="Coins &amp; Tokens" />
+                <Button Grid.Column="1"
+                        Width="26"
+                        Height="26"
+                        Padding="3"
+                        BorderThickness="0"
+                        VerticalContentAlignment="Center"
+                        HorizontalContentAlignment="Center"
+                        Margin="0 0 12 0"
+                        Command="{Binding ManageAssetsCommand}"
+                        Classes="ButtonWithIcon">
+                    <svg:Svg Width="22"
+                             Path="/Resources/Icons/settings.svg" />
+                </Button>
+            </Grid>
+
+            <TextBox Grid.Row="1"
+                     Margin="0 16 0 0"
+                     Height="44"
+                     CornerRadius="8"
+                     Watermark="Search"
+                     FontSize="16"
+                     Text="{Binding SearchPattern, Mode=TwoWay}"
+                     Classes="SearchTextBox">
+                <TextBox.InnerRightContent>
+                    <StackPanel VerticalAlignment="Center"
+                                IsVisible="{Binding SearchPattern, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+                        <Button Margin="0 0 15 0"
+                                Padding="0"
+                                BorderThickness="0"
+                                VerticalContentAlignment="Center"
+                                Command="{ReflectionBinding $parent[TextBox].Clear}"
+                                Classes="ButtonWithIcon WithoutEffects">
+
+                            <svg:Svg HorizontalAlignment="Center"
+                                     Width="18"
+                                     Height="18"
+                                     Path="/Resources/Icons/subtract.svg" />
+                        </Button>
+                    </StackPanel>
+                </TextBox.InnerRightContent>
+            </TextBox>
+
+            <ListBox Grid.Row="2"
+                     Background="{DynamicResource AlmostTransparentBrush}"
+                     Margin="0 8 0 0"
+                     Items="{Binding ChoosenCurrencies}"
+                     HorizontalAlignment="Stretch"
+                     SelectionMode="Toggle">
+                <ListBox.Styles>
+                    <Style Selector="ListBoxItem">
+                        <Setter Property="Padding" Value="0" />
+                        <Setter Property="Height" Value="60" />
+                        <Setter Property="VerticalContentAlignment" Value="Center" />
+                        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                        <Setter Property="Cursor" Value="Hand" />
+                        <Setter Property="BorderThickness" Value="0 0 0 1" />
+                        <Setter Property="BorderBrush" Value="{DynamicResource LightDefaultOpacity10}" />
+                    </Style>
+                    <Style Selector="ListBoxItem:pointerover /template/ ContentPresenter">
+                        <Setter Property="Background" Value="{DynamicResource ListBoxItemPointeroverBrush}" />
+                        <Setter Property="CornerRadius" Value="8" />
+                    </Style>
+
+                    <Style Selector="ListBoxItem:not(:pointerover) /template/ ContentPresenter">
+                        <Setter Property="Background" Value="{DynamicResource AlmostTransparentBrush}" />
+                    </Style>
+                </ListBox.Styles>
+
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <Grid ColumnDefinitions="*,Auto"
+                              RowDefinitions="Auto">
+                            <StackPanel Orientation="Horizontal"
+                                        Grid.Column="0">
+                                <Image Source="{Binding LargeIconPath}"
+                                       Margin="16 0"
+                                       Width="24" />
+                                <TextBlock VerticalAlignment="Center"
+                                           FontFamily="{DynamicResource DefaultFontFamily}"
+                                           Foreground="{DynamicResource DefaultForegroundBrush}"
+                                           FontSize="18"
+                                           Text="{Binding Currency.Description}" />
+                                <TextBlock VerticalAlignment="Center"
+                                           Margin="24 0 8 0"
+                                           FontFamily="{DynamicResource DefaultFontFamily}"
+                                           Foreground="{DynamicResource SecondaryForegroundBrush}"
+                                           FontSize="13">
+                                    <TextBlock.Text>
+                                        <MultiBinding Converter="{StaticResource AmountToStringConverter}">
+                                            <Binding Path="CurrentQuote" Mode="OneWay" />
+                                            <Binding Path="BaseCurrencyFormat" Mode="OneWay" />
+                                        </MultiBinding>
+                                    </TextBlock.Text>
+                                </TextBlock>
+                                <TextBlock VerticalAlignment="Center"
+                                           FontFamily="{DynamicResource DefaultFontFamily}"
+                                           Foreground="{DynamicResource SuccessForegroundBrush}"
+                                           FontSize="13"
+                                           Text="+3.0%" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="1"
+                                        Orientation="Horizontal">
+                                <StackPanel IsVisible="{Binding !!AvailableAmount}">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock HorizontalAlignment="Right"
+                                                   FontFamily="{DynamicResource DefaultFontFamily}"
+                                                   Foreground="{DynamicResource DefaultForegroundBrush}"
+                                                   FontSize="16"
+                                                   Margin="0 0 0 2">
+                                            <TextBlock.Text>
+                                                <MultiBinding Converter="{StaticResource AmountToStringConverter}">
+                                                    <Binding Path="AvailableAmount" Mode="OneWay" />
+                                                    <Binding Path="CurrencyFormat" Mode="OneWay" />
+                                                </MultiBinding>
+                                            </TextBlock.Text>
+                                        </TextBlock>
+                                        <TextBlock HorizontalAlignment="Right"
+                                                   FontFamily="{DynamicResource DefaultFontFamily}"
+                                                   Foreground="{DynamicResource DefaultForegroundBrush}"
+                                                   FontSize="16"
+                                                   Text="{Binding CurrencyCode}"
+                                                   Margin="3 0 0 0" />
+                                    </StackPanel>
+                                    <TextBlock HorizontalAlignment="Right"
                                                FontFamily="{DynamicResource DefaultFontFamily}"
                                                Foreground="{DynamicResource SecondaryForegroundBrush}"
-                                               FontSize="13">
+                                               FontSize="13"
+                                               Margin="0 2 0 0">
                                         <TextBlock.Text>
                                             <MultiBinding Converter="{StaticResource AmountToStringConverter}">
-                                                <Binding Path="CurrentQuote" Mode="OneWay" />
+                                                <Binding Path="AvailableAmountInBase" Mode="OneWay" />
                                                 <Binding Path="BaseCurrencyFormat" Mode="OneWay" />
                                             </MultiBinding>
                                         </TextBlock.Text>
                                     </TextBlock>
-                                    <TextBlock VerticalAlignment="Center"
-                                               FontFamily="{DynamicResource DefaultFontFamily}"
-                                               Foreground="{DynamicResource SuccessForegroundBrush}"
-                                               FontSize="13"
-                                               Text="+3.0%" />
                                 </StackPanel>
-                                <StackPanel Grid.Column="1"
-                                            Orientation="Horizontal">
-                                    <StackPanel IsVisible="{Binding !!AvailableAmount}">
-                                        <StackPanel Orientation="Horizontal">
-                                            <TextBlock HorizontalAlignment="Right"
-                                                       FontFamily="{DynamicResource DefaultFontFamily}"
-                                                       Foreground="{DynamicResource DefaultForegroundBrush}"
-                                                       FontSize="16"
-                                                       Margin="0 0 0 2">
-                                                <TextBlock.Text>
-                                                    <MultiBinding Converter="{StaticResource AmountToStringConverter}">
-                                                        <Binding Path="AvailableAmount" Mode="OneWay" />
-                                                        <Binding Path="CurrencyFormat" Mode="OneWay" />
-                                                    </MultiBinding>
-                                                </TextBlock.Text>
-                                            </TextBlock>
-                                            <TextBlock HorizontalAlignment="Right"
-                                                       FontFamily="{DynamicResource DefaultFontFamily}"
-                                                       Foreground="{DynamicResource DefaultForegroundBrush}"
-                                                       FontSize="16"
-                                                       Text="{Binding CurrencyCode}"
-                                                       Margin="3 0 0 0" />
+
+                                <TextBlock IsVisible="{Binding !AvailableAmount}"
+                                           HorizontalAlignment="Right"
+                                           FontFamily="{DynamicResource DefaultFontFamily}"
+                                           Foreground="{DynamicResource DefaultForegroundBrush}"
+                                           FontSize="16"
+                                           VerticalAlignment="Center"
+                                           Text="{Binding AvailableAmount}" />
+
+                                <TextBlock IsVisible="{Binding !AvailableAmount}"
+                                           HorizontalAlignment="Right"
+                                           FontFamily="{DynamicResource DefaultFontFamily}"
+                                           Foreground="{DynamicResource DefaultForegroundBrush}"
+                                           FontSize="16"
+                                           VerticalAlignment="Center"
+                                           Margin="3 0 0 0"
+                                           Text="{Binding CurrencyCode}" />
+
+                                
+                                <Button Width="26"
+                                        Height="26"
+                                        Padding="3"
+                                        BorderThickness="0"
+                                        VerticalContentAlignment="Center"
+                                        HorizontalContentAlignment="Center"
+                                        Margin="12 0"
+                                        Classes="ButtonWithIcon"
+                                        ToolTip.Placement="AnchorAndGravity"
+                                        ToolTip.IsOpen="True"
+                                        ToolTip.ShowDelay="1000">
+                                    <svg:Svg Width="22"
+                                             Path="/Resources/Icons/menu-dots.svg" />
+                                    <ToolTip.Tip>
+                                        <StackPanel>
+                                            <TextBlock Text="First" Padding="10"/>
+                                            <TextBlock Text="Second" Padding="10"/>
+                                            <TextBlock Text="Third" Padding="10"/>
+                                            <TextBlock Text="Fourth" Padding="10" />
                                         </StackPanel>
-                                        <TextBlock HorizontalAlignment="Right"
-                                                   FontFamily="{DynamicResource DefaultFontFamily}"
-                                                   Foreground="{DynamicResource SecondaryForegroundBrush}"
-                                                   FontSize="13"
-                                                   Margin="0 2 0 0">
-                                            <TextBlock.Text>
-                                                <MultiBinding Converter="{StaticResource AmountToStringConverter}">
-                                                    <Binding Path="AvailableAmountInBase" Mode="OneWay" />
-                                                    <Binding Path="BaseCurrencyFormat" Mode="OneWay" />
-                                                </MultiBinding>
-                                            </TextBlock.Text>
-                                        </TextBlock>
-                                    </StackPanel>
-
-                                    <TextBlock IsVisible="{Binding !AvailableAmount}"
-                                               HorizontalAlignment="Right"
-                                               FontFamily="{DynamicResource DefaultFontFamily}"
-                                               Foreground="{DynamicResource DefaultForegroundBrush}"
-                                               FontSize="16"
-                                               VerticalAlignment="Center"
-                                               Text="{Binding AvailableAmount}" />
-
-                                    <TextBlock IsVisible="{Binding !AvailableAmount}"
-                                               HorizontalAlignment="Right"
-                                               FontFamily="{DynamicResource DefaultFontFamily}"
-                                               Foreground="{DynamicResource DefaultForegroundBrush}"
-                                               FontSize="16"
-                                               VerticalAlignment="Center"
-                                               Margin="3 0 0 0"
-                                               Text="{Binding CurrencyCode}" />
-
-                                    <Button Width="26"
-                                            Height="26"
-                                            Padding="3"
-                                            BorderThickness="0"
-                                            VerticalContentAlignment="Center"
-                                            HorizontalContentAlignment="Center"
-                                            Margin="12 0"
-                                            Classes="ButtonWithIcon">
-                                        <svg:Svg Width="22"
-                                                 Path="/Resources/Icons/menu-dots.svg" />
-                                    </Button>
-                                </StackPanel>
-                            </Grid>
-                        </DataTemplate>
-                    </ListBox.ItemTemplate>
-                </ListBox>
-            </Grid>
+                                    </ToolTip.Tip>
+                                </Button>
+                            </StackPanel>
+                        </Grid>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
         </Grid>
-    </Border>
+    </Grid>
 </UserControl>

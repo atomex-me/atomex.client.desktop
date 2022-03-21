@@ -42,7 +42,7 @@ namespace Atomex.Client.Desktop.ViewModels
                 {
                     AvailableCurrencies.ForEachDo(curr => curr.OnChanged = () =>
                     {
-                        OnAssetsChanged?.Invoke(AvailableCurrencies
+                        OnAssetsChanged?.Invoke(InitialCurrencies
                             .Where(currency => currency.IsSelected)
                             .Select(currencyWithSelection => currencyWithSelection.Currency));
                     });
