@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
@@ -39,7 +38,7 @@ namespace Atomex.Client.Desktop.ViewModels
         [Reactive] public decimal PortfolioValue { get; set; }
         [Reactive] public string SearchPattern { get; set; }
         [Reactive] public CurrencyViewModel? SelectedCurrency { get; set; }
-
+        [Reactive] public string? OpenedCurrency { get; set; }
 
         public PortfolioViewModel()
         {
@@ -117,6 +116,7 @@ namespace Atomex.Client.Desktop.ViewModels
             ChoosenCurrencies = new List<CurrencyViewModel>(AllCurrencies)
                 .Where(c => savedCurrenciesArr.Contains(c.Currency.Name))
                 .ToList();
+
             InitialChoosenCurrencies = new List<CurrencyViewModel>(ChoosenCurrencies);
 
             OnAmountUpdatedEventHandler(this, EventArgs.Empty);
@@ -175,6 +175,16 @@ namespace Atomex.Client.Desktop.ViewModels
 
             this.RaisePropertyChanged(nameof(PlotModel));
         }
+
+        private ReactiveCommand<CurrencyViewModel, Unit> _openCurrencyPopupCommand;
+
+        public ReactiveCommand<CurrencyViewModel, Unit> OpenCurrencyPopupCommand => _openCurrencyPopupCommand ??=
+            (_openCurrencyPopupCommand = ReactiveCommand.Create<CurrencyViewModel>(currencyViewModel =>
+            {
+                Log.Fatal($"Selected {currencyViewModel.CurrencyCode}");
+
+                OpenedCurrency = currencyViewModel.CurrencyCode;
+            }));
 
         private ReactiveCommand<Unit, Unit> _sendCommand;
 
@@ -273,6 +283,8 @@ namespace Atomex.Client.Desktop.ViewModels
                 {
                     var vm = CurrencyViewModelCreator.CreateViewModel(c, subscribeToUpdates: false);
                     vm.TotalAmountInBase = random.Next(1000000, 10000000);
+                    vm.TotalAmount = random.Next(1000000, 10000000);
+                    vm.AvailableAmount = random.Next(1000000, 10000000);
                     return vm;
                 })
                 .ToList();

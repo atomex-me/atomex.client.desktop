@@ -16,11 +16,10 @@
 
     <UserControl.Resources>
         <converters:AmountToStringConverter x:Key="AmountToStringConverter" />
-        <converters:StringToUpperCaseConverter x:Key="StringToUpperCaseConverter" />
         <converters:PortfolioToTotalConverter x:Key="PortfolioToTotalConverter" />
-        <converters:PercentConverter x:Key="PercentConverter" />
         <converters:PortfolioTooltipPositionXConverter x:Key="PortfolioTooltipPositionXConverter" />
         <converters:PortfolioTooltipPositionYConverter x:Key="PortfolioTooltipPositionYConverter" />
+        <converters:StringsEqualConverter x:Key="StringsEqualConverter" />
     </UserControl.Resources>
 
     <Grid RowDefinitions="Auto,*"
@@ -337,29 +336,138 @@
                                            Margin="3 0 0 0"
                                            Text="{Binding CurrencyCode}" />
 
-                                
-                                <Button Width="26"
-                                        Height="26"
-                                        Padding="3"
-                                        BorderThickness="0"
-                                        VerticalContentAlignment="Center"
-                                        HorizontalContentAlignment="Center"
-                                        Margin="12 0"
-                                        Classes="ButtonWithIcon"
-                                        ToolTip.Placement="AnchorAndGravity"
-                                        ToolTip.IsOpen="True"
-                                        ToolTip.ShowDelay="1000">
-                                    <svg:Svg Width="22"
-                                             Path="/Resources/Icons/menu-dots.svg" />
-                                    <ToolTip.Tip>
-                                        <StackPanel>
-                                            <TextBlock Text="First" Padding="10"/>
-                                            <TextBlock Text="Second" Padding="10"/>
-                                            <TextBlock Text="Third" Padding="10"/>
-                                            <TextBlock Text="Fourth" Padding="10" />
-                                        </StackPanel>
-                                    </ToolTip.Tip>
-                                </Button>
+                                <WrapPanel VerticalAlignment="Center">
+                                    <Button Width="26"
+                                            Height="26"
+                                            Padding="3"
+                                            BorderThickness="0"
+                                            VerticalContentAlignment="Center"
+                                            HorizontalContentAlignment="Center"
+                                            Margin="12 0"
+                                            Classes="ButtonWithIcon"
+                                            Command="{Binding $parent[ListBox].DataContext.OpenCurrencyPopupCommand}"
+                                            CommandParameter="{Binding}">
+                                        <svg:Svg Width="22"
+                                                 Path="/Resources/Icons/menu-dots.svg" />
+                                    </Button>
+                                    <Popup PlacementMode="Left"
+                                           VerticalAlignment="Center"
+                                           WindowManagerAddShadowHint="False"
+                                           IsLightDismissEnabled="True"
+                                           Closed="Popup_OnClosed">
+                                        <Popup.IsOpen>
+                                            <MultiBinding Converter="{StaticResource StringsEqualConverter}">
+                                                <Binding Path="CurrencyCode" />
+                                                <Binding Path="$parent[ListBox].DataContext.OpenedCurrency" />
+                                            </MultiBinding>
+                                        </Popup.IsOpen>
+                                        <Border Background="{DynamicResource DeepBlue}"
+                                                CornerRadius="6"
+                                                Padding="12 16">
+                                            <StackPanel>
+                                                <StackPanel.Styles>
+                                                    <Style
+                                                        Selector="Button:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+                                                        <Setter Property="Background"
+                                                                Value="{DynamicResource LightDefaultOpacity6}" />
+                                                    </Style>
+                                                    <Style
+                                                        Selector="Button:not(:pointerover) /template/ ContentPresenter#PART_ContentPresenter">
+                                                        <Setter Property="Background"
+                                                                Value="{DynamicResource AlmostTransparentBrush}" />
+                                                    </Style>
+
+                                                    <Style
+                                                        Selector="Button:pressed /template/ ContentPresenter#PART_ContentPresenter">
+                                                        <Setter Property="Background"
+                                                                Value="{DynamicResource LightDefaultOpacity6}" />
+                                                    </Style>
+                                                </StackPanel.Styles>
+
+                                                <Button Width="180"
+                                                        Height="40"
+                                                        Padding="12 0"
+                                                        CornerRadius="6"
+                                                        VerticalContentAlignment="Center">
+                                                    <StackPanel Orientation="Horizontal"
+                                                                VerticalAlignment="Stretch">
+                                                        <TextBlock Text="Send"
+                                                                   Foreground="{DynamicResource DefaultForegroundBrush}"
+                                                                   FontFamily="{DynamicResource DefaultFontFamily}"
+                                                                   VerticalAlignment="Center"
+                                                                   FontSize="16" />
+                                                        <TextBlock Text="{Binding CurrencyCode}"
+                                                                   Foreground="{DynamicResource DefaultForegroundBrush}"
+                                                                   FontFamily="{DynamicResource DefaultFontFamily}"
+                                                                   VerticalAlignment="Center"
+                                                                   FontSize="16"
+                                                                   Margin="3 0 0 0" />
+                                                    </StackPanel>
+                                                </Button>
+                                                <Button Width="180"
+                                                        Height="40"
+                                                        Padding="12 0"
+                                                        CornerRadius="6"
+                                                        VerticalContentAlignment="Center">
+                                                    <StackPanel Orientation="Horizontal"
+                                                                VerticalAlignment="Stretch">
+                                                        <TextBlock Text="Receive"
+                                                                   Foreground="{DynamicResource DefaultForegroundBrush}"
+                                                                   FontFamily="{DynamicResource DefaultFontFamily}"
+                                                                   VerticalAlignment="Center"
+                                                                   FontSize="16" />
+                                                        <TextBlock Text="{Binding CurrencyCode}"
+                                                                   Foreground="{DynamicResource DefaultForegroundBrush}"
+                                                                   FontFamily="{DynamicResource DefaultFontFamily}"
+                                                                   VerticalAlignment="Center"
+                                                                   FontSize="16"
+                                                                   Margin="3 0 0 0" />
+                                                    </StackPanel>
+                                                </Button>
+                                                <Button Width="180"
+                                                        Height="40"
+                                                        Padding="12 0"
+                                                        CornerRadius="6"
+                                                        VerticalContentAlignment="Center">
+                                                    <StackPanel Orientation="Horizontal"
+                                                                VerticalAlignment="Stretch">
+                                                        <TextBlock Text="Exchange"
+                                                                   Foreground="{DynamicResource DefaultForegroundBrush}"
+                                                                   FontFamily="{DynamicResource DefaultFontFamily}"
+                                                                   VerticalAlignment="Center"
+                                                                   FontSize="16" />
+                                                        <TextBlock Text="{Binding CurrencyCode}"
+                                                                   Foreground="{DynamicResource DefaultForegroundBrush}"
+                                                                   FontFamily="{DynamicResource DefaultFontFamily}"
+                                                                   VerticalAlignment="Center"
+                                                                   FontSize="16"
+                                                                   Margin="3 0 0 0" />
+                                                    </StackPanel>
+                                                </Button>
+                                                <Button Width="180"
+                                                        Height="40"
+                                                        Padding="12 0"
+                                                        CornerRadius="6"
+                                                        VerticalContentAlignment="Center">
+                                                    <StackPanel Orientation="Horizontal"
+                                                                VerticalAlignment="Stretch">
+                                                        <TextBlock Text="Buy"
+                                                                   Foreground="{DynamicResource DefaultForegroundBrush}"
+                                                                   FontFamily="{DynamicResource DefaultFontFamily}"
+                                                                   VerticalAlignment="Center"
+                                                                   FontSize="16" />
+                                                        <TextBlock Text="{Binding CurrencyCode}"
+                                                                   Foreground="{DynamicResource DefaultForegroundBrush}"
+                                                                   FontFamily="{DynamicResource DefaultFontFamily}"
+                                                                   VerticalAlignment="Center"
+                                                                   FontSize="16"
+                                                                   Margin="3 0 0 0" />
+                                                    </StackPanel>
+                                                </Button>
+                                            </StackPanel>
+                                        </Border>
+                                    </Popup>
+                                </WrapPanel>
                             </StackPanel>
                         </Grid>
                     </DataTemplate>
