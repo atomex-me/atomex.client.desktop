@@ -5,6 +5,7 @@
              xmlns:converters="clr-namespace:Atomex.Client.Desktop.Converters"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="Atomex.Client.Desktop.Views.WalletsView"
+             xmlns:svg="clr-namespace:Avalonia.Svg.Skia;assembly=Avalonia.Svg.Skia"
              xmlns:vm="clr-namespace:Atomex.Client.Desktop.ViewModels">
 
     <Design.DataContext>
@@ -15,42 +16,54 @@
         <converters:WalletsViewMarginConverter x:Key="WalletsViewMarginConverter" />
     </UserControl.Resources>
 
-    <Grid
-        Margin="{Binding $parent[Window].DataContext.IsLinux,
-        Converter={StaticResource WalletsViewMarginConverter}}">
-        <TabControl Name="Wallets"
-                    Items="{Binding Wallets}"
-                    SelectedItem="{Binding Selected}"
-                    Margin="0 5 0 0">
+    <Border Padding="50 0 50 0"
+            Margin="{Binding $parent[Window].DataContext.IsLinux,
+            Converter={StaticResource WalletsViewMarginConverter}}"
+            Name="MainControl">
+        <StackPanel>
+            <Grid Height="75"
+                  ColumnDefinitions="Auto,*,Auto">
+                <Button Grid.Column="0"
+                        Width="28"
+                        Height="28"
+                        Padding="3"
+                        BorderThickness="0"
+                        VerticalContentAlignment="Center"
+                        VerticalAlignment="Center"
+                        Command="{Binding BackCommand}"
+                        Classes="ButtonWithIcon">
+                    <svg:Svg Width="28"
+                             Path="/Resources/Icons/back.svg"
+                             HorizontalAlignment="Left" />
+                </Button>
 
-            <TabControl.ItemTemplate>
-                <DataTemplate>
-                    <StackPanel x:Name="walletTabItem" Orientation="Vertical" Background="Transparent">
-                        <ContentControl x:Name="ContentControl"
-                                        HorizontalAlignment="Center"
-                                        VerticalContentAlignment="Center"
-                                        HorizontalContentAlignment="Center"
-                                        Width="64"
-                                        Height="64"
-                                        Opacity="0.8"
-                                        Margin="3 0 3 0">
-                            <Canvas Width="48"
-                                    Height="48"
-                                    Background="{Binding Background}"
-                                    OpacityMask="{Binding OpacityMask}" />
-                        </ContentControl>
+                <TextBlock Grid.Column="1"
+                           Foreground="{DynamicResource ChildViewHeaderForegroundBrush}"
+                           FontFamily="{DynamicResource DefaultLightFontFamily}"
+                           FontSize="22"
+                           HorizontalAlignment="Left"
+                           VerticalAlignment="Center"
+                           Text="{Binding Selected.Header}"
+                           Margin="20 0 0 0"
+                           Name="WindowTitle" />
 
-                        <TextBlock x:Name="HeaderTextBlock"
-                                   Text="{Binding Header}"
-                                   Foreground="{DynamicResource DefaultForegroundBrush}"
-                                   FontFamily="{StaticResource AgencyFb}"
-                                   FontSize="20"
-                                   TextAlignment="Center"
-                                   TextWrapping="Wrap"
-                                   Opacity="{Binding CurrencyOpacityValue}" />
-                    </StackPanel>
-                </DataTemplate>
-            </TabControl.ItemTemplate>
-        </TabControl>
-    </Grid>
+                <Button Grid.Column="2"
+                        Width="44"
+                        Height="44"
+                        BorderThickness="0"
+                        VerticalContentAlignment="Center"
+                        HorizontalContentAlignment="Center"
+                        CornerRadius="50"
+                        Classes="ButtonWithIcon Alert">
+                    <svg:Svg Width="22"
+                             Path="/Resources/Icons/notification-bell.svg" />
+                </Button>
+            </Grid>
+
+            <Border Height="1"
+                    Background="{DynamicResource LightDefaultOpacity10}" />
+
+            <ContentControl Content="{Binding Selected}" />
+        </StackPanel>
+    </Border>
 </UserControl>

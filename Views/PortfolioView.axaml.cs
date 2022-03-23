@@ -33,7 +33,7 @@ namespace Atomex.Client.Desktop.Views
         private void Popup_OnClosed(object? sender, EventArgs e)
         {
             if (DataContext is not PortfolioViewModel portfolioViewModel) return;
-            portfolioViewModel.OpenedCurrency = null;
+            portfolioViewModel.PopupOpenedCurrency = null;
         }
     }
 }

@@ -1,7 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-
 using Atomex.Client.Desktop.Api;
 using Atomex.Client.Desktop.Common;
 using Atomex.Services;
@@ -10,7 +10,7 @@ namespace Atomex.Client.Desktop.ViewModels
 {
     public class WertViewModel : ViewModelBase
     {
-        private string[] CurrenciesToBuy => new[] {"BTC", "ETH", "XTZ"};
+        public static IEnumerable<string> CurrenciesToBuy => new[] { "BTC", "ETH", "XTZ" };
         private IAtomexApp App { get; }
 
         private ObservableCollection<WertCurrencyViewModel> _wallets;
@@ -34,12 +34,12 @@ namespace Atomex.Client.Desktop.ViewModels
             {
                 if (_selected != null)
                     _selected.IsSelected = false;
-                
+
                 _selected = value;
-                
+
                 if (_selected != null)
                     _selected.IsSelected = true;
-                
+
                 OnPropertyChanged(nameof(Wallets));
             }
         }
@@ -67,7 +67,7 @@ namespace Atomex.Client.Desktop.ViewModels
         private void OnTerminalChangedEventHandler(object sender, AtomexClientChangedEventArgs e)
         {
             var wertApi = new WertApi(App);
-            
+
             Wallets = e.AtomexClient?.Account != null
                 ? new ObservableCollection<WertCurrencyViewModel>(
                     e.AtomexClient.Account.Currencies

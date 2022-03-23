@@ -1,8 +1,7 @@
 using System;
 using System.Diagnostics;
-
+using System.Linq;
 using ReactiveUI;
-
 using Atomex.Core;
 using Atomex.MarketData;
 using Atomex.MarketData.Abstract;
@@ -23,16 +22,22 @@ namespace Atomex.Client.Desktop.ViewModels
 
             PortfolioViewModel = new PortfolioViewModel(AtomexApp)
             {
-                SetDexTab = SelectConversion
+                SetDexTab = SelectConversion,
+                SetWalletCurrency = SelectCurrencyWallet,
+                SetWertCurrency = SelectWert
+            };
+            WalletsViewModel = new WalletsViewModel(AtomexApp)
+            {
+                SetConversionTab = SelectConversion,
+                BackAction = SelectPortfolio
             };
             ConversionViewModel = new ConversionViewModel(AtomexApp);
-            WalletsViewModel = new WalletsViewModel(AtomexApp, SelectConversion);
             SettingsViewModel = new SettingsViewModel(AtomexApp);
             WertViewModel = new WertViewModel(AtomexApp);
 
             SelectPortfolio();
             SubscribeToServices();
-            
+
             InstalledVersion = GetAssemblyFileVersion();
         }
 
@@ -42,7 +47,7 @@ namespace Atomex.Client.Desktop.ViewModels
         public ConversionViewModel ConversionViewModel { get; set; }
         public SettingsViewModel SettingsViewModel { get; set; }
         public WertViewModel WertViewModel { get; set; }
-        
+
         private ViewModelBase _content;
 
         public ViewModelBase Content
@@ -71,18 +76,6 @@ namespace Atomex.Client.Desktop.ViewModels
             set
             {
                 _installedVersion = value;
-                this.RaisePropertyChanged(nameof(SelectedMenuIndex));
-            }
-        }
-
-        private bool _updatesReady;
-
-        public bool UpdatesReady
-        {
-            get => _updatesReady;
-            set
-            {
-                _updatesReady = value;
                 this.RaisePropertyChanged(nameof(SelectedMenuIndex));
             }
         }
@@ -122,14 +115,14 @@ namespace Atomex.Client.Desktop.ViewModels
                 this.RaisePropertyChanged(nameof(IsQuotesProviderAvailable));
             }
         }
-        
-        
+
+
         private void SubscribeToServices()
         {
             AtomexApp.AtomexClientChanged += OnTerminalChangedEventHandler;
             AtomexApp.QuotesProvider.AvailabilityChanged += OnQuotesProviderAvailabilityChangedEventHandler;
         }
-        
+
         private void OnTerminalChangedEventHandler(object sender, AtomexClientChangedEventArgs args)
         {
             var terminal = args.AtomexClient;
@@ -139,15 +132,15 @@ namespace Atomex.Client.Desktop.ViewModels
             terminal.ServiceConnected += OnTerminalServiceStateChangedEventHandler;
             terminal.ServiceDisconnected += OnTerminalServiceStateChangedEventHandler;
         }
-        
+
         private void OnTerminalServiceStateChangedEventHandler(object sender, TerminalServiceEventArgs args)
         {
             if (sender is not IAtomexClient terminal)
                 return;
-            
+
             IsExchangeConnected = terminal.IsServiceConnected(TerminalService.Exchange);
             IsMarketDataConnected = terminal.IsServiceConnected(TerminalService.MarketData);
-            
+
             // subscribe to symbols updates
             if (args.Service == TerminalService.MarketData && IsMarketDataConnected)
             {
@@ -155,25 +148,18 @@ namespace Atomex.Client.Desktop.ViewModels
                 terminal.SubscribeToMarketData(SubscriptionType.DepthTwenty);
             }
         }
-        
+
         private void OnQuotesProviderAvailabilityChangedEventHandler(object sender, EventArgs args)
         {
             if (sender is not ICurrencyQuotesProvider provider)
                 return;
-            
+
             IsQuotesProviderAvailable = provider.IsAvailable;
-        }
-        
-        
-        public void SelectMenu(int index)
-        {
-            SelectedMenuIndex = index;
         }
 
         private void RefreshAllMenus()
         {
             this.RaisePropertyChanged(nameof(IsPortfolioSectionActive));
-            this.RaisePropertyChanged(nameof(IsWalletsSectionActive));
             this.RaisePropertyChanged(nameof(IsConversionSectionActive));
             this.RaisePropertyChanged(nameof(IsSettingsSectionActive));
             this.RaisePropertyChanged(nameof(IsWertSectionActive));
@@ -185,13 +171,20 @@ namespace Atomex.Client.Desktop.ViewModels
             Content = PortfolioViewModel;
             RefreshAllMenus();
         }
-        
-        public void SelectWallets()
+
+        private void SelectCurrencyWallet(string? currencyDescription = null)
         {
+            if (currencyDescription != null)
+            {
+                WalletsViewModel.Selected = WalletsViewModel
+                    .Wallets
+                    .First(wallet => wallet.Header == currencyDescription);
+            }
+
             Content = WalletsViewModel;
             RefreshAllMenus();
         }
-        
+
         public void SelectConversion(CurrencyConfig? fromCurrency = null)
         {
             Content = ConversionViewModel;
@@ -199,36 +192,40 @@ namespace Atomex.Client.Desktop.ViewModels
             {
                 ConversionViewModel.SetFromCurrency(fromCurrency);
             }
+
             RefreshAllMenus();
         }
-        
+
         public void SelectSettings()
         {
             Content = SettingsViewModel;
             RefreshAllMenus();
         }
-        
-        public void SelectWert()
+
+        public void SelectWert(string? currencyDescription = null)
         {
+            if (currencyDescription != null)
+            {
+                WertViewModel.Selected = WertViewModel
+                    .Wallets
+                    .First(wallet => wallet.Header == currencyDescription);
+            }
+
             Content = WertViewModel;
             RefreshAllMenus();
         }
 
-        public void SurveyCommand()
-        {
-            App.OpenBrowser("https://forms.gle/TACSt9JDJSd7tZyk9");
-        }
+        public bool IsPortfolioSectionActive => Content.GetType() == typeof(PortfolioViewModel) ||
+                                                Content.GetType() == typeof(WalletsViewModel);
 
-        public bool IsPortfolioSectionActive => Content.GetType() == typeof(PortfolioViewModel);
-        public bool IsWalletsSectionActive => Content.GetType() == typeof(WalletsViewModel);
         public bool IsConversionSectionActive => Content.GetType() == typeof(ConversionViewModel);
         public bool IsSettingsSectionActive => Content.GetType() == typeof(SettingsViewModel);
         public bool IsWertSectionActive => Content.GetType() == typeof(WertViewModel);
-        
+
         public static string GetAssemblyFileVersion()
         {
-            System.Reflection.Assembly assembly = System.Reflection.Assembly.GetExecutingAssembly();
-            FileVersionInfo fileVersion = FileVersionInfo.GetVersionInfo(assembly.Location);
+            var assembly = System.Reflection.Assembly.GetExecutingAssembly();
+            var fileVersion = FileVersionInfo.GetVersionInfo(assembly.Location);
             return fileVersion.FileVersion;
         }
     }

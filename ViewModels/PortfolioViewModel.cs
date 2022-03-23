@@ -35,10 +35,12 @@ namespace Atomex.Client.Desktop.ViewModels
         private Color NoTokensColor { get; } = Color.FromArgb(50, 0, 0, 0);
         public SelectCurrencyType SelectCurrencyUseCase { get; set; }
         public Action<CurrencyConfig?> SetDexTab { get; set; }
+        public Action<string> SetWalletCurrency { get; set; }
+        public Action<string> SetWertCurrency { get; set; }
         [Reactive] public decimal PortfolioValue { get; set; }
         [Reactive] public string SearchPattern { get; set; }
         [Reactive] public CurrencyViewModel? SelectedCurrency { get; set; }
-        [Reactive] public string? OpenedCurrency { get; set; }
+        [Reactive] public string? PopupOpenedCurrency { get; set; }
 
         public PortfolioViewModel()
         {
@@ -176,14 +178,29 @@ namespace Atomex.Client.Desktop.ViewModels
             this.RaisePropertyChanged(nameof(PlotModel));
         }
 
+        private ReactiveCommand<CurrencyViewModel, Unit> _setWalletCurrencyCommand;
+
+        public ReactiveCommand<CurrencyViewModel, Unit> SetWalletCurrencyCommand => _setWalletCurrencyCommand ??=
+            (_setWalletCurrencyCommand = ReactiveCommand.Create<CurrencyViewModel>(currencyViewModel =>
+            {
+                SetWalletCurrency?.Invoke(currencyViewModel.Currency.Description);
+            }));
+        
+        private ReactiveCommand<CurrencyViewModel, Unit> _setWertCurrencyCommand;
+
+        public ReactiveCommand<CurrencyViewModel, Unit> SetWertCurrencyCommand => _setWertCurrencyCommand ??=
+            (_setWertCurrencyCommand = ReactiveCommand.Create<CurrencyViewModel>(currencyViewModel =>
+            {
+                PopupOpenedCurrency = null;
+                SetWertCurrency?.Invoke(currencyViewModel.Currency.Description);
+            }));
+
         private ReactiveCommand<CurrencyViewModel, Unit> _openCurrencyPopupCommand;
 
         public ReactiveCommand<CurrencyViewModel, Unit> OpenCurrencyPopupCommand => _openCurrencyPopupCommand ??=
             (_openCurrencyPopupCommand = ReactiveCommand.Create<CurrencyViewModel>(currencyViewModel =>
             {
-                Log.Fatal($"Selected {currencyViewModel.CurrencyCode}");
-
-                OpenedCurrency = currencyViewModel.CurrencyCode;
+                PopupOpenedCurrency = currencyViewModel.CurrencyCode;
             }));
 
         private ReactiveCommand<Unit, Unit> _sendCommand;
@@ -204,6 +221,17 @@ namespace Atomex.Client.Desktop.ViewModels
             Desktop.App.DialogService.Show(selectFromCurrencyViewModel);
         }));
 
+        private ReactiveCommand<CurrencyViewModel, Unit> _sendFromPopupCommand;
+
+        public ReactiveCommand<CurrencyViewModel, Unit> SendFromPopupCommand => _sendFromPopupCommand ??=
+            (_sendFromPopupCommand = ReactiveCommand.Create<CurrencyViewModel>(currencyViewModel =>
+            {
+                var sendViewModel = SendViewModelCreator.CreateViewModel(App, currencyViewModel.Currency);
+                PopupOpenedCurrency = null;
+                Desktop.App.DialogService.Show(sendViewModel.SelectFromViewModel);
+            }));
+
+
         private ReactiveCommand<Unit, Unit> _receiveCommand;
 
         public ReactiveCommand<Unit, Unit> ReceiveCommand => _receiveCommand ??= _receiveCommand =
@@ -223,10 +251,25 @@ namespace Atomex.Client.Desktop.ViewModels
                 Desktop.App.DialogService.Show(selectReceiveCurrencyViewModel);
             });
 
-        private ReactiveCommand<Unit, Unit> _exchangeCommand;
+        private ReactiveCommand<CurrencyViewModel, Unit> _receiveFromPopupCommand;
 
-        public ReactiveCommand<Unit, Unit> ExchangeCommand => _exchangeCommand ??= _exchangeCommand =
-            ReactiveCommand.Create(() => { SetDexTab?.Invoke(null); });
+        public ReactiveCommand<CurrencyViewModel, Unit> ReceiveFromPopupCommand => _receiveFromPopupCommand ??=
+            _receiveFromPopupCommand =
+                ReactiveCommand.Create<CurrencyViewModel>(currencyViewModel =>
+                {
+                    var receiveViewModel = new ReceiveViewModel(App, currencyViewModel.Currency);
+                    PopupOpenedCurrency = null;
+                    Desktop.App.DialogService.Show(receiveViewModel);
+                });
+
+        private ReactiveCommand<CurrencyViewModel, Unit> _exchangeCommand;
+
+        public ReactiveCommand<CurrencyViewModel, Unit> ExchangeCommand => _exchangeCommand ??= _exchangeCommand =
+            ReactiveCommand.Create<CurrencyViewModel>(currencyViewModel =>
+            {
+                PopupOpenedCurrency = null;
+                SetDexTab?.Invoke(currencyViewModel?.Currency);
+            });
 
         private ReactiveCommand<Unit, Unit> _manageAssetsCommand;
 

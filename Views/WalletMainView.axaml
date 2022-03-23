@@ -158,10 +158,11 @@
             <StackPanel Orientation="Horizontal"
                         VerticalAlignment="Center">
                 <TextBlock Text="Version:"
-                           Margin="8 0 4 0"
+                           Margin="8 0 4 1"
                            FontSize="11"
                            Foreground="{DynamicResource StatusBarVersionForeground}" />
                 <TextBlock Text="{Binding InstalledVersion}"
+                           Margin="0 0 0 1"
                            FontSize="11"
                            Foreground="{DynamicResource StatusBarVersionForeground}" />
             </StackPanel>
@@ -169,21 +170,7 @@
 
         <!-- left menu -->
         <DockPanel DockPanel.Dock="Left">
-
-            <!--<StackPanel Width="239" DockPanel.Dock="Bottom">
-        <controls:MenuButton
-            IsVisible="False"
-            IsSelected="{Binding IsSettingsSectionActive}"
-            HorizontalAlignment="Stretch"
-            Command="{Binding SelectSettings}">
-          <TextBlock VerticalAlignment="Center"
-                      Margin="32 16 0 16"
-                      Text="Settings"/>
-        </controls:MenuButton>
-      </StackPanel>-->
-
             <StackPanel Width="239">
-
                 <Image Source="/Resources/Images/menu_logo.png"
                        Stretch="None"
                        HorizontalAlignment="Left"
@@ -197,17 +184,7 @@
                     Command="{Binding SelectPortfolio}">
                     <TextBlock VerticalAlignment="Center"
                                Margin="32 16 0 16"
-
                                Text="Portfolio" />
-                </controls:MenuButton>
-
-                <controls:MenuButton
-                    IsSelected="{Binding IsWalletsSectionActive}"
-                    HorizontalAlignment="Stretch"
-                    Command="{Binding SelectWallets}">
-                    <TextBlock VerticalAlignment="Center"
-                               Margin="32 16 0 16"
-                               Text="Wallets" />
                 </controls:MenuButton>
 
                 <controls:MenuButton
@@ -234,8 +211,6 @@
                     Width="1" />
         </DockPanel>
 
-        <Border Padding="50 16 50 0">
-            <ContentControl Content="{Binding Content}" />
-        </Border>
+        <ContentControl Content="{Binding Content}" />
     </DockPanel>
 </UserControl>
