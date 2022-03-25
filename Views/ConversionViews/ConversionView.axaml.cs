@@ -4,6 +4,7 @@ using Avalonia.Markup.Xaml;
 using Avalonia.Threading;
 
 using Atomex.Client.Desktop.ViewModels;
+using Avalonia.Media;
 
 namespace Atomex.Client.Desktop.Views
 {
@@ -12,7 +13,7 @@ namespace Atomex.Client.Desktop.Views
         public ConversionView()
         {
             InitializeComponent();
-
+            
             var dgConversions = this.FindControl<DataGrid>("DgConversions");
 
             dgConversions.CellPointerPressed += (sender, args) =>
@@ -24,6 +25,13 @@ namespace Atomex.Client.Desktop.Views
                         viewModel.CellPointerPressed(cellIndex);
                 });
             };
+            
+#if DEBUG
+            if (!Design.IsDesignMode) return;
+
+            var designGrid = this.FindControl<Grid>("DesignGrid");
+            designGrid.Background = new SolidColorBrush(Color.FromRgb(0x0F, 0x21, 0x39));
+#endif
         }
 
         private void InitializeComponent()

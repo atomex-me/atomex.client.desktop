@@ -2,11 +2,12 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             mc:Ignorable="d" d:DesignWidth="700" d:DesignHeight="450"
              x:Class="Atomex.Client.Desktop.Views.ConversionConfirmationView"
              xmlns:vm="clr-namespace:Atomex.Client.Desktop.ViewModels"
              xmlns:controls="clr-namespace:Atomex.Client.Desktop.Controls"
              xmlns:converters="clr-namespace:Atomex.Client.Desktop.Converters"
+             xmlns:svg="clr-namespace:Avalonia.Svg.Skia;assembly=Avalonia.Svg.Skia"
              Height="434"
              Width="700">
 
@@ -50,11 +51,10 @@
           <StackPanel Orientation="Horizontal"
                       Grid.Row="1"
                       Grid.Column="1">
-            <Image Width="24"
-                   Height="24"
-                   VerticalAlignment="Center"
-                   Source="{Binding FromCurrencyViewModel.LargeIconPath}"
-                   UseLayoutRounding="True"/>
+            
+            <svg:Svg Path="{Binding FromCurrencyViewModel.IconPath}"
+                     Width="24"
+                     VerticalAlignment="Center" />
 
             <TextBlock Margin="8 0 0 0"
                        Text="{Binding FromCurrencyViewModel.Header}"
@@ -70,6 +70,7 @@
                      FontFamily="{DynamicResource DefaultLightFontFamily}"
                      Foreground="{DynamicResource SecondaryForegroundBrush}"
                      VerticalAlignment="Bottom"
+                     Margin="0 4 0 0"
                      Grid.Row="2"
                      Grid.Column="1"/>
 
@@ -146,11 +147,10 @@
           <StackPanel Orientation="Horizontal"
                       Grid.Row="1"
                       Grid.Column="1">
-            <Image Width="24"
-                   Height="24"
-                   VerticalAlignment="Center"
-                   Source="{Binding ToCurrencyViewModel.LargeIconPath}"
-                   UseLayoutRounding="True"/>
+            
+            <svg:Svg Path="{Binding ToCurrencyViewModel.IconPath}"
+                     Width="24"
+                     VerticalAlignment="Center" />
 
             <TextBlock Margin="8 0 0 0"
                        Text="{Binding ToCurrencyViewModel.Header}"
@@ -163,6 +163,7 @@
           <!-- address description -->
           <TextBlock Text="{Binding ToAddressDescription}"
                      FontSize="13"
+                     Margin="0 4 0 0"
                      FontFamily="{DynamicResource DefaultLightFontFamily}"
                      Foreground="{DynamicResource SecondaryForegroundBrush}"
                      VerticalAlignment="Bottom"

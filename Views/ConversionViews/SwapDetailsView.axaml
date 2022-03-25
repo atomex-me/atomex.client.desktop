@@ -294,25 +294,11 @@
                 </i:Interaction.Behaviors>
             </TextBlock>
 
-            <Grid Margin="0 32 0 40">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="40" />
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="16" />
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="40" />
-                </Grid.ColumnDefinitions>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                </Grid.RowDefinitions>
-
-                <Image Source="{Binding FromCurrencyViewModel.LargeIconPath}"
-                       Width="48"
-                       Height="48"
-                       Grid.Column="1"
-                       Grid.Row="0" />
+            <Grid Margin="0 32 0 40" ColumnDefinitions="40,*,16,*,40" RowDefinitions="Auto,Auto,Auto">
+                <svg:Svg Grid.Column="1"
+                         Grid.Row="0"
+                         Width="50"
+                         Path="{Binding FromCurrencyViewModel.IconPath}" />
 
                 <Path Width="14"
                       Height="14"
@@ -323,11 +309,10 @@
                       Data="{DynamicResource SwapArrows}"
                       Fill="{DynamicResource LightDefaultOpacity50}" />
 
-                <Image Source="{Binding ToCurrencyViewModel.LargeIconPath}"
-                       Width="48"
-                       Height="48"
-                       Grid.Column="3"
-                       Grid.Row="0" />
+                <svg:Svg Grid.Column="3"
+                         Grid.Row="0"
+                         Width="50"
+                         Path="{Binding ToCurrencyViewModel.IconPath}" />
 
                 <TextBlock Text="{Binding FromCurrencyCode}"
                            Foreground="{DynamicResource ChildViewHeaderForegroundBrush}"

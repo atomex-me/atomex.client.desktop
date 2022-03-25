@@ -265,9 +265,9 @@
                                           RowDefinitions="Auto">
                                         <StackPanel Orientation="Horizontal"
                                                     Grid.Column="0">
-                                            <Image Source="{Binding LargeIconPath}"
-                                                   Margin="16 0"
-                                                   Width="24" />
+                                            <svg:Svg Width="28"
+                                                     Margin="16 0"
+                                                     Path="{Binding IconPath}" />
                                             <TextBlock VerticalAlignment="Center"
                                                        FontFamily="{DynamicResource DefaultFontFamily}"
                                                        Foreground="{DynamicResource DefaultForegroundBrush}"

@@ -12,7 +12,8 @@
              xmlns:helpers="clr-namespace:Atomex.Client.Desktop.Helpers"
              xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
              xmlns:ia="clr-namespace:Avalonia.Xaml.Interactions.Core;assembly=Avalonia.Xaml.Interactions"
-             xmlns:transactionViews="clr-namespace:Atomex.Client.Desktop.Views.TransactionViews">
+             xmlns:transactionViews="clr-namespace:Atomex.Client.Desktop.Views.TransactionViews"
+             xmlns:svg="clr-namespace:Avalonia.Svg.Skia;assembly=Avalonia.Svg.Skia">
 
     <Design.DataContext>
         <vm:Fa12WalletViewModel />
@@ -43,12 +44,10 @@
                                 IsVisible="{Binding !IsBalanceUpdating}">
                         <StackPanel Orientation="Horizontal"
                                     Margin="20 20 20 0">
-
-                            <Image Classes="BaseDisabledStyle"
-                                   Source="{Binding CurrencyViewModel.LargeIconPath}"
-                                   Width="90"
-                                   Height="90"
-                                   VerticalAlignment="Top" />
+                            <svg:Svg Path="{Binding CurrencyViewModel.IconPath}"
+                                     Width="90"
+                                     VerticalAlignment="Top"
+                                     Classes="BaseDisabledStyle" />
                             <StackPanel Orientation="Vertical"
                                         Margin="20 10 0 0">
                                 <StackPanel Orientation="Horizontal">
@@ -231,18 +230,18 @@
                                 HorizontalAlignment="Center"
                                 VerticalAlignment="Center"
                                 IsVisible="{Binding IsBalanceUpdating}">
-                        <Image Name="CurrencyLogo"
-                               Classes="CurrencyLogo"
-                               Source="{Binding CurrencyViewModel.LargeIconPath}"
-                               Margin="0 0 0 0"
-                               Width="64"
-                               Height="64"
-                               VerticalAlignment="Top"
-                               IsEnabled="{Binding IsBalanceUpdating}">
-                            <Image.RenderTransform>
+                        
+                        <svg:Svg Path="{Binding CurrencyViewModel.IconPath}"
+                                 Margin="0"
+                                 Width="64"
+                                 VerticalAlignment="Top"
+                                 IsEnabled="{Binding IsBalanceUpdating}"
+                                 Name="CurrencyLogo"
+                                 Classes="CurrencyLogo">
+                            <svg:Svg.RenderTransform>
                                 <RotateTransform Angle="0" />
-                            </Image.RenderTransform>
-                        </Image>
+                            </svg:Svg.RenderTransform>
+                        </svg:Svg>
                         <TextBlock Name="UpdatingTextBlock"
                                    Classes="UpdatingTextBlock"
                                    Text="balance update in progress..."
@@ -286,7 +285,7 @@
 
             <DataGrid.RowDetailsTemplate>
                 <DataTemplate>
-                    <transactionViews:TezosTokenTransferDetailsView/>
+                    <transactionViews:TezosTokenTransferDetailsView />
                 </DataTemplate>
             </DataGrid.RowDetailsTemplate>
 

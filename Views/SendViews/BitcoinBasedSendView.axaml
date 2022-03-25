@@ -151,12 +151,10 @@
                   VerticalContentAlignment="Center"
                   Classes="EmptyBtnWithContent">
             <Grid ColumnDefinitions="24,*">
-              <Image Width="24"
-                     Height="24"
-                     Source="{Binding CurrencyViewModel.LargeIconPath}"
-                     UseLayoutRounding="True"
-                     Grid.Row="0"
-                     Grid.Column="0"/>
+              <svg:Svg Grid.Row="0"
+                       Grid.Column="0"
+                       Path="{Binding CurrencyViewModel.IconPath}"
+                       Width="25" />
 
               <TextBlock Grid.Column="1"
                          FontFamily="{DynamicResource DefaultMediumFontFamily}"

@@ -22,8 +22,8 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
             AccentColor         = Color.FromRgb(r: 73, g: 114, b: 143);
             AmountColor         = Color.FromRgb(r: 183, g: 208, b: 225);
             UnselectedIconBrush = Brushes.White;
-            IconPath            = GetBitmap(PathToImage("ethereum.png"));
-            LargeIconPath       = GetBitmap(PathToImage("ethereum_90x90.png"));
+            IconPath            = $"{PathToIcons}/ethereum.svg";
+            DisabledIconPath    = $"{PathToIcons}/ethereum-disabled.svg";
             FeeName             = Resources.SvGasLimit;
         }
     }

@@ -32,7 +32,7 @@
                      Grid.Row="1"
                      Height="44"
                      CornerRadius="8"
-                     Watermark="Search or paste an address"
+                     Watermark="Search"
                      FontSize="16"
                      Text="{Binding SearchPattern, Mode=TwoWay}"
                      Classes="SearchTextBox">
@@ -45,7 +45,6 @@
                                 VerticalContentAlignment="Center"
                                 Command="{ReflectionBinding $parent[TextBox].Clear}"
                                 Classes="ButtonWithIcon WithoutEffects">
-
                             <svg:Svg HorizontalAlignment="Center"
                                      Width="18"
                                      Height="18"
@@ -90,11 +89,16 @@
                                         Orientation="Horizontal"
                                         VerticalAlignment="Center"
                                         Grid.Column="0">
-                                <Image Width="24"
-                                       Height="24"
-                                       Source="{Binding Currency.LargeIconPath}"
-                                       VerticalAlignment="Center"
-                                       UseLayoutRounding="True" />
+                                <svg:Svg Path="{Binding Currency.IconPath}"
+                                         Width="28"
+                                         VerticalAlignment="Top"
+                                         Classes="BaseDisabledStyle"
+                                         IsVisible="{Binding IsSelected}" />
+                                <svg:Svg Path="{Binding Currency.DisabledIconPath}"
+                                         Width="28"
+                                         VerticalAlignment="Top"
+                                         Classes="BaseDisabledStyle"
+                                         IsVisible="{Binding !IsSelected}" />
                                 <TextBlock Margin="17 0 0 0"
                                            Text="{Binding Currency.Header}"
                                            FontFamily="{DynamicResource DefaultLightFontFamily}"

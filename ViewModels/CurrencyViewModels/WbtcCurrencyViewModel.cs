@@ -26,8 +26,8 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
             AccentColor         = Color.FromRgb(r: 7, g: 82, b: 192);
             AmountColor         = Color.FromRgb(r: 188, g: 212, b: 247);
             UnselectedIconBrush = Brushes.White;
-            IconPath            = GetBitmap(PathToImage("wbtc.png"));
-            LargeIconPath       = GetBitmap(PathToImage("wbtc_90x90.png"));
+            IconPath            = $"{PathToIcons}/wbtc.svg";
+            DisabledIconPath    = $"{PathToIcons}/wbtc-disabled.svg";
             FeeName             = Resources.SvGasLimit;
         }
     }

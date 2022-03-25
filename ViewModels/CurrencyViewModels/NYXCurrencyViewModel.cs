@@ -23,8 +23,8 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
             AccentColor         = Color.FromRgb(r: 7, g: 82, b: 192);
             AmountColor         = Color.FromRgb(r: 188, g: 212, b: 247);
             UnselectedIconBrush = Brushes.White;
-            IconPath            = GetBitmap(PathToImage("tezos.png"));
-            LargeIconPath       = GetBitmap(PathToImage("tezos_90x90.png"));
+            IconPath            = $"{PathToIcons}/tezos.svg";
+            DisabledIconPath    = $"{PathToIcons}/tezos-disabled.svg";
             FeeName             = Resources.SvMiningFee;
         }
     }

@@ -23,6 +23,7 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
     public abstract class CurrencyViewModel : ViewModelBase
     {
         private const string PathToImages = "avares://Atomex.Client.Desktop/Resources/Images";
+        protected const string PathToIcons = "/Resources/Icons";
 
         protected IAccount Account { get; set; }
         private ICurrencyQuotesProvider QuotesProvider { get; set; }
@@ -37,8 +38,8 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
         public Brush IconMaskBrush { get; set; }
         public Color AccentColor { get; set; }
         public Color AmountColor { get; set; }
-        public IImage IconPath { get; set; }
-        public IImage LargeIconPath { get; set; }
+        public string IconPath { get; set; }
+        public string DisabledIconPath { get; set; }
         [Reactive] public decimal CurrentQuote { get; set; }
         [Reactive] public decimal TotalAmount { get; set; }
         [Reactive] public decimal TotalAmountInBase { get; set; }

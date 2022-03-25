@@ -6,7 +6,6 @@
              x:Class="Atomex.Client.Desktop.Views.ConversionView"
              xmlns:vm="clr-namespace:Atomex.Client.Desktop.ViewModels"
              xmlns:views="clr-namespace:Atomex.Client.Desktop.Views"
-             xmlns:helpers="clr-namespace:Atomex.Client.Desktop.Helpers"
              xmlns:controls="clr-namespace:Atomex.Client.Desktop.Controls"
              xmlns:converters="clr-namespace:Atomex.Client.Desktop.Converters"
              xmlns:styles="clr-namespace:Atomex.Client.Desktop.Styles"
@@ -42,18 +41,7 @@
     <converters:WidthToHorizontalCenterOffsetConverter x:Key="WidthToHorizontalCenterOffsetConverter"/>
   </UserControl.Resources>
 
-  <Grid>
-    <Grid.RowDefinitions>
-      <RowDefinition Height="Auto"/>
-      <RowDefinition Height="Auto"/>
-      <RowDefinition Height="*"/>
-    </Grid.RowDefinitions>
-
-    <Grid.ColumnDefinitions>
-      <ColumnDefinition Width="*"/>
-      <ColumnDefinition Width="360"/>
-    </Grid.ColumnDefinitions>
-      
+  <Grid Name="DesignGrid" RowDefinitions="Auto,Auto,*" ColumnDefinitions="*,360">
     <StackPanel Orientation="Vertical"
                 Grid.ColumnSpan="{Binding ColumnSpan}"
                 Grid.Column="0"
@@ -819,10 +807,9 @@
               <StackPanel Orientation="Horizontal"
                           Margin="10 0 10 0">
                 <!-- from -->
-                <Image Width="24"
-                       Height="24"
-                       Source="{Binding FromCurrencyViewModel.LargeIconPath}"
-                       UseLayoutRounding="True"/>
+                <svg:Svg Width="28"
+                         VerticalAlignment="Center"
+                         Path="{Binding FromCurrencyViewModel.IconPath}" />
 
                 <StackPanel Orientation="Horizontal"
                             Margin="9 0 0 0"
@@ -856,10 +843,9 @@
                       Fill="{DynamicResource LightDefaultOpacity50}"/>
                 
                 <!-- to -->
-                <Image Width="24"
-                       Height="24"
-                       Source="{Binding ToCurrencyViewModel.LargeIconPath}"
-                       UseLayoutRounding="True"/>
+                <svg:Svg Width="28"
+                         VerticalAlignment="Center"
+                         Path="{Binding ToCurrencyViewModel.IconPath}" />
 
                 <TextBlock Margin="9 0 0 0"
                            FontFamily="{DynamicResource DefaultLightFontFamily}"

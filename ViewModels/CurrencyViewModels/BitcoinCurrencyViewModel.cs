@@ -1,11 +1,6 @@
-﻿using System.Collections.ObjectModel;
-using System.Linq;
-using System.Threading.Tasks;
-using Atomex.Blockchain.BitcoinBased;
-using Atomex.Client.Desktop.Properties;
+﻿using Atomex.Client.Desktop.Properties;
 using Atomex.Core;
 using Avalonia.Media;
-using Atomex.Wallet.BitcoinBased;
 using Avalonia.Visuals.Media.Imaging;
 
 
@@ -27,8 +22,8 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
             AccentColor         = Color.FromRgb(r: 255, g: 148, b: 0);
             AmountColor         = Color.FromRgb(r: 255, g: 148, b: 0);
             UnselectedIconBrush = Brushes.White;
-            IconPath            = GetBitmap(PathToImage("bitcoin.png"));
-            LargeIconPath       = GetBitmap(PathToImage("bitcoin_90x90.png"));
+            IconPath            = $"{PathToIcons}/bitcoin.svg";
+            DisabledIconPath    = $"{PathToIcons}/bitcoin-disabled.svg";
             FeeName             = Resources.SvMiningFee;
         }
     }

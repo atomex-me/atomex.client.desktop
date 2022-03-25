@@ -6,7 +6,8 @@
              x:Class="Atomex.Client.Desktop.Views.SelectCurrencyWithoutAddressesView"
              xmlns:vm="clr-namespace:Atomex.Client.Desktop.ViewModels"
              xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
-             xmlns:ia="clr-namespace:Avalonia.Xaml.Interactions.Core;assembly=Avalonia.Xaml.Interactions">
+             xmlns:ia="clr-namespace:Avalonia.Xaml.Interactions.Core;assembly=Avalonia.Xaml.Interactions"
+             xmlns:svg="clr-namespace:Avalonia.Svg.Skia;assembly=Avalonia.Svg.Skia">
     <Design.DataContext>
         <vm:SelectCurrencyWithoutAddressesViewModel />
     </Design.DataContext>
@@ -60,11 +61,9 @@
                                         Orientation="Horizontal"
                                         VerticalAlignment="Center"
                                         Grid.Column="0">
-                                <Image Width="24"
-                                       Height="24"
-                                       Source="{Binding LargeIconPath}"
-                                       VerticalAlignment="Center"
-                                       UseLayoutRounding="True" />
+                                <svg:Svg Width="28"
+                                         VerticalAlignment="Center"
+                                         Path="{Binding IconPath}" />
                                 <TextBlock Margin="17 0 0 0"
                                            Text="{Binding Header}"
                                            FontFamily="{DynamicResource DefaultLightFontFamily}"
