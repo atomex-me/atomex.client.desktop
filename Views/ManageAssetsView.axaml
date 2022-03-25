@@ -61,27 +61,7 @@
                      ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                      Background="{DynamicResource AlmostTransparentBrush}"
                      Items="{Binding AvailableCurrencies}"
-                     Classes="SelectCurrencyListBox">
-                <ListBox.Styles>
-                    <Style Selector="ListBoxItem:selected /template/ ContentPresenter">
-                        <Setter Property="Background" Value="{DynamicResource AlmostTransparentBrush}" />
-                    </Style>
-                    <Style Selector="ListBoxItem:pointerover:selected /template/ ContentPresenter">
-                        <Setter Property="Background" Value="{DynamicResource ListBoxItemPointeroverBrush}" />
-                    </Style>
-                    <Style Selector="ListBoxItem Border#BottomLine">
-                        <Setter Property="IsVisible" Value="True" />
-                    </Style>
-                    <Style Selector="ListBoxItem:selected Border#BottomLine">
-                        <Setter Property="IsVisible" Value="True" />
-                    </Style>
-                    <Style Selector="TextBlock.IsSelected">
-                        <Setter Property="Foreground" Value="{DynamicResource DefaultForegroundBrush}" />
-                    </Style>
-                    <Style Selector="TextBlock.NotSelected">
-                        <Setter Property="Foreground" Value="{DynamicResource SecondaryForegroundBrush}" />
-                    </Style>
-                </ListBox.Styles>
+                     Classes="SelectCurrencyListBox ManageAssets">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <Grid ColumnDefinitions="*,Auto">

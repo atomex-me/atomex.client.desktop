@@ -4,6 +4,7 @@
         <Setter Property="Padding" Value="0" />
         <Setter Property="CornerRadius" Value="8" />
         <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+        <Setter Property="Cursor" Value="Hand"></Setter>
     </Style>
 
     <Style Selector=".SelectCurrencyListBox ListBoxItem:pointerover Border#BottomLine">
@@ -20,5 +21,28 @@
     </Style>
     <Style Selector=".SelectCurrencyListBox ListBoxItem:selected Border#BottomLine">
         <Setter Property="IsVisible" Value="False" />
+    </Style>
+    
+    
+    <Style Selector=".ManageAssets ListBoxItem">
+        <Setter Property="Cursor" Value="Arrow" />
+    </Style>
+    <Style Selector=".ManageAssets ListBoxItem:selected /template/ ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource AlmostTransparentBrush}" />
+    </Style>
+    <Style Selector=".ManageAssets ListBoxItem:pointerover:selected /template/ ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource ListBoxItemPointeroverBrush}" />
+    </Style>
+    <Style Selector=".ManageAssets ListBoxItem Border#BottomLine">
+        <Setter Property="IsVisible" Value="True" />
+    </Style>
+    <Style Selector=".ManageAssets ListBoxItem:selected Border#BottomLine">
+        <Setter Property="IsVisible" Value="True" />
+    </Style>
+    <Style Selector=".ManageAssets TextBlock.IsSelected">
+        <Setter Property="Foreground" Value="{DynamicResource DefaultForegroundBrush}" />
+    </Style>
+    <Style Selector=".ManageAssets TextBlock.NotSelected">
+        <Setter Property="Foreground" Value="{DynamicResource SecondaryForegroundBrush}" />
     </Style>
 </Styles>
