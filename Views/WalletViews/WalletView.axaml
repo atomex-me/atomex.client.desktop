@@ -2,7 +2,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="650"
              x:Class="Atomex.Client.Desktop.Views.WalletViews.WalletView"
              xmlns:vm="clr-namespace:Atomex.Client.Desktop.ViewModels.WalletViewModels"
              xmlns:txViewModels="clr-namespace:Atomex.Client.Desktop.ViewModels.TransactionViewModels"
@@ -21,370 +21,198 @@
     <UserControl.Resources>
         <converters:AmountToStringConverter x:Key="AmountToStringConverter" />
         <converters:DateTimeToTxTimeConverter x:Key="DateTimeToTxTimeConverter" />
+        <converters:ShowBuyButton x:Key="ShowBuyButton" />
     </UserControl.Resources>
 
-    <Grid RowDefinitions="Auto,*">
-        <!-- Margin="10 20 10 10" -->
-        <StackPanel Orientation="Horizontal"
-                    HorizontalAlignment="Center"
-                    Margin="10 0 10 10"
-                    Grid.Row="0">
-            <Border Background="{DynamicResource DefaultSubstrateBrush}"
-                    CornerRadius="10"
-                    MinWidth="483"
-                    MinHeight="160">
-                <Grid>
-                    <StackPanel Orientation="Vertical"
-                                IsEnabled="True"
-                                IsVisible="{Binding !IsBalanceUpdating}">
-                        <StackPanel Orientation="Horizontal"
-                                    Margin="20 20 20 0">
+    <Grid RowDefinitions="Auto,*"
+          Name="DesignGrid">
+        <Grid ColumnDefinitions="Auto,*"
+              Margin="0 40 0 0">
+            <Border Grid.Column="0"
+                    Background="{DynamicResource LightDefaultOpacity10}"
+                    Width="150"
+                    Height="150"
+                    CornerRadius="150" />
+            <svg:Svg Grid.Column="0"
+                     Path="{Binding CurrencyViewModel.IconPath}"
+                     Height="55" />
 
-                            <svg:Svg Path="{Binding CurrencyViewModel.IconPath}"
-                                     Width="90"
-                                     VerticalAlignment="Top"
-                                     Classes="BaseDisabledStyle" />
+            <StackPanel Grid.Column="1"
+                        Margin="40 0 0 0">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock FontFamily="{DynamicResource DefaultFontFamily}"
+                               Foreground="{DynamicResource DefaultForegroundBrush}"
+                               FontWeight="Light"
+                               FontSize="32"
+                               LineHeight="40">
+                        <TextBlock.Text>
+                            <MultiBinding Converter="{StaticResource AmountToStringConverter}">
+                                <Binding Path="CurrencyViewModel.TotalAmount" Mode="OneWay" />
+                                <Binding Path="CurrencyViewModel.CurrencyFormat" Mode="OneWay" />
+                            </MultiBinding>
+                        </TextBlock.Text>
+                    </TextBlock>
+                    <TextBlock Margin="6 0 0 0"
+                               FontFamily="{DynamicResource DefaultFontFamily}"
+                               Foreground="{DynamicResource DefaultForegroundBrush}"
+                               FontWeight="Light"
+                               FontSize="32"
+                               LineHeight="40"
+                               Text="{Binding CurrencyViewModel.CurrencyCode}" />
+                    <Button Padding="2 4"
+                            Margin="15 0 0 0"
+                            BorderThickness="0"
+                            VerticalContentAlignment="Center"
+                            HorizontalContentAlignment="Center"
+                            VerticalAlignment="Center"
+                            Command="{Binding UpdateCommand}"
+                            Classes="ButtonWithIcon">
+                        <svg:Svg Width="24"
+                                 Path="/Resources/Icons/update.svg" />
+                    </Button>
+                </StackPanel>
 
-                            <StackPanel Orientation="Vertical"
-                                        Margin="20 10 0 0">
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock Classes="BaseDisabledStyle"
-                                               Foreground="{DynamicResource BalanceBackgroundBrush}"
-                                               FontFamily="{DynamicResource DefaultFontFamily}"
-                                               FontSize="36"
-                                               VerticalAlignment="Bottom"
-                                               HorizontalAlignment="Left">
-                                        <TextBlock.Text>
-                                            <MultiBinding Converter="{StaticResource AmountToStringConverter}">
-                                                <Binding Path="CurrencyViewModel.TotalAmount" Mode="OneWay" />
-                                                <Binding Path="CurrencyViewModel.CurrencyFormat" Mode="OneWay" />
-                                            </MultiBinding>
-                                        </TextBlock.Text>
-                                    </TextBlock>
+                <TextBlock FontFamily="{DynamicResource DefaultFontFamily}"
+                           Foreground="{DynamicResource DefaultForegroundBrush}"
+                           FontWeight="Light"
+                           FontSize="13"
+                           LineHeight="16">
+                    <TextBlock.Text>
+                        <MultiBinding Converter="{StaticResource AmountToStringConverter}">
+                            <Binding Path="CurrencyViewModel.TotalAmountInBase" Mode="OneWay" />
+                            <Binding Path="CurrencyViewModel.BaseCurrencyFormat" Mode="OneWay" />
+                        </MultiBinding>
+                    </TextBlock.Text>
+                </TextBlock>
 
-                                    <TextBlock Classes="BaseDisabledStyle"
-                                               Text="{Binding CurrencyViewModel.CurrencyCode}"
-                                               Foreground="{DynamicResource BalanceBackgroundBrush}"
-                                               FontFamily="{DynamicResource DefaultFontFamily}"
-                                               VerticalAlignment="Bottom"
-                                               FontSize="22"
-                                               HorizontalAlignment="Left"
-                                               Margin="5 0 0 0"
-                                               Padding="0 0 0 4" />
-                                </StackPanel>
-                                <StackPanel Orientation="Horizontal"
-                                            Margin="0 -5 0 0">
+                <StackPanel Orientation="Horizontal"
+                            Margin="0 24 0 0">
+                    <TextBlock FontFamily="{DynamicResource DefaultFontFamily}"
+                               Foreground="{DynamicResource SecondaryForegroundBrush}"
+                               FontWeight="Light"
+                               FontSize="13"
+                               LineHeight="16"
+                               Text="1" />
+                    <TextBlock FontFamily="{DynamicResource DefaultFontFamily}"
+                               Foreground="{DynamicResource SecondaryForegroundBrush}"
+                               FontWeight="Light"
+                               FontSize="13"
+                               LineHeight="16"
+                               Margin="4 0"
+                               Text="{Binding CurrencyViewModel.CurrencyCode}" />
+                    <TextBlock FontFamily="{DynamicResource DefaultFontFamily}"
+                               Foreground="{DynamicResource SecondaryForegroundBrush}"
+                               FontWeight="Light"
+                               FontSize="13"
+                               LineHeight="16"
+                               Text="=" />
+                    <TextBlock FontFamily="{DynamicResource DefaultFontFamily}"
+                               Foreground="{DynamicResource SecondaryForegroundBrush}"
+                               FontWeight="Light"
+                               FontSize="13"
+                               LineHeight="16"
+                               Margin="4 0 0 0">
+                        <TextBlock.Text>
+                            <MultiBinding Converter="{StaticResource AmountToStringConverter}">
+                                <Binding Path="CurrencyViewModel.CurrentQuote" Mode="OneWay" />
+                                <Binding Path="CurrencyViewModel.BaseCurrencyFormat" Mode="OneWay" />
+                            </MultiBinding>
+                        </TextBlock.Text>
+                    </TextBlock>
 
-                                    <TextBlock Classes="BaseDisabledStyle"
-                                               Foreground="{DynamicResource UsdBalanceBackgroundBrush}"
-                                               FontFamily="{DynamicResource DefaultFontFamily}"
-                                               FontSize="24"
-                                               VerticalAlignment="Bottom"
-                                               HorizontalAlignment="Left">
-                                        <TextBlock.Text>
-                                            <MultiBinding Converter="{StaticResource AmountToStringConverter}">
-                                                <Binding Path="CurrencyViewModel.TotalAmountInBase" Mode="OneWay" />
-                                                <Binding Path="CurrencyViewModel.BaseCurrencyFormat" Mode="OneWay" />
-                                            </MultiBinding>
-                                        </TextBlock.Text>
-                                    </TextBlock>
+                    <TextBlock FontFamily="{DynamicResource DefaultFontFamily}"
+                               Foreground="{DynamicResource SuccessForegroundBrush}"
+                               FontWeight="Light"
+                               FontSize="13"
+                               LineHeight="16"
+                               Margin="10 0 0 0"
+                               Text="+1.20%" />
+                </StackPanel>
 
-                                    <TextBlock Classes="BaseDisabledStyle"
-                                               Text="{Binding CurrencyViewModel.BaseCurrencyCode}"
-                                               Foreground="{DynamicResource UsdBalanceBackgroundBrush}"
-                                               FontFamily="{DynamicResource DefaultFontFamily}"
-                                               VerticalAlignment="Bottom"
-                                               FontSize="14"
-                                               HorizontalAlignment="Left"
-                                               Margin="2 0 0 0"
-                                               Padding="0 0 0 2" />
-                                </StackPanel>
-                                <Grid HorizontalAlignment="Left"
-                                      IsVisible="{Binding CurrencyViewModel.HasUnconfirmedAmount}"
-                                      Margin="0 10 0 0">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="Auto" />
-                                        <ColumnDefinition Width="Auto" />
-                                        <ColumnDefinition Width="Auto" />
-                                        <ColumnDefinition Width="Auto" />
-                                    </Grid.ColumnDefinitions>
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="27" />
-                                    </Grid.RowDefinitions>
+                <StackPanel
+                    Margin="0 16 0 0"
+                    Orientation="Horizontal"
+                    VerticalAlignment="Top">
 
-                                    <Border Grid.Column="0"
-                                            Grid.Row="0"
-                                            Cursor="Help"
-                                            ToolTip.Placement="AnchorAndGravity"
-                                            ToolTip.VerticalOffset="-32">
-                                        <Path Data="{DynamicResource FontAwesome.QuestionCircleSolid}"
-                                              Fill="{DynamicResource UnconfirmedAmountBrush}"
-                                              Width="21"
-                                              Height="21"
-                                              Stretch="Uniform" />
-                                        <ToolTip.Tip>
-                                            <TextBlock Text="Unconfirmed" />
-                                        </ToolTip.Tip>
-                                    </Border>
-
-                                    <Border Grid.Column="1"
-                                            Grid.Row="0"
-                                            BorderThickness="0"
-                                            ToolTip.Tip="Unconfirmed">
-                                        <TextBlock Classes="BaseDisabledStyle"
-                                                   FontFamily="{DynamicResource DefaultFontFamily}"
-                                                   FontSize="14"
-                                                   Foreground="{DynamicResource UnconfirmedAmountBrush}"
-                                                   VerticalAlignment="Center"
-                                                   HorizontalAlignment="Right"
-                                                   Margin="7 0 0 0">
-                                            <TextBlock.Text>
-                                                <MultiBinding Converter="{StaticResource AmountToStringConverter}">
-                                                    <Binding Path="CurrencyViewModel.UnconfirmedAmount" Mode="OneWay" />
-                                                    <Binding Path="CurrencyViewModel.CurrencyFormat" Mode="OneWay" />
-                                                </MultiBinding>
-                                            </TextBlock.Text>
-                                        </TextBlock>
-                                    </Border>
-
-                                    <Border Grid.Column="2"
-                                            Grid.Row="0"
-                                            BorderThickness="0"
-                                            ToolTip.Tip="Unconfirmed">
-                                        <TextBlock
-                                            Classes="BaseDisabledStyle"
-                                            Text="{Binding CurrencyViewModel.CurrencyCode}"
-                                            FontFamily="{DynamicResource DefaultFontFamily}"
-                                            FontSize="8"
-                                            Foreground="{DynamicResource UnconfirmedAmountBrush}"
-                                            VerticalAlignment="Center"
-                                            Margin="4 0 0 0"
-                                            Padding="0 3 0 0" />
-                                    </Border>
-
-                                    <Border Grid.Column="3"
-                                            Grid.Row="0"
-                                            BorderThickness="0"
-                                            ToolTip.Tip="Unconfirmed">
-                                        <TextBlock
-                                            Classes="BaseDisabledStyle"
-                                            FontFamily="{DynamicResource DefaultFontFamily}"
-                                            FontSize="11"
-                                            Foreground="DarkGray"
-                                            VerticalAlignment="Center"
-                                            Margin="7 0 0 0"
-                                            Padding="0 2 0 0">
-                                            <TextBlock.Text>
-                                                <MultiBinding Converter="{StaticResource AmountToStringConverter}">
-                                                    <Binding Path="CurrencyViewModel.UnconfirmedAmountInBase"
-                                                             Mode="OneWay" />
-                                                    <Binding Path="CurrencyViewModel.BaseCurrencyFormat" Mode="OneWay" />
-                                                </MultiBinding>
-                                            </TextBlock.Text>
-                                        </TextBlock>
-                                    </Border>
-
-                                </Grid>
-                            </StackPanel>
+                    <controls:RoundedButton Height="46"
+                                            Padding="26 0"
+                                            CornerRadius="6"
+                                            Command="{Binding SendCommand}"
+                                            FontFamily="{DynamicResource DefaultFontFamily}">
+                        <StackPanel Orientation="Horizontal">
+                            <svg:Svg HorizontalAlignment="Center"
+                                     Width="24"
+                                     Height="24"
+                                     Path="/Resources/Icons/top-right-arrow.svg" />
+                            <TextBlock Margin="8 0 0 0"
+                                       Text="Send"
+                                       FontFamily="{DynamicResource DefaultFontFamily}"
+                                       FontWeight="Light"
+                                       FontSize="18"
+                                       Foreground="{DynamicResource RoundedButtonForegroundBrush}" />
                         </StackPanel>
-
-                        <StackPanel HorizontalAlignment="Center"
-                                    Margin="10"
-                                    Orientation="Horizontal">
-
-                            <controls:RoundedButton
-                                Classes="WalletMenuButton"
-                                Content="Send"
-                                Margin="0 0 2 0"
-                                Command="{Binding SendCommand}"
-                                IsEnabled="{Binding Currency.IsTransactionsAvailable}" />
-
-                            <controls:RoundedButton
-                                Classes="WalletMenuButton"
-                                Content="Receive"
-                                Margin="2 0 2 0"
-                                Command="{Binding ReceiveCommand}"
-                                IsEnabled="{Binding Currency.IsTransactionsAvailable}" />
-
-                            <controls:RoundedButton
-                                Classes="WalletMenuButton"
-                                Content="Convert"
-                                Margin="1 0 1 0"
-                                Command="{Binding ConvertCommand}"
-                                IsEnabled="{Binding Currency.IsSwapAvailable}" />
-
-                            <controls:RoundedButton
-                                Classes="WalletMenuButton"
-                                Content="Update"
-                                Margin="2 0 1 0"
-                                Command="{Binding UpdateCommand}"
-                                IsEnabled="{Binding Currency.IsTransactionsAvailable}" />
-
-                            <controls:RoundedButton
-                                Classes="WalletMenuButton"
-                                Content="Addresses"
-                                Margin="2 0 0 0"
-                                Command="{Binding AddressesCommand}" />
+                    </controls:RoundedButton>
+                    <controls:RoundedButton Height="46"
+                                            Padding="26 0"
+                                            CornerRadius="6"
+                                            Command="{Binding ReceiveCommand}"
+                                            FontFamily="{DynamicResource DefaultFontFamily}"
+                                            Margin="12 0 0 0">
+                        <StackPanel Orientation="Horizontal">
+                            <svg:Svg HorizontalAlignment="Center"
+                                     Width="24"
+                                     Height="24"
+                                     Path="/Resources/Icons/bottom-right-arrow.svg" />
+                            <TextBlock Margin="8 0 0 0"
+                                       Text="Receive"
+                                       FontFamily="{DynamicResource DefaultFontFamily}"
+                                       FontWeight="Light"
+                                       FontSize="18"
+                                       Foreground="{DynamicResource RoundedButtonForegroundBrush}" />
                         </StackPanel>
-                    </StackPanel>
-
-                    <StackPanel Orientation="Horizontal"
-                                Margin="10"
-                                HorizontalAlignment="Center"
-                                VerticalAlignment="Center"
-                                IsVisible="{Binding IsBalanceUpdating}">
-                        <svg:Svg Path="{Binding CurrencyViewModel.IconPath}"
-                                 Margin="0"
-                                 Width="64"
-                                 VerticalAlignment="Top"
-                                 IsEnabled="{Binding IsBalanceUpdating}"
-                                 Name="CurrencyLogo"
-                                 Classes="CurrencyLogo">
-                            <svg:Svg.RenderTransform>
-                                <RotateTransform Angle="0" />
-                            </svg:Svg.RenderTransform>
-                        </svg:Svg>
-                        <TextBlock Name="UpdatingTextBlock"
-                                   Classes="UpdatingTextBlock"
-                                   Text="balance update in progress..."
-                                   Margin="10 0 0 0"
-                                   Foreground="{DynamicResource DefaultForegroundBrush}"
-                                   FontFamily="{DynamicResource DefaultFontFamily}"
-                                   FontSize="15"
-                                   VerticalAlignment="Center"
-                                   IsEnabled="{Binding IsBalanceUpdating}" />
-                    </StackPanel>
-
-                    <Border>
-                        <Button Classes="ChildViewCloseButtonLight"
-                                Width="24"
-                                Height="24"
-                                Margin="0 5 2 0"
-                                HorizontalAlignment="Right"
-                                VerticalAlignment="Top"
-                                Command="{Binding CancelUpdateCommand}"
-                                IsVisible="{Binding IsBalanceUpdating}" />
-                        <ToolTip.Tip>
-                            <TextBlock Text="Cancel" />
-                        </ToolTip.Tip>
-                    </Border>
-                </Grid>
-            </Border>
-        </StackPanel>
-
-        <DataGrid x:Name="DgTransactions"
-                  Margin="0 10"
-                  ColumnWidth="*"
-                  AutoGenerateColumns="False"
-                  IsReadOnly="True"
-                  RowDetailsVisibilityMode="VisibleWhenSelected"
-                  SelectionMode="Single"
-                  SelectedIndex="{Binding DGSelectedIndex, Mode=OneWay}"
-                  Items="{Binding Transactions}"
-                  helpers:DataGridHelper.SortInfo="{Binding SortInfo}"
-                  CanUserResizeColumns="True"
-                  Grid.Row="1">
-
-            <DataGrid.RowDetailsTemplate>
-                <DataTemplate>
-                    <styles:TypeTest>
-                        <styles:TypeTest.DataTemplate>
-                            <controls:TransactionDetailsDataTemplateSelector />
-                        </styles:TypeTest.DataTemplate>
-                    </styles:TypeTest>
-                </DataTemplate>
-            </DataGrid.RowDetailsTemplate>
-
-            <DataGrid.Columns>
-                <DataGridTemplateColumn Header="TYPE" CanUserSort="True" MinWidth="65" MaxWidth="65">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <styles:TypeTest>
-                                <styles:TypeTest.DataTemplate>
-                                    <controls:TransactionTypeDataTemplateSelector />
-                                </styles:TypeTest.DataTemplate>
-                            </styles:TypeTest>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
-
-                <DataGridTemplateColumn Header="DESCRIPTION" CanUserSort="False">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <styles:TypeTest>
-                                <styles:TypeTest.DataTemplate>
-                                    <controls:TransactionDescriptionDataTemplateSelector />
-                                </styles:TypeTest.DataTemplate>
-                            </styles:TypeTest>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
-
-                <DataGridTemplateColumn Header="AMOUNT" CanUserSort="True" MinWidth="112" MaxWidth="112">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate DataType="{x:Type txViewModels:TransactionViewModel}">
-                            <StackPanel Classes="DGTemplateContainer" Orientation="Horizontal">
-                                <TextBlock FontFamily="{DynamicResource DefaultFontFamily}"
-                                           VerticalAlignment="Center"
-                                           HorizontalAlignment="Left"
-                                           Name="AmountTextBlock"
-                                           FontSize="13">
-                                    <TextBlock.Text>
-                                        <MultiBinding Converter="{StaticResource AmountToStringConverter}">
-                                            <Binding Path="Amount" Mode="OneWay" />
-                                            <Binding Path="AmountFormat" Mode="OneWay" />
-                                        </MultiBinding>
-                                    </TextBlock.Text>
-                                    <i:Interaction.Behaviors>
-                                        <ia:DataTriggerBehavior Binding="{Binding Amount}"
-                                                                ComparisonCondition="LessThan"
-                                                                Value="0">
-                                            <ia:ChangePropertyAction TargetObject="{Binding #AmountTextBlock}"
-                                                                     PropertyName="Foreground"
-                                                                     Value="{StaticResource NegativeAmountBrush}" />
-                                        </ia:DataTriggerBehavior>
-                                        <ia:DataTriggerBehavior Binding="{Binding Amount}"
-                                                                ComparisonCondition="GreaterThanOrEqual"
-                                                                Value="0">
-                                            <ia:ChangePropertyAction TargetObject="{Binding #AmountTextBlock}"
-                                                                     PropertyName="Foreground"
-                                                                     Value="{StaticResource PositiveAmountBrush}" />
-                                        </ia:DataTriggerBehavior>
-                                    </i:Interaction.Behaviors>
-                                </TextBlock>
-
-                                <TextBlock Text="{Binding CurrencyCode}"
-                                           FontFamily="{DynamicResource DefaultFontFamily}"
-                                           FontSize="8"
-                                           VerticalAlignment="Bottom"
-                                           IsVisible="False"
-                                           Margin="3 0 0 2" />
-                            </StackPanel>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
-
-                <DataGridTemplateColumn Header="STATE" CanUserSort="True" MinWidth="90" MaxWidth="90">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <styles:TypeTest>
-                                <styles:TypeTest.DataTemplate>
-                                    <controls:TransactionStateDataTemplateSelector />
-                                </styles:TypeTest.DataTemplate>
-                            </styles:TypeTest>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
-
-                <DataGridTemplateColumn Header="TIME" CanUserSort="True" MinWidth="165" MaxWidth="165">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate DataType="{x:Type txViewModels:TransactionViewModel}">
-                            <TextBlock Classes="DGTemplateContainer"
-                                       Text="{Binding LocalTime, Converter={StaticResource DateTimeToTxTimeConverter}}" />
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
-            </DataGrid.Columns>
-        </DataGrid>
+                    </controls:RoundedButton>
+                    <controls:RoundedButton Height="46"
+                                            Padding="26 0"
+                                            CornerRadius="6"
+                                            Command="{Binding ExchangeCommand}"
+                                            FontFamily="{DynamicResource DefaultFontFamily}"
+                                            Margin="12 0 0 0"
+                                            Classes="AccentButton">
+                        <StackPanel Orientation="Horizontal">
+                            <svg:Svg HorizontalAlignment="Center"
+                                     Width="24"
+                                     Height="24"
+                                     Path="/Resources/Icons/exchange-arrows.svg" />
+                            <TextBlock Margin="8 0 0 0"
+                                       Text="Exchange"
+                                       FontFamily="{DynamicResource DefaultFontFamily}"
+                                       FontWeight="Light"
+                                       FontSize="18"
+                                       Foreground="{DynamicResource DeepBlue}" />
+                        </StackPanel>
+                    </controls:RoundedButton>
+                    <controls:RoundedButton Height="46"
+                                            Padding="26 0"
+                                            CornerRadius="6"
+                                            Command="{Binding BuyCommand}"
+                                            FontFamily="{DynamicResource DefaultFontFamily}"
+                                            Margin="12 0 0 0"
+                                            IsVisible="{Binding CurrencyViewModel.CurrencyCode, Converter={StaticResource ShowBuyButton}}"
+                                            Classes="GrayButton">
+                        <StackPanel Orientation="Horizontal">
+                            <svg:Svg HorizontalAlignment="Center"
+                                     Width="24"
+                                     Height="24"
+                                     Path="/Resources/Icons/plus.svg" />
+                            <TextBlock Margin="8 0 0 0"
+                                       Text="Buy"
+                                       FontFamily="{DynamicResource DefaultFontFamily}"
+                                       FontWeight="Light"
+                                       FontSize="18" />
+                        </StackPanel>
+                    </controls:RoundedButton>
+                </StackPanel>
+            </StackPanel>
+        </Grid>
     </Grid>
 </UserControl>

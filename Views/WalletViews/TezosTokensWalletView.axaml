@@ -280,7 +280,7 @@
                     <controls:RoundedButton
                         Content="Convert"
                         Margin="3 0 0 0"
-                        Command="{Binding ConvertCommand}"
+                        Command="{Binding ExchangeCommand}"
                         Classes="WalletMenuButton"
                         IsVisible="{Binding IsConvertable}" />
                     <controls:RoundedButton

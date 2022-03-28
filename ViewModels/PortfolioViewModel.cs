@@ -34,9 +34,9 @@ namespace Atomex.Client.Desktop.ViewModels
         [Reactive] public IList<CurrencyViewModel> InitialChoosenCurrencies { get; set; }
         private Color NoTokensColor { get; } = Color.FromArgb(50, 0, 0, 0);
         public SelectCurrencyType SelectCurrencyUseCase { get; set; }
-        public Action<CurrencyConfig?> SetDexTab { get; set; }
-        public Action<string> SetWalletCurrency { get; set; }
-        public Action<string> SetWertCurrency { get; set; }
+        public Action<CurrencyConfig?> SetDexTab { get; init; }
+        public Action<string> SetWalletCurrency { get; init; }
+        public Action<string> SetWertCurrency { get; init; }
         [Reactive] public decimal PortfolioValue { get; set; }
         [Reactive] public string SearchPattern { get; set; }
         [Reactive] public CurrencyViewModel? SelectedCurrency { get; set; }

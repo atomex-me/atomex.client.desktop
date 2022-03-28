@@ -46,14 +46,14 @@
         <Setter Property="Background" Value="{DynamicResource RoundedButtonDisabledBrush}" />
         <Setter Property="Foreground" Value="{DynamicResource RoundedButtonDisabledForegroundBrush}" />
     </Style>
-    
+
     <Style Selector="controls|RoundedButton.StartPage:disabled">
         <Setter Property="Background" Value="{DynamicResource RoundedButtonBackgroundBrush}" />
         <Setter Property="Foreground" Value="{DynamicResource RoundedButtonForegroundBrush}" />
         <Setter Property="Opacity" Value="0.75"></Setter>
     </Style>
-    
-    
+
+
     <Style Selector="controls|RoundedButton.AccentButton">
         <Setter Property="Background" Value="{DynamicResource AccentButtonBackgroundBrush}" />
         <Setter Property="Foreground" Value="{DynamicResource AccentButtonForegroundBrush}" />
@@ -73,5 +73,35 @@
     <Style Selector="controls|RoundedButton.AccentButton:disabled">
         <Setter Property="Background" Value="{DynamicResource AccentButtonDisabledBrush}" />
         <Setter Property="Foreground" Value="{DynamicResource AccentButtonDisabledForegroundBrush}" />
+    </Style>
+
+
+    <Style Selector="controls|RoundedButton.GrayButton">
+        <Setter Property="Background" Value="{DynamicResource GrayButtonBackgroundBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource GrayButtonForegroundBrush}" />
+    </Style>
+    <Style Selector="controls|RoundedButton.GrayButton:focus">
+        <Setter Property="Background" Value="{DynamicResource GrayButtonMouseOverBrush}" />
+    </Style>
+    <!-- IsMouseOver -->
+    <Style Selector="controls|RoundedButton.GrayButton:pointerover">
+        <Setter Property="Background" Value="{DynamicResource GrayButtonMouseOverBrush}" />
+    </Style>
+    <!-- IsPressed -->
+    <Style Selector="controls|RoundedButton.GrayButton:pressed">
+        <Setter Property="Background" Value="{DynamicResource GrayButtonPressedBrush}" />
+    </Style>
+    <!-- IsDisabled -->
+    <Style Selector="controls|RoundedButton.GrayButton:disabled">
+        <Setter Property="Background" Value="{DynamicResource GrayButtonDisabledBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource GrayButtonDisabledForegroundBrush}" />
+    </Style>
+
+    <Style Selector="controls|RoundedButton.GrayButton TextBox">
+        <Setter Property="Foreground" Value="{DynamicResource GrayButtonForegroundBrush}" />
+    </Style>
+    <!-- IsDisabled -->
+    <Style Selector="controls|RoundedButton.GrayButton:disabled TextBox">
+        <Setter Property="Foreground" Value="{DynamicResource GrayButtonDisabledForegroundBrush}" />
     </Style>
 </Styles>

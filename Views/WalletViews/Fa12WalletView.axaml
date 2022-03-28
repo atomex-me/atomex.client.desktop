@@ -207,7 +207,7 @@
                                 Classes="WalletMenuButton"
                                 Content="Convert"
                                 Margin="1 0 1 0"
-                                Command="{Binding ConvertCommand}"
+                                Command="{Binding ExchangeCommand}"
                                 IsEnabled="{Binding Currency.IsSwapAvailable}" />
 
                             <controls:RoundedButton

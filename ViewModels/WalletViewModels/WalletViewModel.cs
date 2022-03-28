@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Reactive;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
@@ -22,6 +23,7 @@ using Atomex.Client.Desktop.ViewModels.TransactionViewModels;
 using Atomex.Common;
 using Atomex.Core;
 using Atomex.Wallet;
+using Avalonia.Controls;
 
 namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 {
@@ -50,7 +52,8 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         }
 
         protected IAtomexApp _app;
-        protected Action<CurrencyConfig> SetConversionTab { get; set; }
+        protected Action<CurrencyConfig> SetConversionTab { get; }
+        private Action<string> SetWertCurrency { get; }
 
         public string Header => CurrencyViewModel.Header;
         public CurrencyConfig Currency => CurrencyViewModel.Currency;
@@ -95,7 +98,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         public WalletViewModel()
         {
 #if DEBUG
-            if (Env.IsInDesignerMode())
+            if (Design.IsDesignMode)
                 DesignerMode();
 #endif
         }
@@ -103,10 +106,12 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         public WalletViewModel(
             IAtomexApp app,
             Action<CurrencyConfig> setConversionTab,
+            Action<string> setWertCurrency,
             CurrencyConfig currency)
         {
             _app = app ?? throw new ArgumentNullException(nameof(app));
             SetConversionTab = setConversionTab ?? throw new ArgumentNullException(nameof(setConversionTab));
+            SetWertCurrency = setWertCurrency ?? throw new ArgumentNullException(nameof(setWertCurrency));
 
             if (currency != null)
                 CurrencyViewModel = CurrencyViewModelCreator.CreateViewModel(currency);
@@ -199,8 +204,8 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         private ICommand _receiveCommand;
         public ICommand ReceiveCommand => _receiveCommand ??= ReactiveCommand.Create(OnReceiveClick);
 
-        private ICommand _convertCommand;
-        public ICommand ConvertCommand => _convertCommand ??= ReactiveCommand.Create(OnConvertClick);
+        private ICommand _exchangeCommand;
+        public ICommand ExchangeCommand => _exchangeCommand ??= ReactiveCommand.Create(OnConvertClick);
 
         private ICommand _updateCommand;
         public ICommand UpdateCommand => _updateCommand ??= ReactiveCommand.Create(OnUpdateClick);
@@ -212,6 +217,12 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         public ICommand CancelUpdateCommand => _cancelUpdateCommand ??= ReactiveCommand.Create(() =>
         {
             _cancellation?.Cancel();
+        });
+        
+        private ReactiveCommand<Unit, Unit> _buyCommand;
+        public ReactiveCommand<Unit, Unit> BuyCommand => _buyCommand ??= ReactiveCommand.Create(() =>
+        {
+            SetWertCurrency?.Invoke(CurrencyViewModel.Header);
         });
 
         protected virtual void OnSendClick()

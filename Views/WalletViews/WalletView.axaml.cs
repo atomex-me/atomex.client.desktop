@@ -8,6 +8,7 @@ using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
+using Avalonia.Media;
 using Avalonia.Threading;
 
 namespace Atomex.Client.Desktop.Views.WalletViews
@@ -19,21 +20,29 @@ namespace Atomex.Client.Desktop.Views.WalletViews
             InitializeComponent();
 
             var dgTransactions = this.FindControl<DataGrid>("DgTransactions");
-            
-            dgTransactions.CellPointerPressed += (sender, args) =>
+            if (dgTransactions != null)
             {
-                var cellIndex = args.Row.GetIndex();
-                Dispatcher.UIThread.InvokeAsync(() =>
+                dgTransactions.CellPointerPressed += (sender, args) =>
                 {
-                    ((WalletViewModel) DataContext!).CellPointerPressed(cellIndex);
-                });
-            };
+                    var cellIndex = args.Row.GetIndex();
+                    Dispatcher.UIThread.InvokeAsync(() =>
+                    {
+                        ((WalletViewModel)DataContext!).CellPointerPressed(cellIndex);
+                    });
+                };
 
-            dgTransactions.Sorting += (sender, args) =>
-            {
-                ((WalletViewModel) DataContext!).SortInfo = args.Column.Header.ToString();
-                args.Handled = true;
-            };
+                dgTransactions.Sorting += (sender, args) =>
+                {
+                    ((WalletViewModel)DataContext!).SortInfo = args.Column.Header.ToString();
+                    args.Handled = true;
+                };
+            }
+#if DEBUG
+            if (!Design.IsDesignMode) return;
+
+            var designGrid = this.FindControl<Grid>("DesignGrid");
+            designGrid.Background = new SolidColorBrush(Color.FromRgb(0x0F, 0x21, 0x39));
+#endif
         }
 
 

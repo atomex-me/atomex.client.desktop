@@ -2,12 +2,10 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Windows.Input;
-
 using Avalonia.Media.Imaging;
 using Avalonia.Threading;
 using Serilog;
 using ReactiveUI;
-
 using Atomex.Blockchain.Tezos;
 using Atomex.Blockchain.Tezos.Internal;
 using Atomex.Core;
@@ -28,24 +26,39 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         private const int DelegationCheckIntervalInSec = 20;
 
         private bool _canDelegate;
+
         public bool CanDelegate
         {
             get => _canDelegate;
-            set { _canDelegate = value; this.RaisePropertyChanged(nameof(CanDelegate)); }
+            set
+            {
+                _canDelegate = value;
+                this.RaisePropertyChanged(nameof(CanDelegate));
+            }
         }
 
         private bool _hasDelegations;
+
         public bool HasDelegations
         {
             get => _hasDelegations;
-            set { _hasDelegations = value; this.RaisePropertyChanged(nameof(HasDelegations)); }
+            set
+            {
+                _hasDelegations = value;
+                this.RaisePropertyChanged(nameof(HasDelegations));
+            }
         }
 
         private List<Delegation> _delegations;
+
         public List<Delegation> Delegations
         {
             get => _delegations;
-            set { _delegations = value; this.RaisePropertyChanged(nameof(Delegations)); }
+            set
+            {
+                _delegations = value;
+                this.RaisePropertyChanged(nameof(Delegations));
+            }
         }
 
         public TezosWalletViewModel()
@@ -55,18 +68,21 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
         public DelegateViewModel DelegateVM { get; set; }
 
-        public TezosWalletViewModel(IAtomexApp app, Action<CurrencyConfig> setConversionTab, CurrencyConfig currency)
-            : base(app, setConversionTab, currency)
+        public TezosWalletViewModel(IAtomexApp app,
+            Action<CurrencyConfig> setConversionTab,
+            Action<string> setWertCurrency,
+            CurrencyConfig currency)
+            : base(app, setConversionTab, setWertCurrency, currency)
         {
             Delegations = new List<Delegation>();
-            
+
             _ = LoadDelegationInfoAsync();
-            
+
             DelegateVM = new DelegateViewModel(_app, async () =>
             {
                 await Task.Delay(TimeSpan.FromSeconds(DelegationCheckIntervalInSec))
                     .ConfigureAwait(false);
-            
+
                 await Dispatcher.UIThread.InvokeAsync(OnUpdateClick);
             });
         }
@@ -132,20 +148,17 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
                     if (!string.IsNullOrEmpty(baker.Logo))
                     {
-                        _ = Task.Run(() =>
-                        {
-                            _ = App.ImageService.LoadImageFromUrl(baker.Logo);
-                        });
+                        _ = Task.Run(() => { _ = App.ImageService.LoadImageFromUrl(baker.Logo); });
                     }
                 }
 
                 await Dispatcher.UIThread.InvokeAsync(() =>
-                {
-                    CanDelegate = balance.Available > 0;
-                    Delegations = delegations;
-                    HasDelegations = delegations.Count > 0;
-                },
-                DispatcherPriority.Background);
+                    {
+                        CanDelegate = balance.Available > 0;
+                        Delegations = delegations;
+                        HasDelegations = delegations.Count > 0;
+                    },
+                    DispatcherPriority.Background);
             }
             catch (OperationCanceledException)
             {
@@ -158,7 +171,9 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         }
 
         private ICommand _delegateCommand;
-        public ICommand DelegateCommand => _delegateCommand ??= (_delegateCommand = ReactiveCommand.Create(OnDelegateClick));
+
+        public ICommand DelegateCommand =>
+            _delegateCommand ??= (_delegateCommand = ReactiveCommand.Create(OnDelegateClick));
 
         private void OnDelegateClick()
         {
@@ -174,7 +189,8 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             {
                 new Delegation
                 {
-                    Baker = new BakerData {
+                    Baker = new BakerData
+                    {
                         Logo = "https://api.baking-bad.org/logos/letzbake.png"
                     },
                     Address = "tz1aqcYgG6NuViML5vdWhohHJBYxcDVLNUsE",
@@ -182,7 +198,8 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                 },
                 new Delegation
                 {
-                    Baker = new BakerData {
+                    Baker = new BakerData
+                    {
                         Logo = "https://api.baking-bad.org/logos/letzbake.png"
                     },
                     Address = "tz1aqcYgG6NuViML5vdWhohHJBYxcDVLNUsE",
@@ -190,7 +207,8 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                 },
                 new Delegation
                 {
-                    Baker = new BakerData {
+                    Baker = new BakerData
+                    {
                         Logo = "https://api.baking-bad.org/logos/letzbake.png"
                     },
                     Address = "tz1aqcYgG6NuViML5vdWhohHJBYxcDVLNUsE",
@@ -198,7 +216,8 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                 },
                 new Delegation
                 {
-                    Baker = new BakerData {
+                    Baker = new BakerData
+                    {
                         Logo = "https://api.baking-bad.org/logos/letzbake.png"
                     },
                     Address = "tz1aqcYgG6NuViML5vdWhohHJBYxcDVLNUsE",
@@ -206,7 +225,8 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                 },
                 new Delegation
                 {
-                    Baker = new BakerData {
+                    Baker = new BakerData
+                    {
                         Logo = "https://api.baking-bad.org/logos/letzbake.png"
                     },
                     Address = "tz1aqcYgG6NuViML5vdWhohHJBYxcDVLNUsE",

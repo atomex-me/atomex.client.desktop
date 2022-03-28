@@ -29,6 +29,7 @@ namespace Atomex.Client.Desktop.ViewModels
             WalletsViewModel = new WalletsViewModel(AtomexApp)
             {
                 SetConversionTab = SelectConversion,
+                SetWertCurrency = SelectWert,
                 BackAction = SelectPortfolio
             };
             ConversionViewModel = new ConversionViewModel(AtomexApp);
@@ -127,8 +128,11 @@ namespace Atomex.Client.Desktop.ViewModels
         {
             var terminal = args.AtomexClient;
             if (terminal?.Account == null)
+            {
+                SelectPortfolio();
                 return;
-
+            }
+            
             terminal.ServiceConnected += OnTerminalServiceStateChangedEventHandler;
             terminal.ServiceDisconnected += OnTerminalServiceStateChangedEventHandler;
         }

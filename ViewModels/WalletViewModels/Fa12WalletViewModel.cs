@@ -39,7 +39,8 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         public Fa12WalletViewModel(
             IAtomexApp app,
             Action<CurrencyConfig> setConversionTab,
-            CurrencyConfig currency) : base(app, setConversionTab, currency)
+            Action<string> setWertCurrency,
+            CurrencyConfig currency) : base(app, setConversionTab, setWertCurrency, currency)
         {
         }
 

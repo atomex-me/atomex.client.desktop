@@ -18,27 +18,12 @@ namespace Atomex.Client.Desktop.ViewModels
     {
         private IAtomexApp App { get; }
         public Action<CurrencyConfig> SetConversionTab { get; init; }
+        public Action<string> SetWertCurrency { get; init; }
         public Action BackAction { get; init; }
         [Reactive] public ObservableCollection<IWalletViewModel> Wallets { get; private set; }
 
-        // private IWalletViewModel _selected;
-
         [Reactive] public IWalletViewModel Selected { get; set; }
-        // {
-        //     get => _selected;
-        //     set
-        //     {
-        //         if (_selected != null)
-        //             _selected.IsSelected = false;
-        //
-        //         _selected = value;
-        //
-        //         if (_selected != null)
-        //             _selected.IsSelected = true;
-        //
-        //         this.RaisePropertyChanged(nameof(Wallets));
-        //     }
-        // }
+
 
         public WalletsViewModel()
         {
@@ -51,7 +36,7 @@ namespace Atomex.Client.Desktop.ViewModels
         public WalletsViewModel(IAtomexApp app)
         {
             App = app ?? throw new ArgumentNullException(nameof(app));
-            
+
             SubscribeToServices();
         }
 
@@ -70,13 +55,15 @@ namespace Atomex.Client.Desktop.ViewModels
                     .Select(currency => WalletViewModelCreator.CreateViewModel(
                         app: App,
                         setConversionTab: SetConversionTab,
+                        setWertCurrency: SetWertCurrency,
                         currency: currency));
 
                 walletsViewModels.AddRange(currenciesViewModels);
 
                 walletsViewModels.Add(new TezosTokensWalletViewModel(
                     app: App,
-                    setConversionTab: SetConversionTab));
+                    setConversionTab: SetConversionTab,
+                    setWertCurrency: SetWertCurrency));
             }
 
             Wallets = new ObservableCollection<IWalletViewModel>(walletsViewModels);
