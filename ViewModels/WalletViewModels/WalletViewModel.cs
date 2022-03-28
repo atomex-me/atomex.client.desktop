@@ -24,34 +24,15 @@ using Atomex.Common;
 using Atomex.Core;
 using Atomex.Wallet;
 using Avalonia.Controls;
+using ReactiveUI.Fody.Helpers;
 
 namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 {
     public class WalletViewModel : ViewModelBase, IWalletViewModel
     {
-        private ObservableCollection<TransactionViewModel> _transactions;
-        public ObservableCollection<TransactionViewModel> Transactions
-        {
-            get => _transactions;
-            set
-            {
-                _transactions = value;
-                OnPropertyChanged(nameof(Transactions));
-            }
-        }
-
-        private CurrencyViewModel _currencyViewModel;
-        public CurrencyViewModel CurrencyViewModel
-        {
-            get => _currencyViewModel;
-            set
-            {
-                _currencyViewModel = value;
-                OnPropertyChanged(nameof(CurrencyViewModel));
-            }
-        }
-
         protected IAtomexApp _app;
+        [Reactive] public ObservableCollection<TransactionViewModel> Transactions { get; set; }
+        [Reactive] public CurrencyViewModel CurrencyViewModel { get; set; }
         protected Action<CurrencyConfig> SetConversionTab { get; }
         private Action<string> SetWertCurrency { get; }
 

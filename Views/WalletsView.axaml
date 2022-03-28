@@ -20,8 +20,9 @@
             Margin="{Binding $parent[Window].DataContext.IsLinux,
             Converter={StaticResource WalletsViewMarginConverter}}"
             Name="MainControl">
-        <StackPanel>
-            <Grid Height="75"
+        <Grid RowDefinitions="Auto,Auto,*">
+            <Grid Grid.Row="0"
+                  Height="75"
                   ColumnDefinitions="Auto,*,Auto">
                 <Button Grid.Column="0"
                         Width="28"
@@ -60,10 +61,13 @@
                 </Button>
             </Grid>
 
-            <Border Height="1"
+            <Border Grid.Row="1"
+                    Height="1"
                     Background="{DynamicResource LightDefaultOpacity10}" />
 
-            <ContentControl Content="{Binding Selected}" />
-        </StackPanel>
+            <ContentControl Grid.Row="2"
+                            Content="{Binding Selected}" />
+        </Grid>
+
     </Border>
 </UserControl>

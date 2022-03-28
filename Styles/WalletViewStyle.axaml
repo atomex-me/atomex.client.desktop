@@ -114,7 +114,7 @@
                       DataType="viewModels:EthereumTransactionViewModel">
             <views:EthereumTransactionDetailsView />
         </DataTemplate>
-        
+
         <DataTemplate x:Key="EthereumERC20TransactionDetailsTemplate"
                       DataType="viewModels:EthereumERC20TransactionViewModel">
             <views:EthereumTransactionDetailsView />
@@ -131,31 +131,31 @@
                         Classes="DGTemplateContainer"
                         Margin="0 5 0 5">
                 <TextBlock Text="{Binding Description}"
-                           Margin="0 0 0 2"/>
+                           Margin="0 0 0 2" />
                 <StackPanel Orientation="Horizontal">
-                    <TextBlock Text="{Binding Direction}" 
-                               FontSize="12" 
-                               Foreground="Gray"/>
-                    <TextBlock Text="{Binding Alias}" 
-                               FontSize="12" 
-                               Foreground="{StaticResource NegativeAmountBrush}"/>
+                    <TextBlock Text="{Binding Direction}"
+                               FontSize="12"
+                               Foreground="Gray" />
+                    <TextBlock Text="{Binding Alias}"
+                               FontSize="12"
+                               Foreground="{StaticResource NegativeAmountBrush}" />
                 </StackPanel>
             </StackPanel>
         </DataTemplate>
-        
+
         <DataTemplate x:Key="XtzAdditionalDescriptionTemplate" DataType="viewModels:TezosTransactionViewModel">
             <StackPanel Orientation="Vertical"
                         Classes="DGTemplateContainer"
                         Margin="0 5 0 5">
                 <TextBlock Text="{Binding Description}"
-                           Margin="0 0 0 2"/>
+                           Margin="0 0 0 2" />
                 <StackPanel Orientation="Horizontal">
                     <TextBlock Text="{Binding Direction}"
                                FontSize="12"
-                               Foreground="Gray"/>
+                               Foreground="Gray" />
                     <TextBlock Text="{Binding Alias}"
                                FontSize="12"
-                               Foreground="{StaticResource NegativeAmountBrush}"/>
+                               Foreground="{StaticResource NegativeAmountBrush}" />
                 </StackPanel>
             </StackPanel>
         </DataTemplate>
@@ -226,7 +226,7 @@
             </Animation>
         </Style.Animations>
     </Style>
-    
+
     <Style Selector=":is(Control).DGTemplateContainer">
         <Setter Property="Margin" Value="10 0 0 0" />
         <Setter Property="HorizontalAlignment" Value="Left" />

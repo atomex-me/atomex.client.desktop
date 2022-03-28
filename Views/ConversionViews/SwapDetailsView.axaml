@@ -39,7 +39,7 @@
         <Style Selector="TabControl">
             <Setter Property="Margin" Value="0" />
             <Setter Property="Padding" Value="0" />
-            <Setter Property="Background" Value="{DynamicResource TabControlBackground}" />
+            <Setter Property="Background" Value="{DynamicResource AlmostTransparentBrush}" />
             <Setter Property="Template">
                 <ControlTemplate>
                     <Border BorderBrush="{TemplateBinding BorderBrush}"
@@ -795,16 +795,7 @@
                                    FontSize="13"
                                    Text="Details" />
                     </TabItem.Header>
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="*" />
-                        </Grid.ColumnDefinitions>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="30" />
-                            <RowDefinition Height="30" />
-                        </Grid.RowDefinitions>
-
+                    <Grid ColumnDefinitions="Auto,*" RowDefinitions="30,30">
                         <TextBlock Grid.Column="0"
                                    Grid.Row="0"
                                    Text="Price:"

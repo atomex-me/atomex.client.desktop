@@ -9,6 +9,10 @@
   <Design.PreviewWith>
     <Border/>
   </Design.PreviewWith>
+  
+  <Style Selector="Button.EmptyBtnWithContent">
+    <Setter Property="BorderThickness" Value="0"/>
+  </Style>
 
   <Style Selector="Button.EmptyBtnWithContent:pressed /template/ ContentPresenter#PART_ContentPresenter">
     <Setter Property="Background"
