@@ -369,9 +369,10 @@
                     <ListBox Grid.Row="1"
                              Background="{DynamicResource AlmostTransparentBrush}"
                              Items="{Binding Transactions}"
+                             SelectedItem="{Binding SelectedTransaction}"
                              HorizontalAlignment="Stretch"
                              VerticalAlignment="Stretch"
-                             SelectionMode="Toggle">
+                             SelectionMode="Single">
                         <ListBox.Styles>
                             <Style Selector="ListBoxItem">
                                 <Setter Property="Padding" Value="0" />
@@ -380,12 +381,12 @@
                                 <Setter Property="HorizontalContentAlignment" Value="Stretch" />
                                 <Setter Property="Cursor" Value="Hand" />
                                 <Setter Property="BorderThickness" Value="0 0 0 1" />
-                                <Setter Property="CornerRadius" Value="6"></Setter>
                                 <Setter Property="BorderBrush" Value="{DynamicResource LightDefaultOpacity10}" />
                             </Style>
 
                             <Style Selector="ListBoxItem:selected /template/ ContentPresenter">
                                 <Setter Property="Background" Value="{DynamicResource LightDefaultOpacity6}" />
+                                <Setter Property="CornerRadius" Value="6" />
                             </Style>
                             <Style Selector="ListBoxItem:not(:selected) /template/ ContentPresenter">
                                 <Setter Property="Background" Value="{DynamicResource AlmostTransparentBrush}" />
@@ -426,7 +427,6 @@
                                                        Text="{Binding CurrencyCode}" />
                                         </StackPanel>
 
-
                                         <ContentControl Grid.Column="2" Content="{Binding}">
                                             <ContentControl.ContentTemplate>
                                                 <controls:TransactionStateDataTemplateSelector />
@@ -436,7 +436,8 @@
                                         <TextBlock Grid.Column="3"
                                                    Foreground="{DynamicResource SecondaryForegroundBrush}"
                                                    VerticalAlignment="Center"
-                                                   FontSize="16"
+                                                   FontSize="13"
+                                                   LineHeight="16"
                                                    Text="{Binding LocalTime, Converter={StaticResource DateTimeToTxTimeConverter}}" />
                                     </Grid>
                                 </Border>

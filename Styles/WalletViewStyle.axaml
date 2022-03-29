@@ -7,15 +7,17 @@
 
     <Styles.Resources>
         <DataTemplate x:Key="UnknownStateTemplate" DataType="viewModels:TransactionViewModel">
-            <Border Background="{StaticResource UnknownBrush}"
-                    CornerRadius="5"
-                    Classes="DGTemplateContainer">
-                <TextBlock Foreground="White"
-                           Text="{Binding State}"
-                           FontSize="11"
-                           Margin="5"
-                           HorizontalAlignment="Left" />
-            </Border>
+            <StackPanel Orientation="Horizontal">
+                <svg:Svg Width="18"
+                         VerticalAlignment="Center"
+                         Path="/Resources/Icons/failed.svg" />
+                <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
+                           Margin="8 0 0 0"
+                           FontSize="13"
+                           LineHeight="16"
+                           VerticalAlignment="Center"
+                           Text="Unknown" />
+            </StackPanel>
         </DataTemplate>
         <DataTemplate x:Key="PendingStateTemplate" DataType="viewModels:TransactionViewModel">
             <StackPanel Orientation="Horizontal">
@@ -34,32 +36,42 @@
         <DataTemplate x:Key="ConfirmedStateTemplate" DataType="viewModels:TransactionViewModel">
             <StackPanel Orientation="Horizontal">
                 <svg:Svg Width="18"
-                         Classes="InProgress"
                          VerticalAlignment="Center"
-                         Path="/Resources/Icons/in-progress.svg" />
+                         Path="/Resources/Icons/completed-checkbox.svg" />
+                <TextBlock Foreground="{DynamicResource DefaultForegroundBrush}"
+                           Margin="8 0 0 0"
+                           FontSize="13"
+                           LineHeight="16"
+                           VerticalAlignment="Center"
+                           Text="Confirmed" />
             </StackPanel>
         </DataTemplate>
         <DataTemplate x:Key="UnconfirmedStateTemplate" DataType="viewModels:TransactionViewModel">
-            <Border Background="{StaticResource UnconfirmedBrush}"
-                    CornerRadius="5"
-                    Classes="DGTemplateContainer">
-                <TextBlock Foreground="White"
-                           Text="{Binding State}"
-                           FontSize="11"
-                           Margin="5"
-                           HorizontalAlignment="Center" />
-            </Border>
+            <StackPanel Orientation="Horizontal">
+                <svg:Svg Width="18"
+                         Classes="InProgress"
+                         VerticalAlignment="Center"
+                         Path="/Resources/Icons/in-progress.svg" />
+                <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
+                           Margin="8 0 0 0"
+                           FontSize="13"
+                           LineHeight="16"
+                           VerticalAlignment="Center"
+                           Text="Unconfirmed" />
+            </StackPanel>
         </DataTemplate>
         <DataTemplate x:Key="FailedStateTemplate" DataType="viewModels:TransactionViewModel">
-            <Border Background="{StaticResource FailedBrush}"
-                    CornerRadius="5"
-                    Classes="DGTemplateContainer">
-                <TextBlock Foreground="White"
-                           Text="{Binding State}"
-                           FontSize="11"
-                           Margin="5"
-                           HorizontalAlignment="Center" />
-            </Border>
+            <StackPanel Orientation="Horizontal">
+                <svg:Svg Width="18"
+                         VerticalAlignment="Center"
+                         Path="/Resources/Icons/failed.svg" />
+                <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
+                           Margin="8 0 0 0"
+                           FontSize="13"
+                           LineHeight="16"
+                           VerticalAlignment="Center"
+                           Text="Failed" />
+            </StackPanel>
         </DataTemplate>
 
         <DataTemplate x:Key="SentTypeTemplate">

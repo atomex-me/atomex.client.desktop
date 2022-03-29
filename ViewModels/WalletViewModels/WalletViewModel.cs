@@ -33,6 +33,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         protected IAtomexApp _app;
         [Reactive] public ObservableCollection<TransactionViewModel> Transactions { get; set; }
         [Reactive] public CurrencyViewModel CurrencyViewModel { get; set; }
+        [Reactive] public TransactionViewModel SelectedTransaction { get; set; }
         protected Action<CurrencyConfig> SetConversionTab { get; }
         private Action<string> SetWertCurrency { get; }
 

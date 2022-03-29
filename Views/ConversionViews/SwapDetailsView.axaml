@@ -404,7 +404,7 @@
                                                             Value="{Binding FailedState}">
                                         <ia:ChangePropertyAction TargetObject="{Binding #InitializationIcon}"
                                                                  PropertyName="Path"
-                                                                 Value="/Resources/Icons/swap-failed.svg" />
+                                                                 Value="/Resources/Icons/failed.svg" />
                                     </ia:DataTriggerBehavior>
                                 </i:Interaction.Behaviors>
                             </svg:Svg>
@@ -465,7 +465,7 @@
                                                             Value="{Binding FailedState}">
                                         <ia:ChangePropertyAction TargetObject="{Binding #ExchangingIcon}"
                                                                  PropertyName="Path"
-                                                                 Value="/Resources/Icons/swap-failed.svg" />
+                                                                 Value="/Resources/Icons/failed.svg" />
                                     </ia:DataTriggerBehavior>
                                 </i:Interaction.Behaviors>
                             </svg:Svg>
@@ -526,7 +526,7 @@
                                                             Value="{Binding FailedState}">
                                         <ia:ChangePropertyAction TargetObject="{Binding #CompletionIcon}"
                                                                  PropertyName="Path"
-                                                                 Value="/Resources/Icons/swap-failed.svg" />
+                                                                 Value="/Resources/Icons/failed.svg" />
                                     </ia:DataTriggerBehavior>
                                 </i:Interaction.Behaviors>
                             </svg:Svg>

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using Avalonia;
 using Avalonia.Data.Converters;
-using Serilog;
+
 
 namespace Atomex.Client.Desktop.Converters
 {
@@ -29,11 +29,8 @@ namespace Atomex.Client.Desktop.Converters
             var format = (string)values[1];
 
             if (values is { Count: 3 } && (bool)values[2] && amount > 0)
-            {
-                Log.Fatal($"Using with 3 parameters");
                 return $"+{amount.ToString(format, culture)}";
-            }
-
+            
             return amount.ToString(format, culture);
         }
     }
