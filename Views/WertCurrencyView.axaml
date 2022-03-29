@@ -46,7 +46,6 @@
                                 Text="(new)"
                                 Foreground="{DynamicResource NewAddressBrush}"
                                 FontSize="12"
-                                FontFamily="{DynamicResource DefaultFontFamily}"
                                 HorizontalAlignment="Left"
                                 VerticalAlignment="Center"
                                 IsVisible="{Binding IsFreeAddress}" />
@@ -55,14 +54,12 @@
                                 Text="{Binding Address}"
                                 Foreground="{DynamicResource DefaultForegroundBrush}"
                                 FontSize="12"
-                                FontFamily="{DynamicResource DefaultFontFamily}"
                                 HorizontalAlignment="Left"
                                 VerticalAlignment="Center" />
                             <TextBlock
                                 Margin="10 0 0 0"
                                 Foreground="{DynamicResource AmountBrush}"
                                 FontSize="12"
-                                FontFamily="{DynamicResource DefaultFontFamily}"
                                 VerticalAlignment="Center">
                                 <TextBlock.Text>
                                     <MultiBinding Converter="{StaticResource AmountToStringConverter}">
@@ -106,7 +103,7 @@
                          helpers:AmountTextBoxHelper.CurrencyCode="USD"
                          Classes="CustomTextBox AmountTextBox" />
             </StackPanel>
-            
+
             <Path x:Name="icon"
                   Stretch="Uniform"
                   UseLayoutRounding="False"
@@ -142,7 +139,7 @@
                          Classes="CustomTextBox AmountTextBox" />
             </StackPanel>
         </StackPanel>
-        
+
         <Border HorizontalAlignment="Center"
                 VerticalAlignment="Center"
                 Padding="10"
@@ -157,10 +154,8 @@
                                HorizontalAlignment="Center"
                                VerticalAlignment="Center"
                                Text="Estimated price:"
-                               Foreground="{DynamicResource DefaultAmountInBaseForegroundBrush}"
-                               FontFamily="{DynamicResource DefaultFontFamily}"/>
+                               Foreground="{DynamicResource DefaultAmountInBaseForegroundBrush}" />
                     <TextBlock Foreground="{DynamicResource DefaultForegroundBrush}"
-                               FontFamily="{DynamicResource DefaultFontFamily}"
                                Margin="3 0 0 0"
                                HorizontalAlignment="Left"
                                Text="{Binding EstimatedPrice}"
@@ -187,11 +182,11 @@
                                MaxWidth="260"
                                TextWrapping="Wrap"
                                HorizontalAlignment="Center"
-                               VerticalAlignment="Bottom"/>
+                               VerticalAlignment="Bottom" />
                 </StackPanel>
             </StackPanel>
         </Border>
-        
+
         <controls:RoundedButton Width="150"
                                 Height="40"
                                 Margin="0 20 0 5"

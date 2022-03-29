@@ -61,8 +61,7 @@
                             VerticalAlignment="Top"
                             Grid.Column="1"
                             Grid.Row="1">
-                    <TextBlock FontFamily="{DynamicResource DefaultFontFamily}"
-                               VerticalAlignment="Center"
+                    <TextBlock VerticalAlignment="Center"
                                FontSize="13"
                                Text="{Binding Fee, Converter={StaticResource PercentConverter}}"
                                Name="FeeTextBlock">
@@ -85,8 +84,7 @@
                         </i:Interaction.Behaviors>
                     </TextBlock>
 
-                    <TextBlock FontFamily="{DynamicResource DefaultFontFamily}"
-                               FontSize="11"
+                    <TextBlock FontSize="11"
                                Margin="7 0 0 0"
                                VerticalAlignment="Center"
                                Foreground="{DynamicResource MinDelegationBrush}"
@@ -115,8 +113,7 @@
                 </StackPanel>
 
 
-                <TextBlock FontFamily="{DynamicResource DefaultFontFamily}"
-                           FontSize="12"
+                <TextBlock FontSize="12"
                            Text="BAKER IS FULL"
                            Foreground="{DynamicResource BakerFullForegroundBrush}"
                            Margin="7 0 0 0"
@@ -127,8 +124,7 @@
                            Grid.RowSpan="2"
                            IsVisible="{Binding IsFull}" />
 
-                <TextBlock FontFamily="{DynamicResource DefaultFontFamily}"
-                           FontSize="11"
+                <TextBlock FontSize="11"
                            Text="Available"
                            Foreground="{DynamicResource DefaultForegroundBrush}"
                            Margin="7 0 0 0"
@@ -138,8 +134,7 @@
                            Grid.Row="0"
                            IsVisible="{Binding !IsFull}" />
 
-                <TextBlock FontFamily="{DynamicResource DefaultFontFamily}"
-                           FontSize="11"
+                <TextBlock FontSize="11"
                            Text="{Binding StakingAvailable}"
                            Foreground="{DynamicResource DefaultForegroundBrush}"
                            Margin="7 0 0 0"

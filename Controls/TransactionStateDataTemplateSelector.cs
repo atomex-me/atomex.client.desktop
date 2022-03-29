@@ -19,24 +19,23 @@ namespace Atomex.Client.Desktop.Controls
 
         private static DataTemplate? GetTemplate(object data)
         {
-            if (!(data is ITransactionViewModel transaction))
+            if (data is not ITransactionViewModel transaction)
                 return null;
 
-            switch (transaction.State)
+            return transaction.State switch
             {
-                case BlockchainTransactionState.Unknown:
-                    return App.TemplateService.GetTxStateTemplate(TxStateTemplate.UnknownStateTemplate);
-                case BlockchainTransactionState.Pending:
-                    return App.TemplateService.GetTxStateTemplate(TxStateTemplate.PendingStateTemplate);
-                case BlockchainTransactionState.Confirmed:
-                    return App.TemplateService.GetTxStateTemplate(TxStateTemplate.ConfirmedStateTemplate);
-                case BlockchainTransactionState.Unconfirmed:
-                    return App.TemplateService.GetTxStateTemplate(TxStateTemplate.UnconfirmedStateTemplate);
-                case BlockchainTransactionState.Failed:
-                    return App.TemplateService.GetTxStateTemplate(TxStateTemplate.FailedStateTemplate);
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
+                BlockchainTransactionState.Unknown => App.TemplateService.GetTxStateTemplate(TxStateTemplate
+                    .UnknownStateTemplate),
+                BlockchainTransactionState.Pending => App.TemplateService.GetTxStateTemplate(TxStateTemplate
+                    .PendingStateTemplate),
+                BlockchainTransactionState.Confirmed => App.TemplateService.GetTxStateTemplate(TxStateTemplate
+                    .ConfirmedStateTemplate),
+                BlockchainTransactionState.Unconfirmed => App.TemplateService.GetTxStateTemplate(TxStateTemplate
+                    .UnconfirmedStateTemplate),
+                BlockchainTransactionState.Failed => App.TemplateService.GetTxStateTemplate(TxStateTemplate
+                    .FailedStateTemplate),
+                _ => throw new ArgumentOutOfRangeException()
+            };
         }
 
         public bool Match(object data)

@@ -61,7 +61,7 @@
                      HorizontalAlignment="Right"/>
         </Border>
 
-        <Border CornerRadius="6"
+        <Border CornerRadius="{DynamicResource AtomexCornerRadius}"
                 Width="440"
                 Height="80"
                 VerticalAlignment="Center"
@@ -130,7 +130,6 @@
                 </TextBlock>
 
                 <TextBlock Text="{Binding CurrencyCode}"
-                           FontFamily="{DynamicResource DefaultFontFamily}"
                            FontSize="13"
                            LineHeight="16"
                            Foreground="{DynamicResource SecondaryForegroundBrush}"

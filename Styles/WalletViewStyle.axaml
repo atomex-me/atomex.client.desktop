@@ -14,30 +14,30 @@
                            Text="{Binding State}"
                            FontSize="11"
                            Margin="5"
-                           HorizontalAlignment="Center" />
+                           HorizontalAlignment="Left" />
             </Border>
         </DataTemplate>
         <DataTemplate x:Key="PendingStateTemplate" DataType="viewModels:TransactionViewModel">
-            <Border Background="{StaticResource PendingBrush}"
-                    CornerRadius="5"
-                    Classes="DGTemplateContainer">
-                <TextBlock Foreground="White"
-                           Text="{Binding State}"
-                           FontSize="11"
-                           Margin="5"
-                           HorizontalAlignment="Center" />
-            </Border>
+            <StackPanel Orientation="Horizontal">
+                <svg:Svg Width="18"
+                         Classes="InProgress"
+                         VerticalAlignment="Center"
+                         Path="/Resources/Icons/in-progress.svg" />
+                <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
+                           Margin="8 0 0 0"
+                           FontSize="13"
+                           LineHeight="16"
+                           VerticalAlignment="Center"
+                           Text="Pending" />
+            </StackPanel>
         </DataTemplate>
         <DataTemplate x:Key="ConfirmedStateTemplate" DataType="viewModels:TransactionViewModel">
-            <Border Background="{StaticResource ConfirmedBrush}"
-                    CornerRadius="5"
-                    Classes="DGTemplateContainer">
-                <TextBlock Foreground="White"
-                           Text="{Binding State}"
-                           FontSize="11"
-                           Margin="5"
-                           HorizontalAlignment="Center" />
-            </Border>
+            <StackPanel Orientation="Horizontal">
+                <svg:Svg Width="18"
+                         Classes="InProgress"
+                         VerticalAlignment="Center"
+                         Path="/Resources/Icons/in-progress.svg" />
+            </StackPanel>
         </DataTemplate>
         <DataTemplate x:Key="UnconfirmedStateTemplate" DataType="viewModels:TransactionViewModel">
             <Border Background="{StaticResource UnconfirmedBrush}"

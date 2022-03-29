@@ -223,14 +223,12 @@
                                Margin="0 0 0 2"
                                LineHeight="16"
                                FontSize="13"
-                               FontFamily="{DynamicResource DefaultFontFamily}"
                                Foreground="{DynamicResource SecondaryForegroundBrush}"
                                Text="{Binding TotalSelected}" />
                     <TextBlock HorizontalAlignment="Right"
                                Margin="0 2 0 0"
                                LineHeight="16"
                                FontSize="13"
-                               FontFamily="{DynamicResource DefaultFontFamily}"
                                Foreground="{DynamicResource SecondaryForegroundBrush}"
                                Text="{Binding TotalCoinAmountSelected}" />
                 </StackPanel>
@@ -238,10 +236,9 @@
                 <controls:RoundedButton Grid.Column="1"
                                         Width="200"
                                         Height="50"
-                                        CornerRadius="6"
+                                        CornerRadius="{DynamicResource AtomexCornerRadius}"
                                         Content="Confirm"
                                         FontSize="18"
-                                        FontFamily="{DynamicResource DefaultFontFamily}"
                                         FontWeight="Normal"
                                         Command="{Binding ConfirmCommand}" />
             </Grid>

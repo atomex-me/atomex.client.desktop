@@ -53,7 +53,6 @@
                                 <StackPanel Orientation="Horizontal">
                                     <TextBlock Classes="BaseDisabledStyle"
                                                Foreground="{DynamicResource BalanceBackgroundBrush}"
-                                               FontFamily="{DynamicResource DefaultFontFamily}"
                                                FontSize="36"
                                                VerticalAlignment="Bottom"
                                                HorizontalAlignment="Left">
@@ -68,7 +67,6 @@
                                     <TextBlock Classes="BaseDisabledStyle"
                                                Text="{Binding CurrencyViewModel.CurrencyCode}"
                                                Foreground="{DynamicResource BalanceBackgroundBrush}"
-                                               FontFamily="{DynamicResource DefaultFontFamily}"
                                                VerticalAlignment="Bottom"
                                                FontSize="22"
                                                HorizontalAlignment="Left"
@@ -80,7 +78,6 @@
 
                                     <TextBlock Classes="BaseDisabledStyle"
                                                Foreground="{DynamicResource UsdBalanceBackgroundBrush}"
-                                               FontFamily="{DynamicResource DefaultFontFamily}"
                                                FontSize="24"
                                                VerticalAlignment="Bottom"
                                                HorizontalAlignment="Left">
@@ -95,7 +92,6 @@
                                     <TextBlock Classes="BaseDisabledStyle"
                                                Text="{Binding CurrencyViewModel.BaseCurrencyCode}"
                                                Foreground="{DynamicResource UsdBalanceBackgroundBrush}"
-                                               FontFamily="{DynamicResource DefaultFontFamily}"
                                                VerticalAlignment="Bottom"
                                                FontSize="14"
                                                HorizontalAlignment="Left"
@@ -127,7 +123,6 @@
                                             BorderThickness="0"
                                             ToolTip.Tip="Unconfirmed">
                                         <TextBlock Classes="BaseDisabledStyle"
-                                                   FontFamily="{DynamicResource DefaultFontFamily}"
                                                    FontSize="14"
                                                    Foreground="{DynamicResource UnconfirmedAmountBrush}"
                                                    VerticalAlignment="Center"
@@ -150,7 +145,6 @@
                                         <TextBlock
                                             Classes="BaseDisabledStyle"
                                             Text="{Binding CurrencyViewModel.CurrencyCode}"
-                                            FontFamily="{DynamicResource DefaultFontFamily}"
                                             FontSize="8"
                                             Foreground="{DynamicResource UnconfirmedAmountBrush}"
                                             VerticalAlignment="Center"
@@ -165,7 +159,6 @@
                                             ToolTip.Tip="Unconfirmed">
                                         <TextBlock
                                             Classes="BaseDisabledStyle"
-                                            FontFamily="{DynamicResource DefaultFontFamily}"
                                             FontSize="11"
                                             Foreground="DarkGray"
                                             VerticalAlignment="Center"
@@ -247,7 +240,6 @@
                                    Text="balance update in progress..."
                                    Margin="10 0 0 0"
                                    Foreground="{DynamicResource DefaultForegroundBrush}"
-                                   FontFamily="{DynamicResource DefaultFontFamily}"
                                    FontSize="15"
                                    VerticalAlignment="Center"
                                    IsEnabled="{Binding IsBalanceUpdating}" />
@@ -318,8 +310,7 @@
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate DataType="{x:Type txViewModels:TransactionViewModel}">
                             <StackPanel Classes="DGTemplateContainer" Orientation="Horizontal">
-                                <TextBlock FontFamily="{DynamicResource DefaultFontFamily}"
-                                           VerticalAlignment="Center"
+                                <TextBlock VerticalAlignment="Center"
                                            HorizontalAlignment="Left"
                                            Name="AmountTextBlock"
                                            FontSize="13">
@@ -348,7 +339,6 @@
                                 </TextBlock>
 
                                 <TextBlock Text="{Binding CurrencyCode}"
-                                           FontFamily="{DynamicResource DefaultFontFamily}"
                                            FontSize="8"
                                            VerticalAlignment="Bottom"
                                            IsVisible="False"

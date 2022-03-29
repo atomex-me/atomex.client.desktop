@@ -23,7 +23,7 @@
     <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml"/>
     <StyleInclude Source="resm:OxyPlot.Avalonia.Themes.Default.xaml?assembly=OxyPlot.Avalonia"/>
     <StyleInclude Source="avares://DialogHost.Avalonia/Styles.xaml"/>
-    <StyleInclude Source="/Styles/Styles.axaml"/>
+    <StyleInclude Source="/Styles/BaseStyles.axaml"/>
     <StyleInclude Source="/Styles/MainWindowStyle.axaml"/>
     <StyleInclude Source="/Styles/ChildViewStyle.axaml"/>
     <StyleInclude Source="/Styles/ButtonStyle.axaml"/>

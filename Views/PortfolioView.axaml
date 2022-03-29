@@ -81,7 +81,6 @@
                                                    Padding="16 8"
                                                    Foreground="White"
                                                    VerticalAlignment="Center"
-                                                   FontFamily="{DynamicResource DefaultFontFamily}"
                                                    FontSize="12" />
                                     </Border>
                                 </Canvas>
@@ -92,13 +91,11 @@
 
                     <StackPanel Grid.Column="1"
                                 Grid.Row="0">
-                        <TextBlock FontFamily="{DynamicResource DefaultFontFamily}"
-                                   Foreground="{DynamicResource SecondaryForegroundBrush}"
+                        <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
                                    Margin="0 5 0 0"
                                    FontSize="13"
                                    Text="Total Balance" />
-                        <TextBlock FontFamily="{DynamicResource DefaultFontFamily}"
-                                   Foreground="{DynamicResource DefaultForegroundBrush}"
+                        <TextBlock Foreground="{DynamicResource DefaultForegroundBrush}"
                                    FontSize="40"
                                    Text="{Binding PortfolioValue, Converter={StaticResource PortfolioToTotalConverter}}" />
                     </StackPanel>
@@ -111,9 +108,8 @@
 
                         <controls:RoundedButton Height="46"
                                                 Padding="26 0"
-                                                CornerRadius="6"
-                                                Command="{Binding SendCommand}"
-                                                FontFamily="{DynamicResource DefaultFontFamily}">
+                                                CornerRadius="{DynamicResource AtomexCornerRadius}"
+                                                Command="{Binding SendCommand}">
                             <StackPanel Orientation="Horizontal">
                                 <svg:Svg HorizontalAlignment="Center"
                                          Width="24"
@@ -121,17 +117,14 @@
                                          Path="/Resources/Icons/top-right-arrow.svg" />
                                 <TextBlock Margin="8 0 0 0"
                                            Text="Send"
-                                           FontFamily="{DynamicResource DefaultFontFamily}"
-                                           FontWeight="Light"
                                            FontSize="18"
                                            Foreground="{DynamicResource RoundedButtonForegroundBrush}" />
                             </StackPanel>
                         </controls:RoundedButton>
                         <controls:RoundedButton Height="46"
                                                 Padding="26 0"
-                                                CornerRadius="6"
+                                                CornerRadius="{DynamicResource AtomexCornerRadius}"
                                                 Command="{Binding ReceiveCommand}"
-                                                FontFamily="{DynamicResource DefaultFontFamily}"
                                                 Margin="12 0 0 0">
                             <StackPanel Orientation="Horizontal">
                                 <svg:Svg HorizontalAlignment="Center"
@@ -140,17 +133,14 @@
                                          Path="/Resources/Icons/bottom-right-arrow.svg" />
                                 <TextBlock Margin="8 0 0 0"
                                            Text="Receive"
-                                           FontFamily="{DynamicResource DefaultFontFamily}"
-                                           FontWeight="Light"
                                            FontSize="18"
                                            Foreground="{DynamicResource RoundedButtonForegroundBrush}" />
                             </StackPanel>
                         </controls:RoundedButton>
                         <controls:RoundedButton Height="46"
                                                 Padding="26 0"
-                                                CornerRadius="6"
+                                                CornerRadius="{DynamicResource AtomexCornerRadius}"
                                                 Command="{Binding ExchangeCommand}"
-                                                FontFamily="{DynamicResource DefaultFontFamily}"
                                                 Margin="12 0 0 0"
                                                 Classes="AccentButton">
                             <StackPanel Orientation="Horizontal">
@@ -160,8 +150,6 @@
                                          Path="/Resources/Icons/exchange-arrows.svg" />
                                 <TextBlock Margin="8 0 0 0"
                                            Text="Exchange"
-                                           FontFamily="{DynamicResource DefaultFontFamily}"
-                                           FontWeight="Light"
                                            FontSize="18"
                                            Foreground="{DynamicResource DeepBlue}" />
                             </StackPanel>
@@ -180,7 +168,6 @@
                       ColumnDefinitions="*,Auto">
                     <TextBlock Grid.Column="0"
                                VerticalAlignment="Center"
-                               FontFamily="{DynamicResource DefaultFontFamily}"
                                Foreground="{DynamicResource DefaultForegroundBrush}"
                                FontSize="22"
                                Text="Coins &amp; Tokens" />
@@ -269,13 +256,11 @@
                                                      Margin="16 0"
                                                      Path="{Binding IconPath}" />
                                             <TextBlock VerticalAlignment="Center"
-                                                       FontFamily="{DynamicResource DefaultFontFamily}"
                                                        Foreground="{DynamicResource DefaultForegroundBrush}"
                                                        FontSize="18"
                                                        Text="{Binding Currency.Description}" />
                                             <TextBlock VerticalAlignment="Center"
                                                        Margin="24 0 8 0"
-                                                       FontFamily="{DynamicResource DefaultFontFamily}"
                                                        Foreground="{DynamicResource SecondaryForegroundBrush}"
                                                        FontSize="13">
                                                 <TextBlock.Text>
@@ -286,7 +271,6 @@
                                                 </TextBlock.Text>
                                             </TextBlock>
                                             <TextBlock VerticalAlignment="Center"
-                                                       FontFamily="{DynamicResource DefaultFontFamily}"
                                                        Foreground="{DynamicResource SuccessForegroundBrush}"
                                                        FontSize="13"
                                                        Text="+3.0%" />
@@ -296,7 +280,6 @@
                                             <StackPanel IsVisible="{Binding !!AvailableAmount}">
                                                 <StackPanel Orientation="Horizontal">
                                                     <TextBlock HorizontalAlignment="Right"
-                                                               FontFamily="{DynamicResource DefaultFontFamily}"
                                                                Foreground="{DynamicResource DefaultForegroundBrush}"
                                                                FontSize="16"
                                                                Margin="0 0 0 2">
@@ -309,14 +292,12 @@
                                                         </TextBlock.Text>
                                                     </TextBlock>
                                                     <TextBlock HorizontalAlignment="Right"
-                                                               FontFamily="{DynamicResource DefaultFontFamily}"
                                                                Foreground="{DynamicResource DefaultForegroundBrush}"
                                                                FontSize="16"
                                                                Text="{Binding CurrencyCode}"
                                                                Margin="3 0 0 0" />
                                                 </StackPanel>
                                                 <TextBlock HorizontalAlignment="Right"
-                                                           FontFamily="{DynamicResource DefaultFontFamily}"
                                                            Foreground="{DynamicResource SecondaryForegroundBrush}"
                                                            FontSize="13"
                                                            Margin="0 2 0 0">
@@ -332,7 +313,6 @@
 
                                             <TextBlock IsVisible="{Binding !AvailableAmount}"
                                                        HorizontalAlignment="Right"
-                                                       FontFamily="{DynamicResource DefaultFontFamily}"
                                                        Foreground="{DynamicResource DefaultForegroundBrush}"
                                                        FontSize="16"
                                                        VerticalAlignment="Center"
@@ -340,7 +320,6 @@
 
                                             <TextBlock IsVisible="{Binding !AvailableAmount}"
                                                        HorizontalAlignment="Right"
-                                                       FontFamily="{DynamicResource DefaultFontFamily}"
                                                        Foreground="{DynamicResource DefaultForegroundBrush}"
                                                        FontSize="16"
                                                        VerticalAlignment="Center"
@@ -375,7 +354,7 @@
                                                         </MultiBinding>
                                                     </Popup.IsOpen>
                                                     <Border Background="{DynamicResource DeepBlue}"
-                                                            CornerRadius="6"
+                                                            CornerRadius="{DynamicResource AtomexCornerRadius}"
                                                             Padding="12 16">
                                                         <StackPanel>
                                                             <StackPanel.Styles>
@@ -400,7 +379,7 @@
                                                             <Button Width="180"
                                                                     Height="40"
                                                                     Padding="12 0"
-                                                                    CornerRadius="6"
+                                                                    CornerRadius="{DynamicResource AtomexCornerRadius}"
                                                                     VerticalContentAlignment="Center"
                                                                     Command="{Binding $parent[ListBox].DataContext.SendFromPopupCommand}"
                                                                     CommandParameter="{Binding}">
@@ -408,12 +387,10 @@
                                                                             VerticalAlignment="Stretch">
                                                                     <TextBlock Text="Send"
                                                                                Foreground="{DynamicResource DefaultForegroundBrush}"
-                                                                               FontFamily="{DynamicResource DefaultFontFamily}"
                                                                                VerticalAlignment="Center"
                                                                                FontSize="16" />
                                                                     <TextBlock Text="{Binding CurrencyCode}"
                                                                                Foreground="{DynamicResource DefaultForegroundBrush}"
-                                                                               FontFamily="{DynamicResource DefaultFontFamily}"
                                                                                VerticalAlignment="Center"
                                                                                FontSize="16"
                                                                                Margin="3 0 0 0" />
@@ -422,7 +399,7 @@
                                                             <Button Width="180"
                                                                     Height="40"
                                                                     Padding="12 0"
-                                                                    CornerRadius="6"
+                                                                    CornerRadius="{DynamicResource AtomexCornerRadius}"
                                                                     VerticalContentAlignment="Center"
                                                                     Command="{Binding $parent[ListBox].DataContext.ReceiveFromPopupCommand}"
                                                                     CommandParameter="{Binding}">
@@ -430,12 +407,10 @@
                                                                             VerticalAlignment="Stretch">
                                                                     <TextBlock Text="Receive"
                                                                                Foreground="{DynamicResource DefaultForegroundBrush}"
-                                                                               FontFamily="{DynamicResource DefaultFontFamily}"
                                                                                VerticalAlignment="Center"
                                                                                FontSize="16" />
                                                                     <TextBlock Text="{Binding CurrencyCode}"
                                                                                Foreground="{DynamicResource DefaultForegroundBrush}"
-                                                                               FontFamily="{DynamicResource DefaultFontFamily}"
                                                                                VerticalAlignment="Center"
                                                                                FontSize="16"
                                                                                Margin="3 0 0 0" />
@@ -444,7 +419,7 @@
                                                             <Button Width="180"
                                                                     Height="40"
                                                                     Padding="12 0"
-                                                                    CornerRadius="6"
+                                                                    CornerRadius="{DynamicResource AtomexCornerRadius}"
                                                                     VerticalContentAlignment="Center"
                                                                     Command="{Binding $parent[ListBox].DataContext.ExchangeCommand}"
                                                                     CommandParameter="{Binding}">
@@ -452,12 +427,10 @@
                                                                             VerticalAlignment="Stretch">
                                                                     <TextBlock Text="Exchange"
                                                                                Foreground="{DynamicResource DefaultForegroundBrush}"
-                                                                               FontFamily="{DynamicResource DefaultFontFamily}"
                                                                                VerticalAlignment="Center"
                                                                                FontSize="16" />
                                                                     <TextBlock Text="{Binding CurrencyCode}"
                                                                                Foreground="{DynamicResource DefaultForegroundBrush}"
-                                                                               FontFamily="{DynamicResource DefaultFontFamily}"
                                                                                VerticalAlignment="Center"
                                                                                FontSize="16"
                                                                                Margin="3 0 0 0" />
@@ -466,7 +439,7 @@
                                                             <Button Width="180"
                                                                     Height="40"
                                                                     Padding="12 0"
-                                                                    CornerRadius="6"
+                                                                    CornerRadius="{DynamicResource AtomexCornerRadius}"
                                                                     VerticalContentAlignment="Center"
                                                                     IsVisible="{Binding CurrencyCode, Converter={StaticResource ShowBuyButton}}"
                                                                     Command="{Binding $parent[ListBox].DataContext.SetWertCurrencyCommand}"
@@ -475,12 +448,10 @@
                                                                             VerticalAlignment="Stretch">
                                                                     <TextBlock Text="Buy"
                                                                                Foreground="{DynamicResource DefaultForegroundBrush}"
-                                                                               FontFamily="{DynamicResource DefaultFontFamily}"
                                                                                VerticalAlignment="Center"
                                                                                FontSize="16" />
                                                                     <TextBlock Text="{Binding CurrencyCode}"
                                                                                Foreground="{DynamicResource DefaultForegroundBrush}"
-                                                                               FontFamily="{DynamicResource DefaultFontFamily}"
                                                                                VerticalAlignment="Center"
                                                                                FontSize="16"
                                                                                Margin="3 0 0 0" />

@@ -17,7 +17,6 @@
             <!-- title -->
             <TextBlock Name="Title"
                        FontSize="22"
-                       FontFamily="{DynamicResource DefaultFontFamily}"
                        HorizontalAlignment="Center"
                        VerticalAlignment="Center"
                        Foreground="{DynamicResource LightDefault}"
@@ -111,7 +110,6 @@
                                         </TextBlock>
                                         <TextBlock HorizontalAlignment="Right"
                                                    VerticalAlignment="Center"
-                                                   FontFamily="{DynamicResource DefaultFontFamily}"
                                                    FontSize="16"
                                                    Text="{Binding Currency.CurrencyCode}"
                                                    Margin="3 0 0 0"
@@ -120,7 +118,6 @@
                                     </StackPanel>
 
                                     <TextBlock HorizontalAlignment="Right"
-                                               FontFamily="{DynamicResource DefaultFontFamily}"
                                                Foreground="{DynamicResource SecondaryForegroundBrush}"
                                                FontSize="13"
                                                Margin="0 2 0 0">

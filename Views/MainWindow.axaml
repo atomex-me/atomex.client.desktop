@@ -14,7 +14,7 @@
         ExtendClientAreaTitleBarHeightHint="-1"
         Name="MainWindow"
         Title="Atomex"
-        MinWidth="1100"
+        MinWidth="1110"
         MinHeight="760"
         Classes="MainWindow">
 

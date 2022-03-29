@@ -174,7 +174,7 @@
                                             Value="{Binding Completed}">
                         <ia:ChangePropertyAction TargetObject="{Binding #SwapStatusIcon}"
                                                  PropertyName="Path"
-                                                 Value="/Resources/Icons/swap-completed.svg" />
+                                                 Value="/Resources/Icons/completed-checkbox.svg" />
                     </ia:DataTriggerBehavior>
                     <ia:DataTriggerBehavior Binding="{Binding CompactState}"
                                             ComparisonCondition="Equal"
@@ -367,7 +367,6 @@
                 <TabItem Margin="0 0 23 0">
                     <TabItem.Header>
                         <TextBlock VerticalAlignment="Center"
-                                   FontFamily="{DynamicResource DefaultFontFamily}"
                                    FontSize="13"
                                    Text="Progress" />
                     </TabItem.Header>
@@ -379,7 +378,7 @@
                             <svg:Svg Width="17"
                                      HorizontalAlignment="Left"
                                      Classes="InProgress"
-                                     Path="/Resources/Icons/swap-exchanging.svg"
+                                     Path="/Resources/Icons/in-progress.svg"
                                      IsVisible="{Binding InitializationStepInProgress}" />
                             <svg:Svg Name="InitializationIcon"
                                      IsVisible="{Binding !InitializationStepInProgress}"
@@ -398,7 +397,7 @@
                                                             Value="{Binding CompletedState}">
                                         <ia:ChangePropertyAction TargetObject="{Binding #InitializationIcon}"
                                                                  PropertyName="Path"
-                                                                 Value="/Resources/Icons/swap-completed.svg" />
+                                                                 Value="/Resources/Icons/completed-checkbox.svg" />
                                     </ia:DataTriggerBehavior>
                                     <ia:DataTriggerBehavior Binding="{Binding InitializationStepStatus}"
                                                             ComparisonCondition="Equal"
@@ -440,7 +439,7 @@
                             <svg:Svg Width="17"
                                      HorizontalAlignment="Left"
                                      Classes="InProgress"
-                                     Path="/Resources/Icons/swap-exchanging.svg"
+                                     Path="/Resources/Icons/in-progress.svg"
                                      IsVisible="{Binding ExchangingStepInProgress}" />
                             <svg:Svg Name="ExchangingIcon"
                                      IsVisible="{Binding !ExchangingStepInProgress}"
@@ -459,7 +458,7 @@
                                                             Value="{Binding CompletedState}">
                                         <ia:ChangePropertyAction TargetObject="{Binding #ExchangingIcon}"
                                                                  PropertyName="Path"
-                                                                 Value="/Resources/Icons/swap-completed.svg" />
+                                                                 Value="/Resources/Icons/completed-checkbox.svg" />
                                     </ia:DataTriggerBehavior>
                                     <ia:DataTriggerBehavior Binding="{Binding ExchangingStepStatus}"
                                                             ComparisonCondition="Equal"
@@ -501,7 +500,7 @@
                             <svg:Svg Width="17"
                                      HorizontalAlignment="Left"
                                      Classes="InProgress"
-                                     Path="/Resources/Icons/swap-exchanging.svg"
+                                     Path="/Resources/Icons/in-progress.svg"
                                      IsVisible="{Binding CompletionStepInProgress}" />
                             <svg:Svg Name="CompletionIcon"
                                      IsVisible="{Binding !CompletionStepInProgress}"
@@ -520,7 +519,7 @@
                                                             Value="{Binding CompletedState}">
                                         <ia:ChangePropertyAction TargetObject="{Binding #CompletionIcon}"
                                                                  PropertyName="Path"
-                                                                 Value="/Resources/Icons/swap-completed.svg" />
+                                                                 Value="/Resources/Icons/completed-checkbox.svg" />
                                     </ia:DataTriggerBehavior>
                                     <ia:DataTriggerBehavior Binding="{Binding CompletionStepStatus}"
                                                             ComparisonCondition="Equal"
@@ -598,8 +597,7 @@
                                             CommandParameter="{Binding ExchangingFirstStepLinkUrl}"
                                             Classes="ExplorerLinkBtn Icon">
                                         <StackPanel Orientation="Horizontal">
-                                            <TextBlock FontFamily="{DynamicResource DefaultFontFamily}"
-                                                       VerticalAlignment="Bottom"
+                                            <TextBlock VerticalAlignment="Bottom"
                                                        FontSize="12"
                                                        Text="{Binding ExchangingFirstStepLinkText}" />
                                             <Path Stretch="Uniform"
@@ -648,8 +646,7 @@
                                             CommandParameter="{Binding ExchangingSecondStepLinkUrl}"
                                             Classes="ExplorerLinkBtn Icon">
                                         <StackPanel Orientation="Horizontal">
-                                            <TextBlock FontFamily="{DynamicResource DefaultFontFamily}"
-                                                       VerticalAlignment="Bottom"
+                                            <TextBlock VerticalAlignment="Bottom"
                                                        FontSize="12"
                                                        Text="{Binding ExchangingSecondStepLinkText}" />
                                             <Path Stretch="Uniform"
@@ -709,8 +706,7 @@
                                             CommandParameter="{Binding CompletionFirstStepLinkUrl}"
                                             Classes="ExplorerLinkBtn Icon">
                                         <StackPanel Orientation="Horizontal">
-                                            <TextBlock FontFamily="{DynamicResource DefaultFontFamily}"
-                                                       VerticalAlignment="Bottom"
+                                            <TextBlock VerticalAlignment="Bottom"
                                                        FontSize="12"
                                                        Text="{Binding CompletionFirstStepLinkText}" />
                                             <Path Stretch="Uniform"
@@ -759,8 +755,7 @@
                                             CommandParameter="{Binding CompletionSecondStepLinkUrl}"
                                             Classes="ExplorerLinkBtn Icon">
                                         <StackPanel Orientation="Horizontal">
-                                            <TextBlock FontFamily="{DynamicResource DefaultFontFamily}"
-                                                       VerticalAlignment="Bottom"
+                                            <TextBlock VerticalAlignment="Bottom"
                                                        FontSize="12"
                                                        Text="{Binding CompletionSecondStepLinkText}" />
                                             <Path Stretch="Uniform"
@@ -791,7 +786,6 @@
                 <TabItem Margin="23 0 0 0">
                     <TabItem.Header>
                         <TextBlock VerticalAlignment="Center"
-                                   FontFamily="{DynamicResource DefaultFontFamily}"
                                    FontSize="13"
                                    Text="Details" />
                     </TabItem.Header>
@@ -800,7 +794,6 @@
                                    Grid.Row="0"
                                    Text="Price:"
                                    Foreground="{StaticResource LightDefaultOpacity50}"
-                                   FontFamily="{DynamicResource DefaultFontFamily}"
                                    FontSize="15" />
 
                         <TextBlock Grid.Column="1"
@@ -808,7 +801,6 @@
                                    Margin="0 0 15 0"
                                    Text="{Binding Price}"
                                    Foreground="{StaticResource PrimaryTextColor}"
-                                   FontFamily="{DynamicResource DefaultFontFamily}"
                                    HorizontalAlignment="Right"
                                    FontSize="15" />
 
@@ -816,7 +808,6 @@
                                    Grid.Row="1"
                                    Text="Date:"
                                    Foreground="{StaticResource LightDefaultOpacity50}"
-                                   FontFamily="{DynamicResource DefaultFontFamily}"
                                    FontSize="15" />
 
                         <TextBlock Grid.Column="1"
@@ -824,7 +815,6 @@
                                    Margin="0 0 15 0"
                                    Text="{Binding TimeStamp, Converter={StaticResource DateTimeToTxTimeConverter}}"
                                    Foreground="{StaticResource PrimaryTextColor}"
-                                   FontFamily="{DynamicResource DefaultFontFamily}"
                                    HorizontalAlignment="Right"
                                    FontSize="15" />
                     </Grid>

@@ -110,10 +110,9 @@
                         IsVisible="{Binding IsNextVisible}">
                 <controls:RoundedButton Width="200"
                                         Height="50"
-                                        CornerRadius="6"
+                                        CornerRadius="{DynamicResource AtomexCornerRadius}"
                                         FontSize="18"
                                         FontWeight="Normal"
-                                        FontFamily="{DynamicResource DefaultFontFamily}"
                                         Content="{Binding NextText}"
                                         Command="{Binding NextCommand}" />
             </StackPanel>

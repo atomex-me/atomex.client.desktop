@@ -30,8 +30,7 @@
                             VerticalAlignment="Top"
                             Grid.Column="1"
                             Grid.Row="1">
-                    <TextBlock FontFamily="{DynamicResource DefaultFontFamily}"
-                               FontSize="13"
+                    <TextBlock FontSize="13"
                                Foreground="{DynamicResource DefaultForegroundBrush}"
                                Margin="7 0 0 0">
                         <TextBlock.Text>
@@ -42,7 +41,6 @@
                         </TextBlock.Text>
                     </TextBlock>
                     <TextBlock Text="{Binding CurrencyCode}"
-                               FontFamily="{DynamicResource DefaultFontFamily}"
                                FontSize="9"
                                Foreground="{DynamicResource DefaultForegroundBrush}"
                                Margin="4 3 0 0" />

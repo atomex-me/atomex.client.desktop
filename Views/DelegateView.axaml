@@ -120,13 +120,11 @@
                       Text="{Binding AvailableBalance, Converter={StaticResource TezosDelegationCurrencyFormatConverter}}"
                       Foreground="{DynamicResource AmountBrush}"
                       FontSize="12"
-                      FontFamily="{DynamicResource DefaultFontFamily}"
                       VerticalAlignment="Center"/>
                   <TextBlock
                       Text="{Binding Address}"
                       Foreground="{DynamicResource DefaultForegroundBrush}"
                       FontSize="12"
-                      FontFamily="{DynamicResource DefaultFontFamily}"
                       HorizontalAlignment="Left"
                       VerticalAlignment="Center"/>
                 </DockPanel>

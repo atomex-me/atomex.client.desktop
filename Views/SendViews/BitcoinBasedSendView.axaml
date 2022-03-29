@@ -133,7 +133,7 @@
                      HorizontalAlignment="Right"/>
         </Border>
 
-        <Border CornerRadius="6"
+        <Border CornerRadius="{DynamicResource AtomexCornerRadius}}"
                 Width="440"
                 Height="80"
                 VerticalAlignment="Center"
@@ -340,13 +340,11 @@
                       HorizontalAlignment="Right"
                       Orientation="Horizontal">
             <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
-                       FontFamily="{DynamicResource DefaultFontFamily}"
                        LineHeight="20"
                        TextAlignment="Right"
                        Text="Fee rate:"/>
 
             <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
-                       FontFamily="{DynamicResource DefaultFontFamily}"
                        LineHeight="20"
                        Margin="3 0 0 0"
                        TextAlignment="Right">
@@ -359,7 +357,6 @@
             </TextBlock>
 
             <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
-                       FontFamily="{DynamicResource DefaultFontFamily}"
                        LineHeight="20"
                        Margin="3 0 0 0"
                        TextAlignment="Right"
@@ -372,24 +369,20 @@
                       HorizontalAlignment="Right"
                       Orientation="Horizontal">
             <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
-                       FontFamily="{DynamicResource DefaultFontFamily}"
                        LineHeight="20"
                        TextAlignment="Right"
                        Text="Fee:"/>
             <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
-                       FontFamily="{DynamicResource DefaultFontFamily}"
                        LineHeight="20"
                        Margin="3 0 0 0"
                        TextAlignment="Right"
                        Text="{Binding Fee}"/>
             <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
-                       FontFamily="{DynamicResource DefaultFontFamily}"
                        LineHeight="20"
                        Margin="3 0 0 0"
                        TextAlignment="Right"
                        Text="{Binding FeeCurrencyCode}"/>
             <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
-                       FontFamily="{DynamicResource DefaultFontFamily}"
                        LineHeight="20"
                        Margin="3 0 0 0"
                        TextAlignment="Right">
@@ -414,26 +407,22 @@
         <Grid ColumnDefinitions="*,Auto,Auto,Auto">
           <TextBlock Grid.Column="0"
                      Text="Amount"
-                     FontFamily="{DynamicResource DefaultFontFamily}"
                      Foreground="{DynamicResource SecondaryForegroundBrush}"
                      FontSize="13"/>
 
           <TextBlock Grid.Column="1"
                      Text="{Binding Amount}"
-                     FontFamily="{DynamicResource DefaultFontFamily}"
                      Foreground="{DynamicResource DefaultForegroundBrush}"
                      FontSize="13"/>
 
           <TextBlock Grid.Column="2"
                      Margin="3 0 0 0"
                      Text="{Binding CurrencyCode}"
-                     FontFamily="{DynamicResource DefaultFontFamily}"
                      Foreground="{DynamicResource DefaultForegroundBrush}"
                      FontSize="13"/>
 
           <TextBlock Grid.Column="3"
                      Foreground="{DynamicResource DefaultForegroundBrush}"
-                     FontFamily="{DynamicResource DefaultFontFamily}"
                      FontSize="13"
                      Margin="3 0 0 0">
             <TextBlock.Text>
@@ -449,26 +438,22 @@
               Margin="0 6 0 0">
           <TextBlock Grid.Column="0"
                      Text="Fee"
-                     FontFamily="{DynamicResource DefaultFontFamily}"
                      Foreground="{DynamicResource SecondaryForegroundBrush}"
                      FontSize="13"/>
 
           <TextBlock Grid.Column="1"
                      Text="{Binding Fee}"
-                     FontFamily="{DynamicResource DefaultFontFamily}"
                      Foreground="{DynamicResource DefaultForegroundBrush}"
                      FontSize="13"/>
 
           <TextBlock Grid.Column="2"
                      Margin="3 0 0 0"
                      Text="{Binding FeeCurrencyCode}"
-                     FontFamily="{DynamicResource DefaultFontFamily}"
                      Foreground="{DynamicResource DefaultForegroundBrush}"
                      FontSize="13"/>
 
           <TextBlock Grid.Column="3"
                      Foreground="{DynamicResource DefaultForegroundBrush}"
-                     FontFamily="{DynamicResource DefaultFontFamily}"
                      FontSize="13"
                      Margin="3 0 0 0">
             <TextBlock.Text>
@@ -484,12 +469,10 @@
               Margin="0 6 0 0">
           <TextBlock Grid.Column="0"
                      Text="Fee rate"
-                     FontFamily="{DynamicResource DefaultFontFamily}"
                      Foreground="{DynamicResource SecondaryForegroundBrush}"
                      FontSize="13" />
 
           <TextBlock Grid.Column="1"
-                     FontFamily="{DynamicResource DefaultFontFamily}"
                      Foreground="{DynamicResource DefaultForegroundBrush}"
                      FontSize="13">
             <TextBlock.Text>
@@ -503,7 +486,6 @@
           <TextBlock Grid.Column="2"
                      Margin="3 0 0 0"
                      Text="sat/byte"
-                     FontFamily="{DynamicResource DefaultFontFamily}"
                      Foreground="{DynamicResource DefaultForegroundBrush}"
                      FontSize="13" />
         </Grid>
@@ -516,14 +498,12 @@
               Margin="0 6 0 0">
           <TextBlock Grid.Column="0"
                      Text="Total (include fees)"
-                     FontFamily="{DynamicResource DefaultFontFamily}"
                      Foreground="{DynamicResource SecondaryForegroundBrush}"
                      VerticalAlignment="Center"
                      FontSize="13" />
 
           <TextBlock Grid.Column="1"
                      Text="{Binding TotalAmountString}"
-                     FontFamily="{DynamicResource DefaultFontFamily}"
                      Foreground="{DynamicResource DefaultForegroundBrush}"
                      VerticalAlignment="Center"
                      FontSize="22" />
@@ -531,7 +511,6 @@
           <TextBlock Grid.Column="2"
                      Margin="4 0 0 0"
                      Text="{Binding CurrencyCode}"
-                     FontFamily="{DynamicResource DefaultFontFamily}"
                      Foreground="{DynamicResource DefaultForegroundBrush}"
                      VerticalAlignment="Center"
                      FontSize="22" />
@@ -544,9 +523,8 @@
                   Margin="0 32 0 60">
         <controls:RoundedButton Width="440"
                                 Height="50"
-                                CornerRadius="6"
+                                CornerRadius="{DynamicResource AtomexCornerRadius}"
                                 FontSize="18"
-                                FontFamily="{DynamicResource DefaultFontFamily}"
                                 FontWeight="Normal"
                                 Command="{Binding NextCommand}"
                                 IsEnabled="{Binding CanSend}">

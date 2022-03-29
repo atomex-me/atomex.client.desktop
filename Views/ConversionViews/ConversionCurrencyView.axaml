@@ -56,7 +56,7 @@
   </UserControl.Styles>
   
   <Border BorderThickness="1"
-          CornerRadius="6"
+          CornerRadius="{DynamicResource AtomexCornerRadius}"
           Classes="designer Default">
     <Grid ColumnDefinitions="20,Auto,*,Auto,24"
           RowDefinitions="20,40,*,18"

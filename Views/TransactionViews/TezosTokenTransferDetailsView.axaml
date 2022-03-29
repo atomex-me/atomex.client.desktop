@@ -31,7 +31,6 @@
             </Grid.RowDefinitions>
 
             <TextBlock Text="Transaction Id:"
-                       FontFamily="{DynamicResource DefaultFontFamily}"
                        Foreground="{DynamicResource TransactionDetailsLineHeaderBrush}"
                        HorizontalAlignment="Right"
                        VerticalAlignment="Center"
@@ -77,14 +76,12 @@
             </StackPanel>
 
             <TextBlock Text="Time Stamp:"
-                       FontFamily="{DynamicResource DefaultFontFamily}"
                        Foreground="{DynamicResource TransactionDetailsLineHeaderBrush}"
                        HorizontalAlignment="Right"
                        VerticalAlignment="Center"
                        Grid.Column="0"
                        Grid.Row="1"/>
             <TextBlock Text="{Binding LocalTime, Converter={StaticResource DateTimeToTxDetailsConverter}}"
-                       FontFamily="{DynamicResource DefaultFontFamily}"
                        Foreground="{DynamicResource DefaultForegroundBrush}"
                        VerticalAlignment="Center"
                        Margin="10 0 0 0"
@@ -92,7 +89,6 @@
                        Grid.Row="1"/>
 
             <TextBlock Text="From:"
-                       FontFamily="{DynamicResource DefaultFontFamily}"
                        Foreground="{DynamicResource TransactionDetailsLineHeaderBrush}"
                        HorizontalAlignment="Right"
                        VerticalAlignment="Center"
@@ -137,7 +133,6 @@
             </StackPanel>
 
             <TextBlock Text="To:"
-                       FontFamily="{DynamicResource DefaultFontFamily}"
                        Foreground="{DynamicResource TransactionDetailsLineHeaderBrush}"
                        HorizontalAlignment="Right"
                        VerticalAlignment="Center"

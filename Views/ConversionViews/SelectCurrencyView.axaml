@@ -18,7 +18,6 @@
             <!-- title -->
             <TextBlock Name="Title"
                        FontSize="22"
-                       FontFamily="{DynamicResource DefaultFontFamily}"
                        HorizontalAlignment="Center"
                        VerticalAlignment="Center"
                        Foreground="{DynamicResource LightDefault}"
@@ -98,7 +97,6 @@
                                     Content="{Binding SelectedAddressDescription}"
                                     HorizontalAlignment="Right"
                                     FontSize="13"
-                                    FontFamily="{DynamicResource DefaultFontFamily}"
                                     Foreground="{DynamicResource LightDefaultOpacity50}"
                                     Command="{Binding $parent[ListBox].DataContext.ChangeAddressesCommand}"
                                     CommandParameter="{Binding}"

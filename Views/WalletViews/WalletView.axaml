@@ -2,7 +2,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="650"
+             mc:Ignorable="d" d:DesignWidth="900" d:DesignHeight="650"
              x:Class="Atomex.Client.Desktop.Views.WalletViews.WalletView"
              xmlns:vm="clr-namespace:Atomex.Client.Desktop.ViewModels.WalletViewModels"
              xmlns:txViewModels="clr-namespace:Atomex.Client.Desktop.ViewModels.TransactionViewModels"
@@ -22,6 +22,7 @@
         <converters:AmountToStringConverter x:Key="AmountToStringConverter" />
         <converters:DateTimeToTxTimeConverter x:Key="DateTimeToTxTimeConverter" />
         <converters:ShowBuyButton x:Key="ShowBuyButton" />
+        <converters:GreaterThanZeroConverter x:Key="GreaterThanZeroConverter" />
     </UserControl.Resources>
 
     <UserControl.Styles>
@@ -62,8 +63,10 @@
             </Setter>
         </Style>
         <Style Selector="TabItem.WalletTabItem">
-            <Setter Property="Foreground" Value="{DynamicResource SecondaryForegroundBrush}" />
             <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Foreground" Value="{DynamicResource SecondaryForegroundBrush}" />
+            <Setter Property="FontFamily" Value="{DynamicResource DefaultFontFamily}" />
+            <Setter Property="FontWeight" Value="Light" />
             <Setter Property="Template">
                 <ControlTemplate>
                     <Border Name="PART_LayoutRoot"
@@ -83,7 +86,7 @@
                                               TextBlock.FontWeight="{TemplateBinding FontWeight}" />
                             <Border Name="PART_SelectedPipe"
                                     Margin="0"
-                                    Background="{StaticResource PrimaryTextColor}" />
+                                    Background="{StaticResource LightDefault}" />
                         </Panel>
                     </Border>
                 </ControlTemplate>
@@ -103,8 +106,16 @@
         <Style Selector="TabItem.WalletTabItem:selected:pointerover /template/ Border#PART_LayoutRoot">
             <Setter Property="TextBlock.Foreground" Value="{DynamicResource DefaultForegroundBrush}" />
         </Style>
+
+        <Style Selector="TextBlock.AmountListBoxItem">
+            <Setter Property="Foreground" Value="{DynamicResource SecondaryForegroundBrush}" />
+        </Style>
+        <Style Selector="TextBlock.PositiveAmount">
+            <Setter Property="Foreground" Value="{DynamicResource SuccessForegroundBrush}" />
+        </Style>
     </UserControl.Styles>
-    <Grid RowDefinitions="Auto,*">
+    <Grid RowDefinitions="Auto,*"
+          Name="DesignGrid">
         <Grid Grid.Row="0"
               ColumnDefinitions="Auto,*"
               Margin="0 40 0 0">
@@ -120,9 +131,7 @@
             <StackPanel Grid.Column="1"
                         Margin="40 0 0 0">
                 <StackPanel Orientation="Horizontal">
-                    <TextBlock FontFamily="{DynamicResource DefaultFontFamily}"
-                               Foreground="{DynamicResource DefaultForegroundBrush}"
-                               FontWeight="Light"
+                    <TextBlock Foreground="{DynamicResource DefaultForegroundBrush}"
                                FontSize="32"
                                LineHeight="40">
                         <TextBlock.Text>
@@ -133,9 +142,7 @@
                         </TextBlock.Text>
                     </TextBlock>
                     <TextBlock Margin="6 0 0 0"
-                               FontFamily="{DynamicResource DefaultFontFamily}"
                                Foreground="{DynamicResource DefaultForegroundBrush}"
-                               FontWeight="Light"
                                FontSize="32"
                                LineHeight="40"
                                Text="{Binding CurrencyViewModel.CurrencyCode}" />
@@ -152,9 +159,7 @@
                     </Button>
                 </StackPanel>
 
-                <TextBlock FontFamily="{DynamicResource DefaultFontFamily}"
-                           Foreground="{DynamicResource DefaultForegroundBrush}"
-                           FontWeight="Light"
+                <TextBlock Foreground="{DynamicResource DefaultForegroundBrush}"
                            FontSize="13"
                            LineHeight="16">
                     <TextBlock.Text>
@@ -167,28 +172,20 @@
 
                 <StackPanel Orientation="Horizontal"
                             Margin="0 24 0 0">
-                    <TextBlock FontFamily="{DynamicResource DefaultFontFamily}"
-                               Foreground="{DynamicResource SecondaryForegroundBrush}"
-                               FontWeight="Light"
+                    <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
                                FontSize="13"
                                LineHeight="16"
                                Text="1" />
-                    <TextBlock FontFamily="{DynamicResource DefaultFontFamily}"
-                               Foreground="{DynamicResource SecondaryForegroundBrush}"
-                               FontWeight="Light"
+                    <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
                                FontSize="13"
                                LineHeight="16"
                                Margin="4 0"
                                Text="{Binding CurrencyViewModel.CurrencyCode}" />
-                    <TextBlock FontFamily="{DynamicResource DefaultFontFamily}"
-                               Foreground="{DynamicResource SecondaryForegroundBrush}"
-                               FontWeight="Light"
+                    <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
                                FontSize="13"
                                LineHeight="16"
                                Text="=" />
-                    <TextBlock FontFamily="{DynamicResource DefaultFontFamily}"
-                               Foreground="{DynamicResource SecondaryForegroundBrush}"
-                               FontWeight="Light"
+                    <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
                                FontSize="13"
                                LineHeight="16"
                                Margin="4 0 0 0">
@@ -200,9 +197,7 @@
                         </TextBlock.Text>
                     </TextBlock>
 
-                    <TextBlock FontFamily="{DynamicResource DefaultFontFamily}"
-                               Foreground="{DynamicResource SuccessForegroundBrush}"
-                               FontWeight="Light"
+                    <TextBlock Foreground="{DynamicResource SuccessForegroundBrush}"
                                FontSize="13"
                                LineHeight="16"
                                Margin="10 0 0 0"
@@ -216,9 +211,8 @@
 
                     <controls:RoundedButton Height="46"
                                             Padding="26 0"
-                                            CornerRadius="6"
-                                            Command="{Binding SendCommand}"
-                                            FontFamily="{DynamicResource DefaultFontFamily}">
+                                            CornerRadius="{DynamicResource AtomexCornerRadius}"
+                                            Command="{Binding SendCommand}">
                         <StackPanel Orientation="Horizontal">
                             <svg:Svg HorizontalAlignment="Center"
                                      Width="24"
@@ -226,17 +220,14 @@
                                      Path="/Resources/Icons/top-right-arrow.svg" />
                             <TextBlock Margin="8 0 0 0"
                                        Text="Send"
-                                       FontFamily="{DynamicResource DefaultFontFamily}"
-                                       FontWeight="Light"
                                        FontSize="18"
                                        Foreground="{DynamicResource RoundedButtonForegroundBrush}" />
                         </StackPanel>
                     </controls:RoundedButton>
                     <controls:RoundedButton Height="46"
                                             Padding="26 0"
-                                            CornerRadius="6"
+                                            CornerRadius="{DynamicResource AtomexCornerRadius}"
                                             Command="{Binding ReceiveCommand}"
-                                            FontFamily="{DynamicResource DefaultFontFamily}"
                                             Margin="12 0 0 0">
                         <StackPanel Orientation="Horizontal">
                             <svg:Svg HorizontalAlignment="Center"
@@ -245,17 +236,14 @@
                                      Path="/Resources/Icons/bottom-right-arrow.svg" />
                             <TextBlock Margin="8 0 0 0"
                                        Text="Receive"
-                                       FontFamily="{DynamicResource DefaultFontFamily}"
-                                       FontWeight="Light"
                                        FontSize="18"
                                        Foreground="{DynamicResource RoundedButtonForegroundBrush}" />
                         </StackPanel>
                     </controls:RoundedButton>
                     <controls:RoundedButton Height="46"
                                             Padding="26 0"
-                                            CornerRadius="6"
+                                            CornerRadius="{DynamicResource AtomexCornerRadius}"
                                             Command="{Binding ExchangeCommand}"
-                                            FontFamily="{DynamicResource DefaultFontFamily}"
                                             Margin="12 0 0 0"
                                             Classes="AccentButton">
                         <StackPanel Orientation="Horizontal">
@@ -265,17 +253,14 @@
                                      Path="/Resources/Icons/exchange-arrows.svg" />
                             <TextBlock Margin="8 0 0 0"
                                        Text="Exchange"
-                                       FontFamily="{DynamicResource DefaultFontFamily}"
-                                       FontWeight="Light"
                                        FontSize="18"
                                        Foreground="{DynamicResource DeepBlue}" />
                         </StackPanel>
                     </controls:RoundedButton>
                     <controls:RoundedButton Height="46"
                                             Padding="26 0"
-                                            CornerRadius="6"
+                                            CornerRadius="{DynamicResource AtomexCornerRadius}"
                                             Command="{Binding BuyCommand}"
-                                            FontFamily="{DynamicResource DefaultFontFamily}"
                                             Margin="12 0 0 0"
                                             IsVisible="{Binding CurrencyViewModel.CurrencyCode, Converter={StaticResource ShowBuyButton}}"
                                             Classes="GrayButton">
@@ -286,8 +271,6 @@
                                      Path="/Resources/Icons/plus.svg" />
                             <TextBlock Margin="8 0 0 0"
                                        Text="Buy"
-                                       FontFamily="{DynamicResource DefaultFontFamily}"
-                                       FontWeight="Light"
                                        FontSize="18" />
                         </StackPanel>
                     </controls:RoundedButton>
@@ -302,7 +285,6 @@
                      Classes="WalletTabItem">
                 <TabItem.Header>
                     <TextBlock VerticalAlignment="Center"
-                               FontFamily="{DynamicResource DefaultFontFamily}"
                                FontSize="16"
                                Text="Activity" />
                 </TabItem.Header>
@@ -311,11 +293,11 @@
                     <Border Grid.Row="0"
                             Background="{DynamicResource LightDefaultOpacity6}"
                             VerticalAlignment="Top"
-                            CornerRadius="6"
+                            CornerRadius="{DynamicResource AtomexCornerRadius}"
                             Height="34"
                             Margin="0 16 0 0"
                             Padding="12 0">
-                        <Grid ColumnDefinitions="10*,5*,2*,3*"
+                        <Grid ColumnDefinitions="8*,4*,3*,5*"
                               VerticalAlignment="Stretch">
                             <Button Grid.Column="0"
                                     Padding="0"
@@ -323,8 +305,7 @@
                                     VerticalContentAlignment="Center"
                                     Classes="EmptyBtnWithContent">
                                 <StackPanel Orientation="Horizontal">
-                                    <TextBlock FontFamily="{DynamicResource DefaultFontFamily}"
-                                               Foreground="{DynamicResource SecondaryForegroundBrush}"
+                                    <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
                                                FontSize="13"
                                                Text="Description" />
                                     <svg:Svg Width="14"
@@ -340,8 +321,7 @@
                                     VerticalContentAlignment="Center"
                                     Classes="EmptyBtnWithContent">
                                 <StackPanel Orientation="Horizontal">
-                                    <TextBlock FontFamily="{DynamicResource DefaultFontFamily}"
-                                               Foreground="{DynamicResource SecondaryForegroundBrush}"
+                                    <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
                                                FontSize="13"
                                                Text="Amount" />
                                     <svg:Svg Width="14"
@@ -357,8 +337,7 @@
                                     VerticalContentAlignment="Center"
                                     Classes="EmptyBtnWithContent">
                                 <StackPanel Orientation="Horizontal">
-                                    <TextBlock FontFamily="{DynamicResource DefaultFontFamily}"
-                                               Foreground="{DynamicResource SecondaryForegroundBrush}"
+                                    <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
                                                FontSize="13"
                                                Text="Status" />
                                     <svg:Svg Width="14"
@@ -374,8 +353,7 @@
                                     VerticalContentAlignment="Center"
                                     Classes="EmptyBtnWithContent">
                                 <StackPanel Orientation="Horizontal">
-                                    <TextBlock FontFamily="{DynamicResource DefaultFontFamily}"
-                                               Foreground="{DynamicResource SecondaryForegroundBrush}"
+                                    <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
                                                FontSize="13"
                                                Text="Time" />
                                     <svg:Svg Width="14"
@@ -402,28 +380,64 @@
                                 <Setter Property="HorizontalContentAlignment" Value="Stretch" />
                                 <Setter Property="Cursor" Value="Hand" />
                                 <Setter Property="BorderThickness" Value="0 0 0 1" />
+                                <Setter Property="CornerRadius" Value="6"></Setter>
                                 <Setter Property="BorderBrush" Value="{DynamicResource LightDefaultOpacity10}" />
+                            </Style>
+
+                            <Style Selector="ListBoxItem:selected /template/ ContentPresenter">
+                                <Setter Property="Background" Value="{DynamicResource LightDefaultOpacity6}" />
+                            </Style>
+                            <Style Selector="ListBoxItem:not(:selected) /template/ ContentPresenter">
+                                <Setter Property="Background" Value="{DynamicResource AlmostTransparentBrush}" />
                             </Style>
                         </ListBox.Styles>
 
                         <ListBox.ItemTemplate>
                             <DataTemplate>
                                 <Border Padding="12 0">
-                                    <Grid ColumnDefinitions="10*,5*,2*,3*"
+                                    <Grid ColumnDefinitions="8*,4*,3*,5*"
                                           VerticalAlignment="Stretch">
                                         <TextBlock Grid.Column="0"
-                                                   FontFamily="{DynamicResource DefaultFontFamily}"
                                                    Foreground="{DynamicResource DefaultForegroundBrush}"
                                                    VerticalAlignment="Center"
                                                    FontSize="16"
                                                    Text="{Binding Description}" />
 
-                                        <TextBlock Grid.Column="1"
-                                                   FontFamily="{DynamicResource DefaultFontFamily}"
-                                                   Foreground="{DynamicResource DefaultForegroundBrush}"
+                                        <StackPanel Grid.Column="1"
+                                                    Orientation="Horizontal">
+                                            <TextBlock VerticalAlignment="Center"
+                                                       FontSize="16"
+                                                       Classes="AmountListBoxItem"
+                                                       Classes.PositiveAmount="{Binding Amount, Converter={StaticResource GreaterThanZeroConverter}}">
+                                                <TextBlock.Text>
+                                                    <MultiBinding Converter="{StaticResource AmountToStringConverter}">
+                                                        <Binding Path="Amount" Mode="OneWay" />
+                                                        <Binding Path="AmountFormat" Mode="OneWay" />
+                                                        <Binding Path="Amount" Mode="OneWay"
+                                                                 Converter="{StaticResource GreaterThanZeroConverter}" />
+                                                    </MultiBinding>
+                                                </TextBlock.Text>
+                                            </TextBlock>
+                                            <TextBlock VerticalAlignment="Center"
+                                                       FontSize="16"
+                                                       Margin="4 0 0 0"
+                                                       Classes="AmountListBoxItem"
+                                                       Classes.PositiveAmount="{Binding Amount, Converter={StaticResource GreaterThanZeroConverter}}"
+                                                       Text="{Binding CurrencyCode}" />
+                                        </StackPanel>
+
+
+                                        <ContentControl Grid.Column="2" Content="{Binding}">
+                                            <ContentControl.ContentTemplate>
+                                                <controls:TransactionStateDataTemplateSelector />
+                                            </ContentControl.ContentTemplate>
+                                        </ContentControl>
+
+                                        <TextBlock Grid.Column="3"
+                                                   Foreground="{DynamicResource SecondaryForegroundBrush}"
                                                    VerticalAlignment="Center"
                                                    FontSize="16"
-                                                   Text="{Binding Amount}" />
+                                                   Text="{Binding LocalTime, Converter={StaticResource DateTimeToTxTimeConverter}}" />
                                     </Grid>
                                 </Border>
                             </DataTemplate>
@@ -435,7 +449,6 @@
                      Classes="WalletTabItem">
                 <TabItem.Header>
                     <TextBlock VerticalAlignment="Center"
-                               FontFamily="{DynamicResource DefaultFontFamily}"
                                FontSize="16"
                                Text="Collectibles" />
                 </TabItem.Header>
@@ -445,7 +458,6 @@
                      Classes="WalletTabItem">
                 <TabItem.Header>
                     <TextBlock VerticalAlignment="Center"
-                               FontFamily="{DynamicResource DefaultFontFamily}"
                                FontSize="16"
                                Text="Addresses" />
                 </TabItem.Header>

@@ -170,7 +170,7 @@
 
         <!-- left menu -->
         <DockPanel DockPanel.Dock="Left">
-            <StackPanel Width="239">
+            <StackPanel Width="220">
                 <Image Source="/Resources/Images/menu_logo.png"
                        Stretch="None"
                        HorizontalAlignment="Left"

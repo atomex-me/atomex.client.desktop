@@ -30,7 +30,6 @@
                            Foreground="{DynamicResource LightDefaultOpacity20}"
                            Text="canceled"
                            FontSize="16"
-                           FontFamily="{DynamicResource DefaultFontFamily}"
                            VerticalAlignment="Center" />
             </StackPanel>
         </DataTemplate>
@@ -45,8 +44,7 @@
                            Foreground="{DynamicResource DefaultForegroundBrush}"
                            Text="completed"
                            FontSize="16"
-                           VerticalAlignment="Center"
-                           FontFamily="{DynamicResource DefaultFontFamily}" />
+                           VerticalAlignment="Center"/>
             </StackPanel>
         </DataTemplate>
 
@@ -61,7 +59,6 @@
                            Foreground="{DynamicResource DefaultForegroundBrush}"
                            Text="in progress"
                            FontSize="16"
-                           FontFamily="{DynamicResource DefaultFontFamily}"
                            VerticalAlignment="Center" />
             </StackPanel>
         </DataTemplate>
@@ -76,7 +73,6 @@
                            Foreground="{DynamicResource DefaultForegroundBrush}"
                            Text="refunded"
                            FontSize="16"
-                           FontFamily="{DynamicResource DefaultFontFamily}"
                            VerticalAlignment="Center" />
             </StackPanel>
         </DataTemplate>
@@ -91,7 +87,6 @@
                            Foreground="{DynamicResource DefaultForegroundBrush}"
                            Text="unsettled"
                            FontSize="16"
-                           FontFamily="{DynamicResource DefaultFontFamily}"
                            VerticalAlignment="Center" />
             </StackPanel>
         </DataTemplate>

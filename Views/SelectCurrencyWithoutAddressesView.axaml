@@ -18,7 +18,6 @@
             <!-- title -->
             <TextBlock Name="Title"
                        FontSize="22"
-                       FontFamily="{DynamicResource DefaultFontFamily}"
                        HorizontalAlignment="Center"
                        VerticalAlignment="Center"
                        Foreground="{DynamicResource LightDefault}"

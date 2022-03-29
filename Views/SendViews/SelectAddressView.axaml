@@ -207,7 +207,6 @@
                                                FontSize="12"
                                                LineHeight="16"
                                                VerticalAlignment="Center"
-                                               FontFamily="{DynamicResource DefaultFontFamily}"
                                                Foreground="{DynamicResource DefaultForegroundBrush}" />
                                 </Border>
 
@@ -270,10 +269,9 @@
                         HorizontalAlignment="Right">
                 <controls:RoundedButton Width="200"
                                         Height="50"
-                                        CornerRadius="6"
+                                        CornerRadius="{DynamicResource AtomexCornerRadius}"
                                         Content="Confirm"
                                         FontSize="18"
-                                        FontFamily="{DynamicResource DefaultFontFamily}"
                                         FontWeight="Normal"
                                         Command="{Binding ConfirmCommand}" />
             </StackPanel>

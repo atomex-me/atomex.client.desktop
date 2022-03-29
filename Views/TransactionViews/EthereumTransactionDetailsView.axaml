@@ -36,7 +36,6 @@
             </Grid.RowDefinitions>
 
             <TextBlock Text="Transaction Id:"
-                       FontFamily="{DynamicResource DefaultFontFamily}"
                        Foreground="{DynamicResource TransactionDetailsLineHeaderBrush}"
                        HorizontalAlignment="Right"
                        VerticalAlignment="Center"
@@ -82,14 +81,12 @@
             </StackPanel>
 
             <TextBlock Text="Time Stamp:"
-                       FontFamily="{DynamicResource DefaultFontFamily}"
                        Foreground="{DynamicResource TransactionDetailsLineHeaderBrush}"
                        HorizontalAlignment="Right"
                        VerticalAlignment="Center"
                        Grid.Column="0"
                        Grid.Row="1"/>
             <TextBlock Text="{Binding LocalTime, Converter={StaticResource DateTimeToTxDetailsConverter}}"
-                       FontFamily="{DynamicResource DefaultFontFamily}"
                        Foreground="{DynamicResource DefaultForegroundBrush}"
                        VerticalAlignment="Center"
                        Margin="10 0 0 0"
@@ -97,7 +94,6 @@
                        Grid.Row="1"/>
 
             <TextBlock Text="From:"
-                       FontFamily="{DynamicResource DefaultFontFamily}"
                        Foreground="{DynamicResource TransactionDetailsLineHeaderBrush}"
                        HorizontalAlignment="Right"
                        VerticalAlignment="Center"
@@ -142,7 +138,6 @@
             </StackPanel>
 
             <TextBlock Text="To:"
-                       FontFamily="{DynamicResource DefaultFontFamily}"
                        Foreground="{DynamicResource TransactionDetailsLineHeaderBrush}"
                        HorizontalAlignment="Right"
                        VerticalAlignment="Center"
@@ -188,14 +183,12 @@
             </StackPanel>
 
             <TextBlock Text="Gas Price:"
-                       FontFamily="{DynamicResource DefaultFontFamily}"
                        Foreground="{DynamicResource TransactionDetailsLineHeaderBrush}"
                        HorizontalAlignment="Right"
                        VerticalAlignment="Center"
                        Grid.Column="0"
                        Grid.Row="4"/>
             <TextBlock Text="{Binding GasPrice}"
-                       FontFamily="{DynamicResource DefaultFontFamily}"
                        Foreground="{DynamicResource DefaultForegroundBrush}"
                        VerticalAlignment="Center"
                        Margin="10 1 0 0"
@@ -203,14 +196,12 @@
                        Grid.Row="4"/>
 
             <TextBlock Text="Gas Limit:"
-                       FontFamily="{DynamicResource DefaultFontFamily}"
                        Foreground="{DynamicResource TransactionDetailsLineHeaderBrush}"
                        HorizontalAlignment="Right"
                        VerticalAlignment="Center"
                        Grid.Column="0"
                        Grid.Row="5"/>
             <TextBlock Text="{Binding GasLimit}"
-                       FontFamily="{DynamicResource DefaultFontFamily}"
                        Foreground="{DynamicResource DefaultForegroundBrush}"
                        Margin="10 1 0 0"
                        VerticalAlignment="Center"
@@ -218,14 +209,12 @@
                        Grid.Row="5"/>
 
             <TextBlock Text="Gas Used:"
-                       FontFamily="{DynamicResource DefaultFontFamily}"
                        Foreground="{DynamicResource TransactionDetailsLineHeaderBrush}"
                        HorizontalAlignment="Right"
                        VerticalAlignment="Center"
                        Grid.Column="0"
                        Grid.Row="6"/>
             <TextBlock Text="{Binding GasUsed}"
-                       FontFamily="{DynamicResource DefaultFontFamily}"
                        Foreground="{DynamicResource DefaultForegroundBrush}"
                        Margin="10 1 0 0"
                        VerticalAlignment="Center"
@@ -233,7 +222,6 @@
                        Grid.Row="6"/>
 
             <TextBlock Text="Is Internal:"
-                       FontFamily="{DynamicResource DefaultFontFamily}"
                        Foreground="{DynamicResource TransactionDetailsLineHeaderBrush}"
                        HorizontalAlignment="Right"
                        VerticalAlignment="Center"
@@ -242,7 +230,6 @@
             <CheckBox IsChecked="{Binding IsInternal, Mode=OneWay}"
                       IsHitTestVisible="False"
                       Focusable="False"
-                      FontFamily="{DynamicResource DefaultFontFamily}"
                       Margin="10 0 0 0"
                       VerticalAlignment="Center"
                       Grid.Column="1"

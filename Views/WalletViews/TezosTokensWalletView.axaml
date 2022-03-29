@@ -221,7 +221,6 @@
                 <!-- Classes="BaseTextBlockStyle" -->
                 <TextBlock Text="{Binding TokenContractName}"
                            Foreground="{DynamicResource BalanceBackgroundBrush}"
-                           FontFamily="{DynamicResource DefaultFontFamily}"
                            FontSize="30"
                            VerticalAlignment="Bottom"
                            Grid.Row="1"
@@ -236,7 +235,6 @@
 
                     <!-- Style="{StaticResource BaseTextBlockStyle}" -->
                     <TextBlock Foreground="{DynamicResource BalanceBackgroundBrush}"
-                               FontFamily="{DynamicResource DefaultFontFamily}"
                                FontSize="33">
                         <TextBlock.Text>
                             <MultiBinding Converter="{StaticResource AmountToStringConverter}">
@@ -248,7 +246,6 @@
                     <TextBlock Margin="5 0 0 4"
                                Text="{Binding BalanceCurrencyCode}"
                                Foreground="{DynamicResource BalanceBackgroundBrush}"
-                               FontFamily="{DynamicResource DefaultFontFamily}"
                                FontSize="22"
                                VerticalAlignment="Bottom" />
                 </StackPanel>
@@ -256,7 +253,6 @@
                 <!-- Style="{StaticResource BaseTextBlockStyle}" -->
                 <TextBlock Text="{Binding TokenContractAddress}"
                            Foreground="LightGray"
-                           FontFamily="{DynamicResource DefaultFontFamily}"
                            FontSize="12"
                            Grid.Row="2"
                            Grid.Column="3"
@@ -423,7 +419,6 @@
                                     </Grid.RowDefinitions>
 
                                     <TextBlock Text="Address:"
-                                               FontFamily="{DynamicResource DefaultFontFamily}"
                                                Foreground="{DynamicResource TransactionDetailsLineHeaderBrush}"
                                                HorizontalAlignment="Right"
                                                VerticalAlignment="Center"
@@ -459,7 +454,6 @@
                                     </StackPanel>
 
                                     <TextBlock Text="Token Id:"
-                                               FontFamily="{DynamicResource DefaultFontFamily}"
                                                Foreground="{DynamicResource TransactionDetailsLineHeaderBrush}"
                                                HorizontalAlignment="Right"
                                                VerticalAlignment="Center"
@@ -468,7 +462,6 @@
 
                                     <TextBlock Text="{Binding TokenBalance.TokenId}"
                                                Margin="10 0 0 0"
-                                               FontFamily="{DynamicResource DefaultFontFamily}"
                                                Foreground="{DynamicResource DefaultForegroundBrush}"
                                                HorizontalAlignment="Left"
                                                VerticalAlignment="Center"
@@ -550,8 +543,7 @@
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate DataType="{x:Type txViewModels:TransactionViewModel}">
                                     <StackPanel Classes="DGTemplateContainer" Orientation="Horizontal">
-                                        <TextBlock FontFamily="{DynamicResource DefaultFontFamily}"
-                                                   VerticalAlignment="Center"
+                                        <TextBlock VerticalAlignment="Center"
                                                    HorizontalAlignment="Left"
                                                    Name="AmountTextBlock"
                                                    FontSize="13">
@@ -580,7 +572,6 @@
                                         </TextBlock>
 
                                         <TextBlock Text="{Binding CurrencyCode}"
-                                                   FontFamily="{DynamicResource DefaultFontFamily}"
                                                    FontSize="8"
                                                    VerticalAlignment="Bottom"
                                                    IsVisible="False"
