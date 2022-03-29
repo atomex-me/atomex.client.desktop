@@ -203,44 +203,92 @@
         <Setter Property="Background" Value="{DynamicResource CheckboxCheckedBrush}" />
     </Style>
 
-    <Style Selector="Svg.CurrencyLogo[IsEnabled=True]">
-        <Style.Animations>
-            <Animation Duration="0:0:2.5"
-                       IterationCount="INFINITE"
-                       FillMode="Forward"
-                       PlaybackDirection="Normal">
-                <KeyFrame Cue="0%">
-                    <Setter Property="RotateTransform.Angle" Value="0" />
-                </KeyFrame>
-                <KeyFrame Cue="100%">
-                    <Setter Property="RotateTransform.Angle" Value="360" />
-                </KeyFrame>
-            </Animation>
-        </Style.Animations>
+
+    <Style Selector="TabControl.WalletTabControl">
+        <Setter Property="Margin" Value="0" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="Background" Value="{DynamicResource AlmostTransparentBrush}" />
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Border BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        CornerRadius="0"
+                        Background="{TemplateBinding Background}"
+                        HorizontalAlignment="{TemplateBinding HorizontalAlignment}"
+                        VerticalAlignment="{TemplateBinding VerticalAlignment}">
+                    <DockPanel>
+                        <StackPanel Orientation="Vertical"
+                                    DockPanel.Dock="{TemplateBinding TabStripPlacement}">
+                            <Border BorderThickness="0 0 0 1"
+                                    BorderBrush="{StaticResource LightDefaultOpacity10}">
+                                <ItemsPresenter Name="PART_ItemsPresenter"
+                                                HorizontalAlignment="Left"
+                                                Items="{TemplateBinding Items}"
+                                                ItemsPanel="{TemplateBinding ItemsPanel}"
+                                                Margin="0"
+                                                ItemTemplate="{TemplateBinding ItemTemplate}" />
+                            </Border>
+                        </StackPanel>
+                        <ContentPresenter Name="PART_SelectedContentHost"
+                                          Margin="{TemplateBinding Padding}"
+                                          HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                          VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+                                          Content="{TemplateBinding SelectedContent}"
+                                          ContentTemplate="{TemplateBinding SelectedContentTemplate}" />
+                    </DockPanel>
+                </Border>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+    <Style Selector="TabItem.WalletTabItem">
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="Foreground" Value="{DynamicResource SecondaryForegroundBrush}" />
+        <Setter Property="FontFamily" Value="{DynamicResource DefaultFontFamily}" />
+        <Setter Property="FontWeight" Value="Light" />
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Border Name="PART_LayoutRoot"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        CornerRadius="0"
+                        Height="72"
+                        Padding="0">
+                    <Panel>
+                        <ContentPresenter Name="PART_ContentPresenter"
+                                          ContentTemplate="{TemplateBinding HeaderTemplate}"
+                                          Content="{TemplateBinding Header}"
+                                          HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                          VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                          TextBlock.FontFamily="{TemplateBinding FontFamily}"
+                                          TextBlock.FontSize="{TemplateBinding FontSize}"
+                                          TextBlock.FontWeight="{TemplateBinding FontWeight}" />
+                        <Border Name="PART_SelectedPipe"
+                                Margin="0"
+                                Background="{StaticResource LightDefault}" />
+                    </Panel>
+                </Border>
+            </ControlTemplate>
+        </Setter>
     </Style>
 
-    <Style Selector="TextBlock.UpdatingTextBlock[IsEnabled=True]">
-        <Style.Animations>
-            <Animation Duration="0:0:2.5"
-                       IterationCount="INFINITE"
-                       FillMode="Forward"
-                       PlaybackDirection="Normal">
-                <KeyFrame Cue="0%">
-                    <Setter Property="Opacity" Value="1" />
-                </KeyFrame>
-                <KeyFrame Cue="50%">
-                    <Setter Property="Opacity" Value="0.1" />
-                </KeyFrame>
-
-                <KeyFrame Cue="100%">
-                    <Setter Property="Opacity" Value="1" />
-                </KeyFrame>
-            </Animation>
-        </Style.Animations>
+    <Style Selector="TabItem.WalletTabItem:selected">
+        <Setter Property="TextBlock.Foreground" Value="{DynamicResource DefaultForegroundBrush}" />
     </Style>
 
-    <Style Selector=":is(Control).DGTemplateContainer">
-        <Setter Property="Margin" Value="10 0 0 0" />
-        <Setter Property="HorizontalAlignment" Value="Left" />
+    <!-- PointerOver state -->
+    <Style Selector="TabItem.WalletTabItem:pointerover /template/ Border#PART_LayoutRoot">
+        <Setter Property="TextBlock.Foreground" Value="{DynamicResource SecondaryForegroundBrush}" />
+    </Style>
+
+    <!-- Selected PointerOver state -->
+    <Style Selector="TabItem.WalletTabItem:selected:pointerover /template/ Border#PART_LayoutRoot">
+        <Setter Property="TextBlock.Foreground" Value="{DynamicResource DefaultForegroundBrush}" />
+    </Style>
+
+    <Style Selector="TextBlock.AmountListBoxItem">
+        <Setter Property="Foreground" Value="{DynamicResource SecondaryForegroundBrush}" />
+    </Style>
+    <Style Selector="TextBlock.PositiveAmount">
+        <Setter Property="Foreground" Value="{DynamicResource SuccessForegroundBrush}" />
     </Style>
 </Styles>

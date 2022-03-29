@@ -28,12 +28,20 @@ using ReactiveUI.Fody.Helpers;
 
 namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 {
+    public enum TxSortType {
+        ByDescription,
+        ByAmount,
+        ByStatus,
+        ByTime
+    }
+
     public class WalletViewModel : ViewModelBase, IWalletViewModel
     {
         protected IAtomexApp _app;
         [Reactive] public ObservableCollection<TransactionViewModel> Transactions { get; set; }
         [Reactive] public CurrencyViewModel CurrencyViewModel { get; set; }
         [Reactive] public TransactionViewModel SelectedTransaction { get; set; }
+        [Reactive] public
         protected Action<CurrencyConfig> SetConversionTab { get; }
         private Action<string> SetWertCurrency { get; }
 

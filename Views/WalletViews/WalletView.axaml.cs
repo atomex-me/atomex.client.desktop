@@ -18,25 +18,6 @@ namespace Atomex.Client.Desktop.Views.WalletViews
         public WalletView()
         {
             InitializeComponent();
-
-            var dgTransactions = this.FindControl<DataGrid>("DgTransactions");
-            if (dgTransactions != null)
-            {
-                dgTransactions.CellPointerPressed += (sender, args) =>
-                {
-                    var cellIndex = args.Row.GetIndex();
-                    Dispatcher.UIThread.InvokeAsync(() =>
-                    {
-                        ((WalletViewModel)DataContext!).CellPointerPressed(cellIndex);
-                    });
-                };
-
-                dgTransactions.Sorting += (sender, args) =>
-                {
-                    ((WalletViewModel)DataContext!).SortInfo = args.Column.Header.ToString();
-                    args.Handled = true;
-                };
-            }
 #if DEBUG
             if (!Design.IsDesignMode) return;
 
