@@ -60,10 +60,10 @@ namespace Atomex.Client.Desktop.ViewModels
 
                 walletsViewModels.AddRange(currenciesViewModels);
 
-                walletsViewModels.Add(new TezosTokensWalletViewModel(
-                    app: App,
-                    setConversionTab: SetConversionTab,
-                    setWertCurrency: SetWertCurrency));
+                // walletsViewModels.Add(new TezosTokensWalletViewModel(
+                //     app: App,
+                //     setConversionTab: SetConversionTab,
+                //     setWertCurrency: SetWertCurrency));
             }
 
             Wallets = new ObservableCollection<IWalletViewModel>(walletsViewModels);

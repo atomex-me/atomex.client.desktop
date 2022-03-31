@@ -6,14 +6,12 @@ using System.Reactive;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
-
 using Avalonia.Media;
 using Avalonia.Threading;
 using NBitcoin;
 using ReactiveUI;
 using Serilog;
 using Network = NBitcoin.Network;
-
 using Atomex.Blockchain;
 using Atomex.Blockchain.BitcoinBased;
 using Atomex.Client.Desktop.Common;
@@ -28,7 +26,8 @@ using ReactiveUI.Fody.Helpers;
 
 namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 {
-    public enum TxSortType {
+    public enum TxSortType
+    {
         ByDescription,
         ByAmount,
         ByStatus,
@@ -41,7 +40,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         [Reactive] public ObservableCollection<TransactionViewModel> Transactions { get; set; }
         [Reactive] public CurrencyViewModel CurrencyViewModel { get; set; }
         [Reactive] public TransactionViewModel SelectedTransaction { get; set; }
-        [Reactive] public
+        public AddressesViewModel AddressesViewModel { get; set; }
         protected Action<CurrencyConfig> SetConversionTab { get; }
         private Action<string> SetWertCurrency { get; }
 
@@ -57,6 +56,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             : CurrencyViewModel.IconMaskBrush;
 
         private bool _isSelected;
+
         public bool IsSelected
         {
             get => _isSelected;
@@ -69,10 +69,11 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                 OnPropertyChanged(nameof(CurrencyOpacityValue));
             }
         }
-        
+
         public double CurrencyOpacityValue => _isSelected ? 1 : 0.4;
-        
+
         private bool _isBalanceUpdating;
+
         public bool IsBalanceUpdating
         {
             get => _isBalanceUpdating;
@@ -106,9 +107,9 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             if (currency != null)
                 CurrencyViewModel = CurrencyViewModelCreator.CreateViewModel(currency);
 
-            SubscribeToServices();
+            AddressesViewModel = new AddressesViewModel(_app, currency);
 
-            // update transactions list
+            SubscribeToServices();
             _ = LoadTransactionsAsync();
         }
 
@@ -133,7 +134,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                 Log.Error(e, "Account balance updated event handler error");
             }
         }
-        
+
         private async void OnUnconfirmedTransactionAdded(object sender, TransactionEventArgs args)
         {
             try
@@ -160,23 +161,23 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                     return;
 
                 var transactions = (await _app.Account
-                    .GetTransactionsAsync(Currency.Name))
+                        .GetTransactionsAsync(Currency.Name))
                     .ToList();
 
                 await Dispatcher.UIThread.InvokeAsync(() =>
-                {
-                    Transactions = new ObservableCollection<TransactionViewModel>(
-                        transactions.Select(t => TransactionViewModelCreator
-                            .CreateViewModel(t, Currency))
-                            .ToList()
-                            .SortList((t1, t2) => t2.Time.CompareTo(t1.Time))
-                            .ForEachDo(t =>
-                            {
-                                t.UpdateClicked += UpdateTransactonEventHandler;
-                                t.RemoveClicked += RemoveTransactonEventHandler;
-                            }));
-                },
-                DispatcherPriority.Background);
+                    {
+                        Transactions = new ObservableCollection<TransactionViewModel>(
+                            transactions.Select(t => TransactionViewModelCreator
+                                    .CreateViewModel(t, Currency))
+                                .ToList()
+                                .SortList((t1, t2) => t2.Time.CompareTo(t1.Time))
+                                .ForEachDo(t =>
+                                {
+                                    t.UpdateClicked += UpdateTransactonEventHandler;
+                                    t.RemoveClicked += RemoveTransactonEventHandler;
+                                }));
+                    },
+                    DispatcherPriority.Background);
             }
             catch (OperationCanceledException)
             {
@@ -204,12 +205,14 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         public ICommand AddressesCommand => _addressesCommand ??= ReactiveCommand.Create(OnAddressesClick);
 
         private ICommand _cancelUpdateCommand;
+
         public ICommand CancelUpdateCommand => _cancelUpdateCommand ??= ReactiveCommand.Create(() =>
         {
             _cancellation?.Cancel();
         });
-        
+
         private ReactiveCommand<Unit, Unit> _buyCommand;
+
         public ReactiveCommand<Unit, Unit> BuyCommand => _buyCommand ??= ReactiveCommand.Create(() =>
         {
             SetWertCurrency?.Invoke(CurrencyViewModel.Header);
@@ -303,30 +306,34 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             var currencies = DesignTime.Currencies.ToList();
 
             CurrencyViewModel = CurrencyViewModelCreator.CreateViewModel(currencies[3], subscribeToUpdates: false);
-            CurrencyViewModel.TotalAmount             = 0.01012345m;
-            CurrencyViewModel.TotalAmountInBase       = 16.51m;
-            CurrencyViewModel.AvailableAmount         = 0.01010005m;
-            CurrencyViewModel.AvailableAmountInBase   = 16.00m;
-            CurrencyViewModel.UnconfirmedAmount       = 0.00002m;
+            CurrencyViewModel.TotalAmount = 0.01012345m;
+            CurrencyViewModel.TotalAmountInBase = 16.51m;
+            CurrencyViewModel.AvailableAmount = 0.01010005m;
+            CurrencyViewModel.AvailableAmountInBase = 16.00m;
+            CurrencyViewModel.UnconfirmedAmount = 0.00002m;
             CurrencyViewModel.UnconfirmedAmountInBase = 0.5m;
 
             var transactions = new List<TransactionViewModel>
             {
-                new BitcoinBasedTransactionViewModel(new BitcoinBasedTransaction("BTC", Transaction.Create(Network.TestNet)), DesignTime.Currencies.Get<BitcoinConfig>("BTC"))
+                new BitcoinBasedTransactionViewModel(
+                    new BitcoinBasedTransaction("BTC", Transaction.Create(Network.TestNet)),
+                    DesignTime.Currencies.Get<BitcoinConfig>("BTC"))
                 {
-                    Description  = "Sent 0.00124 BTC",
-                    Amount       = -0.00124m,
+                    Description = "Sent 0.00124 BTC",
+                    Amount = -0.00124m,
                     AmountFormat = CurrencyViewModel.CurrencyFormat,
                     CurrencyCode = CurrencyViewModel.CurrencyCode,
-                    Time         = DateTime.Now,
+                    Time = DateTime.Now,
                 },
-                new BitcoinBasedTransactionViewModel(new BitcoinBasedTransaction("BTC", Transaction.Create(Network.TestNet)), DesignTime.Currencies.Get<BitcoinConfig>("BTC"))
+                new BitcoinBasedTransactionViewModel(
+                    new BitcoinBasedTransaction("BTC", Transaction.Create(Network.TestNet)),
+                    DesignTime.Currencies.Get<BitcoinConfig>("BTC"))
                 {
-                    Description  = "Received 1.00666 BTC",
-                    Amount       = 1.00666m,
+                    Description = "Received 1.00666 BTC",
+                    Amount = 1.00666m,
                     AmountFormat = CurrencyViewModel.CurrencyFormat,
                     CurrencyCode = CurrencyViewModel.CurrencyCode,
-                    Time         = DateTime.Now,
+                    Time = DateTime.Now,
                 }
             };
 
@@ -335,6 +342,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         }
 
         private int _dgSelectedIndex = -1;
+
         public int DGSelectedIndex
         {
             get => _dgSelectedIndex;
@@ -357,6 +365,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         }
 
         protected string _sortInfo;
+
         public string SortInfo
         {
             get => _sortInfo;

@@ -115,15 +115,15 @@
                                Text="+1.20%" />
                 </StackPanel>
 
-                <StackPanel
-                    Margin="0 16 0 0"
-                    Orientation="Horizontal"
-                    VerticalAlignment="Top">
+                <WrapPanel Margin="0 16 0 0"
+                           Orientation="Horizontal"
+                           VerticalAlignment="Top">
 
                     <controls:RoundedButton Height="46"
                                             Padding="26 0"
                                             CornerRadius="{DynamicResource AtomexCornerRadius}"
-                                            Command="{Binding SendCommand}">
+                                            Command="{Binding SendCommand}"
+                                            Margin="0 0 12 12">
                         <StackPanel Orientation="Horizontal">
                             <svg:Svg HorizontalAlignment="Center"
                                      Width="24"
@@ -139,7 +139,7 @@
                                             Padding="26 0"
                                             CornerRadius="{DynamicResource AtomexCornerRadius}"
                                             Command="{Binding ReceiveCommand}"
-                                            Margin="12 0 0 0">
+                                            Margin="0 0 12 12">
                         <StackPanel Orientation="Horizontal">
                             <svg:Svg HorizontalAlignment="Center"
                                      Width="24"
@@ -155,7 +155,7 @@
                                             Padding="26 0"
                                             CornerRadius="{DynamicResource AtomexCornerRadius}"
                                             Command="{Binding ExchangeCommand}"
-                                            Margin="12 0 0 0"
+                                            Margin="0 0 12 12"
                                             Classes="AccentButton">
                         <StackPanel Orientation="Horizontal">
                             <svg:Svg HorizontalAlignment="Center"
@@ -172,7 +172,7 @@
                                             Padding="26 0"
                                             CornerRadius="{DynamicResource AtomexCornerRadius}"
                                             Command="{Binding BuyCommand}"
-                                            Margin="12 0 0 0"
+                                            Margin="0 0 12 12"
                                             IsVisible="{Binding CurrencyViewModel.CurrencyCode, Converter={StaticResource ShowBuyButton}}"
                                             Classes="GrayButton">
                         <StackPanel Orientation="Horizontal">
@@ -185,12 +185,21 @@
                                        FontSize="18" />
                         </StackPanel>
                     </controls:RoundedButton>
-                </StackPanel>
+                    <controls:RoundedButton Height="46"
+                                            Padding="26 0"
+                                            CornerRadius="{DynamicResource AtomexCornerRadius}"
+                                            Command="{Binding DelegateCommand}"
+                                            Margin="0 0 12 12"
+                                            Classes="GrayButton">
+                        <TextBlock Text="Delegate"
+                                   FontSize="18" />
+                    </controls:RoundedButton>
+                </WrapPanel>
             </StackPanel>
         </Grid>
 
         <TabControl Grid.Row="1"
-                    Margin="0 16 0 0"
+                    Margin="0 4 0 0"
                     Classes="WalletTabControl">
             <TabItem Margin="0 0 16 0"
                      Classes="WalletTabItem">
@@ -365,14 +374,163 @@
                 </TabItem.Header>
                 <TextBlock Text="Collectibles tab" />
             </TabItem>
-            <TabItem Margin="16 0 0 0"
+            <TabItem Margin="16 0 "
                      Classes="WalletTabItem">
                 <TabItem.Header>
                     <TextBlock VerticalAlignment="Center"
                                FontSize="16"
                                Text="Addresses" />
                 </TabItem.Header>
-                <TextBlock Text="Addresses tab" />
+                <ContentControl Content="{Binding AddressesViewModel}" />
+            </TabItem>
+            <TabItem Margin="16 0"
+                     Classes="WalletTabItem">
+                <TabItem.Header>
+                    <TextBlock VerticalAlignment="Center"
+                               FontSize="16"
+                               Text="Delegations" />
+                </TabItem.Header>
+                <Grid RowDefinitions="Auto,*">
+                    <Border Grid.Row="0"
+                            Background="{DynamicResource LightDefaultOpacity6}"
+                            VerticalAlignment="Top"
+                            CornerRadius="{DynamicResource AtomexCornerRadius}"
+                            Height="34"
+                            Margin="0 16 0 0"
+                            Padding="12 0">
+                        <Grid ColumnDefinitions="11*,4*,3*,2*"
+                              VerticalAlignment="Stretch">
+                            <Button Grid.Column="0"
+                                    Padding="0"
+                                    VerticalAlignment="Stretch"
+                                    VerticalContentAlignment="Center"
+                                    Classes="EmptyBtnWithContent">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
+                                               FontSize="13"
+                                               Text="Address" />
+                                    <svg:Svg Width="14"
+                                             Height="14"
+                                             Margin="5 0 0 0"
+                                             VerticalAlignment="Center"
+                                             Path="/Resources/Icons/arrow-sort.svg" />
+                                </StackPanel>
+                            </Button>
+                            <Button Grid.Column="1"
+                                    Padding="0"
+                                    VerticalAlignment="Stretch"
+                                    VerticalContentAlignment="Center"
+                                    Classes="EmptyBtnWithContent">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
+                                               FontSize="13"
+                                               Text="Validator" />
+                                    <svg:Svg Width="14"
+                                             Height="14"
+                                             Margin="5 0 0 0"
+                                             VerticalAlignment="Center"
+                                             Path="/Resources/Icons/arrow-sort.svg" />
+                                </StackPanel>
+                            </Button>
+                            <Button Grid.Column="2"
+                                    Padding="0"
+                                    VerticalAlignment="Stretch"
+                                    VerticalContentAlignment="Center"
+                                    Classes="EmptyBtnWithContent">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
+                                               FontSize="13"
+                                               Text="Est. ROI, %" />
+                                    <svg:Svg Width="14"
+                                             Height="14"
+                                             Margin="5 0 0 0"
+                                             VerticalAlignment="Center"
+                                             Path="/Resources/Icons/arrow-sort.svg" />
+                                </StackPanel>
+                            </Button>
+                            <Button Grid.Column="3"
+                                    Padding="0"
+                                    VerticalAlignment="Stretch"
+                                    VerticalContentAlignment="Center"
+                                    Classes="EmptyBtnWithContent">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
+                                               FontSize="13"
+                                               Text="Status" />
+                                    <svg:Svg Width="14"
+                                             Height="14"
+                                             Margin="5 0 0 0"
+                                             VerticalAlignment="Center"
+                                             Path="/Resources/Icons/arrow-sort.svg" />
+                                </StackPanel>
+                            </Button>
+                        </Grid>
+                    </Border>
+
+                    <ListBox Grid.Row="1"
+                             Background="{DynamicResource AlmostTransparentBrush}"
+                             Items="{Binding Delegations}"
+                             HorizontalAlignment="Stretch"
+                             VerticalAlignment="Stretch">
+                        <ListBox.Styles>
+                            <Style Selector="ListBoxItem">
+                                <Setter Property="Padding" Value="0" />
+                                <Setter Property="Height" Value="48" />
+                                <Setter Property="VerticalContentAlignment" Value="Stretch" />
+                                <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                                <Setter Property="BorderThickness" Value="0 0 0 1" />
+                                <Setter Property="BorderBrush" Value="{DynamicResource LightDefaultOpacity10}" />
+                            </Style>
+                            <Style Selector="ListBoxItem:selected /template/ ContentPresenter">
+                                <Setter Property="Background" Value="{DynamicResource AlmostTransparentBrush}" />
+                            </Style>
+                            <Style Selector="ListBoxItem:not(:selected) /template/ ContentPresenter">
+                                <Setter Property="Background" Value="{DynamicResource AlmostTransparentBrush}" />
+                            </Style>
+                        </ListBox.Styles>
+
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <Border Padding="12 0">
+                                    <Grid ColumnDefinitions="11*,4*,3*,2*"
+                                          VerticalAlignment="Stretch">
+                                        <TextBlock Grid.Column="0"
+                                                   Foreground="{DynamicResource DefaultForegroundBrush}"
+                                                   VerticalAlignment="Center"
+                                                   FontSize="16"
+                                                   Text="{Binding Address}" />
+
+                                        <StackPanel Grid.Column="1"
+                                                    Orientation="Horizontal">
+                                            <Image Width="22"
+                                                   Height="22"
+                                                   Source="{Binding GetBakerLogo}"
+                                                   VerticalAlignment="Center" />
+
+                                            <TextBlock Foreground="{DynamicResource DefaultForegroundBrush}"
+                                                       VerticalAlignment="Center"
+                                                       FontSize="16"
+                                                       Margin="8 0 0 0"
+                                                       Text="{Binding Baker.Name}" />
+                                        </StackPanel>
+
+                                        <TextBlock Grid.Column="2"
+                                                   Foreground="{DynamicResource SecondaryForegroundBrush}"
+                                                   VerticalAlignment="Center"
+                                                   FontSize="16"
+                                                   Text="{Binding Baker.EstimatedRoi}" />
+
+                                        <TextBlock Grid.Column="3"
+                                                   Foreground="{DynamicResource SuccessForegroundBrush}"
+                                                   VerticalAlignment="Center"
+                                                   FontSize="16"
+                                                   Text="Active" />
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </Grid>
             </TabItem>
         </TabControl>
     </Grid>

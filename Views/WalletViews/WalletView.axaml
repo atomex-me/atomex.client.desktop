@@ -115,14 +115,14 @@
                                Text="+1.20%" />
                 </StackPanel>
 
-                <StackPanel
-                    Margin="0 16 0 0"
-                    Orientation="Horizontal"
-                    VerticalAlignment="Top">
+                <WrapPanel Margin="0 16 0 0"
+                           Orientation="Horizontal"
+                           VerticalAlignment="Top">
 
                     <controls:RoundedButton Height="46"
                                             Padding="26 0"
                                             CornerRadius="{DynamicResource AtomexCornerRadius}"
+                                            Margin="0 0 12 12"
                                             Command="{Binding SendCommand}">
                         <StackPanel Orientation="Horizontal">
                             <svg:Svg HorizontalAlignment="Center"
@@ -139,7 +139,7 @@
                                             Padding="26 0"
                                             CornerRadius="{DynamicResource AtomexCornerRadius}"
                                             Command="{Binding ReceiveCommand}"
-                                            Margin="12 0 0 0">
+                                            Margin="0 0 12 12">
                         <StackPanel Orientation="Horizontal">
                             <svg:Svg HorizontalAlignment="Center"
                                      Width="24"
@@ -155,7 +155,7 @@
                                             Padding="26 0"
                                             CornerRadius="{DynamicResource AtomexCornerRadius}"
                                             Command="{Binding ExchangeCommand}"
-                                            Margin="12 0 0 0"
+                                            Margin="0 0 12 12"
                                             Classes="AccentButton">
                         <StackPanel Orientation="Horizontal">
                             <svg:Svg HorizontalAlignment="Center"
@@ -172,7 +172,7 @@
                                             Padding="26 0"
                                             CornerRadius="{DynamicResource AtomexCornerRadius}"
                                             Command="{Binding BuyCommand}"
-                                            Margin="12 0 0 0"
+                                            Margin="0 0 12 12"
                                             IsVisible="{Binding CurrencyViewModel.CurrencyCode, Converter={StaticResource ShowBuyButton}}"
                                             Classes="GrayButton">
                         <StackPanel Orientation="Horizontal">
@@ -185,12 +185,12 @@
                                        FontSize="18" />
                         </StackPanel>
                     </controls:RoundedButton>
-                </StackPanel>
+                </WrapPanel>
             </StackPanel>
         </Grid>
 
         <TabControl Grid.Row="1"
-                    Margin="0 16 0 0"
+                    Margin="0 4 0 0"
                     Classes="WalletTabControl">
             <TabItem Margin="0 0 16 0"
                      Classes="WalletTabItem">

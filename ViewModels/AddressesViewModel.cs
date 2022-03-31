@@ -15,6 +15,7 @@ using Atomex.Core;
 using Atomex.Cryptography;
 using Atomex.Wallet;
 using Atomex.Wallet.Tezos;
+using Avalonia.Controls;
 
 namespace Atomex.Client.Desktop.ViewModels
 {
@@ -121,7 +122,7 @@ namespace Atomex.Client.Desktop.ViewModels
         public AddressesViewModel()
         {
 #if DEBUG
-            if (Env.IsInDesignerMode())
+            if (Design.IsDesignMode)
                 DesignerMode();
 #endif
         }

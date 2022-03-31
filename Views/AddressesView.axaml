@@ -6,8 +6,7 @@
              x:Class="Atomex.Client.Desktop.Views.AddressesView"
              xmlns:vm="clr-namespace:Atomex.Client.Desktop.ViewModels"
              xmlns:controls="clr-namespace:Atomex.Client.Desktop.Controls"
-             Width="930"
-             Height="400">
+             xmlns:svg="clr-namespace:Avalonia.Svg.Skia;assembly=Avalonia.Svg.Skia">
 
     <Design.DataContext>
         <vm:AddressesViewModel />
@@ -45,278 +44,168 @@
         </Style>
     </UserControl.Styles>
 
-    <Border Width="930" Classes="ChildViewBorder">
-        <Grid>
-            <StackPanel Orientation="Vertical">
-                <Border Margin="0 20 0 20"
-                        Height="33"
-                        Background="{DynamicResource ChildViewHeaderBackgroundBrush}">
-                    <TextBlock Text="Addresses"
-                               Foreground="{DynamicResource ChildViewHeaderForegroundBrush}"
-                               FontFamily="{DynamicResource DefaultLightFontFamily}"
-                               FontSize="25"
-                               HorizontalAlignment="Center"
-                               VerticalAlignment="Center" />
-                </Border>
+    <Grid RowDefinitions="Auto,*"
+          Name="DesignGrid">
+        <Border Grid.Row="0"
+                Background="{DynamicResource LightDefaultOpacity6}"
+                CornerRadius="{DynamicResource AtomexCornerRadius}"
+                VerticalAlignment="Top"
+                Height="34"
+                Margin="0 16 0 0"
+                Padding="12 0">
+            <Grid ColumnDefinitions="14*,4*,2*,4*,4*,2*"
+                  VerticalAlignment="Stretch">
+                <Button Grid.Column="0"
+                        Padding="0"
+                        VerticalAlignment="Stretch"
+                        VerticalContentAlignment="Center"
+                        Classes="EmptyBtnWithContent">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
+                                   FontSize="13"
+                                   Text="Address" />
+                    </StackPanel>
+                </Button>
+                <Button Grid.Column="1"
+                        Padding="0"
+                        VerticalAlignment="Stretch"
+                        VerticalContentAlignment="Center"
+                        Classes="EmptyBtnWithContent">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
+                                   FontSize="13"
+                                   Text="Path" />
+                    </StackPanel>
+                </Button>
+                <Button Grid.Column="2"
+                        Padding="0"
+                        VerticalAlignment="Stretch"
+                        VerticalContentAlignment="Center"
+                        Classes="EmptyBtnWithContent">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
+                                   FontSize="13"
+                                   Text="Type" />
+                    </StackPanel>
+                </Button>
+                <Button Grid.Column="3"
+                        Padding="0"
+                        VerticalAlignment="Stretch"
+                        VerticalContentAlignment="Center"
+                        Classes="EmptyBtnWithContent">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
+                                   FontSize="13"
+                                   Text="Balance" />
+                    </StackPanel>
+                </Button>
+                <Button Grid.Column="4"
+                        Padding="0"
+                        VerticalAlignment="Stretch"
+                        VerticalContentAlignment="Center"
+                        Classes="EmptyBtnWithContent">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
+                                   FontSize="13"
+                                   Text="Token balance" />
+                    </StackPanel>
+                </Button>
+                <Button Grid.Column="5"
+                        Padding="0"
+                        VerticalAlignment="Stretch"
+                        VerticalContentAlignment="Center"
+                        Classes="EmptyBtnWithContent">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
+                                   FontSize="13"
+                                   Text="Key" />
+                    </StackPanel>
+                </Button>
+            </Grid>
+        </Border>
 
-                <DataGrid Margin="10 0 10 10"
-                          Items="{Binding Addresses}"
-                          AutoGenerateColumns="False"
-                          IsReadOnly="True"
-                          IsVisible="{Binding HasTokens}"
-                          MaxHeight="300">
-                    <DataGrid.Columns>
-                        <DataGridTemplateColumn Header="ADDRESS" Width="*">
-                            <DataGridTemplateColumn.CellTemplate>
-                                <DataTemplate>
-                                    <StackPanel Orientation="Horizontal">
-                                        <Button
-                                            Content="{Binding Address}"
-                                            Margin="5 0 0 0"
-                                            HorizontalAlignment="Left"
-                                            VerticalAlignment="Center"
-                                            Command="{Binding OpenInExplorerCommand}"
-                                            CommandParameter="{Binding Address}"
-                                            Classes="ExplorerLinkButton" />
+        <ListBox Grid.Row="1"
+                 Background="{DynamicResource AlmostTransparentBrush}"
+                 Items="{Binding Addresses}"
+                 HorizontalAlignment="Stretch"
+                 VerticalAlignment="Stretch">
+            <ListBox.Styles>
+                <Style Selector="ListBoxItem">
+                    <Setter Property="Padding" Value="0" />
+                    <Setter Property="Height" Value="48" />
+                    <Setter Property="VerticalContentAlignment" Value="Stretch" />
+                    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                    <Setter Property="BorderThickness" Value="0 0 0 1" />
+                    <Setter Property="BorderBrush" Value="{DynamicResource LightDefaultOpacity10}" />
+                </Style>
+                <Style Selector="ListBoxItem:selected /template/ ContentPresenter">
+                    <Setter Property="Background" Value="{DynamicResource AlmostTransparentBrush}" />
+                </Style>
+                <Style Selector="ListBoxItem:not(:selected) /template/ ContentPresenter">
+                    <Setter Property="Background" Value="{DynamicResource AlmostTransparentBrush}" />
+                </Style>
+            </ListBox.Styles>
 
-                                        <Border>
-                                            <controls:IconButton
-                                                HorizontalAlignment="Center"
-                                                VerticalAlignment="Center"
-                                                Foreground="{DynamicResource IconButtonForegroundBrush}"
-                                                MouseOverBrush="{DynamicResource IconButtonMouseOverBrush}"
-                                                PressedBrush="{DynamicResource IconButtonPressedBrush}"
-                                                Path="{DynamicResource Octicons.Clippy}"
-                                                Margin="7 -2 0 0"
-                                                Width="15"
-                                                Height="15"
-                                                Command="{Binding CopyCommand}"
-                                                CommandParameter="{Binding Address}"
-                                                Classes="PathButtonStyle" />
-                                            <ToolTip.Tip>
-                                                <TextBlock>Copy address to clipboard</TextBlock>
-                                            </ToolTip.Tip>
-                                        </Border>
-                                    </StackPanel>
-                                </DataTemplate>
-                            </DataGridTemplateColumn.CellTemplate>
-                        </DataGridTemplateColumn>
-                        <DataGridTextColumn Header="TYPE"
-                                            Binding="{Binding Type}"
-                                            Width="Auto"
-                                            FontSize="12"/>
-                        <DataGridTextColumn Header="PATH"
-                                            Binding="{Binding Path}"
-                                            Width="Auto"
-                                            FontSize="12" />
-                        <DataGridTextColumn Header="BALANCE"
-                                            Binding="{Binding Balance}"
-                                            Width="Auto"
-                                            Foreground="Gold"
-                                            FontSize="12" />
-                        <DataGridTextColumn Header="TOKEN BALANCE"
-                                            Binding="{Binding TokenBalance}"
-                                            Width="Auto"
-                                            Foreground="White"
-                                            FontSize="12" />
-                        <DataGridTemplateColumn Header="UPDATE" Width="90">
-                            <DataGridTemplateColumn.CellTemplate>
-                                <DataTemplate>
-                                    <Border Padding="10 0 0 0">
-                                        <Button Classes="Refresh"
-                                                Width="28"
-                                                Command="{Binding SetAddressUpdating}"
-                                                CommandParameter="{Binding Address}"
-                                                Height="28">
-                                            <Viewbox Stretch="Fill"
-                                                     HorizontalAlignment="Center"
-                                                     VerticalAlignment="Center"
-                                                     Width="20"
-                                                     Height="20"
-                                                     IsEnabled="{Binding IsUpdating}"
-                                                     Classes="Refresh">
-                                                <!-- <Viewbox.IsEnabled> -->
-                                                <!-- -->
-                                                <!--     <MultiBinding Converter="{StaticResource AmountToStringConverter}"> -->
-                                                <!--         <Binding Path="CurrentUpdatingId" Mode="TwoWay" /> -->
-                                                <!--         <Binding Path="Id" Mode="OneWay" /> -->
-                                                <!--     </MultiBinding> -->
-                                                <!-- -->
-                                                <!-- </Viewbox.IsEnabled> -->
-                                                <Panel>
-                                                    <Path Fill="{DynamicResource IconButtonForegroundBrush}"
-                                                          Data="{DynamicResource Refresh.First}" />
-                                                    <Path Fill="{DynamicResource IconButtonForegroundBrush}"
-                                                          Data="{DynamicResource Refresh.Second}" />
-                                                </Panel>
-                                            </Viewbox>
-                                        </Button>
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <Border Padding="12 0">
+                        <Grid ColumnDefinitions="14*,4*,2*,4*,4*,2*"
+                              VerticalAlignment="Stretch">
+                            <TextBlock Grid.Column="0"
+                                       Foreground="{DynamicResource DefaultForegroundBrush}"
+                                       VerticalAlignment="Center"
+                                       FontSize="16"
+                                       Text="{Binding Address}" />
 
-                                        <ToolTip.Tip>
-                                            <TextBlock>Update this address.</TextBlock>
-                                        </ToolTip.Tip>
-                                    </Border>
-                                </DataTemplate>
-                            </DataGridTemplateColumn.CellTemplate>
-                        </DataGridTemplateColumn>
-                        <DataGridTemplateColumn Header="KEY" Width="60">
-                            <DataGridTemplateColumn.CellTemplate>
-                                <DataTemplate>
-                                    <Border>
-                                        <controls:IconButton
-                                            HorizontalAlignment="Center"
-                                            VerticalAlignment="Center"
-                                            Foreground="{DynamicResource IconButtonForegroundBrush}"
-                                            MouseOverBrush="{DynamicResource IconButtonMouseOverBrush}"
-                                            PressedBrush="{DynamicResource IconButtonPressedBrush}"
-                                            Path="{DynamicResource FontAwesome.KeySolid}"
-                                            Margin="7 0 0 0"
-                                            Width="15"
-                                            Height="15"
-                                            Command="{Binding ExportKeyCommand}"
-                                            CommandParameter="{Binding Id}"
-                                            Classes="PathButtonStyle" />
-                                        <ToolTip.Tip>
-                                            <TextBlock>Private key export dialog</TextBlock>
-                                        </ToolTip.Tip>
-                                    </Border>
-                                </DataTemplate>
-                            </DataGridTemplateColumn.CellTemplate>
-                        </DataGridTemplateColumn>
-                    </DataGrid.Columns>
-                </DataGrid>
-                <DataGrid Margin="10 0 10 10"
-                          Items="{Binding Addresses}"
-                          AutoGenerateColumns="False"
-                          IsReadOnly="True"
-                          IsVisible="{Binding !HasTokens}"
-                          MaxHeight="300">
-                    <DataGrid.Columns>
-                        <DataGridTemplateColumn Header="ADDRESS" Width="*">
-                            <DataGridTemplateColumn.CellTemplate>
-                                <DataTemplate>
-                                    <StackPanel Orientation="Horizontal">
-                                        <Button
-                                            Content="{Binding Address}"
-                                            Margin="5 0 0 0"
-                                            HorizontalAlignment="Left"
-                                            VerticalAlignment="Center"
-                                            Command="{Binding OpenInExplorerCommand}"
-                                            CommandParameter="{Binding Address}"
-                                            Classes="ExplorerLinkButton" />
+                            <TextBlock Grid.Column="1"
+                                       Foreground="{DynamicResource SecondaryForegroundBrush}"
+                                       VerticalAlignment="Center"
+                                       FontSize="13"
+                                       Text="{Binding Path}" />
 
-                                        <Border>
-                                            <controls:IconButton
-                                                HorizontalAlignment="Center"
-                                                VerticalAlignment="Center"
-                                                Foreground="{DynamicResource IconButtonForegroundBrush}"
-                                                MouseOverBrush="{DynamicResource IconButtonMouseOverBrush}"
-                                                PressedBrush="{DynamicResource IconButtonPressedBrush}"
-                                                Path="{DynamicResource Octicons.Clippy}"
-                                                Margin="7 -2 0 0"
-                                                Width="15"
-                                                Height="15"
-                                                Command="{Binding CopyCommand}"
-                                                CommandParameter="{Binding Address}"
-                                                Classes="PathButtonStyle" />
-                                            <ToolTip.Tip>
-                                                <TextBlock>Copy address to clipboard</TextBlock>
-                                            </ToolTip.Tip>
-                                        </Border>
-                                    </StackPanel>
-                                </DataTemplate>
-                            </DataGridTemplateColumn.CellTemplate>
-                        </DataGridTemplateColumn>
-                        <DataGridTextColumn Header="TYPE"
-                                            Binding="{Binding Type}"
-                                            Width="Auto"
-                                            FontSize="12"/>
-                        <DataGridTextColumn Header="PATH"
-                                            Binding="{Binding Path}"
-                                            Width="Auto"
-                                            FontSize="12" />
-                        <DataGridTextColumn Header="BALANCE"
-                                            Binding="{Binding Balance}"
-                                            Width="Auto"
-                                            Foreground="Gold"
-                                            FontSize="12" />
-                        <DataGridTemplateColumn Header="UPDATE" Width="90">
-                            <DataGridTemplateColumn.CellTemplate>
-                                <DataTemplate>
-                                    <Border Padding="10 0 0 0">
-                                        <Button Classes="Refresh"
-                                                Width="28"
-                                                Command="{Binding SetAddressUpdating}"
-                                                CommandParameter="{Binding Address}"
-                                                Height="28">
-                                            <Viewbox Stretch="Fill"
-                                                     HorizontalAlignment="Center"
-                                                     VerticalAlignment="Center"
-                                                     Width="20"
-                                                     Height="20"
-                                                     IsEnabled="{Binding IsUpdating}"
-                                                     Classes="Refresh">
-                                                <!-- <Viewbox.IsEnabled> -->
-                                                <!-- -->
-                                                <!--     <MultiBinding Converter="{StaticResource AmountToStringConverter}"> -->
-                                                <!--         <Binding Path="CurrentUpdatingId" Mode="TwoWay" /> -->
-                                                <!--         <Binding Path="Id" Mode="OneWay" /> -->
-                                                <!--     </MultiBinding> -->
-                                                <!-- -->
-                                                <!-- </Viewbox.IsEnabled> -->
-                                                <Panel>
-                                                    <Path Fill="{DynamicResource IconButtonForegroundBrush}"
-                                                          Data="{DynamicResource Refresh.First}" />
-                                                    <Path Fill="{DynamicResource IconButtonForegroundBrush}"
-                                                          Data="{DynamicResource Refresh.Second}" />
-                                                </Panel>
-                                            </Viewbox>
-                                        </Button>
+                            <TextBlock Grid.Column="2"
+                                       Foreground="{DynamicResource SecondaryForegroundBrush}"
+                                       VerticalAlignment="Center"
+                                       FontSize="13"
+                                       Text="{Binding Type}" />
 
-                                        <ToolTip.Tip>
-                                            <TextBlock>Update this address.</TextBlock>
-                                        </ToolTip.Tip>
-                                    </Border>
-                                </DataTemplate>
-                            </DataGridTemplateColumn.CellTemplate>
-                        </DataGridTemplateColumn>
-                        <DataGridTemplateColumn Header="KEY" Width="60">
-                            <DataGridTemplateColumn.CellTemplate>
-                                <DataTemplate>
-                                    <Border>
-                                        <controls:IconButton
-                                            HorizontalAlignment="Center"
-                                            VerticalAlignment="Center"
-                                            Foreground="{DynamicResource IconButtonForegroundBrush}"
-                                            MouseOverBrush="{DynamicResource IconButtonMouseOverBrush}"
-                                            PressedBrush="{DynamicResource IconButtonPressedBrush}"
-                                            Path="{DynamicResource FontAwesome.KeySolid}"
-                                            Margin="7 0 0 0"
-                                            Width="15"
-                                            Height="15"
-                                            Command="{Binding ExportKeyCommand}"
-                                            CommandParameter="{Binding Id}"
-                                            Classes="PathButtonStyle" />
-                                        <ToolTip.Tip>
-                                            <TextBlock>Private key export dialog</TextBlock>
-                                        </ToolTip.Tip>
-                                    </Border>
-                                </DataTemplate>
-                            </DataGridTemplateColumn.CellTemplate>
-                        </DataGridTemplateColumn>
-                    </DataGrid.Columns>
-                </DataGrid>
+                            <TextBlock Grid.Column="3"
+                                       Foreground="{DynamicResource SecondaryForegroundBrush}"
+                                       VerticalAlignment="Center"
+                                       FontSize="13"
+                                       Text="{Binding Balance}" />
 
-                <TextBlock Text="{Binding Warning}"
-                           Foreground="{DynamicResource WarningForegroundBrush}"
-                           FontFamily="{DynamicResource DefaultLightFontFamily}"
-                           FontSize="13"
-                           Margin="20 0 20 5"
-                           TextWrapping="Wrap"
-                           HorizontalAlignment="Center"
-                           VerticalAlignment="Bottom"
-                           IsVisible="{Binding HasWarning}" />
-            </StackPanel>
-        </Grid>
-    </Border>
+                            <StackPanel Grid.Column="5"
+                                        Orientation="Horizontal">
+                                <Button Width="22"
+                                        Padding="3"
+                                        BorderThickness="0"
+                                        VerticalContentAlignment="Center"
+                                        Command="{Binding ExportKeyCommand}"
+                                        Classes="ButtonWithIcon">
+
+                                    <svg:Svg Width="20"
+                                             Path="/Resources/Icons/key.svg"
+                                             HorizontalAlignment="Left" />
+                                </Button>
+
+                                <Button Width="22"
+                                        Margin="24 0 0 0"
+                                        Padding="3"
+                                        BorderThickness="0"
+                                        VerticalContentAlignment="Center"
+                                        Command="{Binding ExportKeyCommand}"
+                                        Classes="ButtonWithIcon">
+
+                                    <svg:Svg Width="20"
+                                             Path="/Resources/Icons/update.svg"
+                                             HorizontalAlignment="Left" />
+                                </Button>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+    </Grid>
 </UserControl>
