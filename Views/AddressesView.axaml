@@ -5,7 +5,6 @@
              mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="450"
              x:Class="Atomex.Client.Desktop.Views.AddressesView"
              xmlns:vm="clr-namespace:Atomex.Client.Desktop.ViewModels"
-             xmlns:controls="clr-namespace:Atomex.Client.Desktop.Controls"
              xmlns:svg="clr-namespace:Avalonia.Svg.Skia;assembly=Avalonia.Svg.Skia">
 
     <Design.DataContext>
@@ -178,28 +177,31 @@
                             <StackPanel Grid.Column="5"
                                         Orientation="Horizontal">
                                 <Button Width="22"
-                                        Padding="3"
+                                        Height="22"
                                         BorderThickness="0"
                                         VerticalContentAlignment="Center"
+                                        HorizontalContentAlignment="Center"
                                         Command="{Binding ExportKeyCommand}"
                                         Classes="ButtonWithIcon">
 
                                     <svg:Svg Width="20"
-                                             Path="/Resources/Icons/key.svg"
-                                             HorizontalAlignment="Left" />
+                                             Path="/Resources/Icons/key.svg" />
                                 </Button>
 
                                 <Button Width="22"
+                                        Height="22"
                                         Margin="24 0 0 0"
-                                        Padding="3"
                                         BorderThickness="0"
                                         VerticalContentAlignment="Center"
-                                        Command="{Binding ExportKeyCommand}"
+                                        HorizontalContentAlignment="Center"
+                                        Command="{Binding UpdateAddressCommand}"
+                                        CommandParameter="{Binding Address}"
                                         Classes="ButtonWithIcon">
 
                                     <svg:Svg Width="20"
                                              Path="/Resources/Icons/update.svg"
-                                             HorizontalAlignment="Left" />
+                                             Classes.InProgress="{Binding IsUpdating}"
+                                             Classes.NotInProgress="{Binding !IsUpdating}" />
                                 </Button>
                             </StackPanel>
                         </Grid>
