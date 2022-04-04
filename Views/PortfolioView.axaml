@@ -181,8 +181,16 @@
                             Margin="0 0 12 0"
                             Command="{Binding ManageAssetsCommand}"
                             Classes="ButtonWithIcon">
-                        <svg:Svg Width="22"
-                                 Path="/Resources/Icons/settings.svg" />
+                        <Button.Styles>
+                            <Style Selector="Button svg|Svg">
+                                <Setter Property="Path" Value="/Resources/Icons/settings.svg"></Setter>
+                            </Style>
+                            <Style Selector="Button:pointerover svg|Svg">
+                                <Setter Property="Path" Value="/Resources/Icons/settings-light.svg"></Setter>
+                            </Style>
+                        </Button.Styles>
+                        
+                        <svg:Svg Width="22" />
                     </Button>
                 </Grid>
 
@@ -203,11 +211,18 @@
                                     VerticalContentAlignment="Center"
                                     Command="{ReflectionBinding $parent[TextBox].Clear}"
                                     Classes="ButtonWithIcon WithoutEffects">
+                                <Button.Styles>
+                                    <Style Selector="Button svg|Svg">
+                                        <Setter Property="Path" Value="/Resources/Icons/subtract.svg"></Setter>
+                                    </Style>
+                                    <Style Selector="Button:pointerover svg|Svg">
+                                        <Setter Property="Path" Value="/Resources/Icons/subtract-light.svg"></Setter>
+                                    </Style>
+                                </Button.Styles>
 
                                 <svg:Svg HorizontalAlignment="Center"
                                          Width="18"
-                                         Height="18"
-                                         Path="/Resources/Icons/subtract.svg" />
+                                         Height="18" />
                             </Button>
                         </StackPanel>
                     </TextBox.InnerRightContent>

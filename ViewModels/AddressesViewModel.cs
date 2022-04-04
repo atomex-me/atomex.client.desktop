@@ -5,7 +5,6 @@ using System.Linq;
 using System.Globalization;
 using System.Reactive;
 using System.Threading.Tasks;
-using System.Windows.Input;
 using Serilog;
 using ReactiveUI;
 using Atomex.Blockchain.Tezos.Internal;
@@ -34,56 +33,43 @@ namespace Atomex.Client.Desktop.ViewModels
         [Reactive] public string TokenBalance { get; set; }
         [Reactive] public bool IsUpdating { get; set; }
 
-        private ReactiveCommand<string, Unit> _updateAddressCommand;
+        private ReactiveCommand<Unit, Unit> _updateAddressCommand;
 
-        public ReactiveCommand<string, Unit> UpdateAddressCommand => _updateAddressCommand ??=
-            ReactiveCommand.Create<string>(async address =>
+        public ReactiveCommand<Unit, Unit> UpdateAddressCommand => _updateAddressCommand ??=
+            ReactiveCommand.CreateFromTask(async () =>
             {
-                if (IsUpdating || UpdateAddress == null) return;
+                if (UpdateAddress == null) return;
                 IsUpdating = true;
-                // var updateAddressTask = UpdateAddress(address);
-                // var minimumDelayTask = Task.Delay(TimeSpan.FromSeconds(10));
-                // await Task.WhenAll(updateAddressTask, minimumDelayTask);
-                Log.Fatal("Start1");
-                await Task.WhenAll(Task.Delay(100), Task.Delay(3000));
-                Log.Fatal("Done1");
+                await UpdateAddress(Address);
                 IsUpdating = false;
             });
 
-        private ICommand _copyCommand;
+        private ReactiveCommand<Unit, Unit> _copyCommand;
 
-        public ICommand CopyCommand => _copyCommand ??= ReactiveCommand.Create<string>((s) =>
-        {
-            CopyToClipboard?.Invoke(s);
-        });
+        public ReactiveCommand<Unit, Unit> CopyCommand => _copyCommand ??= ReactiveCommand.Create(
+            () => CopyToClipboard?.Invoke(Address));
 
-        private ICommand _openInExplorerCommand;
+        private ReactiveCommand<Unit, Unit> _openInExplorerCommand;
 
-        public ICommand OpenInExplorerCommand => _openInExplorerCommand ??= ReactiveCommand.Create<string>((s) =>
-        {
-            OpenInExplorer?.Invoke(Address);
-        });
+        public ReactiveCommand<Unit, Unit> OpenInExplorerCommand => _openInExplorerCommand ??= ReactiveCommand.Create(
+            () => OpenInExplorer?.Invoke(Address));
 
-        private ICommand _exportKeyCommand;
+        private ReactiveCommand<Unit, Unit> _exportKeyCommand;
 
-        public ICommand ExportKeyCommand => _exportKeyCommand ??= ReactiveCommand.Create<string>((s) =>
-        {
-            ExportKey?.Invoke(Address);
-        });
+        public ReactiveCommand<Unit, Unit> ExportKeyCommand => _exportKeyCommand ??= ReactiveCommand.Create(
+            () => ExportKey?.Invoke(Address));
     }
 
     public class AddressesViewModel : ViewModelBase
     {
         private const int DefaultTokenPrecision = 9;
+        private const int MinimalUpdateTimeMs = 1500;
         private readonly IAtomexApp _app;
         private CurrencyConfig _currency;
         private readonly string _tokenContract;
 
         [Reactive] public ObservableCollection<AddressInfo> Addresses { get; set; }
         [Reactive] public bool HasTokens { get; set; }
-        [Reactive] public string Warning { get; set; }
-
-        public bool HasWarning => !string.IsNullOrEmpty(Warning);
 
         public AddressesViewModel()
         {
@@ -212,8 +198,6 @@ namespace Atomex.Client.Desktop.ViewModels
             try
             {
                 App.Clipboard.SetTextAsync(address);
-
-                Warning = "Address successfully copied to clipboard.";
             }
             catch (Exception e)
             {
@@ -240,8 +224,10 @@ namespace Atomex.Client.Desktop.ViewModels
         {
             try
             {
-                await new HdWalletScanner(_app.Account)
+                var updateTask = new HdWalletScanner(_app.Account)
                     .ScanAddressAsync(_currency.Name, address);
+
+                await Task.WhenAll(Task.Delay(MinimalUpdateTimeMs), updateTask);
 
                 if (_currency.Name == TezosConfig.Xtz && _tokenContract != null)
                 {
@@ -282,7 +268,6 @@ namespace Atomex.Client.Desktop.ViewModels
                         text:
                         "Copying the private key to the clipboard may result in the loss of all your coins in the wallet. Are you sure you want to copy the private key?",
                         nextTitle: "Copy",
-                        backAction: () => App.DialogService.Show(this),
                         nextAction: async () =>
                         {
                             var walletAddress = await _app.Account
@@ -326,8 +311,6 @@ namespace Atomex.Client.Desktop.ViewModels
                                 text: "Private key successfully copied to clipboard.",
                                 nextAction: () => App.DialogService.Close()
                             ));
-
-                            Warning = "Private key successfully copied to clipboard.";
                         }
                     )
                 );

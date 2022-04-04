@@ -8,8 +8,8 @@ namespace Atomex.Client.Desktop.ViewModels
 {
     public class MessageViewModel : ViewModelBase
     {
-        private readonly Action _backAction;
-        private readonly Action _nextAction;
+        private readonly Action? _backAction;
+        private readonly Action? _nextAction;
 
         public string Title { get; }
         public string Text { get; }
@@ -25,12 +25,12 @@ namespace Atomex.Client.Desktop.ViewModels
         private ICommand _backCommand;
 
         public ICommand BackCommand =>
-            _backCommand ??= (_backCommand = ReactiveCommand.Create(() => { _backAction(); }));
+            _backCommand ??= (_backCommand = ReactiveCommand.Create(() => { _backAction?.Invoke(); }));
 
         private ICommand _nextCommand;
 
         public ICommand NextCommand =>
-            _nextCommand ??= (_nextCommand = ReactiveCommand.Create(() => { _nextAction(); }));
+            _nextCommand ??= (_nextCommand = ReactiveCommand.Create(() => { _nextAction?.Invoke(); }));
 
         public MessageViewModel()
         {
@@ -39,18 +39,16 @@ namespace Atomex.Client.Desktop.ViewModels
         public MessageViewModel(
             string title,
             string text,
-            bool isBackVisible,
             string nextTitle,
-            Action backAction,
-            Action nextAction,
+            Action? backAction,
+            Action? nextAction,
             bool withProgressBar = false)
         {
             Title = title;
             Text = text;
-
             NextText = nextTitle;
 
-            IsBackVisible = isBackVisible;
+            IsBackVisible = backAction != null;
             IsNextVisible = !string.IsNullOrEmpty(NextText);
             WithProgressBar = withProgressBar;
 
@@ -63,10 +61,9 @@ namespace Atomex.Client.Desktop.ViewModels
             string text,
             string baseUrl,
             string id,
-            bool isBackVisible,
             string nextTitle,
-            Action backAction,
-            Action nextAction,
+            Action? backAction,
+            Action? nextAction,
             bool withProgressBar = false)
         {
             Title = title;
@@ -77,7 +74,7 @@ namespace Atomex.Client.Desktop.ViewModels
             Id = id;
 
             IsLinkVisible = !string.IsNullOrEmpty(BaseUrl) && !string.IsNullOrEmpty(Id);
-            IsBackVisible = isBackVisible;
+            IsBackVisible = backAction != null;
             IsNextVisible = !string.IsNullOrEmpty(NextText);
             WithProgressBar = withProgressBar;
 
@@ -89,7 +86,6 @@ namespace Atomex.Client.Desktop.ViewModels
             new(
                 title: Resources.SvError,
                 text: text,
-                isBackVisible: true,
                 nextTitle: null,
                 backAction: backAction,
                 nextAction: null);
@@ -98,7 +94,6 @@ namespace Atomex.Client.Desktop.ViewModels
             new(
                 title: Resources.SvSuccess,
                 text: text,
-                isBackVisible: false,
                 nextTitle: Resources.SvOk,
                 backAction: null,
                 nextAction: nextAction);
@@ -107,38 +102,35 @@ namespace Atomex.Client.Desktop.ViewModels
             new(
                 title: title,
                 text: text,
-                isBackVisible: false,
                 nextTitle: Resources.SvOk,
                 backAction: null,
                 nextAction: nextAction);
-        
+
         public static MessageViewModel Message(string title, bool withProgressBar) =>
             new(
                 title: title,
                 text: null,
-                isBackVisible: false,
                 nextTitle: null,
                 backAction: null,
                 nextAction: null,
                 withProgressBar: withProgressBar
             );
-        
-        public static MessageViewModel Message(string title, string text, Action nextAction, string buttonTitle, bool withProgressBar) =>
+
+        public static MessageViewModel Message(string title, string text, Action nextAction, string buttonTitle,
+            bool withProgressBar) =>
             new(
                 title: title,
                 text: text,
-                isBackVisible: false,
                 nextTitle: buttonTitle,
                 backAction: null,
                 nextAction: nextAction,
                 withProgressBar: withProgressBar
-                );
+            );
 
         public static MessageViewModel Message(string title, string text, Action backAction) =>
             new(
                 title: title,
                 text: text,
-                isBackVisible: true,
                 nextTitle: null,
                 backAction: backAction,
                 nextAction: null);
@@ -148,10 +140,16 @@ namespace Atomex.Client.Desktop.ViewModels
             new(
                 title: title,
                 text: text,
-                isBackVisible: true,
                 nextTitle: nextTitle,
                 backAction: backAction,
                 nextAction: nextAction);
+
+        public static MessageViewModel Message(string title, string text, string nextTitle, Action nextAction) => new(
+            title: title,
+            text: text,
+            nextTitle: nextTitle,
+            backAction: null,
+            nextAction: nextAction);
 
         public static MessageViewModel Success(string text, string baseUrl, string id, Action nextAction) =>
             new(
@@ -159,7 +157,6 @@ namespace Atomex.Client.Desktop.ViewModels
                 text: text,
                 baseUrl: baseUrl,
                 id: id,
-                isBackVisible: false,
                 nextTitle: Resources.SvOk,
                 backAction: null,
                 nextAction: nextAction);

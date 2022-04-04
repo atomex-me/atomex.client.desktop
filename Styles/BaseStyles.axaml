@@ -48,6 +48,15 @@
         </Style.Animations>
     </Style>
     <Style Selector="svg|Svg.NotInProgress">
-        <Setter Property="RotateTransform.Angle" Value="0" />
+        <Style.Animations>
+            <Animation Duration="0:0:0.001"
+                       IterationCount="1"
+                       FillMode="Forward"
+                       PlaybackDirection="Normal">
+                <KeyFrame Cue="100%">
+                    <Setter Property="RotateTransform.Angle" Value="0" />
+                </KeyFrame>
+            </Animation>
+        </Style.Animations>
     </Style>
 </Styles>

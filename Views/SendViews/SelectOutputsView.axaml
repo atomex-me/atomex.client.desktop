@@ -14,7 +14,7 @@
     <Design.DataContext>
         <vm:SelectOutputsViewModel />
     </Design.DataContext>
-    
+
     <Border Classes="ChildViewBorder"
             Padding="24 20 24 16"
             Width="700">
@@ -30,9 +30,16 @@
                         VerticalContentAlignment="Center"
                         Command="{Binding BackCommand}"
                         Classes="ButtonWithIcon">
+                    <Button.Styles>
+                        <Style Selector="Button svg|Svg">
+                            <Setter Property="Path" Value="/Resources/Icons/back.svg"></Setter>
+                        </Style>
+                        <Style Selector="Button:pointerover svg|Svg">
+                            <Setter Property="Path" Value="/Resources/Icons/back-light.svg"></Setter>
+                        </Style>
+                    </Button.Styles>
 
                     <svg:Svg Width="28"
-                             Path="/Resources/Icons/back.svg"
                              HorizontalAlignment="Left" />
                 </Button>
 
@@ -66,11 +73,18 @@
                                 VerticalContentAlignment="Center"
                                 Command="{ReflectionBinding $parent[TextBox].Clear}"
                                 Classes="ButtonWithIcon WithoutEffects">
+                            <Button.Styles>
+                                <Style Selector="Button svg|Svg">
+                                    <Setter Property="Path" Value="/Resources/Icons/subtract.svg"></Setter>
+                                </Style>
+                                <Style Selector="Button:pointerover svg|Svg">
+                                    <Setter Property="Path" Value="/Resources/Icons/subtract-light.svg"></Setter>
+                                </Style>
+                            </Button.Styles>
 
                             <svg:Svg HorizontalAlignment="Center"
                                      Width="18"
-                                     Height="18"
-                                     Path="/Resources/Icons/subtract.svg" />
+                                     Height="18" />
                         </Button>
                     </StackPanel>
                 </TextBox.InnerRightContent>
@@ -194,12 +208,19 @@
                                         Command="{Binding $parent[ListBox].DataContext.CopyAddressCommand}"
                                         CommandParameter="{Binding}"
                                         Classes="ButtonWithIcon">
+                                    <Button.Styles>
+                                        <Style Selector="Button svg|Svg">
+                                            <Setter Property="Path" Value="/Resources/Icons/copy.svg"></Setter>
+                                        </Style>
+                                        <Style Selector="Button:pointerover svg|Svg">
+                                            <Setter Property="Path" Value="/Resources/Icons/copy-light.svg"></Setter>
+                                        </Style>
+                                    </Button.Styles>
 
                                     <svg:Svg HorizontalAlignment="Center"
                                              VerticalAlignment="Center"
                                              Width="24"
-                                             Height="24"
-                                             Path="/Resources/Icons/copy.svg" />
+                                             Height="24" />
                                 </Button>
                                 <ToolTip.Tip>
                                     <TextBlock Text="{Binding CopyButtonToolTip}" />

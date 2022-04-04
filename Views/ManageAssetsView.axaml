@@ -44,10 +44,17 @@
                                 VerticalContentAlignment="Center"
                                 Command="{ReflectionBinding $parent[TextBox].Clear}"
                                 Classes="ButtonWithIcon WithoutEffects">
+                            <Button.Styles>
+                                <Style Selector="Button svg|Svg">
+                                    <Setter Property="Path" Value="/Resources/Icons/subtract.svg"></Setter>
+                                </Style>
+                                <Style Selector="Button:pointerover svg|Svg">
+                                    <Setter Property="Path" Value="/Resources/Icons/subtract-light.svg"></Setter>
+                                </Style>
+                            </Button.Styles>
                             <svg:Svg HorizontalAlignment="Center"
                                      Width="18"
-                                     Height="18"
-                                     Path="/Resources/Icons/subtract.svg" />
+                                     Height="18" />
                         </Button>
                     </StackPanel>
                 </TextBox.InnerRightContent>

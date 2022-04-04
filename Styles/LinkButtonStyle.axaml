@@ -1,8 +1,7 @@
 <Styles xmlns='https://github.com/avaloniaui'
         xmlns:x='http://schemas.microsoft.com/winfx/2006/xaml'
-        xmlns:svg="clr-namespace:Avalonia.Svg.Skia;assembly=Avalonia.Svg.Skia"     
         xmlns:converters="clr-namespace:Atomex.Client.Desktop.Converters">
-  
+
     <Style Selector="Button.LinkButton">
         <Setter Property="FontFamily" Value="{DynamicResource DefaultFontFamily}" />
         <Setter Property="Foreground" Value="{DynamicResource DefaultLinkButtonForegroundBrush}" />
@@ -11,7 +10,9 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Button">
-                    <TextBlock Text="{TemplateBinding Content}" />
+                    <TextBlock Text="{TemplateBinding Content}"
+                               FontSize="{TemplateBinding FontSize}"
+                               Foreground="{TemplateBinding Foreground}" />
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
@@ -25,50 +26,79 @@
         <Setter Property="FontSize" Value="13" />
         <Setter Property="FontFamily" Value="{DynamicResource DefaultFontFamily}" />
         <Setter Property="Foreground" Value="{DynamicResource DefaultForegroundBrush}" />
+        <Setter Property="FontWeight" Value="Light" />
         <Setter Property="Padding" Value="0" />
         <Setter Property="BorderThickness" Value="0" />
 
         <Style.Resources>
-          <converters:WidthToPointConverter x:Key="WidthToPointConverter"/>
-          <SolidColorBrush x:Key="LineStrokeBrush" Color="{DynamicResource LightDefaultOpacity20}"/>
+            <converters:WidthToPointConverter x:Key="WidthToPointConverter" />
+            <SolidColorBrush x:Key="LineStrokeBrush" Color="{DynamicResource LightDefaultOpacity20}" />
         </Style.Resources>
 
         <Setter Property="Template">
-          <Setter.Value>
-            <ControlTemplate TargetType="Button">
-              <StackPanel>
-                <TextBlock Name="TextBlock"
-                           Text="{TemplateBinding Content}"
-                           FontSize="{TemplateBinding FontSize}"
-                           Foreground="{TemplateBinding Foreground}"
-                           FontFamily="{TemplateBinding FontFamily}"
-                           FontWeight="{TemplateBinding FontWeight}"
-                           HorizontalAlignment="Center"
-                           Padding="0"
-                           Margin="0 0 0 2" />
-                <Line Height="1"
-                      Width="{Binding #TextBlock.Bounds.Width}"
-                      StartPoint="0,0"
-                      EndPoint="{Binding #TextBlock.Bounds.Width, Converter={StaticResource WidthToPointConverter}}"
-                      StrokeThickness="1"
-                      StrokeDashArray="2,2"
-                      Stroke="{DynamicResource LineStrokeBrush}">
-                </Line>
-              </StackPanel>
-            </ControlTemplate>
-          </Setter.Value>
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <StackPanel>
+                        <TextBlock Name="TextBlock"
+                                   Text="{TemplateBinding Content}"
+                                   FontSize="{TemplateBinding FontSize}"
+                                   Foreground="{TemplateBinding Foreground}"
+                                   FontFamily="{TemplateBinding FontFamily}"
+                                   FontWeight="{TemplateBinding FontWeight}"
+                                   HorizontalAlignment="Center"
+                                   Padding="0"
+                                   Margin="0 0 0 2" />
+                        <Line Name="PART_Line"
+                              Width="{Binding #TextBlock.Bounds.Width}"
+                              StartPoint="0,0"
+                              EndPoint="{Binding #TextBlock.Bounds.Width, Converter={StaticResource WidthToPointConverter}}"
+                              StrokeThickness="1">
+                        </Line>
+                    </StackPanel>
+                </ControlTemplate>
+            </Setter.Value>
         </Setter>
     </Style>
 
+    <Style Selector="Button.LinkButton.Underlined /template/ Line#PART_Line">
+        <Setter Property="StrokeDashArray" Value="2,2"></Setter>
+        <Setter Property="Stroke" Value="{DynamicResource LineStrokeBrush}" />
+        <Setter Property="Height" Value="1" />
+    </Style>
+    
+    <Style Selector="Button.LinkButton.Underlined.SolidHover /template/ Line#PART_Line">
+        <Setter Property="StrokeDashArray" Value="2,0"></Setter>
+        <Setter Property="IsVisible" Value="False"></Setter>
+        <Setter Property="Stroke" Value="{DynamicResource DefaultForegroundBrush}" />
+        <Setter Property="Height" Value="0.5" />
+    </Style>
+
     <Style Selector="Button.LinkButton.Underlined:pointerover">
-      <Setter Property="Foreground" Value="{DynamicResource LightDefaultOpacity50}" />
+        <Setter Property="Foreground" Value="{DynamicResource SecondaryForegroundBrush}" />
+    </Style>
+    
+    <Style Selector="Button.LinkButton.Underlined.SolidHover:pointerover /template/ Line#PART_Line">
+        <Setter Property="Stroke" Value="{DynamicResource SecondaryForegroundBrush}" />
+        <Setter Property="IsVisible" Value="True"></Setter>
     </Style>
 
     <Style Selector="Button.LinkButton.Underlined:pressed">
-      <Setter Property="Foreground" Value="{DynamicResource LightDefaultOpacity20}" />
+        <Setter Property="Foreground" Value="{DynamicResource LightDefaultOpacity20}" />
+    </Style>
+    
+    <Style Selector="Button.LinkButton.Underlined.SolidHover:pressed /template/ Line#PART_Line">
+        <Setter Property="Stroke" Value="{DynamicResource LightDefaultOpacity20}" />
+    </Style>
+    
+    <Style Selector="Button.LinkButton:pressed">
+        <Setter Property="RenderTransform" Value="none" />    
     </Style>
 
     <Style Selector="Button.LinkButton.Underlined:disabled">
         <Setter Property="Foreground" Value="{DynamicResource DisabledForegroundBrush}" />
+    </Style>
+    
+    <Style Selector="Button.LinkButton.Underlined.SolidHover:disabled /template/ Line#PART_Line">
+        <Setter Property="Stroke" Value="{DynamicResource DisabledForegroundBrush}" />
     </Style>
 </Styles>
