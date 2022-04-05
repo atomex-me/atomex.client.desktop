@@ -349,13 +349,13 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         public string BalanceFormat { get; set; }
         public string BalanceCurrencyCode { get; set; }
 
-        public IBrush Background => IsSelected
-            ? TezosCurrencyViewModel.DefaultIconBrush
-            : TezosCurrencyViewModel.DefaultUnselectedIconBrush;
-
-        public IBrush OpacityMask => IsSelected
-            ? null
-            : TezosCurrencyViewModel.DefaultIconMaskBrush;
+        // public IBrush Background => IsSelected
+        //     ? TezosCurrencyViewModel.DefaultIconBrush
+        //     : TezosCurrencyViewModel.DefaultUnselectedIconBrush;
+        //
+        // public IBrush OpacityMask => IsSelected
+        //     ? null
+        //     : TezosCurrencyViewModel.DefaultIconMaskBrush;
 
         public int SelectedTabIndex { get; set; }
 
@@ -549,9 +549,6 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             OnPropertyChanged(nameof(SelectedTabIndex));
 
             OnPropertyChanged(nameof(TokenContractIconPreview));
-
-            _sortInfo = null;
-            OnPropertyChanged(nameof(SortInfo));
         }
 
         protected override void OnSendClick()
@@ -683,60 +680,60 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             App.DialogService.Show(addressesViewModel);
         }
 
-        protected override void SortTransactions(string columnName, SortType sortType)
-        {
-            DGSelectedIndex = -1;
-
-            if (columnName.ToLower() == "time" && sortType == SortType.Asc)
-            {
-                Transfers = new ObservableCollection<TezosTokenTransferViewModel>(
-                    Transfers.OrderBy(tx => tx.LocalTime));
-            }
-
-            if (columnName.ToLower() == "time" && sortType == SortType.Desc)
-            {
-                Transfers = new ObservableCollection<TezosTokenTransferViewModel>(
-                    Transfers.OrderByDescending(tx => tx.LocalTime));
-            }
-
-            if (columnName.ToLower() == "amount" && sortType == SortType.Asc)
-            {
-                Transfers = new ObservableCollection<TezosTokenTransferViewModel>(
-                    Transfers.OrderBy(tx => tx.Amount));
-            }
-
-            if (columnName.ToLower() == "amount" && sortType == SortType.Desc)
-            {
-                Transfers = new ObservableCollection<TezosTokenTransferViewModel>(
-                    Transfers.OrderByDescending(tx => tx.Amount));
-            }
-
-            if (columnName.ToLower() == "state" && sortType == SortType.Asc)
-            {
-                Transfers = new ObservableCollection<TezosTokenTransferViewModel>(
-                    Transfers.OrderBy(tx => tx.State));
-            }
-
-            if (columnName.ToLower() == "state" && sortType == SortType.Desc)
-            {
-                Transfers = new ObservableCollection<TezosTokenTransferViewModel>(
-                    Transfers.OrderByDescending(tx => tx.State));
-            }
-
-            if (columnName.ToLower() == "type" && sortType == SortType.Asc)
-            {
-                Transfers = new ObservableCollection<TezosTokenTransferViewModel>(
-                    Transfers.OrderBy(tx => tx.Type));
-            }
-
-            if (columnName.ToLower() == "type" && sortType == SortType.Desc)
-            {
-                Transfers = new ObservableCollection<TezosTokenTransferViewModel>(
-                    Transfers.OrderByDescending(tx => tx.Type));
-            }
-
-            OnPropertyChanged(nameof(Transfers));
-        }
+        // protected override void SortTransactions(string columnName, SortDirection sortDirection)
+        // {
+        //     DGSelectedIndex = -1;
+        //
+        //     if (columnName.ToLower() == "time" && sortDirection == SortDirection.Asc)
+        //     {
+        //         Transfers = new ObservableCollection<TezosTokenTransferViewModel>(
+        //             Transfers.OrderBy(tx => tx.LocalTime));
+        //     }
+        //
+        //     if (columnName.ToLower() == "time" && sortDirection == SortDirection.Desc)
+        //     {
+        //         Transfers = new ObservableCollection<TezosTokenTransferViewModel>(
+        //             Transfers.OrderByDescending(tx => tx.LocalTime));
+        //     }
+        //
+        //     if (columnName.ToLower() == "amount" && sortDirection == SortDirection.Asc)
+        //     {
+        //         Transfers = new ObservableCollection<TezosTokenTransferViewModel>(
+        //             Transfers.OrderBy(tx => tx.Amount));
+        //     }
+        //
+        //     if (columnName.ToLower() == "amount" && sortDirection == SortDirection.Desc)
+        //     {
+        //         Transfers = new ObservableCollection<TezosTokenTransferViewModel>(
+        //             Transfers.OrderByDescending(tx => tx.Amount));
+        //     }
+        //
+        //     if (columnName.ToLower() == "state" && sortDirection == SortDirection.Asc)
+        //     {
+        //         Transfers = new ObservableCollection<TezosTokenTransferViewModel>(
+        //             Transfers.OrderBy(tx => tx.State));
+        //     }
+        //
+        //     if (columnName.ToLower() == "state" && sortDirection == SortDirection.Desc)
+        //     {
+        //         Transfers = new ObservableCollection<TezosTokenTransferViewModel>(
+        //             Transfers.OrderByDescending(tx => tx.State));
+        //     }
+        //
+        //     if (columnName.ToLower() == "type" && sortDirection == SortDirection.Asc)
+        //     {
+        //         Transfers = new ObservableCollection<TezosTokenTransferViewModel>(
+        //             Transfers.OrderBy(tx => tx.Type));
+        //     }
+        //
+        //     if (columnName.ToLower() == "type" && sortDirection == SortDirection.Desc)
+        //     {
+        //         Transfers = new ObservableCollection<TezosTokenTransferViewModel>(
+        //             Transfers.OrderByDescending(tx => tx.Type));
+        //     }
+        //
+        //     OnPropertyChanged(nameof(Transfers));
+        // }
 
 #if DEBUG
         private void DesignerMode()

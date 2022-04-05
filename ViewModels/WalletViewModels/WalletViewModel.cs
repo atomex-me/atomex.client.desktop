@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive;
+using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
-using Avalonia.Media;
 using Avalonia.Threading;
 using NBitcoin;
 using ReactiveUI;
@@ -26,12 +26,17 @@ using ReactiveUI.Fody.Helpers;
 
 namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 {
-    public enum TxSortType
+    public enum TxSortField
     {
-        ByDescription,
         ByAmount,
         ByStatus,
         ByTime
+    }
+
+    public enum SortDirection
+    {
+        Asc,
+        Desc
     }
 
     public class WalletViewModel : ViewModelBase, IWalletViewModel
@@ -41,6 +46,8 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         [Reactive] public CurrencyViewModel CurrencyViewModel { get; set; }
         [Reactive] public TransactionViewModel SelectedTransaction { get; set; }
         [Reactive] public bool IsBalanceUpdating { get; set; }
+        [Reactive] public TxSortField? CurrentSortField { get; set; }
+        [Reactive] public SortDirection? CurrentSortDirection { get; set; }
         public AddressesViewModel AddressesViewModel { get; set; }
         protected Action<CurrencyConfig> SetConversionTab { get; }
         private Action<string> SetWertCurrency { get; }
@@ -48,30 +55,16 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         public string Header => CurrencyViewModel.Header;
         public CurrencyConfig Currency => CurrencyViewModel.Currency;
 
-        public IBrush Background => IsSelected
-            ? CurrencyViewModel.IconBrush
-            : CurrencyViewModel.UnselectedIconBrush;
+        [Reactive] public bool SortByTimeAndAsc { get; set; }
+        [Reactive] public bool SortByTimeAndDesc { get; set; }
+        [Reactive] public bool SortByStatusAndAsc { get; set; }
+        [Reactive] public bool SortByStatusAndDesc { get; set; }
+        [Reactive] public bool SortByAmountAndAsc { get; set; }
+        [Reactive] public bool SortByAmountAndDesc { get; set; }
 
-        public IBrush OpacityMask => IsSelected
-            ? CurrencyViewModel.IconBrush is ImageBrush ? null : CurrencyViewModel.IconMaskBrush
-            : CurrencyViewModel.IconMaskBrush;
-
-        private bool _isSelected;
-
-        public bool IsSelected
-        {
-            get => _isSelected;
-            set
-            {
-                _isSelected = value;
-                OnPropertyChanged(nameof(IsSelected));
-                OnPropertyChanged(nameof(Background));
-                OnPropertyChanged(nameof(OpacityMask));
-                OnPropertyChanged(nameof(CurrencyOpacityValue));
-            }
-        }
-
-        public double CurrencyOpacityValue => _isSelected ? 1 : 0.4;
+        [Reactive] public bool SortByTime { get; set; }
+        [Reactive] public bool SortByStatus { get; set; }
+        [Reactive] public bool SortByAmount { get; set; }
 
         protected CancellationTokenSource _cancellation { get; set; }
 
@@ -97,6 +90,21 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                 CurrencyViewModel = CurrencyViewModelCreator.CreateViewModel(currency);
 
             AddressesViewModel = new AddressesViewModel(_app, currency);
+
+            this.WhenAnyValue(vm => vm.Transactions)
+                .WhereNotNull()
+                .Take(1)
+                .SubscribeInMainThread(_ =>
+                {
+                    CurrentSortField = TxSortField.ByTime;
+                    CurrentSortDirection = SortDirection.Desc;
+                });
+
+            this.WhenAnyValue(vm => vm.CurrentSortField, vm => vm.CurrentSortDirection)
+                .WhereAllNotNull()
+                .Where(_ => Transactions != null)
+                .Throttle(TimeSpan.FromMilliseconds(1))
+                .SubscribeInMainThread(_ => { SortTransactions(); });
 
             SubscribeToServices();
             _ = LoadTransactionsAsync();
@@ -140,6 +148,51 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             }
         }
 
+        private void SortTransactions()
+        {
+            Transactions = CurrentSortField switch
+            {
+                TxSortField.ByTime when CurrentSortDirection == SortDirection.Desc
+                    => new ObservableCollection<TransactionViewModel>(
+                        Transactions!.OrderByDescending(tx => tx.LocalTime)),
+                TxSortField.ByTime when CurrentSortDirection == SortDirection.Asc
+                    => new ObservableCollection<TransactionViewModel>(
+                        Transactions!.OrderBy(tx => tx.LocalTime)),
+
+                TxSortField.ByAmount when CurrentSortDirection == SortDirection.Desc
+                    => new ObservableCollection<TransactionViewModel>(
+                        Transactions!.OrderByDescending(tx => tx.Amount)),
+                TxSortField.ByAmount when CurrentSortDirection == SortDirection.Asc
+                    => new ObservableCollection<TransactionViewModel>(
+                        Transactions!.OrderBy(tx => tx.Amount)),
+
+                TxSortField.ByStatus when CurrentSortDirection == SortDirection.Desc
+                    => new ObservableCollection<TransactionViewModel>(
+                        Transactions!.OrderByDescending(tx => tx.State)),
+                TxSortField.ByStatus when CurrentSortDirection == SortDirection.Asc
+                    => new ObservableCollection<TransactionViewModel>(
+                        Transactions!.OrderBy(tx => tx.State)),
+                _ => Transactions
+            };
+
+            SortByTimeAndAsc =
+                CurrentSortField == TxSortField.ByTime && CurrentSortDirection == SortDirection.Asc;
+            SortByTimeAndDesc =
+                CurrentSortField == TxSortField.ByTime && CurrentSortDirection == SortDirection.Desc;
+            SortByStatusAndAsc =
+                CurrentSortField == TxSortField.ByStatus && CurrentSortDirection == SortDirection.Asc;
+            SortByStatusAndDesc =
+                CurrentSortField == TxSortField.ByStatus && CurrentSortDirection == SortDirection.Desc;
+            SortByAmountAndAsc =
+                CurrentSortField == TxSortField.ByAmount && CurrentSortDirection == SortDirection.Asc;
+            SortByAmountAndDesc =
+                CurrentSortField == TxSortField.ByAmount && CurrentSortDirection == SortDirection.Desc;
+
+            SortByTime = CurrentSortField == TxSortField.ByTime;
+            SortByStatus = CurrentSortField == TxSortField.ByStatus;
+            SortByAmount = CurrentSortField == TxSortField.ByAmount;
+        }
+
         protected virtual async Task LoadTransactionsAsync()
         {
             Log.Debug("LoadTransactionsAsync for {@currency}", Currency.Name);
@@ -156,15 +209,17 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                 await Dispatcher.UIThread.InvokeAsync(() =>
                     {
                         Transactions = new ObservableCollection<TransactionViewModel>(
-                            transactions.Select(t => TransactionViewModelCreator
+                            transactions
+                                .Select(t => TransactionViewModelCreator
                                     .CreateViewModel(t, Currency))
                                 .ToList()
-                                .SortList((t1, t2) => t2.Time.CompareTo(t1.Time))
                                 .ForEachDo(t =>
                                 {
                                     t.UpdateClicked += UpdateTransactonEventHandler;
                                     t.RemoveClicked += RemoveTransactonEventHandler;
                                 }));
+
+                        SortTransactions();
                     },
                     DispatcherPriority.Background);
             }
@@ -195,17 +250,26 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
         private ICommand _cancelUpdateCommand;
 
-        public ICommand CancelUpdateCommand => _cancelUpdateCommand ??= ReactiveCommand.Create(() =>
-        {
-            _cancellation?.Cancel();
-        });
+        public ICommand CancelUpdateCommand => _cancelUpdateCommand ??= ReactiveCommand.Create(
+            () => _cancellation?.Cancel());
 
         private ReactiveCommand<Unit, Unit> _buyCommand;
 
-        public ReactiveCommand<Unit, Unit> BuyCommand => _buyCommand ??= ReactiveCommand.Create(() =>
-        {
-            SetWertCurrency?.Invoke(CurrencyViewModel.Header);
-        });
+        public ReactiveCommand<Unit, Unit> BuyCommand => _buyCommand ??= ReactiveCommand.Create(
+            () => SetWertCurrency?.Invoke(CurrencyViewModel.Header));
+
+        private ReactiveCommand<TxSortField, Unit> _setSortTypeCommand;
+
+        public ReactiveCommand<TxSortField, Unit> SetSortTypeCommand =>
+            _setSortTypeCommand ??= ReactiveCommand.Create<TxSortField>(sortField =>
+            {
+                if (CurrentSortField != sortField)
+                    CurrentSortField = sortField;
+                else
+                    CurrentSortDirection = CurrentSortDirection == SortDirection.Asc
+                        ? SortDirection.Desc
+                        : SortDirection.Asc;
+            });
 
         protected virtual void OnSendClick()
         {
@@ -330,107 +394,53 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                 transactions.SortList((t1, t2) => t2.Time.CompareTo(t1.Time)));
         }
 
-        private int _dgSelectedIndex = -1;
-
-        public int DGSelectedIndex
+        protected virtual void SortTransactions(string columnName, SortDirection sortDirection)
         {
-            get => _dgSelectedIndex;
-            set
-            {
-                _dgSelectedIndex = value;
-                OnPropertyChanged(nameof(DGSelectedIndex));
-            }
-        }
+            // DGSelectedIndex = -1;
 
-        public void CellPointerPressed(int cellIndex)
-        {
-            if (cellIndex == DGSelectedIndex)
-            {
-                DGSelectedIndex = -1;
-                return;
-            }
-
-            DGSelectedIndex = cellIndex;
-        }
-
-        protected string _sortInfo;
-
-        public string SortInfo
-        {
-            get => _sortInfo;
-            set
-            {
-                SortType newSortType = SortType.Asc;
-
-                if (!string.IsNullOrEmpty(_sortInfo))
-                {
-                    var lastSortType = _sortInfo.Split(Convert.ToChar("/"))[1];
-                    var lastSortedColumn = _sortInfo.Split(Convert.ToChar("/"))[0];
-
-                    if (string.Equals(lastSortedColumn, value))
-                    {
-                        if (lastSortType == SortType.Asc.ToString())
-                            newSortType = SortType.Desc;
-
-                        if (lastSortType == SortType.Desc.ToString())
-                            newSortType = SortType.Asc;
-                    }
-                }
-
-                _sortInfo = $"{value}/{newSortType}";
-                OnPropertyChanged(nameof(SortInfo));
-
-                SortTransactions(value, newSortType);
-            }
-        }
-
-        protected virtual void SortTransactions(string columnName, SortType sortType)
-        {
-            DGSelectedIndex = -1;
-
-            if (columnName.ToLower() == "time" && sortType == SortType.Asc)
+            if (columnName.ToLower() == "time" && sortDirection == SortDirection.Asc)
             {
                 Transactions = new ObservableCollection<TransactionViewModel>(
                     Transactions.OrderBy(tx => tx.LocalTime));
             }
 
-            if (columnName.ToLower() == "time" && sortType == SortType.Desc)
+            if (columnName.ToLower() == "time" && sortDirection == SortDirection.Desc)
             {
                 Transactions = new ObservableCollection<TransactionViewModel>(
                     Transactions.OrderByDescending(tx => tx.LocalTime));
             }
 
-            if (columnName.ToLower() == "amount" && sortType == SortType.Asc)
+            if (columnName.ToLower() == "amount" && sortDirection == SortDirection.Asc)
             {
                 Transactions = new ObservableCollection<TransactionViewModel>(
                     Transactions.OrderBy(tx => tx.Amount));
             }
 
-            if (columnName.ToLower() == "amount" && sortType == SortType.Desc)
+            if (columnName.ToLower() == "amount" && sortDirection == SortDirection.Desc)
             {
                 Transactions = new ObservableCollection<TransactionViewModel>(
                     Transactions.OrderByDescending(tx => tx.Amount));
             }
 
-            if (columnName.ToLower() == "state" && sortType == SortType.Asc)
+            if (columnName.ToLower() == "state" && sortDirection == SortDirection.Asc)
             {
                 Transactions = new ObservableCollection<TransactionViewModel>(
                     Transactions.OrderBy(tx => tx.State));
             }
 
-            if (columnName.ToLower() == "state" && sortType == SortType.Desc)
+            if (columnName.ToLower() == "state" && sortDirection == SortDirection.Desc)
             {
                 Transactions = new ObservableCollection<TransactionViewModel>(
                     Transactions.OrderByDescending(tx => tx.State));
             }
 
-            if (columnName.ToLower() == "type" && sortType == SortType.Asc)
+            if (columnName.ToLower() == "type" && sortDirection == SortDirection.Asc)
             {
                 Transactions = new ObservableCollection<TransactionViewModel>(
                     Transactions.OrderBy(tx => tx.Type));
             }
 
-            if (columnName.ToLower() == "type" && sortType == SortType.Desc)
+            if (columnName.ToLower() == "type" && sortDirection == SortDirection.Desc)
             {
                 Transactions = new ObservableCollection<TransactionViewModel>(
                     Transactions.OrderByDescending(tx => tx.Type));
