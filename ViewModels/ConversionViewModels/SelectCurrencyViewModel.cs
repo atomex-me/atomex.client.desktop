@@ -278,7 +278,7 @@ namespace Atomex.Client.Desktop.ViewModels.ConversionViewModels
         {
             Type = SelectCurrencyType.From;
 
-            var currencies = DesignTime.Currencies
+            var currencies = DesignTime.TestNetCurrencies
                 .Select<CurrencyConfig, SelectCurrencyViewModelItem>(c =>
                 {
                     if (Atomex.Currencies.IsBitcoinBased(c.Name))

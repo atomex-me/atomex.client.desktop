@@ -137,7 +137,7 @@ namespace Atomex.Client.Desktop.ViewModels
         {
             var random = new Random();
             
-            AllCurrencies = DesignTime.Currencies
+            AllCurrencies = DesignTime.TestNetCurrencies
                 .Select(c =>
                 {
                     var vm = CurrencyViewModelCreator.CreateViewModel(c, subscribeToUpdates: false);

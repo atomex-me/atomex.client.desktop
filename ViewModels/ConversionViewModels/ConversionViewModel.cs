@@ -41,7 +41,7 @@ namespace Atomex.Client.Desktop.ViewModels
             {
 #if DEBUG
                 if (Design.IsDesignMode)
-                    return DesignTime.Symbols;
+                    return DesignTime.TestNetSymbols;
 #endif
                 return _app.SymbolsProvider
                     .GetSymbols(_app.Account.Network);
@@ -53,7 +53,7 @@ namespace Atomex.Client.Desktop.ViewModels
             {
 #if DEBUG
                 if (Design.IsDesignMode)
-                    return DesignTime.Currencies;
+                    return DesignTime.TestNetCurrencies;
 #endif
                 return _app.Account.Currencies;
             }
@@ -1104,8 +1104,8 @@ namespace Atomex.Client.Desktop.ViewModels
                 .Select(detailsVisible => detailsVisible ? Swaps?[DGSelectedIndex]?.Details : null)
                 .ToPropertyExInMainThread(this, vm => vm.SwapDetailsViewModel);
 
-            var btc = DesignTime.Currencies.Get<BitcoinConfig>("BTC");
-            var ltc = DesignTime.Currencies.Get<LitecoinConfig>("LTC");
+            var btc = DesignTime.TestNetCurrencies.Get<BitcoinConfig>("BTC");
+            var ltc = DesignTime.TestNetCurrencies.Get<LitecoinConfig>("LTC");
 
             var btcViewModel = CurrencyViewModelCreator.CreateViewModel(btc, subscribeToUpdates: false);
             var ltcViewModel = CurrencyViewModelCreator.CreateViewModel(ltc, subscribeToUpdates: false);
@@ -1166,7 +1166,7 @@ namespace Atomex.Client.Desktop.ViewModels
                         TimeStamp  = DateTime.UtcNow,
                         StateFlags = SwapStateFlags.IsRedeemConfirmed
                     },
-                    DesignTime.Currencies)!,
+                    DesignTime.TestNetCurrencies)!,
                 SwapViewModelFactory.CreateSwapViewModel(new Swap
                     {
                         Symbol    = "LTC/BTC",
@@ -1175,7 +1175,7 @@ namespace Atomex.Client.Desktop.ViewModels
                         Side      = Side.Sell,
                         TimeStamp = DateTime.UtcNow,
                     },
-                    DesignTime.Currencies)!,
+                    DesignTime.TestNetCurrencies)!,
                 SwapViewModelFactory.CreateSwapViewModel(new Swap
                     {
                         Symbol     = "XTZ/ETH",
@@ -1185,7 +1185,7 @@ namespace Atomex.Client.Desktop.ViewModels
                         TimeStamp  = DateTime.UtcNow,
                         StateFlags = SwapStateFlags.IsRefundConfirmed,
                     },
-                    DesignTime.Currencies)!,
+                    DesignTime.TestNetCurrencies)!,
                 SwapViewModelFactory.CreateSwapViewModel(new Swap
                     {
                         Symbol     = "XTZ/ETH",
@@ -1195,7 +1195,7 @@ namespace Atomex.Client.Desktop.ViewModels
                         TimeStamp  = DateTime.UtcNow,
                         StateFlags = SwapStateFlags.IsCanceled,
                     },
-                    DesignTime.Currencies)!,
+                    DesignTime.TestNetCurrencies)!,
                 SwapViewModelFactory.CreateSwapViewModel(new Swap
                     {
                         Symbol     = "XTZ/ETH",
@@ -1205,7 +1205,7 @@ namespace Atomex.Client.Desktop.ViewModels
                         TimeStamp  = DateTime.UtcNow,
                         StateFlags = SwapStateFlags.IsUnsettled,
                     },
-                    DesignTime.Currencies)!
+                    DesignTime.TestNetCurrencies)!
             };
 
             Swaps = new ObservableCollection<SwapViewModel>(swapViewModels);

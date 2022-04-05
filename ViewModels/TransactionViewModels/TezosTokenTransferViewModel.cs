@@ -1,7 +1,7 @@
 using System;
-using System.Diagnostics;
 using System.Windows.Input;
 
+using ReactiveUI;
 using Serilog;
 
 using Atomex.Blockchain.Abstract;
@@ -9,7 +9,6 @@ using Atomex.Blockchain.Tezos;
 using Atomex.Common;
 using Atomex.Client.Desktop.Common;
 using Atomex.ViewModels;
-using ReactiveUI;
 
 namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
 {
@@ -59,10 +58,9 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
 
         public TezosTokenTransferViewModel(TokenTransfer tx, TezosConfig tezosConfig)
         {
-            _tezosConfig = tezosConfig;
+            _tezosConfig = tezosConfig ?? throw new ArgumentNullException(nameof(tezosConfig));
 
             Transaction  = tx ?? throw new ArgumentNullException(nameof(tx));
-            Id           = tx.Hash;
             State        = Transaction.State;
             Type         = Transaction.Type;
             From         = tx.From;
@@ -78,31 +76,16 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
                 netAmount: Amount,
                 amountDigits: tx.Token.Decimals,
                 currencyCode: tx.Token.Symbol);
-            
-            if (!string.IsNullOrEmpty(tx.Alias))
-            {
-                Alias = tx.Alias;
-            }
-            else
-            {
-                if (Amount <= 0)
-                {
-                    Alias = tx.To;
-                }
 
-                if (Amount > 0)
-                {
-                    Alias = tx.From;
-                }
-            }
-            
             if (Amount <= 0)
             {
+                Alias = tx.To;
                 Direction = "To: ";
             }
 
             if (Amount > 0)
             {
+                Alias = tx.From;
                 Direction = "From: ";
             }
         }

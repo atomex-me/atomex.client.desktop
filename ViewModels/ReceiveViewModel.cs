@@ -128,7 +128,7 @@ namespace Atomex.Client.Desktop.ViewModels
 
         private void DesignerMode()
         {
-            Currency = DesignTime.Currencies.First();
+            Currency = DesignTime.TestNetCurrencies.First();
 
             SelectedAddress = new WalletAddressViewModel
             {
