@@ -153,6 +153,11 @@
                 <Style Selector="ListBoxItem:not(:selected) /template/ ContentPresenter">
                     <Setter Property="Background" Value="{DynamicResource AlmostTransparentBrush}" />
                 </Style>
+
+                <Style Selector="ListBoxItem:pointerover /template/ ContentPresenter">
+                    <Setter Property="Background" Value="{DynamicResource ListBoxItemPointeroverBrush}" />
+                    <Setter Property="CornerRadius" Value="8" />
+                </Style>
             </ListBox.Styles>
 
             <ListBox.ItemTemplate>

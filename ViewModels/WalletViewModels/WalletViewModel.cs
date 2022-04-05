@@ -40,6 +40,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         [Reactive] public ObservableCollection<TransactionViewModel> Transactions { get; set; }
         [Reactive] public CurrencyViewModel CurrencyViewModel { get; set; }
         [Reactive] public TransactionViewModel SelectedTransaction { get; set; }
+        [Reactive] public bool IsBalanceUpdating { get; set; }
         public AddressesViewModel AddressesViewModel { get; set; }
         protected Action<CurrencyConfig> SetConversionTab { get; }
         private Action<string> SetWertCurrency { get; }
@@ -71,18 +72,6 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         }
 
         public double CurrencyOpacityValue => _isSelected ? 1 : 0.4;
-
-        private bool _isBalanceUpdating;
-
-        public bool IsBalanceUpdating
-        {
-            get => _isBalanceUpdating;
-            set
-            {
-                _isBalanceUpdating = value;
-                OnPropertyChanged(nameof(IsBalanceUpdating));
-            }
-        }
 
         protected CancellationTokenSource _cancellation { get; set; }
 

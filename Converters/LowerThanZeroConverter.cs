@@ -1,23 +1,20 @@
-﻿using System;
+using System;
 using System.Globalization;
 using Avalonia.Data.Converters;
 
+
 namespace Atomex.Client.Desktop.Converters
 {
-    public class PercentConverter : IValueConverter
+    public class LowerThanZeroConverter : IValueConverter
     {
         #region IValueConverter Members
 
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value is decimal decimalValue && targetType == typeof(string))
-            {
-                var percentValue = decimalValue * 100;
+            if (value is decimal val)
+                return val < 0;
 
-                return percentValue != 0 ? $"{percentValue:F}%" : "0%";
-            }
-
-            return value;
+            return false;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

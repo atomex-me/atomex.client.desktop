@@ -23,6 +23,14 @@
     <Style Selector=":is(Control).BaseDisabledStyle[IsEnabled=False]">
         <Setter Property="Opacity" Value="0.5" />
     </Style>
+    
+    <Style Selector="TextBlock.Success">
+        <Setter Property="Foreground" Value="{DynamicResource SuccessForegroundBrush}" />
+    </Style>
+
+    <Style Selector="TextBlock.UnSuccess">
+        <Setter Property="Foreground" Value="{DynamicResource ErrorForegroundBrush}" />
+    </Style>
 
     <!-- todo: remove this -->
     <Style Selector="Border.FieldHeader">

@@ -7,31 +7,25 @@ using System.Threading.Tasks;
 using Serilog;
 using Avalonia.Threading;
 
-using Atomex.Client.Desktop.Common;
-using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
 using Atomex.Client.Desktop.ViewModels.TransactionViewModels;
 using Atomex.Common;
 using Atomex.Core;
 using Atomex.TezosTokens;
 using Atomex.Wallet.Tezos;
+using Avalonia.Controls;
+using ReactiveUI.Fody.Helpers;
 
 namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 {
     public class Fa12WalletViewModel : WalletViewModel
     {
-        private ObservableCollection<TezosTokenTransferViewModel> _transactions;
-        public ObservableCollection<TezosTokenTransferViewModel> Transactions
-        {
-            get => _transactions;
-            set { _transactions = value; OnPropertyChanged(nameof(Transactions)); }
-        }
-        
+        [Reactive] public ObservableCollection<TezosTokenTransferViewModel> Transactions { get; set; }
         public Fa12Config Currency => CurrencyViewModel.Currency as Fa12Config;
         
         public Fa12WalletViewModel()
         {
 #if DEBUG
-            if (Env.IsInDesignerMode())
+            if (Design.IsDesignMode)
                 DesignerMode();
 #endif
         }
@@ -138,6 +132,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
             App.DialogService.Show(addressesViewModel);
         }
+
 #if DEBUG
         protected virtual void DesignerMode()
         {

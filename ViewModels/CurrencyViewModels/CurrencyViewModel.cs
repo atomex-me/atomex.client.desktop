@@ -41,6 +41,7 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
         public string IconPath { get; set; }
         public string DisabledIconPath { get; set; }
         [Reactive] public decimal CurrentQuote { get; set; }
+        [Reactive] public decimal DailyChangePercent { get; set; }
         [Reactive] public decimal TotalAmount { get; set; }
         [Reactive] public decimal TotalAmountInBase { get; set; }
         [Reactive] public decimal AvailableAmount { get; set; }
@@ -128,10 +129,11 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
         {
             var quote = quotesProvider.GetQuote(CurrencyCode, BaseCurrencyCode);
 
-            TotalAmountInBase = TotalAmount.SafeMultiply(quote?.Bid ?? 0m);
-            AvailableAmountInBase = AvailableAmount.SafeMultiply(quote?.Bid ?? 0m);
-            UnconfirmedAmountInBase = UnconfirmedAmount.SafeMultiply(quote?.Bid ?? 0m);
-            CurrentQuote = quote?.Bid ?? 0m;
+            TotalAmountInBase = TotalAmount.SafeMultiply(quote?.Bid ?? 0);
+            AvailableAmountInBase = AvailableAmount.SafeMultiply(quote?.Bid ?? 0);
+            UnconfirmedAmountInBase = UnconfirmedAmount.SafeMultiply(quote?.Bid ?? 0);
+            CurrentQuote = quote?.Bid ?? 0;
+            DailyChangePercent = quote?.DailyChangePercent ?? 0;
 
             AmountUpdated?.Invoke(this, EventArgs.Empty);
         }

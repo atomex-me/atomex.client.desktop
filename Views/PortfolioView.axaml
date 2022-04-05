@@ -21,6 +21,8 @@
         <converters:PortfolioTooltipPositionYConverter x:Key="PortfolioTooltipPositionYConverter" />
         <converters:StringsEqualConverter x:Key="StringsEqualConverter" />
         <converters:ShowBuyButton x:Key="ShowBuyButton" />
+        <converters:PercentConverter x:Key="PercentConverter" />
+        <converters:LowerThanZeroConverter x:Key="LowerThanZeroConverter" />
     </UserControl.Resources>
 
     <Border Padding="50 16 50 0">
@@ -189,7 +191,7 @@
                                 <Setter Property="Path" Value="/Resources/Icons/settings-light.svg"></Setter>
                             </Style>
                         </Button.Styles>
-                        
+
                         <svg:Svg Width="22" />
                     </Button>
                 </Grid>
@@ -286,9 +288,10 @@
                                                 </TextBlock.Text>
                                             </TextBlock>
                                             <TextBlock VerticalAlignment="Center"
-                                                       Foreground="{DynamicResource SuccessForegroundBrush}"
                                                        FontSize="13"
-                                                       Text="+3.0%" />
+                                                       Text="{Binding DailyChangePercent, Converter={StaticResource PercentConverter}}"
+                                                       Classes="Success"
+                                                       Classes.UnSuccess="{Binding DailyChangePercent, Converter={StaticResource LowerThanZeroConverter}}" />
                                         </StackPanel>
                                         <StackPanel Grid.Column="1"
                                                     Orientation="Horizontal">

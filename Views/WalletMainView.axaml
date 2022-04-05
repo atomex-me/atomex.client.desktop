@@ -184,7 +184,7 @@
                     Command="{Binding SelectPortfolio}">
                     <TextBlock VerticalAlignment="Center"
                                Margin="32 16 0 16"
-                               Text="Portfolio" />
+                               Text="Wallets" />
                 </controls:MenuButton>
 
                 <controls:MenuButton
