@@ -17,6 +17,7 @@ using ReactiveUI;
 using Serilog;
 
 using Atomex.Blockchain.Tezos;
+using Atomex.Blockchain.Tezos.Tzkt;
 using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.ViewModels.Abstract;
 using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
@@ -736,7 +737,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         // }
 
 #if DEBUG
-        private void DesignerMode()
+        protected override void DesignerMode()
         {
             TokensContracts = new ObservableCollection<TezosTokenContractViewModel>
             {
@@ -745,10 +746,8 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                     Contract = new TokenContract
                     {
                         Address = "KT1K9gCRgaLRFKTErYt1wVxA3Frb9FjasjTV",
-                        Network = "mainnet",
                         Name = "kUSD",
-                        Description = "FA1.2 Implementation of kUSD",
-                        Interfaces = new List<string> { "TZIP-007-2021-01-29" }
+                        Type = "FA12"
                     }
                 },
                 new TezosTokenContractViewModel
@@ -756,10 +755,8 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                     Contract = new TokenContract
                     {
                         Address = "KT1PWx2mnDueood7fEmfbBDKx1D9BAnnXitn",
-                        Network = "mainnet",
                         Name = "tzBTC",
-                        Description = "Wrapped Bitcon",
-                        Interfaces = new List<string> { "TZIP-7", "TZIP-16", "TZIP-20" }
+                        Type = "FA12"
                     }
                 },
                 new TezosTokenContractViewModel
@@ -767,10 +764,8 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                     Contract = new TokenContract
                     {
                         Address = "KT1G1cCRNBgQ48mVDjopHjEmTN5Sbtar8nn9",
-                        Network = "mainnet",
                         Name = "Hedgehoge",
-                        Description = "such cute, much hedge!",
-                        Interfaces = new List<string> { "TZIP-007", "TZIP-016" }
+                        Type = "FA12"
                     }
                 },
                 new TezosTokenContractViewModel
@@ -778,30 +773,21 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                     Contract = new TokenContract
                     {
                         Address = "KT1RJ6PbjHpwc3M5rw5s2Nbmefwbuwbdxton",
-                        Network = "mainent",
                         Name = "hic et nunc NFTs",
-                        Description = "NFT token for digital assets.",
-                        Interfaces = new List<string> { "TZIP-12" }
+                        Type = "FA2"
                     }
                 }
             };
 
             _tokenContract = null; // TokensContracts.First();
 
-            var bcdApi = new BcdApi(new BcdApiSettings
-            {
-                MaxSize = 10,
-                MaxTokensSize = 50,
-                Network = "mainnet",
-                Uri = "https://api.better-call.dev/v1/"
-            });
+            var tezosConfig = DesignTime.MainNetCurrencies.Get<TezosConfig>("XTZ");
+            var tzktApi = new TzktApi(tezosConfig);
 
             var address = "tz1YS2CmS5o24bDz9XNr84DSczBXuq4oGHxr";
 
-            var tokensBalances = bcdApi
-                .GetTokenBalancesAsync(
-                    address: address,
-                    count: 36)
+            var tokensBalances = tzktApi
+                .GetTokenBalancesAsync(address)
                 .WaitForResult();
 
             Tokens = new ObservableCollection<TezosTokenViewModel>(
@@ -811,14 +797,12 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                     Address = address
                 }));
 
-            var transfers = bcdApi
-                .GetTokenTransfers(
+            var transfers = tzktApi
+                .GetTokenTransfersAsync(
                     address: address,
-                    contract: "KT1RJ6PbjHpwc3M5rw5s2Nbmefwbuwbdxton")
+                    contractAddress: "KT1RJ6PbjHpwc3M5rw5s2Nbmefwbuwbdxton")
                 .WaitForResult()
                 .Value;
-
-            var tezosConfig = DesignTime.Currencies.Get<TezosConfig>(TezosConfig.Xtz);
 
             Transfers = new ObservableCollection<TezosTokenTransferViewModel>(transfers
                 .Select(t => new TezosTokenTransferViewModel(t, tezosConfig)));

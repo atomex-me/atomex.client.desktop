@@ -356,37 +356,33 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
         protected virtual void DesignerMode()
         {
-            var currencies = DesignTime.Currencies.ToList();
+            var currencies = DesignTime.TestNetCurrencies.ToList();
 
             CurrencyViewModel = CurrencyViewModelCreator.CreateViewModel(currencies[3], subscribeToUpdates: false);
-            CurrencyViewModel.TotalAmount = 0.01012345m;
-            CurrencyViewModel.TotalAmountInBase = 16.51m;
-            CurrencyViewModel.AvailableAmount = 0.01010005m;
-            CurrencyViewModel.AvailableAmountInBase = 16.00m;
-            CurrencyViewModel.UnconfirmedAmount = 0.00002m;
+            CurrencyViewModel.TotalAmount             = 0.01012345m;
+            CurrencyViewModel.TotalAmountInBase       = 16.51m;
+            CurrencyViewModel.AvailableAmount         = 0.01010005m;
+            CurrencyViewModel.AvailableAmountInBase   = 16.00m;
+            CurrencyViewModel.UnconfirmedAmount       = 0.00002m;
             CurrencyViewModel.UnconfirmedAmountInBase = 0.5m;
 
             var transactions = new List<TransactionViewModel>
             {
-                new BitcoinBasedTransactionViewModel(
-                    new BitcoinBasedTransaction("BTC", Transaction.Create(Network.TestNet)),
-                    DesignTime.Currencies.Get<BitcoinConfig>("BTC"))
+                new BitcoinBasedTransactionViewModel(new BitcoinBasedTransaction("BTC", Transaction.Create(Network.TestNet)), DesignTime.TestNetCurrencies.Get<BitcoinConfig>("BTC"))
                 {
-                    Description = "Sent 0.00124 BTC",
-                    Amount = -0.00124m,
+                    Description  = "Sent 0.00124 BTC",
+                    Amount       = -0.00124m,
                     AmountFormat = CurrencyViewModel.CurrencyFormat,
                     CurrencyCode = CurrencyViewModel.CurrencyCode,
-                    Time = DateTime.Now,
+                    Time         = DateTime.Now,
                 },
-                new BitcoinBasedTransactionViewModel(
-                    new BitcoinBasedTransaction("BTC", Transaction.Create(Network.TestNet)),
-                    DesignTime.Currencies.Get<BitcoinConfig>("BTC"))
+                new BitcoinBasedTransactionViewModel(new BitcoinBasedTransaction("BTC", Transaction.Create(Network.TestNet)), DesignTime.TestNetCurrencies.Get<BitcoinConfig>("BTC"))
                 {
-                    Description = "Received 1.00666 BTC",
-                    Amount = 1.00666m,
+                    Description  = "Received 1.00666 BTC",
+                    Amount       = 1.00666m,
                     AmountFormat = CurrencyViewModel.CurrencyFormat,
                     CurrencyCode = CurrencyViewModel.CurrencyCode,
-                    Time = DateTime.Now,
+                    Time         = DateTime.Now,
                 }
             };
 

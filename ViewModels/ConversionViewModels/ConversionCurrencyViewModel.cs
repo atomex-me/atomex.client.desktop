@@ -63,7 +63,7 @@ namespace Atomex.Client.Desktop.ViewModels
         {
             UnselectedLabel   = "Choose From";
             CurrencyViewModel = CurrencyViewModelCreator.CreateViewModel(
-                currencyConfig: DesignTime.Currencies.Get<BitcoinConfig>("BTC"),
+                currencyConfig: DesignTime.TestNetCurrencies.Get<BitcoinConfig>("BTC"),
                 subscribeToUpdates: false);
             Address           = "13V2gzjUL9DiHZLy1WFk9q6pZ3yBsb4TzP".TruncateAddress();
             Amount            = 12.000516666m;

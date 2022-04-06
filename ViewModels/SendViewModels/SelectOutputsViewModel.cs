@@ -272,7 +272,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     spentTxPoint: null)
             };
 
-            var btcCurrencyConfig = DesignTime.Currencies
+            var btcCurrencyConfig = DesignTime.TestNetCurrencies
                 .Where(currency => currency.Name == "BTC")
                 .ToList()
                 .First();

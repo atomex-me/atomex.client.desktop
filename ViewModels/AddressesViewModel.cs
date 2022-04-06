@@ -323,7 +323,7 @@ namespace Atomex.Client.Desktop.ViewModels
 
         private void DesignerMode()
         {
-            _currency = DesignTime.Currencies.First();
+            _currency = DesignTime.TestNetCurrencies.First();
 
             Addresses = new ObservableCollection<AddressInfo>(
                 new List<AddressInfo>

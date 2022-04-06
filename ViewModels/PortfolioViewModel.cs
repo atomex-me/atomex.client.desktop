@@ -318,10 +318,10 @@ namespace Atomex.Client.Desktop.ViewModels
         private void DesignerMode()
         {
             var random = new Random();
-
+            
             PortfolioValue = 423394932.23m;
-
-            ChoosenCurrencies = DesignTime.Currencies
+            
+            ChoosenCurrencies = DesignTime.TestNetCurrencies
                 .Select(c =>
                 {
                     var vm = CurrencyViewModelCreator.CreateViewModel(c, subscribeToUpdates: false);

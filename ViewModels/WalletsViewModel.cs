@@ -77,7 +77,7 @@ namespace Atomex.Client.Desktop.ViewModels
 
         private void DesignerMode()
         {
-            var currencies = DesignTime.Currencies.ToList();
+            var currencies = DesignTime.TestNetCurrencies.ToList();
 
             Wallets = new ObservableCollection<IWalletViewModel>
             {
