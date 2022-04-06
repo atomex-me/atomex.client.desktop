@@ -88,9 +88,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
             if (currency != null)
                 CurrencyViewModel = CurrencyViewModelCreator.CreateViewModel(currency);
-
-            AddressesViewModel = new AddressesViewModel(_app, currency);
-
+            
             this.WhenAnyValue(vm => vm.Transactions)
                 .WhereNotNull()
                 .Take(1)
@@ -106,6 +104,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                 .SubscribeInMainThread(_ => { SortTransactions(); });
 
             SubscribeToServices();
+            LoadAddresses();
             _ = LoadTransactionsAsync();
         }
 
@@ -145,6 +144,11 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             {
                 Log.Error(e, "Account unconfirmed transaction added event handler error");
             }
+        }
+
+        protected virtual void LoadAddresses()
+        {
+            AddressesViewModel = new AddressesViewModel(_app, CurrencyViewModel.Currency);
         }
 
         protected void SortTransactions()

@@ -26,11 +26,12 @@ namespace Atomex.Client.Desktop.ViewModels
         ByBalance,
     }
 
-    public class AddressInfo : ViewModelBase
+    public class AddressViewModel : ViewModelBase
     {
         public string Address { get; set; }
         public string Type { get; set; }
         public string Path { get; set; }
+        public bool HasTokens { get; set; }
         public Action<string> CopyToClipboard { get; set; }
         public Action<string> OpenInExplorer { get; set; }
         public Action<string> ExportKey { get; set; }
@@ -73,10 +74,10 @@ namespace Atomex.Client.Desktop.ViewModels
         private const int MinimalUpdateTimeMs = 1000;
         private readonly IAtomexApp _app;
         private CurrencyConfig _currency;
-        private readonly string _tokenContract;
+        private readonly string? _tokenContract;
 
-        [Reactive] public ObservableCollection<AddressInfo> Addresses { get; set; }
-        [Reactive] public bool HasTokens { get; set; }
+        public bool HasTokens => _currency.Name == TezosConfig.Xtz && _tokenContract != null;
+        [Reactive] public ObservableCollection<AddressViewModel> Addresses { get; set; }
         [Reactive] public bool SortByPathAndAsc { get; set; }
         [Reactive] public bool SortByPathAndDesc { get; set; }
         [Reactive] public bool SortByBalanceAndAsc { get; set; }
@@ -176,18 +177,19 @@ namespace Atomex.Client.Desktop.ViewModels
                         throw new ArgumentOutOfRangeException();
                 }
 
-                Addresses = new ObservableCollection<AddressInfo>(
+                Addresses = new ObservableCollection<AddressViewModel>(
                     addresses.Select(a =>
                     {
                         var path = a.KeyType == CurrencyConfig.StandardKey && Currencies.IsTezosBased(_currency.Name)
                             ? $"m/44'/{_currency.Bip44Code}'/{a.KeyIndex.Account}'/{a.KeyIndex.Chain}'"
                             : $"m/44'/{_currency.Bip44Code}'/{a.KeyIndex.Account}'/{a.KeyIndex.Chain}/{a.KeyIndex.Index}";
 
-                        return new AddressInfo
+                        return new AddressViewModel
                         {
                             Address = a.Address,
                             Type = KeyTypeToString(a.KeyType),
                             Path = path,
+                            HasTokens = HasTokens,
                             Balance = $"{a.Balance.ToString(CultureInfo.InvariantCulture)} {_currency.Name}",
                             CopyToClipboard = address => App.Clipboard.SetTextAsync(address),
                             OpenInExplorer = OpenInExplorer,
@@ -197,10 +199,8 @@ namespace Atomex.Client.Desktop.ViewModels
                     }));
 
                 // token balances
-                if (_currency.Name == TezosConfig.Xtz && _tokenContract != null)
+                if (HasTokens)
                 {
-                    HasTokens = true;
-
                     var tezosAccount = account as TezosAccount;
 
                     var addressesWithTokens = (await tezosAccount
@@ -393,22 +393,22 @@ namespace Atomex.Client.Desktop.ViewModels
         {
             _currency = DesignTime.TestNetCurrencies.First();
 
-            Addresses = new ObservableCollection<AddressInfo>(
-                new List<AddressInfo>
+            Addresses = new ObservableCollection<AddressViewModel>(
+                new List<AddressViewModel>
                 {
-                    new AddressInfo
+                    new AddressViewModel
                     {
                         Address = "mzztP8VVJYxV93EUiiYrJUbL55MLx7KLoM",
                         Path = "m/44'/0'/0'/0/0",
                         Balance = 4.0000000.ToString(CultureInfo.InvariantCulture),
                     },
-                    new AddressInfo
+                    new AddressViewModel
                     {
                         Address = "mzztP8VVJYxV93EUiiYrJUbL55MLx7KLoM",
                         Path = "m/44'/0'/0'/0/0",
                         Balance = 100.ToString(CultureInfo.InvariantCulture),
                     },
-                    new AddressInfo
+                    new AddressViewModel
                     {
                         Address = "mzztP8VVJYxV93EUiiYrJUbL55MLx7KLoM",
                         Path = "m/44'/0'/0'/0/0",

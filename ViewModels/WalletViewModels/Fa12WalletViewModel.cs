@@ -8,12 +8,11 @@ using Serilog;
 using Avalonia.Threading;
 
 using Atomex.Client.Desktop.ViewModels.TransactionViewModels;
-using Atomex.Common;
 using Atomex.TezosTokens;
 using Atomex.Core;
 using Atomex.Wallet.Tezos;
 using Avalonia.Controls;
-using ReactiveUI.Fody.Helpers;
+
 
 namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 {
@@ -119,18 +118,16 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             IsBalanceUpdating = false;
         }
 
-        protected void OnAddressesClick()
+        protected override void LoadAddresses()
         {
             var tezosConfig = _app.Account
                 .Currencies
                 .Get<TezosConfig>(TezosConfig.Xtz);
 
-            var addressesViewModel = new AddressesViewModel(
+            AddressesViewModel = new AddressesViewModel(
                 app: _app,
                 currency: tezosConfig,
                 tokenContract: Currency.TokenContractAddress);
-
-            App.DialogService.Show(addressesViewModel);
         }
 
 #if DEBUG

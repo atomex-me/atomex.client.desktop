@@ -187,7 +187,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
             Delegations = new List<Delegation>()
             {
-                new Delegation
+                new()
                 {
                     Baker = new BakerData
                     {
@@ -196,7 +196,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                     Address = "tz1aqcYgG6NuViML5vdWhohHJBYxcDVLNUsE",
                     Balance = 1000.2123m
                 },
-                new Delegation
+                new()
                 {
                     Baker = new BakerData
                     {
@@ -205,7 +205,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                     Address = "tz1aqcYgG6NuViML5vdWhohHJBYxcDVLNUsE",
                     Balance = 1000.2123m
                 },
-                new Delegation
+                new()
                 {
                     Baker = new BakerData
                     {
@@ -214,7 +214,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                     Address = "tz1aqcYgG6NuViML5vdWhohHJBYxcDVLNUsE",
                     Balance = 1000.2123m
                 },
-                new Delegation
+                new()
                 {
                     Baker = new BakerData
                     {
@@ -223,7 +223,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                     Address = "tz1aqcYgG6NuViML5vdWhohHJBYxcDVLNUsE",
                     Balance = 1000.2123m
                 },
-                new Delegation
+                new()
                 {
                     Baker = new BakerData
                     {

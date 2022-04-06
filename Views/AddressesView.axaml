@@ -5,12 +5,13 @@
              mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="450"
              x:Class="Atomex.Client.Desktop.Views.AddressesView"
              xmlns:vm="clr-namespace:Atomex.Client.Desktop.ViewModels"
+             xmlns:views="clr-namespace:Atomex.Client.Desktop.Views"
              xmlns:svg="clr-namespace:Avalonia.Svg.Skia;assembly=Avalonia.Svg.Skia">
 
     <Design.DataContext>
         <vm:AddressesViewModel />
     </Design.DataContext>
-
+    
     <UserControl.Styles>
         <Style Selector="Viewbox.Refresh[IsEnabled=True]">
             <Style.Animations>
@@ -52,8 +53,10 @@
                 Height="34"
                 Margin="0 16 0 0"
                 Padding="12 0">
-            <Grid ColumnDefinitions="14*,4*,2*,4*,4*,1*,1*"
+            
+            <Grid Name="HeaderGrid"
                   VerticalAlignment="Stretch">
+
                 <Button Grid.Column="0"
                         Padding="0"
                         VerticalAlignment="Stretch"
@@ -171,6 +174,7 @@
         </Border>
 
         <ListBox Grid.Row="1"
+                 Name="AddressesListBox"
                  Background="{DynamicResource AlmostTransparentBrush}"
                  Items="{Binding Addresses}"
                  HorizontalAlignment="Stretch"
@@ -199,118 +203,7 @@
 
             <ListBox.ItemTemplate>
                 <DataTemplate>
-                    <Border Padding="12 0">
-                        <Grid ColumnDefinitions="14*,4*,2*,4*,4*,1*,1*"
-                              VerticalAlignment="Stretch">
-
-                            <StackPanel Grid.Column="0"
-                                        Orientation="Horizontal">
-                                <Button Classes="LinkButton Underlined SolidHover"
-                                        VerticalAlignment="Center"
-                                        FontSize="16"
-                                        Content="{Binding Address}"
-                                        Command="{Binding OpenInExplorerCommand}" />
-
-                                <Border ToolTip.Placement="AnchorAndGravity"
-                                        ToolTip.VerticalOffset="-32"
-                                        Margin="16 0 0 0">
-                                    <Button BorderThickness="0"
-                                            Width="22"
-                                            Height="22"
-                                            HorizontalAlignment="Center"
-                                            VerticalContentAlignment="Center"
-                                            Command="{Binding CopyCommand}"
-                                            Classes="ButtonWithIcon">
-                                        <Button.Styles>
-                                            <Style Selector="Button svg|Svg">
-                                                <Setter Property="Path" Value="/Resources/Icons/copy.svg"></Setter>
-                                            </Style>
-                                            <Style Selector="Button:pointerover svg|Svg">
-                                                <Setter Property="Path" Value="/Resources/Icons/copy-light.svg"></Setter>
-                                            </Style>
-                                        </Button.Styles>
-
-                                        <svg:Svg Width="20" />
-                                    </Button>
-                                    <ToolTip.Tip>
-                                        <TextBlock Text="Copy address to clipboard" />
-                                    </ToolTip.Tip>
-                                </Border>
-                            </StackPanel>
-
-                            <TextBlock Grid.Column="1"
-                                       Foreground="{DynamicResource SecondaryForegroundBrush}"
-                                       VerticalAlignment="Center"
-                                       FontSize="13"
-                                       Text="{Binding Path}" />
-
-                            <TextBlock Grid.Column="2"
-                                       Foreground="{DynamicResource SecondaryForegroundBrush}"
-                                       VerticalAlignment="Center"
-                                       FontSize="13"
-                                       Text="{Binding Type}" />
-
-                            <TextBlock Grid.Column="3"
-                                       Foreground="{DynamicResource SecondaryForegroundBrush}"
-                                       VerticalAlignment="Center"
-                                       FontSize="13"
-                                       Text="{Binding Balance}" />
-
-                            <Border ToolTip.Placement="AnchorAndGravity"
-                                    ToolTip.VerticalOffset="-32"
-                                    Grid.Column="5">
-                                <Button Width="22"
-                                        Height="22"
-                                        BorderThickness="0"
-                                        VerticalContentAlignment="Center"
-                                        HorizontalContentAlignment="Center"
-                                        Command="{Binding ExportKeyCommand}"
-                                        Classes="ButtonWithIcon">
-                                    <Button.Styles>
-                                        <Style Selector="Button svg|Svg">
-                                            <Setter Property="Path" Value="/Resources/Icons/key.svg"></Setter>
-                                        </Style>
-                                        <Style Selector="Button:pointerover svg|Svg">
-                                            <Setter Property="Path" Value="/Resources/Icons/key-light.svg"></Setter>
-                                        </Style>
-                                    </Button.Styles>
-
-                                    <svg:Svg Width="20" />
-                                </Button>
-                                <ToolTip.Tip>
-                                    <TextBlock Text="Export address private key" />
-                                </ToolTip.Tip>
-                            </Border>
-
-                            <Border ToolTip.Placement="AnchorAndGravity"
-                                    ToolTip.VerticalOffset="-32"
-                                    Grid.Column="6">
-                                <Button Width="22"
-                                        Height="22"
-                                        BorderThickness="0"
-                                        VerticalContentAlignment="Center"
-                                        HorizontalContentAlignment="Center"
-                                        Command="{Binding UpdateAddressCommand}"
-                                        Classes="ButtonWithIcon">
-                                    <Button.Styles>
-                                        <Style Selector="Button svg|Svg">
-                                            <Setter Property="Path" Value="/Resources/Icons/update.svg"></Setter>
-                                        </Style>
-                                        <Style Selector="Button:pointerover svg|Svg">
-                                            <Setter Property="Path" Value="/Resources/Icons/update-light.svg"></Setter>
-                                        </Style>
-                                    </Button.Styles>
-
-                                    <svg:Svg Width="20"
-                                             Classes.InProgress="{Binding IsUpdating}"
-                                             Classes.NotInProgress="{Binding !IsUpdating}" />
-                                </Button>
-                                <ToolTip.Tip>
-                                    <TextBlock Text="Update address" />
-                                </ToolTip.Tip>
-                            </Border>
-                        </Grid>
-                    </Border>
+                    <views:AddressView DataContext="{Binding}" />
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>
