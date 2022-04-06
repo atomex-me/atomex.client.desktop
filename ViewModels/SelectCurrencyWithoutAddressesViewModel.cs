@@ -40,7 +40,7 @@ namespace Atomex.Client.Desktop.ViewModels
             Type = SelectCurrencyType.From;
             var random = new Random();
 
-            var currencies = DesignTime.Currencies
+            var currencies = DesignTime.TestNetCurrencies
                 .Select(c =>
                 {
                     var vm = CurrencyViewModelCreator.CreateViewModel(c, subscribeToUpdates: false);

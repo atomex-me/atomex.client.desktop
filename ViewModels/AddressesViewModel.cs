@@ -9,6 +9,7 @@ using Serilog;
 using ReactiveUI;
 using Atomex.Blockchain.Tezos.Internal;
 using Atomex.Client.Desktop.Common;
+using Atomex.Client.Desktop.ViewModels.WalletViewModels;
 using Atomex.Common;
 using Atomex.Core;
 using Atomex.Cryptography;
@@ -19,6 +20,12 @@ using ReactiveUI.Fody.Helpers;
 
 namespace Atomex.Client.Desktop.ViewModels
 {
+    public enum AddressesSortField
+    {
+        ByPath,
+        ByBalance,
+    }
+
     public class AddressInfo : ViewModelBase
     {
         public string Address { get; set; }
@@ -63,13 +70,21 @@ namespace Atomex.Client.Desktop.ViewModels
     public class AddressesViewModel : ViewModelBase
     {
         private const int DefaultTokenPrecision = 9;
-        private const int MinimalUpdateTimeMs = 1500;
+        private const int MinimalUpdateTimeMs = 1000;
         private readonly IAtomexApp _app;
         private CurrencyConfig _currency;
         private readonly string _tokenContract;
 
         [Reactive] public ObservableCollection<AddressInfo> Addresses { get; set; }
         [Reactive] public bool HasTokens { get; set; }
+        [Reactive] public bool SortByPathAndAsc { get; set; }
+        [Reactive] public bool SortByPathAndDesc { get; set; }
+        [Reactive] public bool SortByBalanceAndAsc { get; set; }
+        [Reactive] public bool SortByBalanceAndDesc { get; set; }
+        [Reactive] public bool SortByPath { get; set; }
+        [Reactive] public bool SortByBalance { get; set; }
+        [Reactive] public AddressesSortField? CurrentSortField { get; set; }
+        [Reactive] public SortDirection? CurrentSortDirection { get; set; }
 
         public AddressesViewModel()
         {
@@ -88,7 +103,12 @@ namespace Atomex.Client.Desktop.ViewModels
             _currency = currency ?? throw new ArgumentNullException(nameof(currency));
             _tokenContract = tokenContract;
 
-            ReloadAddresses();
+            this.WhenAnyValue(vm => vm.CurrentSortField, vm => vm.CurrentSortDirection)
+                .WhereAllNotNull()
+                .SubscribeInMainThread(_ => { ReloadAddresses(); });
+
+            CurrentSortField = AddressesSortField.ByPath;
+            CurrentSortDirection = SortDirection.Asc;
         }
 
         private async void ReloadAddresses()
@@ -102,24 +122,59 @@ namespace Atomex.Client.Desktop.ViewModels
                         .GetAddressesAsync())
                     .ToList();
 
-                addresses.Sort((a1, a2) =>
+                switch (CurrentSortField)
                 {
-                    var typeResult = a1.KeyType.CompareTo(a2.KeyType);
+                    case AddressesSortField.ByPath when CurrentSortDirection == SortDirection.Desc:
+                        addresses.Sort((a2, a1) =>
+                        {
+                            var typeResult = a1.KeyType.CompareTo(a2.KeyType);
 
-                    if (typeResult != 0)
-                        return typeResult;
+                            if (typeResult != 0)
+                                return typeResult;
 
-                    var accountResult = a1.KeyIndex.Account.CompareTo(a2.KeyIndex.Account);
+                            var accountResult = a1.KeyIndex.Account.CompareTo(a2.KeyIndex.Account);
 
-                    if (accountResult != 0)
-                        return accountResult;
+                            if (accountResult != 0)
+                                return accountResult;
 
-                    var chainResult = a1.KeyIndex.Chain.CompareTo(a2.KeyIndex.Chain);
+                            var chainResult = a1.KeyIndex.Chain.CompareTo(a2.KeyIndex.Chain);
 
-                    return chainResult != 0
-                        ? chainResult
-                        : a1.KeyIndex.Index.CompareTo(a2.KeyIndex.Index);
-                });
+                            return chainResult != 0
+                                ? chainResult
+                                : a1.KeyIndex.Index.CompareTo(a2.KeyIndex.Index);
+                        });
+                        break;
+                    case AddressesSortField.ByPath when CurrentSortDirection == SortDirection.Asc:
+                        addresses.Sort((a1, a2) =>
+                        {
+                            var typeResult = a1.KeyType.CompareTo(a2.KeyType);
+
+                            if (typeResult != 0)
+                                return typeResult;
+
+                            var accountResult = a1.KeyIndex.Account.CompareTo(a2.KeyIndex.Account);
+
+                            if (accountResult != 0)
+                                return accountResult;
+
+                            var chainResult = a1.KeyIndex.Chain.CompareTo(a2.KeyIndex.Chain);
+
+                            return chainResult != 0
+                                ? chainResult
+                                : a1.KeyIndex.Index.CompareTo(a2.KeyIndex.Index);
+                        });
+                        break;
+                    case AddressesSortField.ByBalance when CurrentSortDirection == SortDirection.Desc:
+                        addresses = addresses.OrderByDescending(a => a.AvailableBalance()).ToList();
+                        break;
+
+                    case AddressesSortField.ByBalance when CurrentSortDirection == SortDirection.Asc:
+                        addresses = addresses.OrderBy(a => a.AvailableBalance()).ToList();
+                        break;
+
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
 
                 Addresses = new ObservableCollection<AddressInfo>(
                     addresses.Select(a =>
@@ -134,7 +189,7 @@ namespace Atomex.Client.Desktop.ViewModels
                             Type = KeyTypeToString(a.KeyType),
                             Path = path,
                             Balance = $"{a.Balance.ToString(CultureInfo.InvariantCulture)} {_currency.Name}",
-                            CopyToClipboard = CopyToClipboard,
+                            CopyToClipboard = address => App.Clipboard.SetTextAsync(address),
                             OpenInExplorer = OpenInExplorer,
                             UpdateAddress = UpdateAddress,
                             ExportKey = ExportKey
@@ -178,12 +233,37 @@ namespace Atomex.Client.Desktop.ViewModels
                         }
                     }
                 }
+
+                SortByPathAndAsc =
+                    CurrentSortField == AddressesSortField.ByPath && CurrentSortDirection == SortDirection.Asc;
+                SortByPathAndDesc =
+                    CurrentSortField == AddressesSortField.ByPath && CurrentSortDirection == SortDirection.Desc;
+                SortByBalanceAndAsc =
+                    CurrentSortField == AddressesSortField.ByBalance && CurrentSortDirection == SortDirection.Asc;
+                SortByBalanceAndDesc =
+                    CurrentSortField == AddressesSortField.ByBalance && CurrentSortDirection == SortDirection.Desc;
+
+                SortByPath = CurrentSortField == AddressesSortField.ByPath;
+                SortByBalance = CurrentSortField == AddressesSortField.ByBalance;
             }
             catch (Exception e)
             {
                 Log.Error(e, "Error while load addresses.");
             }
         }
+
+        private ReactiveCommand<AddressesSortField, Unit> _setSortTypeCommand;
+
+        public ReactiveCommand<AddressesSortField, Unit> SetSortTypeCommand =>
+            _setSortTypeCommand ??= ReactiveCommand.Create<AddressesSortField>(sortField =>
+            {
+                if (CurrentSortField != sortField)
+                    CurrentSortField = sortField;
+                else
+                    CurrentSortDirection = CurrentSortDirection == SortDirection.Asc
+                        ? SortDirection.Desc
+                        : SortDirection.Asc;
+            });
 
         private string KeyTypeToString(int keyType) =>
             keyType switch
@@ -192,18 +272,6 @@ namespace Atomex.Client.Desktop.ViewModels
                 TezosConfig.Bip32Ed25519Key => "Atomex",
                 _ => throw new NotSupportedException($"Key type {keyType} not supported.")
             };
-
-        private void CopyToClipboard(string address)
-        {
-            try
-            {
-                App.Clipboard.SetTextAsync(address);
-            }
-            catch (Exception e)
-            {
-                Log.Error(e, "Copy to clipboard error");
-            }
-        }
 
         private void OpenInExplorer(string address)
         {

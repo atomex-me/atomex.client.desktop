@@ -103,7 +103,6 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             this.WhenAnyValue(vm => vm.CurrentSortField, vm => vm.CurrentSortDirection)
                 .WhereAllNotNull()
                 .Where(_ => Transactions != null)
-                .Throttle(TimeSpan.FromMilliseconds(1))
                 .SubscribeInMainThread(_ => { SortTransactions(); });
 
             SubscribeToServices();
@@ -148,30 +147,30 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             }
         }
 
-        public void SortTransactions()
+        protected void SortTransactions()
         {
             Transactions = CurrentSortField switch
             {
                 TxSortField.ByTime when CurrentSortDirection == SortDirection.Desc
                     => new ObservableCollection<ITransactionViewModel>(
-                        Transactions!.OrderByDescending(tx => tx.LocalTime)),
+                        Transactions.OrderByDescending(tx => tx.LocalTime)),
                 TxSortField.ByTime when CurrentSortDirection == SortDirection.Asc
                     => new ObservableCollection<ITransactionViewModel>(
-                        Transactions!.OrderBy(tx => tx.LocalTime)),
+                        Transactions.OrderBy(tx => tx.LocalTime)),
 
                 TxSortField.ByAmount when CurrentSortDirection == SortDirection.Desc
                     => new ObservableCollection<ITransactionViewModel>(
-                        Transactions!.OrderByDescending(tx => tx.Amount)),
+                        Transactions.OrderByDescending(tx => tx.Amount)),
                 TxSortField.ByAmount when CurrentSortDirection == SortDirection.Asc
                     => new ObservableCollection<ITransactionViewModel>(
-                        Transactions!.OrderBy(tx => tx.Amount)),
+                        Transactions.OrderBy(tx => tx.Amount)),
 
                 TxSortField.ByStatus when CurrentSortDirection == SortDirection.Desc
                     => new ObservableCollection<ITransactionViewModel>(
-                        Transactions!.OrderByDescending(tx => tx.State)),
+                        Transactions.OrderByDescending(tx => tx.State)),
                 TxSortField.ByStatus when CurrentSortDirection == SortDirection.Asc
                     => new ObservableCollection<ITransactionViewModel>(
-                        Transactions!.OrderBy(tx => tx.State)),
+                        Transactions.OrderBy(tx => tx.State)),
                 _ => Transactions
             };
 
@@ -244,9 +243,6 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
         private ICommand _updateCommand;
         public ICommand UpdateCommand => _updateCommand ??= ReactiveCommand.Create(OnUpdateClick);
-
-        private ICommand _addressesCommand;
-        public ICommand AddressesCommand => _addressesCommand ??= ReactiveCommand.Create(OnAddressesClick);
 
         private ICommand _cancelUpdateCommand;
 
@@ -323,11 +319,6 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             IsBalanceUpdating = false;
         }
 
-        protected virtual void OnAddressesClick()
-        {
-            App.DialogService.Show(new AddressesViewModel(_app, Currency));
-        }
-
         private void UpdateTransactonEventHandler(object sender, TransactionEventArgs args)
         {
             // todo:
@@ -389,58 +380,5 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             Transactions = new ObservableCollection<ITransactionViewModel>(
                 transactions.SortList((t1, t2) => t2.Time.CompareTo(t1.Time)));
         }
-
-        // protected virtual void SortTransactions(string columnName, SortDirection sortDirection)
-        // {
-        //     // DGSelectedIndex = -1;
-        //
-        //     if (columnName.ToLower() == "time" && sortDirection == SortDirection.Asc)
-        //     {
-        //         Transactions = new ObservableCollection<TransactionViewModel>(
-        //             Transactions.OrderBy(tx => tx.LocalTime));
-        //     }
-        //
-        //     if (columnName.ToLower() == "time" && sortDirection == SortDirection.Desc)
-        //     {
-        //         Transactions = new ObservableCollection<TransactionViewModel>(
-        //             Transactions.OrderByDescending(tx => tx.LocalTime));
-        //     }
-        //
-        //     if (columnName.ToLower() == "amount" && sortDirection == SortDirection.Asc)
-        //     {
-        //         Transactions = new ObservableCollection<TransactionViewModel>(
-        //             Transactions.OrderBy(tx => tx.Amount));
-        //     }
-        //
-        //     if (columnName.ToLower() == "amount" && sortDirection == SortDirection.Desc)
-        //     {
-        //         Transactions = new ObservableCollection<TransactionViewModel>(
-        //             Transactions.OrderByDescending(tx => tx.Amount));
-        //     }
-        //
-        //     if (columnName.ToLower() == "state" && sortDirection == SortDirection.Asc)
-        //     {
-        //         Transactions = new ObservableCollection<TransactionViewModel>(
-        //             Transactions.OrderBy(tx => tx.State));
-        //     }
-        //
-        //     if (columnName.ToLower() == "state" && sortDirection == SortDirection.Desc)
-        //     {
-        //         Transactions = new ObservableCollection<TransactionViewModel>(
-        //             Transactions.OrderByDescending(tx => tx.State));
-        //     }
-        //
-        //     if (columnName.ToLower() == "type" && sortDirection == SortDirection.Asc)
-        //     {
-        //         Transactions = new ObservableCollection<TransactionViewModel>(
-        //             Transactions.OrderBy(tx => tx.Type));
-        //     }
-        //
-        //     if (columnName.ToLower() == "type" && sortDirection == SortDirection.Desc)
-        //     {
-        //         Transactions = new ObservableCollection<TransactionViewModel>(
-        //             Transactions.OrderByDescending(tx => tx.Type));
-        //     }
-        // }
     }
 }

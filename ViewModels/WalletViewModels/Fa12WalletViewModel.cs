@@ -119,7 +119,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             IsBalanceUpdating = false;
         }
 
-        protected override void OnAddressesClick()
+        protected void OnAddressesClick()
         {
             var tezosConfig = _app.Account
                 .Currencies

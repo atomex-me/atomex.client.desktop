@@ -58,28 +58,47 @@
                         Padding="0"
                         VerticalAlignment="Stretch"
                         VerticalContentAlignment="Center"
+                        IsEnabled="False"
                         Classes="EmptyBtnWithContent">
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
-                                   FontSize="13"
-                                   Text="Address" />
-                    </StackPanel>
+                    <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
+                               FontSize="13"
+                               Text="Address" />
                 </Button>
                 <Button Grid.Column="1"
                         Padding="0"
                         VerticalAlignment="Stretch"
                         VerticalContentAlignment="Center"
+                        Command="{Binding SetSortTypeCommand}"
+                        CommandParameter="{x:Static vm:AddressesSortField.ByPath}"
                         Classes="EmptyBtnWithContent">
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
                                    FontSize="13"
+                                   VerticalAlignment="Center"
                                    Text="Path" />
+                        <StackPanel Orientation="Vertical"
+                                    VerticalAlignment="Center"
+                                    Margin="5 0 0 0">
+                            <svg:Svg Width="14"
+                                     Height="14"
+                                     IsVisible="{Binding !SortByPath}"
+                                     Path="/Resources/Icons/arrow-double.svg" />
+                            <svg:Svg Width="14"
+                                     Height="14"
+                                     IsVisible="{Binding SortByPathAndAsc}"
+                                     Path="/Resources/Icons/arrow-double-asc.svg" />
+                            <svg:Svg Width="14"
+                                     Height="14"
+                                     IsVisible="{Binding SortByPathAndDesc}"
+                                     Path="/Resources/Icons/arrow-double-desc.svg" />
+                        </StackPanel>
                     </StackPanel>
                 </Button>
                 <Button Grid.Column="2"
                         Padding="0"
                         VerticalAlignment="Stretch"
                         VerticalContentAlignment="Center"
+                        IsEnabled="False"
                         Classes="EmptyBtnWithContent">
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
@@ -91,23 +110,41 @@
                         Padding="0"
                         VerticalAlignment="Stretch"
                         VerticalContentAlignment="Center"
+                        Command="{Binding SetSortTypeCommand}"
+                        CommandParameter="{x:Static vm:AddressesSortField.ByBalance}"
                         Classes="EmptyBtnWithContent">
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
                                    FontSize="13"
+                                   VerticalAlignment="Center"
                                    Text="Balance" />
+                        <StackPanel Orientation="Vertical"
+                                    VerticalAlignment="Center"
+                                    Margin="5 0 0 0">
+                            <svg:Svg Width="14"
+                                     Height="14"
+                                     IsVisible="{Binding !SortByBalance}"
+                                     Path="/Resources/Icons/arrow-double.svg" />
+                            <svg:Svg Width="14"
+                                     Height="14"
+                                     IsVisible="{Binding SortByBalanceAndAsc}"
+                                     Path="/Resources/Icons/arrow-double-asc.svg" />
+                            <svg:Svg Width="14"
+                                     Height="14"
+                                     IsVisible="{Binding SortByBalanceAndDesc}"
+                                     Path="/Resources/Icons/arrow-double-desc.svg" />
+                        </StackPanel>
                     </StackPanel>
                 </Button>
                 <Button Grid.Column="4"
                         Padding="0"
                         VerticalAlignment="Stretch"
                         VerticalContentAlignment="Center"
+                        IsEnabled="False"
                         Classes="EmptyBtnWithContent">
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
-                                   FontSize="13"
-                                   Text="Token balance" />
-                    </StackPanel>
+                    <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
+                               FontSize="13"
+                               Text="Token balance" />
                 </Button>
                 <Button Grid.Column="5"
                         Padding="0"
