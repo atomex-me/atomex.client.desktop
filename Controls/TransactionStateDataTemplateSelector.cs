@@ -40,7 +40,7 @@ namespace Atomex.Client.Desktop.Controls
 
         public bool Match(object data)
         {
-            return data is TransactionViewModel;
+            return data is ITransactionViewModel;
         }
     }
 }

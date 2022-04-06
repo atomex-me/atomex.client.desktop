@@ -138,8 +138,8 @@
                         Padding="4 5"
                         Margin="8 0 12 0"
                         Command="{Binding ChangeSortDirectionCommand}"
-                        Classes.Rotated="{Binding SortIsAscending}"
-                        Classes.NotRotated="{Binding !SortIsAscending}"
+                        Classes.Rotated="{Binding !SortIsAscending}"
+                        Classes.NotRotated="{Binding SortIsAscending}"
                         Classes="SecondaryButton Sort">
                     <svg:Svg HorizontalAlignment="Center"
                              Width="16"

@@ -9,8 +9,8 @@ using Avalonia.Threading;
 
 using Atomex.Client.Desktop.ViewModels.TransactionViewModels;
 using Atomex.Common;
-using Atomex.Core;
 using Atomex.TezosTokens;
+using Atomex.Core;
 using Atomex.Wallet.Tezos;
 using Avalonia.Controls;
 using ReactiveUI.Fody.Helpers;
@@ -19,7 +19,6 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 {
     public class Fa12WalletViewModel : WalletViewModel
     {
-        [Reactive] public ObservableCollection<TezosTokenTransferViewModel> Transactions { get; set; }
         public Fa12Config Currency => CurrencyViewModel.Currency as Fa12Config;
         
         public Fa12WalletViewModel()
@@ -61,10 +60,11 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
                 await Dispatcher.UIThread.InvokeAsync(() =>
                 {
-                    Transactions = new ObservableCollection<TezosTokenTransferViewModel>(
+                    Transactions = new ObservableCollection<ITransactionViewModel>(
                         transactions.Select(t => new TezosTokenTransferViewModel(t, Currency))
-                            .ToList()
-                            .SortList((t1, t2) => t2.Time.CompareTo(t1.Time)));
+                            .ToList());
+
+                    SortTransactions();
                 },
                 DispatcherPriority.Background);
             }
