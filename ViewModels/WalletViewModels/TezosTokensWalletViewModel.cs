@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Globalization;
@@ -37,7 +36,6 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
     {
         private bool _isPreviewDownloading = false;
         public TezosConfig TezosConfig { get; set; }
-
         public TokenBalance TokenBalance { get; set; }
         public string Address { get; set; }
 
@@ -59,7 +57,16 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                 if (_isPreviewDownloading)
                     return null;
 
-                foreach (var url in GetTokenPreviewUrls())
+                var thumbsApiSettings = new ThumbsApiSettings
+                {
+                    ThumbsApiUri   = TezosConfig.ThumbsApiUri,
+                    IpfsGatewayUri = TezosConfig.IpfsGatewayUri,
+                    CatavaApiUri   = TezosConfig.CatavaApiUri
+                };
+
+                var thumbsApi = new ThumbsApi(thumbsApiSettings);
+
+                foreach (var url in thumbsApi.GetTokenPreviewUrls(TokenBalance.Contract, TokenBalance.ThumbnailUri, TokenBalance.DisplayUri))
                 {
                     if (!App.ImageService.GetImageLoaded(url))
                     {
@@ -105,30 +112,11 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                 Log.Error("Invalid uri for ipfs asset");
         });
 
-        public bool IsIpfsAsset => TokenBalance.ArtifactUri != null && HasIpfsPrefix(TokenBalance.ArtifactUri);
+        public bool IsIpfsAsset => TokenBalance.ArtifactUri != null && ThumbsApi.HasIpfsPrefix(TokenBalance.ArtifactUri);
 
-        public string AssetUrl => IsIpfsAsset
-            ? $"http://ipfs.io/ipfs/{RemoveIpfsPrefix(TokenBalance.ArtifactUri)}"
+        public string? AssetUrl => IsIpfsAsset
+            ? $"http://ipfs.io/ipfs/{ThumbsApi.RemoveIpfsPrefix(TokenBalance.ArtifactUri)}"
             : null;
-
-        public IEnumerable<string> GetTokenPreviewUrls()
-        {
-            yield return $"https://d38roug276qjor.cloudfront.net/{TokenBalance.Contract}/{TokenBalance.TokenId}.png";
-
-            if (TokenBalance.ArtifactUri != null && HasIpfsPrefix(TokenBalance.ArtifactUri))
-                yield return $"https://api.dipdup.net/thumbnail/{RemoveIpfsPrefix(TokenBalance.ArtifactUri)}";
-
-            yield return $"https://services.tzkt.io/v1/avatars/{TokenBalance.Contract}";
-        }
-
-        public static string RemovePrefix(string s, string prefix) =>
-            s.StartsWith(prefix) ? s.Substring(prefix.Length) : s;
-
-        public static string RemoveIpfsPrefix(string url) =>
-            RemovePrefix(url, "ipfs://");
-
-        public static bool HasIpfsPrefix(string url) =>
-            url?.StartsWith("ipfs://") ?? false;
 
         public Action<TezosTokenViewModel> SendCallback;
 
@@ -277,8 +265,8 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         public ObservableCollection<TezosTokenViewModel> Tokens { get; set; }
         public ObservableCollection<TezosTokenTransferViewModel> Transfers { get; set; }
 
-        private TezosTokenContractViewModel _tokenContract;
-        public TezosTokenContractViewModel TokenContract
+        private TezosTokenContractViewModel? _tokenContract;
+        public TezosTokenContractViewModel? TokenContract
         {
             get => _tokenContract;
             set
@@ -302,11 +290,11 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         public bool IsFa2 => TokenContract?.IsFa2 ?? false;
         public string TokenContractAddress => TokenContract?.Contract?.Address ?? "";
         public string TokenContractName => TokenContract?.Name ?? "";
-        public string TokenContractIconUrl => TokenContract?.IconUrl;
+        public string? TokenContractIconUrl => TokenContract?.IconUrl;
 
         private bool _isPreviewDownloading;
 
-        public IBitmap TokenContractIconPreview
+        public IBitmap? TokenContractIconPreview
         {
             get
             {
@@ -455,7 +443,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             }
         }
 
-        private async void TokenContractChanged(TezosTokenContractViewModel tokenContract)
+        private async void TokenContractChanged(TezosTokenContractViewModel? tokenContract)
         {
             if (tokenContract == null)
             {
