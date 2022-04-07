@@ -7,6 +7,7 @@
              xmlns:vm="clr-namespace:Atomex.Client.Desktop.ViewModels.TransactionViewModels"
              xmlns:converters="clr-namespace:Atomex.Client.Desktop.Converters"
              xmlns:controls="clr-namespace:Atomex.Client.Desktop.Controls">
+
     <Design.DataContext>
         <vm:TezosTransactionViewModel />
     </Design.DataContext>
@@ -16,17 +17,7 @@
     </UserControl.Resources>
 
     <Grid Background="{DynamicResource TransactionDetailsBackgroundBrush}">
-        <Grid Margin="10">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition />
-            </Grid.ColumnDefinitions>
-
-            <Grid.RowDefinitions>
-                <RowDefinition Height="22" />
-                <RowDefinition Height="22" />
-                <RowDefinition Height="22" />
-            </Grid.RowDefinitions>
+        <Grid Margin="10" ColumnDefinitions="Auto,*" RowDefinitions="22,22,22">
 
             <TextBlock Text="Time Stamp:"
                        FontFamily="{DynamicResource DefaultFontFamily}"

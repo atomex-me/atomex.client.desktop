@@ -185,7 +185,7 @@ namespace Atomex.Client.Desktop.ViewModels
             {
                 SetWalletCurrency?.Invoke(currencyViewModel.Currency.Description);
             }));
-        
+
         private ReactiveCommand<CurrencyViewModel, Unit> _setWertCurrencyCommand;
 
         public ReactiveCommand<CurrencyViewModel, Unit> SetWertCurrencyCommand => _setWertCurrencyCommand ??=
@@ -318,9 +318,9 @@ namespace Atomex.Client.Desktop.ViewModels
         private void DesignerMode()
         {
             var random = new Random();
-            
+
             PortfolioValue = 423394932.23m;
-            
+
             ChoosenCurrencies = DesignTime.TestNetCurrencies
                 .Select(c =>
                 {

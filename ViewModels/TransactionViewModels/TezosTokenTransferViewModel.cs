@@ -77,17 +77,8 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
                 amountDigits: tx.Token.Decimals,
                 currencyCode: tx.Token.Symbol);
 
-            if (Amount <= 0)
-            {
-                Alias = tx.To;
-                Direction = "To: ";
-            }
-
-            if (Amount > 0)
-            {
-                Alias = tx.From;
-                Direction = "From: ";
-            }
+            Alias = tx.GetAlias();
+            Direction = Amount <= 0 ? "To: ": "From: ";
         }
 
         private ICommand _openTxInExplorerCommand;
