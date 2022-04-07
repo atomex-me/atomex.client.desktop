@@ -5,23 +5,47 @@
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="Atomex.Client.Desktop.Views.AddressView"
              xmlns:vm="clr-namespace:Atomex.Client.Desktop.ViewModels"
+             xmlns:converters="clr-namespace:Atomex.Client.Desktop.Converters"
              xmlns:svg="clr-namespace:Avalonia.Svg.Skia;assembly=Avalonia.Svg.Skia">
-    
+
     <Design.DataContext>
         <vm:AddressViewModel />
     </Design.DataContext>
 
+    <UserControl.Resources>
+        <converters:AddressShouldShrinkConverter x:Key="AddressShouldShrinkConverter" />
+        <converters:AddressShouldExpandConverter x:Key="AddressShouldExpandConverter" />
+    </UserControl.Resources>
+
     <Border Padding="12 0">
         <Grid Name="AddressItemGrid"
+              ColumnDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto"
               VerticalAlignment="Stretch">
 
             <StackPanel Grid.Column="0"
                         Orientation="Horizontal">
+
                 <Button Classes="LinkButton Underlined SolidHover"
                         VerticalAlignment="Center"
                         FontSize="16"
+                        IsVisible="{Binding $parent[Border].Bounds.Width,
+                        Converter={StaticResource AddressShouldExpandConverter}}"
                         Content="{Binding Address}"
                         Command="{Binding OpenInExplorerCommand}" />
+
+                <Button Classes="LinkButton Underlined SolidHover"
+                        ToolTip.Placement="AnchorAndGravity"
+                        ToolTip.VerticalOffset="-32"
+                        VerticalAlignment="Center"
+                        FontSize="16"
+                        IsVisible="{Binding $parent[Border].Bounds.Width,
+                        Converter={StaticResource AddressShouldShrinkConverter}}"
+                        Content="{Binding ShortenedAddress}"
+                        Command="{Binding OpenInExplorerCommand}">
+                    <ToolTip.Tip>
+                        <TextBlock Text="{Binding Address}" />
+                    </ToolTip.Tip>
+                </Button>
 
                 <Border ToolTip.Placement="AnchorAndGravity"
                         ToolTip.VerticalOffset="-32"

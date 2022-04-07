@@ -2,12 +2,12 @@
 {
     public static class AddressExtensions
     {
-        public static string TruncateAddress(this string address)
+        public static string TruncateAddress(this string address, int leftLength = 4, int rightLength = 5)
         {
             if (string.IsNullOrEmpty(address) || address.Length < 9)
                 return address;
 
-            return $"{address[..4]}···{address[^5..]}";
+            return $"{address[..leftLength]}···{address[^rightLength..]}";
         }
     }
 }

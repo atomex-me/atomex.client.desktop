@@ -55,6 +55,7 @@
                 Padding="12 0">
             
             <Grid Name="HeaderGrid"
+                  ColumnDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto"
                   VerticalAlignment="Stretch">
 
                 <Button Grid.Column="0"

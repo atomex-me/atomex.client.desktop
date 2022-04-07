@@ -5,14 +5,16 @@ using Avalonia.Data.Converters;
 
 namespace Atomex.Client.Desktop.Converters
 {
-    public class LowerThanZeroConverter : IValueConverter
+    public class AddressShouldShrinkConverter : IValueConverter
     {
         #region IValueConverter Members
 
+        public const int AddressViewWidthToChange = 960;
+
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value is decimal val)
-                return val < 0;
+            if (value is double val)
+                return val < AddressViewWidthToChange;
 
             return false;
         }

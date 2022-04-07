@@ -29,6 +29,7 @@ namespace Atomex.Client.Desktop.ViewModels
     public class AddressViewModel : ViewModelBase
     {
         public string Address { get; set; }
+        public string ShortenedAddress => Address?.TruncateAddress(15, 12);
         public string Type { get; set; }
         public string Path { get; set; }
         public bool HasTokens { get; set; }

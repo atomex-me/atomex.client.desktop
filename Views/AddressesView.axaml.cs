@@ -7,8 +7,8 @@ namespace Atomex.Client.Desktop.Views
 {
     public class AddressesView : UserControl
     {
-        public static ColumnDefinitions WithoutTokensColumns => new("13.2*,4*,2*,4*,0,1*,1.8*");
-        public static ColumnDefinitions WithTokensColumns => new("13.2*,4*,2*,4*,4*,1*,1.8*");
+        public static ColumnDefinitions WithoutTokensColumns => new("12.6*,4.3*,2.3*,4*,0,1*,1.8*");
+        public static ColumnDefinitions WithTokensColumns => new("12.6*,4.3*,2.3*,4*,4*,1*,1.8*");
 
         public AddressesView()
         {

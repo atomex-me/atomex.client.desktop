@@ -218,7 +218,7 @@
                             Height="34"
                             Margin="0 16 0 0"
                             Padding="12 0">
-                        <Grid ColumnDefinitions="8*,4*,3*,5*"
+                        <Grid ColumnDefinitions="7*,5.5*,3*,4.5*"
                               VerticalAlignment="Stretch">
                             <Button Grid.Column="0"
                                     Padding="0"
@@ -352,7 +352,7 @@
                         <ListBox.ItemTemplate>
                             <DataTemplate>
                                 <Border Padding="12 0">
-                                    <Grid ColumnDefinitions="8*,4*,3*,5*"
+                                    <Grid ColumnDefinitions="7*,5.5*,3*,4.5*"
                                           VerticalAlignment="Stretch">
                                         <TextBlock Grid.Column="0"
                                                    Foreground="{DynamicResource DefaultForegroundBrush}"
