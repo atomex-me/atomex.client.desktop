@@ -13,6 +13,7 @@ using Atomex.Client.Desktop.ViewModels.WalletViewModels;
 using Atomex.Common;
 using Atomex.Core;
 using Atomex.Cryptography;
+using Atomex.ViewModels;
 using Atomex.Wallet;
 using Atomex.Wallet.Tezos;
 using Avalonia.Controls;
@@ -111,9 +112,11 @@ namespace Atomex.Client.Desktop.ViewModels
 
             CurrentSortField = AddressesSortField.ByPath;
             CurrentSortDirection = SortDirection.Asc;
+
+            SubscribeToServices();
         }
 
-        private async void ReloadAddresses()
+        private async Task ReloadAddresses()
         {
             try
             {
@@ -265,6 +268,26 @@ namespace Atomex.Client.Desktop.ViewModels
                         ? SortDirection.Desc
                         : SortDirection.Asc;
             });
+        
+        private void SubscribeToServices()
+        {
+            _app.Account.BalanceUpdated += OnBalanceUpdatedEventHandler;
+        }
+
+        private async void OnBalanceUpdatedEventHandler(object? sender, CurrencyEventArgs args)
+        {
+            try
+            {
+                if (_currency.Name != args.Currency) return;
+
+                // reload addresses list
+                await ReloadAddresses();
+            }
+            catch (Exception e)
+            {
+                Log.Error(e, "Reload addresses event handler error");
+            }
+        }
 
         private string KeyTypeToString(int keyType) =>
             keyType switch

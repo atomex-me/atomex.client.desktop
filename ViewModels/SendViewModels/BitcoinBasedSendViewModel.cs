@@ -18,6 +18,7 @@ using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.Properties;
 using Atomex.Common;
 using Atomex.Core;
+using Atomex.ViewModels;
 using Atomex.Wallet.BitcoinBased;
 
 namespace Atomex.Client.Desktop.ViewModels.SendViewModels

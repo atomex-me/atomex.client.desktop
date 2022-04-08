@@ -332,6 +332,7 @@
                         </Grid>
                     </Border>
 
+
                     <ListBox Grid.Row="1"
                              Background="{DynamicResource AlmostTransparentBrush}"
                              Items="{Binding Transactions}"
@@ -342,7 +343,7 @@
                         <ListBox.Styles>
                             <Style Selector="ListBoxItem">
                                 <Setter Property="Padding" Value="0" />
-                                <Setter Property="Height" Value="48" />
+                                <Setter Property="Height" Value="62" />
                                 <Setter Property="VerticalContentAlignment" Value="Stretch" />
                                 <Setter Property="HorizontalContentAlignment" Value="Stretch" />
                                 <Setter Property="Cursor" Value="Hand" />
@@ -363,11 +364,14 @@
                                 <Border Padding="12 0">
                                     <Grid ColumnDefinitions="7*,5.5*,3*,4.5*"
                                           VerticalAlignment="Stretch">
-                                        <TextBlock Grid.Column="0"
-                                                   Foreground="{DynamicResource DefaultForegroundBrush}"
-                                                   VerticalAlignment="Center"
-                                                   FontSize="16"
-                                                   Text="{Binding Description}" />
+
+                                        <ContentControl Grid.Column="0"
+                                                        VerticalAlignment="Center"
+                                                        Content="{Binding}">
+                                            <ContentControl.ContentTemplate>
+                                                <controls:TransactionDescriptionDataTemplateSelector />
+                                            </ContentControl.ContentTemplate>
+                                        </ContentControl>
 
                                         <StackPanel Grid.Column="1"
                                                     Orientation="Horizontal">

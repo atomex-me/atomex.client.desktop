@@ -4,6 +4,7 @@ using Atomex.Blockchain.Abstract;
 using Atomex.Blockchain.Ethereum;
 using Atomex.Client.Desktop.Common;
 using Atomex.EthereumTokens;
+using Atomex.ViewModels;
 
 namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
 {
@@ -38,16 +39,12 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
             GasLimit   = (decimal)tx.GasLimit;
             GasUsed    = (decimal)tx.GasUsed;
             IsInternal = tx.IsInternal;
-            
-            if (Amount <= 0)
-            {
-                Alias = tx.To;
-            }
 
-            if (Amount > 0)
+            Alias = Amount switch
             {
-                Alias = tx.From;
-            }
+                <= 0 => tx.To.TruncateAddress(),
+                > 0 => tx.From.TruncateAddress()
+            };
         }
 
         public static decimal GetAmount(

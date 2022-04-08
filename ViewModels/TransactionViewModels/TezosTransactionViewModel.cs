@@ -3,6 +3,7 @@
 using Atomex.Blockchain.Abstract;
 using Atomex.Blockchain.Tezos;
 using Atomex.Client.Desktop.Common;
+using Atomex.ViewModels;
 
 namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
 {
@@ -39,15 +40,11 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
             }
             else
             {
-                if (Amount <= 0)
+                Alias = Amount switch
                 {
-                    Alias = tx.To;
-                }
-
-                if (Amount > 0)
-                {
-                    Alias = tx.From;
-                }
+                    <= 0 => tx.To.TruncateAddress(),
+                    > 0 => tx.From.TruncateAddress()
+                };
             }
         }
 

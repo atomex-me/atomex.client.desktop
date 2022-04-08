@@ -22,25 +22,24 @@ namespace Atomex.Client.Desktop.Controls
             if (data is TezosTokenTransferViewModel)
                 return App.TemplateService.GetTxDescriptionTemplate(TxDescriptionTemplate.XtzAdditionalDescriptionTemplate);
 
-            if (!(data is TransactionViewModel tx))
+            if (data is not TransactionViewModel tx)
                 return null;
 
-            switch (tx.Currency)
+            return tx.Currency switch
             {
-                case BitcoinBasedConfig:
-                    return App.TemplateService.GetTxDescriptionTemplate(TxDescriptionTemplate.BtcBasedDescriptionTemplate);
-                case TezosConfig:
-                    return App.TemplateService.GetTxDescriptionTemplate(TxDescriptionTemplate.XtzAdditionalDescriptionTemplate);
-                case EthereumConfig:
-                    return App.TemplateService.GetTxDescriptionTemplate(TxDescriptionTemplate.EthAdditionalDescriptionTemplate);
-                default:
-                    return App.TemplateService.GetTxDescriptionTemplate(TxDescriptionTemplate.BtcBasedDescriptionTemplate);
-            }
+                BitcoinBasedConfig => App.TemplateService.GetTxDescriptionTemplate(TxDescriptionTemplate
+                    .BtcBasedDescriptionTemplate),
+                TezosConfig => App.TemplateService.GetTxDescriptionTemplate(TxDescriptionTemplate
+                    .XtzAdditionalDescriptionTemplate),
+                EthereumConfig => App.TemplateService.GetTxDescriptionTemplate(TxDescriptionTemplate
+                    .EthAdditionalDescriptionTemplate),
+                _ => App.TemplateService.GetTxDescriptionTemplate(TxDescriptionTemplate.BtcBasedDescriptionTemplate)
+            };
         }
 
         public bool Match(object data)
         {
-            return data is TransactionViewModel;
+            return data is ITransactionViewModel;
         }
     }
 }

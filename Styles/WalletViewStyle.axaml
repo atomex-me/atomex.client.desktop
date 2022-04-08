@@ -133,41 +133,45 @@
         </DataTemplate>
 
         <DataTemplate x:Key="BtcBasedDescriptionTemplate" DataType="viewModels:TransactionViewModel">
-            <Border Classes="DGTemplateContainer">
-                <TextBlock Text="{Binding Description}" />
-            </Border>
+            <TextBlock Foreground="{DynamicResource DefaultForegroundBrush}"
+                       VerticalAlignment="Center"
+                       FontSize="16"
+                       Text="{Binding Description}" />
         </DataTemplate>
 
         <DataTemplate x:Key="EthAdditionalDescriptionTemplate" DataType="viewModels:EthereumTransactionViewModel">
-            <StackPanel Orientation="Vertical"
-                        Classes="DGTemplateContainer"
-                        Margin="0 5 0 5">
-                <TextBlock Text="{Binding Description}"
-                           Margin="0 0 0 2" />
+            <StackPanel Orientation="Vertical">
+                <TextBlock Foreground="{DynamicResource DefaultForegroundBrush}"
+                           VerticalAlignment="Center"
+                           FontSize="16"
+                           LineHeight="24"
+                           Text="{Binding Description}" />
                 <StackPanel Orientation="Horizontal">
                     <TextBlock Text="{Binding Direction}"
-                               FontSize="12"
-                               Foreground="Gray" />
+                               FontSize="13"
+                               Foreground="{DynamicResource SecondaryForegroundBrush}" />
                     <TextBlock Text="{Binding Alias}"
-                               FontSize="12"
-                               Foreground="{StaticResource NegativeAmountBrush}" />
+                               FontSize="13"
+                               Foreground="{DynamicResource SecondaryForegroundBrush}" />
+
                 </StackPanel>
             </StackPanel>
         </DataTemplate>
 
         <DataTemplate x:Key="XtzAdditionalDescriptionTemplate" DataType="viewModels:TezosTransactionViewModel">
-            <StackPanel Orientation="Vertical"
-                        Classes="DGTemplateContainer"
-                        Margin="0 5 0 5">
-                <TextBlock Text="{Binding Description}"
-                           Margin="0 0 0 2" />
+            <StackPanel Orientation="Vertical">
+                <TextBlock Foreground="{DynamicResource DefaultForegroundBrush}"
+                           VerticalAlignment="Center"
+                           FontSize="16"
+                           LineHeight="24"
+                           Text="{Binding Description}" />
                 <StackPanel Orientation="Horizontal">
                     <TextBlock Text="{Binding Direction}"
-                               FontSize="12"
-                               Foreground="Gray" />
+                               FontSize="13"
+                               Foreground="{DynamicResource SecondaryForegroundBrush}" />
                     <TextBlock Text="{Binding Alias}"
-                               FontSize="12"
-                               Foreground="{StaticResource NegativeAmountBrush}" />
+                               FontSize="13"
+                               Foreground="{DynamicResource SecondaryForegroundBrush}" />
                 </StackPanel>
             </StackPanel>
         </DataTemplate>

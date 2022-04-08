@@ -118,11 +118,10 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         {
             try
             {
-                if (Currency.Name == args.Currency)
-                {
-                    // update transactions list
-                    await LoadTransactionsAsync();
-                }
+                if (Currency.Name != args.Currency) return;
+
+                // update transactions list
+                await LoadTransactionsAsync();
             }
             catch (Exception e)
             {

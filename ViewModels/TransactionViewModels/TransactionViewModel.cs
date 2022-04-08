@@ -69,10 +69,10 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
             AmountFormat = currencyViewModel.CurrencyFormat;
             CurrencyCode = currencyViewModel.CurrencyCode;
             Time         = tx.CreationTime ?? DateTime.UtcNow;
-            CanBeRemoved = tx.State == BlockchainTransactionState.Unknown ||
-                           tx.State == BlockchainTransactionState.Failed ||
-                           tx.State == BlockchainTransactionState.Pending ||
-                           tx.State == BlockchainTransactionState.Unconfirmed;
+            CanBeRemoved = tx.State is BlockchainTransactionState.Unknown or
+                BlockchainTransactionState.Failed or
+                BlockchainTransactionState.Pending or
+                BlockchainTransactionState.Unconfirmed;
 
             Description = GetDescription(
                 type: tx.Type,
@@ -80,16 +80,12 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
                 netAmount: netAmount,
                 amountDigits: currencyConfig.Digits,
                 currencyCode: currencyConfig.Name);
-            
-            if (Amount <= 0)
-            {
-                Direction = "To: ";
-            }
 
-            if (Amount > 0)
+            Direction = Amount switch
             {
-                Direction = "From: ";
-            }
+                <= 0 => "to ",
+                > 0 => "from "
+            };
         }
 
         private ICommand _openTxInExplorerCommand;

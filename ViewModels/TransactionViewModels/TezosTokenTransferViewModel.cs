@@ -78,7 +78,7 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
                 currencyCode: tx.Token.Symbol);
 
             Alias = tx.GetAlias();
-            Direction = Amount <= 0 ? "To: ": "From: ";
+            Direction = Amount <= 0 ? "to ": "from ";
         }
 
         private ICommand _openTxInExplorerCommand;

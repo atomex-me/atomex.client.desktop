@@ -91,14 +91,13 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         {
             try
             {
-                if (Currency.Name == args.Currency)
-                {
-                    // update transactions list
-                    await LoadTransactionsAsync();
+                if (Currency.Name != args.Currency) return;
 
-                    // update delegation info
-                    await LoadDelegationInfoAsync();
-                }
+                // update transactions list
+                await LoadTransactionsAsync();
+
+                // update delegation info
+                await LoadDelegationInfoAsync();
             }
             catch (Exception e)
             {
