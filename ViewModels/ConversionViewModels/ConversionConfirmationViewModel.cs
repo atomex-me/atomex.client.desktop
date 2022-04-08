@@ -166,7 +166,7 @@ namespace Atomex.Client.Desktop.ViewModels
 
                 var baseCurrency = _app.Account.Currencies.GetByName(symbol.Base);
                 var side         = symbol.OrderSideForBuyCurrency(ToCurrencyViewModel.Currency);
-                var terminal     = _app.Terminal;
+                var terminal     = _app.AtomexClient;
                 var price        = EstimatedPrice;
                 var orderPrice   = EstimatedOrderPrice;
 

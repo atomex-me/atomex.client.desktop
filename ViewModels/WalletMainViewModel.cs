@@ -137,16 +137,16 @@ namespace Atomex.Client.Desktop.ViewModels
             terminal.ServiceDisconnected += OnTerminalServiceStateChangedEventHandler;
         }
         
-        private void OnTerminalServiceStateChangedEventHandler(object sender, TerminalServiceEventArgs args)
+        private void OnTerminalServiceStateChangedEventHandler(object sender, AtomexClientServiceEventArgs args)
         {
             if (sender is not IAtomexClient terminal)
                 return;
             
-            IsExchangeConnected = terminal.IsServiceConnected(TerminalService.Exchange);
-            IsMarketDataConnected = terminal.IsServiceConnected(TerminalService.MarketData);
+            IsExchangeConnected = terminal.IsServiceConnected(AtomexClientService.Exchange);
+            IsMarketDataConnected = terminal.IsServiceConnected(AtomexClientService.MarketData);
             
             // subscribe to symbols updates
-            if (args.Service == TerminalService.MarketData && IsMarketDataConnected)
+            if (args.Service == AtomexClientService.MarketData && IsMarketDataConnected)
             {
                 terminal.SubscribeToMarketData(SubscriptionType.TopOfBook);
                 terminal.SubscribeToMarketData(SubscriptionType.DepthTwenty);

@@ -463,7 +463,7 @@ namespace Atomex.Client.Desktop.ViewModels
                         fromCurrency: FromViewModel.CurrencyViewModel?.Currency,
                         toCurrency: ToViewModel.CurrencyViewModel?.Currency,
                         account: _app.Account,
-                        atomexClient: _app.Terminal,
+                        atomexClient: _app.AtomexClient,
                         symbolsProvider: _app.SymbolsProvider,
                         quotesProvider: _app.QuotesProvider);
 
@@ -672,7 +672,7 @@ namespace Atomex.Client.Desktop.ViewModels
                         fromCurrency: FromViewModel.CurrencyViewModel?.Currency,
                         toCurrency: ToViewModel.CurrencyViewModel?.Currency,
                         account: _app.Account,
-                        atomexClient: _app.Terminal,
+                        atomexClient: _app.AtomexClient,
                         symbolsProvider: _app.SymbolsProvider,
                         quotesProvider: _app.QuotesProvider);
 
@@ -866,7 +866,7 @@ namespace Atomex.Client.Desktop.ViewModels
                         fromCurrency: FromViewModel.CurrencyViewModel?.Currency,
                         toCurrency: ToViewModel.CurrencyViewModel?.Currency,
                         account: _app.Account,
-                        atomexClient: _app.Terminal,
+                        atomexClient: _app.AtomexClient,
                         symbolsProvider: _app.SymbolsProvider);
 
                 await Dispatcher.UIThread.InvokeAsync(() =>
@@ -980,7 +980,7 @@ namespace Atomex.Client.Desktop.ViewModels
                 return;
             }
 
-            if (!_app.Terminal.IsServiceConnected(TerminalService.All))
+            if (!_app.AtomexClient.IsServiceConnected(AtomexClientService.All))
             {
                 App.DialogService.Show(
                     MessageViewModel.Message(

@@ -191,7 +191,7 @@ namespace Atomex.Client.Desktop.ViewModels
         private async void OnUpdateClick()
         {
             await SignOut(withAppUpdate: true);
-            if (AtomexApp.Terminal != null) return;
+            if (AtomexApp.AtomexClient != null) return;
 
             OnUpdateAction?.Invoke();
             UpdateStarted = true;
