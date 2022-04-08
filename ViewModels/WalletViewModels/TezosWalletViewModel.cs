@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Reactive;
 using System.Threading.Tasks;
-using System.Windows.Input;
 using Avalonia.Media.Imaging;
 using Avalonia.Threading;
 using Serilog;
@@ -10,6 +11,7 @@ using Atomex.Blockchain.Tezos;
 using Atomex.Blockchain.Tezos.Internal;
 using Atomex.Core;
 using Atomex.Wallet;
+using ReactiveUI.Fody.Helpers;
 
 namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 {
@@ -25,48 +27,15 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
     {
         private const int DelegationCheckIntervalInSec = 20;
 
-        private bool _canDelegate;
-
-        public bool CanDelegate
-        {
-            get => _canDelegate;
-            set
-            {
-                _canDelegate = value;
-                this.RaisePropertyChanged(nameof(CanDelegate));
-            }
-        }
-
-        private bool _hasDelegations;
-
-        public bool HasDelegations
-        {
-            get => _hasDelegations;
-            set
-            {
-                _hasDelegations = value;
-                this.RaisePropertyChanged(nameof(HasDelegations));
-            }
-        }
-
-        private List<Delegation> _delegations;
-
-        public List<Delegation> Delegations
-        {
-            get => _delegations;
-            set
-            {
-                _delegations = value;
-                this.RaisePropertyChanged(nameof(Delegations));
-            }
-        }
+        [Reactive] public bool CanDelegate { get; set; }
+        [Reactive] public bool HasDelegations { get; set; }
+        [Reactive] public ObservableCollection<Delegation> Delegations { get; set; }
+        private DelegateViewModel DelegateViewModel { get; set; }
 
         public TezosWalletViewModel()
             : base()
         {
         }
-
-        public DelegateViewModel DelegateVM { get; set; }
 
         public TezosWalletViewModel(IAtomexApp app,
             Action<CurrencyConfig> setConversionTab,
@@ -74,11 +43,11 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             CurrencyConfig currency)
             : base(app, setConversionTab, setWertCurrency, currency)
         {
-            Delegations = new List<Delegation>();
+            Delegations = new ObservableCollection<Delegation>();
 
             _ = LoadDelegationInfoAsync();
 
-            DelegateVM = new DelegateViewModel(_app, async () =>
+            DelegateViewModel = new DelegateViewModel(_app, async () =>
             {
                 await Task.Delay(TimeSpan.FromSeconds(DelegationCheckIntervalInSec))
                     .ConfigureAwait(false);
@@ -154,7 +123,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                 await Dispatcher.UIThread.InvokeAsync(() =>
                     {
                         CanDelegate = balance.Available > 0;
-                        Delegations = delegations;
+                        Delegations = new ObservableCollection<Delegation>(delegations);
                         HasDelegations = delegations.Count > 0;
                     },
                     DispatcherPriority.Background);
@@ -169,14 +138,14 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             }
         }
 
-        private ICommand _delegateCommand;
+        private ReactiveCommand<Unit, Unit> _delegateCommand;
 
-        public ICommand DelegateCommand =>
+        public ReactiveCommand<Unit, Unit> DelegateCommand =>
             _delegateCommand ??= (_delegateCommand = ReactiveCommand.Create(OnDelegateClick));
 
         private void OnDelegateClick()
         {
-            App.DialogService.Show(DelegateVM);
+            App.DialogService.Show(DelegateViewModel);
         }
 
 #if DEBUG
@@ -184,7 +153,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         {
             base.DesignerMode();
 
-            Delegations = new List<Delegation>()
+            Delegations = new ObservableCollection<Delegation>()
             {
                 new()
                 {

@@ -43,8 +43,8 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
     {
         protected IAtomexApp _app;
         [Reactive] public ObservableCollection<ITransactionViewModel> Transactions { get; set; }
+        [Reactive] public ITransactionViewModel SelectedTransaction { get; set; }
         [Reactive] public CurrencyViewModel CurrencyViewModel { get; set; }
-        [Reactive] public TransactionViewModel SelectedTransaction { get; set; }
         [Reactive] public bool IsBalanceUpdating { get; set; }
         [Reactive] public TxSortField? CurrentSortField { get; set; }
         [Reactive] public SortDirection? CurrentSortDirection { get; set; }

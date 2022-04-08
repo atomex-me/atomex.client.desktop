@@ -43,7 +43,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
         protected sealed override async Task LoadTransactionsAsync()
         {
-            Log.Debug("LoadTransactionsAsync for {@currency}.", Currency.Name);
+            Log.Debug("LoadTransactionsAsync for FA12 {@currency}.", Currency.Name);
 
             try
             {
