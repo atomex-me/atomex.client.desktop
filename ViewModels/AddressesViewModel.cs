@@ -31,6 +31,7 @@ namespace Atomex.Client.Desktop.ViewModels
     {
         public string Address { get; set; }
         public string ShortenedAddress => Address?.TruncateAddress(15, 12);
+        public string AddressExplorerUri { get; set; }
         public string Type { get; set; }
         public string Path { get; set; }
         public bool HasTokens { get; set; }
@@ -191,6 +192,7 @@ namespace Atomex.Client.Desktop.ViewModels
                         return new AddressViewModel
                         {
                             Address = a.Address,
+                            AddressExplorerUri = _currency.AddressExplorerUri,
                             Type = KeyTypeToString(a.KeyType),
                             Path = path,
                             HasTokens = HasTokens,
