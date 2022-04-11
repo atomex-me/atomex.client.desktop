@@ -177,8 +177,8 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                             .SortList((t1, t2) => t2.Time.CompareTo(t1.Time))
                             .ForEachDo(t =>
                             {
-                                t.UpdateClicked += UpdateTransactonEventHandler;
-                                t.RemoveClicked += RemoveTransactonEventHandler;
+                                t.UpdateClicked += UpdateTransactionEventHandler;
+                                t.RemoveClicked += RemoveTransactionEventHandler;
                             }));
                 },
                 DispatcherPriority.Background);
@@ -271,12 +271,12 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             App.DialogService.Show(new AddressesViewModel(_app, Currency));
         }
 
-        private void UpdateTransactonEventHandler(object sender, TransactionEventArgs args)
+        private void UpdateTransactionEventHandler(object sender, TransactionEventArgs args)
         {
             // todo:
         }
 
-        private async void RemoveTransactonEventHandler(object sender, TransactionEventArgs args)
+        private async void RemoveTransactionEventHandler(object sender, TransactionEventArgs args)
         {
             if (_app.Account == null)
                 return;
