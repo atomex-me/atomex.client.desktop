@@ -73,28 +73,45 @@
                         HorizontalAlignment="Center"
                         IsVisible="{Binding IsLinkVisible}">
 
-                <!-- ToolTip="{Binding TxExplorerUri}" -->
-                <Button Content="{Binding Id}"
-                        Margin="20 0 20 0"
-                        HorizontalAlignment="Center"
+                <Button Classes="LinkButton Underlined SolidHover"
+                        ToolTip.Placement="AnchorAndGravity"
+                        ToolTip.VerticalOffset="-32"
                         VerticalAlignment="Center"
-                        Command="{Binding OpenTxInExplorerCommand}"
+                        HorizontalAlignment="Center"
+                        FontSize="16"
+                        Content="{Binding Id}"
+                        Command="{Binding OpenTxInExplorerCommand}">
+                    <ToolTip.Tip>
+                        <TextBlock Text="{Binding TransactionUri}" />
+                    </ToolTip.Tip>
+                </Button>
+                
+                <Button BorderThickness="0"
+                        ToolTip.Placement="AnchorAndGravity"
+                        ToolTip.VerticalOffset="-32"
+                        Margin="8 0 0 0"
+                        Width="22"
+                        Height="22"
+                        VerticalAlignment="Center"
+                        VerticalContentAlignment="Center"
+                        Command="{Binding CopyCommand}"
                         CommandParameter="{Binding Id}"
-                        Classes="ExplorerLinkButton" />
+                        Classes="ButtonWithIcon">
+                    <Button.Styles>
+                        <Style Selector="Button svg|Svg">
+                            <Setter Property="Path" Value="/Resources/Icons/copy.svg"></Setter>
+                        </Style>
+                        <Style Selector="Button:pointerover svg|Svg">
+                            <Setter Property="Path" Value="/Resources/Icons/copy-light.svg"></Setter>
+                        </Style>
+                    </Button.Styles>
 
-                <!-- ToolTip="Copy transaction id to clipboard" -->
-                <controls:IconButton
-                    VerticalAlignment="Center"
-                    Foreground="{DynamicResource IconButtonForegroundBrush}"
-                    MouseOverBrush="{DynamicResource IconButtonMouseOverBrush}"
-                    PressedBrush="{DynamicResource IconButtonPressedBrush}"
-                    Path="{DynamicResource Octicons.Clippy}"
-                    Margin="5 20 20 0"
-                    Width="15"
-                    Height="15"
-                    Command="{Binding CopyCommand}"
-                    CommandParameter="{Binding Id}"
-                    Classes="PathButtonStyle" />
+                    <ToolTip.Tip>
+                        <TextBlock Text="Copy transaction id to clipboard" />
+                    </ToolTip.Tip>
+
+                    <svg:Svg Width="20" />
+                </Button>
             </StackPanel>
 
             <StackPanel Orientation="Horizontal"

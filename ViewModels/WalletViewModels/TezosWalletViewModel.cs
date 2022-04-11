@@ -3,26 +3,18 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Reactive;
 using System.Threading.Tasks;
-using Avalonia.Media.Imaging;
 using Avalonia.Threading;
 using Serilog;
 using ReactiveUI;
 using Atomex.Blockchain.Tezos;
 using Atomex.Blockchain.Tezos.Internal;
+using Atomex.Blockchain.Tezos.Tzkt;
 using Atomex.Core;
 using Atomex.Wallet;
 using ReactiveUI.Fody.Helpers;
 
 namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 {
-    public class Delegation
-    {
-        public BakerData Baker { get; set; }
-        public string Address { get; set; }
-        public decimal Balance { get; set; }
-        public IBitmap GetBakerLogo => App.ImageService.GetImage(Baker.Logo);
-    }
-
     public class TezosWalletViewModel : WalletViewModel
     {
         private const int DelegationCheckIntervalInSec = 20;
@@ -91,6 +83,14 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                 var rpc = new Rpc(tezos.RpcNodeUri);
 
                 var delegations = new List<Delegation>();
+                
+                var tzktApi = new TzktApi(tezos);
+                var head = await tzktApi.GetHeadLevelAsync();
+                var headLevel = head.Value;
+                    
+                var currentCycle = _app.Account.Network == Network.MainNet
+                    ? Math.Floor((headLevel - 1) / 4096)
+                    : Math.Floor((headLevel - 1) / 2048);
 
                 foreach (var wa in addresses)
                 {
@@ -106,12 +106,22 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                     var baker = await BbApi
                         .GetBaker(@delegate, _app.Account.Network)
                         .ConfigureAwait(false) ?? new BakerData { Address = @delegate };
+                        
+                    var account = await tzktApi.GetAccountByAddressAsync(wa.Address);
+
+                    var txCycle = _app.Account.Network == Network.MainNet
+                        ? Math.Floor((account.Value.DelegationLevel - 1) / 4096)
+                        : Math.Floor((account.Value.DelegationLevel - 1) / 2048);
 
                     delegations.Add(new Delegation
                     {
                         Baker = baker,
                         Address = wa.Address,
-                        Balance = wa.Balance
+                        Balance = wa.Balance,
+                        DelegationTime = account.Value.DelegationTime,
+                        Status = currentCycle - txCycle < 2 ? DelegationStatus.Pending :
+                            currentCycle - txCycle < 7 ? DelegationStatus.Confirmed :
+                            DelegationStatus.Active
                     });
 
                     if (!string.IsNullOrEmpty(baker.Logo))

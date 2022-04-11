@@ -15,6 +15,7 @@ namespace Atomex.Client.Desktop.ViewModels
         public string Text { get; }
         public string BaseUrl { get; }
         public string Id { get; }
+        public string TransactionUri => $"{BaseUrl}{Id}";
         public string NextText { get; }
         public bool IsBackVisible { get; }
         public bool IsLinkVisible { get; }
@@ -164,9 +165,9 @@ namespace Atomex.Client.Desktop.ViewModels
         private ICommand _openTxInExplorerCommand;
 
         public ICommand OpenTxInExplorerCommand => _openTxInExplorerCommand ??= (_openTxInExplorerCommand =
-            ReactiveCommand.Create<string>((id) =>
+            ReactiveCommand.Create(() =>
             {
-                if (Uri.TryCreate($"{BaseUrl}{Id}", UriKind.Absolute, out var uri))
+                if (Uri.TryCreate(TransactionUri, UriKind.Absolute, out var uri))
                     App.OpenBrowser(uri.ToString());
                 else
                     Log.Error("Invalid uri for transaction explorer");

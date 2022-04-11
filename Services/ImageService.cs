@@ -50,9 +50,9 @@ namespace Atomex.Client.Desktop.Services
                     successCallback?.Invoke();
                 }
             }
-            catch
+            catch (Exception e)
             {
-                Log.Error($"Error during loading image {url}");
+                Log.Error($"Error during loading image {url} \n {e}");
             }
         }
 
