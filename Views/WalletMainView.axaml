@@ -210,7 +210,26 @@
                     DockPanel.Dock="Right"
                     Width="1" />
         </DockPanel>
+        <Panel Name="ParentPanel">
+            <ContentControl Content="{Binding Content}" />
 
-        <ContentControl Content="{Binding Content}" />
+            <Popup Height="{Binding #ParentPanel.Bounds.Height}"
+                   PlacementMode="AnchorAndGravity"
+                   PlacementTarget="{Binding ElementName=ParentPanel}"
+                   PlacementAnchor="TopRight"
+                   PlacementGravity="BottomLeft"
+                   VerticalAlignment="Stretch"
+                   WindowManagerAddShadowHint="False"
+                   IsLightDismissEnabled="True"
+                   IsOpen="{Binding RightPopupOpened}"
+                   Closed="Popup_OnClosed">
+
+                <ContentControl Content="{Binding RightPopupContent}">
+                    <ContentControl.ContentTemplate>
+                        <controls:WalletPopupRightDataTemplateSelector />
+                    </ContentControl.ContentTemplate>
+                </ContentControl>
+            </Popup>
+        </Panel>
     </DockPanel>
 </UserControl>

@@ -386,7 +386,6 @@
                                                                     <Setter Property="Background"
                                                                             Value="{DynamicResource AlmostTransparentBrush}" />
                                                                 </Style>
-
                                                                 <Style
                                                                     Selector="Button:pressed /template/ ContentPresenter#PART_ContentPresenter">
                                                                     <Setter Property="Background"

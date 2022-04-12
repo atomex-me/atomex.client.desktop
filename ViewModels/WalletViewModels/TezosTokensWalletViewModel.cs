@@ -6,7 +6,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
-using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Avalonia.Threading;
 using Newtonsoft.Json;
@@ -16,8 +15,6 @@ using Serilog;
 using Atomex.Blockchain.Tezos;
 using Atomex.Blockchain.Tezos.Tzkt;
 using Atomex.Client.Desktop.Common;
-using Atomex.Client.Desktop.ViewModels.Abstract;
-using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
 using Atomex.Client.Desktop.ViewModels.SendViewModels;
 using Atomex.Client.Desktop.ViewModels.TransactionViewModels;
 using Atomex.Common;
@@ -30,24 +27,12 @@ using Atomex.Wallet.Tezos;
 
 namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 {
-    public class TezosTokenViewModel : ViewModelBase, IExpandable
+    public class TezosTokenViewModel : ViewModelBase
     {
         private bool _isPreviewDownloading = false;
         public TezosConfig TezosConfig { get; set; }
         public TokenBalance TokenBalance { get; set; }
         public string Address { get; set; }
-
-        private bool _isExpanded;
-
-        public bool IsExpanded
-        {
-            get => _isExpanded;
-            set
-            {
-                _isExpanded = value;
-                OnPropertyChanged(nameof(IsExpanded));
-            }
-        }
 
         public IBitmap TokenPreview
         {
@@ -365,7 +350,9 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         public TezosTokensWalletViewModel(
             IAtomexApp app,
             Action<CurrencyConfig> setConversionTab,
-            Action<string> setWertCurrency) : base(app, setConversionTab, setWertCurrency, null)
+            Action<string> setWertCurrency,
+            Action<ViewModelBase?> showRightPopupContent
+        ) : base(app, setConversionTab, setWertCurrency, showRightPopupContent, null)
         {
             _ = ReloadTokenContractsAsync();
         }

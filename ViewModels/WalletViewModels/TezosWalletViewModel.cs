@@ -50,8 +50,9 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         public TezosWalletViewModel(IAtomexApp app,
             Action<CurrencyConfig> setConversionTab,
             Action<string> setWertCurrency,
+            Action<ViewModelBase?> showRightPopupContent,
             CurrencyConfig currency)
-            : base(app, setConversionTab, setWertCurrency, currency)
+            : base(app, setConversionTab, setWertCurrency, showRightPopupContent, currency)
         {
             Tezos = currency as TezosConfig;
             Delegations = new ObservableCollection<Delegation>();

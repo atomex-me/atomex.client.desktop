@@ -30,6 +30,7 @@
         <Setter Property="Padding" Value="0" />
         <Setter Property="BorderThickness" Value="0" />
 
+
         <Style.Resources>
             <converters:WidthToPointConverter x:Key="WidthToPointConverter" />
             <SolidColorBrush x:Key="LineStrokeBrush" Color="{DynamicResource LightDefaultOpacity20}" />
@@ -65,7 +66,7 @@
         <Setter Property="Stroke" Value="{DynamicResource LineStrokeBrush}" />
         <Setter Property="Height" Value="1" />
     </Style>
-    
+
     <Style Selector="Button.LinkButton.Underlined.SolidHover /template/ Line#PART_Line">
         <Setter Property="StrokeDashArray" Value="2,0"></Setter>
         <Setter Property="IsVisible" Value="False"></Setter>
@@ -73,10 +74,14 @@
         <Setter Property="Height" Value="0.5" />
     </Style>
 
+    <Style Selector="Button.LinkButton.Underlined.SolidHover /template/ TextBlock#TextBlock">
+        <Setter Property="LineHeight" Value="20" />
+    </Style>
+
     <Style Selector="Button.LinkButton.Underlined:pointerover">
         <Setter Property="Foreground" Value="{DynamicResource SecondaryForegroundBrush}" />
     </Style>
-    
+
     <Style Selector="Button.LinkButton.Underlined.SolidHover:pointerover /template/ Line#PART_Line">
         <Setter Property="Stroke" Value="{DynamicResource SecondaryForegroundBrush}" />
         <Setter Property="IsVisible" Value="True"></Setter>
@@ -85,19 +90,19 @@
     <Style Selector="Button.LinkButton.Underlined:pressed">
         <Setter Property="Foreground" Value="{DynamicResource LightDefaultOpacity20}" />
     </Style>
-    
+
     <Style Selector="Button.LinkButton.Underlined.SolidHover:pressed /template/ Line#PART_Line">
         <Setter Property="Stroke" Value="{DynamicResource LightDefaultOpacity20}" />
     </Style>
-    
+
     <Style Selector="Button.LinkButton:pressed">
-        <Setter Property="RenderTransform" Value="none" />    
+        <Setter Property="RenderTransform" Value="none" />
     </Style>
 
     <Style Selector="Button.LinkButton.Underlined:disabled">
         <Setter Property="Foreground" Value="{DynamicResource DisabledForegroundBrush}" />
     </Style>
-    
+
     <Style Selector="Button.LinkButton.Underlined.SolidHover:disabled /template/ Line#PART_Line">
         <Setter Property="Stroke" Value="{DynamicResource DisabledForegroundBrush}" />
     </Style>

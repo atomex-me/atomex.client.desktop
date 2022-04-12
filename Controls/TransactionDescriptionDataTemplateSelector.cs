@@ -1,6 +1,4 @@
-﻿using System;
-using Atomex.Blockchain.Abstract;
-using Avalonia.Controls;
+﻿using Avalonia.Controls;
 using Avalonia.Controls.Templates;
 using Atomex.Client.Desktop.Services;
 using Atomex.Client.Desktop.ViewModels.TransactionViewModels;
@@ -19,10 +17,7 @@ namespace Atomex.Client.Desktop.Controls
 
         private static DataTemplate? GetTemplate(object data)
         {
-            if (data is TezosTokenTransferViewModel)
-                return App.TemplateService.GetTxDescriptionTemplate(TxDescriptionTemplate.XtzAdditionalDescriptionTemplate);
-
-            if (data is not TransactionViewModel tx)
+            if (data is not TransactionViewModelBase tx)
                 return null;
 
             return tx.Currency switch
@@ -39,7 +34,7 @@ namespace Atomex.Client.Desktop.Controls
 
         public bool Match(object data)
         {
-            return data is ITransactionViewModel;
+            return data is TransactionViewModelBase;
         }
     }
 }

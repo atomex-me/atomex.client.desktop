@@ -20,10 +20,9 @@ namespace Atomex.Client.Desktop.ViewModels
         public Action<CurrencyConfig> SetConversionTab { get; init; }
         public Action<string> SetWertCurrency { get; init; }
         public Action BackAction { get; init; }
+        public Action<ViewModelBase?> ShowRightPopupContent { get; set; }
         [Reactive] public ObservableCollection<IWalletViewModel> Wallets { get; private set; }
-
         [Reactive] public IWalletViewModel Selected { get; set; }
-
 
         public WalletsViewModel()
         {
@@ -36,7 +35,7 @@ namespace Atomex.Client.Desktop.ViewModels
         public WalletsViewModel(IAtomexApp app)
         {
             App = app ?? throw new ArgumentNullException(nameof(app));
-
+            
             SubscribeToServices();
         }
 
@@ -56,6 +55,7 @@ namespace Atomex.Client.Desktop.ViewModels
                         app: App,
                         setConversionTab: SetConversionTab,
                         setWertCurrency: SetWertCurrency,
+                        showRightPopupContent: ShowRightPopupContent,
                         currency: currency));
 
                 walletsViewModels.AddRange(currenciesViewModels);
@@ -73,7 +73,6 @@ namespace Atomex.Client.Desktop.ViewModels
 
         public ReactiveCommand<Unit, Unit> BackCommand => _backCommand ??=
             (_backCommand = ReactiveCommand.Create(() => BackAction?.Invoke()));
-
 
         private void DesignerMode()
         {

@@ -19,7 +19,7 @@ namespace Atomex.Client.Desktop.Controls
 
         private static DataTemplate? GetTemplate(object data)
         {
-            if (data is not ITransactionViewModel transaction)
+            if (data is not TransactionViewModelBase transaction)
                 return null;
 
             return transaction.State switch
@@ -40,7 +40,7 @@ namespace Atomex.Client.Desktop.Controls
 
         public bool Match(object data)
         {
-            return data is ITransactionViewModel;
+            return data is TransactionViewModelBase;
         }
     }
 }

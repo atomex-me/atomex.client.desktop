@@ -8,45 +8,25 @@ using Atomex.Blockchain.Abstract;
 using Atomex.Blockchain.Tezos;
 using Atomex.Common;
 using Atomex.Client.Desktop.Common;
+using Atomex.Core;
 using Atomex.ViewModels;
 
 namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
 {
-    public class TezosTokenTransferViewModel : ViewModelBase, ITransactionViewModel
+    public class TezosTokenTransferViewModel : TransactionViewModelBase
     {
         public const int MaxAmountDecimals = AddressesHelper.MaxTokenCurrencyFormatDecimals;
-
-        private readonly TezosConfig _tezosConfig;
-
-        public IBlockchainTransaction Transaction { get; }
-        public string Id { get; set; }
-        public BlockchainTransactionState State { get; set; }
-        public BlockchainTransactionType Type { get; set; }
-
+        
         public string From { get; set; }
         public string To { get; set; }
-
-        public string Description { get; set; }
-        public decimal Amount { get; set; }
-        public string AmountFormat { get; set; }
         public string CurrencyCode { get; set; }
 
-        public DateTime Time { get; set; }
-        public DateTime LocalTime => Time.ToLocalTime();
-        public string TxExplorerUri => $"{_tezosConfig.TxExplorerUri}{Id}";
-        public string FromExplorerUri => $"{_tezosConfig.AddressExplorerUri}{From}";
-        public string ToExplorerUri => $"{_tezosConfig.AddressExplorerUri}{To}";
+        public string TxExplorerUri => $"{Currency.TxExplorerUri}{Id}";
+        public string FromExplorerUri => $"{Currency.AddressExplorerUri}{From}";
+        public string ToExplorerUri => $"{Currency.AddressExplorerUri}{To}";
         
         public string Alias { get; set; }
         public string Direction { get; set; }
-
-
-        private bool _isExpanded;
-        public bool IsExpanded
-        {
-            get => _isExpanded;
-            set { _isExpanded = value; OnPropertyChanged(nameof(IsExpanded)); }
-        }
 
         public TezosTokenTransferViewModel()
         {
@@ -58,7 +38,7 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
 
         public TezosTokenTransferViewModel(TokenTransfer tx, TezosConfig tezosConfig)
         {
-            _tezosConfig = tezosConfig ?? throw new ArgumentNullException(nameof(tezosConfig));
+            Currency = tezosConfig ?? throw new ArgumentNullException(nameof(tezosConfig));
 
             Transaction  = tx ?? throw new ArgumentNullException(nameof(tx));
             State        = Transaction.State;
@@ -84,7 +64,7 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
         private ICommand _openTxInExplorerCommand;
         public ICommand OpenTxInExplorerCommand => _openTxInExplorerCommand ??= ReactiveCommand.Create<string>((id) =>
         {
-            if (Uri.TryCreate($"{_tezosConfig.TxExplorerUri}{id}", UriKind.Absolute, out var uri))
+            if (Uri.TryCreate($"{Currency.TxExplorerUri}{id}", UriKind.Absolute, out var uri))
                 App.OpenBrowser(uri.ToString());
             else
                 Log.Error("Invalid uri for transaction explorer");
@@ -93,7 +73,7 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
         private ICommand _openAddressInExplorerCommand;
         public ICommand OpenAddressInExplorerCommand => _openAddressInExplorerCommand ??= ReactiveCommand.Create<string>((address) =>
         {
-            if (Uri.TryCreate($"{_tezosConfig.AddressExplorerUri}{address}", UriKind.Absolute, out var uri))
+            if (Uri.TryCreate($"{Currency.AddressExplorerUri}{address}", UriKind.Absolute, out var uri))
                 App.OpenBrowser(uri.ToString());
             else
                 Log.Error("Invalid uri for address explorer");

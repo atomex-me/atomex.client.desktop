@@ -3,10 +3,8 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-
 using Serilog;
 using Avalonia.Threading;
-
 using Atomex.Client.Desktop.ViewModels.TransactionViewModels;
 using Atomex.TezosTokens;
 using Atomex.Core;
@@ -19,7 +17,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
     public class Fa12WalletViewModel : WalletViewModel
     {
         public Fa12Config Currency => CurrencyViewModel.Currency as Fa12Config;
-        
+
         public Fa12WalletViewModel()
         {
 #if DEBUG
@@ -32,7 +30,8 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             IAtomexApp app,
             Action<CurrencyConfig> setConversionTab,
             Action<string> setWertCurrency,
-            CurrencyConfig currency) : base(app, setConversionTab, setWertCurrency, currency)
+            Action<ViewModelBase?> showRightPopupContent,
+            CurrencyConfig currency) : base(app, setConversionTab, setWertCurrency, showRightPopupContent, currency)
         {
         }
 
@@ -51,21 +50,21 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                     return;
 
                 var transactions = (await _app.Account
-                    .GetCurrencyAccount<Fa12Account>(Currency.Name)
-                    .DataRepository
-                    .GetTezosTokenTransfersAsync(Currency.TokenContractAddress)
-                    .ConfigureAwait(false))
+                        .GetCurrencyAccount<Fa12Account>(Currency.Name)
+                        .DataRepository
+                        .GetTezosTokenTransfersAsync(Currency.TokenContractAddress)
+                        .ConfigureAwait(false))
                     .ToList();
 
                 await Dispatcher.UIThread.InvokeAsync(() =>
-                {
-                    Transactions = new ObservableCollection<ITransactionViewModel>(
-                        transactions.Select(t => new TezosTokenTransferViewModel(t, Currency))
-                            .ToList());
+                    {
+                        Transactions = new ObservableCollection<TransactionViewModelBase>(
+                            transactions.Select(t => new TezosTokenTransferViewModel(t, Currency))
+                                .ToList());
 
-                    SortTransactions();
-                },
-                DispatcherPriority.Background);
+                        SortTransactions();
+                    },
+                    DispatcherPriority.Background);
             }
             catch (OperationCanceledException)
             {
@@ -76,7 +75,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                 Log.Error(e, "LoadTransactionsAsync error for {@currency}.", Currency?.Name);
             }
         }
-        
+
         protected override void OnReceiveClick()
         {
             var tezosConfig = _app.Account.Currencies.GetByName(TezosConfig.Xtz);

@@ -42,8 +42,8 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
     public class WalletViewModel : ViewModelBase, IWalletViewModel
     {
         protected IAtomexApp _app;
-        [Reactive] public ObservableCollection<ITransactionViewModel> Transactions { get; set; }
-        [Reactive] public ITransactionViewModel SelectedTransaction { get; set; }
+        [Reactive] public ObservableCollection<TransactionViewModelBase> Transactions { get; set; }
+        [Reactive] public TransactionViewModelBase? SelectedTransaction { get; set; }
         [Reactive] public CurrencyViewModel CurrencyViewModel { get; set; }
         [Reactive] public bool IsBalanceUpdating { get; set; }
         [Reactive] public TxSortField? CurrentSortField { get; set; }
@@ -51,6 +51,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         public AddressesViewModel AddressesViewModel { get; set; }
         protected Action<CurrencyConfig> SetConversionTab { get; }
         private Action<string> SetWertCurrency { get; }
+        private Action<ViewModelBase?> ShowRightPopupContent { get; }
 
         public string Header => CurrencyViewModel.Header;
         public CurrencyConfig Currency => CurrencyViewModel.Currency;
@@ -80,15 +81,18 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             IAtomexApp app,
             Action<CurrencyConfig> setConversionTab,
             Action<string> setWertCurrency,
+            Action<ViewModelBase?> showRightPopupContent,
             CurrencyConfig currency)
         {
             _app = app ?? throw new ArgumentNullException(nameof(app));
             SetConversionTab = setConversionTab ?? throw new ArgumentNullException(nameof(setConversionTab));
             SetWertCurrency = setWertCurrency ?? throw new ArgumentNullException(nameof(setWertCurrency));
+            ShowRightPopupContent =
+                showRightPopupContent ?? throw new ArgumentNullException(nameof(showRightPopupContent));
 
             if (currency != null)
                 CurrencyViewModel = CurrencyViewModelCreator.CreateViewModel(currency);
-            
+
             this.WhenAnyValue(vm => vm.Transactions)
                 .WhereNotNull()
                 .Take(1)
@@ -102,6 +106,9 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                 .WhereAllNotNull()
                 .Where(_ => Transactions != null)
                 .SubscribeInMainThread(_ => { SortTransactions(); });
+
+            this.WhenAnyValue(vm => vm.SelectedTransaction)
+                .SubscribeInMainThread(_ => ShowRightPopupContent?.Invoke(SelectedTransaction));
 
             SubscribeToServices();
             LoadAddresses();
@@ -155,24 +162,24 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             Transactions = CurrentSortField switch
             {
                 TxSortField.ByTime when CurrentSortDirection == SortDirection.Desc
-                    => new ObservableCollection<ITransactionViewModel>(
+                    => new ObservableCollection<TransactionViewModelBase>(
                         Transactions.OrderByDescending(tx => tx.LocalTime)),
                 TxSortField.ByTime when CurrentSortDirection == SortDirection.Asc
-                    => new ObservableCollection<ITransactionViewModel>(
+                    => new ObservableCollection<TransactionViewModelBase>(
                         Transactions.OrderBy(tx => tx.LocalTime)),
 
                 TxSortField.ByAmount when CurrentSortDirection == SortDirection.Desc
-                    => new ObservableCollection<ITransactionViewModel>(
+                    => new ObservableCollection<TransactionViewModelBase>(
                         Transactions.OrderByDescending(tx => tx.Amount)),
                 TxSortField.ByAmount when CurrentSortDirection == SortDirection.Asc
-                    => new ObservableCollection<ITransactionViewModel>(
+                    => new ObservableCollection<TransactionViewModelBase>(
                         Transactions.OrderBy(tx => tx.Amount)),
 
                 TxSortField.ByStatus when CurrentSortDirection == SortDirection.Desc
-                    => new ObservableCollection<ITransactionViewModel>(
+                    => new ObservableCollection<TransactionViewModelBase>(
                         Transactions.OrderByDescending(tx => tx.State)),
                 TxSortField.ByStatus when CurrentSortDirection == SortDirection.Asc
-                    => new ObservableCollection<ITransactionViewModel>(
+                    => new ObservableCollection<TransactionViewModelBase>(
                         Transactions.OrderBy(tx => tx.State)),
                 _ => Transactions
             };
@@ -210,7 +217,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
                 await Dispatcher.UIThread.InvokeAsync(() =>
                     {
-                        Transactions = new ObservableCollection<ITransactionViewModel>(
+                        Transactions = new ObservableCollection<TransactionViewModelBase>(
                             transactions
                                 .Select(t => TransactionViewModelCreator
                                     .CreateViewModel(t, Currency))
@@ -353,34 +360,38 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             var currencies = DesignTime.TestNetCurrencies.ToList();
 
             CurrencyViewModel = CurrencyViewModelCreator.CreateViewModel(currencies[3], subscribeToUpdates: false);
-            CurrencyViewModel.TotalAmount             = 0.01012345m;
-            CurrencyViewModel.TotalAmountInBase       = 16.51m;
-            CurrencyViewModel.AvailableAmount         = 0.01010005m;
-            CurrencyViewModel.AvailableAmountInBase   = 16.00m;
-            CurrencyViewModel.UnconfirmedAmount       = 0.00002m;
+            CurrencyViewModel.TotalAmount = 0.01012345m;
+            CurrencyViewModel.TotalAmountInBase = 16.51m;
+            CurrencyViewModel.AvailableAmount = 0.01010005m;
+            CurrencyViewModel.AvailableAmountInBase = 16.00m;
+            CurrencyViewModel.UnconfirmedAmount = 0.00002m;
             CurrencyViewModel.UnconfirmedAmountInBase = 0.5m;
 
-            var transactions = new List<TransactionViewModel>
+            var transactions = new List<TransactionViewModelBase>
             {
-                new BitcoinBasedTransactionViewModel(new BitcoinBasedTransaction("BTC", Transaction.Create(Network.TestNet)), DesignTime.TestNetCurrencies.Get<BitcoinConfig>("BTC"))
+                new BitcoinBasedTransactionViewModel(
+                    new BitcoinBasedTransaction("BTC", Transaction.Create(Network.TestNet)),
+                    DesignTime.TestNetCurrencies.Get<BitcoinConfig>("BTC"))
                 {
-                    Description  = "Sent 0.00124 BTC",
-                    Amount       = -0.00124m,
+                    Description = "Sent 0.00124 BTC",
+                    Amount = -0.00124m,
                     AmountFormat = CurrencyViewModel.CurrencyFormat,
                     CurrencyCode = CurrencyViewModel.CurrencyCode,
-                    Time         = DateTime.Now,
+                    Time = DateTime.Now,
                 },
-                new BitcoinBasedTransactionViewModel(new BitcoinBasedTransaction("BTC", Transaction.Create(Network.TestNet)), DesignTime.TestNetCurrencies.Get<BitcoinConfig>("BTC"))
+                new BitcoinBasedTransactionViewModel(
+                    new BitcoinBasedTransaction("BTC", Transaction.Create(Network.TestNet)),
+                    DesignTime.TestNetCurrencies.Get<BitcoinConfig>("BTC"))
                 {
-                    Description  = "Received 1.00666 BTC",
-                    Amount       = 1.00666m,
+                    Description = "Received 1.00666 BTC",
+                    Amount = 1.00666m,
                     AmountFormat = CurrencyViewModel.CurrencyFormat,
                     CurrencyCode = CurrencyViewModel.CurrencyCode,
-                    Time         = DateTime.Now,
+                    Time = DateTime.Now,
                 }
             };
 
-            Transactions = new ObservableCollection<ITransactionViewModel>(
+            Transactions = new ObservableCollection<TransactionViewModelBase>(
                 transactions.SortList((t1, t2) => t2.Time.CompareTo(t1.Time)));
         }
     }

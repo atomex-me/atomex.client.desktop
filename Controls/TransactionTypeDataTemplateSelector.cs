@@ -19,7 +19,7 @@ namespace Atomex.Client.Desktop.Controls
 
         private static DataTemplate? GetTemplate(object data)
         {
-            if (!(data is ITransactionViewModel tx))
+            if (data is not TransactionViewModelBase tx)
                 return null;
 
             if (tx.Type.HasFlag(BlockchainTransactionType.SwapPayment))
@@ -51,7 +51,7 @@ namespace Atomex.Client.Desktop.Controls
 
         public bool Match(object data)
         {
-            return data is TransactionViewModel;
+            return data is TransactionViewModelBase;
         }
     }
 }

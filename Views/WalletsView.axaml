@@ -76,6 +76,5 @@
             <ContentControl Grid.Row="2"
                             Content="{Binding Selected}" />
         </Grid>
-
     </Border>
 </UserControl>

@@ -10,36 +10,32 @@ using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
 using Atomex.Core;
 
+
 namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
 {
-    public class TransactionViewModel : ViewModelBase, ITransactionViewModel
+    public class TransactionViewModelBase : ViewModelBase
+    {
+        public decimal Amount { get; set; }
+        public string AmountFormat { get; set; }
+        public string Description { get; set; }
+        public string Id { get; set; }
+        public CurrencyConfig Currency { get; set; }
+        public DateTime LocalTime => Time.ToLocalTime();
+        public BlockchainTransactionState State { get; set; }
+        public DateTime Time { get; set; }
+        public IBlockchainTransaction Transaction { get; set; }
+        public BlockchainTransactionType Type { get; set; }
+    }
+
+    public class TransactionViewModel : TransactionViewModelBase
     {
         public event EventHandler<TransactionEventArgs> UpdateClicked;
         public event EventHandler<TransactionEventArgs> RemoveClicked;
-
-        public IBlockchainTransaction Transaction { get; }
-        public string Id { get; set; }
-        public CurrencyConfig Currency { get; set; }
-        public BlockchainTransactionState State { get; set; }
-        public BlockchainTransactionType Type { get; set; }
-
-        public string Description { get; set; }
-        public decimal Amount { get; set; }
-        public string AmountFormat { get; set; }
         public string CurrencyCode { get; set; }
         public decimal Fee { get; set; }
-        public DateTime Time { get; set; }
-        public DateTime LocalTime => Time.ToLocalTime();
         public string TxExplorerUri => $"{Currency.TxExplorerUri}{Id}";
         public bool CanBeRemoved { get; set; }
         public string Direction { get; set; }
-
-        private bool _isExpanded;
-        public bool IsExpanded
-        {
-            get => _isExpanded;
-            set { _isExpanded = value; OnPropertyChanged(nameof(IsExpanded)); }
-        }
 
         public TransactionViewModel()
         {

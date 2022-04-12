@@ -1,6 +1,5 @@
 using System;
 
-using Atomex.Client.Desktop.ViewModels.Abstract;
 using Atomex.Core;
 
 namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
