@@ -166,7 +166,7 @@ namespace Atomex.Client.Desktop.ViewModels
 
                 var baseCurrency = _app.Account.Currencies.GetByName(symbol.Base);
                 var side         = symbol.OrderSideForBuyCurrency(ToCurrencyViewModel.Currency);
-                var terminal     = _app.AtomexClient;
+                var atomexClient = _app.AtomexClient;
                 var price        = EstimatedPrice;
                 var orderPrice   = EstimatedOrderPrice;
 
@@ -219,7 +219,7 @@ namespace Atomex.Client.Desktop.ViewModels
 
                 await order.CreateProofOfPossessionAsync(account);
 
-                terminal.OrderSendAsync(order);
+                atomexClient.OrderSendAsync(order);
 
                 // wait for swap confirmation
                 var timeStamp = DateTime.UtcNow;
@@ -228,7 +228,7 @@ namespace Atomex.Client.Desktop.ViewModels
                 {
                     await Task.Delay(SwapCheckInterval);
 
-                    var currentOrder = terminal.Account.GetOrderById(order.ClientOrderId);
+                    var currentOrder = atomexClient.Account.GetOrderById(order.ClientOrderId);
 
                     if (currentOrder == null)
                         continue;
@@ -238,7 +238,7 @@ namespace Atomex.Client.Desktop.ViewModels
 
                     if (currentOrder.Status == OrderStatus.PartiallyFilled || currentOrder.Status == OrderStatus.Filled)
                     {
-                        var swap = (await terminal.Account
+                        var swap = (await atomexClient.Account
                             .GetSwapsAsync())
                             .FirstOrDefault(s => s.OrderId == currentOrder.Id);
 

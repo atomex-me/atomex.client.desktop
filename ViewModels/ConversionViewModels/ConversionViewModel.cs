@@ -653,7 +653,7 @@ namespace Atomex.Client.Desktop.ViewModels
 
         private void SubscribeToServices()
         {
-            _app.AtomexClientChanged += OnTerminalChangedEventHandler;
+            _app.AtomexClientChanged += OnAtomexClientChangedEventHandler;
 
             if (_app.HasQuotesProvider)
                 _app.QuotesProvider.QuotesUpdated += OnBaseQuotesUpdatedEventHandler;
@@ -776,20 +776,20 @@ namespace Atomex.Client.Desktop.ViewModels
                 EstimatedMakerNetworkFeeInBase +
                 (HasRewardForRedeem ? RewardForRedeemInBase : 0);
 
-        private void OnTerminalChangedEventHandler(object? sender, AtomexClientChangedEventArgs args)
+        private void OnAtomexClientChangedEventHandler(object? sender, AtomexClientChangedEventArgs args)
         {
-            var terminal = args.AtomexClient;
+            var atomexClient = args.AtomexClient;
 
-            if (terminal?.Account == null)
+            if (atomexClient?.Account == null)
             {
                 DGSelectedIndex = -1;
                 return;
             }
 
-            terminal.QuotesUpdated += OnQuotesUpdatedEventHandler;
-            terminal.SwapUpdated += OnSwapEventHandler;
+            atomexClient.QuotesUpdated += OnQuotesUpdatedEventHandler;
+            _app.SwapManager.SwapUpdated += OnSwapEventHandler;
 
-            FromCurrencies = terminal.Account.Currencies
+            FromCurrencies = atomexClient.Account.Currencies
                 .Where(c => c.IsSwapAvailable)
                 .Select(CurrencyViewModelCreator.CreateViewModel)
                 .ToList();

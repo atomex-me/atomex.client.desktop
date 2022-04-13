@@ -123,33 +123,33 @@ namespace Atomex.Client.Desktop.ViewModels
         
         private void SubscribeToServices()
         {
-            AtomexApp.AtomexClientChanged += OnTerminalChangedEventHandler;
+            AtomexApp.AtomexClientChanged += OnAtomexClientChangedEventHandler;
             AtomexApp.QuotesProvider.AvailabilityChanged += OnQuotesProviderAvailabilityChangedEventHandler;
         }
         
-        private void OnTerminalChangedEventHandler(object sender, AtomexClientChangedEventArgs args)
+        private void OnAtomexClientChangedEventHandler(object sender, AtomexClientChangedEventArgs args)
         {
-            var terminal = args.AtomexClient;
-            if (terminal?.Account == null)
+            var atomexClient = args.AtomexClient;
+            if (atomexClient?.Account == null)
                 return;
 
-            terminal.ServiceConnected += OnTerminalServiceStateChangedEventHandler;
-            terminal.ServiceDisconnected += OnTerminalServiceStateChangedEventHandler;
+            atomexClient.ServiceConnected += OnAtomexClientServiceStateChangedEventHandler;
+            atomexClient.ServiceDisconnected += OnAtomexClientServiceStateChangedEventHandler;
         }
         
-        private void OnTerminalServiceStateChangedEventHandler(object sender, AtomexClientServiceEventArgs args)
+        private void OnAtomexClientServiceStateChangedEventHandler(object sender, AtomexClientServiceEventArgs args)
         {
-            if (sender is not IAtomexClient terminal)
+            if (sender is not IAtomexClient atomexClient)
                 return;
             
-            IsExchangeConnected = terminal.IsServiceConnected(AtomexClientService.Exchange);
-            IsMarketDataConnected = terminal.IsServiceConnected(AtomexClientService.MarketData);
+            IsExchangeConnected = atomexClient.IsServiceConnected(AtomexClientService.Exchange);
+            IsMarketDataConnected = atomexClient.IsServiceConnected(AtomexClientService.MarketData);
             
             // subscribe to symbols updates
             if (args.Service == AtomexClientService.MarketData && IsMarketDataConnected)
             {
-                terminal.SubscribeToMarketData(SubscriptionType.TopOfBook);
-                terminal.SubscribeToMarketData(SubscriptionType.DepthTwenty);
+                atomexClient.SubscribeToMarketData(SubscriptionType.TopOfBook);
+                atomexClient.SubscribeToMarketData(SubscriptionType.DepthTwenty);
             }
         }
         
