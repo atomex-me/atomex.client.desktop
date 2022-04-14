@@ -796,10 +796,11 @@
                   Cursor="Hand"
                   RowDetailsVisibilityMode="VisibleWhenSelected"
                   SelectionMode="Single"
+                  SelectedIndex="{Binding DGSelectedIndex, Mode=OneWay}"
                   Items="{Binding Swaps}"
                   Grid.Column="0"
                   Grid.Row="2"
-                  Classes="RedesignGrid">
+                  Classes="RedesignGrid NoCloseRightPopup">
             <DataGrid.Columns>
                 <DataGridTemplateColumn Header="From - To"
                                         CanUserSort="False"

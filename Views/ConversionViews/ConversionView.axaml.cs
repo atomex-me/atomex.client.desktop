@@ -22,7 +22,7 @@ namespace Atomex.Client.Desktop.Views
                 Dispatcher.UIThread.InvokeAsync(() =>
                 {
                     if (DataContext is ConversionViewModel viewModel)
-                        viewModel.CellPointerPressed(cellIndex);
+                        viewModel.SetSwapSelectedIndex(cellIndex);
                 });
             };
             

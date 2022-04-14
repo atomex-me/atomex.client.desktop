@@ -108,6 +108,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                 .SubscribeInMainThread(_ => { SortTransactions(); });
 
             this.WhenAnyValue(vm => vm.SelectedTransaction)
+                .Skip(1)
                 .SubscribeInMainThread(_ => ShowRightPopupContent?.Invoke(SelectedTransaction));
 
             SubscribeToServices();

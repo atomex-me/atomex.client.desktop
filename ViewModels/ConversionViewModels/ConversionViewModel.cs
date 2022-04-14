@@ -31,6 +31,7 @@ namespace Atomex.Client.Desktop.ViewModels
 {
     public class ConversionViewModel : ViewModelBase
     {
+        private const int DelayBeforeSwitchingSwapDetailsMs = 400;
         private readonly IAtomexApp _app;
 
         private ISymbols Symbols
@@ -104,7 +105,7 @@ namespace Atomex.Client.Desktop.ViewModels
         [Reactive] public decimal RewardForRedeemInBase { get; set; }
         [ObservableAsProperty] public bool HasRewardForRedeem { get; }
         [Reactive] public bool CanExchange { get; set; }
-        [Reactive] public ObservableCollection<SwapViewModel> Swaps { get; set; }
+        [Reactive] public ObservableCollection<SwapViewModel>? Swaps { get; set; }
         [Reactive] public bool IsNoLiquidity { get; set; }
         [Reactive] public bool IsInsufficientFunds { get; set; }
         [Reactive] public bool IsToAddressExtrenal { get; set; }
@@ -117,9 +118,21 @@ namespace Atomex.Client.Desktop.ViewModels
         [Reactive] public int DGSelectedIndex { get; set; } // current selected swap in DataGrid
         public Action<ViewModelBase?> ShowRightPopupContent { get; set; }
 
-        public void CellPointerPressed(int cellIndex)
+        public void SetSwapSelectedIndex(int cellIndex)
         {
-            DGSelectedIndex = cellIndex;
+            if (DGSelectedIndex != -1 && DGSelectedIndex != cellIndex)
+            {
+                _ = Dispatcher.UIThread.InvokeAsync(async () =>
+                {
+                    OnSwapDetailsClose();
+                    await Task.Delay(DelayBeforeSwitchingSwapDetailsMs);
+                    DGSelectedIndex = cellIndex;
+                });
+            }
+            else
+            {
+                DGSelectedIndex = cellIndex;
+            }
         }
 
 #if DEBUG
@@ -135,7 +148,6 @@ namespace Atomex.Client.Desktop.ViewModels
             _app = app ?? throw new ArgumentNullException(nameof(app));
 
             CanExchange = true;
-            DGSelectedIndex = -1;
 
             FromViewModel = new ConversionCurrencyViewModel
             {
@@ -428,9 +440,15 @@ namespace Atomex.Client.Desktop.ViewModels
                     vm => vm.DGSelectedIndex,
                     vm => vm.Swaps,
                     (selectedSwapIndex, _) => selectedSwapIndex)
-                .Select(selectedSwapIndex => selectedSwapIndex != -1 ? Swaps?[selectedSwapIndex]?.Details : null)
+                .Throttle(TimeSpan.FromMilliseconds(1))
+                .Where(selectedSwapIndex => selectedSwapIndex != -1)
+                .Select(selectedSwapIndex => Swaps?[selectedSwapIndex]?.Details)
                 .WhereNotNull()
-                .SubscribeInMainThread(swapDetailsViewModel => ShowRightPopupContent?.Invoke(swapDetailsViewModel));
+                .SubscribeInMainThread(swapDetailsViewModel =>
+                {
+                    ShowRightPopupContent?.Invoke(swapDetailsViewModel);
+                    this.RaisePropertyChanged(nameof(DGSelectedIndex));
+                });
 
             SubscribeToServices();
         }
@@ -775,10 +793,7 @@ namespace Atomex.Client.Desktop.ViewModels
             var terminal = args.AtomexClient;
 
             if (terminal?.Account == null)
-            {
-                DGSelectedIndex = -1;
                 return;
-            }
 
             terminal.QuotesUpdated += OnQuotesUpdatedEventHandler;
             terminal.SwapUpdated += OnSwapEventHandler;
@@ -798,6 +813,9 @@ namespace Atomex.Client.Desktop.ViewModels
 
             FromCurrencyViewModelItem = null;
             ToCurrencyViewModelItem = null;
+
+            DGSelectedIndex = -1;
+            Swaps = null;
 
             OnSwapEventHandler(this, args: null);
         }
@@ -912,29 +930,39 @@ namespace Atomex.Client.Desktop.ViewModels
                 var swaps = await _app.Account
                     .GetSwapsAsync();
 
-                await Dispatcher.UIThread.InvokeAsync(() =>
+                await Dispatcher.UIThread.InvokeAsync(async () =>
                 {
                     var swapViewModels = swaps
                         .Select(s => SwapViewModelFactory.CreateSwapViewModel(
                             swap: s,
                             currencies: Currencies,
-                            onCloseSwap: () => { DGSelectedIndex = -1; }))
+                            onCloseSwap: OnSwapDetailsClose))
                         .WhereNotNull()
                         .ToList()
                         .SortList((s1, s2) =>
                             s2!.Time.ToUniversalTime().CompareTo(s1!.Time.ToUniversalTime()));
-
+                    
                     var previousSwapsCount = Swaps?.Count;
                     Swaps = new ObservableCollection<SwapViewModel>(swapViewModels!);
 
-                    if (previousSwapsCount < swapViewModels?.Count)
+                    if (previousSwapsCount != null && previousSwapsCount < swapViewModels?.Count)
+                    {
+                        OnSwapDetailsClose();
+                        await Task.Delay(DelayBeforeSwitchingSwapDetailsMs);
                         DGSelectedIndex = 0;
+                    }
                 }, DispatcherPriority.Background);
             }
             catch (Exception e)
             {
                 Log.Error(e, "Swaps update error");
             }
+        }
+
+        private void OnSwapDetailsClose()
+        {
+            DGSelectedIndex = -1;
+            ShowRightPopupContent?.Invoke(null);
         }
 
         private void OnConvertClick()
@@ -1088,9 +1116,15 @@ namespace Atomex.Client.Desktop.ViewModels
                     vm => vm.DGSelectedIndex,
                     vm => vm.Swaps,
                     (selectedSwapIndex, _) => selectedSwapIndex)
-                .Select(selectedSwapIndex => selectedSwapIndex != -1 ? Swaps?[selectedSwapIndex]?.Details : null)
+                .Throttle(TimeSpan.FromMilliseconds(1))
+                .Where(selectedSwapIndex => selectedSwapIndex != -1)
+                .Select(selectedSwapIndex => Swaps?[selectedSwapIndex]?.Details)
                 .WhereNotNull()
-                .SubscribeInMainThread(swapDetailsViewModel => ShowRightPopupContent?.Invoke(swapDetailsViewModel));
+                .SubscribeInMainThread(swapDetailsViewModel =>
+                {
+                    ShowRightPopupContent?.Invoke(swapDetailsViewModel);
+                    this.RaisePropertyChanged(nameof(DGSelectedIndex));
+                });
 
             var btc = DesignTime.TestNetCurrencies.Get<BitcoinConfig>("BTC");
             var ltc = DesignTime.TestNetCurrencies.Get<LitecoinConfig>("LTC");

@@ -2,6 +2,7 @@ using System;
 using System.Diagnostics;
 using System.Linq;
 using System.Reactive.Linq;
+using System.Threading.Tasks;
 using Atomex.Client.Desktop.Common;
 using ReactiveUI;
 using Atomex.Core;
@@ -10,6 +11,7 @@ using Atomex.MarketData.Abstract;
 using Atomex.Services;
 using Atomex.Services.Abstract;
 using ReactiveUI.Fody.Helpers;
+using Serilog;
 
 namespace Atomex.Client.Desktop.ViewModels
 {
@@ -22,26 +24,26 @@ namespace Atomex.Client.Desktop.ViewModels
         public WalletMainViewModel(IAtomexApp app)
         {
             AtomexApp = app ?? throw new ArgumentNullException(nameof(app));
-            
+
             this.WhenAnyValue(vm => vm.Content)
                 .Select(content => content is ViewModels.PortfolioViewModel or ViewModels.WalletsViewModel)
                 .ToPropertyExInMainThread(this, vm => vm.IsPortfolioSectionActive);
-            
+
             this.WhenAnyValue(vm => vm.Content)
                 .Select(content => content is ConversionViewModel)
                 .ToPropertyExInMainThread(this, vm => vm.IsConversionSectionActive);
-                        
+
             this.WhenAnyValue(vm => vm.Content)
                 .Select(content => content is SettingsViewModel)
                 .ToPropertyExInMainThread(this, vm => vm.IsSettingsSectionActive);
-            
+
             this.WhenAnyValue(vm => vm.Content)
                 .Select(content => content is WertViewModel)
                 .ToPropertyExInMainThread(this, vm => vm.IsWertSectionActive);
 
             this.WhenAnyValue(vm => vm.RightPopupContent)
-                .Select(content => content != null)
-                .ToPropertyExInMainThread(this, vm => vm.RightPopupOpened);
+                .WhereNotNull()
+                .SubscribeInMainThread(_ => RightPopupOpened = true);
 
             PortfolioViewModel = new PortfolioViewModel(AtomexApp)
             {
@@ -70,14 +72,15 @@ namespace Atomex.Client.Desktop.ViewModels
             InstalledVersion = GetAssemblyFileVersion();
         }
 
-        public IAtomexApp AtomexApp { get; set; }
-        public PortfolioViewModel PortfolioViewModel { get; set; }
-        public WalletsViewModel WalletsViewModel { get; set; }
-        public ConversionViewModel ConversionViewModel { get; set; }
-        public SettingsViewModel SettingsViewModel { get; set; }
-        public WertViewModel WertViewModel { get; set; }
+        private IAtomexApp AtomexApp { get; set; }
+        private PortfolioViewModel PortfolioViewModel { get; set; }
+        private WalletsViewModel WalletsViewModel { get; set; }
+        private ConversionViewModel ConversionViewModel { get; set; }
+        private SettingsViewModel SettingsViewModel { get; set; }
+        private WertViewModel WertViewModel { get; set; }
 
         [Reactive] public ViewModelBase? RightPopupContent { get; set; }
+        [Reactive] public bool RightPopupOpened { get; set; }
         [Reactive] public ViewModelBase Content { get; set; }
         [Reactive] public string InstalledVersion { get; set; }
         [Reactive] public bool IsExchangeConnected { get; set; }
@@ -87,7 +90,6 @@ namespace Atomex.Client.Desktop.ViewModels
         [ObservableAsProperty] public bool IsConversionSectionActive { get; }
         [ObservableAsProperty] public bool IsSettingsSectionActive { get; }
         [ObservableAsProperty] public bool IsWertSectionActive { get; }
-        [ObservableAsProperty] public bool RightPopupOpened { get; }
 
 
         private void SubscribeToServices()
@@ -102,6 +104,7 @@ namespace Atomex.Client.Desktop.ViewModels
             if (terminal?.Account == null)
             {
                 SelectPortfolio();
+                ShowRightPopupContent(null);
                 return;
             }
 
@@ -119,7 +122,7 @@ namespace Atomex.Client.Desktop.ViewModels
 
             // subscribe to symbols updates
             if (args.Service != TerminalService.MarketData || !IsMarketDataConnected) return;
-            
+
             terminal.SubscribeToMarketData(SubscriptionType.TopOfBook);
             terminal.SubscribeToMarketData(SubscriptionType.DepthTwenty);
         }
@@ -134,9 +137,18 @@ namespace Atomex.Client.Desktop.ViewModels
 
         private void ShowRightPopupContent(ViewModelBase? content)
         {
+            if (content == null)
+            {
+                RightPopupOpened = false;
+                return;
+            }
+
+            Log.Fatal($"Showing RightPopupContent with type {content.GetType()}");
+
+            RightPopupContent = null;
             RightPopupContent = content;
         }
-        
+
         public void SelectPortfolio()
         {
             Content = PortfolioViewModel;

@@ -170,6 +170,7 @@ namespace Atomex.Client.Desktop.ViewModels
             {
                 HasAccount = false;
                 MainView?.StopInactivityControl();
+                
                 return;
             }
 

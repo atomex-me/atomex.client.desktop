@@ -210,26 +210,55 @@
                     DockPanel.Dock="Right"
                     Width="1" />
         </DockPanel>
-        <Panel Name="ParentPanel">
-            <ContentControl Content="{Binding Content}" />
 
-            <Popup Height="{Binding #ParentPanel.Bounds.Height}"
-                   PlacementMode="AnchorAndGravity"
-                   PlacementTarget="{Binding ElementName=ParentPanel}"
-                   PlacementAnchor="TopRight"
-                   PlacementGravity="BottomLeft"
-                   VerticalAlignment="Stretch"
-                   WindowManagerAddShadowHint="False"
-                   IsLightDismissEnabled="True"
-                   IsOpen="{Binding RightPopupOpened}"
-                   Closed="Popup_OnClosed">
+        <Grid Name="WalletContentGrid" 
+              PointerPressed="WalletContentGrid_OnPointerPressed"
+              Background="{DynamicResource AlmostTransparentBrush}"
+              ColumnDefinitions="*,396">
+            <ContentControl Grid.Column="0"
+                            Grid.ColumnSpan="2"
+                            Content="{Binding Content}" />
 
-                <ContentControl Content="{Binding RightPopupContent}">
-                    <ContentControl.ContentTemplate>
-                        <controls:WalletPopupRightDataTemplateSelector />
-                    </ContentControl.ContentTemplate>
-                </ContentControl>
-            </Popup>
-        </Panel>
+            <ContentControl Grid.Column="1"
+                            IsEnabled="{Binding RightPopupOpened}"
+                            Content="{Binding RightPopupContent}">
+                
+                <ContentControl.ContentTemplate>
+                    <controls:WalletPopupRightDataTemplateSelector />
+                </ContentControl.ContentTemplate>
+                
+                <ContentControl.Styles>
+                    <Style Selector="ContentControl[IsEnabled=True]">
+                        <Style.Animations>
+                            <Animation Duration="0:0:0.5" Easing="QuadraticEaseOut" FillMode="Forward">
+                                <KeyFrame Cue="0%">
+                                    <Setter Property="TranslateTransform.X" Value="396" />
+                                    <Setter Property="Opacity" Value="0"></Setter>
+                                </KeyFrame>
+                                <KeyFrame Cue="100%">
+                                    <Setter Property="TranslateTransform.X" Value="0" />
+                                    <Setter Property="Opacity" Value="1"></Setter>
+                                </KeyFrame>
+                            </Animation>
+                        </Style.Animations>
+                    </Style>
+                    
+                    <Style Selector="ContentControl[IsEnabled=False]">
+                        <Style.Animations>
+                            <Animation Duration="0:0:0.5" Easing="QuadraticEaseOut" FillMode="Forward">
+                                <KeyFrame Cue="0%">
+                                    <Setter Property="TranslateTransform.X" Value="0" />
+                                    <Setter Property="Opacity" Value="1"></Setter>
+                                </KeyFrame>
+                                <KeyFrame Cue="100%">
+                                    <Setter Property="TranslateTransform.X" Value="396" />
+                                    <Setter Property="Opacity" Value="0"></Setter>
+                                </KeyFrame>
+                            </Animation>
+                        </Style.Animations>
+                    </Style>
+                </ContentControl.Styles>
+            </ContentControl>
+        </Grid>
     </DockPanel>
 </UserControl>
