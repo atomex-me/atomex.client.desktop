@@ -1,10 +1,12 @@
 using System;
 using System.Windows.Input;
 using System.Linq;
+
+using ReactiveUI;
+
 using Atomex.Client.Desktop.Common;
 using Atomex.Services;
 using Atomex.Wallet.Abstract;
-using ReactiveUI;
 
 namespace Atomex.Client.Desktop.ViewModels
 {
@@ -14,7 +16,10 @@ namespace Atomex.Client.Desktop.ViewModels
         {
         }
 
-        public StartViewModel(Action<ViewModelBase> showContent, Action showStart, IAtomexApp app,
+        public StartViewModel(
+            Action<ViewModelBase> showContent,
+            Action showStart,
+            IAtomexApp app,
             MainWindowViewModel mainWindowWM)
         {
 #if DEBUG
@@ -99,8 +104,7 @@ namespace Atomex.Client.Desktop.ViewModels
             var atomexClient = new WebSocketAtomexClient(
                 configuration: App.Configuration,
                 account: account,
-                symbolsProvider: AtomexApp.SymbolsProvider,
-                quotesProvider: AtomexApp.QuotesProvider);
+                symbolsProvider: AtomexApp.SymbolsProvider);
 
             AtomexApp.UseAtomexClient(atomexClient, restart: true);
         }
@@ -110,8 +114,7 @@ namespace Atomex.Client.Desktop.ViewModels
             var atomexClient = new WebSocketAtomexClient(
                 configuration: App.Configuration,
                 account: account,
-                symbolsProvider: AtomexApp.SymbolsProvider,
-                quotesProvider: AtomexApp.QuotesProvider);
+                symbolsProvider: AtomexApp.SymbolsProvider);
 
             MainWindowVM.AccountRestored = true;
 

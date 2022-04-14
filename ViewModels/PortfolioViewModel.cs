@@ -54,10 +54,10 @@ namespace Atomex.Client.Desktop.ViewModels
 
         private async void SubscribeToServices()
         {
-            App.AtomexClientChanged += OnTerminalChangedEventHandler;
+            App.AtomexClientChanged += OnAtomexClientChangedEventHandler;
         }
 
-        private void OnTerminalChangedEventHandler(object sender, AtomexClientChangedEventArgs e)
+        private void OnAtomexClientChangedEventHandler(object sender, AtomexClientChangedEventArgs e)
         {
             AllCurrencies = e.AtomexClient?.Account?.Currencies
                 .Select(c =>

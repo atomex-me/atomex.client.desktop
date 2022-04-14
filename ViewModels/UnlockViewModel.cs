@@ -4,9 +4,12 @@ using System.Security;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
 using System.Windows.Input;
-using Atomex.Client.Desktop.Common;
+
 using ReactiveUI;
+using ReactiveUI.Fody.Helpers;
 using Serilog;
+
+using Atomex.Client.Desktop.Common;
 
 namespace Atomex.Client.Desktop.ViewModels
 {
@@ -17,34 +20,14 @@ namespace Atomex.Client.Desktop.ViewModels
         public PasswordControlViewModel PasswordVM { get; set; }
         public string WalletName { get; set; }
 
-        private bool _inProgress;
-
-        public bool InProgress
-        {
-            get => _inProgress;
-            set
-            {
-                _inProgress = value;
-                this.RaisePropertyChanged(nameof(InProgress));
-            }
-        }
-
-        private bool _invalidPassword;
-
-        public bool InvalidPassword
-        {
-            get => _invalidPassword;
-            set
-            {
-                _invalidPassword = value;
-                this.RaisePropertyChanged(nameof(InvalidPassword));
-            }
-        }
+        [Reactive] public bool InProgress { get; set; }
+        [Reactive] public bool InvalidPassword { get; set; }
 
         private ICommand _unlockCommand;
         public ICommand UnlockCommand => _unlockCommand ??= (_unlockCommand = ReactiveCommand.Create(OnUnlockClick));
 
         private readonly Action<SecureString> _unlockAction;
+        private readonly Action _goBackAction;
 
         public UnlockViewModel()
         {
@@ -57,14 +40,18 @@ namespace Atomex.Client.Desktop.ViewModels
         public UnlockViewModel(
             string walletName,
             Action<SecureString> unlockAction,
-            Action goBack)
+            Action goBack,
+            Action? onUnlock = null)
         {
             WalletName = $"\"{walletName}\"";
             _unlockAction = unlockAction;
-            GoBack += goBack;
+            _goBackAction += goBack;
+            Unlocked += onUnlock;
 
             PasswordVM = new PasswordControlViewModel(
-                () => { InvalidPassword = false; }, placeholder: "Password...", isSmall: true)
+                onPasswordChanged: () => { InvalidPassword = false; },
+                placeholder: "Password...",
+                isSmall: true)
             {
                 IsFocused = true
             };
@@ -108,11 +95,9 @@ namespace Atomex.Client.Desktop.ViewModels
             Unlocked?.Invoke();
         }
 
-        private Action GoBack;
-
         public void GoBackCommand()
         {
-            GoBack?.Invoke();
+            _goBackAction?.Invoke();
         }
 
         private void DesignerMode()

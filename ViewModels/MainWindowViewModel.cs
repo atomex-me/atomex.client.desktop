@@ -4,16 +4,17 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using System.Windows.Input;
-using Atomex.Client.Desktop.Controls;
-using Atomex.Client.Desktop.Common;
-using Atomex.Client.Desktop.Properties;
-using Atomex.Common;
-using ReactiveUI;
-using Atomex.Services;
-using Atomex.Wallet;
+
 using Avalonia.Threading;
+using ReactiveUI;
 using Serilog;
 
+using Atomex.Client.Desktop.Common;
+using Atomex.Client.Desktop.Controls;
+using Atomex.Client.Desktop.Properties;
+using Atomex.Common;
+using Atomex.Services;
+using Atomex.Wallet;
 
 namespace Atomex.Client.Desktop.ViewModels
 {
@@ -100,7 +101,6 @@ namespace Atomex.Client.Desktop.ViewModels
         }
 
         public bool AccountRestored { get; set; }
-        private bool _updatesReady;
         public bool UpdatesReady => HasUpdates && UpdateDownloadProgress == 100;
         public bool IsDownloadingUpdate => HasUpdates && UpdateDownloadProgress > 0 && UpdateDownloadProgress < 100;
 
@@ -159,21 +159,21 @@ namespace Atomex.Client.Desktop.ViewModels
 
         private void SubscribeToServices()
         {
-            AtomexApp.AtomexClientChanged += OnTerminalChangedEventHandler;
+            AtomexApp.AtomexClientChanged += OnAtomexClientChangedEventHandler;
         }
 
-        private void OnTerminalChangedEventHandler(object sender, AtomexClientChangedEventArgs args)
+        private void OnAtomexClientChangedEventHandler(object sender, AtomexClientChangedEventArgs args)
         {
-            var terminal = args.AtomexClient;
+            var atomexClient = args.AtomexClient;
 
-            if (terminal?.Account == null)
+            if (atomexClient?.Account == null)
             {
                 HasAccount = false;
                 MainView?.StopInactivityControl();
                 return;
             }
 
-            var account = terminal.Account;
+            var account = atomexClient.Account;
 
             HasAccount = true;
 
@@ -191,7 +191,7 @@ namespace Atomex.Client.Desktop.ViewModels
         private async void OnUpdateClick()
         {
             await SignOut(withAppUpdate: true);
-            if (AtomexApp.Terminal != null) return;
+            if (AtomexApp.AtomexClient != null) return;
 
             OnUpdateAction?.Invoke();
             UpdateStarted = true;
@@ -277,37 +277,37 @@ namespace Atomex.Client.Desktop.ViewModels
 
             var accountName = new DirectoryInfo(accountDirectory).Name;
 
-            _unlockViewModel = new UnlockViewModel(accountName, password =>
-            {
-                var clientType = ClientType.Unknown;
-                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) clientType = ClientType.AvaloniaWindows;
-                if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX)) clientType = ClientType.AvaloniaMac;
-                if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux)) clientType = ClientType.AvaloniaLinux;
-
-                var _ = Account.LoadFromFile(
-                    pathToAccount: pathToAccount,
-                    password: password,
-                    currenciesProvider: AtomexApp.CurrenciesProvider,
-                    clientType: clientType);
-            }, async () => await SignOut());
-
             var wasClosed = false;
             Dispatcher.UIThread.InvokeAsync(() =>
             {
                 wasClosed = App.DialogService.Close();
-                ;
             });
 
-            _unlockViewModel.Unlocked = () =>
-            {
-                ShowContent(MainWalletVM);
-
-                if (wasClosed)
+            _unlockViewModel = new UnlockViewModel(
+                walletName: accountName,
+                unlockAction: password =>
                 {
-                    App.DialogService.ShowPrevious();
-                }
-            };
+                    var clientType = ClientType.Unknown;
+                    if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) clientType = ClientType.AvaloniaWindows;
+                    if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX)) clientType = ClientType.AvaloniaMac;
+                    if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux)) clientType = ClientType.AvaloniaLinux;
 
+                    var _ = Account.LoadFromFile(
+                        pathToAccount: pathToAccount,
+                        password: password,
+                        currenciesProvider: AtomexApp.CurrenciesProvider,
+                        clientType: clientType);
+                },
+                goBack: async () => await SignOut(),
+                onUnlock: () =>
+                {
+                    ShowContent(MainWalletVM);
+
+                    if (wasClosed)
+                    {
+                        App.DialogService.ShowPrevious();
+                    }
+                });
 
             ShowContent(_unlockViewModel);
         }
