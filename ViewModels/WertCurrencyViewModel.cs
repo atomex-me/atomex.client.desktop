@@ -18,6 +18,7 @@ using Atomex.Common;
 using Atomex.Cryptography;
 using Atomex.Wallet.Abstract;
 using Atomex.ViewModels;
+using Atomex.Cryptography.Abstract;
 
 namespace Atomex.Client.Desktop.ViewModels
 {
@@ -82,7 +83,8 @@ namespace Atomex.Client.Desktop.ViewModels
             using var servicePublicKey =
                 _app.Account.Wallet.GetServicePublicKey(_app.Account.UserSettings.AuthenticationKeyIndex);
             using var publicKey = servicePublicKey.ToUnsecuredBytes();
-            return Sha256.Compute(Sha256.Compute(publicKey)).ToHexString();
+
+            return HashAlgorithm.Sha256.Hash(publicKey.Data).ToHexString();
         }
 
         public WertCurrencyViewModel()
