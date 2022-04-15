@@ -334,7 +334,7 @@ namespace Atomex.Client.Desktop.ViewModels
                                 keyIndex: walletAddress.KeyIndex,
                                 keyType: walletAddress.KeyType);
 
-                            using var unsecuredPrivateKey = privateKey.ToUnsecuredBytes();
+                            var unsecuredPrivateKey = privateKey.ToUnsecuredBytes();
 
                             if (Currencies.IsBitcoinBased(_currency.Name))
                             {
@@ -349,14 +349,14 @@ namespace Atomex.Client.Desktop.ViewModels
                             else if (Currencies.IsTezosBased(_currency.Name))
                             {
                                 var base58 = unsecuredPrivateKey.Length == 32
-                                    ? Base58Check.Encode(unsecuredPrivateKey.Data, Prefix.Edsk)
-                                    : Base58Check.Encode(unsecuredPrivateKey.Data, Prefix.EdskSecretKey);
+                                    ? Base58Check.Encode(unsecuredPrivateKey, Prefix.Edsk)
+                                    : Base58Check.Encode(unsecuredPrivateKey, Prefix.EdskSecretKey);
 
                                 _ = App.Clipboard.SetTextAsync(base58);
                             }
                             else
                             {
-                                var hex = Hex.ToHexString(unsecuredPrivateKey.Data);
+                                var hex = Hex.ToHexString(unsecuredPrivateKey);
 
                                 _ = App.Clipboard.SetTextAsync(hex);
                             }
