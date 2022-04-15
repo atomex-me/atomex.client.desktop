@@ -58,25 +58,8 @@ namespace Atomex.Client.Desktop.Views
         {
             InitializeComponent();
             this.AttachDevTools();
-            
-            // var walletContentGrid = this.FindControl<DialogHost.DialogHost>("MainDialogHost");
-            //
-            // walletContentGrid.AddHandler(PointerPressedEvent, handler!, RoutingStrategies.Tunnel);
-            //
-            // void handler(object sender, PointerPressedEventArgs e)
-            // {
-            //     // if (DataContext is WertCurrencyViewModel viewModel)
-            //     // {
-            //     //     viewModel.FromAmountChangedFromKeyboard = true;
-            //     //     viewModel.StartAsyncRatesCheck(WertCurrencyViewModel.Side.From);
-            //     // }
-            //     
-            //     //e.Source.InteractiveParent.InteractiveParent.InteractiveParent.InteractiveParent
-            //     
-            //     Log.Fatal($"ShouldClose 333333");
-            // }
 
-            this.PropertyChanged += (s, e) =>
+            PropertyChanged += (s, e) =>
             {
                 if (e.Property == Control.DataContextProperty)
                 {
@@ -90,24 +73,13 @@ namespace Atomex.Client.Desktop.Views
 
             InputManager.Instance.PreProcess.OfType<RawInputEventArgs>()
                 .Throttle(TimeSpan.FromMilliseconds(500))
-                .SubscribeInMainThread(
-                    (a) =>
-                    {
-                        if (a is RawPointerEventArgs rawPointerEventArgs)
-                        {
-           
-                            if (rawPointerEventArgs.Type is RawPointerEventType.LeftButtonUp)
-                            {
-                                Log.Fatal("MouseUp");
-                            }
-                        }
+                .SubscribeInMainThread(_ =>
+                {
+                    if (!_inactivityControlEnabled || _activityTimer == null) return;
 
-                        if (_inactivityControlEnabled && _activityTimer != null)
-                        {
-                            _activityTimer.Stop();
-                            _activityTimer.Start();
-                        }
-                    });
+                    _activityTimer.Stop();
+                    _activityTimer.Start();
+                });
             _isOsx = RuntimeInformation.IsOSPlatform(OSPlatform.OSX);
             _isWin = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
             _isLinux = RuntimeInformation.IsOSPlatform(OSPlatform.Linux);

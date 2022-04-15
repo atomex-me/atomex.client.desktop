@@ -7,6 +7,7 @@ using System.Windows.Input;
 using Atomex.Client.Desktop.Controls;
 using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.Properties;
+using Atomex.Client.Desktop.Views;
 using Atomex.Common;
 using ReactiveUI;
 using Atomex.Services;
@@ -40,7 +41,7 @@ namespace Atomex.Client.Desktop.ViewModels
             set => this.RaiseAndSetIfChanged(ref _content, value);
         }
 
-        private ViewModelBase MainWalletVM;
+        private WalletMainViewModel WalletMainViewModel;
 
         public MainWindowViewModel()
         {
@@ -55,7 +56,7 @@ namespace Atomex.Client.Desktop.ViewModels
         public MainWindowViewModel(IAtomexApp app, IMainView mainView = null)
         {
             AtomexApp = app ?? throw new ArgumentNullException(nameof(app));
-            MainWalletVM = new WalletMainViewModel(AtomexApp);
+            WalletMainViewModel = new WalletMainViewModel(AtomexApp);
 
             SubscribeToServices();
 
@@ -82,7 +83,7 @@ namespace Atomex.Client.Desktop.ViewModels
                 _hasAccount = value;
                 if (_hasAccount)
                 {
-                    ShowContent(MainWalletVM);
+                    ShowContent(WalletMainViewModel);
 
                     if (AccountRestored)
                     {
@@ -296,20 +297,18 @@ namespace Atomex.Client.Desktop.ViewModels
             Dispatcher.UIThread.InvokeAsync(() =>
             {
                 wasClosed = App.DialogService.Close();
-                ;
             });
 
             _unlockViewModel.Unlocked = () =>
             {
-                ShowContent(MainWalletVM);
+                ShowContent(WalletMainViewModel);
 
                 if (wasClosed)
                 {
                     App.DialogService.ShowPrevious();
                 }
             };
-
-
+            
             ShowContent(_unlockViewModel);
         }
 
@@ -344,7 +343,7 @@ namespace Atomex.Client.Desktop.ViewModels
                             _unlockViewModel.Unlocked = null;
                             _unlockViewModel.Unlocked = () =>
                             {
-                                ShowContent(MainWalletVM);
+                                ShowContent(WalletMainViewModel);
                                 _ = Dispatcher.UIThread.InvokeAsync(() =>
                                 {
                                     App.DialogService.Show(

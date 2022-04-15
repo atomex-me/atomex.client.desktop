@@ -31,7 +31,6 @@ namespace Atomex.Client.Desktop.ViewModels
 {
     public class ConversionViewModel : ViewModelBase
     {
-        private const int DelayBeforeSwitchingSwapDetailsMs = 400;
         private readonly IAtomexApp _app;
 
         private ISymbols Symbols
@@ -124,8 +123,8 @@ namespace Atomex.Client.Desktop.ViewModels
             {
                 _ = Dispatcher.UIThread.InvokeAsync(async () =>
                 {
-                    OnSwapDetailsClose();
-                    await Task.Delay(DelayBeforeSwitchingSwapDetailsMs);
+                    ShowRightPopupContent?.Invoke(null);
+                    await Task.Delay(WalletMainViewModel.DelayBeforeSwitchingSwapDetailsMs);
                     DGSelectedIndex = cellIndex;
                 });
             }
@@ -936,7 +935,7 @@ namespace Atomex.Client.Desktop.ViewModels
                         .Select(s => SwapViewModelFactory.CreateSwapViewModel(
                             swap: s,
                             currencies: Currencies,
-                            onCloseSwap: OnSwapDetailsClose))
+                            onCloseSwap: () => ShowRightPopupContent?.Invoke(null)))
                         .WhereNotNull()
                         .ToList()
                         .SortList((s1, s2) =>
@@ -947,8 +946,8 @@ namespace Atomex.Client.Desktop.ViewModels
 
                     if (previousSwapsCount != null && previousSwapsCount < swapViewModels?.Count)
                     {
-                        OnSwapDetailsClose();
-                        await Task.Delay(DelayBeforeSwitchingSwapDetailsMs);
+                        ShowRightPopupContent?.Invoke(null);
+                        await Task.Delay(WalletMainViewModel.DelayBeforeSwitchingSwapDetailsMs);
                         DGSelectedIndex = 0;
                     }
                 }, DispatcherPriority.Background);
@@ -957,12 +956,6 @@ namespace Atomex.Client.Desktop.ViewModels
             {
                 Log.Error(e, "Swaps update error");
             }
-        }
-
-        private void OnSwapDetailsClose()
-        {
-            DGSelectedIndex = -1;
-            ShowRightPopupContent?.Invoke(null);
         }
 
         private void OnConvertClick()

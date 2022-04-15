@@ -4,19 +4,23 @@ using System.Linq;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using Atomex.Client.Desktop.Common;
+using Atomex.Client.Desktop.ViewModels.TransactionViewModels;
 using ReactiveUI;
 using Atomex.Core;
 using Atomex.MarketData;
 using Atomex.MarketData.Abstract;
 using Atomex.Services;
 using Atomex.Services.Abstract;
+using Avalonia.Threading;
 using ReactiveUI.Fody.Helpers;
-using Serilog;
+
 
 namespace Atomex.Client.Desktop.ViewModels
 {
     public class WalletMainViewModel : ViewModelBase
     {
+        public const int DelayBeforeSwitchingSwapDetailsMs = 250;
+
         public WalletMainViewModel()
         {
         }
@@ -44,6 +48,16 @@ namespace Atomex.Client.Desktop.ViewModels
             this.WhenAnyValue(vm => vm.RightPopupContent)
                 .WhereNotNull()
                 .SubscribeInMainThread(_ => RightPopupOpened = true);
+
+            this.WhenAnyValue(vm => vm.Content)
+                .WhereNotNull()
+                .Where(_ => RightPopupOpened)
+                .SubscribeInMainThread(_ => ShowRightPopupContent(null));
+
+            this.WhenAnyValue(vm => vm.RightPopupContent)
+                .Select(content => content != null)
+                .Throttle(TimeSpan.FromMilliseconds(1))
+                .ToPropertyExInMainThread(this, vm => vm.RightPopupHasContent);
 
             PortfolioViewModel = new PortfolioViewModel(AtomexApp)
             {
@@ -74,7 +88,7 @@ namespace Atomex.Client.Desktop.ViewModels
 
         private IAtomexApp AtomexApp { get; set; }
         private PortfolioViewModel PortfolioViewModel { get; set; }
-        private WalletsViewModel WalletsViewModel { get; set; }
+        public WalletsViewModel WalletsViewModel { get; set; }
         private ConversionViewModel ConversionViewModel { get; set; }
         private SettingsViewModel SettingsViewModel { get; set; }
         private WertViewModel WertViewModel { get; set; }
@@ -90,6 +104,7 @@ namespace Atomex.Client.Desktop.ViewModels
         [ObservableAsProperty] public bool IsConversionSectionActive { get; }
         [ObservableAsProperty] public bool IsSettingsSectionActive { get; }
         [ObservableAsProperty] public bool IsWertSectionActive { get; }
+        [ObservableAsProperty] public bool RightPopupHasContent { get; }
 
 
         private void SubscribeToServices()
@@ -135,19 +150,40 @@ namespace Atomex.Client.Desktop.ViewModels
             IsQuotesProviderAvailable = provider.IsAvailable;
         }
 
-        private void ShowRightPopupContent(ViewModelBase? content)
+        public void ShowRightPopupContent(ViewModelBase? popupContent)
         {
-            if (content == null)
+            switch (popupContent)
             {
-                RightPopupOpened = false;
-                return;
+                case null:
+                    RightPopupOpened = false;
+                    ConversionViewModel.DGSelectedIndex = -1;
+
+                    _ = Dispatcher.UIThread.InvokeAsync(async () =>
+                    {
+                        await Task.Delay(TimeSpan.FromMilliseconds(DelayBeforeSwitchingSwapDetailsMs + 100));
+                        if (!RightPopupOpened)
+                        {
+                            RightPopupContent = null;
+                            WalletsViewModel.Selected.SelectedTransaction = null;
+                        }
+                    });
+                    return;
+
+                // allow showing SwapDetails only when Conversion page is active
+                case SwapDetailsViewModel when Content is not ViewModels.ConversionViewModel:
+                    return;
+
+                // allow showing TransactionDetails only when WalletsViewModel page is active
+                case TransactionViewModelBase when Content is not ViewModels.WalletsViewModel:
+                    return;
+
+                default:
+                    RightPopupContent = null;
+                    RightPopupContent = popupContent;
+                    break;
             }
-
-            Log.Fatal($"Showing RightPopupContent with type {content.GetType()}");
-
-            RightPopupContent = null;
-            RightPopupContent = content;
         }
+
 
         public void SelectPortfolio()
         {

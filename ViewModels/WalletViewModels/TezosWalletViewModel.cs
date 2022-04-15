@@ -16,6 +16,7 @@ using Atomex.Core;
 using Atomex.Wallet;
 using ReactiveUI.Fody.Helpers;
 
+
 namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 {
     public enum DelegationSortField

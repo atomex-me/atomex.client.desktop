@@ -329,7 +329,8 @@
                              SelectedItem="{Binding SelectedTransaction}"
                              HorizontalAlignment="Stretch"
                              VerticalAlignment="Stretch"
-                             SelectionMode="Single">
+                             SelectionMode="Single"
+                             Classes="NoCloseRightPopup">
                         <ListBox.Styles>
                             <Style Selector="ListBoxItem">
                                 <Setter Property="Padding" Value="0" />

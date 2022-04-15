@@ -42,12 +42,15 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
         protected sealed override async Task LoadTransactionsAsync()
         {
+            await LoadTransactionsSemaphore.WaitAsync();
             Log.Debug("LoadTransactionsAsync for FA12 {@currency}.", Currency.Name);
 
             try
             {
                 if (_app.Account == null)
                     return;
+                
+                IsTransactionsLoading = true;
 
                 var transactions = (await _app.Account
                         .GetCurrencyAccount<Fa12Account>(Currency.Name)
@@ -58,13 +61,15 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
                 await Dispatcher.UIThread.InvokeAsync(() =>
                     {
-                        Transactions = new ObservableCollection<TransactionViewModelBase>(
-                            transactions.Select(t => new TezosTokenTransferViewModel(t, Currency))
-                                .ToList());
+                        var selectedTransactionId = SelectedTransaction?.Id;
 
-                        SortTransactions();
-                    },
-                    DispatcherPriority.Background);
+                        Transactions = SortTransactions(
+                            transactions.Select(t => new TezosTokenTransferViewModel(t, Currency)));
+
+                        if (selectedTransactionId != null)
+                            SelectedTransaction = Transactions.FirstOrDefault(t => t.Id == selectedTransactionId);
+                    }
+                );
             }
             catch (OperationCanceledException)
             {
@@ -73,6 +78,10 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             catch (Exception e)
             {
                 Log.Error(e, "LoadTransactionsAsync error for {@currency}.", Currency?.Name);
+            }
+            finally
+            {
+                LoadTransactionsSemaphore.Release();
             }
         }
 

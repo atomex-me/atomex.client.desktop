@@ -44,10 +44,12 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         protected IAtomexApp _app;
         [Reactive] public ObservableCollection<TransactionViewModelBase> Transactions { get; set; }
         [Reactive] public TransactionViewModelBase? SelectedTransaction { get; set; }
+        private TransactionViewModelBase? PreviousSelectedTransaction { get; set; }
         [Reactive] public CurrencyViewModel CurrencyViewModel { get; set; }
         [Reactive] public bool IsBalanceUpdating { get; set; }
         [Reactive] public TxSortField? CurrentSortField { get; set; }
         [Reactive] public SortDirection? CurrentSortDirection { get; set; }
+        protected bool IsTransactionsLoading { get; set; }
         public AddressesViewModel AddressesViewModel { get; set; }
         protected Action<CurrencyConfig> SetConversionTab { get; }
         private Action<string> SetWertCurrency { get; }
@@ -93,23 +95,42 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             if (currency != null)
                 CurrencyViewModel = CurrencyViewModelCreator.CreateViewModel(currency);
 
-            this.WhenAnyValue(vm => vm.Transactions)
-                .WhereNotNull()
-                .Take(1)
-                .SubscribeInMainThread(_ =>
-                {
-                    CurrentSortField = TxSortField.ByTime;
-                    CurrentSortDirection = SortDirection.Desc;
-                });
-
             this.WhenAnyValue(vm => vm.CurrentSortField, vm => vm.CurrentSortDirection)
                 .WhereAllNotNull()
                 .Where(_ => Transactions != null)
-                .SubscribeInMainThread(_ => { SortTransactions(); });
+                .SubscribeInMainThread(_ => { Transactions = SortTransactions(Transactions); });
 
             this.WhenAnyValue(vm => vm.SelectedTransaction)
                 .Skip(1)
-                .SubscribeInMainThread(_ => ShowRightPopupContent?.Invoke(SelectedTransaction));
+                .Throttle(TimeSpan.FromMilliseconds(1))
+                .SubscribeInMainThread(selectedTransaction =>
+                {
+                    if (IsTransactionsLoading && selectedTransaction == null)
+                    {
+                        IsTransactionsLoading = false;
+                        return;
+                    }
+
+                    if (PreviousSelectedTransaction != null && selectedTransaction != null &&
+                        PreviousSelectedTransaction.Id != selectedTransaction.Id)
+                    {
+                        Dispatcher.UIThread.InvokeAsync(async () =>
+                        {
+                            ShowRightPopupContent?.Invoke(null);
+                            await Task.Delay(WalletMainViewModel.DelayBeforeSwitchingSwapDetailsMs);
+                            ShowRightPopupContent?.Invoke(selectedTransaction);
+                        });
+                    }
+                    else
+                    {
+                        ShowRightPopupContent?.Invoke(selectedTransaction);
+                    }
+
+                    PreviousSelectedTransaction = selectedTransaction;
+                });
+
+            CurrentSortField = TxSortField.ByTime;
+            CurrentSortDirection = SortDirection.Desc;
 
             SubscribeToServices();
             LoadAddresses();
@@ -141,11 +162,10 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         {
             try
             {
-                if (Currency.Name == args.Transaction.Currency)
-                {
-                    // update transactions list
-                    await LoadTransactionsAsync();
-                }
+                if (Currency.Name != args.Transaction.Currency) return;
+
+                // update transactions list
+                await LoadTransactionsAsync();
             }
             catch (Exception e)
             {
@@ -158,33 +178,9 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             AddressesViewModel = new AddressesViewModel(_app, CurrencyViewModel.Currency);
         }
 
-        protected void SortTransactions()
+        protected ObservableCollection<TransactionViewModelBase> SortTransactions(
+            IEnumerable<TransactionViewModelBase> transactions)
         {
-            Transactions = CurrentSortField switch
-            {
-                TxSortField.ByTime when CurrentSortDirection == SortDirection.Desc
-                    => new ObservableCollection<TransactionViewModelBase>(
-                        Transactions.OrderByDescending(tx => tx.LocalTime)),
-                TxSortField.ByTime when CurrentSortDirection == SortDirection.Asc
-                    => new ObservableCollection<TransactionViewModelBase>(
-                        Transactions.OrderBy(tx => tx.LocalTime)),
-
-                TxSortField.ByAmount when CurrentSortDirection == SortDirection.Desc
-                    => new ObservableCollection<TransactionViewModelBase>(
-                        Transactions.OrderByDescending(tx => tx.Amount)),
-                TxSortField.ByAmount when CurrentSortDirection == SortDirection.Asc
-                    => new ObservableCollection<TransactionViewModelBase>(
-                        Transactions.OrderBy(tx => tx.Amount)),
-
-                TxSortField.ByStatus when CurrentSortDirection == SortDirection.Desc
-                    => new ObservableCollection<TransactionViewModelBase>(
-                        Transactions.OrderByDescending(tx => tx.State)),
-                TxSortField.ByStatus when CurrentSortDirection == SortDirection.Asc
-                    => new ObservableCollection<TransactionViewModelBase>(
-                        Transactions.OrderBy(tx => tx.State)),
-                _ => Transactions
-            };
-
             SortByTimeAndAsc =
                 CurrentSortField == TxSortField.ByTime && CurrentSortDirection == SortDirection.Asc;
             SortByTimeAndDesc =
@@ -201,10 +197,38 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             SortByTime = CurrentSortField == TxSortField.ByTime;
             SortByStatus = CurrentSortField == TxSortField.ByStatus;
             SortByAmount = CurrentSortField == TxSortField.ByAmount;
+
+            return CurrentSortField switch
+            {
+                TxSortField.ByTime when CurrentSortDirection == SortDirection.Desc
+                    => new ObservableCollection<TransactionViewModelBase>(
+                        transactions.OrderByDescending(tx => tx.LocalTime)),
+                TxSortField.ByTime when CurrentSortDirection == SortDirection.Asc
+                    => new ObservableCollection<TransactionViewModelBase>(
+                        transactions.OrderBy(tx => tx.LocalTime)),
+
+                TxSortField.ByAmount when CurrentSortDirection == SortDirection.Desc
+                    => new ObservableCollection<TransactionViewModelBase>(
+                        transactions.OrderByDescending(tx => tx.Amount)),
+                TxSortField.ByAmount when CurrentSortDirection == SortDirection.Asc
+                    => new ObservableCollection<TransactionViewModelBase>(
+                        transactions.OrderBy(tx => tx.Amount)),
+
+                TxSortField.ByStatus when CurrentSortDirection == SortDirection.Desc
+                    => new ObservableCollection<TransactionViewModelBase>(
+                        transactions.OrderByDescending(tx => tx.State)),
+                TxSortField.ByStatus when CurrentSortDirection == SortDirection.Asc
+                    => new ObservableCollection<TransactionViewModelBase>(
+                        transactions.OrderBy(tx => tx.State)),
+                _ => Transactions
+            };
         }
 
+        
+        protected readonly SemaphoreSlim LoadTransactionsSemaphore = new(1, 1);
         protected virtual async Task LoadTransactionsAsync()
         {
+            await LoadTransactionsSemaphore.WaitAsync();
             Log.Debug("LoadTransactionsAsync for {@currency}", Currency.Name);
 
             try
@@ -212,26 +236,29 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                 if (_app.Account == null)
                     return;
 
+                IsTransactionsLoading = true;
+
                 var transactions = (await _app.Account
                         .GetTransactionsAsync(Currency.Name))
                     .ToList();
 
                 await Dispatcher.UIThread.InvokeAsync(() =>
-                    {
-                        Transactions = new ObservableCollection<TransactionViewModelBase>(
-                            transactions
-                                .Select(t => TransactionViewModelCreator
-                                    .CreateViewModel(t, Currency))
-                                .ToList()
-                                .ForEachDo(t =>
-                                {
-                                    t.UpdateClicked += UpdateTransactonEventHandler;
-                                    t.RemoveClicked += RemoveTransactonEventHandler;
-                                }));
+                {
+                    var selectedTransactionId = SelectedTransaction?.Id;
 
-                        SortTransactions();
-                    },
-                    DispatcherPriority.Background);
+                    Transactions = SortTransactions(
+                        transactions
+                            .Select(t => TransactionViewModelCreator.CreateViewModel(t, Currency))
+                            .ToList()
+                            .ForEachDo(t =>
+                            {
+                                t.UpdateClicked += UpdateTransactonEventHandler;
+                                t.RemoveClicked += RemoveTransactonEventHandler;
+                            }));
+
+                    if (selectedTransactionId != null)
+                        SelectedTransaction = Transactions.FirstOrDefault(t => t.Id == selectedTransactionId);
+                });
             }
             catch (OperationCanceledException)
             {
@@ -240,6 +267,11 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             catch (Exception e)
             {
                 Log.Error(e, "LoadTransactionAsync error for {@currency}", Currency?.Name);
+            }
+
+            finally
+            {
+                LoadTransactionsSemaphore.Release();
             }
         }
 

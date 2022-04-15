@@ -127,7 +127,8 @@
         </Style>
     </UserControl.Styles>
 
-    <Border Background="{DynamicResource DeepBlue}">
+    <Border Background="{DynamicResource DeepBlue}"
+            Classes="NoCloseRightPopup">
         <StackPanel Orientation="Vertical">
             <Button Width="25"
                     Height="25"

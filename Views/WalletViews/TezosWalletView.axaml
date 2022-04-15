@@ -222,7 +222,8 @@
                                Text="Activity" />
                 </TabItem.Header>
 
-                <Grid RowDefinitions="Auto,*">
+                <Grid RowDefinitions="Auto,*"
+                      Classes="NoCloseRightPopup">
                     <Border Grid.Row="0"
                             Background="{DynamicResource LightDefaultOpacity6}"
                             VerticalAlignment="Top"
@@ -339,10 +340,11 @@
                     <ListBox Grid.Row="1"
                              Background="{DynamicResource AlmostTransparentBrush}"
                              Items="{Binding Transactions}"
-                             SelectedItem="{Binding SelectedTransaction}"
+                             SelectedItem="{Binding SelectedTransaction, Mode=TwoWay}"
                              HorizontalAlignment="Stretch"
                              VerticalAlignment="Stretch"
-                             SelectionMode="Single">
+                             SelectionMode="Single"
+                             Name="TransactionsListBox">
                         <ListBox.Styles>
                             <Style Selector="ListBoxItem">
                                 <Setter Property="Padding" Value="0" />

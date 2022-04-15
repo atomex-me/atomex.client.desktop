@@ -1,10 +1,8 @@
-using System;
 using Atomex.Client.Desktop.ViewModels;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
-using Serilog;
 
 namespace Atomex.Client.Desktop.Views
 {
@@ -15,20 +13,16 @@ namespace Atomex.Client.Desktop.Views
             InitializeComponent();
 
             var walletContentGrid = this.FindControl<Grid>("WalletContentGrid");
-            
-            walletContentGrid.AddHandler(PointerPressedEvent, handler!, RoutingStrategies.Tunnel);
-            
-            void handler(object sender, PointerPressedEventArgs e)
+            walletContentGrid.AddHandler(PointerPressedEvent, WalletContentGridClicked!, RoutingStrategies.Tunnel);
+
+            void WalletContentGridClicked(object sender, PointerPressedEventArgs e)
             {
-                // if (DataContext is WertCurrencyViewModel viewModel)
-                // {
-                //     viewModel.FromAmountChangedFromKeyboard = true;
-                //     viewModel.StartAsyncRatesCheck(WertCurrencyViewModel.Side.From);
-                // }
+                if (DataContext is not WalletMainViewModel walletMainViewModel) return;
+                if (!GetShouldClose(e.Source) || !walletMainViewModel.RightPopupOpened) return;
                 
-                //e.Source.InteractiveParent.InteractiveParent.InteractiveParent.InteractiveParent
-                
-                Log.Fatal($"ShouldClose {GetShouldClose(e.Source)}");
+                walletMainViewModel.ShowRightPopupContent(null);
+                // if (walletMainViewModel.Content is WalletsViewModel walletsViewModel)
+                //     walletsViewModel
             }
         }
 
@@ -42,11 +36,6 @@ namespace Atomex.Client.Desktop.Views
             var control = parent as Control;
             if (control is WalletMainView) return true;
             return !control.Classes.Contains("NoCloseRightPopup") && GetShouldClose(parent.InteractiveParent);
-        }
-
-        private void WalletContentGrid_OnPointerPressed(object? sender, PointerPressedEventArgs e)
-        {
-            Log.Fatal("PRESSED");
         }
     }
 }
