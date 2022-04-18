@@ -41,10 +41,10 @@ namespace Atomex.Client.Desktop.ViewModels
 
         private void SubscribeToServices()
         {
-            App.AtomexClientChanged += OnTerminalChangedEventHandler;
+            App.AtomexClientChanged += OnAtomexClientChangedEventHandler;
         }
 
-        private void OnTerminalChangedEventHandler(object sender, AtomexClientChangedEventArgs e)
+        private void OnAtomexClientChangedEventHandler(object sender, AtomexClientChangedEventArgs e)
         {
             var walletsViewModels = new List<IWalletViewModel>();
 

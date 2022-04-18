@@ -6,12 +6,10 @@ using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows.Input;
 using Avalonia.Threading;
 using NBitcoin;
 using ReactiveUI;
 using Serilog;
-using Network = NBitcoin.Network;
 using Atomex.Blockchain;
 using Atomex.Blockchain.BitcoinBased;
 using Atomex.Client.Desktop.Common;
@@ -23,6 +21,8 @@ using Atomex.Core;
 using Atomex.Wallet;
 using Avalonia.Controls;
 using ReactiveUI.Fody.Helpers;
+using Network = NBitcoin.Network;
+
 
 namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 {
@@ -252,8 +252,8 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                             .ToList()
                             .ForEachDo(t =>
                             {
-                                t.UpdateClicked += UpdateTransactonEventHandler;
-                                t.RemoveClicked += RemoveTransactonEventHandler;
+                                t.UpdateClicked += UpdateTransactionEventHandler;
+                                t.RemoveClicked += RemoveTransactionEventHandler;
                             }));
 
                     if (selectedTransactionId != null)
@@ -275,21 +275,21 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             }
         }
 
-        private ICommand _sendCommand;
-        public ICommand SendCommand => _sendCommand ??= ReactiveCommand.Create(OnSendClick);
+        private ReactiveCommand<Unit, Unit> _sendCommand;
+        public ReactiveCommand<Unit, Unit> SendCommand => _sendCommand ??= ReactiveCommand.Create(OnSendClick);
 
-        private ICommand _receiveCommand;
-        public ICommand ReceiveCommand => _receiveCommand ??= ReactiveCommand.Create(OnReceiveClick);
+        private ReactiveCommand<Unit, Unit> _receiveCommand;
+        public ReactiveCommand<Unit, Unit> ReceiveCommand => _receiveCommand ??= ReactiveCommand.Create(OnReceiveClick);
 
-        private ICommand _exchangeCommand;
-        public ICommand ExchangeCommand => _exchangeCommand ??= ReactiveCommand.Create(OnConvertClick);
+        private ReactiveCommand<Unit, Unit> _exchangeCommand;
+        public ReactiveCommand<Unit, Unit> ExchangeCommand => _exchangeCommand ??= ReactiveCommand.Create(OnConvertClick);
 
-        private ICommand _updateCommand;
-        public ICommand UpdateCommand => _updateCommand ??= ReactiveCommand.Create(OnUpdateClick);
+        private ReactiveCommand<Unit, Unit> _updateCommand;
+        public ReactiveCommand<Unit, Unit> UpdateCommand => _updateCommand ??= ReactiveCommand.Create(OnUpdateClick);
 
-        private ICommand _cancelUpdateCommand;
+        private ReactiveCommand<Unit, Unit> _cancelUpdateCommand;
 
-        public ICommand CancelUpdateCommand => _cancelUpdateCommand ??= ReactiveCommand.Create(
+        public ReactiveCommand<Unit, Unit> CancelUpdateCommand => _cancelUpdateCommand ??= ReactiveCommand.Create(
             () => _cancellation?.Cancel());
 
         private ReactiveCommand<Unit, Unit> _buyCommand;
@@ -362,12 +362,12 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             IsBalanceUpdating = false;
         }
 
-        private void UpdateTransactonEventHandler(object sender, TransactionEventArgs args)
+        private void UpdateTransactionEventHandler(object sender, TransactionEventArgs args)
         {
             // todo:
         }
 
-        private async void RemoveTransactonEventHandler(object sender, TransactionEventArgs args)
+        private async void RemoveTransactionEventHandler(object sender, TransactionEventArgs args)
         {
             if (_app.Account == null)
                 return;

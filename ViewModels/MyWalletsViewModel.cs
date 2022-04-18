@@ -1,24 +1,25 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.InteropServices;
 using System.Windows.Input;
+
+using ReactiveUI;
+
 using Atomex.Client.Desktop.Common;
 using Atomex.Common;
 using Atomex.Core;
 using Atomex.LiteDb;
 using Atomex.Services;
-
 using Atomex.Wallet;
 using Atomex.Wallet.Abstract;
-using ReactiveUI;
-using Serilog;
 
 namespace Atomex.Client.Desktop.ViewModels
 {
     public class MyWalletsViewModel : ViewModelBase
     {
         private IAtomexApp AtomexApp { get; }
+        private readonly Action<ViewModelBase> ShowContent;
+        private Action DoAfterAtomexClientChanged;
 
         public IEnumerable<WalletInfo> Wallets { get; set; }
 
@@ -31,58 +32,53 @@ namespace Atomex.Client.Desktop.ViewModels
         }
 
         public MyWalletsViewModel(
-            IAtomexApp app, Action<ViewModelBase> showContent)
+            IAtomexApp app,
+            Action<ViewModelBase> showContent)
         {
             AtomexApp = app ?? throw new ArgumentNullException(nameof(app));
             Wallets = WalletInfo.AvailableWallets();
-            AtomexApp.AtomexClientChanged += OnTerminalChangedEventHandler;
+            AtomexApp.AtomexClientChanged += OnAtomexClientChangedEventHandler;
 
             ShowContent += showContent;
         }
 
-        private Action<ViewModelBase> ShowContent;
-
         private ICommand _selectWalletCommand;
-
-        private Action DoAfterTerminalChanged;
-
-
         public ICommand SelectWalletCommand => _selectWalletCommand ??= ReactiveCommand.Create<WalletInfo>(info =>
         {
             IAccount account = null;
 
-            var unlockViewModel = new UnlockViewModel(info.Name, password =>
-            {
-                var clientType = ClientType.Unknown;
-                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) clientType = ClientType.AvaloniaWindows;
-                if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX)) clientType = ClientType.AvaloniaMac;
-                if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux)) clientType = ClientType.AvaloniaLinux;
+            var unlockViewModel = new UnlockViewModel(
+                walletName: info.Name,
+                unlockAction: password =>
+                {
+                    var clientType = ClientType.Unknown;
+                    if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) clientType = ClientType.AvaloniaWindows;
+                    if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX)) clientType = ClientType.AvaloniaMac;
+                    if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux)) clientType = ClientType.AvaloniaLinux;
                 
-                account = Account.LoadFromFile(
-                    pathToAccount: info.Path,
-                    password: password,
-                    currenciesProvider: AtomexApp.CurrenciesProvider,
-                    clientType: clientType,
-                    migrationCompleteCallback: (MigrationActionType actionType) =>
-                    {
-                        if (actionType == MigrationActionType.XtzTransactionsDeleted)
+                    account = Account.LoadFromFile(
+                        pathToAccount: info.Path,
+                        password: password,
+                        currenciesProvider: AtomexApp.CurrenciesProvider,
+                        clientType: clientType,
+                        migrationCompleteCallback: (MigrationActionType actionType) =>
                         {
-                            DoAfterTerminalChanged = TezosTransactionsDeleted;
-                        }
-                    });
-            }, () => ShowContent(this));
+                            if (actionType == MigrationActionType.XtzTransactionsDeleted)
+                            {
+                                DoAfterAtomexClientChanged = TezosTransactionsDeleted;
+                            }
+                        });
+                },
+                goBack: () => ShowContent(this),
+                onUnlock: () =>
+                {
+                    var atomexClient = new WebSocketAtomexClient(
+                        configuration: App.Configuration,
+                        account: account,
+                        symbolsProvider: AtomexApp.SymbolsProvider);
 
-            unlockViewModel.Unlocked = () =>
-            {
-                var atomexClient = new WebSocketAtomexClient(
-                    configuration: App.Configuration,
-                    account: account,
-                    symbolsProvider: AtomexApp.SymbolsProvider,
-                    quotesProvider: AtomexApp.QuotesProvider);
-
-                AtomexApp.UseAtomexClient(atomexClient, restart: true);
-            };
-
+                    AtomexApp.UseAtomexClient(atomexClient, restart: true);
+                });
 
             ShowContent?.Invoke(unlockViewModel);
         });
@@ -93,17 +89,17 @@ namespace Atomex.Client.Desktop.ViewModels
             App.DialogService.Show(new RestoreDialogViewModel(AtomexApp, xtzCurrencies));
         }
 
-        private void OnTerminalChangedEventHandler(object sender, AtomexClientChangedEventArgs args)
+        private void OnAtomexClientChangedEventHandler(object? sender, AtomexClientChangedEventArgs args)
         {
-            var terminal = args.AtomexClient;
+            var atomexClient = args.AtomexClient;
 
-            if (terminal?.Account == null)
+            if (atomexClient?.Account == null)
             {
-                AtomexApp.AtomexClientChanged -= OnTerminalChangedEventHandler;
+                AtomexApp.AtomexClientChanged -= OnAtomexClientChangedEventHandler;
                 return;
             }
 
-            DoAfterTerminalChanged?.Invoke();
+            DoAfterAtomexClientChanged?.Invoke();
         }
 
         private void DesignerMode()
