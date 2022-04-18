@@ -210,7 +210,8 @@
                                Text="Activity" />
                 </TabItem.Header>
 
-                <Grid RowDefinitions="Auto,*">
+                <Grid RowDefinitions="Auto,*"
+                      Classes="NoCloseRightPopup">
                     <Border Grid.Row="0"
                             Background="{DynamicResource LightDefaultOpacity6}"
                             VerticalAlignment="Top"
@@ -329,8 +330,7 @@
                              SelectedItem="{Binding SelectedTransaction}"
                              HorizontalAlignment="Stretch"
                              VerticalAlignment="Stretch"
-                             SelectionMode="Single"
-                             Classes="NoCloseRightPopup">
+                             SelectionMode="Single">
                         <ListBox.Styles>
                             <Style Selector="ListBoxItem">
                                 <Setter Property="Padding" Value="0" />

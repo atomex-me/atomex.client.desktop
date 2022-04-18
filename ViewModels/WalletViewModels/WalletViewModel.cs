@@ -229,8 +229,8 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         protected virtual async Task LoadTransactionsAsync()
         {
             await LoadTransactionsSemaphore.WaitAsync();
-            Log.Debug("LoadTransactionsAsync for {@currency}", Currency.Name);
 
+            Log.Debug("LoadTransactionsAsync for {@currency}", Currency.Name);
             try
             {
                 if (_app.Account == null)

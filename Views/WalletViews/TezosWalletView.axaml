@@ -335,8 +335,7 @@
                             </Button>
                         </Grid>
                     </Border>
-
-
+                    
                     <ListBox Grid.Row="1"
                              Background="{DynamicResource AlmostTransparentBrush}"
                              Items="{Binding Transactions}"

@@ -1,5 +1,4 @@
 using System;
-using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -43,8 +42,8 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         protected sealed override async Task LoadTransactionsAsync()
         {
             await LoadTransactionsSemaphore.WaitAsync();
-            Log.Debug("LoadTransactionsAsync for FA12 {@currency}.", Currency.Name);
 
+            Log.Debug("LoadTransactionsAsync for FA12 {@currency}.", Currency.Name);
             try
             {
                 if (_app.Account == null)

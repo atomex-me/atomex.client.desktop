@@ -21,8 +21,6 @@ namespace Atomex.Client.Desktop.Views
                 if (!GetShouldClose(e.Source) || !walletMainViewModel.RightPopupOpened) return;
                 
                 walletMainViewModel.ShowRightPopupContent(null);
-                // if (walletMainViewModel.Content is WalletsViewModel walletsViewModel)
-                //     walletsViewModel
             }
         }
 

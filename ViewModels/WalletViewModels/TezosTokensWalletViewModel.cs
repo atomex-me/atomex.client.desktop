@@ -362,12 +362,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             _app.AtomexClientChanged += OnAtomexClientChanged;
             _app.Account.BalanceUpdated += OnBalanceUpdatedEventHandler;
         }
-
-        protected override Task LoadTransactionsAsync()
-        {
-            return null!;
-        }
-
+        
         private void OnAtomexClientChanged(object sender, AtomexClientChangedEventArgs e)
         {
             Tokens?.Clear();
