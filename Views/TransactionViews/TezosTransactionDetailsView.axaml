@@ -16,7 +16,6 @@
     </Design.DataContext>
 
     <UserControl.Resources>
-        <converters:DateTimeToTxDetailsConverter x:Key="DateTimeToTxDetailsConverter" />
         <converters:GreaterThanZeroConverter x:Key="GreaterThanZeroConverter" />
         <converters:AmountToStringConverter x:Key="AmountToStringConverter" />
         <converters:DateTimeToTxTimeConverter x:Key="DateTimeToTxTimeConverter" />
@@ -29,7 +28,6 @@
         <StackPanel>
             <Button Command="{Binding OnCloseCommand}"
                     Classes="ButtonWithIcon Close">
-
                 <svg:Svg />
             </Button>
 
@@ -301,29 +299,12 @@
                            Foreground="{DynamicResource SecondaryForegroundBrush}"
                            VerticalAlignment="Center"
                            FontSize="13"
-                           Text="Gas Limit" />
-
-                <TextBlock Grid.Column="1"
-                           Foreground="{DynamicResource DefaultForegroundBrush}"
-                           FontSize="13"
-                           Text="{Binding GasLimit}" />
-            </Grid>
-            
-            <Border Height="1"
-                    Margin="0 15 0 15"
-                    Background="{DynamicResource LightDefaultOpacity4}" />
-            
-            <Grid ColumnDefinitions="100,*">
-                <TextBlock Grid.Column="0"
-                           Foreground="{DynamicResource SecondaryForegroundBrush}"
-                           VerticalAlignment="Center"
-                           FontSize="13"
                            Text="Gas Used" />
 
                 <TextBlock Grid.Column="1"
                            Foreground="{DynamicResource DefaultForegroundBrush}"
                            FontSize="13"
-                           Text="{Binding GasUsed}" />
+                           Text="{Binding GasString}" />
             </Grid>
             
             <Border Height="1"
@@ -340,8 +321,11 @@
                 <TextBlock Grid.Column="1"
                            Foreground="{DynamicResource DefaultForegroundBrush}"
                            FontSize="13"
-                           Text="{Binding StorageUsed}" />
+                           Text="{Binding StorageString}" />
             </Grid>
+            <Border Height="1"
+                    Margin="0 15 0 0"
+                    Background="{DynamicResource LightDefaultOpacity4}" />
         </StackPanel>
     </Border>
 </UserControl>

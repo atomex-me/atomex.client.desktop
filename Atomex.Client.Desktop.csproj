@@ -179,6 +179,10 @@
             <DependentUpon>LinuxUpdateControls.axaml</DependentUpon>
             <SubType>Code</SubType>
         </Compile>
+        <Compile Update="Views\TransactionViews\EthereumERC20TransactionDetailsView.axaml.cs">
+          <DependentUpon>EthereumERC20TransactionDetailsView.axaml</DependentUpon>
+          <SubType>Code</SubType>
+        </Compile>
     </ItemGroup>
     <ItemGroup>
         <ProjectReference Include="atomex.client.core\Atomex.Client.Core\Atomex.Client.Core.csproj">

@@ -1,5 +1,4 @@
 ﻿using System;
-
 using Atomex.Blockchain.Abstract;
 using Atomex.Blockchain.Tezos;
 using Atomex.ViewModels;
@@ -11,9 +10,18 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
     {
         public string From { get; set; }
         public string To { get; set; }
-        public decimal GasLimit { get; set; }
-        public decimal GasUsed { get; set; }
-        public decimal StorageUsed { get; set; }
+        private decimal GasLimit { get; set; }
+        private decimal GasUsed { get; set; }
+        public string GasString => GasLimit == 0
+            ? "0 / 0"
+            : $"{GasUsed} / {GasLimit} ({GasUsed / GasLimit * 100:0.#}%)";
+
+        private decimal StorageLimit { get; set; }
+        private decimal StorageUsed { get; set; }
+        public string StorageString => StorageLimit == 0
+            ? "0 / 0"
+            : $"{StorageUsed} / {StorageLimit} ({StorageUsed / StorageLimit * 100:0.#}%)";
+
         public string FromExplorerUri => $"{Currency.AddressExplorerUri}{From}";
         public string ToExplorerUri => $"{Currency.AddressExplorerUri}{To}";
         public string Alias { get; set; }
@@ -29,13 +37,13 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
         public TezosTransactionViewModel(TezosTransaction tx, TezosConfig tezosConfig)
             : base(tx, tezosConfig, GetAmount(tx, tezosConfig), GetFee(tx))
         {
-            From        = tx.From;
-            To          = tx.To;
-            GasLimit    = tx.GasLimit;
-            GasUsed     = tx.GasUsed;
+            From = tx.From;
+            To = tx.To;
+            GasLimit = tx.GasLimit;
+            GasUsed = tx.GasUsed;
+            StorageLimit = tx.StorageLimit;
             StorageUsed = tx.StorageUsed;
-            Fee         = TezosConfig.MtzToTz(tx.Fee);
-            FeeCode     = Currency.FeeCode;
+            Fee = TezosConfig.MtzToTz(tx.Fee);
 
             if (!string.IsNullOrEmpty(tx.Alias))
             {
@@ -80,16 +88,15 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
 
             return result;
         }
-               
+
         private void DesignerMode()
         {
-            Id   = "1234567890abcdefgh1234567890abcdefgh";
+            Id = "1234567890abcdefgh1234567890abcdefgh";
             From = "1234567890abcdefgh1234567890abcdefgh";
-            To   = "1234567890abcdefgh1234567890abcdefgh";
+            To = "1234567890abcdefgh1234567890abcdefgh";
             Time = DateTime.UtcNow;
             Description = "Exchange refund 0.030001 XTZ";
             CurrencyCode = TezosConfig.Xtz;
-            
         }
     }
 }

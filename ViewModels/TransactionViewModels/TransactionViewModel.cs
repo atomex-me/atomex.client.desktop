@@ -62,6 +62,7 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
             State = Transaction.State;
             Type = Transaction.Type;
             Amount = amount;
+            FeeCode = currencyConfig.FeeCode;
 
             var netAmount = amount + fee;
 

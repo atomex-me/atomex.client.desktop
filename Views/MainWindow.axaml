@@ -15,7 +15,7 @@
         Name="MainWindow"
         Title="Atomex"
         MinWidth="1118"
-        MinHeight="760"
+        MinHeight="780"
         Classes="MainWindow">
 
     <Design.DataContext>

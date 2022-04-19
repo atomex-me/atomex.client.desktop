@@ -10,10 +10,9 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
 {
     public class EthereumERC20TransactionViewModel : TransactionViewModel
     {
-        public string From { get; set; }
+        public string From { get; set; }    
         public string To { get; set; }
         public decimal GasPrice { get; set; }
-        public decimal GasLimit { get; set; }
         public decimal GasUsed { get; set; }
         public bool IsInternal { get; set; }
         public string FromExplorerUri => $"{Currency.AddressExplorerUri}{From}";
@@ -36,8 +35,8 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
             From       = tx.From;
             To         = tx.To;
             GasPrice   = EthereumConfig.WeiToGwei((decimal)tx.GasPrice);
-            GasLimit   = (decimal)tx.GasLimit;
             GasUsed    = (decimal)tx.GasUsed;
+            Fee        = EthereumConfig.WeiToEth(tx.GasUsed * tx.GasPrice);
             IsInternal = tx.IsInternal;
 
             Alias = Amount switch
