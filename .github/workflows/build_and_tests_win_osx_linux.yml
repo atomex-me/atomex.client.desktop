@@ -21,7 +21,7 @@ jobs:
       with:
         dotnet-version: 5.0.x
     - name: Build library
-      run: dotnet build Atomex.Client.Desktop/Atomex.Client.Desktop.csproj
+      run: dotnet build Atomex.Client.Desktop.csproj
 #    - name: Build and run tests
 #      run: |
 #        dotnet build Atomex.Client.Core.Tests/Atomex.Client.Core.Tests.csproj
