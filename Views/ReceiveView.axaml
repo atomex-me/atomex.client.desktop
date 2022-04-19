@@ -33,26 +33,10 @@
                   Margin="24 0"
                   Height="72">
                 <Button Grid.Column="0"
-                        Width="28"
-                        Height="28"
-                        Padding="3"
-                        BorderThickness="0"
-                        VerticalContentAlignment="Center"
-                        VerticalAlignment="Center"
                         IsVisible="{Binding IsBackVisible}"
                         Command="{Binding BackCommand}"
-                        Classes="ButtonWithIcon">
-                    <Button.Styles>
-                        <Style Selector="Button svg|Svg">
-                            <Setter Property="Path" Value="/Resources/Icons/back.svg"></Setter>
-                        </Style>
-                        <Style Selector="Button:pointerover svg|Svg">
-                            <Setter Property="Path" Value="/Resources/Icons/back-light.svg"></Setter>
-                        </Style>
-                    </Button.Styles>
-
-                    <svg:Svg Width="28"
-                             HorizontalAlignment="Left" />
+                        Classes="ButtonWithIcon Back">
+                    <svg:Svg />
                 </Button>
 
                 <TextBlock Grid.Column="1"

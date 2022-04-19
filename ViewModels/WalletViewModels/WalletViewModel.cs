@@ -53,7 +53,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         public AddressesViewModel AddressesViewModel { get; set; }
         protected Action<CurrencyConfig> SetConversionTab { get; }
         private Action<string> SetWertCurrency { get; }
-        private Action<ViewModelBase?> ShowRightPopupContent { get; }
+        protected Action<ViewModelBase?> ShowRightPopupContent { get; }
 
         public string Header => CurrencyViewModel.Header;
         public CurrencyConfig Currency => CurrencyViewModel.Currency;
@@ -254,6 +254,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                             {
                                 t.UpdateClicked += UpdateTransactionEventHandler;
                                 t.RemoveClicked += RemoveTransactionEventHandler;
+                                t.OnClose = () => ShowRightPopupContent?.Invoke(null);
                             }));
 
                     if (selectedTransactionId != null)

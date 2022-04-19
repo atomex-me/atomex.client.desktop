@@ -1,14 +1,12 @@
 ﻿using System;
-using System.Windows.Input;
-
+using System.Reactive;
 using ReactiveUI;
 using Serilog;
-
 using Atomex.Blockchain;
 using Atomex.Blockchain.Abstract;
-using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
 using Atomex.Core;
+using Avalonia.Controls;
 
 
 namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
@@ -25,6 +23,12 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
         public DateTime Time { get; set; }
         public IBlockchainTransaction Transaction { get; set; }
         public BlockchainTransactionType Type { get; set; }
+        public Action? OnClose { get; set; }
+
+        private ReactiveCommand<Unit, Unit> _onCloseCommand;
+
+        public ReactiveCommand<Unit, Unit> OnCloseCommand => _onCloseCommand ??= ReactiveCommand.Create(
+            () => OnClose?.Invoke());
     }
 
     public class TransactionViewModel : TransactionViewModelBase
@@ -33,14 +37,14 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
         public event EventHandler<TransactionEventArgs> RemoveClicked;
         public string CurrencyCode { get; set; }
         public decimal Fee { get; set; }
-        public string TxExplorerUri => $"{Currency.TxExplorerUri}{Id}";
         public bool CanBeRemoved { get; set; }
         public string Direction { get; set; }
+        public string TxExplorerUri => $"{Currency.TxExplorerUri}{Id}";
 
         public TransactionViewModel()
         {
 #if DEBUG
-            if (Env.IsInDesignerMode())
+            if (Design.IsDesignMode)
                 DesignerMode();
 #endif
         }
@@ -52,11 +56,11 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
             decimal fee)
         {
             Transaction = tx ?? throw new ArgumentNullException(nameof(tx));
-            Id          = Transaction.Id;
-            Currency    = currencyConfig;
-            State       = Transaction.State;
-            Type        = Transaction.Type;
-            Amount      = amount;
+            Id = Transaction.Id;
+            Currency = currencyConfig;
+            State = Transaction.State;
+            Type = Transaction.Type;
+            Amount = amount;
 
             var netAmount = amount + fee;
 
@@ -64,7 +68,7 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
 
             AmountFormat = currencyViewModel.CurrencyFormat;
             CurrencyCode = currencyViewModel.CurrencyCode;
-            Time         = tx.CreationTime ?? DateTime.UtcNow;
+            Time = tx.CreationTime ?? DateTime.UtcNow;
             CanBeRemoved = tx.State is BlockchainTransactionState.Unknown or
                 BlockchainTransactionState.Failed or
                 BlockchainTransactionState.Pending or
@@ -84,26 +88,26 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
             };
         }
 
-        private ICommand _openTxInExplorerCommand;
-        public ICommand OpenTxInExplorerCommand => _openTxInExplorerCommand ??= ReactiveCommand.Create<string>((id) =>
-        {
-            if (Uri.TryCreate($"{Currency.TxExplorerUri}{id}", UriKind.Absolute, out var uri))
-                App.OpenBrowser(uri.ToString());
-            else
-                Log.Error("Invalid uri for transaction explorer");
-        });
+        private ReactiveCommand<Unit, Unit> _openTxInExplorerCommand;
 
-        private ICommand _openAddressInExplorerCommand;
-        public ICommand OpenAddressInExplorerCommand => _openAddressInExplorerCommand ??= ReactiveCommand.Create<string>((address) =>
-        {
-            if (Uri.TryCreate($"{Currency.AddressExplorerUri}{address}", UriKind.Absolute, out var uri))
-                App.OpenBrowser(uri.ToString());
-            else
-                Log.Error("Invalid uri for address explorer");
-        });
+        public ReactiveCommand<Unit, Unit> OpenTxInExplorerCommand => _openTxInExplorerCommand ??=
+            ReactiveCommand.Create(() => App.OpenBrowser(TxExplorerUri));
 
-        private ICommand _copyCommand;
-        public ICommand CopyCommand => _copyCommand ??= ReactiveCommand.Create<string>((s) =>
+
+        private ReactiveCommand<string, Unit> _openAddressInExplorerCommand;
+
+        public ReactiveCommand<string, Unit> OpenAddressInExplorerCommand => _openAddressInExplorerCommand ??=
+            ReactiveCommand.Create<string>((address) =>
+            {
+                if (Uri.TryCreate($"{Currency.AddressExplorerUri}{address}", UriKind.Absolute, out var uri))
+                    App.OpenBrowser(uri.ToString());
+                else
+                    Log.Error("Invalid uri for address explorer");
+            });
+
+        private ReactiveCommand<string, Unit> _copyCommand;
+
+        public ReactiveCommand<string, Unit> CopyCommand => _copyCommand ??= ReactiveCommand.Create<string>((s) =>
         {
             try
             {
@@ -115,22 +119,24 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
             }
         });
 
-        private ICommand _updateCommand;
-        public ICommand UpdateCommand => _updateCommand ??= ReactiveCommand.Create(() =>
-        {
-            UpdateClicked?.Invoke(this, new TransactionEventArgs(Transaction));
-        });
+        private ReactiveCommand<Unit, Unit> _updateCommand;
 
-        private ICommand _removeCommand;
-        public ICommand RemoveCommand => _removeCommand ??= ReactiveCommand.Create(() =>
-        {
-            RemoveClicked?.Invoke(this, new TransactionEventArgs(Transaction));
-        });
+        public ReactiveCommand<Unit, Unit> UpdateCommand => _updateCommand ??= ReactiveCommand.Create(
+            () => UpdateClicked?.Invoke(this, new TransactionEventArgs(Transaction))
+        );
+
+        private ReactiveCommand<Unit, Unit> _removeCommand;
+
+        public ReactiveCommand<Unit, Unit> RemoveCommand => _removeCommand ??= ReactiveCommand.Create(
+            () => RemoveClicked?.Invoke(this, new TransactionEventArgs(Transaction))
+        );
 
         private void DesignerMode()
         {
+            var random = new Random();
             Id = "1234567890abcdefgh1234567890abcdefgh";
             Time = DateTime.UtcNow;
+            Amount = random.Next(-1000, 1000);
         }
 
         public static string GetDescription(
@@ -146,11 +152,13 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
             }
             else if (type.HasFlag(BlockchainTransactionType.SwapRefund))
             {
-                return $"Swap refund {Math.Abs(netAmount).ToString("0." + new string('#', amountDigits))} {currencyCode}";
+                return
+                    $"Swap refund {Math.Abs(netAmount).ToString("0." + new string('#', amountDigits))} {currencyCode}";
             }
             else if (type.HasFlag(BlockchainTransactionType.SwapRedeem))
             {
-                return $"Swap redeem {Math.Abs(netAmount).ToString("0." + new string('#', amountDigits))} {currencyCode}";
+                return
+                    $"Swap redeem {Math.Abs(netAmount).ToString("0." + new string('#', amountDigits))} {currencyCode}";
             }
             else if (type.HasFlag(BlockchainTransactionType.TokenApprove))
             {

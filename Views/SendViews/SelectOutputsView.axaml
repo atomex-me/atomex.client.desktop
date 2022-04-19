@@ -23,29 +23,13 @@
             <Grid ColumnDefinitions="Auto,*"
                   RowDefinitions="Auto">
                 <Button Grid.Column="0"
-                        Width="28"
-                        Height="28"
-                        Padding="3"
-                        BorderThickness="0"
-                        VerticalContentAlignment="Center"
                         Command="{Binding BackCommand}"
-                        Classes="ButtonWithIcon">
-                    <Button.Styles>
-                        <Style Selector="Button svg|Svg">
-                            <Setter Property="Path" Value="/Resources/Icons/back.svg"></Setter>
-                        </Style>
-                        <Style Selector="Button:pointerover svg|Svg">
-                            <Setter Property="Path" Value="/Resources/Icons/back-light.svg"></Setter>
-                        </Style>
-                    </Button.Styles>
-
-                    <svg:Svg Width="28"
-                             HorizontalAlignment="Left" />
+                        Classes="ButtonWithIcon Back">
+                    <svg:Svg />
                 </Button>
 
                 <TextBlock Grid.Column="1"
                            FontSize="22"
-                           FontWeight="400"
                            Margin="-28 0 0 0"
                            HorizontalAlignment="Center"
                            Foreground="{DynamicResource LightDefault}">
@@ -197,35 +181,20 @@
                                        Foreground="{DynamicResource SecondaryForegroundBrush}"
                                        FontSize="16"
                                        Text="{Binding BalanceString}" />
-
-                            <Border Grid.Column="2"
+                            
+                            <Button Grid.Column="2"
                                     ToolTip.Placement="AnchorAndGravity"
-                                    ToolTip.VerticalOffset="-32">
-                                <Button Margin="0 0 9 0"
-                                        Padding="3"
-                                        BorderThickness="0"
-                                        VerticalContentAlignment="Center"
-                                        Command="{Binding $parent[ListBox].DataContext.CopyAddressCommand}"
-                                        CommandParameter="{Binding}"
-                                        Classes="ButtonWithIcon">
-                                    <Button.Styles>
-                                        <Style Selector="Button svg|Svg">
-                                            <Setter Property="Path" Value="/Resources/Icons/copy.svg"></Setter>
-                                        </Style>
-                                        <Style Selector="Button:pointerover svg|Svg">
-                                            <Setter Property="Path" Value="/Resources/Icons/copy-light.svg"></Setter>
-                                        </Style>
-                                    </Button.Styles>
+                                    ToolTip.VerticalOffset="-32"
+                                    Margin="0 0 9 0"
+                                    Command="{Binding $parent[ListBox].DataContext.CopyAddressCommand}"
+                                    CommandParameter="{Binding}"
+                                    Classes="ButtonWithIcon Copy">
 
-                                    <svg:Svg HorizontalAlignment="Center"
-                                             VerticalAlignment="Center"
-                                             Width="24"
-                                             Height="24" />
-                                </Button>
                                 <ToolTip.Tip>
                                     <TextBlock Text="{Binding CopyButtonToolTip}" />
                                 </ToolTip.Tip>
-                            </Border>
+                                <svg:Svg />
+                            </Button>
                         </Grid>
                     </DataTemplate>
                 </ListBox.ItemTemplate>

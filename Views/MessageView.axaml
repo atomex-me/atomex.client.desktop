@@ -22,25 +22,10 @@
                   RowDefinitions="Auto"
                   Margin="0 20 0 20">
                 <Button Grid.Column="0"
-                        Width="28"
-                        Height="28"
-                        Padding="3"
-                        BorderThickness="0"
-                        VerticalContentAlignment="Center"
                         IsVisible="{Binding IsBackVisible}"
                         Command="{Binding BackCommand}"
-                        Classes="ButtonWithIcon">
-                    <Button.Styles>
-                        <Style Selector="Button svg|Svg">
-                            <Setter Property="Path" Value="/Resources/Icons/back.svg"></Setter>
-                        </Style>
-                        <Style Selector="Button:pointerover svg|Svg">
-                            <Setter Property="Path" Value="/Resources/Icons/back-light.svg"></Setter>
-                        </Style>
-                    </Button.Styles>
-
-                    <svg:Svg Width="28"
-                             HorizontalAlignment="Left" />
+                        Classes="ButtonWithIcon Back">
+                    <svg:Svg />
                 </Button>
 
                 <TextBlock Grid.Column="1"
@@ -86,31 +71,17 @@
                     </ToolTip.Tip>
                 </Button>
                 
-                <Button BorderThickness="0"
-                        ToolTip.Placement="AnchorAndGravity"
+                <Button ToolTip.Placement="AnchorAndGravity"
                         ToolTip.VerticalOffset="-32"
                         Margin="8 0 0 0"
-                        Width="22"
-                        Height="22"
-                        VerticalAlignment="Center"
-                        VerticalContentAlignment="Center"
                         Command="{Binding CopyCommand}"
                         CommandParameter="{Binding Id}"
-                        Classes="ButtonWithIcon">
-                    <Button.Styles>
-                        <Style Selector="Button svg|Svg">
-                            <Setter Property="Path" Value="/Resources/Icons/copy.svg"></Setter>
-                        </Style>
-                        <Style Selector="Button:pointerover svg|Svg">
-                            <Setter Property="Path" Value="/Resources/Icons/copy-light.svg"></Setter>
-                        </Style>
-                    </Button.Styles>
+                        Classes="ButtonWithIcon Copy">
 
                     <ToolTip.Tip>
                         <TextBlock Text="Copy transaction id to clipboard" />
                     </ToolTip.Tip>
-
-                    <svg:Svg Width="20" />
+                    <svg:Svg />
                 </Button>
             </StackPanel>
 

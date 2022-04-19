@@ -120,6 +120,7 @@
     <SolidColorBrush x:Key="StatusBarVersionForeground" Color="DarkGray" />
     <SolidColorBrush x:Key="MainWindowTitleBarForeground" Color="DarkGray" />
     <SolidColorBrush x:Key="DefaultUpdateForegroundBrush" Color="Gold" />
+    <SolidColorBrush x:Key="RightPopupBackgroundBrush" Color="{StaticResource DeepBlue}" />
 
     <LinearGradientBrush x:Key="MainBackgroundBrush" StartPoint="0%,0%" EndPoint="100%,100%">
         <LinearGradientBrush.GradientStops>
@@ -323,8 +324,10 @@
 
     <SolidColorBrush x:Key="BalanceBackgroundBrush" Color="White" />
     <SolidColorBrush x:Key="UsdBalanceBackgroundBrush" Color="Gray" />
-    <SolidColorBrush x:Key="ExplorerLinkButtonForegroundBrush" Color="#6bbaff" />
-    <SolidColorBrush x:Key="ExplorerLinkButtonMouseOverBrush" Color="#cfe4f7" />
+    <SolidColorBrush x:Key="ExplorerLinkButtonForegroundBrush" Color="{DynamicResource Emerald}" />
+    <SolidColorBrush x:Key="ExplorerLinkButtonMouseOverBrush" Color="{DynamicResource LightEmerald}" />
+    <SolidColorBrush x:Key="ExplorerLinkButtonMousePressedBrush" Color="{DynamicResource DarkEmerald}" />
+    
 
     <SolidColorBrush x:Key="NoDelegationsBrush" Color="Gray" />
     <SolidColorBrush x:Key="DelegatedAmountBrush" Color="#ffa500" />

@@ -60,27 +60,12 @@
             RowDefinitions="72">
         <!-- back button -->
         <Button Grid.Column="0"
-                Width="28"
-                Height="28"
-                Padding="3"
-                BorderThickness="0"
-                VerticalContentAlignment="Center"
                 IsVisible="{Binding Stage,
                   Converter={StaticResource EnumToStringNotEqualConverter},
                   ConverterParameter=Edit}"
                 Command="{Binding UndoConfirmStageCommand}"
-                Classes="ButtonWithIcon">
-          <Button.Styles>
-            <Style Selector="Button svg|Svg">
-              <Setter Property="Path" Value="/Resources/Icons/back.svg"></Setter>
-            </Style>
-            <Style Selector="Button:pointerover svg|Svg">
-              <Setter Property="Path" Value="/Resources/Icons/back-light.svg"></Setter>
-            </Style>
-          </Button.Styles>
-
-          <svg:Svg Width="28"
-                   HorizontalAlignment="Left"/>
+                Classes="ButtonWithIcon Back">
+          <svg:Svg />
         </Button>
 
         <!-- window title -->

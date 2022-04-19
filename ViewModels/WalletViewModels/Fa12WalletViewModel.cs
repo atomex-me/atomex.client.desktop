@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Serilog;
 using Avalonia.Threading;
 using Atomex.Client.Desktop.ViewModels.TransactionViewModels;
+using Atomex.Common;
 using Atomex.TezosTokens;
 using Atomex.Core;
 using Atomex.Wallet.Tezos;
@@ -48,7 +49,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             {
                 if (_app.Account == null)
                     return;
-                
+
                 IsTransactionsLoading = true;
 
                 var transactions = (await _app.Account
@@ -63,7 +64,11 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                         var selectedTransactionId = SelectedTransaction?.Id;
 
                         Transactions = SortTransactions(
-                            transactions.Select(t => new TezosTokenTransferViewModel(t, Currency)));
+                            transactions
+                                .Select(t => new TezosTokenTransferViewModel(t, Currency))
+                                .ToList()
+                                .ForEachDo(t => t.OnClose = () => ShowRightPopupContent?.Invoke(null)
+                                ));
 
                         if (selectedTransactionId != null)
                             SelectedTransaction = Transactions.FirstOrDefault(t => t.Id == selectedTransactionId);

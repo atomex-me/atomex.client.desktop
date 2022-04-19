@@ -99,61 +99,27 @@
         <Style Selector="TabItem:selected:pointerover /template/ Border#PART_LayoutRoot">
             <Setter Property="TextBlock.Foreground" Value="{StaticResource PrimaryTextColor}" />
         </Style>
-
-        <Style Selector="Button.ExplorerLinkBtn.Icon">
-            <Setter Property="FontFamily" Value="{DynamicResource DefaultFontFamily}" />
-            <Setter Property="BorderThickness" Value="0" />
-        </Style>
-
-        <Style Selector="Button.ExplorerLinkBtn.Icon:pointerover">
-            <Setter Property="Foreground" Value="{DynamicResource ExplorerLinkButtonMouseOverBrush}" />
-        </Style>
-
-        <Style Selector="Button.ExplorerLinkBtn.Icon:pointerover /template/ ContentPresenter#PART_ContentPresenter">
-            <Setter Property="Background" Value="Transparent" />
-            <Setter Property="TextBlock.Foreground" Value="{DynamicResource ExplorerLinkButtonMouseOverBrush}" />
-        </Style>
-        <Style
-            Selector="Button.ExplorerLinkBtn.Icon:not(:pointerover) /template/ ContentPresenter#PART_ContentPresenter">
-            <Setter Property="Background" Value="Transparent" />
-            <Setter Property="TextBlock.Foreground" Value="{DynamicResource ExplorerLinkButtonForegroundBrush}" />
-        </Style>
-
-        <Style Selector="Button.ExplorerLinkBtn.Icon:pointerover Path">
-            <Setter Property="Fill" Value="{DynamicResource ExplorerLinkButtonMouseOverBrush}" />
-        </Style>
-        <Style Selector="Button.ExplorerLinkBtn.Icon:not(:pointerover) Path">
-            <Setter Property="Fill" Value="{DynamicResource ExplorerLinkButtonForegroundBrush}" />
-        </Style>
     </UserControl.Styles>
 
-    <Border Background="{DynamicResource DeepBlue}"
+    <Border Background="{DynamicResource RightPopupBackgroundBrush}"
             Classes="NoCloseRightPopup">
         <StackPanel Orientation="Vertical">
-            <Button Width="25"
-                    Height="25"
-                    Margin="12 12 0 0"
-                    BorderThickness="0"
-                    VerticalContentAlignment="Center"
-                    Padding="0"
+            <Button Margin="25 25 0 0"
                     Command="{Binding CloseCommand}"
-                    Classes="ButtonWithIcon">
-                <Path Width="16"
-                      Height="16"
-                      Stretch="Uniform"
-                      Data="{DynamicResource CloseCross}" />
+                    Classes="ButtonWithIcon Close">
+                <svg:Svg />
             </Button>
 
             <svg:Svg Name="SwapStatusIcon"
-                     Width="30"
-                     Margin="0 20 0 0">
+                     Width="40"
+                     Margin="0 22 0 0">
                 <i:Interaction.Behaviors>
                     <ia:DataTriggerBehavior Binding="{Binding CompactState}"
                                             ComparisonCondition="Equal"
                                             Value="{Binding InProgress}">
                         <ia:ChangePropertyAction TargetObject="{Binding #SwapStatusIcon}"
                                                  PropertyName="Path"
-                                                 Value="/Resources/Icons/swap-inprogress.svg" />
+                                                 Value="/Resources/Icons/pending-hourglass.svg" />
                     </ia:DataTriggerBehavior>
                     <ia:DataTriggerBehavior Binding="{Binding CompactState}"
                                             ComparisonCondition="Equal"
@@ -167,33 +133,33 @@
                                             Value="{Binding Cancelled}">
                         <ia:ChangePropertyAction TargetObject="{Binding #SwapStatusIcon}"
                                                  PropertyName="Path"
-                                                 Value="/Resources/Icons/swap-cancelled.svg" />
+                                                 Value="/Resources/Icons/cancelled-cross.svg" />
                     </ia:DataTriggerBehavior>
                     <ia:DataTriggerBehavior Binding="{Binding CompactState}"
                                             ComparisonCondition="Equal"
                                             Value="{Binding Refunded}">
                         <ia:ChangePropertyAction TargetObject="{Binding #SwapStatusIcon}"
                                                  PropertyName="Path"
-                                                 Value="/Resources/Icons/swap-cancelled.svg" />
+                                                 Value="/Resources/Icons/cancelled-cross.svg" />
                     </ia:DataTriggerBehavior>
                     <ia:DataTriggerBehavior Binding="{Binding CompactState}"
                                             ComparisonCondition="Equal"
                                             Value="{Binding Unsettled}">
                         <ia:ChangePropertyAction TargetObject="{Binding #SwapStatusIcon}"
                                                  PropertyName="Path"
-                                                 Value="/Resources/Icons/swap-cancelled.svg" />
+                                                 Value="/Resources/Icons/cancelled-cross.svg" />
                     </ia:DataTriggerBehavior>
                 </i:Interaction.Behaviors>
             </svg:Svg>
 
             <TextBlock Name="SwapCompactStateTitle"
                        Text="{Binding SwapCompactStateTitle}"
-                       FontFamily="{DynamicResource DefaultLightFontFamily}"
+                       Foreground="{DynamicResource DefaultForegroundBrush}"
                        TextAlignment="Center"
-                       FontSize="22"
-                       Margin="0 14 0 0"
                        HorizontalAlignment="Center"
-                       VerticalAlignment="Center">
+                       FontSize="22"
+                       LineHeight="32"
+                       Margin="0 10 0 0">
                 <i:Interaction.Behaviors>
                     <ia:DataTriggerBehavior Binding="{Binding CompactState}"
                                             ComparisonCondition="Equal"
@@ -235,7 +201,6 @@
 
             <TextBlock Name="SwapCompactStateDescription"
                        Text="{Binding SwapCompactStateDescription}"
-                       FontFamily="{DynamicResource DefaultLightFontFamily}"
                        TextAlignment="Center"
                        FontSize="13"
                        Margin="0 6 0 0"
@@ -534,7 +499,7 @@
                                        Margin="0 4 0 0"
                                        Foreground="{StaticResource LightDefaultOpacity50}"
                                        FontFamily="{DynamicResource DefaultLightFontFamily}"
-                                       FontSize="12"
+                                       FontSize="13"
                                        HorizontalAlignment="Left"
                                        VerticalAlignment="Center" />
 
@@ -544,7 +509,7 @@
                                        Margin="0 2 0 0"
                                        Foreground="{StaticResource LightDefaultOpacity50}"
                                        FontFamily="{DynamicResource DefaultLightFontFamily}"
-                                       FontSize="12"
+                                       FontSize="13"
                                        HorizontalAlignment="Left"
                                        VerticalAlignment="Center" />
                         </StackPanel>
@@ -566,38 +531,25 @@
                                            Margin="0 4 4 0"
                                            Foreground="{StaticResource LightDefaultOpacity50}"
                                            FontFamily="{DynamicResource DefaultLightFontFamily}"
-                                           FontSize="12"
+                                           FontSize="13"
                                            HorizontalAlignment="Left"
                                            VerticalAlignment="Center" />
 
-                                <Border ToolTip.Placement="AnchorAndGravity"
+                                <Button ToolTip.Placement="AnchorAndGravity"
                                         ToolTip.VerticalOffset="-42"
-                                        VerticalAlignment="Bottom"
                                         Margin="0 2 0 0"
-                                        IsVisible="{Binding ExchangingFirstStepLinkUrl, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
-
-                                    <Button HorizontalAlignment="Left"
-                                            VerticalAlignment="Bottom"
-                                            Padding="0"
-                                            Command="{Binding OpenTxInExplorerCommand}"
-                                            CommandParameter="{Binding ExchangingFirstStepLinkUrl}"
-                                            Classes="ExplorerLinkBtn Icon">
-                                        <StackPanel Orientation="Horizontal">
-                                            <TextBlock VerticalAlignment="Bottom"
-                                                       FontSize="12"
-                                                       Text="{Binding ExchangingFirstStepLinkText}" />
-                                            <Path Stretch="Uniform"
-                                                  Margin="5 0 0 0"
-                                                  VerticalAlignment="Top"
-                                                  Height="11"
-                                                  Data="{DynamicResource LinkIcon}" />
-                                        </StackPanel>
-                                    </Button>
-
+                                        Padding="0"
+                                        HorizontalAlignment="Stretch"
+                                        VerticalAlignment="Bottom"
+                                        IsVisible="{Binding ExchangingFirstStepLinkUrl, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                                        Command="{Binding OpenTxInExplorerCommand}"
+                                        CommandParameter="{Binding ExchangingFirstStepLinkUrl}"
+                                        Classes="TransactionLink"
+                                        Content="{Binding ExchangingFirstStepLinkText}">
                                     <ToolTip.Tip>
                                         <TextBlock Text="{Binding ExchangingFirstStepLinkUrl}" />
                                     </ToolTip.Tip>
-                                </Border>
+                                </Button>
 
                                 <TextBlock Text="{Binding ExchangingFirstStepLinkText}"
                                            IsVisible="{Binding ExchangingFirstStepLinkUrl, Converter={x:Static StringConverters.IsNullOrEmpty}}"
@@ -605,10 +557,11 @@
                                            Margin="0 2 0 0"
                                            Foreground="{StaticResource LightDefaultOpacity50}"
                                            FontFamily="{DynamicResource DefaultLightFontFamily}"
-                                           FontSize="12"
+                                           FontSize="13"
                                            HorizontalAlignment="Left"
                                            VerticalAlignment="Center" />
                             </WrapPanel>
+
                             <WrapPanel
                                 IsVisible="{Binding ExchangingSecondStepDescription, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
                                 <TextBlock Text="{Binding ExchangingSecondStepDescription}"
@@ -616,7 +569,7 @@
                                            Margin="0 4 4 0"
                                            Foreground="{StaticResource LightDefaultOpacity50}"
                                            FontFamily="{DynamicResource DefaultLightFontFamily}"
-                                           FontSize="12"
+                                           FontSize="13"
                                            HorizontalAlignment="Left"
                                            VerticalAlignment="Center" />
 
@@ -630,17 +583,18 @@
                                             Padding="0"
                                             Command="{Binding OpenTxInExplorerCommand}"
                                             CommandParameter="{Binding ExchangingSecondStepLinkUrl}"
-                                            Classes="ExplorerLinkBtn Icon">
-                                        <StackPanel Orientation="Horizontal">
-                                            <TextBlock VerticalAlignment="Bottom"
-                                                       FontSize="12"
-                                                       Text="{Binding ExchangingSecondStepLinkText}" />
-                                            <Path Stretch="Uniform"
-                                                  Margin="5 0 0 0"
-                                                  VerticalAlignment="Top"
-                                                  Height="11"
-                                                  Data="{DynamicResource LinkIcon}" />
-                                        </StackPanel>
+                                            Classes="TransactionLink"
+                                            Content="{Binding ExchangingSecondStepLinkText}">
+                                        <!-- <StackPanel Orientation="Horizontal"> -->
+                                        <!--     <TextBlock VerticalAlignment="Bottom" -->
+                                        <!--                FontSize="13" -->
+                                        <!--                Text="{Binding ExchangingSecondStepLinkText}" /> -->
+                                        <!--     <Path Stretch="Uniform" -->
+                                        <!--           Margin="5 0 0 0" -->
+                                        <!--           VerticalAlignment="Top" -->
+                                        <!--           Height="11" -->
+                                        <!--           Data="{DynamicResource LinkIcon}" /> -->
+                                        <!-- </StackPanel> -->
                                     </Button>
                                     <ToolTip.Tip>
                                         <TextBlock Text="{Binding ExchangingSecondStepLinkUrl}" />
@@ -652,7 +606,7 @@
                                            Margin="0 2 0 0"
                                            Foreground="{StaticResource LightDefaultOpacity50}"
                                            FontFamily="{DynamicResource DefaultLightFontFamily}"
-                                           FontSize="12"
+                                           FontSize="13"
                                            HorizontalAlignment="Left"
                                            VerticalAlignment="Center" />
                             </WrapPanel>
@@ -675,7 +629,7 @@
                                            Margin="0 4 4 0"
                                            Foreground="{StaticResource LightDefaultOpacity50}"
                                            FontFamily="{DynamicResource DefaultLightFontFamily}"
-                                           FontSize="12"
+                                           FontSize="13"
                                            HorizontalAlignment="Left"
                                            VerticalAlignment="Center" />
 
@@ -690,17 +644,18 @@
                                             Padding="0"
                                             Command="{Binding OpenTxInExplorerCommand}"
                                             CommandParameter="{Binding CompletionFirstStepLinkUrl}"
-                                            Classes="ExplorerLinkBtn Icon">
-                                        <StackPanel Orientation="Horizontal">
-                                            <TextBlock VerticalAlignment="Bottom"
-                                                       FontSize="12"
-                                                       Text="{Binding CompletionFirstStepLinkText}" />
-                                            <Path Stretch="Uniform"
-                                                  Margin="5 0 0 0"
-                                                  VerticalAlignment="Top"
-                                                  Height="11"
-                                                  Data="{DynamicResource LinkIcon}" />
-                                        </StackPanel>
+                                            Classes="TransactionLink"
+                                            Content="{Binding CompletionFirstStepLinkText}">
+                                        <!-- <StackPanel Orientation="Horizontal"> -->
+                                        <!--     <TextBlock VerticalAlignment="Bottom" -->
+                                        <!--                FontSize="13" -->
+                                        <!--                Text="{Binding CompletionFirstStepLinkText}" /> -->
+                                        <!--     <Path Stretch="Uniform" -->
+                                        <!--           Margin="5 0 0 0" -->
+                                        <!--           VerticalAlignment="Top" -->
+                                        <!--           Height="11" -->
+                                        <!--           Data="{DynamicResource LinkIcon}" /> -->
+                                        <!-- </StackPanel> -->
                                     </Button>
                                     <ToolTip.Tip>
                                         <TextBlock Text="{Binding CompletionFirstStepLinkUrl}" />
@@ -713,7 +668,7 @@
                                            Margin="0 2 0 0"
                                            Foreground="{StaticResource LightDefaultOpacity50}"
                                            FontFamily="{DynamicResource DefaultLightFontFamily}"
-                                           FontSize="12"
+                                           FontSize="13"
                                            HorizontalAlignment="Left"
                                            VerticalAlignment="Center" />
                             </WrapPanel>
@@ -724,7 +679,7 @@
                                            Margin="0 4 4 0"
                                            Foreground="{StaticResource LightDefaultOpacity50}"
                                            FontFamily="{DynamicResource DefaultLightFontFamily}"
-                                           FontSize="12"
+                                           FontSize="13"
                                            HorizontalAlignment="Left"
                                            VerticalAlignment="Center" />
 
@@ -739,17 +694,18 @@
                                             Padding="0"
                                             Command="{Binding OpenTxInExplorerCommand}"
                                             CommandParameter="{Binding CompletionSecondStepLinkUrl}"
-                                            Classes="ExplorerLinkBtn Icon">
-                                        <StackPanel Orientation="Horizontal">
-                                            <TextBlock VerticalAlignment="Bottom"
-                                                       FontSize="12"
-                                                       Text="{Binding CompletionSecondStepLinkText}" />
-                                            <Path Stretch="Uniform"
-                                                  Margin="5 0 0 0"
-                                                  VerticalAlignment="Top"
-                                                  Height="11"
-                                                  Data="{DynamicResource LinkIcon}" />
-                                        </StackPanel>
+                                            Classes="TransactionLink"
+                                            Content="{Binding CompletionSecondStepLinkText}">
+                                        <!-- <StackPanel Orientation="Horizontal"> -->
+                                        <!--     <TextBlock VerticalAlignment="Bottom" -->
+                                        <!--                FontSize="13" -->
+                                        <!--                Text="{Binding CompletionSecondStepLinkText}" /> -->
+                                        <!--     <Path Stretch="Uniform" -->
+                                        <!--           Margin="5 0 0 0" -->
+                                        <!--           VerticalAlignment="Top" -->
+                                        <!--           Height="11" -->
+                                        <!--           Data="{DynamicResource LinkIcon}" /> -->
+                                        <!-- </StackPanel> -->
                                     </Button>
                                     <ToolTip.Tip>
                                         <TextBlock Text="{Binding CompletionSecondStepLinkUrl}" />
@@ -762,12 +718,12 @@
                                            Margin="0 2 0 0"
                                            Foreground="{StaticResource LightDefaultOpacity50}"
                                            FontFamily="{DynamicResource DefaultLightFontFamily}"
-                                           FontSize="12"
+                                           FontSize="13"
                                            HorizontalAlignment="Left"
                                            VerticalAlignment="Center" />
                             </WrapPanel>
                         </StackPanel>
-                    </Grid>
+                        </Grid>
                 </TabItem>
                 <TabItem Margin="23 0 0 0">
                     <TabItem.Header>

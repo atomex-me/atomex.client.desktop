@@ -20,29 +20,13 @@
             <Grid ColumnDefinitions="Auto,*"
                   RowDefinitions="Auto">
                 <Button Grid.Column="0"
-                        Width="28"
-                        Height="28"
-                        Padding="3"
-                        BorderThickness="0"
-                        VerticalContentAlignment="Center"
                         Command="{Binding BackCommand}"
-                        Classes="ButtonWithIcon">
-                    <Button.Styles>
-                        <Style Selector="Button svg|Svg">
-                            <Setter Property="Path" Value="/Resources/Icons/back.svg"></Setter>
-                        </Style>
-                        <Style Selector="Button:pointerover svg|Svg">
-                            <Setter Property="Path" Value="/Resources/Icons/back-light.svg"></Setter>
-                        </Style>
-                    </Button.Styles>
-
-                    <svg:Svg Width="28"
-                             HorizontalAlignment="Left" />
+                        Classes="ButtonWithIcon Back">
+                    <svg:Svg />
                 </Button>
 
                 <TextBlock Grid.Column="1"
                            FontSize="22"
-                           FontWeight="400"
                            Margin="-28 0 0 0"
                            HorizontalAlignment="Center"
                            Foreground="{DynamicResource LightDefault}">
@@ -246,36 +230,19 @@
                                         FontSize="16"
                                         Text="{Binding BalanceCode}" />
                                 </StackPanel>
-                                <Border
-                                    ToolTip.Placement="AnchorAndGravity"
-                                    ToolTip.VerticalOffset="-32">
-                                    <Button Margin="0 0 9 0"
-                                            Padding="3"
-                                            BorderThickness="0"
-                                            VerticalContentAlignment="Center"
-                                            Command="{Binding $parent[ListBox].DataContext.CopyAddressCommand}"
-                                            CommandParameter="{Binding WalletAddress}"
-                                            Click="CopyButtonOnClick"
-                                            Classes="ButtonWithIcon">
-                                        <Button.Styles>
-                                            <Style Selector="Button svg|Svg">
-                                                <Setter Property="Path" Value="/Resources/Icons/copy.svg"></Setter>
-                                            </Style>
-                                            <Style Selector="Button:pointerover svg|Svg">
-                                                <Setter Property="Path" Value="/Resources/Icons/copy-light.svg"></Setter>
-                                            </Style>
-                                        </Button.Styles>
-
-                                        <svg:Svg HorizontalAlignment="Center"
-                                                 VerticalAlignment="Center"
-                                                 Width="24"
-                                                 Height="24"/>
-                                    </Button>
+                                <Button ToolTip.Placement="AnchorAndGravity"
+                                        ToolTip.VerticalOffset="-32"
+                                        Margin="0 0 9 0"
+                                        Command="{Binding $parent[ListBox].DataContext.CopyAddressCommand}"
+                                        CommandParameter="{Binding WalletAddress}"
+                                        Click="CopyButtonOnClick"
+                                        Classes="ButtonWithIcon Copy">
                                     <ToolTip.Tip>
                                         <TextBlock Text="Copy address to clipboard"
                                                    Name="CopyTextBlock" />
                                     </ToolTip.Tip>
-                                </Border>
+                                    <svg:Svg />
+                                </Button>
                             </StackPanel>
                         </Grid>
                     </DataTemplate>

@@ -43,27 +43,11 @@
                             BoxShadow="1.5 1.5 8 #4c000000" ClipToBounds="False">
                         <Grid>
                             <Canvas ZIndex="1">
-                                <Button
-                                    Canvas.Right="24"
-                                    Canvas.Top="21"
-                                    Width="28"
-                                    Height="28"
-                                    Padding="3"
-                                    BorderThickness="0"
-                                    VerticalContentAlignment="Center"
-                                    Command="{Binding CloseDialog}"
-                                    Classes="ButtonWithIcon">
-                                    <Button.Styles>
-                                        <Style Selector="Button svg|Svg">
-                                            <Setter Property="Path" Value="/Resources/Icons/close.svg"></Setter>
-                                        </Style>
-                                        <Style Selector="Button:pointerover svg|Svg">
-                                            <Setter Property="Path" Value="/Resources/Icons/close-light.svg"></Setter>
-                                        </Style>
-                                    </Button.Styles>
-
-                                    <svg:Svg Width="28"
-                                             HorizontalAlignment="Left" />
+                                <Button Canvas.Right="24"
+                                        Canvas.Top="20"
+                                        Command="{Binding CloseDialog}"
+                                        Classes="ButtonWithIcon Close">
+                                    <svg:Svg />
                                 </Button>
                             </Canvas>
                             <ContentPresenter Name="PART_ContentPresenter"
