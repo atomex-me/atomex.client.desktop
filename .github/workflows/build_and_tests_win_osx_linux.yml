@@ -1,0 +1,28 @@
+name: Build and run tests on Windows & MacOS & Linux
+
+on:
+  push:
+    branches-ignore:
+      - 'master'
+    tags-ignore:
+      - '*.*.*'
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [windows-latest, ubuntu-latest, macos-latest]
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Setup .NET core
+      uses: actions/setup-dotnet@v2
+      with:
+        dotnet-version: 5.0.x
+    - name: Build library
+      run: dotnet build Atomex.Client.Desktop/Atomex.Client.Desktop.csproj
+#    - name: Build and run tests
+#      run: |
+#        dotnet build Atomex.Client.Core.Tests/Atomex.Client.Core.Tests.csproj
+#        dotnet test Atomex.Client.Core.Tests/Atomex.Client.Core.Tests.csproj
