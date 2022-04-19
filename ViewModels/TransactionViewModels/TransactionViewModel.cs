@@ -36,6 +36,7 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
         public event EventHandler<TransactionEventArgs> UpdateClicked;
         public event EventHandler<TransactionEventArgs> RemoveClicked;
         public string CurrencyCode { get; set; }
+        public string FeeCode { get; set; }
         public decimal Fee { get; set; }
         public bool CanBeRemoved { get; set; }
         public string Direction { get; set; }

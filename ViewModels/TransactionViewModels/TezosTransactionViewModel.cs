@@ -35,6 +35,7 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
             GasUsed     = tx.GasUsed;
             StorageUsed = tx.StorageUsed;
             Fee         = TezosConfig.MtzToTz(tx.Fee);
+            FeeCode     = Currency.FeeCode;
 
             if (!string.IsNullOrEmpty(tx.Alias))
             {

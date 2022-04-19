@@ -279,11 +279,17 @@
                            VerticalAlignment="Center"
                            FontSize="13"
                            Text="Fee" />
-
-                <TextBlock Grid.Column="1"
-                           Foreground="{DynamicResource DefaultForegroundBrush}"
-                           FontSize="13"
-                           Text="{Binding Fee}" />
+                <StackPanel Grid.Column="1"
+                            Orientation="Horizontal">
+                    <TextBlock Foreground="{DynamicResource DefaultForegroundBrush}"
+                               FontSize="13"
+                               Text="{Binding Fee}" />
+                    
+                    <TextBlock Foreground="{DynamicResource DefaultForegroundBrush}"
+                               FontSize="13"
+                               Margin="4 0 0 0"
+                               Text="{Binding FeeCode}" />
+                </StackPanel>
             </Grid>
             
             <Border Height="1"
