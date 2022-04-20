@@ -93,7 +93,7 @@ namespace Atomex.Client.Desktop.ViewModels
                             OnRestored = () => AccountRestored = false
                         };
 
-                        App.DialogService.Show(restoreViewModel);
+                        restoreViewModel.ScanCurrenciesAsync();
                     }
                 }
 

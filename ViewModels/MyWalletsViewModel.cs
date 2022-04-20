@@ -86,7 +86,8 @@ namespace Atomex.Client.Desktop.ViewModels
         private void TezosTransactionsDeleted()
         {
             var xtzCurrencies = new[] {"XTZ", "TZBTC", "KUSD"};
-            App.DialogService.Show(new RestoreDialogViewModel(AtomexApp, xtzCurrencies));
+            var restoreDialogViewModel = new RestoreDialogViewModel(AtomexApp);
+            restoreDialogViewModel.ScanCurrenciesAsync(xtzCurrencies);
         }
 
         private void OnAtomexClientChangedEventHandler(object? sender, AtomexClientChangedEventArgs args)
