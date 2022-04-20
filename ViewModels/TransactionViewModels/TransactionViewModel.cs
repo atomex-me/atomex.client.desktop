@@ -13,6 +13,9 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
 {
     public class TransactionViewModelBase : ViewModelBase
     {
+        public event EventHandler<TransactionEventArgs> UpdateClicked;
+        public event EventHandler<TransactionEventArgs> RemoveClicked;
+        public string TxExplorerUri => $"{Currency.TxExplorerUri}{Id}";
         public decimal Amount { get; set; }
         public string AmountFormat { get; set; }
         public string Description { get; set; }
@@ -25,22 +28,70 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
         public BlockchainTransactionType Type { get; set; }
         public Action? OnClose { get; set; }
 
+        private ReactiveCommand<Unit, Unit> _openTxInExplorerCommand;
+
+        public ReactiveCommand<Unit, Unit> OpenTxInExplorerCommand => _openTxInExplorerCommand ??=
+            ReactiveCommand.Create(() => App.OpenBrowser(TxExplorerUri));
+
+
+        private ReactiveCommand<string, Unit> _openAddressInExplorerCommand;
+
+        public ReactiveCommand<string, Unit> OpenAddressInExplorerCommand => _openAddressInExplorerCommand ??=
+            ReactiveCommand.Create<string>((address) =>
+            {
+                if (Uri.TryCreate($"{Currency.AddressExplorerUri}{address}", UriKind.Absolute, out var uri))
+                    App.OpenBrowser(uri.ToString());
+                else
+                    Log.Error("Invalid uri for address explorer");
+            });
+
+        private ReactiveCommand<string, Unit> _copyCommand;
+
+        public ReactiveCommand<string, Unit> CopyCommand => _copyCommand ??= ReactiveCommand.Create<string>((s) =>
+        {
+            try
+            {
+                App.Clipboard.SetTextAsync(s);
+            }
+            catch (Exception e)
+            {
+                Log.Error(e, "Copy to clipboard error");
+            }
+        });
+
+        private ReactiveCommand<Unit, Unit> _updateCommand;
+
+        public ReactiveCommand<Unit, Unit> UpdateCommand => _updateCommand ??= ReactiveCommand.Create(
+            () => UpdateClicked?.Invoke(this, new TransactionEventArgs(Transaction))
+        );
+
+        private ReactiveCommand<Unit, Unit> _removeCommand;
+
+        public ReactiveCommand<Unit, Unit> RemoveCommand => _removeCommand ??= ReactiveCommand.Create(
+            () => RemoveClicked?.Invoke(this, new TransactionEventArgs(Transaction))
+        );
+
         private ReactiveCommand<Unit, Unit> _onCloseCommand;
 
         public ReactiveCommand<Unit, Unit> OnCloseCommand => _onCloseCommand ??= ReactiveCommand.Create(
             () => OnClose?.Invoke());
+        
+        protected void DesignerMode()
+        {
+            var random = new Random();
+            Id = "1234567890abcdefgh1234567890abcdefgh";
+            Time = DateTime.UtcNow;
+            Amount = random.Next(-1000, 1000);
+        }
     }
 
     public class TransactionViewModel : TransactionViewModelBase
     {
-        public event EventHandler<TransactionEventArgs> UpdateClicked;
-        public event EventHandler<TransactionEventArgs> RemoveClicked;
         public string CurrencyCode { get; set; }
         public string FeeCode { get; set; }
         public decimal Fee { get; set; }
         public bool CanBeRemoved { get; set; }
         public string Direction { get; set; }
-        public string TxExplorerUri => $"{Currency.TxExplorerUri}{Id}";
 
         public TransactionViewModel()
         {
@@ -89,58 +140,7 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
                 > 0 => "from "
             };
         }
-
-        private ReactiveCommand<Unit, Unit> _openTxInExplorerCommand;
-
-        public ReactiveCommand<Unit, Unit> OpenTxInExplorerCommand => _openTxInExplorerCommand ??=
-            ReactiveCommand.Create(() => App.OpenBrowser(TxExplorerUri));
-
-
-        private ReactiveCommand<string, Unit> _openAddressInExplorerCommand;
-
-        public ReactiveCommand<string, Unit> OpenAddressInExplorerCommand => _openAddressInExplorerCommand ??=
-            ReactiveCommand.Create<string>((address) =>
-            {
-                if (Uri.TryCreate($"{Currency.AddressExplorerUri}{address}", UriKind.Absolute, out var uri))
-                    App.OpenBrowser(uri.ToString());
-                else
-                    Log.Error("Invalid uri for address explorer");
-            });
-
-        private ReactiveCommand<string, Unit> _copyCommand;
-
-        public ReactiveCommand<string, Unit> CopyCommand => _copyCommand ??= ReactiveCommand.Create<string>((s) =>
-        {
-            try
-            {
-                App.Clipboard.SetTextAsync(s);
-            }
-            catch (Exception e)
-            {
-                Log.Error(e, "Copy to clipboard error");
-            }
-        });
-
-        private ReactiveCommand<Unit, Unit> _updateCommand;
-
-        public ReactiveCommand<Unit, Unit> UpdateCommand => _updateCommand ??= ReactiveCommand.Create(
-            () => UpdateClicked?.Invoke(this, new TransactionEventArgs(Transaction))
-        );
-
-        private ReactiveCommand<Unit, Unit> _removeCommand;
-
-        public ReactiveCommand<Unit, Unit> RemoveCommand => _removeCommand ??= ReactiveCommand.Create(
-            () => RemoveClicked?.Invoke(this, new TransactionEventArgs(Transaction))
-        );
-
-        private void DesignerMode()
-        {
-            var random = new Random();
-            Id = "1234567890abcdefgh1234567890abcdefgh";
-            Time = DateTime.UtcNow;
-            Amount = random.Next(-1000, 1000);
-        }
-
+        
         public static string GetDescription(
             BlockchainTransactionType type,
             decimal amount,
@@ -148,42 +148,27 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
             int amountDigits,
             string currencyCode)
         {
-            if (type.HasFlag(BlockchainTransactionType.SwapPayment))
+            return type switch
             {
-                return $"Swap payment {Math.Abs(amount).ToString("0." + new string('#', amountDigits))} {currencyCode}";
-            }
-            else if (type.HasFlag(BlockchainTransactionType.SwapRefund))
-            {
-                return
-                    $"Swap refund {Math.Abs(netAmount).ToString("0." + new string('#', amountDigits))} {currencyCode}";
-            }
-            else if (type.HasFlag(BlockchainTransactionType.SwapRedeem))
-            {
-                return
-                    $"Swap redeem {Math.Abs(netAmount).ToString("0." + new string('#', amountDigits))} {currencyCode}";
-            }
-            else if (type.HasFlag(BlockchainTransactionType.TokenApprove))
-            {
-                return $"Token approve";
-            }
-            else if (type.HasFlag(BlockchainTransactionType.TokenCall))
-            {
-                return $"Token call";
-            }
-            else if (type.HasFlag(BlockchainTransactionType.SwapCall))
-            {
-                return $"Token swap call";
-            }
-            else if (amount <= 0)
-            {
-                return $"Sent {Math.Abs(netAmount).ToString("0." + new string('#', amountDigits))} {currencyCode}";
-            }
-            else if (amount > 0)
-            {
-                return $"Received {Math.Abs(netAmount).ToString("0." + new string('#', amountDigits))} {currencyCode}";
-            }
+                BlockchainTransactionType.SwapPayment =>
+                    $"Sent {Math.Abs(netAmount).ToString("0." + new string('#', amountDigits))} {currencyCode}",
 
-            return "Unknown transaction";
+                BlockchainTransactionType.SwapRefund =>
+                    $"Swap refund {Math.Abs(netAmount).ToString("0." + new string('#', amountDigits))} {currencyCode}",
+
+                BlockchainTransactionType.SwapRedeem =>
+                    $"Swap redeem {Math.Abs(netAmount).ToString("0." + new string('#', amountDigits))} {currencyCode}",
+
+                BlockchainTransactionType.TokenApprove => "Token approve",
+                BlockchainTransactionType.TokenCall => "Token call",
+                BlockchainTransactionType.SwapCall => "Token swap call",
+                _ => amount switch
+                {
+                    <= 0 => $"Sent {Math.Abs(netAmount).ToString("0." + new string('#', amountDigits))} {currencyCode}",
+                    > 0 =>
+                        $"Received {Math.Abs(netAmount).ToString("0." + new string('#', amountDigits))} {currencyCode}"
+                }
+            };
         }
     }
 }

@@ -4,6 +4,7 @@ using Atomex.Client.Desktop.Services;
 using Atomex.Client.Desktop.ViewModels;
 using Atomex.Client.Desktop.ViewModels.TransactionViewModels;
 using Atomex.EthereumTokens;
+using Atomex.TezosTokens;
 using Avalonia.Markup.Xaml.Templates;
 
 namespace Atomex.Client.Desktop.Controls
@@ -31,6 +32,8 @@ namespace Atomex.Client.Desktop.Controls
                     App.TemplateService.GetTxDetailsTemplate(TxDetailsTemplate.EthereumERC20TransactionDetailsTemplate),
                 EthereumConfig =>
                     App.TemplateService.GetTxDetailsTemplate(TxDetailsTemplate.EthereumTransactionDetailsTemplate),
+                Fa12Config =>
+                    App.TemplateService.GetTxDetailsTemplate(TxDetailsTemplate.TezosTokenTransferDetailsTemplate),
                 TezosConfig =>
                     App.TemplateService.GetTxDetailsTemplate(TxDetailsTemplate.TezosTransactionDetailsTemplate),
                 _ => null

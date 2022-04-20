@@ -1,27 +1,20 @@
 using System;
-using System.Windows.Input;
-
-using ReactiveUI;
-using Serilog;
 
 using Atomex.Blockchain.Abstract;
 using Atomex.Blockchain.Tezos;
 using Atomex.Common;
-using Atomex.Client.Desktop.Common;
-using Atomex.Core;
 using Atomex.ViewModels;
+using Avalonia.Controls;
 
 namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
 {
     public class TezosTokenTransferViewModel : TransactionViewModelBase
     {
-        public const int MaxAmountDecimals = AddressesHelper.MaxTokenCurrencyFormatDecimals;
-        
+        private const int MaxAmountDecimals = AddressesHelper.MaxTokenCurrencyFormatDecimals;
         public string From { get; set; }
         public string To { get; set; }
         public string CurrencyCode { get; set; }
-
-        public string TxExplorerUri => $"{Currency.TxExplorerUri}{Id}";
+        public string TxHash => Id.Split("/")[0];
         public string FromExplorerUri => $"{Currency.AddressExplorerUri}{From}";
         public string ToExplorerUri => $"{Currency.AddressExplorerUri}{To}";
         
@@ -31,7 +24,7 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
         public TezosTokenTransferViewModel()
         {
 #if DEBUG
-            if (Env.IsInDesignerMode())
+            if (Design.IsDesignMode)
                 DesignerMode();
 #endif
         }
@@ -41,8 +34,9 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
             Currency = tezosConfig ?? throw new ArgumentNullException(nameof(tezosConfig));
 
             Transaction  = tx ?? throw new ArgumentNullException(nameof(tx));
-            State        = Transaction.State;
-            Type         = Transaction.Type;
+            Id           = tx.Id;
+            State        = tx.State;
+            Type         = tx.Type;
             From         = tx.From;
             To           = tx.To;
             Amount       = GetAmount(tx);
@@ -60,37 +54,6 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
             Alias = tx.GetAlias();
             Direction = Amount <= 0 ? "to ": "from ";
         }
-
-        private ICommand _openTxInExplorerCommand;
-        public ICommand OpenTxInExplorerCommand => _openTxInExplorerCommand ??= ReactiveCommand.Create<string>((id) =>
-        {
-            if (Uri.TryCreate($"{Currency.TxExplorerUri}{id}", UriKind.Absolute, out var uri))
-                App.OpenBrowser(uri.ToString());
-            else
-                Log.Error("Invalid uri for transaction explorer");
-        });
-
-        private ICommand _openAddressInExplorerCommand;
-        public ICommand OpenAddressInExplorerCommand => _openAddressInExplorerCommand ??= ReactiveCommand.Create<string>((address) =>
-        {
-            if (Uri.TryCreate($"{Currency.AddressExplorerUri}{address}", UriKind.Absolute, out var uri))
-                App.OpenBrowser(uri.ToString());
-            else
-                Log.Error("Invalid uri for address explorer");
-        });
-
-        private ICommand _copyCommand;
-        public ICommand CopyCommand => _copyCommand ??= ReactiveCommand.Create<string>((s) =>
-        {
-            try
-            {
-                App.Clipboard.SetTextAsync(s);
-            }
-            catch (Exception e)
-            {
-                Log.Error(e, "Copy to clipboard error");
-            }
-        });
 
         private static decimal GetAmount(TokenTransfer tx)
         {

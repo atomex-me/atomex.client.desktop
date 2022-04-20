@@ -122,6 +122,10 @@
                       DataType="viewModels:TezosTransactionViewModel">
             <views:TezosTransactionDetailsView />
         </DataTemplate>
+        <DataTemplate x:Key="TezosTokenTransferDetailsTemplate"
+                      DataType="viewModels:TezosTransactionViewModel">
+            <views:TezosTokenTransferDetailsView />
+        </DataTemplate>
         <DataTemplate x:Key="EthereumTransactionDetailsTemplate"
                       DataType="viewModels:EthereumTransactionViewModel">
             <views:EthereumTransactionDetailsView />
