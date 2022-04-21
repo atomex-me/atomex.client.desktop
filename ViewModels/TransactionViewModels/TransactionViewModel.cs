@@ -27,7 +27,9 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
         public IBlockchainTransaction Transaction { get; set; }
         public BlockchainTransactionType Type { get; set; }
         public Action? OnClose { get; set; }
+        public bool CanBeRemoved { get; set; }
 
+        
         private ReactiveCommand<Unit, Unit> _openTxInExplorerCommand;
 
         public ReactiveCommand<Unit, Unit> OpenTxInExplorerCommand => _openTxInExplorerCommand ??=
@@ -62,14 +64,12 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
         private ReactiveCommand<Unit, Unit> _updateCommand;
 
         public ReactiveCommand<Unit, Unit> UpdateCommand => _updateCommand ??= ReactiveCommand.Create(
-            () => UpdateClicked?.Invoke(this, new TransactionEventArgs(Transaction))
-        );
+            () => UpdateClicked?.Invoke(this, new TransactionEventArgs(Transaction)));
 
         private ReactiveCommand<Unit, Unit> _removeCommand;
 
         public ReactiveCommand<Unit, Unit> RemoveCommand => _removeCommand ??= ReactiveCommand.Create(
-            () => RemoveClicked?.Invoke(this, new TransactionEventArgs(Transaction))
-        );
+            () => RemoveClicked?.Invoke(this, new TransactionEventArgs(Transaction)));
 
         private ReactiveCommand<Unit, Unit> _onCloseCommand;
 
@@ -90,7 +90,6 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
         public string CurrencyCode { get; set; }
         public string FeeCode { get; set; }
         public decimal Fee { get; set; }
-        public bool CanBeRemoved { get; set; }
         public string Direction { get; set; }
 
         public TransactionViewModel()

@@ -72,6 +72,18 @@
         <Setter Property="Path" Value="/Resources/Icons/copy-light.svg" />
     </Style>
     
+    <!-- delete button -->
+    <Style Selector="Button.ButtonWithIcon.Trash">
+        <Setter Property="Width" Value="28" />
+        <Setter Property="Height" Value="28" />
+    </Style>
+    <Style Selector="Button.ButtonWithIcon.Trash svg|Svg">
+        <Setter Property="Path" Value="/Resources/Icons/trash.svg" />
+        <Setter Property="Width" Value="24" />
+    </Style>
+    <Style Selector="Button.ButtonWithIcon.Trash:pointerover svg|Svg">
+        <Setter Property="Path" Value="/Resources/Icons/trash-light.svg" />
+    </Style>
 
     <Style
         Selector="Button.SecondaryButton:not(:pointerover) /template/ ContentPresenter#PART_ContentPresenter">

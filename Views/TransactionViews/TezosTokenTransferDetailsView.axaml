@@ -26,10 +26,20 @@
             Classes="NoCloseRightPopup">
 
         <StackPanel>
-            <Button Command="{Binding OnCloseCommand}"
-                    Classes="ButtonWithIcon Close">
-                <svg:Svg />
-            </Button>
+            <Grid ColumnDefinitions="Auto,*,Auto">
+                <Button Grid.Column="0"
+                        Command="{Binding OnCloseCommand}"
+                        Classes="ButtonWithIcon Close">
+                    <svg:Svg />
+                </Button>
+                
+                <Button Grid.Column="2"
+                        IsVisible="{Binding CanBeRemoved}"
+                        Command="{Binding RemoveCommand}"
+                        Classes="ButtonWithIcon Trash">
+                    <svg:Svg />
+                </Button>
+            </Grid>
 
             <svg:Svg Name="StateIcon"
                      Width="40"

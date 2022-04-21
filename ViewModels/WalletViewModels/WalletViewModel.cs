@@ -380,8 +380,10 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                 var isRemoved = await _app.Account
                     .RemoveTransactionAsync(txId);
 
-                if (isRemoved)
-                    await LoadTransactionsAsync();
+                if (!isRemoved) return;
+
+                ShowRightPopupContent?.Invoke(null);
+                await LoadTransactionsAsync();
             }
             catch (Exception e)
             {
