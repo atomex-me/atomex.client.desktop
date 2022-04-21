@@ -34,10 +34,16 @@
                 </Button>
                 
                 <Button Grid.Column="2"
+                        ToolTip.Placement="AnchorAndGravity"
+                        ToolTip.VerticalOffset="-32"
                         IsVisible="{Binding CanBeRemoved}"
                         Command="{Binding RemoveCommand}"
                         Classes="ButtonWithIcon Trash">
                     <svg:Svg />
+                    
+                    <ToolTip.Tip>
+                        <TextBlock Text="Remove from the transaction list" />
+                    </ToolTip.Tip>
                 </Button>
             </Grid>
 
