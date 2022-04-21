@@ -11,6 +11,7 @@ using Atomex.Client.Desktop.ViewModels.ConversionViewModels;
 using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
 using Atomex.Client.Desktop.ViewModels.SendViewModels;
 using Atomex.Core;
+using Atomex.TezosTokens;
 using Avalonia.Controls;
 using Avalonia.Media;
 using ReactiveUI;
@@ -18,7 +19,6 @@ using OxyPlot;
 using OxyPlot.Avalonia;
 using OxyPlot.Series;
 using ReactiveUI.Fody.Helpers;
-using Serilog;
 using PieSeries = OxyPlot.Series.PieSeries;
 
 
@@ -66,11 +66,7 @@ namespace Atomex.Client.Desktop.ViewModels
                             Desktop.App.DialogService.Show(sendViewModel.SelectFromViewModel);
                             break;
                         case SelectCurrencyType.To:
-                            var receiveViewModel = new ReceiveViewModel(App, selectedCurrency.Currency)
-                            {
-                                OnBack = () => ReceiveCommand.Execute().Subscribe()
-                            };
-                            Desktop.App.DialogService.Show(receiveViewModel);
+                            ShowReceiveWindow(selectedCurrency.Currency);
                             break;
                     }
                 });
@@ -178,6 +174,23 @@ namespace Atomex.Client.Desktop.ViewModels
             this.RaisePropertyChanged(nameof(PlotModel));
         }
 
+        private void ShowReceiveWindow(CurrencyConfig currencyConfig)
+        {
+            var receiveViewModel = currencyConfig switch
+            {
+                Fa12Config fa12Config => new ReceiveViewModel(
+                    app: App,
+                    currency: App.Account.Currencies.GetByName(TezosConfig.Xtz),
+                    tokenContract: fa12Config.TokenContractAddress,
+                    tokenType: "FA12"),
+
+                _ => new ReceiveViewModel(App, currencyConfig)
+            };
+            receiveViewModel.OnBack = () => ReceiveCommand.Execute().Subscribe();
+
+            Desktop.App.DialogService.Show(receiveViewModel);
+        }
+
         private ReactiveCommand<CurrencyViewModel, Unit> _setWalletCurrencyCommand;
 
         public ReactiveCommand<CurrencyViewModel, Unit> SetWalletCurrencyCommand => _setWalletCurrencyCommand ??=
@@ -254,13 +267,8 @@ namespace Atomex.Client.Desktop.ViewModels
         private ReactiveCommand<CurrencyViewModel, Unit> _receiveFromPopupCommand;
 
         public ReactiveCommand<CurrencyViewModel, Unit> ReceiveFromPopupCommand => _receiveFromPopupCommand ??=
-            _receiveFromPopupCommand =
-                ReactiveCommand.Create<CurrencyViewModel>(currencyViewModel =>
-                {
-                    var receiveViewModel = new ReceiveViewModel(App, currencyViewModel.Currency);
-                    PopupOpenedCurrency = null;
-                    Desktop.App.DialogService.Show(receiveViewModel);
-                });
+            _receiveFromPopupCommand = ReactiveCommand.Create<CurrencyViewModel>(
+                currencyViewModel => ShowReceiveWindow(currencyViewModel.Currency));
 
         private ReactiveCommand<CurrencyViewModel, Unit> _exchangeCommand;
 
