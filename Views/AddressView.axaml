@@ -6,6 +6,7 @@
              x:Class="Atomex.Client.Desktop.Views.AddressView"
              xmlns:vm="clr-namespace:Atomex.Client.Desktop.ViewModels"
              xmlns:converters="clr-namespace:Atomex.Client.Desktop.Converters"
+             xmlns:controls="clr-namespace:Atomex.Client.Desktop.Controls"
              xmlns:svg="clr-namespace:Avalonia.Svg.Skia;assembly=Avalonia.Svg.Skia">
 
     <Design.DataContext>
@@ -56,17 +57,27 @@
                     </ToolTip.Tip>
                 </Button>
 
-                <Button ToolTip.Placement="AnchorAndGravity"
-                        ToolTip.VerticalOffset="-32"
-                        Margin="16 0 0 0"
-                        Command="{Binding CopyCommand}"
-                        Classes="ButtonWithIcon Copy">
-                    
-                    <svg:Svg />
-                    <ToolTip.Tip>
-                        <TextBlock Text="Copy address to clipboard" />
-                    </ToolTip.Tip>
-                </Button>
+                <!-- <Button ToolTip.Placement="AnchorAndGravity" -->
+                <!--         ToolTip.VerticalOffset="-32" -->
+                <!--         Margin="16 0 0 0" -->
+                <!--         CommandyCommand}" -->
+                <!--         Classes="ButtonWithIcon Copy"> -->
+                <!--      -->
+                <!--     <svg:Svg /> -->
+                <!--     <ToolTip.Tip> -->
+                <!--         <TextBlock Text="Copy address to clipboard" /> -->
+                <!--     </ToolTip.Tip> -->
+                <!-- </Button> -->
+
+                <!-- <controls:CopyButton Command="{Binding CopyCommand}" -->
+                <!--                      Margin="16 0 0 0" -->
+                <!--                      ToolText="Copy address to clipboard" -->
+                <!--                      DoneToolText="Copied" /> -->
+                
+                <controls:CopyButton ToolText="PLease copy!"
+                                     DoneToolText="Copied)"
+                                     Margin="16 0 0 0"
+                                     Command="{Binding CopyCommand}"/>
             </StackPanel>
 
             <TextBlock Grid.Column="1"

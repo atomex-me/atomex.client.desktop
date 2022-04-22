@@ -221,40 +221,30 @@ namespace Atomex.Client.Desktop.Controls
 
         private IBrush ScoreToBrush(int passwordScore)
         {
-            if (passwordScore <= 0)
-                return BlankBackground;
-            if (passwordScore == 1)
-                return TooShortBackground;
-            if (passwordScore == 2)
-                return WeakBackground;
-            if (passwordScore == 3)
-                return MediumBackground;
-            if (passwordScore == 4)
-                return StrongBackground;
-
-            return VeryStrongBackground;
+            return passwordScore switch
+            {
+                <= 0 => BlankBackground,
+                1 => TooShortBackground,
+                2 => WeakBackground,
+                3 => MediumBackground,
+                4 => StrongBackground,
+                _ => VeryStrongBackground
+            };
         }
 
         // todo: localization
         private static string ScoreToString(int passwordScore)
         {
-            switch (passwordScore)
+            return passwordScore switch
             {
-                case 0:
-                    return "Blank";
-                case 1:
-                    return "Too Short";
-                case 2:
-                    return "Weak";
-                case 3:
-                    return "Medium";
-                case 4:
-                    return "Strong";
-                case 5:
-                    return "Very Strong";
-                default:
-                    return "Blank";
-            }
+                0 => "Blank",
+                1 => "Too Short",
+                2 => "Weak",
+                3 => "Medium",
+                4 => "Strong",
+                5 => "Very Strong",
+                _ => "Blank"
+            };
         }
     }
 }
