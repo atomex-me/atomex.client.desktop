@@ -9,10 +9,6 @@
         </Border>
     </Design.PreviewWith>
 
-    <!-- <Style -->
-    <!--     Selector="controls|CopyButton:not(:pointerover) /template/ ContentPresenter#PART_ContentPresenter"> -->
-    <!--     <Setter Property="Background" Value="Transparent" /> -->
-    <!-- </Style> -->
 
     <Style Selector="controls|CopyButton /template/ svg|Svg">
         <Setter Property="Path" Value="/Resources/Icons/copy.svg" />
@@ -22,20 +18,25 @@
         <Setter Property="Path" Value="/Resources/Icons/copy-light.svg" />
     </Style>
     
-    <!-- <Style Selector="controls|CopyButton[IsDone=True] ToolTip"> -->
-    <!--     <Setter Property="Background" Value="{DynamicResource Emerald}" /> -->
-    <!--     <Setter Property="Foreground" Value="{DynamicResource DeepBlue}" /> -->
-    <!-- </Style> -->
+    <Style Selector="controls|CopyButton:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource ButtonBackgroundPointerOver}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource ButtonBorderBrushPointerOver}" />
+    </Style>
 
+    <Style Selector="controls|CopyButton:pressed /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource ButtonBackgroundPressed}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource ButtonBorderBrushPressed}" />
+    </Style>
 
     <Style Selector="controls|CopyButton">
         <Setter Property="Cursor" Value="Hand" />
         <Setter Property="FontFamily" Value="{DynamicResource DefaultFontFamily}" />
-        
+        <Setter Property="Background" Value="Transparent" />
         <Setter Property="Padding" Value="0" />
         <Setter Property="BorderThickness" Value="0" />
         <Setter Property="VerticalContentAlignment" Value="Center" />
         <Setter Property="HorizontalContentAlignment" Value="Center" />
+        <Setter Property="CornerRadius" Value="{DynamicResource AtomexCornerRadius}"></Setter>
         <Setter Property="Width" Value="28" />
         <Setter Property="Height" Value="28" />
         <Setter Property="Template">
@@ -43,7 +44,14 @@
                 <ControlTemplate TargetType="{x:Type controls:CopyButton}">
                     <Panel ToolTip.Placement="AnchorAndGravity"
                            ToolTip.VerticalOffset="-32"
+                           Name="ToolTipPanel"
                            Background="{TemplateBinding Background}">
+                        <Panel.Styles>
+                            <Style Selector="Panel.IsDone ToolTip">
+                                <Setter Property="Background" Value="{DynamicResource Emerald}" />
+                                <Setter Property="Foreground" Value="{DynamicResource DeepBlue}" />
+                            </Style>
+                        </Panel.Styles>
                         <ContentPresenter x:Name="PART_ContentPresenter"
                                           Background="{TemplateBinding Background}"
                                           BorderBrush="{TemplateBinding BorderBrush}"
@@ -55,17 +63,17 @@
                                           RecognizesAccessKey="True"
                                           HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
                                           VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}" />
-                        
+
                         <ToolTip.Tip>
                             <StackPanel>
                                 <TextBlock IsVisible="{Binding !$parent[controls:CopyButton].IsDone}"
                                            Text="{Binding $parent[controls:CopyButton].ToolText}" />
-                                       
+
                                 <TextBlock IsVisible="{Binding $parent[controls:CopyButton].IsDone}"
                                            Text="{Binding $parent[controls:CopyButton].DoneToolText}" />
                             </StackPanel>
                         </ToolTip.Tip>
-                        
+
                         <svg:Svg />
                     </Panel>
                 </ControlTemplate>

@@ -73,11 +73,12 @@
                 <!--                      Margin="16 0 0 0" -->
                 <!--                      ToolText="Copy address to clipboard" -->
                 <!--                      DoneToolText="Copied" /> -->
-                
+
+
                 <controls:CopyButton ToolText="PLease copy!"
                                      DoneToolText="Copied)"
                                      Margin="16 0 0 0"
-                                     Command="{Binding CopyCommand}"/>
+                                     Command="{Binding CopyCommand}" />
             </StackPanel>
 
             <TextBlock Grid.Column="1"

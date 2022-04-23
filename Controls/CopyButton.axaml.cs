@@ -2,7 +2,9 @@
 using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.LogicalTree;
 using Avalonia.Threading;
+using Avalonia.VisualTree;
 
 namespace Atomex.Client.Desktop.Controls
 {
@@ -65,9 +67,11 @@ namespace Atomex.Client.Desktop.Controls
 
             Dispatcher.UIThread.InvokeAsync(async () =>
             {
+                this.FindDescendantOfType<Panel>().Classes.Add(nameof(IsDone));
                 IsDone = true;
                 await Task.Delay(3000);
                 IsDone = false;
+                this.FindDescendantOfType<Panel>().Classes.Remove(nameof(IsDone));
             });
         }
     }
