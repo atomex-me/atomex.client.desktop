@@ -1,10 +1,7 @@
 ﻿<Styles xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:svg="clr-namespace:Avalonia.Svg.Skia;assembly=Avalonia.Svg.Skia">
-    <Styles.Resources>
-        <CornerRadius x:Key="AtomexCornerRadius">6</CornerRadius>
-    </Styles.Resources>
-
+    
     <Style Selector=":is(TextBlock)">
         <Setter Property="FontFamily" Value="{DynamicResource DefaultFontFamily}" />
         <Setter Property="FontWeight" Value="Light" />

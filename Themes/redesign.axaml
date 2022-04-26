@@ -348,4 +348,6 @@
     <SolidColorBrush x:Key="SwapStateUnconfirmedBackgroundBrush" Color="{DynamicResource UnconfirmedColor}" />
     <SolidColorBrush x:Key="SwapStateRefundedBackgroundBrush" Color="{DynamicResource ConfirmedColor}" />
     <SolidColorBrush x:Key="SwapStateUnsettledBackgroundBrush" Color="{DynamicResource UnknownColor}" />
+    
+    <CornerRadius x:Key="AtomexCornerRadius">6</CornerRadius>
 </ResourceDictionary>

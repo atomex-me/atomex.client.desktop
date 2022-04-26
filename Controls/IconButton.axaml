@@ -1,0 +1,68 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:svg="clr-namespace:Avalonia.Svg.Skia;assembly=Avalonia.Svg.Skia"
+        xmlns:controls="clr-namespace:Atomex.Client.Desktop.Controls">
+    <Design.PreviewWith>
+        <Border Padding="100 50" Background="Brown">
+            <controls:IconButton ToolText="Some tooltip text" />
+        </Border>
+    </Design.PreviewWith>
+    
+    <Style Selector="controls|IconButton:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource ButtonBackgroundPointerOver}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource ButtonBorderBrushPointerOver}" />
+    </Style>
+
+    <Style Selector="controls|IconButton:pressed /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource ButtonBackgroundPressed}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource ButtonBorderBrushPressed}" />
+    </Style>
+
+    <Style Selector="controls|IconButton">
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="FontFamily" Value="{DynamicResource DefaultFontFamily}" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="HorizontalContentAlignment" Value="Center" />
+        <Setter Property="CornerRadius" Value="{DynamicResource AtomexCornerRadius}"></Setter>
+        <Setter Property="Width" Value="28" />
+        <Setter Property="Height" Value="28" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type controls:IconButton}">
+                    <Panel ToolTip.Placement="AnchorAndGravity"
+                           ToolTip.VerticalOffset="-32"
+                           Name="ToolTipPanel"
+                           Background="{TemplateBinding Background}">
+                        <Panel.Styles>
+                            <Style Selector="Panel.IsDone ToolTip">
+                                <Setter Property="Background" Value="{DynamicResource Emerald}" />
+                                <Setter Property="Foreground" Value="{DynamicResource DeepBlue}" />
+                                <!-- <Setter Property="IsOpen" Value="False"/> -->
+                            </Style>
+                        </Panel.Styles>
+                        <ContentPresenter x:Name="PART_ContentPresenter"
+                                          Background="{TemplateBinding Background}"
+                                          BorderBrush="{TemplateBinding BorderBrush}"
+                                          BorderThickness="{TemplateBinding BorderThickness}"
+                                          CornerRadius="{TemplateBinding CornerRadius}"
+                                          Content="{TemplateBinding Content}"
+                                          ContentTemplate="{TemplateBinding ContentTemplate}"
+                                          Padding="{TemplateBinding Padding}"
+                                          RecognizesAccessKey="True"
+                                          HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                          VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}" />
+
+                        <ToolTip.Tip>
+                            <TextBlock Text="{Binding $parent[controls:IconButton].ToolText}" />
+                        </ToolTip.Tip>
+
+                        <svg:Svg />
+                    </Panel>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+</Styles>

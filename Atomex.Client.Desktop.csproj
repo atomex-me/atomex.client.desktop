@@ -183,6 +183,10 @@
           <DependentUpon>EthereumERC20TransactionDetailsView.axaml</DependentUpon>
           <SubType>Code</SubType>
         </Compile>
+        <Compile Update="Controls\IconButton.axaml.cs">
+          <DependentUpon>IconButton.axaml</DependentUpon>
+          <SubType>Code</SubType>
+        </Compile>
     </ItemGroup>
     <ItemGroup>
         <ProjectReference Include="atomex.client.core\Atomex.Client.Core\Atomex.Client.Core.csproj">
