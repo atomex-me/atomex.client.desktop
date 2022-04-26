@@ -8,7 +8,7 @@ using Avalonia.VisualTree;
 
 namespace Atomex.Client.Desktop.Controls
 {
-    public class CopyButton : Button
+    public class CopyButton : IconButton
     {
         static CopyButton()
         {
@@ -18,27 +18,14 @@ namespace Atomex.Client.Desktop.Controls
                 IsDoneProperty
             );
         }
-
-
-        public static readonly DirectProperty<CopyButton, string> ToolTextProperty =
-            AvaloniaProperty.RegisterDirect<CopyButton, string>(
-                nameof(ToolText),
-                o => o.ToolText);
-
-        private string _toolText;
-
-        public string ToolText
-        {
-            get { return _toolText; }
-            set { SetAndRaise(ToolTextProperty, ref _toolText, value); }
-        }
-
+        
 
         public static readonly DirectProperty<CopyButton, string> DoneToolTextProperty =
             AvaloniaProperty.RegisterDirect<CopyButton, string>(
                 nameof(DoneToolText),
                 o => o.DoneToolText);
 
+        
         private string _doneToolText;
 
         public string DoneToolText

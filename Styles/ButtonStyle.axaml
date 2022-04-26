@@ -20,10 +20,6 @@
         Selector="Button.ButtonWithIcon:not(:pointerover) /template/ ContentPresenter#PART_ContentPresenter">
         <Setter Property="Background" Value="Transparent" />
     </Style>
-    <Style Selector="Button.ButtonWithIcon > Path">
-        <Setter Property="Fill" Value="{StaticResource PrimaryTextColor}" />
-    </Style>
-
     <Style
         Selector="Button.ButtonWithIcon.WithoutEffects:not(:pointerover) /template/ ContentPresenter#PART_ContentPresenter">
         <Setter Property="Background" Value="Transparent" />
@@ -57,19 +53,6 @@
     </Style>
     <Style Selector="Button.ButtonWithIcon.Close:pointerover svg|Svg">
         <Setter Property="Path" Value="/Resources/Icons/close-light.svg" />
-    </Style>
-    
-    <!-- copy button -->
-    <Style Selector="Button.ButtonWithIcon.Copy">
-        <Setter Property="Width" Value="28" />
-        <Setter Property="Height" Value="28" />
-    </Style>
-    <Style Selector="Button.ButtonWithIcon.Copy svg|Svg">
-        <Setter Property="Path" Value="/Resources/Icons/copy.svg" />
-        <Setter Property="Width" Value="24" />
-    </Style>
-    <Style Selector="Button.ButtonWithIcon.Copy:pointerover svg|Svg">
-        <Setter Property="Path" Value="/Resources/Icons/copy-light.svg" />
     </Style>
     
     <!-- delete button -->
@@ -137,29 +120,27 @@
     
     <Style Selector="Button.TransactionLink">
         <Setter Property="FontFamily" Value="{DynamicResource DefaultFontFamily}" />
+        <Setter Property="Foreground" Value="{DynamicResource ExplorerLinkButtonForegroundBrush}" />
         <Setter Property="BorderThickness" Value="0" />
     </Style>
     
     <Style Selector="Button.TransactionLink:pointerover /template/ TextBlock">
         <Setter Property="Foreground" Value="{DynamicResource ExplorerLinkButtonMouseOverBrush}" />
     </Style>
-    <Style
-        Selector="Button.TransactionLink:not(:pointerover) /template/ TextBlock">
-        <Setter Property="Foreground" Value="{DynamicResource ExplorerLinkButtonForegroundBrush}" />
-    </Style>
+    
     <Style Selector="Button.TransactionLink:pressed /template/ TextBlock">
         <Setter Property="Foreground" Value="{DynamicResource ExplorerLinkButtonMousePressedBrush}" />
     </Style>
 
-    <Style Selector="Button.TransactionLink:pointerover Path">
-        <Setter Property="Fill" Value="{DynamicResource ExplorerLinkButtonMouseOverBrush}" />
-    </Style>
-    <Style Selector="Button.TransactionLink:not(:pointerover) Path">
-        <Setter Property="Fill" Value="{DynamicResource ExplorerLinkButtonForegroundBrush}" />
-    </Style>
-    <Style Selector="Button.TransactionLink:not(:pointerover) Path">
-        <Setter Property="Fill" Value="{DynamicResource ExplorerLinkButtonMousePressedBrush}" />
-    </Style>
+    <!-- <Style Selector="Button.TransactionLink:pointerover Path"> -->
+    <!--     <Setter Property="Fill" Value="{DynamicResource ExplorerLinkButtonMouseOverBrush}" /> -->
+    <!-- </Style> -->
+    <!-- <Style Selector="Button.TransactionLink:not(:pointerover) Path"> -->
+    <!--     <Setter Property="Fill" Value="{DynamicResource ExplorerLinkButtonForegroundBrush}" /> -->
+    <!-- </Style> -->
+    <!-- <Style Selector="Button.TransactionLink:not(:pointerover) Path"> -->
+    <!--     <Setter Property="Fill" Value="{DynamicResource ExplorerLinkButtonMousePressedBrush}" /> -->
+    <!-- </Style> -->
     
     <Style Selector="Button.TransactionLink">
         <Setter Property="Template">

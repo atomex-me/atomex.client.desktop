@@ -15,14 +15,5 @@ namespace Atomex.Client.Desktop.Views.SendViews
         {
             AvaloniaXamlLoader.Load(this);
         }
-
-        private void CopyButtonOnClick(object? sender, RoutedEventArgs e)
-        {
-            // var copyTextBlock = this.FindControl<TextBlock>("CopyTextBlock");
-            // var initialText = copyTextBlock.Text;
-            // copyTextBlock.Text = "Successfully copied!";
-            // await Task.Delay(TimeSpan.FromSeconds(5));
-            // copyTextBlock.Text = initialText;
-        }
     }
 }

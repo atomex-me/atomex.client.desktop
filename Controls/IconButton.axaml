@@ -1,24 +1,29 @@
 <Styles xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:svg="clr-namespace:Avalonia.Svg.Skia;assembly=Avalonia.Svg.Skia"
-        xmlns:controls="clr-namespace:Atomex.Client.Desktop.Controls">
+        xmlns:controls="clr-namespace:Atomex.Client.Desktop.Controls"
+        xmlns:converters="clr-namespace:Atomex.Client.Desktop.Converters">
     <Design.PreviewWith>
-        <Border Padding="100 50" Background="Brown">
-            <controls:IconButton ToolText="Some tooltip text" />
+        <Border Padding="100 50" Background="#122B50">
+            <controls:IconButton Classes="Update" ToolText="Some tooltip text" />
         </Border>
     </Design.PreviewWith>
     
-    <Style Selector="controls|IconButton:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+    <Styles.Resources>
+        <converters:ToolTipOffsetConverter x:Key="ToolTipOffsetConverter" />
+    </Styles.Resources>
+
+    <Style Selector=":is(controls|IconButton):pointerover /template/ ContentPresenter#PART_ContentPresenter">
         <Setter Property="Background" Value="{DynamicResource ButtonBackgroundPointerOver}" />
         <Setter Property="BorderBrush" Value="{DynamicResource ButtonBorderBrushPointerOver}" />
     </Style>
 
-    <Style Selector="controls|IconButton:pressed /template/ ContentPresenter#PART_ContentPresenter">
+    <Style Selector=":is(controls|IconButton):pressed /template/ ContentPresenter#PART_ContentPresenter">
         <Setter Property="Background" Value="{DynamicResource ButtonBackgroundPressed}" />
         <Setter Property="BorderBrush" Value="{DynamicResource ButtonBorderBrushPressed}" />
     </Style>
 
-    <Style Selector="controls|IconButton">
+    <Style Selector=":is(controls|IconButton)">
         <Setter Property="Cursor" Value="Hand" />
         <Setter Property="FontFamily" Value="{DynamicResource DefaultFontFamily}" />
         <Setter Property="Background" Value="Transparent" />
@@ -26,21 +31,23 @@
         <Setter Property="BorderThickness" Value="0" />
         <Setter Property="VerticalContentAlignment" Value="Center" />
         <Setter Property="HorizontalContentAlignment" Value="Center" />
-        <Setter Property="CornerRadius" Value="{DynamicResource AtomexCornerRadius}"></Setter>
+        <Setter Property="CornerRadius" Value="{DynamicResource AtomexCornerRadius}" />
         <Setter Property="Width" Value="28" />
         <Setter Property="Height" Value="28" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type controls:IconButton}">
                     <Panel ToolTip.Placement="AnchorAndGravity"
-                           ToolTip.VerticalOffset="-32"
-                           Name="ToolTipPanel"
+                           ToolTip.VerticalOffset="{Binding $self.Bounds.Height,
+                           Converter={StaticResource ToolTipOffsetConverter}}"
+                           Width="{TemplateBinding Width}"
+                           Height="{TemplateBinding Height}"
                            Background="{TemplateBinding Background}">
                         <Panel.Styles>
-                            <Style Selector="Panel.IsDone ToolTip">
-                                <Setter Property="Background" Value="{DynamicResource Emerald}" />
-                                <Setter Property="Foreground" Value="{DynamicResource DeepBlue}" />
-                                <!-- <Setter Property="IsOpen" Value="False"/> -->
+                            <Style Selector="Panel ToolTip">
+                                <Setter Property="IsVisible"
+                                        Value="{Binding $parent[controls:IconButton].ToolText,
+                                        Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
                             </Style>
                         </Panel.Styles>
                         <ContentPresenter x:Name="PART_ContentPresenter"
@@ -58,11 +65,66 @@
                         <ToolTip.Tip>
                             <TextBlock Text="{Binding $parent[controls:IconButton].ToolText}" />
                         </ToolTip.Tip>
-
                         <svg:Svg />
                     </Panel>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
+    </Style>
+
+    <!-- Updating button rotating animations -->
+    <Style Selector="controls|IconButton.Updating">
+        <Setter Property="IsEnabled" Value="False" />
+    </Style>
+    <Style Selector="controls|IconButton.Updating /template/ svg|Svg">
+        <Style.Animations>
+            <Animation Duration="0:0:2.5"
+                       IterationCount="INFINITE"
+                       FillMode="Forward"
+                       PlaybackDirection="Normal">
+                <KeyFrame Cue="0%">
+                    <Setter Property="RotateTransform.Angle" Value="0" />
+                </KeyFrame>
+                <KeyFrame Cue="100%">
+                    <Setter Property="RotateTransform.Angle" Value="360" />
+                </KeyFrame>
+            </Animation>
+        </Style.Animations>
+    </Style>
+    <Style Selector="controls|IconButton.NotUpdating /template/ svg|Svg">
+        <Style.Animations>
+            <Animation Duration="0:0:0.001"
+                       IterationCount="1"
+                       FillMode="Forward"
+                       PlaybackDirection="Normal">
+                <KeyFrame Cue="100%">
+                    <Setter Property="RotateTransform.Angle" Value="0" />
+                </KeyFrame>
+            </Animation>
+        </Style.Animations>
+    </Style>
+    
+    <Style Selector="controls|IconButton.Key">
+        <Setter Property="Width" Value="24" />
+        <Setter Property="Height" Value="24" />
+    </Style>
+    <Style Selector="controls|IconButton.Key /template/ svg|Svg">
+        <Setter Property="Path" Value="/Resources/Icons/key.svg" />
+        <Setter Property="Width" Value="20" />
+    </Style>
+    <Style Selector="controls|IconButton.Key:pointerover /template/ svg|Svg">
+        <Setter Property="Path" Value="/Resources/Icons/key-light.svg" />
+    </Style>
+    
+    <Style Selector="controls|IconButton.Update">
+        <Setter Property="Width" Value="24" />
+        <Setter Property="Height" Value="24" />
+    </Style>
+    <Style Selector="controls|IconButton.Update /template/ svg|Svg">
+        <Setter Property="Path" Value="/Resources/Icons/update.svg" />
+        <Setter Property="Width" Value="20" />
+    </Style>
+    <Style Selector="controls|IconButton.Update:pointerover /template/ svg|Svg">
+        <Setter Property="Path" Value="/Resources/Icons/update-light.svg" />
     </Style>
 </Styles>

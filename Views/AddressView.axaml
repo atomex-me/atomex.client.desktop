@@ -6,8 +6,7 @@
              x:Class="Atomex.Client.Desktop.Views.AddressView"
              xmlns:vm="clr-namespace:Atomex.Client.Desktop.ViewModels"
              xmlns:converters="clr-namespace:Atomex.Client.Desktop.Converters"
-             xmlns:controls="clr-namespace:Atomex.Client.Desktop.Controls"
-             xmlns:svg="clr-namespace:Avalonia.Svg.Skia;assembly=Avalonia.Svg.Skia">
+             xmlns:controls="clr-namespace:Atomex.Client.Desktop.Controls">
 
     <Design.DataContext>
         <vm:AddressViewModel />
@@ -16,6 +15,7 @@
     <UserControl.Resources>
         <converters:AddressShouldShrinkConverter x:Key="AddressShouldShrinkConverter" />
         <converters:AddressShouldExpandConverter x:Key="AddressShouldExpandConverter" />
+        <converters:ToolTipOffsetConverter x:Key="ToolTipOffsetConverter" />
     </UserControl.Resources>
 
     <Border Padding="12 0">
@@ -27,7 +27,8 @@
                         Orientation="Horizontal">
 
                 <Button ToolTip.Placement="AnchorAndGravity"
-                        ToolTip.VerticalOffset="-32"
+                        ToolTip.VerticalOffset="{Binding $self.Bounds.Height,
+                        Converter={StaticResource ToolTipOffsetConverter}}"
                         VerticalAlignment="Center"
                         FontSize="16"
                         IsVisible="{Binding $parent[Border].Bounds.Width,
@@ -45,7 +46,8 @@
 
                 <Button Classes="LinkButton Underlined SolidHover"
                         ToolTip.Placement="AnchorAndGravity"
-                        ToolTip.VerticalOffset="-32"
+                        ToolTip.VerticalOffset="{Binding $self.Bounds.Height,
+                        Converter={StaticResource ToolTipOffsetConverter}}"
                         VerticalAlignment="Center"
                         FontSize="16"
                         IsVisible="{Binding $parent[Border].Bounds.Width,
@@ -53,30 +55,15 @@
                         Content="{Binding ShortenedAddress}"
                         Command="{Binding OpenInExplorerCommand}">
                     <ToolTip.Tip>
-                        <TextBlock Text="{Binding Address}" />
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="{Binding AddressExplorerUri}" />
+                            <TextBlock Text="{Binding Address}" />
+                        </StackPanel>
                     </ToolTip.Tip>
                 </Button>
 
-                <!-- <Button ToolTip.Placement="AnchorAndGravity" -->
-                <!--         ToolTip.VerticalOffset="-32" -->
-                <!--         Margin="16 0 0 0" -->
-                <!--         CommandyCommand}" -->
-                <!--         Classes="ButtonWithIcon Copy"> -->
-                <!--      -->
-                <!--     <svg:Svg /> -->
-                <!--     <ToolTip.Tip> -->
-                <!--         <TextBlock Text="Copy address to clipboard" /> -->
-                <!--     </ToolTip.Tip> -->
-                <!-- </Button> -->
-
-                <!-- <controls:CopyButton Command="{Binding CopyCommand}" -->
-                <!--                      Margin="16 0 0 0" -->
-                <!--                      ToolText="Copy address to clipboard" -->
-                <!--                      DoneToolText="Copied" /> -->
-
-
-                <controls:CopyButton ToolText="PLease copy!"
-                                     DoneToolText="Copied)"
+                <controls:CopyButton ToolText="Copy address to clipboard"
+                                     DoneToolText="Copied!"
                                      Margin="16 0 0 0"
                                      Command="{Binding CopyCommand}" />
             </StackPanel>
@@ -105,59 +92,17 @@
                        FontSize="13"
                        Text="{Binding TokenBalance}" />
 
-            <Border ToolTip.Placement="AnchorAndGravity"
-                    ToolTip.VerticalOffset="-32"
-                    Grid.Column="5">
-                <Button Width="22"
-                        Height="22"
-                        BorderThickness="0"
-                        VerticalContentAlignment="Center"
-                        HorizontalContentAlignment="Center"
-                        Command="{Binding ExportKeyCommand}"
-                        Classes="ButtonWithIcon">
-                    <Button.Styles>
-                        <Style Selector="Button svg|Svg">
-                            <Setter Property="Path" Value="/Resources/Icons/key.svg"></Setter>
-                        </Style>
-                        <Style Selector="Button:pointerover svg|Svg">
-                            <Setter Property="Path" Value="/Resources/Icons/key-light.svg"></Setter>
-                        </Style>
-                    </Button.Styles>
+            <controls:IconButton Grid.Column="5"
+                                 Classes="Key"
+                                 Command="{Binding ExportKeyCommand}"
+                                 ToolText="Export address private key" />
 
-                    <svg:Svg Width="20" />
-                </Button>
-                <ToolTip.Tip>
-                    <TextBlock Text="Export address private key" />
-                </ToolTip.Tip>
-            </Border>
-
-            <Border ToolTip.Placement="AnchorAndGravity"
-                    ToolTip.VerticalOffset="-32"
-                    Grid.Column="6">
-                <Button Width="22"
-                        Height="22"
-                        BorderThickness="0"
-                        VerticalContentAlignment="Center"
-                        HorizontalContentAlignment="Center"
-                        Command="{Binding UpdateAddressCommand}"
-                        Classes="ButtonWithIcon">
-                    <Button.Styles>
-                        <Style Selector="Button svg|Svg">
-                            <Setter Property="Path" Value="/Resources/Icons/update.svg"></Setter>
-                        </Style>
-                        <Style Selector="Button:pointerover svg|Svg">
-                            <Setter Property="Path" Value="/Resources/Icons/update-light.svg"></Setter>
-                        </Style>
-                    </Button.Styles>
-
-                    <svg:Svg Width="20"
-                             Classes.InProgress="{Binding IsUpdating}"
-                             Classes.NotInProgress="{Binding !IsUpdating}" />
-                </Button>
-                <ToolTip.Tip>
-                    <TextBlock Text="Update address" />
-                </ToolTip.Tip>
-            </Border>
+            <controls:IconButton Grid.Column="6"
+                                 Classes="Update"
+                                 Classes.Updating="{Binding IsUpdating}"
+                                 Classes.NotUpdating="{Binding !IsUpdating}"
+                                 Command="{Binding UpdateAddressCommand}"
+                                 ToolText="Update address" />
         </Grid>
     </Border>
 </UserControl>

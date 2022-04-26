@@ -1,14 +1,18 @@
 <Styles xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:svg="clr-namespace:Avalonia.Svg.Skia;assembly=Avalonia.Svg.Skia"
-        xmlns:controls="clr-namespace:Atomex.Client.Desktop.Controls">
+        xmlns:controls="clr-namespace:Atomex.Client.Desktop.Controls"
+        xmlns:converters="clr-namespace:Atomex.Client.Desktop.Converters">
     <Design.PreviewWith>
-        <Border Padding="100 50" Background="Brown">
+        <Border Padding="80 50" Background="#122B50">
             <controls:CopyButton ToolText="PLease copy"
                                  DoneToolText="Copied" />
         </Border>
     </Design.PreviewWith>
 
+    <Styles.Resources>
+        <converters:ToolTipOffsetConverter x:Key="ToolTipOffsetConverter" />
+    </Styles.Resources>
 
     <Style Selector="controls|CopyButton /template/ svg|Svg">
         <Setter Property="Path" Value="/Resources/Icons/copy.svg" />
@@ -17,34 +21,16 @@
     <Style Selector="controls|CopyButton:pointerover /template/ svg|Svg">
         <Setter Property="Path" Value="/Resources/Icons/copy-light.svg" />
     </Style>
-    
-    <Style Selector="controls|CopyButton:pointerover /template/ ContentPresenter#PART_ContentPresenter">
-        <Setter Property="Background" Value="{DynamicResource ButtonBackgroundPointerOver}" />
-        <Setter Property="BorderBrush" Value="{DynamicResource ButtonBorderBrushPointerOver}" />
-    </Style>
-
-    <Style Selector="controls|CopyButton:pressed /template/ ContentPresenter#PART_ContentPresenter">
-        <Setter Property="Background" Value="{DynamicResource ButtonBackgroundPressed}" />
-        <Setter Property="BorderBrush" Value="{DynamicResource ButtonBorderBrushPressed}" />
-    </Style>
 
     <Style Selector="controls|CopyButton">
-        <Setter Property="Cursor" Value="Hand" />
-        <Setter Property="FontFamily" Value="{DynamicResource DefaultFontFamily}" />
-        <Setter Property="Background" Value="Transparent" />
-        <Setter Property="Padding" Value="0" />
-        <Setter Property="BorderThickness" Value="0" />
-        <Setter Property="VerticalContentAlignment" Value="Center" />
-        <Setter Property="HorizontalContentAlignment" Value="Center" />
-        <Setter Property="CornerRadius" Value="{DynamicResource AtomexCornerRadius}"></Setter>
-        <Setter Property="Width" Value="28" />
-        <Setter Property="Height" Value="28" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type controls:CopyButton}">
                     <Panel ToolTip.Placement="AnchorAndGravity"
-                           ToolTip.VerticalOffset="-32"
-                           Name="ToolTipPanel"
+                           ToolTip.VerticalOffset="{Binding $self.Bounds.Height,
+                           Converter={StaticResource ToolTipOffsetConverter}}"
+                           Width="{TemplateBinding Width}"
+                           Height="{TemplateBinding Height}"
                            Background="{TemplateBinding Background}">
                         <Panel.Styles>
                             <Style Selector="Panel.IsDone ToolTip">

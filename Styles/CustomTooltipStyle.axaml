@@ -4,6 +4,7 @@
 
     <Styles.Resources>
         <sys:Double x:Key="ToolTipContentMaxWidth">560</sys:Double>
+        <sys:Double x:Key="DefaultToolTipVerticalOffset">-40</sys:Double>
     </Styles.Resources>
 
     <Design.PreviewWith>
@@ -15,7 +16,7 @@
                     Background="{DynamicResource SystemControlBackgroundAccentBrush}"
                     Margin="5"
                     Padding="50"
-                    ToolTip.Tip="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.">
+                    ToolTip.Tip="https://live.blockcypher.com/btc-testnet/address/mtS7VvBom7WkeiF9SytZr8G6DZSF1n5nxf/">
                 <TextBlock>Hover Here</TextBlock>
             </Border>
             <CheckBox Grid.Column="1"
@@ -50,13 +51,16 @@
         <Setter Property="MaxWidth" Value="{DynamicResource ToolTipContentMaxWidth}" />
         <Setter Property="Transitions">
             <Transitions>
-                <DoubleTransition Property="Opacity" Duration="0:0:0.15" />
+                <DoubleTransition Property="Opacity" Duration="0:0:0.1" />
             </Transitions>
         </Setter>
         <Setter Property="Template">
             <ControlTemplate>
-                <StackPanel Orientation="Vertical">
+                <Grid ColumnDefinitions="*,Auto,*"
+                      RowDefinitions="*,8"
+                      Background="Transparent">
                     <Border Name="PART_LayoutRoot"
+                            Grid.ColumnSpan="3"
                             BorderThickness="{TemplateBinding BorderThickness}"
                             Background="{TemplateBinding Background}"
                             BorderBrush="{TemplateBinding BorderBrush}"
@@ -69,19 +73,18 @@
                                           ContentTemplate="{TemplateBinding ContentTemplate}" />
                     </Border>
                     
-                    <Border Height="30">
-                        <Border VerticalAlignment="Center"
-                                Width="20"
-                                Height="20"
-                                Margin="0 -38 0 0"
-                                Background="{TemplateBinding Background}">
-                        
-                            <Border.RenderTransform>
-                                <RotateTransform Angle="45" />
-                            </Border.RenderTransform>
-                        </Border>
+                    <Border Grid.Row="1"
+                            Grid.Column="1"
+                            VerticalAlignment="Center"
+                            Width="20"
+                            Height="20"
+                            Margin="0 -20 0 0"
+                            Background="{TemplateBinding Background}">
+                        <Border.RenderTransform>
+                            <RotateTransform Angle="45" />
+                        </Border.RenderTransform>
                     </Border>
-                </StackPanel>
+                </Grid>
             </ControlTemplate>
         </Setter>
     </Style>
@@ -90,11 +93,11 @@
         <Setter Property="TextWrapping" Value="Wrap" />
     </Style>
 
-    <Style Selector="ToolTip">
+    <Style Selector="ToolTip /template/ Border">
         <Setter Property="Opacity" Value="0" />
     </Style>
 
-    <Style Selector="ToolTip:open">
+    <Style Selector="ToolTip:open /template/ Border">
         <Setter Property="Opacity" Value="1" />
     </Style>
 </Styles>

@@ -9,6 +9,7 @@
              xmlns:svg="clr-namespace:Avalonia.Svg.Skia;assembly=Avalonia.Svg.Skia"
              xmlns:abstract="clr-namespace:Atomex.Blockchain.Abstract;assembly=Atomex.Client.Core"
              xmlns:converters="clr-namespace:Atomex.Client.Desktop.Converters"
+             xmlns:controls="clr-namespace:Atomex.Client.Desktop.Controls"
              xmlns:vm="clr-namespace:Atomex.Client.Desktop.ViewModels.TransactionViewModels">
 
     <Design.DataContext>
@@ -19,6 +20,7 @@
         <converters:GreaterThanZeroConverter x:Key="GreaterThanZeroConverter" />
         <converters:AmountToStringConverter x:Key="AmountToStringConverter" />
         <converters:DateTimeToTxTimeConverter x:Key="DateTimeToTxTimeConverter" />
+        <converters:ToolTipOffsetConverter x:Key="ToolTipOffsetConverter" />
     </UserControl.Resources>
 
     <Border Background="{DynamicResource RightPopupBackgroundBrush}"
@@ -35,7 +37,7 @@
                 
                 <Button Grid.Column="2"
                         ToolTip.Placement="AnchorAndGravity"
-                        ToolTip.VerticalOffset="-32"
+                        ToolTip.VerticalOffset="{DynamicResource DefaultToolTipVerticalOffset}"
                         IsVisible="{Binding CanBeRemoved}"
                         Command="{Binding RemoveCommand}"
                         Classes="ButtonWithIcon Trash">
@@ -156,8 +158,10 @@
                            Text="Transaction ID" />
 
                 <Button Grid.Column="1"
+                        Name="TxIdBtn"
                         ToolTip.Placement="AnchorAndGravity"
-                        ToolTip.VerticalOffset="-32"
+                        ToolTip.VerticalOffset="{Binding $self.Bounds.Height,
+                        Converter={StaticResource ToolTipOffsetConverter}}"
                         HorizontalAlignment="Left"
                         VerticalAlignment="Center"
                         Padding="0"
@@ -168,20 +172,13 @@
                         <TextBlock Text="{Binding TxExplorerUri}" />
                     </ToolTip.Tip>
                 </Button>
-
-                <Button Grid.Column="2"
-                        ToolTip.Placement="AnchorAndGravity"
-                        ToolTip.VerticalOffset="-32"
-                        Margin="10 0 0 0"
-                        Command="{Binding CopyCommand}"
-                        CommandParameter="{Binding Id}"
-                        Classes="ButtonWithIcon Copy">
-
-                    <ToolTip.Tip>
-                        <TextBlock Text="Copy transaction id to clipboard" />
-                    </ToolTip.Tip>
-                    <svg:Svg />
-                </Button>
+                
+                <controls:CopyButton Grid.Column="2"
+                                     Margin="10 0 0 0"
+                                     ToolText="Copy transaction id to clipboard"
+                                     DoneToolText="Copied!"
+                                     Command="{Binding CopyCommand}"
+                                     CommandParameter="{Binding Id}" />
             </Grid>
 
             <Border Height="1"

@@ -182,19 +182,12 @@
                                        FontSize="16"
                                        Text="{Binding BalanceString}" />
                             
-                            <Button Grid.Column="2"
-                                    ToolTip.Placement="AnchorAndGravity"
-                                    ToolTip.VerticalOffset="-32"
-                                    Margin="0 0 9 0"
-                                    Command="{Binding $parent[ListBox].DataContext.CopyAddressCommand}"
-                                    CommandParameter="{Binding}"
-                                    Classes="ButtonWithIcon Copy">
-
-                                <ToolTip.Tip>
-                                    <TextBlock Text="{Binding CopyButtonToolTip}" />
-                                </ToolTip.Tip>
-                                <svg:Svg />
-                            </Button>
+                            <controls:CopyButton Grid.Column="2"
+                                                 Margin="0 0 9 0"
+                                                 ToolText="Copy address to clipboard"
+                                                 DoneToolText="Copied!"
+                                                 Command="{Binding $parent[ListBox].DataContext.CopyAddressCommand}"
+                                                 CommandParameter="{Binding}" />
                         </Grid>
                     </DataTemplate>
                 </ListBox.ItemTemplate>

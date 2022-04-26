@@ -230,19 +230,12 @@
                                         FontSize="16"
                                         Text="{Binding BalanceCode}" />
                                 </StackPanel>
-                                <Button ToolTip.Placement="AnchorAndGravity"
-                                        ToolTip.VerticalOffset="-32"
-                                        Margin="0 0 9 0"
-                                        Command="{Binding $parent[ListBox].DataContext.CopyAddressCommand}"
-                                        CommandParameter="{Binding WalletAddress}"
-                                        Click="CopyButtonOnClick"
-                                        Classes="ButtonWithIcon Copy">
-                                    <ToolTip.Tip>
-                                        <TextBlock Text="Copy address to clipboard"
-                                                   Name="CopyTextBlock" />
-                                    </ToolTip.Tip>
-                                    <svg:Svg />
-                                </Button>
+                                
+                                <controls:CopyButton Margin="0 0 9 0"
+                                                     ToolText="Copy address to clipboard"
+                                                     DoneToolText="Copied!"
+                                                     Command="{Binding $parent[ListBox].DataContext.CopyAddressCommand}"
+                                                     CommandParameter="{Binding WalletAddress}" />
                             </StackPanel>
                         </Grid>
                     </DataTemplate>

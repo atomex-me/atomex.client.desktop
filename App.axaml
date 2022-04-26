@@ -28,9 +28,10 @@
     <StyleInclude Source="/Styles/ChildViewStyle.axaml"/>
     <StyleInclude Source="/Styles/ButtonStyle.axaml"/>
     <StyleInclude Source="/Styles/RoundedButtonStyle.axaml"/>
-    <StyleInclude Source="/Controls/CopyButton.axaml"/>
-    <StyleInclude Source="/Styles/IconButtonStyle.axaml"/>
     <StyleInclude Source="/Styles/LinkButtonStyle.axaml"/>
+    <StyleInclude Source="/Styles/RadioButtonStyle.axaml"/>
+    <StyleInclude Source="/Controls/IconButton.axaml"/>
+    <StyleInclude Source="/Controls/CopyButton.axaml"/>
     <StyleInclude Source="/Styles/CustomComboBoxStyle.axaml"/>
     <StyleInclude Source="/Styles/BakersComboBoxStyle.axaml"/>
     <StyleInclude Source="/Styles/CustomTextBoxStyle.axaml"/>
@@ -38,7 +39,6 @@
     <StyleInclude Source="/Styles/AmountTextBoxStyle.axaml"/>
     <StyleInclude Source="/Styles/PasswordTextBoxStyle.axaml"/>
     <StyleInclude Source="/Styles/TabControl.axaml"/>
-    <!-- <StyleInclude Source="/Styles/WalletTabControlStyle.axaml" /> -->
     <StyleInclude Source="/Styles/CustomTooltipStyle.axaml"/>
     <StyleInclude Source="/Styles/WalletMenuButton.axaml"/>
     <StyleInclude Source="/Styles/OldCustomDataGridStyle.axaml"/>
@@ -53,7 +53,6 @@
     <StyleInclude Source="/Styles/DialogHostCustomStyle.axaml"/>
     <StyleInclude Source="/Styles/CustomCheckBoxStyle.axaml"/>
     <StyleInclude Source="/Styles/CollapsedAnimation.axaml"/>
-    <StyleInclude Source="/Styles/RadioButtonStyle.axaml"/>
     <StyleInclude Source="/Styles/SelectCurrencyListBoxStyle.axaml"/>
   </Application.Styles>
 </Application>

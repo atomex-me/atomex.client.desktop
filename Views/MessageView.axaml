@@ -72,18 +72,11 @@
                     </ToolTip.Tip>
                 </Button>
                 
-                <Button ToolTip.Placement="AnchorAndGravity"
-                        ToolTip.VerticalOffset="-32"
-                        Margin="8 0 0 0"
-                        Command="{Binding CopyCommand}"
-                        CommandParameter="{Binding Id}"
-                        Classes="ButtonWithIcon Copy">
-
-                    <ToolTip.Tip>
-                        <TextBlock Text="Copy transaction id to clipboard" />
-                    </ToolTip.Tip>
-                    <svg:Svg />
-                </Button>
+                <controls:CopyButton ToolText="Copy transaction id to clipboard"
+                                     DoneToolText="Copied!"
+                                     Margin="8 0 0 0"
+                                     Command="{Binding CopyCommand}"
+                                     CommandParameter="{Binding Id}"/>
             </StackPanel>
 
             <StackPanel Orientation="Horizontal"
