@@ -35,9 +35,17 @@ namespace Atomex.Client.Desktop.Services
         public void ShowPrevious()
         {
             if (_isDialogOpened) return;
-            _ = DialogHost.DialogHost.Show(_dialogServiceViewModel, MainDialogHostIdentifier);
+            _ = DialogHost.DialogHost.Show(_dialogServiceViewModel, MainDialogHostIdentifier, ClosingEventHandler);
 
             _isDialogOpened = true;
+        }
+
+        private void ClosingEventHandler(object sender, DialogClosingEventArgs args)
+        {
+            if (_dialogServiceViewModel.Content is IDisposable vm)
+            {
+                vm.Dispose();
+            }
         }
 
 
