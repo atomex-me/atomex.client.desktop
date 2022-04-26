@@ -1,5 +1,7 @@
+using System;
 using Atomex.Client.Desktop.Dialogs.ViewModels;
 using Atomex.Client.Desktop.ViewModels;
+using DialogHost;
 
 
 namespace Atomex.Client.Desktop.Services
@@ -34,6 +36,7 @@ namespace Atomex.Client.Desktop.Services
         {
             if (_isDialogOpened) return;
             _ = DialogHost.DialogHost.Show(_dialogServiceViewModel, MainDialogHostIdentifier);
+
             _isDialogOpened = true;
         }
 
