@@ -13,99 +13,100 @@
              x:Class="Atomex.Client.Desktop.Views.ConversionCurrencyView"
              Classes="designer">
 
-  <Design.DataContext>
-    <vm:ConversionCurrencyViewModel/>
-  </Design.DataContext>
+    <Design.DataContext>
+        <vm:ConversionCurrencyViewModel />
+    </Design.DataContext>
 
-  <Design.DesignStyle>
-    <Style Selector="Border.designer">
-      <Setter Property="Background" Value="#10243f"/>
-    </Style>
-  </Design.DesignStyle>       
+    <Design.DesignStyle>
+        <Style Selector="Border.designer">
+            <Setter Property="Background" Value="#10243f" />
+        </Style>
+    </Design.DesignStyle>
 
-  <UserControl.Resources>
-    <converters:AmountToStringConverter x:Key="AmountToStringConverter"/>
-    <converters:StringToDecimalConverter x:Key="StringToDecimalConverter"/>
-    <SolidColorBrush x:Key="CurrencySelectionViewBorderBrush"
-                     Color="{DynamicResource LightDefaultOpacity20}"/>
-    <SolidColorBrush x:Key="CurrencySelectionViewBackgroundBrush"
-                     Color="Transparent"/>
-    <SolidColorBrush x:Key="SelectCurrencyButtonBackgroundBrush"
-                     Color="{DynamicResource LightDefaultOpacity4}"/>
-    <SolidColorBrush x:Key="SelectCurrencyButtonHoverBrush"
-                     Color="{DynamicResource LightDefaultOpacity6}"/>
-    <SolidColorBrush x:Key="SelectCurrencyButtonPressedBrush"
-                     Color="{DynamicResource LightDefaultOpacity10}"/>
-    <SolidColorBrush x:Key="WatermarkForegroundBrush"
-                     Color="{DynamicResource LightDefaultOpacity20}"/>
-  </UserControl.Resources>
+    <UserControl.Resources>
+        <converters:AmountToStringConverter x:Key="AmountToStringConverter" />
+        <converters:StringToDecimalConverter x:Key="StringToDecimalConverter" />
+        <converters:ToolTipOffsetConverter x:Key="ToolTipOffsetConverter" />
+        <SolidColorBrush x:Key="CurrencySelectionViewBorderBrush"
+                         Color="{DynamicResource LightDefaultOpacity20}" />
+        <SolidColorBrush x:Key="CurrencySelectionViewBackgroundBrush"
+                         Color="Transparent" />
+        <SolidColorBrush x:Key="SelectCurrencyButtonBackgroundBrush"
+                         Color="{DynamicResource LightDefaultOpacity4}" />
+        <SolidColorBrush x:Key="SelectCurrencyButtonHoverBrush"
+                         Color="{DynamicResource LightDefaultOpacity6}" />
+        <SolidColorBrush x:Key="SelectCurrencyButtonPressedBrush"
+                         Color="{DynamicResource LightDefaultOpacity10}" />
+        <SolidColorBrush x:Key="WatermarkForegroundBrush"
+                         Color="{DynamicResource LightDefaultOpacity20}" />
+    </UserControl.Resources>
 
-  <UserControl.Styles>
-    <Style Selector="Button.Default /template/ ContentPresenter#PART_ContentPresenter">
-      <Setter Property="Background" Value="{DynamicResource SelectCurrencyButtonBackgroundBrush}"/>
-    </Style>
-    <Style Selector="Button.Default:pointerover /template/ ContentPresenter#PART_ContentPresenter">
-      <Setter Property="Background" Value="{DynamicResource SelectCurrencyButtonHoverBrush}"/>
-    </Style>
-    <Style Selector="Button.Default:pressed /template/ ContentPresenter#PART_ContentPresenter">
-      <Setter Property="Background" Value="{DynamicResource SelectCurrencyButtonPressedBrush}"/>
-    </Style>
-    <Style Selector="Border.Default">
-      <Setter Property="BorderBrush" Value="{DynamicResource CurrencySelectionViewBorderBrush}"/>     
-    </Style>
-  </UserControl.Styles>
-  
-  <Border BorderThickness="1"
-          CornerRadius="{DynamicResource AtomexCornerRadius}"
-          Classes="designer Default">
-    <Grid ColumnDefinitions="20,Auto,*,Auto,24"
-          RowDefinitions="20,40,*,18"
-          Background="{DynamicResource CurrencySelectionViewBackgroundBrush}">
+    <UserControl.Styles>
+        <Style Selector="Button.Default /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource SelectCurrencyButtonBackgroundBrush}" />
+        </Style>
+        <Style Selector="Button.Default:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource SelectCurrencyButtonHoverBrush}" />
+        </Style>
+        <Style Selector="Button.Default:pressed /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource SelectCurrencyButtonPressedBrush}" />
+        </Style>
+        <Style Selector="Border.Default">
+            <Setter Property="BorderBrush" Value="{DynamicResource CurrencySelectionViewBorderBrush}" />
+        </Style>
+    </UserControl.Styles>
 
-      <!-- select currency button -->
-      <Button CornerRadius="8"
-              VerticalAlignment="Stretch"
-              HorizontalAlignment="Stretch"
-              VerticalContentAlignment="Center"
-              HorizontalContentAlignment="Center"
-              Padding="0"
-              Background="{DynamicResource SelectCurrencyButtonBackgroundBrush}"
-              Grid.Row="1"
-              Grid.Column="1"
-              IsVisible="{Binding Selected}"
-              Command="{Binding SelectCurrencyCommand}"
-              Classes="Default">
-        <Button.Content>
-          <StackPanel Orientation="Horizontal"
-                      VerticalAlignment="Center"
-                      HorizontalAlignment="Center">
+    <Border BorderThickness="1"
+            CornerRadius="{DynamicResource AtomexCornerRadius}"
+            Classes="designer Default">
+        <Grid ColumnDefinitions="20,Auto,*,Auto,24"
+              RowDefinitions="20,40,*,18"
+              Background="{DynamicResource CurrencySelectionViewBackgroundBrush}">
 
-            <svg:Svg Margin="15 0 0 0"
-                     Path="{Binding CurrencyViewModel.IconPath}"
-                     Width="25" />
-            
-            <TextBlock Margin="9 0 15 0"
-                       Text="{Binding CurrencyViewModel.Header}"
-                       FontSize="18"
-                       FontFamily="{DynamicResource DefaultLightFontFamily}"
-                       Foreground="{DynamicResource DefaultForegroundBrush}"
-                       VerticalAlignment="Center"/>
-          </StackPanel>
-        </Button.Content>
-      </Button>
+            <!-- select currency button -->
+            <Button CornerRadius="8"
+                    VerticalAlignment="Stretch"
+                    HorizontalAlignment="Stretch"
+                    VerticalContentAlignment="Center"
+                    HorizontalContentAlignment="Center"
+                    Padding="0"
+                    Background="{DynamicResource SelectCurrencyButtonBackgroundBrush}"
+                    Grid.Row="1"
+                    Grid.Column="1"
+                    IsVisible="{Binding Selected}"
+                    Command="{Binding SelectCurrencyCommand}"
+                    Classes="Default">
+                <Button.Content>
+                    <StackPanel Orientation="Horizontal"
+                                VerticalAlignment="Center"
+                                HorizontalAlignment="Center">
 
-      <!-- address and max button-->
-      <StackPanel Orientation="Horizontal"
-                  VerticalAlignment="Bottom"
-                  Grid.Row="2"
-                  Grid.Column="1"
-                  IsVisible="{Binding Selected}">
-        <TextBlock Text="{Binding Address}"
-                   FontSize="13"
-                   FontFamily="{DynamicResource DefaultLightFontFamily}"
-                   Foreground="{DynamicResource SecondaryForegroundBrush}"
-                   VerticalAlignment="Bottom"/>
-        <!--<TextBlock Text="/"
+                        <svg:Svg Margin="15 0 0 0"
+                                 Path="{Binding CurrencyViewModel.IconPath}"
+                                 Width="25" />
+
+                        <TextBlock Margin="9 0 15 0"
+                                   Text="{Binding CurrencyViewModel.Header}"
+                                   FontSize="18"
+                                   FontFamily="{DynamicResource DefaultLightFontFamily}"
+                                   Foreground="{DynamicResource DefaultForegroundBrush}"
+                                   VerticalAlignment="Center" />
+                    </StackPanel>
+                </Button.Content>
+            </Button>
+
+            <!-- address and max button-->
+            <StackPanel Orientation="Horizontal"
+                        VerticalAlignment="Bottom"
+                        Grid.Row="2"
+                        Grid.Column="1"
+                        IsVisible="{Binding Selected}">
+                <TextBlock Text="{Binding Address}"
+                           FontSize="13"
+                           FontFamily="{DynamicResource DefaultLightFontFamily}"
+                           Foreground="{DynamicResource SecondaryForegroundBrush}"
+                           VerticalAlignment="Bottom" />
+                <!--<TextBlock Text="/"
                    FontSize="13"
                    FontFamily="{DynamicResource DefaultLightFontFamily}"
                    Foreground="{DynamicResource SecondaryForegroundBrush}"
@@ -115,93 +116,99 @@
                    FontFamily="{DynamicResource DefaultLightFontFamily}"
                    Foreground="{DynamicResource SecondaryForegroundBrush}"
                    VerticalAlignment="Bottom"/>-->
-        <Button Margin="7 0 0 -3"
-                Command="{Binding MaxCommand}"
-                Content="max"
-                VerticalAlignment="Bottom"
-                Classes="LinkButton Underlined"
-                ToolTip.Placement="AnchorAndGravity"
-                ToolTip.VerticalOffset="-30"
-                IsVisible="{Binding UseMax}">
-          <ToolTip.Tip>
-            <TextBlock Text="Use the maximum currently available amount" />
-          </ToolTip.Tip>
-        </Button>
-      </StackPanel>
+                <Button Margin="7 0 0 -3"
+                        Command="{Binding MaxCommand}"
+                        Content="max"
+                        VerticalAlignment="Bottom"
+                        Classes="LinkButton Underlined"
+                        ToolTip.Placement="AnchorAndGravity"
+                        IsVisible="{Binding UseMax}">
+                    <ToolTip.VerticalOffset>
+                        <MultiBinding Converter="{StaticResource ToolTipOffsetConverter}">
+                            <Binding Path="$self.Bounds.Height" />
+                            <Binding Path="#UseMaxToolTip.Bounds.Height" />
+                        </MultiBinding>
+                    </ToolTip.VerticalOffset>
+                    <ToolTip.Tip>
+                        <TextBlock Name="UseMaxToolTip"
+                                   Text="Use the maximum currently available amount" />
+                    </ToolTip.Tip>
+                </Button>
+            </StackPanel>
 
-      <!-- amount text box -->
-      <TextBox Padding="0 0 0 2"
-               Height="40"
-               Text="{Binding Amount, Converter={StaticResource StringToDecimalConverter}}"
-               VerticalAlignment="Bottom"
-               VerticalContentAlignment="Bottom"
-               HorizontalContentAlignment="Right"
-               Grid.Row="1"
-               Grid.Column="2"
-               IsVisible="{Binding Selected}"
-               GotFocus="OnGotFocus"
-               Classes="Amount"
-               Classes.ValidAmount="{Binding IsAmountValid}"
-               Classes.InvalidAmount="{Binding !IsAmountValid}">
-        <i:Interaction.Behaviors>
-          <behaviors:AmountBehavior Format="{Binding CurrencyFormat}"/>
-        </i:Interaction.Behaviors>
-      </TextBox>
+            <!-- amount text box -->
+            <TextBox Padding="0 0 0 2"
+                     Height="40"
+                     Text="{Binding Amount, Converter={StaticResource StringToDecimalConverter}}"
+                     VerticalAlignment="Bottom"
+                     VerticalContentAlignment="Bottom"
+                     HorizontalContentAlignment="Right"
+                     Grid.Row="1"
+                     Grid.Column="2"
+                     IsVisible="{Binding Selected}"
+                     GotFocus="OnGotFocus"
+                     Classes="Amount"
+                     Classes.ValidAmount="{Binding IsAmountValid}"
+                     Classes.InvalidAmount="{Binding !IsAmountValid}">
+                <i:Interaction.Behaviors>
+                    <behaviors:AmountBehavior Format="{Binding CurrencyFormat}" />
+                </i:Interaction.Behaviors>
+            </TextBox>
 
-      <!-- amount in base -->
-      <TextBlock Margin="0 1 0 0"
-                 HorizontalAlignment="Right"
-                 FontSize="13"
-                 FontFamily="{DynamicResource DefaultLightFontFamily}"
-                 Foreground="{DynamicResource SecondaryForegroundBrush}"
-                 Grid.Row="2"
-                 Grid.Column="1"
-                 Grid.ColumnSpan="3"
-                 IsVisible="{Binding Selected}">
-        <TextBlock.Text>
-          <MultiBinding Converter="{StaticResource AmountToStringConverter}">
-            <Binding Path="AmountInBase"/>
-            <Binding Path="CurrencyViewModel.BaseCurrencyFormat"/>
-          </MultiBinding>
-        </TextBlock.Text>
-      </TextBlock>
+            <!-- amount in base -->
+            <TextBlock Margin="0 1 0 0"
+                       HorizontalAlignment="Right"
+                       FontSize="13"
+                       FontFamily="{DynamicResource DefaultLightFontFamily}"
+                       Foreground="{DynamicResource SecondaryForegroundBrush}"
+                       Grid.Row="2"
+                       Grid.Column="1"
+                       Grid.ColumnSpan="3"
+                       IsVisible="{Binding Selected}">
+                <TextBlock.Text>
+                    <MultiBinding Converter="{StaticResource AmountToStringConverter}">
+                        <Binding Path="AmountInBase" />
+                        <Binding Path="CurrencyViewModel.BaseCurrencyFormat" />
+                    </MultiBinding>
+                </TextBlock.Text>
+            </TextBlock>
 
-      <!-- unselected view button -->
-      <Button CornerRadius="8"
-              Height="40"
-              VerticalAlignment="Center"
-              HorizontalAlignment="Center"
-              VerticalContentAlignment="Center"
-              HorizontalContentAlignment="Center"
-              Padding="15 0 15 0"
-              Margin="0 -1 0 0"
-              Background="{DynamicResource SelectCurrencyButtonBackgroundBrush}"
-              Grid.Row="1"
-              Grid.RowSpan="2"
-              Grid.Column="1"
-              IsVisible="{Binding !Selected}"
-              Command="{Binding SelectCurrencyCommand}"
-              Classes="Default">
-        <Button.Content>
-          <TextBlock Text="{Binding UnselectedLabel}"
-                     FontSize="18"
-                     FontFamily="{DynamicResource DefaultLightFontFamily}"
-                     Foreground="{DynamicResource DefaultForegroundBrush}"/>
-        </Button.Content>
-      </Button>
+            <!-- unselected view button -->
+            <Button CornerRadius="8"
+                    Height="40"
+                    VerticalAlignment="Center"
+                    HorizontalAlignment="Center"
+                    VerticalContentAlignment="Center"
+                    HorizontalContentAlignment="Center"
+                    Padding="15 0 15 0"
+                    Margin="0 -1 0 0"
+                    Background="{DynamicResource SelectCurrencyButtonBackgroundBrush}"
+                    Grid.Row="1"
+                    Grid.RowSpan="2"
+                    Grid.Column="1"
+                    IsVisible="{Binding !Selected}"
+                    Command="{Binding SelectCurrencyCommand}"
+                    Classes="Default">
+                <Button.Content>
+                    <TextBlock Text="{Binding UnselectedLabel}"
+                               FontSize="18"
+                               FontFamily="{DynamicResource DefaultLightFontFamily}"
+                               Foreground="{DynamicResource DefaultForegroundBrush}" />
+                </Button.Content>
+            </Button>
 
-      <!-- unselected zero amount -->
-      <TextBlock Margin="0 -1 0 0"
-                 Text="0"
-                 FontSize="22"
-                 FontFamily="{DynamicResource DefaultLightFontFamily}"
-                 Foreground="{DynamicResource WatermarkForegroundBrush}"
-                 HorizontalAlignment="Right"
-                 VerticalAlignment="Center"
-                 Grid.Row="1"
-                 Grid.RowSpan="2"
-                 Grid.Column="3"
-                 IsVisible="{Binding !Selected}"/>
-    </Grid>
-  </Border>
+            <!-- unselected zero amount -->
+            <TextBlock Margin="0 -1 0 0"
+                       Text="0"
+                       FontSize="22"
+                       FontFamily="{DynamicResource DefaultLightFontFamily}"
+                       Foreground="{DynamicResource WatermarkForegroundBrush}"
+                       HorizontalAlignment="Right"
+                       VerticalAlignment="Center"
+                       Grid.Row="1"
+                       Grid.RowSpan="2"
+                       Grid.Column="3"
+                       IsVisible="{Binding !Selected}" />
+        </Grid>
+    </Border>
 </UserControl>

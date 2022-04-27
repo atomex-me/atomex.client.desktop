@@ -44,7 +44,6 @@
         <converters:AmountToStringInBracketsConverter x:Key="AmountToStringInBracketsConverter" />
         <converters:EnumToStringEqualConverter x:Key="EnumToStringEqualConverter" />
         <converters:EnumToStringNotEqualConverter x:Key="EnumToStringNotEqualConverter" />
-        <converters:WidthToHorizontalCenterOffsetConverter x:Key="WidthToHorizontalCenterOffsetConverter" />
         <converters:StringToDecimalConverter x:Key="StringToDecimalConverter" />
     </UserControl.Resources>
 
@@ -273,44 +272,27 @@
                                FontFamily="{DynamicResource DefaultLightFontFamily}"
                                Classes="Message"
                                Classes.Warning="{Binding WarningType,
-                       Converter={StaticResource EnumToStringEqualConverter},
-                       ConverterParameter=Warning}"
+                               Converter={StaticResource EnumToStringEqualConverter},
+                               ConverterParameter=Warning}"
                                Classes.Error="{Binding WarningType,
-                       Converter={StaticResource EnumToStringEqualConverter},
-                       ConverterParameter=Error}" />
-                    <Button Padding="3"
-                            VerticalAlignment="Center"
-                            VerticalContentAlignment="Center"
-                            ToolTip.Placement="Bottom"
-                            ToolTip.VerticalOffset="10"
-                            ToolTip.HorizontalOffset="{Binding ElementName=WarningToolTipGrid,
-                    Path=Bounds.Width,
-                    Converter={StaticResource WidthToHorizontalCenterOffsetConverter}}"
-                            Click="HelpClickHandler"
-                            Classes="ButtonWithIcon"
-                            IsVisible="{Binding WarningToolTip, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
-                        <ToolTip.Tip>
-                            <Grid Name="WarningToolTipGrid">
-                                <TextBlock TextWrapping="Wrap"
-                                           Text="{Binding WarningToolTip}"
-                                           Classes.Warning="{Binding WarningType,
-                             Converter={StaticResource EnumToStringEqualConverter},
-                             ConverterParameter=Warning}"
-                                           Classes.Error="{Binding WarningType,
-                             Converter={StaticResource EnumToStringEqualConverter},
-                             ConverterParameter=Error}" />
-                            </Grid>
-                        </ToolTip.Tip>
-                        <Path HorizontalAlignment="Center"
-                              VerticalAlignment="Center"
-                              Width="12"
-                              Height="12"
-                              Data="{DynamicResource Help}"
-                              Fill="{DynamicResource LightDefaultOpacity20}" />
-                    </Button>
+                               Converter={StaticResource EnumToStringEqualConverter},
+                               ConverterParameter=Error}" />
+                    
+                    <controls:IconButton Classes="Question WithToolTipContent"
+                                         VerticalAlignment="Center"
+                                         IsVisible="{Binding WarningToolTip, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                                         Margin="4 0 0 0">
+                        <TextBlock TextWrapping="Wrap"
+                                   Text="{Binding WarningToolTip}"
+                                   Classes.Warning="{Binding WarningType,
+                                           Converter={StaticResource EnumToStringEqualConverter},
+                                           ConverterParameter=Warning}"
+                                   Classes.Error="{Binding WarningType,
+                                           Converter={StaticResource EnumToStringEqualConverter},
+                                           ConverterParameter=Error}" />
+                    </controls:IconButton>
                 </StackPanel>
-
-
+                
                 <Grid ColumnDefinitions="*,Auto"
                       RowDefinitions="Auto,Auto"
                       Margin="0 12 0 0"

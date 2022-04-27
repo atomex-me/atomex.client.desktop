@@ -47,7 +47,6 @@
     <converters:AmountToStringInBracketsConverter x:Key="AmountToStringInBracketsConverter"/>
     <converters:EnumToStringEqualConverter x:Key="EnumToStringEqualConverter"/>
     <converters:EnumToStringNotEqualConverter x:Key="EnumToStringNotEqualConverter"/>
-    <converters:WidthToHorizontalCenterOffsetConverter x:Key="WidthToHorizontalCenterOffsetConverter"/>
     <converters:StringToDecimalConverter x:Key="StringToDecimalConverter"/>
     <converters:StringToIntConverter x:Key="StringToIntConverter"/>
   </UserControl.Resources>
@@ -287,36 +286,21 @@
                      Classes.Error="{Binding WarningType,
                        Converter={StaticResource EnumToStringEqualConverter},
                        ConverterParameter=Error}"/>
-          <Button Padding="3"
-                  VerticalAlignment="Center"
-                  VerticalContentAlignment="Center"
-                  ToolTip.Placement="Bottom"
-                  ToolTip.VerticalOffset="10"
-                  ToolTip.HorizontalOffset="{Binding ElementName=WarningToolTipGrid,
-                    Path=Bounds.Width,
-                    Converter={StaticResource WidthToHorizontalCenterOffsetConverter}}"
-                  Click="HelpClickHandler"
-                  Classes="ButtonWithIcon"
-                  IsVisible="{Binding WarningToolTip, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
-            <ToolTip.Tip>
-              <Grid Name="WarningToolTipGrid">
-                <TextBlock TextWrapping="Wrap"
-                           Text="{Binding WarningToolTip}"
-                           Classes.Warning="{Binding WarningType,
+          
+          <controls:IconButton Classes="Question WithToolTipContent"
+                               VerticalAlignment="Center"
+                               IsVisible="{Binding WarningToolTip,
+                               Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                               Margin="4 0 0 0">
+            <TextBlock TextWrapping="Wrap"
+                       Text="{Binding WarningToolTip}"
+                       Classes.Warning="{Binding WarningType,
                              Converter={StaticResource EnumToStringEqualConverter},
                              ConverterParameter=Warning}"
-                           Classes.Error="{Binding WarningType,
+                       Classes.Error="{Binding WarningType,
                              Converter={StaticResource EnumToStringEqualConverter},
                              ConverterParameter=Error}"/>
-              </Grid>
-            </ToolTip.Tip>
-            <Path HorizontalAlignment="Center"
-                  VerticalAlignment="Center"
-                  Width="12"
-                  Height="12"
-                  Data="{DynamicResource Help}"
-                  Fill="{DynamicResource LightDefaultOpacity20}"/>
-          </Button>
+          </controls:IconButton>
         </StackPanel>
 
         <!-- recommended max amount warning -->
@@ -339,36 +323,20 @@
                      Classes.Error="{Binding RecommendedMaxAmountWarningType,
                        Converter={StaticResource EnumToStringEqualConverter},
                        ConverterParameter=Error}"/>
-          <Button Padding="3"
-                  VerticalAlignment="Center"
-                  VerticalContentAlignment="Center"
-                  ToolTip.Placement="Bottom"
-                  ToolTip.VerticalOffset="10"
-                  ToolTip.HorizontalOffset="{Binding ElementName=RecommendedMaxAmountWarningToolTipGrid,
-                    Path=Bounds.Width,
-                    Converter={StaticResource WidthToHorizontalCenterOffsetConverter}}"
-                  Click="HelpClickHandler"
-                  Classes="ButtonWithIcon"
-                  IsVisible="{Binding RecommendedMaxAmountWarningToolTip, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
-            <ToolTip.Tip>
-              <Grid Name="RecommendedMaxAmountWarningToolTipGrid">
-                <TextBlock TextWrapping="Wrap"
-                           Text="{Binding RecommendedMaxAmountWarningToolTip}"
-                           Classes.Warning="{Binding RecommendedMaxAmountWarningType,
+          <controls:IconButton Classes="Question WithToolTipContent"
+                               VerticalAlignment="Center"
+                               IsVisible="{Binding RecommendedMaxAmountWarningToolTip,
+                               Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                               Margin="4 0 0 0">
+            <TextBlock TextWrapping="Wrap"
+                       Text="{Binding RecommendedMaxAmountWarningToolTip}"
+                       Classes.Warning="{Binding RecommendedMaxAmountWarningType,
                              Converter={StaticResource EnumToStringEqualConverter},
                              ConverterParameter=Warning}"
-                           Classes.Error="{Binding RecommendedMaxAmountWarningType,
+                       Classes.Error="{Binding RecommendedMaxAmountWarningType,
                              Converter={StaticResource EnumToStringEqualConverter},
                              ConverterParameter=Error}"/>
-              </Grid>
-            </ToolTip.Tip>
-            <Path HorizontalAlignment="Center"
-                  VerticalAlignment="Center"
-                  Width="12"
-                  Height="12"
-                  Data="{DynamicResource Help}"
-                  Fill="{DynamicResource LightDefaultOpacity20}"/>
-          </Button>
+          </controls:IconButton>
         </StackPanel>
 
         <Grid ColumnDefinitions="*,Auto"

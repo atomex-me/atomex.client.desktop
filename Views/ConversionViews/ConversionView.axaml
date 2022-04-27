@@ -38,7 +38,6 @@
     <UserControl.Resources>
         <converters:AmountToStringConverter x:Key="AmountToStringConverter" />
         <converters:DateTimeToTxTimeConverter x:Key="DateTimeToTxTimeConverter" />
-        <converters:WidthToHorizontalCenterOffsetConverter x:Key="WidthToHorizontalCenterOffsetConverter" />
     </UserControl.Resources>
 
     <Grid Name="DesignGrid"
@@ -109,29 +108,11 @@
                                 VerticalAlignment="Bottom"
                                 Command="{Binding ChangeRedeemAddress}"
                                 Classes="LinkButton Underlined" />
-                        <Button Padding="3"
-                                VerticalAlignment="Center"
-                                VerticalContentAlignment="Center"
-                                ToolTip.Placement="Bottom"
-                                ToolTip.VerticalOffset="10"
-                                ToolTip.HorizontalOffset="{Binding ElementName=ChangeRedeemAddressToolTipGrid,
-                      Path=Bounds.Width,
-                      Converter={StaticResource WidthToHorizontalCenterOffsetConverter}}"
-                                Click="HelpClickHandler"
-                                Classes="ButtonWithIcon">
-                            <ToolTip.Tip>
-                                <Grid Name="ChangeRedeemAddressToolTipGrid">
-                                    <TextBlock TextWrapping="Wrap"
-                                               Text="By default wallet will send a redeem transaction from the address you use to receive funds. You can change the address to any other that has sufficient funds to send the redeem transaction" />
-                                </Grid>
-                            </ToolTip.Tip>
-                            <Path HorizontalAlignment="Center"
-                                  VerticalAlignment="Center"
-                                  Width="12"
-                                  Height="12"
-                                  Data="{DynamicResource Help}"
-                                  Fill="{DynamicResource LightDefaultOpacity20}" />
-                        </Button>
+
+                        <controls:IconButton Classes="Question"
+                                             VerticalAlignment="Center"
+                                             Margin="4 0 0 0"
+                                             ToolText="By default wallet will send a redeem transaction from the address you use to receive funds. You can change the address to any other that has sufficient funds to send the redeem transaction" />
                     </StackPanel>
 
                     <!-- estimated price -->
@@ -171,29 +152,11 @@
                                    VerticalAlignment="Center"
                                    FontSize="13"
                                    FontFamily="{DynamicResource DefaultLightFontFamily}" />
-                        <Button Padding="3"
-                                VerticalAlignment="Center"
-                                VerticalContentAlignment="Center"
-                                Click="HelpClickHandler"
-                                Classes="ButtonWithIcon"
-                                ToolTip.Placement="Bottom"
-                                ToolTip.VerticalOffset="10"
-                                ToolTip.HorizontalOffset="{Binding ElementName=EstimatedPriceToolTipGrid,
-                      Path=Bounds.Width,
-                      Converter={StaticResource WidthToHorizontalCenterOffsetConverter}}">
-                            <ToolTip.Tip>
-                                <Grid Name="EstimatedPriceToolTipGrid">
-                                    <TextBlock TextWrapping="Wrap"
-                                               Text="Estimated price depends on the conversion amount and may change. A trading order is always sent with a price no worse than agreed by the user. If during the time of sending the order the price has changed for the worse, the trading order is canceled" />
-                                </Grid>
-                            </ToolTip.Tip>
-                            <Path HorizontalAlignment="Center"
-                                  VerticalAlignment="Center"
-                                  Width="12"
-                                  Height="12"
-                                  Data="{DynamicResource Help}"
-                                  Fill="{DynamicResource LightDefaultOpacity20}" />
-                        </Button>
+
+                        <controls:IconButton Classes="Question"
+                                             VerticalAlignment="Center"
+                                             ToolText="Estimated price depends on the conversion amount and may change. A trading order is always sent with a price no worse than agreed by the user. If during the time of sending the order the price has changed for the worse, the trading order is canceled"
+                                             Margin="4 0 0 0" />
                     </StackPanel>
 
                     <!-- estimated network fees -->
@@ -215,295 +178,284 @@
                                 </MultiBinding>
                             </TextBlock.Text>
                         </TextBlock>
-                        <Button Padding="3"
-                                VerticalAlignment="Center"
-                                VerticalContentAlignment="Center"
-                                Click="HelpClickHandler"
-                                Classes="ButtonWithIcon"
-                                ToolTip.Placement="Top"
-                                ToolTip.HorizontalOffset="25">
-                            <Path HorizontalAlignment="Center"
-                                  VerticalAlignment="Center"
-                                  Width="12"
-                                  Height="12"
-                                  Data="{DynamicResource Help}"
-                                  Fill="{DynamicResource LightDefaultOpacity20}" />
-                            <ToolTip.Tip>
-                                <StackPanel Orientation="Vertical">
+
+                        <controls:IconButton Classes="Question WithToolTipContent"
+                                             VerticalAlignment="Center"
+                                             Margin="4 0 0 0">
+                            <StackPanel Orientation="Vertical">
+                                <TextBlock Foreground="{DynamicResource DefaultForegroundBrush}"
+                                           Text="Network fees for atomic swap:" />
+
+                                <Grid Margin="0 7 0 0"
+                                      ColumnDefinitions="Auto,15,Auto,5,Auto"
+                                      RowDefinitions="Auto,Auto,Auto,Auto">
+
+                                    <!-- payment fee -->
                                     <TextBlock Foreground="{DynamicResource DefaultForegroundBrush}"
-                                               Text="Network fees for atomic swap:" />
+                                               Text="Payment fee:"
+                                               Grid.Row="0"
+                                               Grid.Column="0" />
 
-                                    <Grid Margin="0 7 0 0"
-                                          ColumnDefinitions="Auto,15,Auto,5,Auto"
-                                          RowDefinitions="Auto,Auto,Auto,Auto">
+                                    <StackPanel Orientation="Horizontal"
+                                                HorizontalAlignment="Right"
+                                                VerticalAlignment="Center"
+                                                Grid.Row="0"
+                                                Grid.Column="2">
 
-                                        <!-- payment fee -->
-                                        <TextBlock Foreground="{DynamicResource DefaultForegroundBrush}"
-                                                   Text="Payment fee:"
-                                                   Grid.Row="0"
-                                                   Grid.Column="0" />
-
-                                        <StackPanel Orientation="Horizontal"
-                                                    HorizontalAlignment="Right"
-                                                    VerticalAlignment="Center"
-                                                    Grid.Row="0"
-                                                    Grid.Column="2">
-
-                                            <TextBlock Foreground="{DynamicResource DefaultForegroundBrush}">
-                                                <TextBlock.Text>
-                                                    <MultiBinding Converter="{StaticResource AmountToStringConverter}">
-                                                        <Binding Path="EstimatedPaymentFee"
-                                                                 Mode="TwoWay" />
-                                                        <Binding
-                                                            Path="FromViewModel.CurrencyViewModel.FeeCurrencyFormat"
-                                                            Mode="OneWay" />
-                                                    </MultiBinding>
-                                                </TextBlock.Text>
-                                            </TextBlock>
-
-                                            <TextBlock Text="{Binding FromViewModel.CurrencyViewModel.FeeCurrencyCode}"
-                                                       Margin="3 0 0 1"
-                                                       FontSize="9"
-                                                       VerticalAlignment="Bottom"
-                                                       Foreground="{DynamicResource DefaultForegroundBrush}" />
-                                        </StackPanel>
-
-                                        <!-- payment fee in base -->
-                                        <StackPanel Orientation="Horizontal"
-                                                    HorizontalAlignment="Left"
-                                                    VerticalAlignment="Center"
-                                                    Grid.Row="0"
-                                                    Grid.Column="4">
-
-                                            <TextBlock
-                                                Foreground="{DynamicResource DefaultAmountInBaseForegroundBrush}"
-                                                Text="(" />
-
-                                            <TextBlock
-                                                Foreground="{DynamicResource DefaultAmountInBaseForegroundBrush}">
-                                                <TextBlock.Text>
-                                                    <MultiBinding Converter="{StaticResource AmountToStringConverter}">
-                                                        <Binding Path="EstimatedPaymentFeeInBase"
-                                                                 Mode="TwoWay" />
-                                                        <Binding
-                                                            Path="FromViewModel.CurrencyViewModel.BaseCurrencyFormat"
-                                                            Mode="OneWay" />
-                                                    </MultiBinding>
-                                                </TextBlock.Text>
-                                            </TextBlock>
-
-                                            <TextBlock
-                                                Foreground="{DynamicResource DefaultAmountInBaseForegroundBrush}"
-                                                Text=")" />
-                                        </StackPanel>
-
-                                        <!-- redeem fee -->
-                                        <TextBlock Foreground="{DynamicResource DefaultForegroundBrush}"
-                                                   Text="Redeem fee:"
-                                                   Grid.Row="1"
-                                                   Grid.Column="0"
-                                                   IsVisible="{Binding !HasRewardForRedeem}" />
-
-                                        <StackPanel Orientation="Horizontal"
-                                                    HorizontalAlignment="Right"
-                                                    VerticalAlignment="Center"
-                                                    Grid.Row="1"
-                                                    Grid.Column="2"
-                                                    IsVisible="{Binding !HasRewardForRedeem}">
-
-                                            <TextBlock Foreground="{DynamicResource DefaultForegroundBrush}">
-                                                <TextBlock.Text>
-                                                    <MultiBinding Converter="{StaticResource AmountToStringConverter}">
-                                                        <Binding Path="EstimatedRedeemFee"
-                                                                 Mode="TwoWay" />
-                                                        <Binding Path="ToViewModel.CurrencyViewModel.FeeCurrencyFormat"
-                                                                 Mode="OneWay" />
-                                                    </MultiBinding>
-                                                </TextBlock.Text>
-                                            </TextBlock>
-
-                                            <TextBlock Text="{Binding ToViewModel.CurrencyViewModel.FeeCurrencyCode}"
-                                                       Margin="3 0 0 1"
-                                                       FontSize="9"
-                                                       VerticalAlignment="Bottom"
-                                                       Foreground="{DynamicResource DefaultForegroundBrush}" />
-                                        </StackPanel>
-
-                                        <!-- redeem fee in base -->
-                                        <StackPanel Orientation="Horizontal"
-                                                    HorizontalAlignment="Left"
-                                                    VerticalAlignment="Center"
-                                                    Grid.Row="1"
-                                                    Grid.Column="4"
-                                                    IsVisible="{Binding !HasRewardForRedeem}">
-
-                                            <TextBlock
-                                                Foreground="{DynamicResource DefaultAmountInBaseForegroundBrush}"
-                                                Text="(" />
-
-                                            <TextBlock
-                                                Foreground="{DynamicResource DefaultAmountInBaseForegroundBrush}">
-                                                <TextBlock.Text>
-                                                    <MultiBinding Converter="{StaticResource AmountToStringConverter}">
-                                                        <Binding Path="EstimatedRedeemFeeInBase"
-                                                                 Mode="TwoWay" />
-                                                        <Binding
-                                                            Path="FromViewModel.CurrencyViewModel.BaseCurrencyFormat"
-                                                            Mode="OneWay" />
-                                                    </MultiBinding>
-                                                </TextBlock.Text>
-                                            </TextBlock>
-
-                                            <TextBlock
-                                                Foreground="{DynamicResource DefaultAmountInBaseForegroundBrush}"
-                                                Text=")" />
-                                        </StackPanel>
-
-                                        <!-- maker fee -->
-                                        <TextBlock Foreground="{DynamicResource DefaultForegroundBrush}"
-                                                   Text="Maker fee:"
-                                                   Grid.Row="2"
-                                                   Grid.Column="0" />
-
-                                        <StackPanel Orientation="Horizontal"
-                                                    HorizontalAlignment="Right"
-                                                    VerticalAlignment="Center"
-                                                    Grid.Row="2"
-                                                    Grid.Column="2">
-
-                                            <TextBlock Foreground="{DynamicResource DefaultForegroundBrush}">
-                                                <TextBlock.Text>
-                                                    <MultiBinding Converter="{StaticResource AmountToStringConverter}">
-                                                        <Binding Path="EstimatedMakerNetworkFee"
-                                                                 Mode="TwoWay" />
-                                                        <Binding Path="FromViewModel.CurrencyViewModel.CurrencyFormat"
-                                                                 Mode="OneWay" />
-                                                    </MultiBinding>
-                                                </TextBlock.Text>
-                                            </TextBlock>
-
-                                            <TextBlock Text="{Binding FromViewModel.CurrencyViewModel.CurrencyCode}"
-                                                       Margin="3 0 0 1"
-                                                       FontSize="9"
-                                                       VerticalAlignment="Bottom"
-                                                       Foreground="{DynamicResource DefaultForegroundBrush}" />
-                                        </StackPanel>
-
-                                        <!-- maker fee in base -->
-                                        <StackPanel Orientation="Horizontal"
-                                                    HorizontalAlignment="Left"
-                                                    VerticalAlignment="Center"
-                                                    Grid.Row="2"
-                                                    Grid.Column="4">
-
-                                            <TextBlock
-                                                Foreground="{DynamicResource DefaultAmountInBaseForegroundBrush}"
-                                                Text="(" />
-
-                                            <TextBlock
-                                                Foreground="{DynamicResource DefaultAmountInBaseForegroundBrush}">
-                                                <TextBlock.Text>
-                                                    <MultiBinding Converter="{StaticResource AmountToStringConverter}">
-                                                        <Binding Path="EstimatedMakerNetworkFeeInBase"
-                                                                 Mode="TwoWay" />
-                                                        <Binding
-                                                            Path="FromViewModel.CurrencyViewModel.BaseCurrencyFormat"
-                                                            Mode="OneWay" />
-                                                    </MultiBinding>
-                                                </TextBlock.Text>
-                                            </TextBlock>
-
-                                            <TextBlock
-                                                Foreground="{DynamicResource DefaultAmountInBaseForegroundBrush}"
-                                                Text=")" />
-                                        </StackPanel>
-
-                                        <!-- reward for redeem -->
-                                        <TextBlock Foreground="{DynamicResource DefaultForegroundBrush}"
-                                                   Text="Reward for redeem:"
-                                                   Grid.Row="3"
-                                                   Grid.Column="0"
-                                                   IsVisible="{Binding HasRewardForRedeem}" />
-
-                                        <StackPanel Orientation="Horizontal"
-                                                    HorizontalAlignment="Right"
-                                                    VerticalAlignment="Center"
-                                                    Grid.Row="3"
-                                                    Grid.Column="2"
-                                                    IsVisible="{Binding HasRewardForRedeem}">
-
-                                            <TextBlock Foreground="{DynamicResource DefaultForegroundBrush}">
-                                                <TextBlock.Text>
-                                                    <MultiBinding Converter="{StaticResource AmountToStringConverter}">
-                                                        <Binding Path="RewardForRedeem"
-                                                                 Mode="TwoWay" />
-                                                        <Binding Path="ToViewModel.CurrencyViewModel.CurrencyFormat"
-                                                                 Mode="OneWay" />
-                                                    </MultiBinding>
-                                                </TextBlock.Text>
-                                            </TextBlock>
-
-                                            <TextBlock Text="{Binding ToViewModel.CurrencyViewModel.CurrencyCode}"
-                                                       Margin="3 0 0 1"
-                                                       FontSize="9"
-                                                       VerticalAlignment="Bottom"
-                                                       Foreground="{DynamicResource DefaultForegroundBrush}" />
-                                        </StackPanel>
-
-                                        <!-- reward for redeem in base -->
-                                        <StackPanel Orientation="Horizontal"
-                                                    HorizontalAlignment="Left"
-                                                    VerticalAlignment="Center"
-                                                    Grid.Row="3"
-                                                    Grid.Column="4"
-                                                    IsVisible="{Binding HasRewardForRedeem}">
-
-                                            <TextBlock
-                                                Foreground="{DynamicResource DefaultAmountInBaseForegroundBrush}"
-                                                Text="(" />
-
-                                            <TextBlock
-                                                Foreground="{DynamicResource DefaultAmountInBaseForegroundBrush}">
-                                                <TextBlock.Text>
-                                                    <MultiBinding Converter="{StaticResource AmountToStringConverter}">
-                                                        <Binding Path="RewardForRedeemInBase"
-                                                                 Mode="TwoWay" />
-                                                        <Binding
-                                                            Path="FromViewModel.CurrencyViewModel.BaseCurrencyFormat"
-                                                            Mode="OneWay" />
-                                                    </MultiBinding>
-                                                </TextBlock.Text>
-                                            </TextBlock>
-
-                                            <TextBlock
-                                                Foreground="{DynamicResource DefaultAmountInBaseForegroundBrush}"
-                                                Text=")" />
-                                        </StackPanel>
-                                    </Grid>
-
-                                    <!-- total network fees -->
-                                    <StackPanel Margin="0 7 0 0"
-                                                Orientation="Horizontal"
-                                                HorizontalAlignment="Left"
-                                                VerticalAlignment="Center">
-                                        <TextBlock Foreground="{DynamicResource DefaultForegroundBrush}"
-                                                   Text="Total network fees:" />
-
-                                        <TextBlock Margin="5 0 0 0"
-                                                   Foreground="{DynamicResource DefaultAmountForegroundBrush}">
+                                        <TextBlock Foreground="{DynamicResource DefaultForegroundBrush}">
                                             <TextBlock.Text>
                                                 <MultiBinding Converter="{StaticResource AmountToStringConverter}">
-                                                    <Binding Path="EstimatedTotalNetworkFeeInBase"
+                                                    <Binding Path="EstimatedPaymentFee"
                                                              Mode="TwoWay" />
-                                                    <Binding Path="FromViewModel.CurrencyViewModel.BaseCurrencyFormat"
+                                                    <Binding
+                                                        Path="FromViewModel.CurrencyViewModel.FeeCurrencyFormat"
+                                                        Mode="OneWay" />
+                                                </MultiBinding>
+                                            </TextBlock.Text>
+                                        </TextBlock>
+
+                                        <TextBlock Text="{Binding FromViewModel.CurrencyViewModel.FeeCurrencyCode}"
+                                                   Margin="3 0 0 1"
+                                                   FontSize="9"
+                                                   VerticalAlignment="Bottom"
+                                                   Foreground="{DynamicResource DefaultForegroundBrush}" />
+                                    </StackPanel>
+
+                                    <!-- payment fee in base -->
+                                    <StackPanel Orientation="Horizontal"
+                                                HorizontalAlignment="Left"
+                                                VerticalAlignment="Center"
+                                                Grid.Row="0"
+                                                Grid.Column="4">
+
+                                        <TextBlock
+                                            Foreground="{DynamicResource DefaultAmountInBaseForegroundBrush}"
+                                            Text="(" />
+
+                                        <TextBlock
+                                            Foreground="{DynamicResource DefaultAmountInBaseForegroundBrush}">
+                                            <TextBlock.Text>
+                                                <MultiBinding Converter="{StaticResource AmountToStringConverter}">
+                                                    <Binding Path="EstimatedPaymentFeeInBase"
+                                                             Mode="TwoWay" />
+                                                    <Binding
+                                                        Path="FromViewModel.CurrencyViewModel.BaseCurrencyFormat"
+                                                        Mode="OneWay" />
+                                                </MultiBinding>
+                                            </TextBlock.Text>
+                                        </TextBlock>
+
+                                        <TextBlock
+                                            Foreground="{DynamicResource DefaultAmountInBaseForegroundBrush}"
+                                            Text=")" />
+                                    </StackPanel>
+
+                                    <!-- redeem fee -->
+                                    <TextBlock Foreground="{DynamicResource DefaultForegroundBrush}"
+                                               Text="Redeem fee:"
+                                               Grid.Row="1"
+                                               Grid.Column="0"
+                                               IsVisible="{Binding !HasRewardForRedeem}" />
+
+                                    <StackPanel Orientation="Horizontal"
+                                                HorizontalAlignment="Right"
+                                                VerticalAlignment="Center"
+                                                Grid.Row="1"
+                                                Grid.Column="2"
+                                                IsVisible="{Binding !HasRewardForRedeem}">
+
+                                        <TextBlock Foreground="{DynamicResource DefaultForegroundBrush}">
+                                            <TextBlock.Text>
+                                                <MultiBinding Converter="{StaticResource AmountToStringConverter}">
+                                                    <Binding Path="EstimatedRedeemFee"
+                                                             Mode="TwoWay" />
+                                                    <Binding Path="ToViewModel.CurrencyViewModel.FeeCurrencyFormat"
                                                              Mode="OneWay" />
                                                 </MultiBinding>
                                             </TextBlock.Text>
                                         </TextBlock>
+
+                                        <TextBlock Text="{Binding ToViewModel.CurrencyViewModel.FeeCurrencyCode}"
+                                                   Margin="3 0 0 1"
+                                                   FontSize="9"
+                                                   VerticalAlignment="Bottom"
+                                                   Foreground="{DynamicResource DefaultForegroundBrush}" />
                                     </StackPanel>
+
+                                    <!-- redeem fee in base -->
+                                    <StackPanel Orientation="Horizontal"
+                                                HorizontalAlignment="Left"
+                                                VerticalAlignment="Center"
+                                                Grid.Row="1"
+                                                Grid.Column="4"
+                                                IsVisible="{Binding !HasRewardForRedeem}">
+
+                                        <TextBlock
+                                            Foreground="{DynamicResource DefaultAmountInBaseForegroundBrush}"
+                                            Text="(" />
+
+                                        <TextBlock
+                                            Foreground="{DynamicResource DefaultAmountInBaseForegroundBrush}">
+                                            <TextBlock.Text>
+                                                <MultiBinding Converter="{StaticResource AmountToStringConverter}">
+                                                    <Binding Path="EstimatedRedeemFeeInBase"
+                                                             Mode="TwoWay" />
+                                                    <Binding
+                                                        Path="FromViewModel.CurrencyViewModel.BaseCurrencyFormat"
+                                                        Mode="OneWay" />
+                                                </MultiBinding>
+                                            </TextBlock.Text>
+                                        </TextBlock>
+
+                                        <TextBlock
+                                            Foreground="{DynamicResource DefaultAmountInBaseForegroundBrush}"
+                                            Text=")" />
+                                    </StackPanel>
+
+                                    <!-- maker fee -->
+                                    <TextBlock Foreground="{DynamicResource DefaultForegroundBrush}"
+                                               Text="Maker fee:"
+                                               Grid.Row="2"
+                                               Grid.Column="0" />
+
+                                    <StackPanel Orientation="Horizontal"
+                                                HorizontalAlignment="Right"
+                                                VerticalAlignment="Center"
+                                                Grid.Row="2"
+                                                Grid.Column="2">
+
+                                        <TextBlock Foreground="{DynamicResource DefaultForegroundBrush}">
+                                            <TextBlock.Text>
+                                                <MultiBinding Converter="{StaticResource AmountToStringConverter}">
+                                                    <Binding Path="EstimatedMakerNetworkFee"
+                                                             Mode="TwoWay" />
+                                                    <Binding Path="FromViewModel.CurrencyViewModel.CurrencyFormat"
+                                                             Mode="OneWay" />
+                                                </MultiBinding>
+                                            </TextBlock.Text>
+                                        </TextBlock>
+
+                                        <TextBlock Text="{Binding FromViewModel.CurrencyViewModel.CurrencyCode}"
+                                                   Margin="3 0 0 1"
+                                                   FontSize="9"
+                                                   VerticalAlignment="Bottom"
+                                                   Foreground="{DynamicResource DefaultForegroundBrush}" />
+                                    </StackPanel>
+
+                                    <!-- maker fee in base -->
+                                    <StackPanel Orientation="Horizontal"
+                                                HorizontalAlignment="Left"
+                                                VerticalAlignment="Center"
+                                                Grid.Row="2"
+                                                Grid.Column="4">
+
+                                        <TextBlock
+                                            Foreground="{DynamicResource DefaultAmountInBaseForegroundBrush}"
+                                            Text="(" />
+
+                                        <TextBlock
+                                            Foreground="{DynamicResource DefaultAmountInBaseForegroundBrush}">
+                                            <TextBlock.Text>
+                                                <MultiBinding Converter="{StaticResource AmountToStringConverter}">
+                                                    <Binding Path="EstimatedMakerNetworkFeeInBase"
+                                                             Mode="TwoWay" />
+                                                    <Binding
+                                                        Path="FromViewModel.CurrencyViewModel.BaseCurrencyFormat"
+                                                        Mode="OneWay" />
+                                                </MultiBinding>
+                                            </TextBlock.Text>
+                                        </TextBlock>
+
+                                        <TextBlock
+                                            Foreground="{DynamicResource DefaultAmountInBaseForegroundBrush}"
+                                            Text=")" />
+                                    </StackPanel>
+
+                                    <!-- reward for redeem -->
+                                    <TextBlock Foreground="{DynamicResource DefaultForegroundBrush}"
+                                               Text="Reward for redeem:"
+                                               Grid.Row="3"
+                                               Grid.Column="0"
+                                               IsVisible="{Binding HasRewardForRedeem}" />
+
+                                    <StackPanel Orientation="Horizontal"
+                                                HorizontalAlignment="Right"
+                                                VerticalAlignment="Center"
+                                                Grid.Row="3"
+                                                Grid.Column="2"
+                                                IsVisible="{Binding HasRewardForRedeem}">
+
+                                        <TextBlock Foreground="{DynamicResource DefaultForegroundBrush}">
+                                            <TextBlock.Text>
+                                                <MultiBinding Converter="{StaticResource AmountToStringConverter}">
+                                                    <Binding Path="RewardForRedeem"
+                                                             Mode="TwoWay" />
+                                                    <Binding Path="ToViewModel.CurrencyViewModel.CurrencyFormat"
+                                                             Mode="OneWay" />
+                                                </MultiBinding>
+                                            </TextBlock.Text>
+                                        </TextBlock>
+
+                                        <TextBlock Text="{Binding ToViewModel.CurrencyViewModel.CurrencyCode}"
+                                                   Margin="3 0 0 1"
+                                                   FontSize="9"
+                                                   VerticalAlignment="Bottom"
+                                                   Foreground="{DynamicResource DefaultForegroundBrush}" />
+                                    </StackPanel>
+
+                                    <!-- reward for redeem in base -->
+                                    <StackPanel Orientation="Horizontal"
+                                                HorizontalAlignment="Left"
+                                                VerticalAlignment="Center"
+                                                Grid.Row="3"
+                                                Grid.Column="4"
+                                                IsVisible="{Binding HasRewardForRedeem}">
+
+                                        <TextBlock
+                                            Foreground="{DynamicResource DefaultAmountInBaseForegroundBrush}"
+                                            Text="(" />
+
+                                        <TextBlock
+                                            Foreground="{DynamicResource DefaultAmountInBaseForegroundBrush}">
+                                            <TextBlock.Text>
+                                                <MultiBinding Converter="{StaticResource AmountToStringConverter}">
+                                                    <Binding Path="RewardForRedeemInBase"
+                                                             Mode="TwoWay" />
+                                                    <Binding
+                                                        Path="FromViewModel.CurrencyViewModel.BaseCurrencyFormat"
+                                                        Mode="OneWay" />
+                                                </MultiBinding>
+                                            </TextBlock.Text>
+                                        </TextBlock>
+
+                                        <TextBlock
+                                            Foreground="{DynamicResource DefaultAmountInBaseForegroundBrush}"
+                                            Text=")" />
+                                    </StackPanel>
+                                </Grid>
+
+                                <!-- total network fees -->
+                                <StackPanel Margin="0 7 0 0"
+                                            Orientation="Horizontal"
+                                            HorizontalAlignment="Left"
+                                            VerticalAlignment="Center">
+                                    <TextBlock Foreground="{DynamicResource DefaultForegroundBrush}"
+                                               Text="Total network fees:" />
+
+                                    <TextBlock Margin="5 0 0 0"
+                                               Foreground="{DynamicResource DefaultAmountForegroundBrush}">
+                                        <TextBlock.Text>
+                                            <MultiBinding Converter="{StaticResource AmountToStringConverter}">
+                                                <Binding Path="EstimatedTotalNetworkFeeInBase"
+                                                         Mode="TwoWay" />
+                                                <Binding Path="FromViewModel.CurrencyViewModel.BaseCurrencyFormat"
+                                                         Mode="OneWay" />
+                                            </MultiBinding>
+                                        </TextBlock.Text>
+                                    </TextBlock>
                                 </StackPanel>
-                            </ToolTip.Tip>
-                        </Button>
+                            </StackPanel>
+                        </controls:IconButton>
                     </StackPanel>
                 </StackPanel>
 
@@ -535,29 +487,11 @@
                                Foreground="{DynamicResource SecondaryForegroundBrush}"
                                FontSize="13"
                                FontFamily="{DynamicResource DefaultLightFontFamily}" />
-                    <Button Padding="3"
-                            VerticalAlignment="Center"
-                            VerticalContentAlignment="Center"
-                            ToolTip.Placement="Bottom"
-                            ToolTip.VerticalOffset="10"
-                            ToolTip.HorizontalOffset="{Binding ElementName=AvailableAmountToolTipGrid,
-                    Path=Bounds.Width,
-                    Converter={StaticResource WidthToHorizontalCenterOffsetConverter}}"
-                            Click="HelpClickHandler"
-                            Classes="ButtonWithIcon">
-                        <ToolTip.Tip>
-                            <Grid Name="AvailableAmountToolTipGrid">
-                                <TextBlock TextWrapping="Wrap"
-                                           Text="The limit applies to a single trade. In case you require more liquidity make multiple trades" />
-                            </Grid>
-                        </ToolTip.Tip>
-                        <Path HorizontalAlignment="Center"
-                              VerticalAlignment="Center"
-                              Width="12"
-                              Height="12"
-                              Data="{DynamicResource Help}"
-                              Fill="{DynamicResource LightDefaultOpacity20}" />
-                    </Button>
+
+                    <controls:IconButton Classes="Question"
+                                         VerticalAlignment="Center"
+                                         ToolText="The limit applies to a single trade. In case you require more liquidity make multiple trades"
+                                         Margin="4 0 0 0" />
                 </StackPanel>
             </Grid>
 
@@ -661,30 +595,12 @@
                                Classes="Message"
                                Classes.Warning="{Binding IsAmountValidationWarning}"
                                Classes.Error="{Binding IsAmountValidationError}" />
-                    <Button Padding="3"
-                            VerticalAlignment="Center"
-                            VerticalContentAlignment="Center"
-                            ToolTip.Placement="Bottom"
-                            ToolTip.VerticalOffset="10"
-                            ToolTip.HorizontalOffset="{Binding ElementName=AmountValidationToolTipGrid,
-                      Path=Bounds.Width,
-                      Converter={StaticResource WidthToHorizontalCenterOffsetConverter}}"
-                            Click="HelpClickHandler"
-                            Classes="ButtonWithIcon"
-                            IsVisible="{Binding AmountValidationMessageToolTip, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
-                        <ToolTip.Tip>
-                            <Grid Name="AmountValidationToolTipGrid">
-                                <TextBlock TextWrapping="Wrap"
-                                           Text="{Binding AmountValidationMessageToolTip}" />
-                            </Grid>
-                        </ToolTip.Tip>
-                        <Path HorizontalAlignment="Center"
-                              VerticalAlignment="Center"
-                              Width="12"
-                              Height="12"
-                              Data="{DynamicResource Help}"
-                              Fill="{DynamicResource LightDefaultOpacity20}" />
-                    </Button>
+
+                    <controls:IconButton Classes="Question"
+                                         VerticalAlignment="Center"
+                                         IsVisible="{Binding AmountValidationMessageToolTip, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                                         ToolText="{Binding AmountValidationMessageToolTip}"
+                                         Margin="4 0 0 0" />
                 </StackPanel>
 
                 <!-- not enough liquidity message -->
@@ -698,29 +614,12 @@
                                FontSize="13"
                                FontFamily="{DynamicResource DefaultLightFontFamily}"
                                Classes="Error" />
-                    <Button Padding="3"
-                            VerticalAlignment="Center"
-                            VerticalContentAlignment="Center"
-                            ToolTip.Placement="Bottom"
-                            ToolTip.VerticalOffset="10"
-                            ToolTip.HorizontalOffset="{Binding ElementName=NotEnoughLiquidityToolTipGrid,
-                      Path=Bounds.Width,
-                      Converter={StaticResource WidthToHorizontalCenterOffsetConverter}}"
-                            Click="HelpClickHandler"
-                            Classes="ButtonWithIcon">
-                        <ToolTip.Tip>
-                            <Grid Name="NotEnoughLiquidityToolTipGrid">
-                                <TextBlock TextWrapping="Wrap"
-                                           Text="The amount you entered is greater than the available liquidity. Please use 'max' button to accurately determine the maximum amount that can be exchanged" />
-                            </Grid>
-                        </ToolTip.Tip>
-                        <Path HorizontalAlignment="Center"
-                              VerticalAlignment="Center"
-                              Width="12"
-                              Height="12"
-                              Data="{DynamicResource Help}"
-                              Fill="{DynamicResource LightDefaultOpacity20}" />
-                    </Button>
+
+                    <controls:IconButton Classes="Question"
+                                         VerticalAlignment="Center"
+                                         IsVisible="{Binding AmountValidationMessageToolTip, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                                         ToolText="The amount you entered is greater than the available liquidity. Please use 'max' button to accurately determine the maximum amount that can be exchanged"
+                                         Margin="4 0 0 0" />
                 </StackPanel>
 
                 <!-- warning -->
@@ -736,29 +635,11 @@
                                Classes="Message"
                                Classes.Warning="{Binding IsWarning}"
                                Classes.Error="{Binding IsError}" />
-                    <Button Padding="3"
-                            VerticalAlignment="Center"
-                            VerticalContentAlignment="Center"
-                            ToolTip.Placement="Bottom"
-                            ToolTip.VerticalOffset="10"
-                            ToolTip.HorizontalOffset="{Binding ElementName=MessageToolTipGrid,
-                    Path=Bounds.Width,
-                    Converter={StaticResource WidthToHorizontalCenterOffsetConverter}}"
-                            Click="HelpClickHandler"
-                            Classes="ButtonWithIcon">
-                        <ToolTip.Tip>
-                            <Grid Name="MessageToolTipGrid">
-                                <TextBlock TextWrapping="Wrap"
-                                           Text="{Binding MessageToolTip}" />
-                            </Grid>
-                        </ToolTip.Tip>
-                        <Path HorizontalAlignment="Center"
-                              VerticalAlignment="Center"
-                              Width="12"
-                              Height="12"
-                              Data="{DynamicResource Help}"
-                              Fill="{DynamicResource LightDefaultOpacity20}" />
-                    </Button>
+
+                    <controls:IconButton Classes="Question"
+                                         VerticalAlignment="Center"
+                                         ToolText="{Binding MessageToolTip}"
+                                         Margin="4 0 0 0" />
                 </StackPanel>
             </StackPanel>
             <!-- exchange button -->

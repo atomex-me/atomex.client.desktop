@@ -16,7 +16,7 @@
                     Background="{DynamicResource SystemControlBackgroundAccentBrush}"
                     Margin="5"
                     Padding="50"
-                    ToolTip.Tip="https://live.blockcypher.com/btc-testnet/address/mtS7VvBom7WkeiF9SytZr8G6DZSF1n5nxf/">
+                    ToolTip.Tip="By default wallet will send a redeem transaction from the address you use to receive funds. You can change the address to any other that has sufficient funds to send the redeem transaction">
                 <TextBlock>Hover Here</TextBlock>
             </Border>
             <CheckBox Grid.Column="1"

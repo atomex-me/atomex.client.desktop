@@ -1,5 +1,6 @@
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Data;
 
 
 namespace Atomex.Client.Desktop.Controls
@@ -9,15 +10,18 @@ namespace Atomex.Client.Desktop.Controls
         static IconButton()
         {
             AffectsRender<IconButton>(
-                ToolTextProperty
+                ToolTextProperty,
+                ContentProperty
             );
         }
-
-
+        
         public static readonly DirectProperty<IconButton, string> ToolTextProperty =
             AvaloniaProperty.RegisterDirect<IconButton, string>(
                 nameof(ToolText),
-                o => o.ToolText);
+                o => o.ToolText,
+                (o, v) => o.ToolText = v,
+                defaultBindingMode: BindingMode.TwoWay,
+                enableDataValidation: true);
 
         private string _toolText;
 

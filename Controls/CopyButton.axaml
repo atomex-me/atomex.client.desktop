@@ -23,45 +23,42 @@
     </Style>
 
     <Style Selector="controls|CopyButton">
+        <Setter Property="CornerRadius" Value="{DynamicResource AtomexCornerRadius}" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type controls:CopyButton}">
-                    <Panel ToolTip.Placement="AnchorAndGravity"
-                           ToolTip.VerticalOffset="{Binding $self.Bounds.Height,
-                           Converter={StaticResource ToolTipOffsetConverter}}"
-                           Width="{TemplateBinding Width}"
-                           Height="{TemplateBinding Height}"
-                           Background="{TemplateBinding Background}">
-                        <Panel.Styles>
-                            <Style Selector="Panel.IsDone ToolTip">
+                    <Border ToolTip.Placement="AnchorAndGravity"
+                            Width="{TemplateBinding Width}"
+                            Height="{TemplateBinding Height}"
+                            CornerRadius="{TemplateBinding CornerRadius}"
+                            Background="{TemplateBinding Background}">
+                        <Border.Styles>
+                            <Style Selector="Border.IsDone ToolTip">
                                 <Setter Property="Background" Value="{DynamicResource Emerald}" />
                                 <Setter Property="Foreground" Value="{DynamicResource DeepBlue}" />
                             </Style>
-                        </Panel.Styles>
-                        <ContentPresenter x:Name="PART_ContentPresenter"
-                                          Background="{TemplateBinding Background}"
-                                          BorderBrush="{TemplateBinding BorderBrush}"
-                                          BorderThickness="{TemplateBinding BorderThickness}"
-                                          CornerRadius="{TemplateBinding CornerRadius}"
-                                          Content="{TemplateBinding Content}"
-                                          ContentTemplate="{TemplateBinding ContentTemplate}"
-                                          Padding="{TemplateBinding Padding}"
-                                          RecognizesAccessKey="True"
-                                          HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                          VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}" />
+                        </Border.Styles>
 
+                        <ToolTip.VerticalOffset>
+                            <MultiBinding Converter="{StaticResource ToolTipOffsetConverter}">
+                                <Binding Path="$self.Bounds.Height" />
+                                <Binding Path="#CopyButtonPanel.Bounds.Height" />
+                            </MultiBinding>
+                        </ToolTip.VerticalOffset>
                         <ToolTip.Tip>
-                            <StackPanel>
+                            <Panel Name="CopyButtonPanel">
                                 <TextBlock IsVisible="{Binding !$parent[controls:CopyButton].IsDone}"
+                                           TextWrapping="Wrap"
                                            Text="{Binding $parent[controls:CopyButton].ToolText}" />
 
                                 <TextBlock IsVisible="{Binding $parent[controls:CopyButton].IsDone}"
+                                           TextWrapping="Wrap"
                                            Text="{Binding $parent[controls:CopyButton].DoneToolText}" />
-                            </StackPanel>
+                            </Panel>
                         </ToolTip.Tip>
 
                         <svg:Svg />
-                    </Panel>
+                    </Border>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>

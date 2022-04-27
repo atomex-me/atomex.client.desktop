@@ -154,9 +154,6 @@
         <Compile Update="Views\AddressesView.axaml.cs">
             <DependentUpon>AddressesView.axaml</DependentUpon>
         </Compile>
-        <Compile Update="Views\RestoreDialogView.axaml.cs">
-            <DependentUpon>RestoreDialogView.axaml</DependentUpon>
-        </Compile>
         <Compile Update="Views\CustomTitleBars\MacosTitleBarView.axaml.cs">
             <DependentUpon>MacosTitleBarView.axaml</DependentUpon>
             <SubType>Code</SubType>

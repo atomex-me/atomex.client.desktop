@@ -16,6 +16,7 @@
 
     <UserControl.Resources>
         <converters:CalcChildHeightConverter x:Key="CalcChildHeightConverter" />
+        <converters:ToolTipOffsetConverter x:Key="ToolTipOffsetConverter" />
     </UserControl.Resources>
 
     <DockPanel x:Name="MainDockerPanel"
@@ -31,15 +32,19 @@
                         Height="20">
 
                 <Border ToolTip.Placement="AnchorAndGravity"
-                        ToolTip.VerticalOffset="-32"
                         VerticalAlignment="Center"
                         Cursor="Help"
                         Margin="8 0">
-
                     <TextBlock Text="Exchange"
                                x:Name="ExchangeTextBox"
                                Padding="0 0 0 1"
                                FontSize="11" />
+                    <ToolTip.VerticalOffset>
+                        <MultiBinding Converter="{StaticResource ToolTipOffsetConverter}">
+                            <Binding Path="$self.Bounds.Height" />
+                            <Binding Path="#ToolTipTextBoxExchange.Bounds.Height" />
+                        </MultiBinding>
+                    </ToolTip.VerticalOffset>
                     <ToolTip.Tip>
                         <TextBlock x:Name="ToolTipTextBoxExchange"
                                    Text="Disconnected" />
@@ -74,7 +79,6 @@
                            Width="1" />
 
                 <Border ToolTip.Placement="AnchorAndGravity"
-                        ToolTip.VerticalOffset="-32"
                         VerticalAlignment="Center"
                         Cursor="Help"
                         Margin="8 0">
@@ -83,6 +87,12 @@
                                x:Name="MarketTextBox"
                                Padding="0 0 0 1"
                                FontSize="11" />
+                    <ToolTip.VerticalOffset>
+                        <MultiBinding Converter="{StaticResource ToolTipOffsetConverter}">
+                            <Binding Path="$self.Bounds.Height" />
+                            <Binding Path="#ToolTipTextBoxMarket.Bounds.Height" />
+                        </MultiBinding>
+                    </ToolTip.VerticalOffset>
                     <ToolTip.Tip>
                         <TextBlock x:Name="ToolTipTextBoxMarket"
                                    Text="Disconnected" />
@@ -117,7 +127,6 @@
                            Width="1" />
 
                 <Border ToolTip.Placement="AnchorAndGravity"
-                        ToolTip.VerticalOffset="-32"
                         VerticalAlignment="Center"
                         Cursor="Help"
                         Margin="8 0">
@@ -126,6 +135,12 @@
                                x:Name="RatesTextBox"
                                Padding="0 0 0 1"
                                FontSize="11" />
+                    <ToolTip.VerticalOffset>
+                        <MultiBinding Converter="{StaticResource ToolTipOffsetConverter}">
+                            <Binding Path="$self.Bounds.Height" />
+                            <Binding Path="#ToolTipTextBoxRates.Bounds.Height" />
+                        </MultiBinding>
+                    </ToolTip.VerticalOffset>
                     <ToolTip.Tip>
                         <TextBlock x:Name="ToolTipTextBoxRates"
                                    Text="Disconnected" />

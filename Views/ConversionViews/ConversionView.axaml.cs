@@ -38,12 +38,5 @@ namespace Atomex.Client.Desktop.Views
         {
             AvaloniaXamlLoader.Load(this);
         }
-
-        private void HelpClickHandler(object sender, RoutedEventArgs e)
-        {
-            var source = e.Source as Button;
-
-            source?.SetValue(ToolTip.IsOpenProperty, true);
-        }
     }
 }

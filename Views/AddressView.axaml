@@ -27,8 +27,6 @@
                         Orientation="Horizontal">
 
                 <Button ToolTip.Placement="AnchorAndGravity"
-                        ToolTip.VerticalOffset="{Binding $self.Bounds.Height,
-                        Converter={StaticResource ToolTipOffsetConverter}}"
                         VerticalAlignment="Center"
                         FontSize="16"
                         IsVisible="{Binding $parent[Border].Bounds.Width,
@@ -36,8 +34,15 @@
                         Content="{Binding Address}"
                         Command="{Binding OpenInExplorerCommand}"
                         Classes="LinkButton Underlined SolidHover">
+                    <ToolTip.VerticalOffset>
+                        <MultiBinding Converter="{StaticResource ToolTipOffsetConverter}">
+                            <Binding Path="$self.Bounds.Height" />
+                            <Binding Path="#AddressPanel.Bounds.Height" />
+                        </MultiBinding>
+                    </ToolTip.VerticalOffset>
                     <ToolTip.Tip>
-                        <StackPanel Orientation="Horizontal">
+                        <StackPanel Name="AddressPanel"
+                                    Orientation="Horizontal">
                             <TextBlock Text="{Binding AddressExplorerUri}" />
                             <TextBlock Text="{Binding Address}" />
                         </StackPanel>
@@ -46,16 +51,21 @@
 
                 <Button Classes="LinkButton Underlined SolidHover"
                         ToolTip.Placement="AnchorAndGravity"
-                        ToolTip.VerticalOffset="{Binding $self.Bounds.Height,
-                        Converter={StaticResource ToolTipOffsetConverter}}"
                         VerticalAlignment="Center"
                         FontSize="16"
                         IsVisible="{Binding $parent[Border].Bounds.Width,
                         Converter={StaticResource AddressShouldShrinkConverter}}"
                         Content="{Binding ShortenedAddress}"
                         Command="{Binding OpenInExplorerCommand}">
+                    <ToolTip.VerticalOffset>
+                        <MultiBinding Converter="{StaticResource ToolTipOffsetConverter}">
+                            <Binding Path="$self.Bounds.Height" />
+                            <Binding Path="#SecondAddressPanel.Bounds.Height" />
+                        </MultiBinding>
+                    </ToolTip.VerticalOffset>
                     <ToolTip.Tip>
-                        <StackPanel Orientation="Horizontal">
+                        <StackPanel Name="SecondAddressPanel"
+                                    Orientation="Horizontal">
                             <TextBlock Text="{Binding AddressExplorerUri}" />
                             <TextBlock Text="{Binding Address}" />
                         </StackPanel>
@@ -93,9 +103,11 @@
                        Text="{Binding TokenBalance}" />
 
             <controls:IconButton Grid.Column="5"
-                                 Classes="Key"
+                                 Classes="Key WithToolTipContent"
                                  Command="{Binding ExportKeyCommand}"
-                                 ToolText="Export address private key" />
+                                  >
+                <TextBlock Text="sd;lkfd;lfkg"></TextBlock>
+            </controls:IconButton>
 
             <controls:IconButton Grid.Column="6"
                                  Classes="Update"

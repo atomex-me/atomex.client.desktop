@@ -2,7 +2,6 @@
 using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
-using Avalonia.LogicalTree;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 
@@ -23,7 +22,8 @@ namespace Atomex.Client.Desktop.Controls
         public static readonly DirectProperty<CopyButton, string> DoneToolTextProperty =
             AvaloniaProperty.RegisterDirect<CopyButton, string>(
                 nameof(DoneToolText),
-                o => o.DoneToolText);
+                o => o.DoneToolText,
+                (o, v) => o.DoneToolText = v);
 
         
         private string _doneToolText;
@@ -38,7 +38,8 @@ namespace Atomex.Client.Desktop.Controls
         public static readonly DirectProperty<CopyButton, bool> IsDoneProperty =
             AvaloniaProperty.RegisterDirect<CopyButton, bool>(
                 nameof(IsDone),
-                o => o.IsDone);
+                o => o.IsDone,
+                (o, v) => o.IsDone = v);
 
         private bool _isDone;
 
@@ -54,11 +55,11 @@ namespace Atomex.Client.Desktop.Controls
 
             Dispatcher.UIThread.InvokeAsync(async () =>
             {
-                this.FindDescendantOfType<Panel>().Classes.Add(nameof(IsDone));
+                this.FindDescendantOfType<Border>().Classes.Add(nameof(IsDone));
                 IsDone = true;
                 await Task.Delay(3000);
                 IsDone = false;
-                this.FindDescendantOfType<Panel>().Classes.Remove(nameof(IsDone));
+                this.FindDescendantOfType<Border>().Classes.Remove(nameof(IsDone));
             });
         }
     }

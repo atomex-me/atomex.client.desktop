@@ -4,8 +4,17 @@
         xmlns:controls="clr-namespace:Atomex.Client.Desktop.Controls"
         xmlns:converters="clr-namespace:Atomex.Client.Desktop.Converters">
     <Design.PreviewWith>
-        <Border Padding="100 50" Background="#122B50">
-            <controls:IconButton Classes="Update" ToolText="Some tooltip text" />
+        <Border Padding="100 100" Background="#122B50">
+            
+            <StackPanel Orientation="Horizontal">
+                <controls:IconButton Classes="Update WithToolTipContent">
+                    <Button>123123</Button>
+                </controls:IconButton>
+            
+                <controls:IconButton Classes="Update"
+                                     Margin="10 0 0 0"
+                                     ToolText="Some tooltip text"/>
+            </StackPanel>
         </Border>
     </Design.PreviewWith>
     
@@ -13,12 +22,12 @@
         <converters:ToolTipOffsetConverter x:Key="ToolTipOffsetConverter" />
     </Styles.Resources>
 
-    <Style Selector=":is(controls|IconButton):pointerover /template/ ContentPresenter#PART_ContentPresenter">
+    <Style Selector=":is(controls|IconButton):pointerover /template/ Border">
         <Setter Property="Background" Value="{DynamicResource ButtonBackgroundPointerOver}" />
         <Setter Property="BorderBrush" Value="{DynamicResource ButtonBorderBrushPointerOver}" />
     </Style>
 
-    <Style Selector=":is(controls|IconButton):pressed /template/ ContentPresenter#PART_ContentPresenter">
+    <Style Selector=":is(controls|IconButton):pressed /template/ Border">
         <Setter Property="Background" Value="{DynamicResource ButtonBackgroundPressed}" />
         <Setter Property="BorderBrush" Value="{DynamicResource ButtonBorderBrushPressed}" />
     </Style>
@@ -37,36 +46,61 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type controls:IconButton}">
-                    <Panel ToolTip.Placement="AnchorAndGravity"
-                           ToolTip.VerticalOffset="{Binding $self.Bounds.Height,
-                           Converter={StaticResource ToolTipOffsetConverter}}"
+                    <Border ToolTip.Placement="AnchorAndGravity"
                            Width="{TemplateBinding Width}"
                            Height="{TemplateBinding Height}"
+                           CornerRadius="{TemplateBinding CornerRadius}"
                            Background="{TemplateBinding Background}">
-                        <Panel.Styles>
-                            <Style Selector="Panel ToolTip">
+                        <Border.Styles>
+                            <Style Selector="Border ToolTip">
                                 <Setter Property="IsVisible"
                                         Value="{Binding $parent[controls:IconButton].ToolText,
                                         Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
                             </Style>
-                        </Panel.Styles>
-                        <ContentPresenter x:Name="PART_ContentPresenter"
-                                          Background="{TemplateBinding Background}"
-                                          BorderBrush="{TemplateBinding BorderBrush}"
-                                          BorderThickness="{TemplateBinding BorderThickness}"
-                                          CornerRadius="{TemplateBinding CornerRadius}"
-                                          Content="{TemplateBinding Content}"
-                                          ContentTemplate="{TemplateBinding ContentTemplate}"
-                                          Padding="{TemplateBinding Padding}"
-                                          RecognizesAccessKey="True"
-                                          HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                          VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}" />
-
+                        </Border.Styles>
+                        <ToolTip.VerticalOffset>
+                            <MultiBinding Converter="{StaticResource ToolTipOffsetConverter}">
+                                <Binding Path="$self.Bounds.Height" />
+                                <Binding Path="#ToolTipTextContent.Bounds.Height" />
+                            </MultiBinding>
+                        </ToolTip.VerticalOffset>
                         <ToolTip.Tip>
-                            <TextBlock Text="{Binding $parent[controls:IconButton].ToolText}" />
+                            <TextBlock Name="ToolTipTextContent"
+                                       TextWrapping="Wrap"
+                                       Text="{Binding $parent[controls:IconButton].ToolText}" />
                         </ToolTip.Tip>
                         <svg:Svg />
-                    </Panel>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    
+    <Style Selector="controls|IconButton.WithToolTipContent">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type controls:IconButton}">
+                    <Border ToolTip.Placement="AnchorAndGravity"
+                           Width="{TemplateBinding Width}"
+                           Height="{TemplateBinding Height}"
+                           CornerRadius="{TemplateBinding CornerRadius}"
+                           Background="{TemplateBinding Background}">
+                        <ToolTip.VerticalOffset>
+                            <MultiBinding Converter="{StaticResource ToolTipOffsetConverter}">
+                                <Binding Path="$self.Bounds.Height" />
+                                <Binding Path="#ToolTipContent.Bounds.Height" />
+                            </MultiBinding>
+                        </ToolTip.VerticalOffset>
+                        <ToolTip.Tip>
+                            <ContentPresenter x:Name="ToolTipContent"
+                                              Content="{Binding $parent[controls:IconButton].Content}"
+                                              Padding="{Binding $parent[controls:IconButton].Padding}"
+                                              RecognizesAccessKey="True"
+                                              HorizontalContentAlignment="{Binding $parent[controls:IconButton].HorizontalContentAlignment}"
+                                              VerticalContentAlignment="{Binding $parent[controls:IconButton].VerticalContentAlignment}" />
+                        </ToolTip.Tip>
+                        <svg:Svg />
+                    </Border>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
@@ -126,5 +160,18 @@
     </Style>
     <Style Selector="controls|IconButton.Update:pointerover /template/ svg|Svg">
         <Setter Property="Path" Value="/Resources/Icons/update-light.svg" />
+    </Style>
+    
+    <Style Selector="controls|IconButton.Question">
+        <Setter Property="Width" Value="18" />
+        <Setter Property="Height" Value="18" />
+        <Setter Property="Cursor" Value="Help"></Setter>
+    </Style>
+    <Style Selector="controls|IconButton.Question /template/ svg|Svg">
+        <Setter Property="Path" Value="/Resources/Icons/question.svg" />
+        <Setter Property="Width" Value="12" />
+    </Style>
+    <Style Selector="controls|IconButton.Question:pointerover /template/ svg|Svg">
+        <Setter Property="Path" Value="/Resources/Icons/question-light.svg" />
     </Style>
 </Styles>

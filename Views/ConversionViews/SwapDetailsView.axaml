@@ -18,6 +18,7 @@
         <SolidColorBrush x:Key="SecondaryTextColor" Color="DarkGray" />
 
         <converters:DateTimeToTxTimeConverter x:Key="DateTimeToTxTimeConverter" />
+        <converters:ToolTipOffsetConverter x:Key="ToolTipOffsetConverter" />
     </UserControl.Resources>
 
     <UserControl.Styles>
@@ -536,7 +537,6 @@
                                            VerticalAlignment="Center" />
 
                                 <Button ToolTip.Placement="AnchorAndGravity"
-                                        ToolTip.VerticalOffset="-42"
                                         Margin="0 2 0 0"
                                         Padding="0"
                                         HorizontalAlignment="Stretch"
@@ -546,8 +546,15 @@
                                         CommandParameter="{Binding ExchangingFirstStepLinkUrl}"
                                         Classes="TransactionLink"
                                         Content="{Binding ExchangingFirstStepLinkText}">
+                                    <ToolTip.VerticalOffset>
+                                        <MultiBinding Converter="{StaticResource ToolTipOffsetConverter}">
+                                            <Binding Path="$self.Bounds.Height" />
+                                            <Binding Path="#ExchangingFirstStepLinkToolTip.Bounds.Height" />
+                                        </MultiBinding>
+                                    </ToolTip.VerticalOffset>
                                     <ToolTip.Tip>
-                                        <TextBlock Text="{Binding ExchangingFirstStepLinkUrl}" />
+                                        <TextBlock Name="ExchangingFirstStepLinkToolTip"
+                                                   Text="{Binding ExchangingFirstStepLinkUrl}" />
                                     </ToolTip.Tip>
                                 </Button>
 
@@ -574,7 +581,6 @@
                                            VerticalAlignment="Center" />
 
                                 <Border ToolTip.Placement="AnchorAndGravity"
-                                        ToolTip.VerticalOffset="-42"
                                         VerticalAlignment="Bottom"
                                         Margin="0 2 0 0"
                                         IsVisible="{Binding ExchangingSecondStepLinkUrl, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
@@ -596,8 +602,15 @@
                                         <!--           Data="{DynamicResource LinkIcon}" /> -->
                                         <!-- </StackPanel> -->
                                     </Button>
+                                    <ToolTip.VerticalOffset>
+                                        <MultiBinding Converter="{StaticResource ToolTipOffsetConverter}">
+                                            <Binding Path="$self.Bounds.Height" />
+                                            <Binding Path="#ExchangingSecondStepLinkToolTip.Bounds.Height" />
+                                        </MultiBinding>
+                                    </ToolTip.VerticalOffset>
                                     <ToolTip.Tip>
-                                        <TextBlock Text="{Binding ExchangingSecondStepLinkUrl}" />
+                                        <TextBlock Name="ExchangingSecondStepLinkToolTip"
+                                                   Text="{Binding ExchangingSecondStepLinkUrl}" />
                                     </ToolTip.Tip>
                                 </Border>
                                 <TextBlock Text="{Binding ExchangingSecondStepLinkText}"
@@ -634,7 +647,6 @@
                                            VerticalAlignment="Center" />
 
                                 <Border ToolTip.Placement="AnchorAndGravity"
-                                        ToolTip.VerticalOffset="-42"
                                         VerticalAlignment="Bottom"
                                         Margin="0 2 0 0"
                                         IsVisible="{Binding CompletionFirstStepLinkUrl, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
@@ -657,8 +669,15 @@
                                         <!--           Data="{DynamicResource LinkIcon}" /> -->
                                         <!-- </StackPanel> -->
                                     </Button>
+                                    <ToolTip.VerticalOffset>
+                                        <MultiBinding Converter="{StaticResource ToolTipOffsetConverter}">
+                                            <Binding Path="$self.Bounds.Height" />
+                                            <Binding Path="#CompletionFirstStepLinkToolTip.Bounds.Height" />
+                                        </MultiBinding>
+                                    </ToolTip.VerticalOffset>
                                     <ToolTip.Tip>
-                                        <TextBlock Text="{Binding CompletionFirstStepLinkUrl}" />
+                                        <TextBlock Name="CompletionFirstStepLinkToolTip"
+                                                   Text="{Binding CompletionFirstStepLinkUrl}" />
                                     </ToolTip.Tip>
                                 </Border>
 
@@ -684,7 +703,6 @@
                                            VerticalAlignment="Center" />
 
                                 <Border ToolTip.Placement="AnchorAndGravity"
-                                        ToolTip.VerticalOffset="-42"
                                         VerticalAlignment="Bottom"
                                         Margin="0 2 0 0"
                                         IsVisible="{Binding CompletionSecondStepLinkUrl, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
@@ -707,8 +725,15 @@
                                         <!--           Data="{DynamicResource LinkIcon}" /> -->
                                         <!-- </StackPanel> -->
                                     </Button>
+                                    <ToolTip.VerticalOffset>
+                                        <MultiBinding Converter="{StaticResource ToolTipOffsetConverter}">
+                                            <Binding Path="$self.Bounds.Height" />
+                                            <Binding Path="#CompletionSecondStepLinkToolTip.Bounds.Height" />
+                                        </MultiBinding>
+                                    </ToolTip.VerticalOffset>
                                     <ToolTip.Tip>
-                                        <TextBlock Text="{Binding CompletionSecondStepLinkUrl}" />
+                                        <TextBlock Name="CompletionSecondStepLinkToolTip"
+                                                   Text="{Binding CompletionSecondStepLinkUrl}" />
                                     </ToolTip.Tip>
                                 </Border>
 
@@ -723,7 +748,7 @@
                                            VerticalAlignment="Center" />
                             </WrapPanel>
                         </StackPanel>
-                        </Grid>
+                    </Grid>
                 </TabItem>
                 <TabItem Margin="23 0 0 0">
                     <TabItem.Header>
