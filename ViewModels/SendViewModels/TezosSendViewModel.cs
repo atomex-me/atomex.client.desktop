@@ -315,18 +315,22 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             }
         }
 
-        protected override Task<Error> Send(CancellationToken cancellationToken = default)
+        protected override async Task<Error> Send(CancellationToken cancellationToken = default)
         {
             var account = _app.Account
                 .GetCurrencyAccount<TezosAccount>(Currency.Name);
 
-            return account.SendAsync(
-                from: From,
-                to: To,
-                amount: AmountToSend,
-                fee: Fee,
-                useDefaultFee: UseDefaultFee,
-                cancellationToken: cancellationToken);
+            var (_, error) = await account
+                .SendAsync(
+                    from: From,
+                    to: To,
+                    amount: AmountToSend,
+                    fee: Fee,
+                    useDefaultFee: UseDefaultFee,
+                    cancellationToken: cancellationToken)
+                .ConfigureAwait(false);
+
+            return error;
         }
     }
 }
