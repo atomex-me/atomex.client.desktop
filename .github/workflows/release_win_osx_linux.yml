@@ -1,4 +1,4 @@
-name: Build and release Windows & MacOS
+name: Build and release Windows & MacOS & Linux
 
 on:
   push:
