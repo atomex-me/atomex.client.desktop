@@ -103,11 +103,9 @@
                        Text="{Binding TokenBalance}" />
 
             <controls:IconButton Grid.Column="5"
-                                 Classes="Key WithToolTipContent"
+                                 Classes="Key"
                                  Command="{Binding ExportKeyCommand}"
-                                  >
-                <TextBlock Text="sd;lkfd;lfkg"></TextBlock>
-            </controls:IconButton>
+                                 ToolText="Export address private key" />
 
             <controls:IconButton Grid.Column="6"
                                  Classes="Update"
