@@ -93,7 +93,7 @@ namespace Atomex.Client.Desktop.ViewModels
         });
     }
 
-    public class AddressesViewModel : ViewModelBase
+    public class AddressesViewModel : ViewModelBase, IDisposable
     {
         private const int DefaultTokenPrecision = 9;
         private readonly IAtomexApp _app;
@@ -136,6 +136,16 @@ namespace Atomex.Client.Desktop.ViewModels
             _tokenContract = tokenContract;
 
             ReloadAddresses();
+
+            _app.Account.BalanceUpdated += OnBalanceUpdatedEventHandler;
+        }
+
+        public void OnBalanceUpdatedEventHandler(object? sender, CurrencyEventArgs args)
+        {
+            if (_currency.Name == args.Currency)
+            {
+                ReloadAddresses();
+            }
         }
 
         public async void ReloadAddresses()
@@ -403,6 +413,12 @@ namespace Atomex.Client.Desktop.ViewModels
                         Balance = 16.0000001.ToString(CultureInfo.InvariantCulture),
                     }
                 });
+        }
+
+        
+        public void Dispose()
+        {
+            _app.Account.BalanceUpdated -= OnBalanceUpdatedEventHandler;
         }
     }
 }

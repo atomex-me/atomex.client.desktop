@@ -11,6 +11,8 @@ Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "Atomex.Client.Desktop.Insta
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Atomex.Client.Core.Tests", "atomex.client.core\Atomex.Client.Core.Tests\Atomex.Client.Core.Tests.csproj", "{0850D513-0732-40BF-A70A-A74C405BDBD4}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Atomex.TzktEvents", "atomex.client.core\Atomex.TzktEvents\Atomex.TzktEvents.csproj", "{67DDA754-DC04-463C-9372-E3340A5CF3E7}"
+EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Atomex.Common", "atomex.client.core\Atomex.Common\Atomex.Common.csproj", "{68A20CD2-2EEB-47F8-B55B-930FBFD9E785}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Atomex.Cryptography", "atomex.client.core\Atomex.Cryptography\Atomex.Cryptography.csproj", "{9E8DD534-2494-46E2-B6CE-671D20E357AD}"
@@ -150,6 +152,18 @@ Global
 		{D892B42C-1C00-49F7-A4BE-8A11C14F73C6}.Release|x64.Build.0 = Release|Any CPU
 		{D892B42C-1C00-49F7-A4BE-8A11C14F73C6}.Release|x86.ActiveCfg = Release|Any CPU
 		{D892B42C-1C00-49F7-A4BE-8A11C14F73C6}.Release|x86.Build.0 = Release|Any CPU
+		{67DDA754-DC04-463C-9372-E3340A5CF3E7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{67DDA754-DC04-463C-9372-E3340A5CF3E7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{67DDA754-DC04-463C-9372-E3340A5CF3E7}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{67DDA754-DC04-463C-9372-E3340A5CF3E7}.Debug|x64.Build.0 = Debug|Any CPU
+		{67DDA754-DC04-463C-9372-E3340A5CF3E7}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{67DDA754-DC04-463C-9372-E3340A5CF3E7}.Debug|x86.Build.0 = Debug|Any CPU
+		{67DDA754-DC04-463C-9372-E3340A5CF3E7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{67DDA754-DC04-463C-9372-E3340A5CF3E7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{67DDA754-DC04-463C-9372-E3340A5CF3E7}.Release|x64.ActiveCfg = Release|Any CPU
+		{67DDA754-DC04-463C-9372-E3340A5CF3E7}.Release|x64.Build.0 = Release|Any CPU
+		{67DDA754-DC04-463C-9372-E3340A5CF3E7}.Release|x86.ActiveCfg = Release|Any CPU
+		{67DDA754-DC04-463C-9372-E3340A5CF3E7}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
