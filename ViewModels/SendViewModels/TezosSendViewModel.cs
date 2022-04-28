@@ -321,13 +321,15 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             var account = _app.Account
                 .GetCurrencyAccount<TezosAccount>(Currency.Name);
 
-            var (_, error) = await account.SendAsync(
-                from: From,
-                to: To,
-                amount: AmountToSend,
-                fee: Fee,
-                useDefaultFee: UseDefaultFee,
-                cancellationToken: cancellationToken);
+            var (_, error) = await account
+                .SendAsync(
+                    from: From,
+                    to: To,
+                    amount: AmountToSend,
+                    fee: Fee,
+                    useDefaultFee: UseDefaultFee,
+                    cancellationToken: cancellationToken)
+                .ConfigureAwait(false);
 
             return error;
         }

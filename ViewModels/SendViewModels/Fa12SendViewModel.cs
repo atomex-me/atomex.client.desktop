@@ -249,13 +249,15 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 tokenContract: tokenContract,
                 tokenId: tokenId);
 
-            var (_, error) = await tokenAccount.SendAsync(
-                from: tokenAddress.Address,
-                to: To,
-                amount: AmountToSend,
-                fee: Fee,
-                useDefaultFee: UseDefaultFee,
-                cancellationToken: cancellationToken);
+            var (_, error) = await tokenAccount
+                .SendAsync(
+                    from: tokenAddress.Address,
+                    to: To,
+                    amount: AmountToSend,
+                    fee: Fee,
+                    useDefaultFee: UseDefaultFee,
+                    cancellationToken: cancellationToken)
+                .ConfigureAwait(false);
 
             return error;
         }

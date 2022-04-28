@@ -71,7 +71,7 @@ namespace Atomex.Client.Desktop.ViewModels
             () => ExportKey?.Invoke(Address));
     }
 
-    public class AddressesViewModel : ViewModelBase
+    public class AddressesViewModel : ViewModelBase, IDisposable
     {
         private const int DefaultTokenPrecision = 9;
         private const int MinimalUpdateTimeMs = 1000;
@@ -114,7 +114,7 @@ namespace Atomex.Client.Desktop.ViewModels
             CurrentSortField = AddressesSortField.ByPath;
             CurrentSortDirection = SortDirection.Asc;
 
-            SubscribeToServices();
+            _app.Account.BalanceUpdated += OnBalanceUpdatedEventHandler;
         }
 
         private async Task ReloadAddresses()
@@ -270,25 +270,12 @@ namespace Atomex.Client.Desktop.ViewModels
                         ? SortDirection.Desc
                         : SortDirection.Asc;
             });
-        
-        private void SubscribeToServices()
-        {
-            _app.Account.BalanceUpdated += OnBalanceUpdatedEventHandler;
-        }
 
         private async void OnBalanceUpdatedEventHandler(object? sender, CurrencyEventArgs args)
         {
-            try
-            {
-                if (_currency.Name != args.Currency) return;
+            if (_currency.Name != args.Currency) return;
 
-                // reload addresses list
-                await ReloadAddresses();
-            }
-            catch (Exception e)
-            {
-                Log.Error(e, "Reload addresses event handler error");
-            }
+            await ReloadAddresses();
         }
 
         private string KeyTypeToString(int keyType) =>
@@ -374,7 +361,7 @@ namespace Atomex.Client.Desktop.ViewModels
                                 keyIndex: walletAddress.KeyIndex,
                                 keyType: walletAddress.KeyType);
 
-                            using var unsecuredPrivateKey = privateKey.ToUnsecuredBytes();
+                            var unsecuredPrivateKey = privateKey.ToUnsecuredBytes();
 
                             if (Currencies.IsBitcoinBased(_currency.Name))
                             {
@@ -396,7 +383,7 @@ namespace Atomex.Client.Desktop.ViewModels
                             }
                             else
                             {
-                                var hex = Hex.ToHexString(unsecuredPrivateKey.Data);
+                                var hex = Hex.ToHexString(unsecuredPrivateKey);
 
                                 _ = App.Clipboard.SetTextAsync(hex);
                             }
@@ -441,6 +428,12 @@ namespace Atomex.Client.Desktop.ViewModels
                         Balance = 16.0000001.ToString(CultureInfo.InvariantCulture),
                     }
                 });
+        }
+
+
+        public void Dispose()
+        {
+            _app.Account.BalanceUpdated -= OnBalanceUpdatedEventHandler;
         }
     }
 }
