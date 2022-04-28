@@ -22,6 +22,7 @@
         <converters:GreaterThanZeroConverter x:Key="GreaterThanZeroConverter" />
         <converters:LowerThanZeroConverter x:Key="LowerThanZeroConverter" />
         <converters:StringToImageConverter x:Key="StringToImageConverter" />
+        <converters:StringsConcatConverter x:Key="StringsConcatConverter" />
     </UserControl.Resources>
 
     <Grid RowDefinitions="Auto,*"
@@ -56,28 +57,16 @@
                                FontSize="32"
                                LineHeight="40"
                                Text="{Binding CurrencyViewModel.CurrencyCode}" />
-                    <Button Width="26"
-                            Height="26"
-                            Margin="15 0 0 0"
-                            BorderThickness="0"
-                            VerticalContentAlignment="Center"
-                            HorizontalContentAlignment="Center"
-                            VerticalAlignment="Center"
-                            Command="{Binding UpdateCommand}"
-                            IsEnabled="{Binding !IsBalanceUpdating}"
-                            Classes="ButtonWithIcon">
-                        <Button.Styles>
-                            <Style Selector="Button svg|Svg">
-                                <Setter Property="Path" Value="/Resources/Icons/update.svg"></Setter>
-                            </Style>
-                            <Style Selector="Button:pointerover svg|Svg">
-                                <Setter Property="Path" Value="/Resources/Icons/update-light.svg"></Setter>
-                            </Style>
-                        </Button.Styles>
-                        <svg:Svg Width="24"
-                                 Classes.InProgress="{Binding IsBalanceUpdating}"
-                                 Classes.NotInProgress="{Binding !IsBalanceUpdating}" />
-                    </Button>
+                    <controls:IconButton Classes="Update Big WithToolTipContent"
+                                         Classes.Updating="{Binding IsBalanceUpdating}"
+                                         Classes.NotUpdating="{Binding !IsBalanceUpdating}"
+                                         Margin="15 0 0 0"
+                                         Command="{Binding UpdateCommand}">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="Update " />
+                            <TextBlock Text="{Binding Currency.Description}" />
+                        </StackPanel>
+                    </controls:IconButton>
                 </StackPanel>
 
                 <TextBlock Foreground="{DynamicResource DefaultForegroundBrush}"
@@ -335,7 +324,7 @@
                             </Button>
                         </Grid>
                     </Border>
-                    
+
                     <ListBox Grid.Row="1"
                              Background="{DynamicResource AlmostTransparentBrush}"
                              Items="{Binding Transactions}"
@@ -474,7 +463,7 @@
                                            FontSize="13"
                                            Text="Validator" />
                             </Button>
-                            
+
                             <Button Grid.Column="2"
                                     Padding="0"
                                     VerticalAlignment="Stretch"
@@ -505,7 +494,7 @@
                                     </StackPanel>
                                 </StackPanel>
                             </Button>
-                            
+
                             <Button Grid.Column="3"
                                     Padding="0"
                                     VerticalAlignment="Stretch"
@@ -571,22 +560,21 @@
                                 <Border Padding="12 0">
                                     <Grid ColumnDefinitions="11*,4*,3*,2*"
                                           VerticalAlignment="Stretch">
-                                        <Button Grid.Column="0"
-                                                ToolTip.Placement="AnchorAndGravity"
-                                                ToolTip.VerticalOffset="-32"
-                                                VerticalAlignment="Center"
-                                                FontSize="16"
-                                                Content="{Binding Address}"
-                                                Command="{Binding $parent[ListBox].DataContext.OpenAddressInExplorerCommand}"
-                                                CommandParameter="{Binding Address}"
-                                                Classes="LinkButton Underlined SolidHover">
-                                            <ToolTip.Tip>
-                                                <StackPanel Orientation="Horizontal">
-                                                    <TextBlock Text="{Binding ExplorerUri}" />
-                                                    <TextBlock Text="{Binding Address}" />
-                                                </StackPanel>
-                                            </ToolTip.Tip>
-                                        </Button>
+                                        <controls:LinkButton Grid.Column="0"
+                                                             Underlined="True"
+                                                             Classes="SolidHover"
+                                                             FontSize="16"
+                                                             HorizontalAlignment="Left"
+                                                             Content="{Binding Address}"
+                                                             Command="{Binding $parent[ListBox].DataContext.OpenAddressInExplorerCommand}"
+                                                             CommandParameter="{Binding Address}">
+                                            <controls:LinkButton.ToolText>
+                                                <MultiBinding Converter="{StaticResource StringsConcatConverter}">
+                                                    <Binding Path="ExplorerUri" />
+                                                    <Binding Path="Address" />
+                                                </MultiBinding>
+                                            </controls:LinkButton.ToolText>
+                                        </controls:LinkButton>
 
                                         <StackPanel Grid.Column="1"
                                                     Orientation="Horizontal">

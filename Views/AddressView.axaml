@@ -15,62 +15,32 @@
     <UserControl.Resources>
         <converters:AddressShouldShrinkConverter x:Key="AddressShouldShrinkConverter" />
         <converters:AddressShouldExpandConverter x:Key="AddressShouldExpandConverter" />
-        <converters:ToolTipOffsetConverter x:Key="ToolTipOffsetConverter" />
     </UserControl.Resources>
 
     <Border Padding="12 0">
         <Grid Name="AddressItemGrid"
               ColumnDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto"
               VerticalAlignment="Stretch">
-
             <StackPanel Grid.Column="0"
                         Orientation="Horizontal">
-
-                <Button ToolTip.Placement="AnchorAndGravity"
-                        VerticalAlignment="Center"
-                        FontSize="16"
-                        IsVisible="{Binding $parent[Border].Bounds.Width,
-                        Converter={StaticResource AddressShouldExpandConverter}}"
-                        Content="{Binding Address}"
-                        Command="{Binding OpenInExplorerCommand}"
-                        Classes="LinkButton Underlined SolidHover">
-                    <ToolTip.VerticalOffset>
-                        <MultiBinding Converter="{StaticResource ToolTipOffsetConverter}">
-                            <Binding Path="$self.Bounds.Height" />
-                            <Binding Path="#AddressPanel.Bounds.Height" />
-                        </MultiBinding>
-                    </ToolTip.VerticalOffset>
-                    <ToolTip.Tip>
-                        <StackPanel Name="AddressPanel"
-                                    Orientation="Horizontal">
-                            <TextBlock Text="{Binding AddressExplorerUri}" />
-                            <TextBlock Text="{Binding Address}" />
-                        </StackPanel>
-                    </ToolTip.Tip>
-                </Button>
-
-                <Button Classes="LinkButton Underlined SolidHover"
-                        ToolTip.Placement="AnchorAndGravity"
-                        VerticalAlignment="Center"
-                        FontSize="16"
-                        IsVisible="{Binding $parent[Border].Bounds.Width,
-                        Converter={StaticResource AddressShouldShrinkConverter}}"
-                        Content="{Binding ShortenedAddress}"
-                        Command="{Binding OpenInExplorerCommand}">
-                    <ToolTip.VerticalOffset>
-                        <MultiBinding Converter="{StaticResource ToolTipOffsetConverter}">
-                            <Binding Path="$self.Bounds.Height" />
-                            <Binding Path="#SecondAddressPanel.Bounds.Height" />
-                        </MultiBinding>
-                    </ToolTip.VerticalOffset>
-                    <ToolTip.Tip>
-                        <StackPanel Name="SecondAddressPanel"
-                                    Orientation="Horizontal">
-                            <TextBlock Text="{Binding AddressExplorerUri}" />
-                            <TextBlock Text="{Binding Address}" />
-                        </StackPanel>
-                    </ToolTip.Tip>
-                </Button>
+                
+                <controls:LinkButton Underlined="True"
+                                     Classes="SolidHover"
+                                     FontSize="16"
+                                     Content="{Binding Address}"
+                                     ToolText="{Binding AddressExplorerUri}"
+                                     Command="{Binding OpenInExplorerCommand}"
+                                     IsVisible="{Binding $parent[Border].Bounds.Width,
+                                     Converter={StaticResource AddressShouldExpandConverter}}"/>
+                
+                <controls:LinkButton Underlined="True"
+                                     Classes="SolidHover"
+                                     FontSize="16"
+                                     Content="{Binding ShortenedAddress}"
+                                     ToolText="{Binding AddressExplorerUri}"
+                                     Command="{Binding OpenInExplorerCommand}"
+                                     IsVisible="{Binding $parent[Border].Bounds.Width,
+                                     Converter={StaticResource AddressShouldShrinkConverter}}"/>
 
                 <controls:CopyButton ToolText="Copy address to clipboard"
                                      DoneToolText="Copied!"

@@ -5,7 +5,7 @@
         xmlns:converters="clr-namespace:Atomex.Client.Desktop.Converters">
     <Design.PreviewWith>
         <Border Padding="80 50" Background="#122B50">
-            <controls:CopyButton ToolText="PLease copy"
+            <controls:CopyButton ToolText="Copy some content"
                                  DoneToolText="Copied" />
         </Border>
     </Design.PreviewWith>
@@ -23,7 +23,6 @@
     </Style>
 
     <Style Selector="controls|CopyButton">
-        <Setter Property="CornerRadius" Value="{DynamicResource AtomexCornerRadius}" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type controls:CopyButton}">

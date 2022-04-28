@@ -8,14 +8,11 @@
              xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
              xmlns:ia="clr-namespace:Avalonia.Xaml.Interactions.Core;assembly=Avalonia.Xaml.Interactions"
              xmlns:svg="clr-namespace:Avalonia.Svg.Skia;assembly=Avalonia.Svg.Skia"
-             xmlns:converters="clr-namespace:Atomex.Client.Desktop.Converters">
+             xmlns:controls="clr-namespace:Atomex.Client.Desktop.Controls">
     <Design.DataContext>
         <vm:SelectCurrencyViewModel />
     </Design.DataContext>
-    
-    <UserControl.Resources>
-    <converters:ToolTipOffsetConverter x:Key="ToolTipOffsetConverter" />
-    </UserControl.Resources>
+
 
     <Border Classes="ChildViewBorder"
             Width="700">
@@ -97,66 +94,17 @@
                                            VerticalAlignment="Center" />
                             </StackPanel>
 
-                            <Button Margin="0 0 16 0"
-                                    Padding="10 6 10 6"
-                                    Content="{Binding SelectedAddressDescription}"
-                                    HorizontalAlignment="Right"
-                                    FontSize="13"
-                                    Foreground="{DynamicResource LightDefaultOpacity50}"
-                                    Command="{Binding $parent[ListBox].DataContext.ChangeAddressesCommand}"
-                                    CommandParameter="{Binding}"
-                                    Grid.Column="1"
-                                    ToolTip.Placement="AnchorAndGravity">
-                                <ToolTip.VerticalOffset>
-                                    <MultiBinding Converter="{StaticResource ToolTipOffsetConverter}">
-                                        <Binding Path="$self.Bounds.Height" />
-                                        <Binding Path="#ChangeAddressTip.Bounds.Height" />
-                                    </MultiBinding>
-                                </ToolTip.VerticalOffset>
-                                <ToolTip.Tip>
-                                    <TextBlock Name="ChangeAddressTip"
-                                               Text="Click to change address"></TextBlock>
-                                </ToolTip.Tip>
-                                <Button.Styles>
-                                    <Style Selector="Button:pointerover Border#BackgroundBorder">
-                                        <Setter Property="Background" Value="{DynamicResource LightDefaultOpacity6}" />
-                                    </Style>
-                                    <Style Selector="Button:pointerover Line#Underline">
-                                        <Setter Property="IsVisible" Value="False" />
-                                    </Style>
-                                </Button.Styles>
-                                <Button.Template>
-                                    <ControlTemplate>
-                                        <Border Name="BackgroundBorder"
-                                                Padding="{TemplateBinding Padding}"
-                                                CornerRadius="8">
-                                            <Grid>
-                                                <TextBlock Name="TextBlock"
-                                                           Text="{TemplateBinding Content}"
-                                                           FontSize="{TemplateBinding FontSize}"
-                                                           Foreground="{TemplateBinding Foreground}"
-                                                           FontFamily="{TemplateBinding FontFamily}"
-                                                           FontWeight="{TemplateBinding FontWeight}"
-                                                           HorizontalAlignment="Center"
-                                                           Padding="0"
-                                                           Margin="0 0 0 2"
-                                                           LineHeight="16" />
-                                                <Line Name="Underline"
-                                                      Height="1"
-                                                      Margin="0 17 0 0"
-                                                      Width="{Binding #TextBlock.Bounds.Width}"
-                                                      StartPoint="0,0"
-                                                      EndPoint="{Binding #TextBlock.Bounds.Width, Converter={StaticResource WidthToPointConverter}}"
-                                                      StrokeThickness="1"
-                                                      StrokeDashArray="2,2"
-                                                      Stroke="{DynamicResource LineStrokeBrush}">
-                                                </Line>
-                                            </Grid>
-                                        </Border>
-                                    </ControlTemplate>
-                                </Button.Template>
-                            </Button>
-
+                            <controls:LinkButton Grid.Column="1"
+                                                 Underlined="True"
+                                                 Classes="Dashed WithCorners"
+                                                 Content="{Binding SelectedAddressDescription}"
+                                                 ToolText="Click to change address"
+                                                 Height="30"
+                                                 Margin="0 0 16 0"
+                                                 HorizontalAlignment="Right"
+                                                 Command="{Binding $parent[ListBox].DataContext.ChangeAddressesCommand}"
+                                                 CommandParameter="{Binding}" />
+                            
                             <Border Name="BottomLine"
                                     Margin="16 0 16 0"
                                     Height="1"

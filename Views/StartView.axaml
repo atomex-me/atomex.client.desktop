@@ -2,7 +2,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="450"
              x:Class="Atomex.Client.Desktop.Views.StartView"
              xmlns:vm="clr-namespace:Atomex.Client.Desktop.ViewModels"
              xmlns:controls="clr-namespace:Atomex.Client.Desktop.Controls"
@@ -12,25 +12,12 @@
         <vm:StartViewModel />
     </Design.DataContext>
 
-    <UserControl.Resources>
-        <ImageBrush BitmapInterpolationMode="HighQuality" x:Key="GithubBrush"
-                    Source="avares://Atomex.Client.Desktop/Resources/Images/github.png" />
-        <ImageBrush BitmapInterpolationMode="HighQuality" x:Key="TelegramBrush"
-                    Source="avares://Atomex.Client.Desktop/Resources/Images/telegram.png" />
-        <ImageBrush BitmapInterpolationMode="HighQuality" x:Key="TwitterBrush"
-                    Source="avares://Atomex.Client.Desktop/Resources/Images/twitter.png" />
-    </UserControl.Resources>
-
     <Border Classes="ChildViewBorderLight"
             Width="600"
             Height="320"
             VerticalAlignment="Center"
             HorizontalAlignment="Center">
-        <Grid>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="1*" />
-                <ColumnDefinition Width="1.2*" />
-            </Grid.ColumnDefinitions>
+        <Grid ColumnDefinitions="1*,1.2*">
 
             <Border Grid.Column="0" CornerRadius="8 0 0 10" BorderThickness="0">
                 <Border.Background>
@@ -64,13 +51,12 @@
             </Border>
 
             <Grid Grid.Column="1">
-                <StackPanel Margin="0 30 0 0"
-                            Orientation="Vertical"
+                <StackPanel Orientation="Vertical"
                             VerticalAlignment="Center">
                     <controls:RoundedButton Width="200"
                                             Height="40"
                                             Margin="0 0 0 5"
-                                            CornerRadius="15 15 15 15"
+                                            CornerRadius="15"
                                             Content="MY WALLETS"
                                             VerticalAlignment="Bottom"
                                             FontSize="11"
@@ -82,7 +68,7 @@
                     <controls:RoundedButton Width="200"
                                             Height="40"
                                             Margin="0 0 0 5"
-                                            CornerRadius="15 15 15 15"
+                                            CornerRadius="15"
                                             Content="CREATE NEW WALLET"
                                             VerticalAlignment="Bottom"
                                             FontSize="11"
@@ -90,65 +76,29 @@
                                             Command="{Binding CreateNewCommand}"
                                             Classes="StartPage" />
 
-                    <Button Content="I want to restore my wallet"
-                            Margin="0 5 0 0"
-                            HorizontalAlignment="Center"
-                            VerticalAlignment="Bottom"
-                            FontSize="12"
-                            FontWeight="Normal"
-                            Command="{Binding RestoreByMnemonicCommand}"
-                            Classes="LinkButton" />
+                    <controls:LinkButton Content="I want to restore my wallet"
+                                         Margin="0 5 0 0"
+                                         HorizontalAlignment="Center"
+                                         Command="{Binding RestoreByMnemonicCommand}" />
                 </StackPanel>
 
                 <StackPanel Margin="0 0 0 33"
                             Orientation="Horizontal"
                             VerticalAlignment="Bottom"
                             HorizontalAlignment="Center">
-                    <Border
-                        ToolTip.Placement="AnchorAndGravity"
-                        ToolTip.VerticalOffset="-32">
-                        <!-- <controls:IconButton Width="25" -->
-                        <!--                      Height="25" -->
-                        <!--                      OpacityMask="{StaticResource TwitterBrush}" -->
-                        <!--                      Foreground="{DynamicResource SocialDefaultBrush}" -->
-                        <!--                      MouseOverBrush="{DynamicResource SocialMouseOverBrush}" -->
-                        <!--                      PressedBrush="{DynamicResource SocialDefaultBrush}" -->
-                        <!--                      Command="{Binding TwitterCommand}" /> -->
-                        <ToolTip.Tip>
-                            <TextBlock Text="Twitter" />
-                        </ToolTip.Tip>
-                    </Border>
-                    <Border
-                        ToolTip.Placement="AnchorAndGravity"
-                        ToolTip.VerticalOffset="-32">
-                        <!-- <controls:IconButton Width="25" -->
-                        <!--                      Height="25" -->
-                        <!--                      Margin="3 0 0 0" -->
-                        <!--                      OpacityMask="{StaticResource TelegramBrush}" -->
-                        <!--                      Foreground="{DynamicResource SocialDefaultBrush}" -->
-                        <!--                      MouseOverBrush="{DynamicResource SocialMouseOverBrush}" -->
-                        <!--                      PressedBrush="{DynamicResource SocialDefaultBrush}" -->
-                        <!--                      Command="{Binding TelegramCommand}" /> -->
-                        <ToolTip.Tip>
-                            <TextBlock Text="Telegram" />
-                        </ToolTip.Tip>
-                    </Border>
 
-                    <Border
-                        ToolTip.Placement="AnchorAndGravity"
-                        ToolTip.VerticalOffset="-32">
-                        <!-- <controls:IconButton Width="25" -->
-                        <!--                      Height="25" -->
-                        <!--                      Margin="4 0 0 0" -->
-                        <!--                      OpacityMask="{StaticResource GithubBrush}" -->
-                        <!--                      Foreground="{DynamicResource SocialDefaultBrush}" -->
-                        <!--                      MouseOverBrush="{DynamicResource SocialMouseOverBrush}" -->
-                        <!--                      PressedBrush="{DynamicResource SocialDefaultBrush}" -->
-                        <!--                      Command="{Binding GithubCommand}" /> -->
-                        <ToolTip.Tip>
-                            <TextBlock Text="Github" />
-                        </ToolTip.Tip>
-                    </Border>
+                    <controls:IconButton Classes="Twitter NoEffects"
+                                         ToolText="{Binding TwitterAddress}"
+                                         Command="{Binding TwitterCommand}" />
+
+                    <controls:IconButton Classes="Telegram NoEffects"
+                                         ToolText="{Binding TelegramAddress}"
+                                         Margin="2 0 2 0"
+                                         Command="{Binding TelegramCommand}" />
+
+                    <controls:IconButton Classes="Github NoEffects"
+                                         ToolText="{Binding GithubAddress}"
+                                         Command="{Binding GithubCommand}" />
                 </StackPanel>
 
                 <TextBlock Foreground="{DynamicResource CopyrightForegroundBrush}"

@@ -53,12 +53,10 @@
             <Grid ColumnDefinitions="Auto,*"
                   RowDefinitions="72">
                 <!-- back button -->
-                <Button Grid.Column="0"
-                        IsVisible="{Binding ConfirmStage}"
-                        Command="{Binding UndoConfirmStageCommand}"
-                        Classes="ButtonWithIcon Back">
-                    <svg:Svg />
-                </Button>
+                <controls:IconButton Grid.Column="0"
+                                     Classes="Back"
+                                     IsVisible="{Binding ConfirmStage}"
+                                     Command="{Binding UndoConfirmStageCommand}"/>
 
                 <!-- window title -->
                 <TextBlock Grid.Column="1"
@@ -290,11 +288,12 @@
                             <behaviors:AmountBehavior Format="{Binding CurrencyFormat}" />
                         </i:Interaction.Behaviors>
                     </TextBox>
-
-                    <Button Classes="LinkButton Underlined"
-                            Margin="-67 0 0 0"
-                            Command="{Binding MaxCommand}"
-                            Content="max" />
+                    
+                    <controls:LinkButton Underlined="True"
+                                         Classes="Dashed"
+                                         Margin="-67 0 0 0"
+                                         Command="{Binding MaxCommand}"
+                                         Content="max" />
                 </StackPanel>
 
                 <!-- Classes="AnimationCollapsed" -->

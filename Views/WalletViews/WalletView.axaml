@@ -53,28 +53,16 @@
                                FontSize="32"
                                LineHeight="40"
                                Text="{Binding CurrencyViewModel.CurrencyCode}" />
-                    <Button Width="26"
-                            Height="26"
-                            Margin="15 0 0 0"
-                            BorderThickness="0"
-                            VerticalContentAlignment="Center"
-                            HorizontalContentAlignment="Center"
-                            VerticalAlignment="Center"
-                            Command="{Binding UpdateCommand}"
-                            IsEnabled="{Binding !IsBalanceUpdating}"
-                            Classes="ButtonWithIcon">
-                        <Button.Styles>
-                            <Style Selector="Button svg|Svg">
-                                <Setter Property="Path" Value="/Resources/Icons/update.svg"></Setter>
-                            </Style>
-                            <Style Selector="Button:pointerover svg|Svg">
-                                <Setter Property="Path" Value="/Resources/Icons/update-light.svg"></Setter>
-                            </Style>
-                        </Button.Styles>
-                        <svg:Svg Width="24"
-                                 Classes.InProgress="{Binding IsBalanceUpdating}"
-                                 Classes.NotInProgress="{Binding !IsBalanceUpdating}" />
-                    </Button>
+                    <controls:IconButton Classes="Update Big WithToolTipContent"
+                                         Classes.Updating="{Binding IsBalanceUpdating}"
+                                         Classes.NotUpdating="{Binding !IsBalanceUpdating}"
+                                         Margin="15 0 0 0"
+                                         Command="{Binding UpdateCommand}">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="Update " />
+                            <TextBlock Text="{Binding Currency.Description}" />
+                        </StackPanel>
+                    </controls:IconButton>
                 </StackPanel>
 
                 <TextBlock Foreground="{DynamicResource DefaultForegroundBrush}"

@@ -59,6 +59,21 @@ namespace Atomex.Client.Desktop.ViewModels
                 .Throttle(TimeSpan.FromMilliseconds(1))
                 .ToPropertyExInMainThread(this, vm => vm.RightPopupHasContent);
 
+            this.WhenAnyValue(vm => vm.IsExchangeConnected)
+                .WhereNotNull()
+                .Select(value => value ? "Connected" : "Disconnected")
+                .ToPropertyExInMainThread(this, vm => vm.IsExchangeConnectedText);
+
+            this.WhenAnyValue(vm => vm.IsMarketDataConnected)
+                .WhereNotNull()
+                .Select(value => value ? "Connected" : "Disconnected")
+                .ToPropertyExInMainThread(this, vm => vm.IsMarketDataConnectedText);
+
+            this.WhenAnyValue(vm => vm.IsQuotesProviderAvailable)
+                .WhereNotNull()
+                .Select(value => value ? "Connected" : "Disconnected")
+                .ToPropertyExInMainThread(this, vm => vm.IsQuotesProviderAvailableText);
+
             PortfolioViewModel = new PortfolioViewModel(AtomexApp)
             {
                 SetDexTab = SelectConversion,
@@ -100,6 +115,9 @@ namespace Atomex.Client.Desktop.ViewModels
         [Reactive] public bool IsExchangeConnected { get; set; }
         [Reactive] public bool IsMarketDataConnected { get; set; }
         [Reactive] public bool IsQuotesProviderAvailable { get; set; }
+        [ObservableAsProperty] public string IsExchangeConnectedText { get; }
+        [ObservableAsProperty] public string IsMarketDataConnectedText { get; }
+        [ObservableAsProperty] public string IsQuotesProviderAvailableText { get; }
         [ObservableAsProperty] public bool IsPortfolioSectionActive { get; }
         [ObservableAsProperty] public bool IsConversionSectionActive { get; }
         [ObservableAsProperty] public bool IsSettingsSectionActive { get; }

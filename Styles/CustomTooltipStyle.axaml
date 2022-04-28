@@ -4,7 +4,6 @@
 
     <Styles.Resources>
         <sys:Double x:Key="ToolTipContentMaxWidth">560</sys:Double>
-        <sys:Double x:Key="DefaultToolTipVerticalOffset">-40</sys:Double>
     </Styles.Resources>
 
     <Design.PreviewWith>

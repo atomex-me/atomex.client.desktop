@@ -192,7 +192,7 @@ namespace Atomex.Client.Desktop.ViewModels
                         return new AddressViewModel
                         {
                             Address = a.Address,
-                            AddressExplorerUri = _currency.AddressExplorerUri,
+                            AddressExplorerUri = $"{_currency.AddressExplorerUri}{a.Address}",
                             Type = KeyTypeToString(a.KeyType),
                             Path = path,
                             HasTokens = HasTokens,

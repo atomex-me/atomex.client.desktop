@@ -1,6 +1,5 @@
 <Styles xmlns='https://github.com/avaloniaui'
-        xmlns:x='http://schemas.microsoft.com/winfx/2006/xaml'
-        xmlns:svg="clr-namespace:Avalonia.Svg.Skia;assembly=Avalonia.Svg.Skia">
+        xmlns:x='http://schemas.microsoft.com/winfx/2006/xaml'>
     <Styles.Resources>
         <SolidColorBrush x:Key="PrimaryTextColor" Color="{DynamicResource LightDefault}" />
     </Styles.Resources>
@@ -8,64 +7,6 @@
     <Style Selector=":is(Button)">
         <Setter Property="Cursor" Value="Hand" />
         <Setter Property="FontFamily" Value="{DynamicResource DefaultFontFamily}" />
-    </Style>
-
-    <Style Selector="Button.ButtonWithIcon">
-        <Setter Property="Padding" Value="0" />
-        <Setter Property="BorderThickness" Value="0" />
-        <Setter Property="VerticalContentAlignment" Value="Center" />
-        <Setter Property="HorizontalContentAlignment" Value="Center" />
-    </Style>
-    <Style
-        Selector="Button.ButtonWithIcon:not(:pointerover) /template/ ContentPresenter#PART_ContentPresenter">
-        <Setter Property="Background" Value="Transparent" />
-    </Style>
-    <Style
-        Selector="Button.ButtonWithIcon.WithoutEffects:not(:pointerover) /template/ ContentPresenter#PART_ContentPresenter">
-        <Setter Property="Background" Value="Transparent" />
-    </Style>
-    <Style
-        Selector="Button.ButtonWithIcon.WithoutEffects:pointerover /template/ ContentPresenter#PART_ContentPresenter">
-        <Setter Property="Background" Value="Transparent" />
-    </Style>
-    
-    <!-- back button -->
-    <Style Selector="Button.ButtonWithIcon.Back">
-        <Setter Property="Width" Value="28" />
-        <Setter Property="Height" Value="28" />
-    </Style>
-    <Style Selector="Button.ButtonWithIcon.Back svg|Svg">
-        <Setter Property="Path" Value="/Resources/Icons/back.svg" />
-        <Setter Property="Width" Value="22" />
-    </Style>
-    <Style Selector="Button.ButtonWithIcon.Back:pointerover svg|Svg">
-        <Setter Property="Path" Value="/Resources/Icons/back-light.svg" />
-    </Style>
-    
-    <!-- close button -->
-    <Style Selector="Button.ButtonWithIcon.Close">
-        <Setter Property="Width" Value="28" />
-        <Setter Property="Height" Value="28" />
-    </Style>
-    <Style Selector="Button.ButtonWithIcon.Close svg|Svg">
-        <Setter Property="Path" Value="/Resources/Icons/close.svg" />
-        <Setter Property="Width" Value="22" />
-    </Style>
-    <Style Selector="Button.ButtonWithIcon.Close:pointerover svg|Svg">
-        <Setter Property="Path" Value="/Resources/Icons/close-light.svg" />
-    </Style>
-    
-    <!-- delete button -->
-    <Style Selector="Button.ButtonWithIcon.Trash">
-        <Setter Property="Width" Value="28" />
-        <Setter Property="Height" Value="28" />
-    </Style>
-    <Style Selector="Button.ButtonWithIcon.Trash svg|Svg">
-        <Setter Property="Path" Value="/Resources/Icons/trash.svg" />
-        <Setter Property="Width" Value="24" />
-    </Style>
-    <Style Selector="Button.ButtonWithIcon.Trash:pointerover svg|Svg">
-        <Setter Property="Path" Value="/Resources/Icons/trash-light.svg" />
     </Style>
 
     <Style
@@ -95,8 +36,7 @@
         <Setter Property="Padding" Value="9 5" />
         <Setter Property="CornerRadius" Value="8" />
     </Style>
-
-
+    
     <Style Selector="Button.Sort">
         <Setter Property="Transitions">
             <Transitions>
@@ -104,60 +44,10 @@
             </Transitions>
         </Setter>
     </Style>
-
     <Style Selector="Button.Sort.Rotated">
         <Setter Property="RenderTransform" Value="rotate(180deg)" />
     </Style>
     <Style Selector="Button.Sort.NotRotated">
         <Setter Property="RenderTransform" Value="none" />
-    </Style>
-
-    <Style
-        Selector="Button.ButtonWithIcon.Alert /template/ ContentPresenter#PART_ContentPresenter">
-        <Setter Property="Background" Value="{DynamicResource LightDefaultOpacity10}" />
-    </Style>
-    
-    
-    <Style Selector="Button.TransactionLink">
-        <Setter Property="FontFamily" Value="{DynamicResource DefaultFontFamily}" />
-        <Setter Property="Foreground" Value="{DynamicResource ExplorerLinkButtonForegroundBrush}" />
-        <Setter Property="BorderThickness" Value="0" />
-    </Style>
-    
-    <Style Selector="Button.TransactionLink:pointerover /template/ TextBlock">
-        <Setter Property="Foreground" Value="{DynamicResource ExplorerLinkButtonMouseOverBrush}" />
-    </Style>
-    
-    <Style Selector="Button.TransactionLink:pressed /template/ TextBlock">
-        <Setter Property="Foreground" Value="{DynamicResource ExplorerLinkButtonMousePressedBrush}" />
-    </Style>
-
-    <!-- <Style Selector="Button.TransactionLink:pointerover Path"> -->
-    <!--     <Setter Property="Fill" Value="{DynamicResource ExplorerLinkButtonMouseOverBrush}" /> -->
-    <!-- </Style> -->
-    <!-- <Style Selector="Button.TransactionLink:not(:pointerover) Path"> -->
-    <!--     <Setter Property="Fill" Value="{DynamicResource ExplorerLinkButtonForegroundBrush}" /> -->
-    <!-- </Style> -->
-    <!-- <Style Selector="Button.TransactionLink:not(:pointerover) Path"> -->
-    <!--     <Setter Property="Fill" Value="{DynamicResource ExplorerLinkButtonMousePressedBrush}" /> -->
-    <!-- </Style> -->
-    
-    <Style Selector="Button.TransactionLink">
-        <Setter Property="Template">
-            <ControlTemplate>
-                <WrapPanel>
-                    <TextBlock VerticalAlignment="Center"
-                               FontSize="13"
-                               TextWrapping="Wrap"
-                               Text="{TemplateBinding Content}" />
-
-                    <!-- <Path Stretch="Uniform" -->
-                    <!--       Margin="5 0 0 3" -->
-                    <!--       VerticalAlignment="Bottom" -->
-                    <!--       Height="11" -->
-                    <!--       Data="{DynamicResource LinkIcon}" /> -->
-                </WrapPanel>
-            </ControlTemplate>
-        </Setter>
     </Style>
 </Styles>

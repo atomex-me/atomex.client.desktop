@@ -7,6 +7,7 @@
              xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
              xmlns:ia="clr-namespace:Avalonia.Xaml.Interactions.Core;assembly=Avalonia.Xaml.Interactions"
              xmlns:converters="clr-namespace:Atomex.Client.Desktop.Converters"
+             xmlns:controls="clr-namespace:Atomex.Client.Desktop.Controls"
              xmlns:svg="clr-namespace:Avalonia.Svg.Skia;assembly=Avalonia.Svg.Skia"
              x:Class="Atomex.Client.Desktop.Views.SwapDetailsView">
     <Design.DataContext>
@@ -16,9 +17,7 @@
     <UserControl.Resources>
         <SolidColorBrush x:Key="PrimaryTextColor" Color="{DynamicResource LightDefault}" />
         <SolidColorBrush x:Key="SecondaryTextColor" Color="DarkGray" />
-
         <converters:DateTimeToTxTimeConverter x:Key="DateTimeToTxTimeConverter" />
-        <converters:ToolTipOffsetConverter x:Key="ToolTipOffsetConverter" />
     </UserControl.Resources>
 
     <UserControl.Styles>
@@ -105,11 +104,10 @@
     <Border Background="{DynamicResource RightPopupBackgroundBrush}"
             Classes="NoCloseRightPopup">
         <StackPanel Orientation="Vertical">
-            <Button Margin="25 25 0 0"
-                    Command="{Binding CloseCommand}"
-                    Classes="ButtonWithIcon Close">
-                <svg:Svg />
-            </Button>
+            <controls:IconButton Classes="Close"
+                                 HorizontalAlignment="Left"
+                                 Margin="25 25 0 0"
+                                 Command="{Binding CloseCommand}" />
 
             <svg:Svg Name="SwapStatusIcon"
                      Width="40"
@@ -492,12 +490,13 @@
                                        Foreground="{StaticResource PrimaryTextColor}"
                                        FontFamily="{DynamicResource DefaultLightFontFamily}"
                                        FontSize="20"
+                                       Margin="0 0 0 4"
                                        HorizontalAlignment="Left"
                                        VerticalAlignment="Center" />
 
                             <TextBlock Text="{Binding InitializationFirstStepDescription}"
                                        TextWrapping="Wrap"
-                                       Margin="0 4 0 0"
+                                       Margin="0 0 0 2"
                                        Foreground="{StaticResource LightDefaultOpacity50}"
                                        FontFamily="{DynamicResource DefaultLightFontFamily}"
                                        FontSize="13"
@@ -507,7 +506,6 @@
                             <TextBlock Text="{Binding InitializationSecondStepDescription}"
                                        IsVisible="{Binding InitializationSecondStepDescription, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
                                        TextWrapping="Wrap"
-                                       Margin="0 2 0 0"
                                        Foreground="{StaticResource LightDefaultOpacity50}"
                                        FontFamily="{DynamicResource DefaultLightFontFamily}"
                                        FontSize="13"
@@ -522,46 +520,31 @@
                                        Foreground="{StaticResource PrimaryTextColor}"
                                        FontFamily="{DynamicResource DefaultLightFontFamily}"
                                        FontSize="20"
+                                       Margin="0 0 0 4"
                                        HorizontalAlignment="Left"
                                        VerticalAlignment="Center" />
 
-                            <WrapPanel
-                                IsVisible="{Binding ExchangingFirstStepDescription, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+                            <WrapPanel Margin="0 0 0 2"
+                                       IsVisible="{Binding ExchangingFirstStepDescription, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
                                 <TextBlock Text="{Binding ExchangingFirstStepDescription}"
                                            TextWrapping="Wrap"
-                                           Margin="0 4 4 0"
+                                           Margin="0 0 4 0"
                                            Foreground="{StaticResource LightDefaultOpacity50}"
                                            FontFamily="{DynamicResource DefaultLightFontFamily}"
                                            FontSize="13"
                                            HorizontalAlignment="Left"
                                            VerticalAlignment="Center" />
 
-                                <Button ToolTip.Placement="AnchorAndGravity"
-                                        Margin="0 2 0 0"
-                                        Padding="0"
-                                        HorizontalAlignment="Stretch"
-                                        VerticalAlignment="Bottom"
-                                        IsVisible="{Binding ExchangingFirstStepLinkUrl, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
-                                        Command="{Binding OpenTxInExplorerCommand}"
-                                        CommandParameter="{Binding ExchangingFirstStepLinkUrl}"
-                                        Classes="TransactionLink"
-                                        Content="{Binding ExchangingFirstStepLinkText}">
-                                    <ToolTip.VerticalOffset>
-                                        <MultiBinding Converter="{StaticResource ToolTipOffsetConverter}">
-                                            <Binding Path="$self.Bounds.Height" />
-                                            <Binding Path="#ExchangingFirstStepLinkToolTip.Bounds.Height" />
-                                        </MultiBinding>
-                                    </ToolTip.VerticalOffset>
-                                    <ToolTip.Tip>
-                                        <TextBlock Name="ExchangingFirstStepLinkToolTip"
-                                                   Text="{Binding ExchangingFirstStepLinkUrl}" />
-                                    </ToolTip.Tip>
-                                </Button>
+                                <controls:LinkButton Classes="Emerald"
+                                                     IsVisible="{Binding ExchangingFirstStepLinkUrl, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                                                     Command="{Binding OpenTxInExplorerCommand}"
+                                                     CommandParameter="{Binding ExchangingFirstStepLinkUrl}"
+                                                     Content="{Binding ExchangingFirstStepLinkText}"
+                                                     ToolText="{Binding ExchangingFirstStepLinkUrl}" />
 
                                 <TextBlock Text="{Binding ExchangingFirstStepLinkText}"
                                            IsVisible="{Binding ExchangingFirstStepLinkUrl, Converter={x:Static StringConverters.IsNullOrEmpty}}"
                                            TextWrapping="Wrap"
-                                           Margin="0 2 0 0"
                                            Foreground="{StaticResource LightDefaultOpacity50}"
                                            FontFamily="{DynamicResource DefaultLightFontFamily}"
                                            FontSize="13"
@@ -573,50 +556,23 @@
                                 IsVisible="{Binding ExchangingSecondStepDescription, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
                                 <TextBlock Text="{Binding ExchangingSecondStepDescription}"
                                            TextWrapping="Wrap"
-                                           Margin="0 4 4 0"
+                                           Margin="0 0 4 0"
                                            Foreground="{StaticResource LightDefaultOpacity50}"
                                            FontFamily="{DynamicResource DefaultLightFontFamily}"
                                            FontSize="13"
                                            HorizontalAlignment="Left"
                                            VerticalAlignment="Center" />
 
-                                <Border ToolTip.Placement="AnchorAndGravity"
-                                        VerticalAlignment="Bottom"
-                                        Margin="0 2 0 0"
-                                        IsVisible="{Binding ExchangingSecondStepLinkUrl, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
-                                    <Button HorizontalAlignment="Left"
-                                            VerticalAlignment="Bottom"
-                                            Padding="0"
-                                            Command="{Binding OpenTxInExplorerCommand}"
-                                            CommandParameter="{Binding ExchangingSecondStepLinkUrl}"
-                                            Classes="TransactionLink"
-                                            Content="{Binding ExchangingSecondStepLinkText}">
-                                        <!-- <StackPanel Orientation="Horizontal"> -->
-                                        <!--     <TextBlock VerticalAlignment="Bottom" -->
-                                        <!--                FontSize="13" -->
-                                        <!--                Text="{Binding ExchangingSecondStepLinkText}" /> -->
-                                        <!--     <Path Stretch="Uniform" -->
-                                        <!--           Margin="5 0 0 0" -->
-                                        <!--           VerticalAlignment="Top" -->
-                                        <!--           Height="11" -->
-                                        <!--           Data="{DynamicResource LinkIcon}" /> -->
-                                        <!-- </StackPanel> -->
-                                    </Button>
-                                    <ToolTip.VerticalOffset>
-                                        <MultiBinding Converter="{StaticResource ToolTipOffsetConverter}">
-                                            <Binding Path="$self.Bounds.Height" />
-                                            <Binding Path="#ExchangingSecondStepLinkToolTip.Bounds.Height" />
-                                        </MultiBinding>
-                                    </ToolTip.VerticalOffset>
-                                    <ToolTip.Tip>
-                                        <TextBlock Name="ExchangingSecondStepLinkToolTip"
-                                                   Text="{Binding ExchangingSecondStepLinkUrl}" />
-                                    </ToolTip.Tip>
-                                </Border>
+                                <controls:LinkButton Classes="Emerald"
+                                                     IsVisible="{Binding ExchangingSecondStepLinkUrl, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                                                     Command="{Binding OpenTxInExplorerCommand}"
+                                                     CommandParameter="{Binding ExchangingSecondStepLinkUrl}"
+                                                     Content="{Binding ExchangingSecondStepLinkText}"
+                                                     ToolText="{Binding ExchangingSecondStepLinkUrl}" />
+
                                 <TextBlock Text="{Binding ExchangingSecondStepLinkText}"
                                            IsVisible="{Binding ExchangingSecondStepLinkUrl, Converter={x:Static StringConverters.IsNullOrEmpty}}"
                                            TextWrapping="Wrap"
-                                           Margin="0 2 0 0"
                                            Foreground="{StaticResource LightDefaultOpacity50}"
                                            FontFamily="{DynamicResource DefaultLightFontFamily}"
                                            FontSize="13"
@@ -632,59 +588,31 @@
                                        Foreground="{StaticResource PrimaryTextColor}"
                                        FontFamily="{DynamicResource DefaultLightFontFamily}"
                                        FontSize="20"
+                                       Margin="0 0 0 4"
                                        HorizontalAlignment="Left"
                                        VerticalAlignment="Center" />
 
-                            <WrapPanel
-                                IsVisible="{Binding CompletionFirstStepDescription, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+                            <WrapPanel Margin="0 0 0 2"
+                                       IsVisible="{Binding CompletionFirstStepDescription, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
                                 <TextBlock Text="{Binding CompletionFirstStepDescription}"
                                            TextWrapping="Wrap"
-                                           Margin="0 4 4 0"
+                                           Margin="0 0 4 0"
                                            Foreground="{StaticResource LightDefaultOpacity50}"
                                            FontFamily="{DynamicResource DefaultLightFontFamily}"
                                            FontSize="13"
                                            HorizontalAlignment="Left"
                                            VerticalAlignment="Center" />
 
-                                <Border ToolTip.Placement="AnchorAndGravity"
-                                        VerticalAlignment="Bottom"
-                                        Margin="0 2 0 0"
-                                        IsVisible="{Binding CompletionFirstStepLinkUrl, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
-
-                                    <Button HorizontalAlignment="Left"
-                                            VerticalAlignment="Bottom"
-                                            Padding="0"
-                                            Command="{Binding OpenTxInExplorerCommand}"
-                                            CommandParameter="{Binding CompletionFirstStepLinkUrl}"
-                                            Classes="TransactionLink"
-                                            Content="{Binding CompletionFirstStepLinkText}">
-                                        <!-- <StackPanel Orientation="Horizontal"> -->
-                                        <!--     <TextBlock VerticalAlignment="Bottom" -->
-                                        <!--                FontSize="13" -->
-                                        <!--                Text="{Binding CompletionFirstStepLinkText}" /> -->
-                                        <!--     <Path Stretch="Uniform" -->
-                                        <!--           Margin="5 0 0 0" -->
-                                        <!--           VerticalAlignment="Top" -->
-                                        <!--           Height="11" -->
-                                        <!--           Data="{DynamicResource LinkIcon}" /> -->
-                                        <!-- </StackPanel> -->
-                                    </Button>
-                                    <ToolTip.VerticalOffset>
-                                        <MultiBinding Converter="{StaticResource ToolTipOffsetConverter}">
-                                            <Binding Path="$self.Bounds.Height" />
-                                            <Binding Path="#CompletionFirstStepLinkToolTip.Bounds.Height" />
-                                        </MultiBinding>
-                                    </ToolTip.VerticalOffset>
-                                    <ToolTip.Tip>
-                                        <TextBlock Name="CompletionFirstStepLinkToolTip"
-                                                   Text="{Binding CompletionFirstStepLinkUrl}" />
-                                    </ToolTip.Tip>
-                                </Border>
+                                <controls:LinkButton Classes="Emerald"
+                                                     IsVisible="{Binding CompletionFirstStepLinkUrl, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                                                     Command="{Binding OpenTxInExplorerCommand}"
+                                                     CommandParameter="{Binding CompletionFirstStepLinkUrl}"
+                                                     Content="{Binding CompletionFirstStepLinkText}"
+                                                     ToolText="{Binding CompletionFirstStepLinkUrl}" />
 
                                 <TextBlock Text="{Binding CompletionFirstStepLinkText}"
                                            IsVisible="{Binding CompletionFirstStepLinkUrl, Converter={x:Static StringConverters.IsNullOrEmpty}}"
                                            TextWrapping="Wrap"
-                                           Margin="0 2 0 0"
                                            Foreground="{StaticResource LightDefaultOpacity50}"
                                            FontFamily="{DynamicResource DefaultLightFontFamily}"
                                            FontSize="13"
@@ -695,52 +623,23 @@
                                 IsVisible="{Binding CompletionSecondStepDescription, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
                                 <TextBlock Text="{Binding CompletionSecondStepDescription}"
                                            TextWrapping="Wrap"
-                                           Margin="0 4 4 0"
+                                           Margin="0 0 4 0"
                                            Foreground="{StaticResource LightDefaultOpacity50}"
                                            FontFamily="{DynamicResource DefaultLightFontFamily}"
                                            FontSize="13"
                                            HorizontalAlignment="Left"
                                            VerticalAlignment="Center" />
 
-                                <Border ToolTip.Placement="AnchorAndGravity"
-                                        VerticalAlignment="Bottom"
-                                        Margin="0 2 0 0"
-                                        IsVisible="{Binding CompletionSecondStepLinkUrl, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
-
-                                    <Button HorizontalAlignment="Left"
-                                            VerticalAlignment="Bottom"
-                                            Padding="0"
-                                            Command="{Binding OpenTxInExplorerCommand}"
-                                            CommandParameter="{Binding CompletionSecondStepLinkUrl}"
-                                            Classes="TransactionLink"
-                                            Content="{Binding CompletionSecondStepLinkText}">
-                                        <!-- <StackPanel Orientation="Horizontal"> -->
-                                        <!--     <TextBlock VerticalAlignment="Bottom" -->
-                                        <!--                FontSize="13" -->
-                                        <!--                Text="{Binding CompletionSecondStepLinkText}" /> -->
-                                        <!--     <Path Stretch="Uniform" -->
-                                        <!--           Margin="5 0 0 0" -->
-                                        <!--           VerticalAlignment="Top" -->
-                                        <!--           Height="11" -->
-                                        <!--           Data="{DynamicResource LinkIcon}" /> -->
-                                        <!-- </StackPanel> -->
-                                    </Button>
-                                    <ToolTip.VerticalOffset>
-                                        <MultiBinding Converter="{StaticResource ToolTipOffsetConverter}">
-                                            <Binding Path="$self.Bounds.Height" />
-                                            <Binding Path="#CompletionSecondStepLinkToolTip.Bounds.Height" />
-                                        </MultiBinding>
-                                    </ToolTip.VerticalOffset>
-                                    <ToolTip.Tip>
-                                        <TextBlock Name="CompletionSecondStepLinkToolTip"
-                                                   Text="{Binding CompletionSecondStepLinkUrl}" />
-                                    </ToolTip.Tip>
-                                </Border>
+                                <controls:LinkButton Classes="Emerald"
+                                                     IsVisible="{Binding CompletionSecondStepLinkUrl, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                                                     Command="{Binding OpenTxInExplorerCommand}"
+                                                     CommandParameter="{Binding CompletionSecondStepLinkUrl}"
+                                                     Content="{Binding CompletionSecondStepLinkText}"
+                                                     ToolText="{Binding CompletionSecondStepLinkUrl}" />
 
                                 <TextBlock Text="{Binding CompletionSecondStepLinkText}"
                                            IsVisible="{Binding CompletionSecondStepLinkUrl, Converter={x:Static StringConverters.IsNullOrEmpty}}"
                                            TextWrapping="Wrap"
-                                           Margin="0 2 0 0"
                                            Foreground="{StaticResource LightDefaultOpacity50}"
                                            FontFamily="{DynamicResource DefaultLightFontFamily}"
                                            FontSize="13"

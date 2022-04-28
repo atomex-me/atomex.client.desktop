@@ -5,19 +5,64 @@
         xmlns:converters="clr-namespace:Atomex.Client.Desktop.Converters">
     <Design.PreviewWith>
         <Border Padding="100 100" Background="#122B50">
-            
-            <StackPanel Orientation="Horizontal">
-                <controls:IconButton Classes="Update WithToolTipContent">
-                    <Button>123123</Button>
-                </controls:IconButton>
-            
-                <controls:IconButton Classes="Update"
-                                     Margin="10 0 0 0"
-                                     ToolText="Some tooltip text"/>
+            <StackPanel Orientation="Vertical">
+                <StackPanel Orientation="Horizontal">
+                    <controls:IconButton Classes="Update WithToolTipContent">
+                        <Button>123123</Button>
+                    </controls:IconButton>
+
+                    <controls:IconButton Classes="Update Big Updating"
+                                         Margin="10 0 0 0"
+                                         ToolText="Some tooltip text" />
+
+                    <controls:IconButton Classes="Key"
+                                         Margin="10 0 0 0" />
+
+                    <controls:IconButton Classes="Twitter NoEffects"
+                                         Margin="10 0 0 0" />
+
+                    <controls:IconButton Classes="Telegram NoEffects"
+                                         Margin="10 0 0 0" />
+
+                    <controls:IconButton Classes="Github NoEffects"
+                                         Margin="10 0 0 0" />
+
+                    <controls:IconButton Classes="Close"
+                                         Margin="10 0 0 0" />
+
+                    <controls:IconButton Classes="Back"
+                                         Margin="10 0 0 0" />
+
+                </StackPanel>
+
+                <StackPanel Margin="0 25 0 0 " Orientation="Horizontal">
+                    <controls:IconButton Classes="Question"
+                                         ToolText="Some tooltip text"
+                                         Margin="10 0 0 0" />
+                    <controls:IconButton Classes="Trash"
+                                         ToolText="Remove transaction from list"
+                                         Margin="10 0 0 0" />
+                    
+                    <controls:IconButton Classes="Settings"
+                                         Margin="10 0 0 0" />
+                                        
+                    <controls:IconButton Classes="Clear NoEffects"
+                                         Margin="10 0 0 0" />
+                    
+                    <controls:IconButton Classes="MenuDots"
+                                         Margin="10 0 0 0" />
+                    
+                    <controls:IconButton Classes="Alert NoEffects"
+                                         Margin="10 0 0 0" />
+                    
+                    <controls:IconButton Classes="Swap"
+                                         Margin="10 0 0 0" />
+                </StackPanel>
             </StackPanel>
+
         </Border>
     </Design.PreviewWith>
-    
+
     <Styles.Resources>
         <converters:ToolTipOffsetConverter x:Key="ToolTipOffsetConverter" />
     </Styles.Resources>
@@ -32,25 +77,32 @@
         <Setter Property="BorderBrush" Value="{DynamicResource ButtonBorderBrushPressed}" />
     </Style>
 
+    <Style Selector=":is(controls|IconButton).NoEffects:pointerover /template/ Border">
+        <Setter Property="Background" Value="Transparent" />
+    </Style>
+
+    <Style Selector=":is(controls|IconButton).NoEffects:pressed /template/ Border">
+        <Setter Property="Background" Value="Transparent" />
+    </Style>
+
     <Style Selector=":is(controls|IconButton)">
-        <Setter Property="Cursor" Value="Hand" />
         <Setter Property="FontFamily" Value="{DynamicResource DefaultFontFamily}" />
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="Padding" Value="0" />
         <Setter Property="BorderThickness" Value="0" />
         <Setter Property="VerticalContentAlignment" Value="Center" />
         <Setter Property="HorizontalContentAlignment" Value="Center" />
-        <Setter Property="CornerRadius" Value="{DynamicResource AtomexCornerRadius}" />
+        <Setter Property="CornerRadius" Value="4" />
         <Setter Property="Width" Value="28" />
         <Setter Property="Height" Value="28" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type controls:IconButton}">
                     <Border ToolTip.Placement="AnchorAndGravity"
-                           Width="{TemplateBinding Width}"
-                           Height="{TemplateBinding Height}"
-                           CornerRadius="{TemplateBinding CornerRadius}"
-                           Background="{TemplateBinding Background}">
+                            Width="{TemplateBinding Width}"
+                            Height="{TemplateBinding Height}"
+                            CornerRadius="{TemplateBinding CornerRadius}"
+                            Background="{TemplateBinding Background}">
                         <Border.Styles>
                             <Style Selector="Border ToolTip">
                                 <Setter Property="IsVisible"
@@ -75,16 +127,16 @@
             </Setter.Value>
         </Setter>
     </Style>
-    
+
     <Style Selector="controls|IconButton.WithToolTipContent">
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type controls:IconButton}">
                     <Border ToolTip.Placement="AnchorAndGravity"
-                           Width="{TemplateBinding Width}"
-                           Height="{TemplateBinding Height}"
-                           CornerRadius="{TemplateBinding CornerRadius}"
-                           Background="{TemplateBinding Background}">
+                            Width="{TemplateBinding Width}"
+                            Height="{TemplateBinding Height}"
+                            CornerRadius="{TemplateBinding CornerRadius}"
+                            Background="{TemplateBinding Background}">
                         <ToolTip.VerticalOffset>
                             <MultiBinding Converter="{StaticResource ToolTipOffsetConverter}">
                                 <Binding Path="$self.Bounds.Height" />
@@ -137,7 +189,7 @@
             </Animation>
         </Style.Animations>
     </Style>
-    
+
     <Style Selector="controls|IconButton.Key">
         <Setter Property="Width" Value="24" />
         <Setter Property="Height" Value="24" />
@@ -149,7 +201,7 @@
     <Style Selector="controls|IconButton.Key:pointerover /template/ svg|Svg">
         <Setter Property="Path" Value="/Resources/Icons/key-light.svg" />
     </Style>
-    
+
     <Style Selector="controls|IconButton.Update">
         <Setter Property="Width" Value="24" />
         <Setter Property="Height" Value="24" />
@@ -161,7 +213,14 @@
     <Style Selector="controls|IconButton.Update:pointerover /template/ svg|Svg">
         <Setter Property="Path" Value="/Resources/Icons/update-light.svg" />
     </Style>
-    
+    <Style Selector="controls|IconButton.Update.Big">
+        <Setter Property="Width" Value="26" />
+        <Setter Property="Height" Value="26" />
+    </Style>
+    <Style Selector="controls|IconButton.Update.Big /template/ svg|Svg">
+        <Setter Property="Width" Value="24" />
+    </Style>
+
     <Style Selector="controls|IconButton.Question">
         <Setter Property="Width" Value="18" />
         <Setter Property="Height" Value="18" />
@@ -173,5 +232,134 @@
     </Style>
     <Style Selector="controls|IconButton.Question:pointerover /template/ svg|Svg">
         <Setter Property="Path" Value="/Resources/Icons/question-light.svg" />
+    </Style>
+
+    <Style Selector="controls|IconButton.Trash">
+        <Setter Property="Width" Value="28" />
+        <Setter Property="Height" Value="28" />
+    </Style>
+    <Style Selector="controls|IconButton.Trash svg|Svg">
+        <Setter Property="Path" Value="/Resources/Icons/trash.svg" />
+        <Setter Property="Width" Value="22" />
+    </Style>
+    <Style Selector="controls|IconButton.Trash:pointerover svg|Svg">
+        <Setter Property="Path" Value="/Resources/Icons/trash-light.svg" />
+    </Style>
+
+    <Style Selector="controls|IconButton.Twitter">
+        <Setter Property="Width" Value="28" />
+        <Setter Property="Height" Value="28" />
+    </Style>
+    <Style Selector="controls|IconButton.Twitter svg|Svg">
+        <Setter Property="Path" Value="/Resources/Icons/twitter.svg" />
+        <Setter Property="Width" Value="24" />
+    </Style>
+
+    <Style Selector="controls|IconButton.Telegram">
+        <Setter Property="Width" Value="28" />
+        <Setter Property="Height" Value="28" />
+    </Style>
+    <Style Selector="controls|IconButton.Telegram svg|Svg">
+        <Setter Property="Path" Value="/Resources/Icons/telegram.svg" />
+        <Setter Property="Width" Value="24" />
+    </Style>
+
+    <Style Selector="controls|IconButton.Github">
+        <Setter Property="Width" Value="28" />
+        <Setter Property="Height" Value="28" />
+    </Style>
+    <Style Selector="controls|IconButton.Github svg|Svg">
+        <Setter Property="Path" Value="/Resources/Icons/github.svg" />
+        <Setter Property="Width" Value="24" />
+    </Style>
+
+    <Style Selector="controls|IconButton.Back">
+        <Setter Property="Width" Value="28" />
+        <Setter Property="Height" Value="28" />
+    </Style>
+    <Style Selector="controls|IconButton.Back svg|Svg">
+        <Setter Property="Path" Value="/Resources/Icons/back.svg" />
+        <Setter Property="Width" Value="22" />
+    </Style>
+    <Style Selector="controls|IconButton.Back:pointerover svg|Svg">
+        <Setter Property="Path" Value="/Resources/Icons/back-light.svg" />
+    </Style>
+
+    <Style Selector="controls|IconButton.Close">
+        <Setter Property="Width" Value="28" />
+        <Setter Property="Height" Value="28" />
+    </Style>
+    <Style Selector="controls|IconButton.Close svg|Svg">
+        <Setter Property="Path" Value="/Resources/Icons/close.svg" />
+        <Setter Property="Width" Value="22" />
+    </Style>
+    <Style Selector="controls|IconButton.Close:pointerover svg|Svg">
+        <Setter Property="Path" Value="/Resources/Icons/close-light.svg" />
+    </Style>
+    
+    <Style Selector="controls|IconButton.Settings">
+        <Setter Property="Width" Value="28" />
+        <Setter Property="Height" Value="28" />
+    </Style>
+    <Style Selector="controls|IconButton.Settings svg|Svg">
+        <Setter Property="Path" Value="/Resources/Icons/settings.svg" />
+        <Setter Property="Width" Value="22" />
+    </Style>
+    <Style Selector="controls|IconButton.Settings:pointerover svg|Svg">
+        <Setter Property="Path" Value="/Resources/Icons/settings-light.svg" />
+    </Style>
+    
+    <Style Selector="controls|IconButton.Clear">
+        <Setter Property="Width" Value="24" />
+        <Setter Property="Height" Value="24" />
+    </Style>
+    <Style Selector="controls|IconButton.Clear svg|Svg">
+        <Setter Property="Path" Value="/Resources/Icons/subtract.svg" />
+        <Setter Property="Width" Value="18" />
+    </Style>
+    <Style Selector="controls|IconButton.Clear:pointerover svg|Svg">
+        <Setter Property="Path" Value="/Resources/Icons/subtract-light.svg" />
+    </Style>
+    
+    <Style Selector="controls|IconButton.MenuDots">
+        <Setter Property="Width" Value="26" />
+        <Setter Property="Height" Value="26" />
+    </Style>
+    <Style Selector="controls|IconButton.MenuDots svg|Svg">
+        <Setter Property="Path" Value="/Resources/Icons/menu-dots.svg" />
+        <Setter Property="Width" Value="22" />
+    </Style>
+    <Style Selector="controls|IconButton.MenuDots:pointerover svg|Svg">
+        <Setter Property="Path" Value="/Resources/Icons/menu-dots-light.svg" />
+    </Style>
+    
+    <Style Selector="controls|IconButton.Alert">
+        <Setter Property="Width" Value="44" />
+        <Setter Property="Height" Value="44" />
+        <Setter Property="CornerRadius" Value="50" />
+        <Setter Property="Background" Value="{DynamicResource LightDefaultOpacity10}" />
+    </Style>
+    <Style Selector="controls|IconButton.Alert svg|Svg">
+        <Setter Property="Path" Value="/Resources/Icons/notification-bell.svg" />
+        <Setter Property="Width" Value="22" />
+    </Style>
+    <Style Selector="controls|IconButton.Alert:pointerover /template/ Border">
+        <Setter Property="Background" Value="{DynamicResource LightDefaultOpacity20}" />
+    </Style>
+    <Style Selector="controls|IconButton.Alert:pointerover svg|Svg">
+        <Setter Property="Path" Value="/Resources/Icons/notification-bell-light.svg" />
+    </Style>
+    
+    <Style Selector="controls|IconButton.Swap">
+        <Setter Property="Width" Value="40" />
+        <Setter Property="Height" Value="40" />
+        <Setter Property="CornerRadius" Value="50" />
+    </Style>
+    <Style Selector="controls|IconButton.Swap svg|Svg">
+        <Setter Property="Path" Value="/Resources/Icons/swap-arrows-vertical.svg" />
+        <Setter Property="Width" Value="20" />
+    </Style>
+    <Style Selector="controls|IconButton.Swap:pointerover svg|Svg">
+        <Setter Property="Path" Value="/Resources/Icons/swap-arrows-vertical-light.svg" />
     </Style>
 </Styles>

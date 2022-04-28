@@ -5,6 +5,7 @@
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="Atomex.Client.Desktop.Views.ManageAssetsView"
              xmlns:vm="clr-namespace:Atomex.Client.Desktop.ViewModels"
+             xmlns:controls="clr-namespace:Atomex.Client.Desktop.Controls"
              xmlns:svg="clr-namespace:Avalonia.Svg.Skia;assembly=Avalonia.Svg.Skia">
 
     <Design.DataContext>
@@ -38,24 +39,9 @@
                 <TextBox.InnerRightContent>
                     <StackPanel VerticalAlignment="Center"
                                 IsVisible="{Binding SearchPattern, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
-                        <Button Margin="0 0 15 0"
-                                Padding="0"
-                                BorderThickness="0"
-                                VerticalContentAlignment="Center"
-                                Command="{ReflectionBinding $parent[TextBox].Clear}"
-                                Classes="ButtonWithIcon WithoutEffects">
-                            <Button.Styles>
-                                <Style Selector="Button svg|Svg">
-                                    <Setter Property="Path" Value="/Resources/Icons/subtract.svg"></Setter>
-                                </Style>
-                                <Style Selector="Button:pointerover svg|Svg">
-                                    <Setter Property="Path" Value="/Resources/Icons/subtract-light.svg"></Setter>
-                                </Style>
-                            </Button.Styles>
-                            <svg:Svg HorizontalAlignment="Center"
-                                     Width="18"
-                                     Height="18" />
-                        </Button>
+                        <controls:IconButton Classes="Clear NoEffects"
+                                             Command="{ReflectionBinding $parent[TextBox].Clear}"
+                                             Margin="0 0 15 0" />
                     </StackPanel>
                 </TextBox.InnerRightContent>
             </TextBox>

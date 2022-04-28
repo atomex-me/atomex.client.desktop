@@ -117,7 +117,7 @@
     <SolidColorBrush x:Key="MainOverlayBrush" Color="{StaticResource MainOverlayColor}" />
     <SolidColorBrush x:Key="StatusBarConnectedForeground" Color="AliceBlue" />
     <SolidColorBrush x:Key="StatusBarDisconnectedForeground" Color="{StaticResource CriticalWarningColor}" />
-    <SolidColorBrush x:Key="StatusBarVersionForeground" Color="DarkGray" />
+    <SolidColorBrush x:Key="StatusBarVerticalDelimiterColor" Color="{StaticResource LightDefault}" />
     <SolidColorBrush x:Key="MainWindowTitleBarForeground" Color="DarkGray" />
     <SolidColorBrush x:Key="DefaultUpdateForegroundBrush" Color="Gold" />
     <SolidColorBrush x:Key="RightPopupBackgroundBrush" Color="{StaticResource DeepBlue}" />

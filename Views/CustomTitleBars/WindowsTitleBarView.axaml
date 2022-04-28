@@ -69,7 +69,7 @@
                     </Button>
                     <Rectangle Margin="0 8"
                                VerticalAlignment="Stretch"
-                               Fill="{DynamicResource StatusBarVersionForeground}"
+                               Fill="{DynamicResource StatusBarVerticalDelimiterColor}"
                                Width="1" />
                 </StackPanel>
                 
@@ -99,7 +99,7 @@
                     </Button>
                     <Rectangle Margin="0 8"
                                VerticalAlignment="Stretch"
-                               Fill="{DynamicResource StatusBarVersionForeground}"
+                               Fill="{DynamicResource StatusBarVerticalDelimiterColor}"
                                Width="1" />
                 </StackPanel>
 
@@ -121,7 +121,7 @@
                     </Button>
                     <Rectangle Margin="0 8"
                                VerticalAlignment="Stretch"
-                               Fill="{DynamicResource StatusBarVersionForeground}"
+                               Fill="{DynamicResource StatusBarVerticalDelimiterColor}"
                                Width="1" />
                 </StackPanel>
 

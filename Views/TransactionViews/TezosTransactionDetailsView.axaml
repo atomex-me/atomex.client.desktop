@@ -28,24 +28,15 @@
 
         <StackPanel>
             <Grid ColumnDefinitions="Auto,*,Auto">
-                <Button Grid.Column="0"
-                        Command="{Binding OnCloseCommand}"
-                        Classes="ButtonWithIcon Close">
-                    <svg:Svg />
-                </Button>
+                <controls:IconButton Grid.Column="0"
+                                     Classes="Close"
+                                     Command="{Binding OnCloseCommand}" />
 
-                <Button Grid.Column="2"
-                        ToolTip.Placement="AnchorAndGravity"
-                        ToolTip.VerticalOffset="{DynamicResource DefaultToolTipVerticalOffset}"
-                        IsVisible="{Binding CanBeRemoved}"
-                        Command="{Binding RemoveCommand}"
-                        Classes="ButtonWithIcon Trash">
-                    <svg:Svg />
-
-                    <ToolTip.Tip>
-                        <TextBlock Text="Remove from the transaction list" />
-                    </ToolTip.Tip>
-                </Button>
+                <controls:IconButton Grid.Column="2"
+                                     Classes="Trash"
+                                     IsVisible="{Binding CanBeRemoved}"
+                                     Command="{Binding RemoveCommand}"
+                                     ToolText="Remove from the transactions list" />
             </Grid>
 
             <svg:Svg Name="StateIcon"
@@ -156,19 +147,12 @@
                            FontSize="13"
                            Text="Transaction ID" />
 
-                <Button Grid.Column="1"
-                        ToolTip.Placement="AnchorAndGravity"
-                        ToolTip.VerticalOffset="{DynamicResource DefaultToolTipVerticalOffset}"
-                        HorizontalAlignment="Left"
-                        VerticalAlignment="Center"
-                        Padding="0"
-                        Command="{Binding OpenTxInExplorerCommand}"
-                        Content="{Binding Id}"
-                        Classes="TransactionLink">
-                    <ToolTip.Tip>
-                        <TextBlock Text="{Binding TxExplorerUri}" />
-                    </ToolTip.Tip>
-                </Button>
+                <controls:LinkButton Grid.Column="1"
+                                     Classes="Emerald"
+                                     HorizontalAlignment="Left"
+                                     Command="{Binding OpenTxInExplorerCommand}"
+                                     Content="{Binding Id}"
+                                     ToolText="{Binding TxExplorerUri}" />
 
                 <controls:CopyButton Grid.Column="2"
                                      Margin="10 0 0 0"
@@ -206,20 +190,13 @@
                            FontSize="13"
                            Text="From" />
 
-                <Button Grid.Column="1"
-                        ToolTip.Placement="AnchorAndGravity"
-                        ToolTip.VerticalOffset="{DynamicResource DefaultToolTipVerticalOffset}"
-                        HorizontalAlignment="Left"
-                        VerticalAlignment="Center"
-                        Padding="0"
-                        Command="{Binding OpenAddressInExplorerCommand}"
-                        CommandParameter="{Binding From}"
-                        Content="{Binding From}"
-                        Classes="TransactionLink">
-                    <ToolTip.Tip>
-                        <TextBlock Text="{Binding FromExplorerUri}" />
-                    </ToolTip.Tip>
-                </Button>
+                <controls:LinkButton Grid.Column="1"
+                                     Classes="Emerald"
+                                     HorizontalAlignment="Left"
+                                     Command="{Binding OpenAddressInExplorerCommand}"
+                                     CommandParameter="{Binding From}"
+                                     Content="{Binding From}"
+                                     ToolText="{Binding FromExplorerUri}" />
 
                 <controls:CopyButton Grid.Column="2"
                                      Margin="10 0 0 0"
@@ -240,20 +217,13 @@
                            FontSize="13"
                            Text="To" />
 
-                <Button Grid.Column="1"
-                        ToolTip.Placement="AnchorAndGravity"
-                        ToolTip.VerticalOffset="{DynamicResource DefaultToolTipVerticalOffset}"
-                        HorizontalAlignment="Left"
-                        VerticalAlignment="Center"
-                        Padding="0"
-                        Command="{Binding OpenAddressInExplorerCommand}"
-                        CommandParameter="{Binding To}"
-                        Content="{Binding To}"
-                        Classes="TransactionLink">
-                    <ToolTip.Tip>
-                        <TextBlock Text="{Binding ToExplorerUri}" />
-                    </ToolTip.Tip>
-                </Button>
+                <controls:LinkButton Grid.Column="1"
+                                     Classes="Emerald"
+                                     HorizontalAlignment="Left"
+                                     Command="{Binding OpenAddressInExplorerCommand}"
+                                     CommandParameter="{Binding To}"
+                                     Content="{Binding To}"
+                                     ToolText="{Binding ToExplorerUri}" />
 
                 <controls:CopyButton Grid.Column="2"
                                      Margin="10 0 0 0"

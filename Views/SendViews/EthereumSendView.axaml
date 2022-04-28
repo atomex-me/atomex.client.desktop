@@ -58,14 +58,12 @@
       <Grid ColumnDefinitions="Auto,*"
             RowDefinitions="72">
         <!-- back button -->
-        <Button Grid.Column="0"
-                IsVisible="{Binding Stage,
-                  Converter={StaticResource EnumToStringNotEqualConverter},
-                  ConverterParameter=Edit}"
-                Command="{Binding UndoConfirmStageCommand}"
-                Classes="ButtonWithIcon Back">
-          <svg:Svg />
-        </Button>
+        <controls:IconButton Grid.Column="0"
+                             Classes="Back"
+                             IsVisible="{Binding Stage,
+                                     Converter={StaticResource EnumToStringNotEqualConverter},
+                                     ConverterParameter={x:Static vm:SendStage.Edit}}"
+                             Command="{Binding UndoConfirmStageCommand}"/>
 
         <!-- window title -->
         <TextBlock Grid.Column="1"
@@ -212,27 +210,32 @@
                        HorizontalAlignment="Right"/>
           </Border>
 
-          <TextBox Width="440"
-                   Text="{Binding Amount, Converter={StaticResource StringToDecimalConverter}}"
-                   helpers:AmountTextBoxHelper.CurrencyCode="{Binding CurrencyCode}"
-                   helpers:AmountTextBoxHelper.BaseCurrencyCode="{Binding BaseCurrencyCode}"
-                   helpers:AmountTextBoxHelper.AmountInBaseMargin="0 0 45 0"
-                   Classes="AtomexTextBox AmountTextBox">
-            <helpers:AmountTextBoxHelper.AmountInBase>
-              <MultiBinding Converter="{StaticResource AmountToStringConverter}">
-                <Binding Path="AmountInBase" Mode="OneWay"/>
-                <Binding Path="BaseCurrencyFormat" Mode="OneWay"/>
-              </MultiBinding>
-            </helpers:AmountTextBoxHelper.AmountInBase>
-            <i:Interaction.Behaviors>
-              <behaviors:AmountBehavior Format="{Binding CurrencyFormat}"/>
-            </i:Interaction.Behaviors>
-          </TextBox>
-
-          <Button Classes="LinkButton Underlined"
-                  Margin="-67 0 0 0"
-                  Command="{Binding MaxCommand}"
-                  Content="max"/>
+          <Grid ColumnDefinitions="398,42">
+            <TextBox Grid.Column="0"
+                     Grid.ColumnSpan="2"
+                     Text="{Binding Amount, Converter={StaticResource StringToDecimalConverter}}"
+                     helpers:AmountTextBoxHelper.CurrencyCode="{Binding CurrencyCode}"
+                     helpers:AmountTextBoxHelper.BaseCurrencyCode="{Binding BaseCurrencyCode}"
+                     helpers:AmountTextBoxHelper.AmountInBaseMargin="0 0 34 0"
+                     Classes="AtomexTextBox AmountTextBox">
+              <helpers:AmountTextBoxHelper.AmountInBase>
+                <MultiBinding Converter="{StaticResource AmountToStringConverter}">
+                  <Binding Path="AmountInBase" Mode="OneWay"/>
+                  <Binding Path="BaseCurrencyFormat" Mode="OneWay"/>
+                </MultiBinding>
+              </helpers:AmountTextBoxHelper.AmountInBase>
+              <i:Interaction.Behaviors>
+                <behaviors:AmountBehavior Format="{Binding CurrencyFormat}"/>
+              </i:Interaction.Behaviors>
+            </TextBox>
+          
+            <controls:LinkButton Grid.Column="1"
+                                 Underlined="True"
+                                 Classes="Dashed"
+                                 HorizontalAlignment="Left"
+                                 Command="{Binding MaxCommand}"
+                                 Content="max" />
+          </Grid>
         </StackPanel>
 
         <!-- Classes="AnimationCollapsed" -->

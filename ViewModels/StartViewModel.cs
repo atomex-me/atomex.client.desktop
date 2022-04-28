@@ -12,6 +12,10 @@ namespace Atomex.Client.Desktop.ViewModels
 {
     public class StartViewModel : ViewModelBase
     {
+        public static string TwitterAddress => "https://twitter.com/atomex_official";
+        public static string TelegramAddress => "tg://resolve?domain=atomex_official";
+        public static string GithubAddress => "https://github.com/atomex-me";
+        
         public StartViewModel()
         {
         }
@@ -81,17 +85,17 @@ namespace Atomex.Client.Desktop.ViewModels
 
         public void TwitterCommand()
         {
-            App.OpenBrowser("https://twitter.com/atomex_official");
+            App.OpenBrowser(TwitterAddress);
         }
 
         public void GithubCommand()
         {
-            App.OpenBrowser("https://github.com/atomex-me");
+            App.OpenBrowser(GithubAddress);
         }
 
         public void TelegramCommand()
         {
-            App.OpenBrowser("tg://resolve?domain=atomex_official");
+            App.OpenBrowser(TelegramAddress);
         }
 
         private void OnCanceled()

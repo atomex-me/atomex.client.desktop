@@ -19,11 +19,10 @@
         <StackPanel Orientation="Vertical">
             <Grid ColumnDefinitions="Auto,*"
                   RowDefinitions="Auto">
-                <Button Grid.Column="0"
-                        Command="{Binding BackCommand}"
-                        Classes="ButtonWithIcon Back">
-                    <svg:Svg />
-                </Button>
+
+                <controls:IconButton Grid.Column="0"
+                                     Classes="Back"
+                                     Command="{Binding BackCommand}"/>
 
                 <TextBlock Grid.Column="1"
                            FontSize="22"
@@ -67,25 +66,9 @@
                 <TextBox.InnerRightContent>
                     <StackPanel VerticalAlignment="Center"
                                 IsVisible="{Binding SearchPattern, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
-                        <Button Margin="0 0 15 0"
-                                Padding="0"
-                                BorderThickness="0"
-                                VerticalContentAlignment="Center"
-                                Command="{ReflectionBinding $parent[TextBox].Clear}"
-                                Classes="ButtonWithIcon WithoutEffects">
-                            <Button.Styles>
-                                <Style Selector="Button svg|Svg">
-                                    <Setter Property="Path" Value="/Resources/Icons/subtract.svg"></Setter>
-                                </Style>
-                                <Style Selector="Button:pointerover svg|Svg">
-                                    <Setter Property="Path" Value="/Resources/Icons/subtract-light.svg"></Setter>
-                                </Style>
-                            </Button.Styles>
-
-                            <svg:Svg HorizontalAlignment="Center"
-                                     Width="18"
-                                     Height="18" />
-                        </Button>
+                        <controls:IconButton Classes="Clear NoEffects"
+                                             Command="{ReflectionBinding $parent[TextBox].Clear}"
+                                             Margin="0 0 15 0" />
                     </StackPanel>
                 </TextBox.InnerRightContent>
             </TextBox>

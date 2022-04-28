@@ -1,0 +1,222 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="clr-namespace:Atomex.Client.Desktop.Controls"
+        xmlns:converters="clr-namespace:Atomex.Client.Desktop.Converters">
+    <Design.PreviewWith>
+        <Border Padding="0 100" Background="#122B50" Width="500">
+            <StackPanel Orientation="Vertical">
+                <controls:LinkButton Content="Restore wallets" />
+                
+                <Panel MaxWidth="200">
+                    <controls:LinkButton Classes="Emerald"
+                                         Content="af0e6198ce35edc4ae91be49bfb0dc1762eae7fe6f443ec1f747c4afcda00a3d"
+                                         ToolText="af0e6198ce35edc4ae91be49bfb0dc1762eae7fe6f443ec1f747c4afcda00a3d"
+                                         Margin="0 16 0 0" />
+                </Panel>
+
+                <controls:LinkButton Underlined="True"
+                                     Classes="Dashed"
+                                     Content="max"
+                                     Margin="-67 16 0 0"
+                                     ToolText="Some tooltip text" />
+
+                <controls:LinkButton Underlined="True"
+                                     Classes="Dashed WithCorners"
+                                     Content="from 6 outputs (1 BTC)"
+                                     ToolText="Click to change address"
+                                     Height="30"
+                                     Margin="0 16 0 0" />
+
+                <controls:LinkButton Underlined="True"
+                                     Classes="SolidHover"
+                                     Content="tz1YFd9cQ7HZdnc9gWKuzvBQdPvbvmdFWeye"
+                                     Margin="0 16 0 0"
+                                     FontSize="18"
+                                     ToolText="Some tooltip text" />
+
+                <controls:LinkButton Underlined="True"
+                                     Classes="SolidHover"
+                                     Content="Restore wallets"
+                                     Margin="0 16 0 0"
+                                     FontSize="18" />
+            </StackPanel>
+        </Border>
+    </Design.PreviewWith>
+
+    <Styles.Resources>
+        <converters:ToolTipOffsetConverter x:Key="ToolTipOffsetConverter" />
+        <converters:WidthToPointConverter x:Key="WidthToPointConverter" />
+    </Styles.Resources>
+
+    <Style Selector=":is(controls|LinkButton)">
+        <Setter Property="RenderTransform" Value="none" />
+        <Setter Property="Transitions">
+            <Transitions>
+                <TransformOperationsTransition Property="RenderTransform" Duration="0:0:.075" />
+            </Transitions>
+        </Setter>
+    </Style>
+    <Style Selector=":is(controls|LinkButton):pressed">
+        <Setter Property="RenderTransform" Value="scale(0.99)" />
+    </Style>
+
+    <Style Selector="controls|LinkButton">
+        <Setter Property="Foreground" Value="{DynamicResource DefaultLinkButtonForegroundBrush}" />
+        <Setter Property="FontSize" Value="13" />
+        <Setter Property="HorizontalAlignment" Value="Center" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="BorderThickness" Value="0" />
+
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type controls:LinkButton}">
+                    <Border Height="{TemplateBinding Height}"
+                            Padding="{TemplateBinding Padding}"
+                            Background="{TemplateBinding Background}"
+                            CornerRadius="{DynamicResource AtomexCornerRadius}"
+                            ToolTip.Placement="AnchorAndGravity">
+                        <WrapPanel ToolTip.Placement="AnchorAndGravity"
+                                   VerticalAlignment="Center">
+                            <WrapPanel.Styles>
+                                <Style Selector="WrapPanel ToolTip">
+                                    <Setter Property="IsVisible"
+                                            Value="{Binding $parent[controls:LinkButton].ToolText,
+                                        Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+                                </Style>
+                            </WrapPanel.Styles>
+                            <ToolTip.VerticalOffset>
+                                <MultiBinding Converter="{StaticResource ToolTipOffsetConverter}">
+                                    <Binding Path="$self.Bounds.Height" />
+                                    <Binding Path="#ToolTipTextContent.Bounds.Height" />
+                                </MultiBinding>
+                            </ToolTip.VerticalOffset>
+
+                            <TextBlock Text="{TemplateBinding Content}"
+                                       FontSize="{TemplateBinding FontSize}"
+                                       Foreground="{TemplateBinding Foreground}"
+                                       TextWrapping="Wrap" />
+                            <ToolTip.Tip>
+                                <TextBlock Name="ToolTipTextContent"
+                                           TextWrapping="Wrap"
+                                           Text="{Binding $parent[controls:LinkButton].ToolText}" />
+                            </ToolTip.Tip>
+                        </WrapPanel>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style Selector="controls|LinkButton:pointerover">
+        <Setter Property="Foreground" Value="{DynamicResource DefaultLinkButtonMouseOverBrush}" />
+    </Style>
+    
+
+    <Style Selector="controls|LinkButton.Emerald">
+        <Setter Property="Foreground" Value="{DynamicResource Emerald}" />
+    </Style>
+
+    <Style Selector="controls|LinkButton:pointerover.Emerald">
+        <Setter Property="Foreground" Value="{DynamicResource LightEmerald}" />
+    </Style>
+
+    <Style Selector="controls|LinkButton:pressed.Emerald">
+        <Setter Property="Foreground" Value="{DynamicResource DarkEmerald}" />
+    </Style>
+
+    <Style Selector="controls|LinkButton[Underlined=True]">
+        <Setter Property="Foreground" Value="{DynamicResource DefaultForegroundBrush}" />
+
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type controls:LinkButton}">
+                    <Border Height="{TemplateBinding Height}"
+                            Padding="{TemplateBinding Padding}"
+                            
+                            Background="{TemplateBinding Background}"
+                            CornerRadius="{DynamicResource AtomexCornerRadius}"
+                            ToolTip.Placement="AnchorAndGravity">
+                        <Border.Styles>
+                            <Style Selector="Border ToolTip">
+                                <Setter Property="IsVisible"
+                                        Value="{Binding $parent[controls:LinkButton].ToolText,
+                                        Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+                            </Style>
+                        </Border.Styles>
+                        <ToolTip.VerticalOffset>
+                            <MultiBinding Converter="{StaticResource ToolTipOffsetConverter}">
+                                <Binding Path="$self.Bounds.Height" />
+                                <Binding Path="#ToolTipTextContent.Bounds.Height" />
+                            </MultiBinding>
+                        </ToolTip.VerticalOffset>
+                        <ToolTip.Tip>
+                            <TextBlock Name="ToolTipTextContent"
+                                       TextWrapping="Wrap"
+                                       Text="{Binding $parent[controls:LinkButton].ToolText}" />
+                        </ToolTip.Tip>
+                        <StackPanel VerticalAlignment="Center">
+                            <TextBlock Name="TextBlock"
+                                       Text="{TemplateBinding Content}"
+                                       FontSize="{TemplateBinding FontSize}"
+                                       Foreground="{TemplateBinding Foreground}"
+                                       FontFamily="{TemplateBinding FontFamily}"
+                                       FontWeight="{TemplateBinding FontWeight}"
+                                       Padding="0"
+                                       Margin="0 0 0 2" />
+                            <Line Name="PART_Line"
+                                  Width="{Binding #TextBlock.Bounds.Width}"
+                                  StartPoint="0,0"
+                                  EndPoint="{Binding #TextBlock.Bounds.Width, Converter={StaticResource WidthToPointConverter}}"
+                                  StrokeThickness="1">
+                            </Line>
+                        </StackPanel>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style Selector="controls|LinkButton.WithCorners">
+        <Setter Property="Height" Value="30" />
+        <Setter Property="Padding" Value="10 0" />
+        <Setter Property="Foreground" Value="{DynamicResource SecondaryForegroundBrush}" />
+    </Style>
+    <Style Selector="controls|LinkButton.WithCorners:pointerover">
+        <Setter Property="Background" Value="{DynamicResource LightDefaultOpacity6}" />
+    </Style>
+    <Style Selector="controls|LinkButton.WithCorners:pointerover /template/ Line#PART_Line">
+        <Setter Property="IsVisible" Value="False" />
+    </Style>
+
+    <Style Selector="controls|LinkButton[Underlined=True]:pointerover">
+        <Setter Property="Foreground" Value="{DynamicResource SecondaryForegroundBrush}" />
+    </Style>
+    <Style Selector="controls|LinkButton[Underlined=True]:pressed">
+        <Setter Property="Foreground" Value="{DynamicResource LightDefaultOpacity20}" />
+    </Style>
+    <Style Selector="controls|LinkButton[Underlined=True]:disabled">
+        <Setter Property="Foreground" Value="{DynamicResource DisabledForegroundBrush}" />
+    </Style>
+    <Style Selector="controls|LinkButton[Underlined=True]:disabled /template/ Line#PART_Line">
+        <Setter Property="Stroke" Value="{DynamicResource DisabledForegroundBrush}" />
+    </Style>
+
+    <Style Selector="controls|LinkButton[Underlined=True].Dashed /template/ Line#PART_Line">
+        <Setter Property="StrokeDashArray" Value="2,2"></Setter>
+        <Setter Property="Stroke" Value="{DynamicResource LightDefaultOpacity20}" />
+        <Setter Property="Height" Value="1" />
+    </Style>
+
+    <Style Selector="controls|LinkButton[Underlined=True].SolidHover /template/ Line#PART_Line">
+        <Setter Property="StrokeDashArray" Value="2,0"></Setter>
+        <Setter Property="IsVisible" Value="False"></Setter>
+        <Setter Property="Height" Value="0.5" />
+    </Style>
+    <Style Selector="controls|LinkButton[Underlined=True].SolidHover:pointerover /template/ Line#PART_Line">
+        <Setter Property="Stroke" Value="{DynamicResource SecondaryForegroundBrush}" />
+        <Setter Property="IsVisible" Value="True" />
+    </Style>
+    <Style Selector="controls|LinkButton[Underlined=True].SolidHover:pressed /template/ Line#PART_Line">
+        <Setter Property="Stroke" Value="{DynamicResource LightDefaultOpacity20}" />
+    </Style>
+</Styles>

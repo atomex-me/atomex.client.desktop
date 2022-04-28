@@ -30,17 +30,8 @@
               Name="DesignGrid">
             <StackPanel Grid.Row="0">
                 <Canvas>
-                    <Button Canvas.Right="0"
-                            Width="44"
-                            Height="44"
-                            BorderThickness="0"
-                            VerticalContentAlignment="Center"
-                            HorizontalContentAlignment="Center"
-                            CornerRadius="50"
-                            Classes="ButtonWithIcon Alert">
-                        <svg:Svg Width="22"
-                                 Path="/Resources/Icons/notification-bell.svg" />
-                    </Button>
+                    <controls:IconButton Canvas.Right="0"
+                                         Classes="Alert NoEffects" />
                 </Canvas>
 
                 <Grid Margin="95 76 0 34"
@@ -173,27 +164,11 @@
                                Foreground="{DynamicResource DefaultForegroundBrush}"
                                FontSize="22"
                                Text="Coins &amp; Tokens" />
-                    <Button Grid.Column="1"
-                            Width="26"
-                            Height="26"
-                            Padding="3"
-                            BorderThickness="0"
-                            VerticalContentAlignment="Center"
-                            HorizontalContentAlignment="Center"
-                            Margin="0 0 12 0"
-                            Command="{Binding ManageAssetsCommand}"
-                            Classes="ButtonWithIcon">
-                        <Button.Styles>
-                            <Style Selector="Button svg|Svg">
-                                <Setter Property="Path" Value="/Resources/Icons/settings.svg"></Setter>
-                            </Style>
-                            <Style Selector="Button:pointerover svg|Svg">
-                                <Setter Property="Path" Value="/Resources/Icons/settings-light.svg"></Setter>
-                            </Style>
-                        </Button.Styles>
 
-                        <svg:Svg Width="22" />
-                    </Button>
+                    <controls:IconButton Grid.Column="1"
+                                         Classes="Settings"
+                                         Margin="0 0 12 0"
+                                         Command="{Binding ManageAssetsCommand}" />
                 </Grid>
 
                 <TextBox Grid.Row="1"
@@ -207,25 +182,9 @@
                     <TextBox.InnerRightContent>
                         <StackPanel VerticalAlignment="Center"
                                     IsVisible="{Binding SearchPattern, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
-                            <Button Margin="0 0 15 0"
-                                    Padding="0"
-                                    BorderThickness="0"
-                                    VerticalContentAlignment="Center"
-                                    Command="{ReflectionBinding $parent[TextBox].Clear}"
-                                    Classes="ButtonWithIcon WithoutEffects">
-                                <Button.Styles>
-                                    <Style Selector="Button svg|Svg">
-                                        <Setter Property="Path" Value="/Resources/Icons/subtract.svg"></Setter>
-                                    </Style>
-                                    <Style Selector="Button:pointerover svg|Svg">
-                                        <Setter Property="Path" Value="/Resources/Icons/subtract-light.svg"></Setter>
-                                    </Style>
-                                </Button.Styles>
-
-                                <svg:Svg HorizontalAlignment="Center"
-                                         Width="18"
-                                         Height="18" />
-                            </Button>
+                            <controls:IconButton Classes="Clear NoEffects"
+                                                 Command="{ReflectionBinding $parent[TextBox].Clear}"
+                                                 Margin="0 0 15 0" />
                         </StackPanel>
                     </TextBox.InnerRightContent>
                 </TextBox>
@@ -345,19 +304,10 @@
                                                        Text="{Binding CurrencyCode}" />
 
                                             <WrapPanel VerticalAlignment="Center">
-                                                <Button Width="26"
-                                                        Height="26"
-                                                        Padding="3"
-                                                        BorderThickness="0"
-                                                        VerticalContentAlignment="Center"
-                                                        HorizontalContentAlignment="Center"
-                                                        Margin="12 0"
-                                                        Classes="ButtonWithIcon"
-                                                        Command="{Binding $parent[ListBox].DataContext.OpenCurrencyPopupCommand}"
-                                                        CommandParameter="{Binding}">
-                                                    <svg:Svg Width="22"
-                                                             Path="/Resources/Icons/menu-dots.svg" />
-                                                </Button>
+                                                <controls:IconButton Classes="MenuDots"
+                                                                     Margin="12 0"
+                                                                     Command="{Binding $parent[ListBox].DataContext.OpenCurrencyPopupCommand}"
+                                                                     CommandParameter="{Binding}" />
                                                 <Popup PlacementMode="Left"
                                                        VerticalAlignment="Center"
                                                        WindowManagerAddShadowHint="False"

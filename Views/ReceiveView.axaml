@@ -32,12 +32,11 @@
                   VerticalAlignment="Stretch"
                   Margin="24 0"
                   Height="72">
-                <Button Grid.Column="0"
-                        IsVisible="{Binding IsBackVisible}"
-                        Command="{Binding BackCommand}"
-                        Classes="ButtonWithIcon Back">
-                    <svg:Svg />
-                </Button>
+                
+                <controls:IconButton Grid.Column="0"
+                                     Classes="Back"
+                                     IsVisible="{Binding IsBackVisible}"
+                                     Command="{Binding BackCommand}"/>
 
                 <TextBlock Grid.Column="1"
                            Foreground="{DynamicResource ChildViewHeaderForegroundBrush}"
@@ -146,11 +145,13 @@
             <StackPanel Orientation="Horizontal"
                         HorizontalAlignment="Center"
                         Margin="0 44 0 40">
-                <Button Classes="LinkButton Underlined"
-                        Foreground="{DynamicResource SecondaryForegroundBrush}"
-                        Command="{Binding SelectAddressCommand}"
-                        Content="{Binding MyAddressesText}"
-                        FontSize="16" />
+
+                <controls:LinkButton Underlined="True"
+                                     Classes="Dashed"
+                                     Foreground="{DynamicResource SecondaryForegroundBrush}"
+                                     Command="{Binding SelectAddressCommand}"
+                                     Content="{Binding MyAddressesText}"
+                                     FontSize="16" />
             </StackPanel>
         </StackPanel>
     </Border>

@@ -29,7 +29,7 @@
         <Setter Property="Foreground" Value="{DynamicResource ErrorForegroundBrush}" />
     </Style>
 
-    <!-- todo: remove this -->
+    <!-- todo: remove this after redesign-->
     <Style Selector="Border.FieldHeader">
         <Setter Property="Width" Value="100" />
         <Setter Property="Height" Value="40" />

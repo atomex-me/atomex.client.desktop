@@ -58,28 +58,15 @@
                                           Height="102"
                                           DataContext="{Binding FromViewModel}" />
 
-            <Grid Width="486">
+            <Grid ColumnDefinitions="486,1"
+                  RowDefinitions="12"
+                  Width="486">
                 <!-- swap currencies button -->
-                <Button HorizontalAlignment="Right"
-                        HorizontalContentAlignment="Center"
-                        VerticalContentAlignment="Center"
-                        Padding="0"
-                        Width="40"
-                        Height="40"
-                        CornerRadius="20"
-                        Margin="0 -14 -45 -14"
-                        Command="{Binding SwapCurrenciesCommand}"
-                        Classes="ButtonWithIcon">
-                    <Path Width="18"
-                          Height="18"
-                          Stretch="Fill"
-                          Data="{DynamicResource SwapArrows}"
-                          Fill="{DynamicResource LightDefaultOpacity50}">
-                        <Path.RenderTransform>
-                            <RotateTransform Angle="90" />
-                        </Path.RenderTransform>
-                    </Path>
-                </Button>
+                <Panel Grid.Column="1"
+                       Margin="30 0 0 0">
+                    <controls:IconButton Classes="Swap"
+                                         Command="{Binding SwapCurrenciesCommand}" />
+                </Panel>
             </Grid>
 
             <!-- to currency view -->
@@ -104,10 +91,12 @@
                     <StackPanel Orientation="Horizontal"
                                 Margin="0 0 0 16"
                                 IsVisible="{Binding UseRedeemAddress}">
-                        <Button Content="Change redeem address"
-                                VerticalAlignment="Bottom"
-                                Command="{Binding ChangeRedeemAddress}"
-                                Classes="LinkButton Underlined" />
+
+                        <controls:LinkButton Underlined="True"
+                                             Classes="Dashed"
+                                             VerticalAlignment="Bottom"
+                                             Content="Change redeem address"
+                                             Command="{Binding ChangeRedeemAddress}" />
 
                         <controls:IconButton Classes="Question"
                                              VerticalAlignment="Center"
@@ -509,78 +498,6 @@
                         <Binding Path="IsRedeemFromAddressWithMaxBalance" />
                     </MultiBinding>
                 </StackPanel.IsVisible>
-
-                <!-- is extrenal address warning -->
-                <!--<StackPanel Orientation="Horizontal"
-                    IsVisible="{Binding IsToAddressExtrenal}">
-          <TextBlock Text="{Binding ExternalAddressWarning}"
-                     MaxWidth="471"
-                     Padding="0 2 0 2"
-                     TextWrapping="Wrap"
-                     VerticalAlignment="Center"
-                     FontSize="13"
-                     FontFamily="{DynamicResource DefaultLightFontFamily}"
-                     Classes="Message Warning"/>
-          <Button Padding="3"
-                  VerticalAlignment="Center"
-                  VerticalContentAlignment="Center"
-                  ToolTip.Placement="Bottom"
-                  ToolTip.VerticalOffset="10"
-                  ToolTip.HorizontalOffset="{Binding ElementName=ExternalAddressToolTipGrid,
-                      Path=Bounds.Width,
-                      Converter={StaticResource WidthToHorizontalCenterOffsetConverter}}"
-                  Click="HelpClickHandler"
-                  Classes="ButtonWithIcon">
-            <ToolTip.Tip>
-              <Grid Name="ExternalAddressToolTipGrid">
-                <TextBlock TextWrapping="Wrap"
-                           Text="{Binding ExternalAddressWarningToolTip}"/>
-              </Grid>
-            </ToolTip.Tip>
-            <Path HorizontalAlignment="Center"
-                  VerticalAlignment="Center"
-                  Width="12"
-                  Height="12"
-                  Data="{DynamicResource Help}"
-                  Fill="{DynamicResource LightDefaultOpacity20}"/>
-          </Button>
-        </StackPanel>-->
-
-                <!-- is redeem from address with max balance note -->
-                <!--<StackPanel Orientation="Horizontal"
-                    IsVisible="{Binding IsRedeemFromAddressWithMaxBalance}">
-          <TextBlock Text="{Binding RedeemFromAddressNote}"
-                     MaxWidth="471"
-                     Padding="0 2 0 2"
-                     TextWrapping="Wrap"
-                     VerticalAlignment="Center"
-                     FontSize="13"
-                     FontFamily="{DynamicResource DefaultLightFontFamily}"
-                     Classes="Message"/>
-          <Button Padding="3"
-                  VerticalAlignment="Center"
-                  VerticalContentAlignment="Center"
-                  ToolTip.Placement="Bottom"
-                  ToolTip.VerticalOffset="10"
-                  ToolTip.HorizontalOffset="{Binding ElementName=RedeemFromAddressNoteToolTipGrid,
-                      Path=Bounds.Width,
-                      Converter={StaticResource WidthToHorizontalCenterOffsetConverter}}"
-                  Click="HelpClickHandler"
-                  Classes="ButtonWithIcon">
-            <ToolTip.Tip>
-              <Grid Name="RedeemFromAddressNoteToolTipGrid">
-                <TextBlock TextWrapping="Wrap"
-                           Text="{Binding RedeemFromAddressNoteToolTip}"/>
-              </Grid>
-            </ToolTip.Tip>
-            <Path HorizontalAlignment="Center"
-                  VerticalAlignment="Center"
-                  Width="12"
-                  Height="12"
-                  Data="{DynamicResource Help}"
-                  Fill="{DynamicResource LightDefaultOpacity20}"/>
-          </Button>
-        </StackPanel>-->
 
                 <!-- amount validation message -->
                 <StackPanel Orientation="Horizontal"

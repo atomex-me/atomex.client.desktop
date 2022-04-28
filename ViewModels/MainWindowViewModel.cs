@@ -12,7 +12,6 @@ using Serilog;
 using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.Controls;
 using Atomex.Client.Desktop.Properties;
-using Atomex.Client.Desktop.Views;
 using Atomex.Common;
 using Atomex.Services;
 using Atomex.Wallet;

@@ -389,6 +389,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
             Outputs = new ObservableCollection<BitcoinBasedTxOutput>(outputs);
             Stage = SendStage.Edit;
+            AmountInBase = 1233123.34m;
         }
 #endif
     }
