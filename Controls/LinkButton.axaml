@@ -17,7 +17,7 @@
                 <controls:LinkButton Underlined="True"
                                      Classes="Dashed"
                                      Content="max"
-                                     Margin="-67 16 0 0"
+                                     Margin="0 16 0 0"
                                      ToolText="Some tooltip text" />
 
                 <controls:LinkButton Underlined="True"

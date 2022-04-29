@@ -13,7 +13,6 @@ using Atomex.Client.Desktop.ViewModels.WalletViewModels;
 using Atomex.Common;
 using Atomex.Core;
 using Atomex.Cryptography;
-using Atomex.ViewModels;
 using Atomex.Wallet;
 using Atomex.Wallet.Tezos;
 using Avalonia.Controls;
@@ -30,7 +29,6 @@ namespace Atomex.Client.Desktop.ViewModels
     public class AddressViewModel : ViewModelBase
     {
         public string Address { get; set; }
-        public string ShortenedAddress => Address?.TruncateAddress(15, 12);
         public string AddressExplorerUri { get; set; }
         public string Type { get; set; }
         public string Path { get; set; }
@@ -81,12 +79,6 @@ namespace Atomex.Client.Desktop.ViewModels
 
         public bool HasTokens => _currency.Name == TezosConfig.Xtz && _tokenContract != null;
         [Reactive] public ObservableCollection<AddressViewModel> Addresses { get; set; }
-        [Reactive] public bool SortByPathAndAsc { get; set; }
-        [Reactive] public bool SortByPathAndDesc { get; set; }
-        [Reactive] public bool SortByBalanceAndAsc { get; set; }
-        [Reactive] public bool SortByBalanceAndDesc { get; set; }
-        [Reactive] public bool SortByPath { get; set; }
-        [Reactive] public bool SortByBalance { get; set; }
         [Reactive] public AddressesSortField? CurrentSortField { get; set; }
         [Reactive] public SortDirection? CurrentSortDirection { get; set; }
 
@@ -239,18 +231,6 @@ namespace Atomex.Client.Desktop.ViewModels
                         }
                     }
                 }
-
-                SortByPathAndAsc =
-                    CurrentSortField == AddressesSortField.ByPath && CurrentSortDirection == SortDirection.Asc;
-                SortByPathAndDesc =
-                    CurrentSortField == AddressesSortField.ByPath && CurrentSortDirection == SortDirection.Desc;
-                SortByBalanceAndAsc =
-                    CurrentSortField == AddressesSortField.ByBalance && CurrentSortDirection == SortDirection.Asc;
-                SortByBalanceAndDesc =
-                    CurrentSortField == AddressesSortField.ByBalance && CurrentSortDirection == SortDirection.Desc;
-
-                SortByPath = CurrentSortField == AddressesSortField.ByPath;
-                SortByBalance = CurrentSortField == AddressesSortField.ByBalance;
             }
             catch (Exception e)
             {

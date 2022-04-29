@@ -21,7 +21,8 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
     public enum DelegationSortField
     {
         ByRoi,
-        ByStatus
+        ByStatus,
+        ByBalance
     }
 
     public class TezosWalletViewModel : WalletViewModel
@@ -30,12 +31,6 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         [Reactive] public ObservableCollection<Delegation> Delegations { get; set; }
         [Reactive] public SortDirection? CurrentDelegationSortDirection { get; set; }
         [Reactive] public DelegationSortField? CurrentDelegationSortField { get; set; }
-        [Reactive] public bool SortByRoiAndAsc { get; set; }
-        [Reactive] public bool SortByRoiAndDesc { get; set; }
-        [Reactive] public bool SortDelegationByStatusAndAsc { get; set; }
-        [Reactive] public bool SortDelegationByStatusAndDesc { get; set; }
-        [Reactive] public bool SortByRoi { get; set; }
-        [Reactive] public bool SortDelegationByStatus { get; set; }
 
         private bool CanDelegate { get; set; }
         private bool HasDelegations { get; set; }
@@ -61,26 +56,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                     vm => vm.CurrentDelegationSortDirection,
                     vm => vm.CurrentDelegationSortField)
                 .WhereAllNotNull()
-                .SubscribeInMainThread(_ =>
-                {
-                    SortDelegations(Delegations);
-
-                    SortByRoiAndAsc =
-                        CurrentDelegationSortField == DelegationSortField.ByRoi &&
-                        CurrentDelegationSortDirection == SortDirection.Asc;
-                    SortByRoiAndDesc =
-                        CurrentDelegationSortField == DelegationSortField.ByRoi &&
-                        CurrentDelegationSortDirection == SortDirection.Desc;
-                    SortDelegationByStatusAndAsc =
-                        CurrentDelegationSortField == DelegationSortField.ByStatus &&
-                        CurrentDelegationSortDirection == SortDirection.Asc;
-                    SortDelegationByStatusAndDesc =
-                        CurrentDelegationSortField == DelegationSortField.ByStatus &&
-                        CurrentDelegationSortDirection == SortDirection.Desc;
-
-                    SortByRoi = CurrentDelegationSortField == DelegationSortField.ByRoi;
-                    SortDelegationByStatus = CurrentDelegationSortField == DelegationSortField.ByStatus;
-                });
+                .SubscribeInMainThread(_ => SortDelegations(Delegations));
 
             _ = LoadDelegationInfoAsync();
             DelegateViewModel = new DelegateViewModel(_app, async () =>
@@ -90,7 +66,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                 await Dispatcher.UIThread.InvokeAsync(OnUpdateClick);
             });
 
-            CurrentDelegationSortField = DelegationSortField.ByStatus;
+            CurrentDelegationSortField = DelegationSortField.ByBalance;
             CurrentDelegationSortDirection = SortDirection.Desc;
         }
 
@@ -111,6 +87,13 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                 DelegationSortField.ByStatus when CurrentDelegationSortDirection == SortDirection.Asc
                     => new ObservableCollection<Delegation>(
                         delegations.OrderBy(d => d.Status)),
+                
+                DelegationSortField.ByBalance when CurrentDelegationSortDirection == SortDirection.Desc
+                    => new ObservableCollection<Delegation>(
+                        delegations.OrderByDescending(d => d.Balance)),
+                DelegationSortField.ByBalance when CurrentDelegationSortDirection == SortDirection.Asc
+                    => new ObservableCollection<Delegation>(
+                        delegations.OrderBy(d => d.Balance)),
                 _ => new ObservableCollection<Delegation>(delegations)
             };
         }

@@ -15,6 +15,7 @@
     <UserControl.Resources>
         <converters:AddressShouldShrinkConverter x:Key="AddressShouldShrinkConverter" />
         <converters:AddressShouldExpandConverter x:Key="AddressShouldExpandConverter" />
+        <converters:ShortenedAddressConverter x:Key="ShortenedAddressConverter" />
     </UserControl.Resources>
 
     <Border Padding="12 0">
@@ -23,7 +24,7 @@
               VerticalAlignment="Stretch">
             <StackPanel Grid.Column="0"
                         Orientation="Horizontal">
-                
+
                 <controls:LinkButton Underlined="True"
                                      Classes="SolidHover"
                                      FontSize="16"
@@ -31,16 +32,16 @@
                                      ToolText="{Binding AddressExplorerUri}"
                                      Command="{Binding OpenInExplorerCommand}"
                                      IsVisible="{Binding $parent[Border].Bounds.Width,
-                                     Converter={StaticResource AddressShouldExpandConverter}}"/>
-                
+                                     Converter={StaticResource AddressShouldExpandConverter}}" />
+
                 <controls:LinkButton Underlined="True"
                                      Classes="SolidHover"
                                      FontSize="16"
-                                     Content="{Binding ShortenedAddress}"
+                                     Content="{Binding Address, Converter={StaticResource ShortenedAddressConverter}}"
                                      ToolText="{Binding AddressExplorerUri}"
                                      Command="{Binding OpenInExplorerCommand}"
                                      IsVisible="{Binding $parent[Border].Bounds.Width,
-                                     Converter={StaticResource AddressShouldShrinkConverter}}"/>
+                                     Converter={StaticResource AddressShouldShrinkConverter}}" />
 
                 <controls:CopyButton ToolText="Copy address to clipboard"
                                      DoneToolText="Copied!"
@@ -74,11 +75,13 @@
 
             <controls:IconButton Grid.Column="5"
                                  Classes="Key"
+                                 HorizontalAlignment="Left"
                                  Command="{Binding ExportKeyCommand}"
                                  ToolText="Export address private key" />
 
             <controls:IconButton Grid.Column="6"
                                  Classes="Update"
+                                 HorizontalAlignment="Left"
                                  Classes.Updating="{Binding IsUpdating}"
                                  Classes.NotUpdating="{Binding !IsUpdating}"
                                  Command="{Binding UpdateAddressCommand}"

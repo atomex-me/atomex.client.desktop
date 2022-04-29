@@ -58,17 +58,6 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         public string Header => CurrencyViewModel.Header;
         public CurrencyConfig Currency => CurrencyViewModel.Currency;
 
-        [Reactive] public bool SortByTimeAndAsc { get; set; }
-        [Reactive] public bool SortByTimeAndDesc { get; set; }
-        [Reactive] public bool SortByStatusAndAsc { get; set; }
-        [Reactive] public bool SortByStatusAndDesc { get; set; }
-        [Reactive] public bool SortByAmountAndAsc { get; set; }
-        [Reactive] public bool SortByAmountAndDesc { get; set; }
-
-        [Reactive] public bool SortByTime { get; set; }
-        [Reactive] public bool SortByStatus { get; set; }
-        [Reactive] public bool SortByAmount { get; set; }
-
         protected CancellationTokenSource _cancellation { get; set; }
 
         public WalletViewModel()
@@ -181,23 +170,6 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         protected ObservableCollection<TransactionViewModelBase> SortTransactions(
             IEnumerable<TransactionViewModelBase> transactions)
         {
-            SortByTimeAndAsc =
-                CurrentSortField == TxSortField.ByTime && CurrentSortDirection == SortDirection.Asc;
-            SortByTimeAndDesc =
-                CurrentSortField == TxSortField.ByTime && CurrentSortDirection == SortDirection.Desc;
-            SortByStatusAndAsc =
-                CurrentSortField == TxSortField.ByStatus && CurrentSortDirection == SortDirection.Asc;
-            SortByStatusAndDesc =
-                CurrentSortField == TxSortField.ByStatus && CurrentSortDirection == SortDirection.Desc;
-            SortByAmountAndAsc =
-                CurrentSortField == TxSortField.ByAmount && CurrentSortDirection == SortDirection.Asc;
-            SortByAmountAndDesc =
-                CurrentSortField == TxSortField.ByAmount && CurrentSortDirection == SortDirection.Desc;
-
-            SortByTime = CurrentSortField == TxSortField.ByTime;
-            SortByStatus = CurrentSortField == TxSortField.ByStatus;
-            SortByAmount = CurrentSortField == TxSortField.ByAmount;
-
             return CurrentSortField switch
             {
                 TxSortField.ByTime when CurrentSortDirection == SortDirection.Desc

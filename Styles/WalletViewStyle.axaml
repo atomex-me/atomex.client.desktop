@@ -10,7 +10,7 @@
             <StackPanel Orientation="Horizontal">
                 <svg:Svg Width="18"
                          VerticalAlignment="Center"
-                         Path="/Resources/Icons/failed.svg" />
+                         Path="/Resources/Icons/question-in-circle.svg" />
                 <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
                            Margin="8 0 0 0"
                            FontSize="13"
@@ -51,7 +51,7 @@
                 <svg:Svg Width="18"
                          Classes="InProgress"
                          VerticalAlignment="Center"
-                         Path="/Resources/Icons/in-progress.svg" />
+                         Path="/Resources/Icons/exclamation-mark.svg" />
                 <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
                            Margin="8 0 0 0"
                            FontSize="13"
@@ -64,7 +64,7 @@
             <StackPanel Orientation="Horizontal">
                 <svg:Svg Width="18"
                          VerticalAlignment="Center"
-                         Path="/Resources/Icons/failed.svg" />
+                         Path="/Resources/Icons/cross-in-circle.svg" />
                 <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
                            Margin="8 0 0 0"
                            FontSize="13"

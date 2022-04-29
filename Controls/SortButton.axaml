@@ -1,0 +1,63 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:svg="clr-namespace:Avalonia.Svg.Skia;assembly=Avalonia.Svg.Skia"
+        xmlns:controls="clr-namespace:Atomex.Client.Desktop.Controls">
+    <Design.PreviewWith>
+        <Border Padding="80 50" Background="#122B50">
+            <StackPanel>
+                <controls:SortButton Title="Sort by Ascending"
+                                     SortIsAsc="True"
+                                     SortIsDesc="False" />
+
+                <controls:SortButton Title="Sort by Descending"
+                                     Margin="0 16 0 0"
+                                     SortIsDesc="True" />
+
+                <controls:SortButton Title="Sort by another field"
+                                     Margin="0 16 0 0" />
+            </StackPanel>
+        </Border>
+    </Design.PreviewWith>
+
+    <Style Selector="controls|SortButton">
+        <Setter Property="RenderTransform" Value="none" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="VerticalAlignment" Value="Stretch" />
+        <Setter Property="Foreground" Value="{DynamicResource SecondaryForegroundBrush}" />
+
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type controls:SortButton}">
+                    <StackPanel Orientation="Horizontal"
+                                Background="Transparent">
+                        <TextBlock Foreground="{TemplateBinding Foreground}"
+                                   FontSize="13"
+                                   VerticalAlignment="Center"
+                                   Text="{TemplateBinding Title}" />
+                        <StackPanel Orientation="Vertical"
+                                    VerticalAlignment="Center"
+                                    Margin="5 0 0 0">
+                            <svg:Svg Width="14"
+                                     Height="14"
+                                     IsVisible="{TemplateBinding SortIsNotActive}"
+                                     Path="/Resources/Icons/arrow-double.svg" />
+                            <svg:Svg Width="14"
+                                     Height="14"
+                                     IsVisible="{TemplateBinding SortIsAsc}"
+                                     Path="/Resources/Icons/arrow-double-asc.svg" />
+                            <svg:Svg Width="14"
+                                     Height="14"
+                                     IsVisible="{TemplateBinding SortIsDesc}"
+                                     Path="/Resources/Icons/arrow-double-desc.svg" />
+                        </StackPanel>
+                    </StackPanel>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style Selector="controls|SortButton:pointerover /template/ TextBlock">
+        <Setter Property="Foreground" Value="{DynamicResource DefaultForegroundBrush}" />
+    </Style>
+</Styles>

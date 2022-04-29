@@ -55,14 +55,14 @@
                                             Value="{x:Static abstract:BlockchainTransactionState.Unconfirmed}">
                         <ia:ChangePropertyAction TargetObject="{Binding #StateIcon}"
                                                  PropertyName="Path"
-                                                 Value="/Resources/Icons/pending-hourglass.svg" />
+                                                 Value="/Resources/Icons/exclamation-mark.svg" />
                     </ia:DataTriggerBehavior>
                     <ia:DataTriggerBehavior Binding="{Binding State}"
                                             ComparisonCondition="Equal"
                                             Value="{x:Static abstract:BlockchainTransactionState.Unknown}">
                         <ia:ChangePropertyAction TargetObject="{Binding #StateIcon}"
                                                  PropertyName="Path"
-                                                 Value="/Resources/Icons/pending-hourglass.svg" />
+                                                 Value="/Resources/Icons/question-in-circle.svg" />
                     </ia:DataTriggerBehavior>
                     <ia:DataTriggerBehavior Binding="{Binding State}"
                                             ComparisonCondition="Equal"
@@ -76,7 +76,7 @@
                                             Value="{x:Static abstract:BlockchainTransactionState.Failed}">
                         <ia:ChangePropertyAction TargetObject="{Binding #StateIcon}"
                                                  PropertyName="Path"
-                                                 Value="/Resources/Icons/cancelled-cross.svg" />
+                                                 Value="/Resources/Icons/cross-in-circle.svg" />
                     </ia:DataTriggerBehavior>
                 </i:Interaction.Behaviors>
             </svg:Svg>
