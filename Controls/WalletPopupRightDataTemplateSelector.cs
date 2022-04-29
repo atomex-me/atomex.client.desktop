@@ -4,7 +4,6 @@ using Atomex.Client.Desktop.Services;
 using Atomex.Client.Desktop.ViewModels;
 using Atomex.Client.Desktop.ViewModels.TransactionViewModels;
 using Atomex.EthereumTokens;
-using Atomex.TezosTokens;
 using Avalonia.Markup.Xaml.Templates;
 
 namespace Atomex.Client.Desktop.Controls
@@ -24,6 +23,9 @@ namespace Atomex.Client.Desktop.Controls
             if (data is not TransactionViewModelBase transaction)
                 return null;
 
+            if (transaction is TezosTokenTransferViewModel)
+                return App.TemplateService.GetTxDetailsTemplate(TxDetailsTemplate.TezosTokenTransferDetailsTemplate);
+
             return transaction.Currency switch
             {
                 BitcoinBasedConfig =>
@@ -32,8 +34,6 @@ namespace Atomex.Client.Desktop.Controls
                     App.TemplateService.GetTxDetailsTemplate(TxDetailsTemplate.EthereumERC20TransactionDetailsTemplate),
                 EthereumConfig =>
                     App.TemplateService.GetTxDetailsTemplate(TxDetailsTemplate.EthereumTransactionDetailsTemplate),
-                Fa12Config =>
-                    App.TemplateService.GetTxDetailsTemplate(TxDetailsTemplate.TezosTokenTransferDetailsTemplate),
                 TezosConfig =>
                     App.TemplateService.GetTxDetailsTemplate(TxDetailsTemplate.TezosTransactionDetailsTemplate),
                 _ => null

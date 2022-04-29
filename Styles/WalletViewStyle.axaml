@@ -181,23 +181,6 @@
         </DataTemplate>
     </Styles.Resources>
 
-    <Style Selector="Button.ExplorerLinkButton">
-        <Setter Property="FontFamily" Value="{DynamicResource DefaultFontFamily}" />
-        <Setter Property="FontSize" Value="12" />
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="Button">
-                    <TextBlock Text="{TemplateBinding Content}" />
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
-        <Setter Property="Foreground" Value="{DynamicResource ExplorerLinkButtonForegroundBrush}" />
-    </Style>
-
-    <Style Selector="Button.ExplorerLinkButton:pointerover">
-        <Setter Property="Foreground" Value="{DynamicResource ExplorerLinkButtonMouseOverBrush}" />
-    </Style>
-
     <Style Selector="controls|RoundedButton.WalletMenuButton">
         <Setter Property="FontFamily" Value="{DynamicResource DefaultFontFamily}" />
         <Setter Property="FontSize" Value="12" />

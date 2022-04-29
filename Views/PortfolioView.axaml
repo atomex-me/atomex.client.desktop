@@ -19,7 +19,7 @@
         <converters:PortfolioToTotalConverter x:Key="PortfolioToTotalConverter" />
         <converters:PortfolioTooltipPositionXConverter x:Key="PortfolioTooltipPositionXConverter" />
         <converters:PortfolioTooltipPositionYConverter x:Key="PortfolioTooltipPositionYConverter" />
-        <converters:StringsEqualConverter x:Key="StringsEqualConverter" />
+        <converters:ObjectsEqualConverter x:Key="ObjectsEqualConverter" />
         <converters:ShowBuyButton x:Key="ShowBuyButton" />
         <converters:PercentConverter x:Key="PercentConverter" />
         <converters:LowerThanZeroConverter x:Key="LowerThanZeroConverter" />
@@ -315,7 +315,7 @@
                                                        Closed="Popup_OnClosed">
                                                     <Popup.IsOpen>
                                                         <MultiBinding
-                                                            Converter="{StaticResource StringsEqualConverter}">
+                                                            Converter="{StaticResource ObjectsEqualConverter}">
                                                             <Binding Path="CurrencyCode" />
                                                             <Binding
                                                                 Path="$parent[ListBox].DataContext.PopupOpenedCurrency" />

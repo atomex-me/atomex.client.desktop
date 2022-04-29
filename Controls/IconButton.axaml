@@ -57,6 +57,9 @@
                     
                     <controls:IconButton Classes="Swap"
                                          Margin="10 0 0 0" />
+                    
+                    <controls:IconButton Classes="ViewAsset"
+                                         Margin="10 0 0 0" />
                 </StackPanel>
             </StackPanel>
 
@@ -361,5 +364,14 @@
     </Style>
     <Style Selector="controls|IconButton.Swap:pointerover svg|Svg">
         <Setter Property="Path" Value="/Resources/Icons/swap-arrows-vertical-light.svg" />
+    </Style>
+    
+    <Style Selector="controls|IconButton.ViewAsset">
+        <Setter Property="Width" Value="28" />
+        <Setter Property="Height" Value="28" />
+    </Style>
+    <Style Selector="controls|IconButton.ViewAsset svg|Svg">
+        <Setter Property="Path" Value="/Resources/Icons/view-asset.svg" />
+        <Setter Property="Width" Value="22" />
     </Style>
 </Styles>

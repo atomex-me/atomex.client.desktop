@@ -5,15 +5,10 @@
              mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="900"
              x:Class="Atomex.Client.Desktop.Views.WalletViews.TezosTokensWalletView"
              xmlns:vm="clr-namespace:Atomex.Client.Desktop.ViewModels.WalletViewModels"
-             xmlns:txViewModels="clr-namespace:Atomex.Client.Desktop.ViewModels.TransactionViewModels"
              xmlns:controls="clr-namespace:Atomex.Client.Desktop.Controls"
              xmlns:converters="clr-namespace:Atomex.Client.Desktop.Converters"
-             xmlns:styles="clr-namespace:Atomex.Client.Desktop.Styles"
-             xmlns:helpers="clr-namespace:Atomex.Client.Desktop.Helpers"
              xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
-             xmlns:ia="clr-namespace:Avalonia.Xaml.Interactions.Core;assembly=Avalonia.Xaml.Interactions"
-             xmlns:iac="clr-namespace:Avalonia.Xaml.Interactions.Custom;assembly=Avalonia.Xaml.Interactions"
-             xmlns:transactionViews="clr-namespace:Atomex.Client.Desktop.Views.TransactionViews">
+             xmlns:iac="clr-namespace:Avalonia.Xaml.Interactions.Custom;assembly=Avalonia.Xaml.Interactions">
 
     <Design.DataContext>
         <vm:TezosTokensWalletViewModel />
@@ -23,7 +18,9 @@
         <converters:AmountToStringConverter x:Key="AmountToStringConverter" />
         <converters:DateTimeToTxTimeConverter x:Key="DateTimeToTxTimeConverter" />
         <converters:BoolToRowSpanConverter x:Key="BoolToRowSpanConverter" />
-        <converters:StringsEqualConverter x:Key="StringsEqualConverter" />
+        <converters:ObjectsEqualConverter x:Key="ObjectsEqualConverter" />
+        <converters:GreaterThanZeroConverter x:Key="GreaterThanZeroConverter" />
+        <converters:StringsConcatConverter x:Key="StringsConcatConverter" />
     </UserControl.Resources>
 
     <UserControl.Styles>
@@ -250,11 +247,11 @@
                         Margin="3 0 0 0"
                         Command="{Binding UpdateCommand}"
                         Classes="WalletMenuButton" />
-                    <controls:RoundedButton
-                        Content="Addresses"
-                        Margin="3 0 0 0"
-                        Command="{Binding AddressesCommand}"
-                        Classes="WalletMenuButton" />
+                    <!-- <controls:RoundedButton -->
+                    <!--     Content="Addresses" -->
+                    <!--     Margin="3 0 0 0" -->
+                    <!--     Command="{Binding AddressesCommand}" -->
+                    <!--     Classes="WalletMenuButton" /> -->
                 </StackPanel>
             </Grid>
         </Border>
@@ -289,7 +286,7 @@
                         <Style Selector="ListBoxItem:selected /template/ ContentPresenter">
                             <Setter Property="Background" Value="Transparent" />
                         </Style>
-                        
+
                         <Style Selector="ListBoxItem.nth-odd-child">
                             <Setter Property="Background"
                                     Value="{DynamicResource CustomDataGridAlternativeRowBackground}" />
@@ -349,19 +346,14 @@
                                            Grid.RowSpan="2" />
 
                                 <!-- ~1~ ToolTip="{Binding AssetUrl}" @1@ -->
-                                <!-- todo: this -->
-                                <!-- <controls:IconButton Path="{DynamicResource Material.FileEyeOutline}" -->
-                                <!--                      Width="17" -->
-                                <!--                      Height="19" -->
-                                <!--                      Foreground="{DynamicResource IconButtonForegroundBrush}" -->
-                                <!--                      MouseOverBrush="{DynamicResource IconButtonMouseOverBrush}" -->
-                                <!--                      PressedBrush="{DynamicResource IconButtonPressedBrush}" -->
-                                <!--                      Command="{Binding OpenInBrowser}" -->
-                                <!--                      Grid.Column="3" -->
-                                <!--                      Grid.Row="1" -->
-                                <!--                      Grid.RowSpan="2" -->
-                                <!--                      IsVisible="{Binding IsIpfsAsset}" -->
-                                <!--                      Classes="PathButtonStyle" /> -->
+                                <controls:IconButton Grid.Column="3"
+                                                     Grid.Row="1"
+                                                     Grid.RowSpan="2"
+                                                     Margin="0 0 5 0"
+                                                     Classes="ViewAsset"
+                                                     ToolText="{Binding AssetUrl}"
+                                                     Command="{Binding OpenInBrowser}"
+                                                     IsVisible="{Binding IsIpfsAsset}" />
 
                                 <!-- ToolTip="Send token" -->
                                 <controls:RoundedButton
@@ -374,7 +366,7 @@
                                     Grid.Row="1"
                                     Grid.RowSpan="2"
                                     Classes="WalletMenuButton" />
-                                
+
                                 <Grid Height="50"
                                       Grid.Row="4"
                                       Grid.Column="0"
@@ -382,12 +374,12 @@
                                       ColumnDefinitions="70,*"
                                       RowDefinitions="5,*,*,5">
                                     <Grid.IsVisible>
-                                        <MultiBinding Converter="{StaticResource StringsEqualConverter}">
-                                            <Binding Path="$parent[ListBox].DataContext.SelectedTokenId" />
-                                            <Binding Path="TokenBalance.TokenId" />
+                                        <MultiBinding Converter="{StaticResource ObjectsEqualConverter}">
+                                            <Binding Path="$parent[ListBox].DataContext.SelectedToken" />
+                                            <Binding Path="" />
                                         </MultiBinding>
                                     </Grid.IsVisible>
-                                    
+
                                     <TextBlock Text="Address:"
                                                Foreground="{DynamicResource TransactionDetailsLineHeaderBrush}"
                                                HorizontalAlignment="Right"
@@ -400,22 +392,27 @@
                                                 Grid.Column="1"
                                                 Grid.Row="1">
 
-                                        <!-- ToolTip="{Binding AddressExplorerUri}" -->
-                                        <Button Content="{Binding Address}"
-                                                HorizontalAlignment="Left"
-                                                VerticalAlignment="Center"
-                                                Command="{Binding OpenAddressInExplorerCommand}"
-                                                CommandParameter="{Binding Address}"
-                                                Classes="ExplorerLinkButton" />
+                                        <controls:LinkButton Classes="Emerald"
+                                                             HorizontalAlignment="Left"
+                                                             VerticalAlignment="Center"
+                                                             Content="{Binding Address}"
+                                                             Command="{Binding OpenAddressInExplorerCommand}"
+                                                             CommandParameter="{Binding Address}">
+                                            <controls:LinkButton.ToolText>
+                                                <MultiBinding Converter="{StaticResource StringsConcatConverter}">
+                                                    <Binding Path="TezosConfig.AddressExplorerUri" />
+                                                    <Binding Path="Address" />
+                                                </MultiBinding>
+                                            </controls:LinkButton.ToolText>
+                                        </controls:LinkButton>
 
-                                        <!-- ToolTip="Copy address to clipboard" -->
                                         <controls:CopyButton HorizontalAlignment="Center"
                                                              VerticalAlignment="Center"
                                                              Margin="7 0 0 0"
                                                              Command="{Binding CopyAddressCommand}"
                                                              CommandParameter="{Binding Address}"
                                                              ToolText="Copy address to clipboard"
-                                                             DoneToolText="Copied"/>
+                                                             DoneToolText="Copied" />
                                     </StackPanel>
 
                                     <TextBlock Text="Token Id:"
@@ -445,129 +442,88 @@
                      Classes="Tokens"
                      Padding="10"
                      FontFamily="{DynamicResource DefaultMediumFontFamily}">
-                <!-- <TabItem.Style> -->
-                <!--     <Style TargetType="TabItem" -->
-                <!--            BasedOn="{StaticResource MetroTabItem}"> -->
-                <!--         <Style.Triggers> -->
-                <!--             <Trigger Property="IsSelected" Value="True"> -->
-                <!--                 <Setter Property="Background" -->
-                <!--                         Value="{DynamicResource DefaultSubstrateBrush}"/> -->
-                <!--             </Trigger> -->
-                <!--             <Trigger Property="IsSelected" Value="False"> -->
-                <!--                 <Setter Property="Background" -->
-                <!--                         Value="Transparent"/> -->
-                <!--             </Trigger> -->
-                <!--         </Style.Triggers> -->
-                <!--     </Style> -->
-                <!-- </TabItem.Style> -->
 
-                <DataGrid x:Name="DgTransactions"
-                          ColumnWidth="*"
-                          AutoGenerateColumns="False"
-                          IsReadOnly="True"
-                          RowDetailsVisibilityMode="VisibleWhenSelected"
-                          SelectionMode="Single"
-                          SelectedIndex="{Binding DGSelectedIndex, Mode=OneWay}"
-                          Items="{Binding Transfers}"
-                          helpers:DataGridHelper.SortInfo="{Binding SortInfo}"
-                          CanUserResizeColumns="True"
-                          Grid.Row="1">
+                <ListBox Background="{DynamicResource DefaultSubstrateBrush}"
+                         Items="{Binding Transfers}"
+                         SelectedItem="{Binding SelectedTransaction}"
+                         HorizontalAlignment="Stretch"
+                         VerticalAlignment="Stretch"
+                         SelectionMode="Single">
+                    <ListBox.Styles>
+                        <Style Selector="ListBoxItem">
+                            <Setter Property="Padding" Value="0" />
+                            <Setter Property="Height" Value="62" />
+                            <Setter Property="VerticalContentAlignment" Value="Stretch" />
+                            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                            <Setter Property="Cursor" Value="Hand" />
+                            <Setter Property="BorderThickness" Value="0 0 0 1" />
+                            <Setter Property="BorderBrush" Value="{DynamicResource LightDefaultOpacity10}" />
+                        </Style>
+                        <Style Selector="ListBoxItem:selected /template/ ContentPresenter">
+                            <Setter Property="Background" Value="{DynamicResource LightDefaultOpacity6}" />
+                            <Setter Property="CornerRadius" Value="6" />
+                        </Style>
+                        <Style Selector="ListBoxItem:not(:selected) /template/ ContentPresenter">
+                            <Setter Property="Background" Value="{DynamicResource AlmostTransparentBrush}" />
+                        </Style>
+                    </ListBox.Styles>
 
-                    <DataGrid.RowDetailsTemplate>
+                    <ListBox.ItemTemplate>
                         <DataTemplate>
-                            <transactionViews:TezosTokenTransferDetailsView />
-                        </DataTemplate>
-                    </DataGrid.RowDetailsTemplate>
-
-                    <DataGrid.Columns>
-                        <DataGridTemplateColumn Header="TYPE" CanUserSort="True" MinWidth="65" MaxWidth="65">
-                            <DataGridTemplateColumn.CellTemplate>
-                                <DataTemplate>
-                                    <styles:TypeTest>
-                                        <styles:TypeTest.DataTemplate>
-                                            <controls:TransactionTypeDataTemplateSelector />
-                                        </styles:TypeTest.DataTemplate>
-                                    </styles:TypeTest>
-                                </DataTemplate>
-                            </DataGridTemplateColumn.CellTemplate>
-                        </DataGridTemplateColumn>
-
-                        <DataGridTemplateColumn Header="DESCRIPTION" CanUserSort="False">
-                            <DataGridTemplateColumn.CellTemplate>
-                                <DataTemplate>
-                                    <styles:TypeTest>
-                                        <styles:TypeTest.DataTemplate>
+                            <Border Padding="12 0">
+                                <Grid ColumnDefinitions="7*,5.5*,3*,4.5*"
+                                      VerticalAlignment="Stretch">
+                                    <ContentControl Grid.Column="0"
+                                                    VerticalAlignment="Center"
+                                                    Content="{Binding}">
+                                        <ContentControl.ContentTemplate>
                                             <controls:TransactionDescriptionDataTemplateSelector />
-                                        </styles:TypeTest.DataTemplate>
-                                    </styles:TypeTest>
-                                </DataTemplate>
-                            </DataGridTemplateColumn.CellTemplate>
-                        </DataGridTemplateColumn>
+                                        </ContentControl.ContentTemplate>
+                                    </ContentControl>
 
-                        <DataGridTemplateColumn Header="AMOUNT" CanUserSort="True" MinWidth="112" MaxWidth="112">
-                            <DataGridTemplateColumn.CellTemplate>
-                                <DataTemplate DataType="{x:Type txViewModels:TransactionViewModel}">
-                                    <StackPanel Classes="DGTemplateContainer" Orientation="Horizontal">
+
+                                    <StackPanel Grid.Column="1"
+                                                Orientation="Horizontal">
                                         <TextBlock VerticalAlignment="Center"
-                                                   HorizontalAlignment="Left"
-                                                   Name="AmountTextBlock"
-                                                   FontSize="13">
+                                                   FontSize="16"
+                                                   Classes="AmountListBoxItem"
+                                                   Classes.PositiveAmount="{Binding Amount,
+                                                   Converter={StaticResource GreaterThanZeroConverter}}">
                                             <TextBlock.Text>
                                                 <MultiBinding Converter="{StaticResource AmountToStringConverter}">
                                                     <Binding Path="Amount" Mode="OneWay" />
                                                     <Binding Path="AmountFormat" Mode="OneWay" />
+                                                    <Binding Path="Amount" Mode="OneWay"
+                                                             Converter="{StaticResource GreaterThanZeroConverter}" />
                                                 </MultiBinding>
                                             </TextBlock.Text>
-                                            <i:Interaction.Behaviors>
-                                                <ia:DataTriggerBehavior Binding="{Binding Amount}"
-                                                                        ComparisonCondition="LessThan"
-                                                                        Value="0">
-                                                    <ia:ChangePropertyAction TargetObject="{Binding #AmountTextBlock}"
-                                                                             PropertyName="Foreground"
-                                                                             Value="{StaticResource NegativeAmountBrush}" />
-                                                </ia:DataTriggerBehavior>
-                                                <ia:DataTriggerBehavior Binding="{Binding Amount}"
-                                                                        ComparisonCondition="GreaterThanOrEqual"
-                                                                        Value="0">
-                                                    <ia:ChangePropertyAction TargetObject="{Binding #AmountTextBlock}"
-                                                                             PropertyName="Foreground"
-                                                                             Value="{StaticResource PositiveAmountBrush}" />
-                                                </ia:DataTriggerBehavior>
-                                            </i:Interaction.Behaviors>
                                         </TextBlock>
-
-                                        <TextBlock Text="{Binding CurrencyCode}"
-                                                   FontSize="8"
-                                                   VerticalAlignment="Bottom"
-                                                   IsVisible="False"
-                                                   Margin="3 0 0 2" />
+                                        <TextBlock VerticalAlignment="Center"
+                                                   FontSize="16"
+                                                   Margin="4 0 0 0"
+                                                   Classes="AmountListBoxItem"
+                                                   Classes.PositiveAmount="{Binding Amount,
+                                                   Converter={StaticResource GreaterThanZeroConverter}}"
+                                                   Text="{Binding CurrencyCode}" />
                                     </StackPanel>
-                                </DataTemplate>
-                            </DataGridTemplateColumn.CellTemplate>
-                        </DataGridTemplateColumn>
 
-                        <DataGridTemplateColumn Header="STATE" CanUserSort="True" MinWidth="90" MaxWidth="90">
-                            <DataGridTemplateColumn.CellTemplate>
-                                <DataTemplate>
-                                    <styles:TypeTest>
-                                        <styles:TypeTest.DataTemplate>
+                                    <ContentControl Grid.Column="2" Content="{Binding}">
+                                        <ContentControl.ContentTemplate>
                                             <controls:TransactionStateDataTemplateSelector />
-                                        </styles:TypeTest.DataTemplate>
-                                    </styles:TypeTest>
-                                </DataTemplate>
-                            </DataGridTemplateColumn.CellTemplate>
-                        </DataGridTemplateColumn>
+                                        </ContentControl.ContentTemplate>
+                                    </ContentControl>
 
-                        <DataGridTemplateColumn Header="TIME" CanUserSort="True" MinWidth="165" MaxWidth="165">
-                            <DataGridTemplateColumn.CellTemplate>
-                                <DataTemplate DataType="{x:Type txViewModels:TransactionViewModel}">
-                                    <TextBlock Classes="DGTemplateContainer"
+                                    <TextBlock Grid.Column="3"
+                                               Foreground="{DynamicResource SecondaryForegroundBrush}"
+                                               VerticalAlignment="Center"
+                                               FontSize="13"
+                                               LineHeight="16"
                                                Text="{Binding LocalTime, Converter={StaticResource DateTimeToTxTimeConverter}}" />
-                                </DataTemplate>
-                            </DataGridTemplateColumn.CellTemplate>
-                        </DataGridTemplateColumn>
-                    </DataGrid.Columns>
-                </DataGrid>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
             </TabItem>
         </TabControl>
     </Grid>

@@ -125,7 +125,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                     return;
 
                 if (Uri.TryCreate($"{TezosConfig.AddressExplorerUri}{address}", UriKind.Absolute, out var uri))
-                    Process.Start(uri.ToString());
+                    App.OpenBrowser(uri.ToString());
                 else
                     Log.Error("Invalid uri for address explorer");
             });
@@ -256,7 +256,6 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         public ObservableCollection<TezosTokenContractViewModel> TokensContracts { get; set; }
         public ObservableCollection<TezosTokenViewModel> Tokens { get; set; }
         [Reactive] public TezosTokenViewModel? SelectedToken { get; set; }
-        [Reactive] public decimal SelectedTokenId { get; set; }
         public ObservableCollection<TezosTokenTransferViewModel> Transfers { get; set; }
 
         private TezosTokenContractViewModel? _tokenContract;
@@ -358,10 +357,6 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             Action<ViewModelBase?> showRightPopupContent
         ) : base(app, setConversionTab, setWertCurrency, showRightPopupContent, null)
         {
-            this.WhenAnyValue(vm => vm.SelectedToken)
-                .SubscribeInMainThread(
-                    selectedToken => SelectedTokenId = selectedToken == null ? -1 : selectedToken.TokenBalance.TokenId);
-            
             _ = ReloadTokenContractsAsync();
         }
 
