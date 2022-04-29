@@ -382,15 +382,15 @@
                     </ListBox>
                 </Grid>
             </TabItem>
-            <TabItem Margin="16 0"
-                     Classes="WalletTabItem">
-                <TabItem.Header>
-                    <TextBlock VerticalAlignment="Center"
-                               FontSize="16"
-                               Text="Collectibles" />
-                </TabItem.Header>
-                <TextBlock Text="Collectibles tab" />
-            </TabItem>
+            <!-- <TabItem Margin="16 0" -->
+            <!--          Classes="WalletTabItem"> -->
+            <!--     <TabItem.Header> -->
+            <!--         <TextBlock VerticalAlignment="Center" -->
+            <!--                    FontSize="16" -->
+            <!--                    Text="Collectibles" /> -->
+            <!--     </TabItem.Header> -->
+            <!--     <TextBlock Text="Collectibles tab" /> -->
+            <!-- </TabItem> -->
             <TabItem Margin="16 0 0 0"
                      Classes="WalletTabItem">
                 <TabItem.Header>

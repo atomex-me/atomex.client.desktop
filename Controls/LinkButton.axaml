@@ -50,6 +50,7 @@
 
     <Style Selector=":is(controls|LinkButton)">
         <Setter Property="RenderTransform" Value="none" />
+        
         <Setter Property="Transitions">
             <Transitions>
                 <TransformOperationsTransition Property="RenderTransform" Duration="0:0:.075" />
@@ -133,7 +134,6 @@
                 <ControlTemplate TargetType="{x:Type controls:LinkButton}">
                     <Border Height="{TemplateBinding Height}"
                             Padding="{TemplateBinding Padding}"
-                            
                             Background="{TemplateBinding Background}"
                             CornerRadius="{DynamicResource AtomexCornerRadius}"
                             ToolTip.Placement="AnchorAndGravity">
@@ -161,7 +161,6 @@
                                        FontSize="{TemplateBinding FontSize}"
                                        Foreground="{TemplateBinding Foreground}"
                                        FontFamily="{TemplateBinding FontFamily}"
-                                       FontWeight="{TemplateBinding FontWeight}"
                                        Padding="0"
                                        Margin="0 0 0 2" />
                             <Line Name="PART_Line"
