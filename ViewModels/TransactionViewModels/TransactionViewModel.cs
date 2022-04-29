@@ -29,7 +29,7 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
         public Action? OnClose { get; set; }
         public bool CanBeRemoved { get; set; }
 
-        
+
         private ReactiveCommand<Unit, Unit> _openTxInExplorerCommand;
 
         public ReactiveCommand<Unit, Unit> OpenTxInExplorerCommand => _openTxInExplorerCommand ??=
@@ -75,7 +75,7 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
 
         public ReactiveCommand<Unit, Unit> OnCloseCommand => _onCloseCommand ??= ReactiveCommand.Create(
             () => OnClose?.Invoke());
-        
+
         protected void DesignerMode()
         {
             var random = new Random();
@@ -139,7 +139,7 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
                 > 0 => "from "
             };
         }
-        
+
         public static string GetDescription(
             BlockchainTransactionType type,
             decimal amount,
@@ -147,26 +147,42 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
             int amountDigits,
             string currencyCode)
         {
-            return type switch
+            if (type.HasFlag(BlockchainTransactionType.SwapPayment))
             {
-                BlockchainTransactionType.SwapPayment =>
-                    $"Sent {Math.Abs(netAmount).ToString("0." + new string('#', amountDigits))} {currencyCode}",
+                return $"Swap payment {Math.Abs(amount).ToString("0." + new string('#', amountDigits))} {currencyCode}";
+            }
 
-                BlockchainTransactionType.SwapRefund =>
-                    $"Swap refund {Math.Abs(netAmount).ToString("0." + new string('#', amountDigits))} {currencyCode}",
+            if (type.HasFlag(BlockchainTransactionType.SwapRefund))
+            {
+                return
+                    $"Swap refund {Math.Abs(netAmount).ToString("0." + new string('#', amountDigits))} {currencyCode}";
+            }
 
-                BlockchainTransactionType.SwapRedeem =>
-                    $"Swap redeem {Math.Abs(netAmount).ToString("0." + new string('#', amountDigits))} {currencyCode}",
+            if (type.HasFlag(BlockchainTransactionType.SwapRedeem))
+            {
+                return
+                    $"Swap redeem {Math.Abs(netAmount).ToString("0." + new string('#', amountDigits))} {currencyCode}";
+            }
 
-                BlockchainTransactionType.TokenApprove => "Token approve",
-                BlockchainTransactionType.TokenCall => "Token call",
-                BlockchainTransactionType.SwapCall => "Token swap call",
-                _ => amount switch
-                {
-                    <= 0 => $"Sent {Math.Abs(netAmount).ToString("0." + new string('#', amountDigits))} {currencyCode}",
-                    > 0 =>
-                        $"Received {Math.Abs(netAmount).ToString("0." + new string('#', amountDigits))} {currencyCode}"
-                }
+            if (type.HasFlag(BlockchainTransactionType.TokenApprove))
+            {
+                return "Token approve";
+            }
+
+            if (type.HasFlag(BlockchainTransactionType.TokenCall))
+            {
+                return "Token call";
+            }
+
+            if (type.HasFlag(BlockchainTransactionType.SwapCall))
+            {
+                return "Token swap call";
+            }
+
+            return amount switch
+            {
+                <= 0 => $"Sent {Math.Abs(netAmount).ToString("0." + new string('#', amountDigits))} {currencyCode}",
+                > 0 => $"Received {Math.Abs(netAmount).ToString("0." + new string('#', amountDigits))} {currencyCode}"
             };
         }
     }
