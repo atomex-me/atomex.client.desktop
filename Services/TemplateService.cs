@@ -34,6 +34,7 @@ namespace Atomex.Client.Desktop.Services
         TransactionDetailsTemplate,
         BitcoinBasedTransactionDetailsTemplate,
         TezosTransactionDetailsTemplate,
+        TezosTokenTransferDetailsTemplate,
         EthereumTransactionDetailsTemplate,
         EthereumERC20TransactionDetailsTemplate
     }

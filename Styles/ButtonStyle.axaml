@@ -10,23 +10,6 @@
     </Style>
 
     <Style
-        Selector="Button.ButtonWithIcon:not(:pointerover) /template/ ContentPresenter#PART_ContentPresenter">
-        <Setter Property="Background" Value="Transparent" />
-    </Style>
-    <Style Selector="Button.ButtonWithIcon > Path">
-        <Setter Property="Fill" Value="{StaticResource PrimaryTextColor}" />
-    </Style>
-
-    <Style
-        Selector="Button.ButtonWithIcon.WithoutEffects:not(:pointerover) /template/ ContentPresenter#PART_ContentPresenter">
-        <Setter Property="Background" Value="Transparent" />
-    </Style>
-    <Style
-        Selector="Button.ButtonWithIcon.WithoutEffects:pointerover /template/ ContentPresenter#PART_ContentPresenter">
-        <Setter Property="Background" Value="Transparent" />
-    </Style>
-    
-    <Style
         Selector="Button.SecondaryButton:not(:pointerover) /template/ ContentPresenter#PART_ContentPresenter">
         <Setter Property="Background" Value="{DynamicResource LightDefaultOpacity4}" />
         <Setter Property="TextBlock.Foreground" Value="{DynamicResource SecondaryForegroundBrush}" />
@@ -53,8 +36,7 @@
         <Setter Property="Padding" Value="9 5" />
         <Setter Property="CornerRadius" Value="8" />
     </Style>
-
-
+    
     <Style Selector="Button.Sort">
         <Setter Property="Transitions">
             <Transitions>
@@ -62,7 +44,6 @@
             </Transitions>
         </Setter>
     </Style>
-
     <Style Selector="Button.Sort.Rotated">
         <Setter Property="RenderTransform" Value="rotate(180deg)" />
     </Style>

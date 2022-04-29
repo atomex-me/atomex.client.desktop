@@ -1,9 +1,9 @@
 using System;
 using System.IO;
+using System.Reactive;
 using System.Security;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
-using System.Windows.Input;
 
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
@@ -16,18 +16,17 @@ namespace Atomex.Client.Desktop.ViewModels
     public class UnlockViewModel : ViewModelBase
     {
         public Action? Unlocked;
+        private readonly Action<SecureString> _unlockAction;
+        private readonly Action _goBackAction;
         public event EventHandler<ErrorEventArgs> Error;
+        [Reactive] public bool InProgress { get; set; }
+        [Reactive] public bool InvalidPassword { get; set; }
+        
         public PasswordControlViewModel PasswordVM { get; set; }
         public string WalletName { get; set; }
 
-        [Reactive] public bool InProgress { get; set; }
-        [Reactive] public bool InvalidPassword { get; set; }
-
-        private ICommand _unlockCommand;
-        public ICommand UnlockCommand => _unlockCommand ??= (_unlockCommand = ReactiveCommand.Create(OnUnlockClick));
-
-        private readonly Action<SecureString> _unlockAction;
-        private readonly Action _goBackAction;
+        private ReactiveCommand<Unit, Unit> _unlockCommand;
+        public ReactiveCommand<Unit, Unit> UnlockCommand => _unlockCommand ??= (_unlockCommand = ReactiveCommand.Create(OnUnlockClick));
 
         public UnlockViewModel()
         {

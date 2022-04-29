@@ -27,6 +27,7 @@
     <Color x:Key="LightDefaultOpacity10">#1AC4DEFF</Color>
     <Color x:Key="LightDefaultOpacity6">#0FC4DEFF</Color>
     <Color x:Key="LightDefaultOpacity4">#0AC4DEFF</Color>
+    <Color x:Key="DeepBlue90">#E60D1421</Color>
     <Color x:Key="Blue">#20439E</Color>
     <Color x:Key="LightBlue">#3964D3</Color>
     <Color x:Key="DarkBlue">#0F3088</Color>
@@ -45,9 +46,12 @@
     <Color x:Key="CriticalWarningColor">#ef6a41</Color>
     <Color x:Key="DarkRed">#E1457C</Color>
     <Color x:Key="Emerald">#00C4B4</Color>
+    <Color x:Key="LightEmerald">#46FEEF</Color>
+    <Color x:Key="DarkEmerald">#008C81</Color>
     <Color x:Key="DeepBlue">#0D1421</Color>
     <Color x:Key="Orange">#FFA800</Color>
-    
+    <Color x:Key="BlueSky">#2988DF</Color>
+
     <Color x:Key="MahApps.Colors.Gray1">#FF333333</Color>
     <Color x:Key="MahApps.Colors.Gray2">#FF7F7F7F</Color>
     <Color x:Key="MahApps.Colors.Gray3">#FF9D9D9D</Color>
@@ -62,7 +66,7 @@
     <Color x:Key="MahApps.Colors.Gray">#FFBEBEBE</Color>
     <Color x:Key="MahApps.Colors.Gray.MouseOver">#FF333333</Color>
     <Color x:Key="MahApps.Colors.Gray.SemiTransparent">#40808080</Color>
-    
+
     <SolidColorBrush x:Key="GrayBrush1" Color="{DynamicResource MahApps.Colors.Gray1}" />
     <SolidColorBrush x:Key="GrayBrush2" Color="{DynamicResource MahApps.Colors.Gray2}" />
     <SolidColorBrush x:Key="GrayBrush3" Color="{DynamicResource MahApps.Colors.Gray3}" />
@@ -73,10 +77,12 @@
     <SolidColorBrush x:Key="GrayBrush8" Color="{DynamicResource MahApps.Colors.Gray8}" />
     <SolidColorBrush x:Key="GrayBrush9" Color="{DynamicResource MahApps.Colors.Gray9}" />
     <SolidColorBrush x:Key="GrayBrush10" Color="{DynamicResource MahApps.Colors.Gray10}" />
-    
+
 
     <SolidColorBrush x:Key="DefaultBackgroundBrush" Color="{DynamicResource DefaultBackgroundColor}" />
     <SolidColorBrush x:Key="DefaultForegroundBrush" Color="{DynamicResource LightDefault}" />
+    <SolidColorBrush x:Key="SuccessForegroundBrush" Color="{DynamicResource Emerald}" />
+    <SolidColorBrush x:Key="ErrorForegroundBrush" Color="{DynamicResource DarkRed}" />
     <SolidColorBrush x:Key="SecondaryForegroundBrush" Color="{DynamicResource LightDefaultOpacity50}" />
     <SolidColorBrush x:Key="DisabledForegroundBrush" Color="{DynamicResource LightDefaultOpacity20}" />
     <SolidColorBrush x:Key="DefaultButtonBackgroundBrush" Color="{DynamicResource Blue}" />
@@ -93,7 +99,7 @@
     <SolidColorBrush x:Key="DefaultTooltipBackgroundBrush" Color="#80000000" />
     <SolidColorBrush x:Key="DefaultMenuItemSelectedBrush" Color="{DynamicResource DefaultMenuItemSelectedColor}" />
     <SolidColorBrush x:Key="DefaultMenuItemMouseOverBrush" Color="{DynamicResource DefaultMenuItemMouseOverColor}" />
-    
+
     <SolidColorBrush x:Key="DefaultProgressRingBrush" Color="{DynamicResource DefaultProgressRingColor}" />
 
     <x:Int32 x:Key="DefaultTooltipFontSize">12</x:Int32>
@@ -111,9 +117,10 @@
     <SolidColorBrush x:Key="MainOverlayBrush" Color="{StaticResource MainOverlayColor}" />
     <SolidColorBrush x:Key="StatusBarConnectedForeground" Color="AliceBlue" />
     <SolidColorBrush x:Key="StatusBarDisconnectedForeground" Color="{StaticResource CriticalWarningColor}" />
-    <SolidColorBrush x:Key="StatusBarVersionForeground" Color="DarkGray"/>
-    <SolidColorBrush x:Key="MainWindowTitleBarForeground" Color="DarkGray"/>
+    <SolidColorBrush x:Key="StatusBarVerticalDelimiterColor" Color="{StaticResource LightDefault}" />
+    <SolidColorBrush x:Key="MainWindowTitleBarForeground" Color="DarkGray" />
     <SolidColorBrush x:Key="DefaultUpdateForegroundBrush" Color="Gold" />
+    <SolidColorBrush x:Key="RightPopupBackgroundBrush" Color="{StaticResource DeepBlue}" />
 
     <LinearGradientBrush x:Key="MainBackgroundBrush" StartPoint="0%,0%" EndPoint="100%,100%">
         <LinearGradientBrush.GradientStops>
@@ -184,7 +191,7 @@
     <SolidColorBrush x:Key="CustomTextBoxDisabledBorderBrush" Color="{DynamicResource LightDefaultOpacity20}" />
     <SolidColorBrush x:Key="CustomTextBoxCaretBrush" Color="#1388ba" />
     <SolidColorBrush x:Key="AmountTextBoxCaretBrush" Color="{DynamicResource LightDefault}" />
-    
+
 
     <!-- Custom ComboBox -->
 
@@ -223,10 +230,11 @@
     <SolidColorBrush x:Key="CustomDataGridRowBackground" Color="Transparent" />
     <SolidColorBrush x:Key="CustomDataGridAlternativeRowBackground" Color="{DynamicResource LightDefaultOpacity6}" />
     <SolidColorBrush x:Key="CustomDataGridNoData" Color="#03ffffff" />
-    <SolidColorBrush x:Key="CustomDataGridHeaderPointerOver" Color="{DynamicResource MahApps.Colors.Gray2}" Opacity="0.5" />
-    
+    <SolidColorBrush x:Key="CustomDataGridHeaderPointerOver" Color="{DynamicResource MahApps.Colors.Gray2}"
+                     Opacity="0.5" />
+
     <!-- Custom ListBox -->
-    
+
     <SolidColorBrush x:Key="ListBoxItemSelectedBrush" Color="{DynamicResource Blue}" />
     <SolidColorBrush x:Key="ListBoxItemPointeroverBrush" Color="{DynamicResource  LightDefaultOpacity6}" />
 
@@ -244,6 +252,20 @@
     <SolidColorBrush x:Key="RoundedButtonDisabledBrush" Color="{DynamicResource LightDefaultOpacity10}" />
     <SolidColorBrush x:Key="RoundedButtonDisabledForegroundBrush" Color="{DynamicResource LightDefaultOpacity20}" />
     <SolidColorBrush x:Key="RoundedButtonForegroundBrush" Color="White" />
+
+    <SolidColorBrush x:Key="AccentButtonBackgroundBrush" Color="{DynamicResource Emerald}" />
+    <SolidColorBrush x:Key="AccentButtonMouseOverBrush" Color="{DynamicResource LightEmerald}" />
+    <SolidColorBrush x:Key="AccentButtonPressedBrush" Color="{DynamicResource DarkEmerald}" />
+    <SolidColorBrush x:Key="AccentButtonDisabledBrush" Color="{DynamicResource LightDefaultOpacity10}" />
+    <SolidColorBrush x:Key="AccentButtonDisabledForegroundBrush" Color="{DynamicResource LightDefaultOpacity20}" />
+    <SolidColorBrush x:Key="AccentButtonForegroundBrush" Color="White" />
+
+    <SolidColorBrush x:Key="GrayButtonBackgroundBrush" Color="{DynamicResource LightDefaultOpacity10}" />
+    <SolidColorBrush x:Key="GrayButtonMouseOverBrush" Color="{DynamicResource LightDefaultOpacity20}" />
+    <SolidColorBrush x:Key="GrayButtonPressedBrush" Color="{DynamicResource LightDefaultOpacity50}" />
+    <SolidColorBrush x:Key="GrayButtonDisabledBrush" Color="{DynamicResource LightDefaultOpacity10}" />
+    <SolidColorBrush x:Key="GrayButtonDisabledForegroundBrush" Color="{DynamicResource LightDefaultOpacity20}" />
+    <SolidColorBrush x:Key="GrayButtonForegroundBrush" Color="White" />
 
     <!-- Link Button -->
 
@@ -302,8 +324,10 @@
 
     <SolidColorBrush x:Key="BalanceBackgroundBrush" Color="White" />
     <SolidColorBrush x:Key="UsdBalanceBackgroundBrush" Color="Gray" />
-    <SolidColorBrush x:Key="ExplorerLinkButtonForegroundBrush" Color="#6bbaff" />
-    <SolidColorBrush x:Key="ExplorerLinkButtonMouseOverBrush" Color="#cfe4f7" />
+    <SolidColorBrush x:Key="ExplorerLinkButtonForegroundBrush" Color="{DynamicResource Emerald}" />
+    <SolidColorBrush x:Key="ExplorerLinkButtonMouseOverBrush" Color="{DynamicResource LightEmerald}" />
+    <SolidColorBrush x:Key="ExplorerLinkButtonMousePressedBrush" Color="{DynamicResource DarkEmerald}" />
+    
 
     <SolidColorBrush x:Key="NoDelegationsBrush" Color="Gray" />
     <SolidColorBrush x:Key="DelegatedAmountBrush" Color="#ffa500" />
@@ -316,7 +340,7 @@
     <SolidColorBrush x:Key="NoLiquidityForegroundBrush" Color="#e25b5b" />
     <SolidColorBrush x:Key="MarketVolumeForegroundBrush" Color="AliceBlue" />
     <SolidColorBrush x:Key="ConversionArrowBrush" Color="LightGray" />
-    <SolidColorBrush x:Key="InvalidAmountForegroundBrush" Color="#e25b5b"/>
+    <SolidColorBrush x:Key="InvalidAmountForegroundBrush" Color="#e25b5b" />
 
     <SolidColorBrush x:Key="SwapStateCanceledBackgroundBrush" Color="{DynamicResource UnconfirmedColor}" />
     <SolidColorBrush x:Key="SwapStateCompletedBackgroundBrush" Color="{DynamicResource ConfirmedColor}" />
@@ -324,4 +348,6 @@
     <SolidColorBrush x:Key="SwapStateUnconfirmedBackgroundBrush" Color="{DynamicResource UnconfirmedColor}" />
     <SolidColorBrush x:Key="SwapStateRefundedBackgroundBrush" Color="{DynamicResource ConfirmedColor}" />
     <SolidColorBrush x:Key="SwapStateUnsettledBackgroundBrush" Color="{DynamicResource UnknownColor}" />
+    
+    <CornerRadius x:Key="AtomexCornerRadius">6</CornerRadius>
 </ResourceDictionary>

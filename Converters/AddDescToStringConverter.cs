@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Globalization;
 using Avalonia.Data.Converters;
-using Atomex.Client.Desktop.Common;
+using Atomex.Client.Desktop.ViewModels.WalletViewModels;
 
 namespace Atomex.Client.Desktop.Converters
 {
@@ -13,7 +13,7 @@ namespace Atomex.Client.Desktop.Converters
         {
             if (value is string val)
             {
-                return $"{val}/{SortType.Desc}";
+                return $"{val}/{SortDirection.Desc}";
             }
 
             return value;

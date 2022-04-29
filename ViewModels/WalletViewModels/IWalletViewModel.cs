@@ -1,13 +1,10 @@
-using Avalonia.Media;
+using Atomex.Client.Desktop.ViewModels.TransactionViewModels;
 
 namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 {
     public interface IWalletViewModel
     {
-        IBrush Background { get; }
         string Header { get; }
-        bool IsSelected { get; set; }
-        IBrush OpacityMask { get; }
-        double CurrencyOpacityValue { get; }
+        TransactionViewModelBase? SelectedTransaction { get; set; }
     }
 }

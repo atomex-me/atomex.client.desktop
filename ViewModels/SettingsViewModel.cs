@@ -8,7 +8,6 @@ namespace Atomex.Client.Desktop.ViewModels
 {
     public class SettingsViewModel : ViewModelBase
     {
-        public string TextStr => "dota 3";
         protected IAtomexApp App { get; }
         
         public SettingsViewModel()

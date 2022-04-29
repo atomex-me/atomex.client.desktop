@@ -2,65 +2,50 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Reactive;
+using System.Reactive.Linq;
 using Atomex.Services;
 using Atomex.Client.Desktop.Common;
-using Atomex.Client.Desktop.ViewModels.Abstract;
 using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
 using Atomex.Client.Desktop.ViewModels.WalletViewModels;
 using Atomex.Core;
+using Avalonia.Controls;
 using ReactiveUI;
+using ReactiveUI.Fody.Helpers;
 
 namespace Atomex.Client.Desktop.ViewModels
 {
     public class WalletsViewModel : ViewModelBase
     {
         private IAtomexApp App { get; }
-        private Action<CurrencyConfig> SetConversionTab { get; }
-
-        private ObservableCollection<IWalletViewModel> _wallets;
-
-        public ObservableCollection<IWalletViewModel> Wallets
-        {
-            get => _wallets;
-            set
-            {
-                _wallets = value;
-                this.RaisePropertyChanged(nameof(Wallets));
-            }
-        }
-
-        private IWalletViewModel _selected;
-
-        public IWalletViewModel Selected
-        {
-            get => _selected;
-            set
-            {
-                if (_selected != null)
-                    _selected.IsSelected = false;
-
-                _selected = value;
-
-                if (_selected != null)
-                    _selected.IsSelected = true;
-                
-                this.RaisePropertyChanged(nameof(Wallets));
-            }
-        }
+        public Action<CurrencyConfig> SetConversionTab { get; init; }
+        public Action<string> SetWertCurrency { get; init; }
+        public Action BackAction { get; init; }
+        public Action<ViewModelBase?> ShowRightPopupContent { get; set; }
+        [Reactive] public ObservableCollection<IWalletViewModel> Wallets { get; private set; }
+        [Reactive] public IWalletViewModel Selected { get; set; }
+        
+        // todo: remove
+        [Reactive] private bool IsTezosTokensSelected { get; set; }
 
         public WalletsViewModel()
         {
 #if DEBUG
-            if (Env.IsInDesignerMode())
+            if (Design.IsDesignMode)
                 DesignerMode();
 #endif
         }
 
-        public WalletsViewModel(IAtomexApp app,  Action<CurrencyConfig> setConversionTab)
+        public WalletsViewModel(IAtomexApp app)
         {
             App = app ?? throw new ArgumentNullException(nameof(app));
-            SetConversionTab = setConversionTab;
 
+            // todo: remove
+            this.WhenAnyValue(vm => vm.Selected)
+                .WhereNotNull()
+                .Select(walletViewModel => walletViewModel is TezosTokensWalletViewModel)
+                .SubscribeInMainThread(res => IsTezosTokensSelected = res);
+            
             SubscribeToServices();
         }
 
@@ -79,28 +64,45 @@ namespace Atomex.Client.Desktop.ViewModels
                     .Select(currency => WalletViewModelCreator.CreateViewModel(
                         app: App,
                         setConversionTab: SetConversionTab,
+                        setWertCurrency: SetWertCurrency,
+                        showRightPopupContent: ShowRightPopupContent,
                         currency: currency));
 
                 walletsViewModels.AddRange(currenciesViewModels);
 
-                walletsViewModels.Add(new TezosTokensWalletViewModel(
-                    app: App,
-                    setConversionTab: SetConversionTab));
+                // walletsViewModels.Add(new TezosTokensWalletViewModel(
+                //     app: App,
+                //     setConversionTab: SetConversionTab,
+                //     setWertCurrency: SetWertCurrency));
             }
 
-            Wallets  = new ObservableCollection<IWalletViewModel>(walletsViewModels);
-            Selected = Wallets.FirstOrDefault();
+            Wallets = new ObservableCollection<IWalletViewModel>(walletsViewModels);
         }
+
+        private ReactiveCommand<Unit, Unit> _backCommand;
+
+        public ReactiveCommand<Unit, Unit> BackCommand => _backCommand ??=
+            (_backCommand = ReactiveCommand.Create(() => BackAction?.Invoke()));
 
         private void DesignerMode()
         {
-            // var currencies = DesignTime.Currencies.ToList();
-            //
-            // Wallets = new ObservableCollection<WalletViewModel>
-            // {
-            //     new WalletViewModel {CurrencyViewModel = CurrencyViewModelCreator.CreateViewModel(currencies[0], subscribeToUpdates: false)},
-            //     new WalletViewModel {CurrencyViewModel = CurrencyViewModelCreator.CreateViewModel(currencies[1], subscribeToUpdates: false)}
-            // };
+            var currencies = DesignTime.TestNetCurrencies.ToList();
+
+            Wallets = new ObservableCollection<IWalletViewModel>
+            {
+                new WalletViewModel
+                {
+                    CurrencyViewModel =
+                        CurrencyViewModelCreator.CreateViewModel(currencies[0], subscribeToUpdates: false)
+                },
+                new WalletViewModel
+                {
+                    CurrencyViewModel =
+                        CurrencyViewModelCreator.CreateViewModel(currencies[1], subscribeToUpdates: false)
+                }
+            };
+
+            Selected = Wallets[1];
         }
     }
 }

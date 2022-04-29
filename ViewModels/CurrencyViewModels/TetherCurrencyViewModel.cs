@@ -1,7 +1,6 @@
 ﻿using Atomex.Client.Desktop.Properties;
 using Atomex.Core;
 using Avalonia.Media;
-using Atomex.Client.Desktop.ViewModels.Abstract;
 using Avalonia.Visuals.Media.Imaging;
 
 
@@ -26,8 +25,8 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
             AccentColor         = Color.FromRgb(r: 0, g: 162, b: 122);
             AmountColor         = Color.FromRgb(r: 183, g: 208, b: 225);
             UnselectedIconBrush = Brushes.White;
-            IconPath            = GetBitmap(PathToImage("tether.png"));
-            LargeIconPath       = GetBitmap(PathToImage("tether_90x90.png"));
+            IconPath            = $"{PathToIcons}/tether.svg";
+            DisabledIconPath    = $"{PathToIcons}/tether-disabled.svg";
             FeeName             = Resources.SvGasLimit;
         }
     }

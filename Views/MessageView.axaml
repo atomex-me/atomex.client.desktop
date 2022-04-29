@@ -13,14 +13,6 @@
     <Design.DataContext>
         <vm:MessageViewModel />
     </Design.DataContext>
-    <UserControl.Styles>
-        <Style Selector="TextBlock.withBack">
-            <Setter Property="Margin" Value="-28 0 0 0" />
-        </Style>
-        <Style Selector="TextBlock.withoutBack">
-            <Setter Property="Margin" Value="0 0 0 0" />
-        </Style>
-    </UserControl.Styles>
 
     <Border Classes="ChildViewBorder"
             Padding="24 0 24 16"
@@ -29,20 +21,11 @@
             <Grid ColumnDefinitions="Auto,*"
                   RowDefinitions="Auto"
                   Margin="0 20 0 20">
-                <Button Grid.Column="0"
-                        Width="28"
-                        Height="28"
-                        Padding="3"
-                        BorderThickness="0"
-                        VerticalContentAlignment="Center"
-                        IsVisible="{Binding IsBackVisible}"
-                        Command="{Binding BackCommand}"
-                        Classes="ButtonWithIcon">
-
-                    <svg:Svg Width="28"
-                             Path="/Resources/Icons/back.svg"
-                             HorizontalAlignment="Left" />
-                </Button>
+                
+                <controls:IconButton Grid.Column="0"
+                                     Classes="Back"
+                                     IsVisible="{Binding IsBackVisible}"
+                                     Command="{Binding BackCommand}"/>
 
                 <TextBlock Grid.Column="1"
                            Foreground="{DynamicResource ChildViewHeaderForegroundBrush}"
@@ -55,7 +38,7 @@
                            Text="{Binding Title}"
                            Name="WindowTitle" />
             </Grid>
-    
+
             <Border Height="1"
                     Margin="-24 0 -24 32"
                     Background="{DynamicResource LightDefaultOpacity10}" />
@@ -63,7 +46,8 @@
             <TextBlock Text="{Binding Text}"
                        IsVisible="{Binding Text, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
                        Margin="0 0 0 16"
-                       FontSize="15"
+                       FontSize="16"
+                       LineHeight="24"
                        FontFamily="{DynamicResource DefaultLightFontFamily}"
                        HorizontalAlignment="Center"
                        TextAlignment="Center"
@@ -74,28 +58,18 @@
                         HorizontalAlignment="Center"
                         IsVisible="{Binding IsLinkVisible}">
 
-                <!-- ToolTip="{Binding TxExplorerUri}" -->
-                <Button Content="{Binding Id}"
-                        Margin="20 0 20 0"
-                        HorizontalAlignment="Center"
-                        VerticalAlignment="Center"
-                        Command="{Binding OpenTxInExplorerCommand}"
-                        CommandParameter="{Binding Id}"
-                        Classes="ExplorerLinkButton" />
+                <controls:LinkButton Underlined="True"
+                                     Classes="SolidHover"
+                                     FontSize="16"
+                                     Content="{Binding Id}"
+                                     Command="{Binding OpenTxInExplorerCommand}"
+                                     ToolText="{Binding TransactionUri}" />
 
-                <!-- ToolTip="Copy transaction id to clipboard" -->
-                <controls:IconButton
-                    VerticalAlignment="Center"
-                    Foreground="{DynamicResource IconButtonForegroundBrush}"
-                    MouseOverBrush="{DynamicResource IconButtonMouseOverBrush}"
-                    PressedBrush="{DynamicResource IconButtonPressedBrush}"
-                    Path="{DynamicResource Octicons.Clippy}"
-                    Margin="5 20 20 0"
-                    Width="15"
-                    Height="15"
-                    Command="{Binding CopyCommand}"
-                    CommandParameter="{Binding Id}"
-                    Classes="PathButtonStyle" />
+                <controls:CopyButton ToolText="Copy transaction id to clipboard"
+                                     DoneToolText="Copied!"
+                                     Margin="8 0 0 0"
+                                     Command="{Binding CopyCommand}"
+                                     CommandParameter="{Binding Id}" />
             </StackPanel>
 
             <StackPanel Orientation="Horizontal"
@@ -106,7 +80,7 @@
                                   Margin="0 16"
                                   Foreground="{DynamicResource DefaultProgressRingBrush}" />
             </StackPanel>
-            
+
             <Border Margin="-24 0 -24 16"
                     Height="1"
                     Background="{DynamicResource LightDefaultOpacity10}"
@@ -118,10 +92,9 @@
                         IsVisible="{Binding IsNextVisible}">
                 <controls:RoundedButton Width="200"
                                         Height="50"
-                                        CornerRadius="6"
+                                        CornerRadius="{DynamicResource AtomexCornerRadius}"
                                         FontSize="18"
                                         FontWeight="Normal"
-                                        FontFamily="{DynamicResource DefaultFontFamily}"
                                         Content="{Binding NextText}"
                                         Command="{Binding NextCommand}" />
             </StackPanel>

@@ -28,18 +28,15 @@
                           Width="16"
                           Height="16"
                           Data="{DynamicResource Unicons.Sync}" />
-                    <TextBlock FontFamily="{DynamicResource DefaultFontFamily}"
-                               VerticalAlignment="Center"
+                    <TextBlock VerticalAlignment="Center"
                                FontSize="14"
                                IsVisible="{Binding !UpdateStarted}"
                                Text="Update Atomex to" />
-                    <TextBlock FontFamily="{DynamicResource DefaultFontFamily}"
-                               VerticalAlignment="Center"
+                    <TextBlock VerticalAlignment="Center"
                                FontSize="14"
                                IsVisible="{Binding UpdateStarted}"
                                Text="Updating, please wait..." />
-                    <TextBlock FontFamily="{DynamicResource DefaultFontFamily}"
-                               VerticalAlignment="Center"
+                    <TextBlock VerticalAlignment="Center"
                                FontSize="14"
                                IsVisible="{Binding !UpdateStarted}"
                                Margin="3 0 0 0"
@@ -49,7 +46,7 @@
             <Rectangle Margin="0 8"
                        IsVisible="{Binding HasAccount}"
                        VerticalAlignment="Stretch"
-                       Fill="{DynamicResource StatusBarVersionForeground}"
+                       Fill="{DynamicResource StatusBarVerticalDelimiterColor}"
                        Width="1" />
         </StackPanel>
         
@@ -57,26 +54,21 @@
                     IsVisible="{Binding IsDownloadingUpdate}">
             <Button Classes="TitleBarCommandBtn UpdateBtn">
                 <StackPanel Orientation="Horizontal">
-                    <TextBlock FontFamily="{DynamicResource DefaultFontFamily}"
-                               VerticalAlignment="Center"
+                    <TextBlock VerticalAlignment="Center"
                                FontSize="14"
                                Text="Downloading update" />
-                    <TextBlock FontFamily="{DynamicResource DefaultFontFamily}"
-                               Margin="3 0 0 0"
+                    <TextBlock Margin="3 0 0 0"
                                VerticalAlignment="Center"
                                FontSize="14"
                                Text="{Binding UpdateVersion}" />
-                    <TextBlock FontFamily="{DynamicResource DefaultFontFamily}"
-                               VerticalAlignment="Center"
+                    <TextBlock VerticalAlignment="Center"
                                FontSize="14"
                                Text=":" />
-                    <TextBlock FontFamily="{DynamicResource DefaultFontFamily}"
-                               Margin="3 0 0 0"
+                    <TextBlock Margin="3 0 0 0"
                                VerticalAlignment="Center"
                                FontSize="14"
                                Text="{Binding UpdateDownloadProgress}" />
-                    <TextBlock FontFamily="{DynamicResource DefaultFontFamily}"
-                               VerticalAlignment="Center"
+                    <TextBlock VerticalAlignment="Center"
                                FontSize="14"
                                Text="%" />
                 </StackPanel>
@@ -84,7 +76,7 @@
             <Rectangle Margin="0 8"
                        IsVisible="{Binding HasAccount}"
                        VerticalAlignment="Stretch"
-                       Fill="{DynamicResource StatusBarVersionForeground}"
+                       Fill="{DynamicResource StatusBarVerticalDelimiterColor}"
                        Width="1" />
         </StackPanel>
 
@@ -100,8 +92,7 @@
                           Width="16"
                           Height="16"
                           Data="{DynamicResource Unicons.SignOutAlt}" />
-                    <TextBlock FontFamily="{DynamicResource DefaultFontFamily}"
-                               VerticalAlignment="Center"
+                    <TextBlock VerticalAlignment="Center"
                                FontSize="14"
                                Text="SignOut" />
                 </StackPanel>

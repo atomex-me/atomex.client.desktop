@@ -18,6 +18,7 @@ using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.Properties;
 using Atomex.Common;
 using Atomex.Core;
+using Atomex.ViewModels;
 using Atomex.Wallet.BitcoinBased;
 
 namespace Atomex.Client.Desktop.ViewModels.SendViewModels
@@ -133,7 +134,8 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 },
                 Config = Config,
             };
-
+            
+            SelectFromViewModel.BackAction = () => App.DialogService.Show(this);
             App.DialogService.Show(SelectFromViewModel);
         }
 
@@ -387,6 +389,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
             Outputs = new ObservableCollection<BitcoinBasedTxOutput>(outputs);
             Stage = SendStage.Edit;
+            AmountInBase = 1233123.34m;
         }
 #endif
     }

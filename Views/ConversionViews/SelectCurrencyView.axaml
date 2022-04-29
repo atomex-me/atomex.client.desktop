@@ -4,184 +4,117 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d" d:DesignWidth="700" d:DesignHeight="570"
              x:Class="Atomex.Client.Desktop.Views.ConversionViews.SelectCurrencyView"
-             xmlns:svg="clr-namespace:Avalonia.Svg.Skia;assembly=Avalonia.Svg.Skia"
              xmlns:vm="clr-namespace:Atomex.Client.Desktop.ViewModels.ConversionViewModels"
              xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
-             xmlns:ia="clr-namespace:Avalonia.Xaml.Interactions.Core;assembly=Avalonia.Xaml.Interactions">
-  <Design.DataContext>
-    <vm:SelectCurrencyViewModel/>
-  </Design.DataContext>
+             xmlns:ia="clr-namespace:Avalonia.Xaml.Interactions.Core;assembly=Avalonia.Xaml.Interactions"
+             xmlns:svg="clr-namespace:Avalonia.Svg.Skia;assembly=Avalonia.Svg.Skia"
+             xmlns:controls="clr-namespace:Atomex.Client.Desktop.Controls">
+    <Design.DataContext>
+        <vm:SelectCurrencyViewModel />
+    </Design.DataContext>
 
-  <Border Classes="ChildViewBorder"
-          Width="700">
-    <Grid RowDefinitions="72,*">
-      <!-- title -->
-      <TextBlock Name="Title"
-                 FontSize="22"
-                 FontFamily="{DynamicResource DefaultFontFamily}"
-                 HorizontalAlignment="Center"
-                 VerticalAlignment="Center"
-                 Foreground="{DynamicResource LightDefault}"
-                 Text="{Binding Title}"
-                 Grid.Column="0"
-                 Grid.ColumnSpan="2">
-        <i:Interaction.Behaviors>
-          <ia:DataTriggerBehavior Binding="{Binding Type}"
-                                  ComparisonCondition="Equal"
-                                  Value="From">
-            <ia:ChangePropertyAction TargetObject="{Binding #Title}"
-                                     PropertyName="Text"
-                                     Value="Send from" />
-          </ia:DataTriggerBehavior>
-          <ia:DataTriggerBehavior Binding="{Binding Type}"
-                                  ComparisonCondition="Equal"
-                                  Value="To">
-            <ia:ChangePropertyAction TargetObject="{Binding #Title}"
-                                     PropertyName="Text"
-                                     Value="Receive to" />
-          </ia:DataTriggerBehavior>
-        </i:Interaction.Behaviors>
-      </TextBlock>
 
-      <Border Height="1"
-              Background="{DynamicResource LightDefaultOpacity10}"
-              VerticalAlignment="Bottom"/>
-
-      <ListBox Margin="16 10 16 16"
-               MaxHeight="460"
-               ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-               Background="{DynamicResource AlmostTransparentBrush}"
-               Items="{Binding Currencies}"
-               SelectionMode="Single"
-               SelectedItem="{Binding SelectedCurrency}"
-               Grid.Row="1">
-        <!--<i:Interaction.Behaviors>
-          <ia:EventTriggerBehavior EventName="Pressed">
-        </i:Interaction.Behaviors>-->
-
-        <ListBox.Styles>
-          <Style Selector="ListBoxItem">
-            <Setter Property="Padding" Value="0"/>
-            <Setter Property="CornerRadius" Value="8"/>
-            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-          </Style>
-
-          <Style Selector="ListBoxItem:pointerover Border#BottomLine">
-            <Setter Property="IsVisible" Value="False"/>
-          </Style>
-          <Style Selector="ListBoxItem:pointerover /template/ ContentPresenter">
-            <Setter Property="Background" Value="{DynamicResource ListBoxItemPointeroverBrush}"/>
-          </Style>
-          <Style Selector="ListBoxItem:pressed /template/ ContentPresenter">
-            <Setter Property="Background" Value="{DynamicResource LightDefaultOpacity4}"/>
-          </Style>
-          <Style Selector="ListBoxItem:selected /template/ ContentPresenter">
-            <Setter Property="Background" Value="{DynamicResource ListBoxItemSelectedBrush}"/>
-          </Style>
-          <Style Selector="ListBoxItem:selected Border#BottomLine">
-            <Setter Property="IsVisible" Value="False"/>
-          </Style>
-        </ListBox.Styles>
-        
-        <ListBox.ItemTemplate>
-          <DataTemplate>
-            <Grid ColumnDefinitions="*,Auto">
-              <StackPanel Margin="16 14 16 14"
-                          Orientation="Horizontal"
-                          VerticalAlignment="Center"
-                          Grid.Column="0">
-                <Image Width="24"
-                       Height="24"
-                       Source="{Binding CurrencyViewModel.LargeIconPath}"
+    <Border Classes="ChildViewBorder"
+            Width="700">
+        <Grid RowDefinitions="72,*">
+            <!-- title -->
+            <TextBlock Name="Title"
+                       FontSize="22"
+                       HorizontalAlignment="Center"
                        VerticalAlignment="Center"
-                       UseLayoutRounding="True"/>
-                <TextBlock Margin="17 0 0 0"
-                           Text="{Binding CurrencyViewModel.Header}"
-                           FontFamily="{DynamicResource DefaultLightFontFamily}"
-                           FontSize="18"
-                           Foreground="{DynamicResource DefaultForegroundBrush}"
-                           VerticalAlignment="Center"/>
-                <TextBlock Margin="12 0 0 -2"
-                           FontFamily="{DynamicResource DefaultLightFontFamily}"
-                           FontSize="16"
-                           Foreground="{DynamicResource LightDefaultOpacity50}"
-                           VerticalAlignment="Center">
-                  <TextBlock.Text>
-                    <MultiBinding Converter="{StaticResource AmountToStringConverter}">
-                      <Binding Path="CurrencyViewModel.TotalAmount" Mode="OneWay"/>
-                      <Binding Path="CurrencyViewModel.CurrencyFormat" Mode="OneWay"/>
-                    </MultiBinding>
-                  </TextBlock.Text>
-                </TextBlock>
-                <TextBlock Margin="6 0 0 -2"
-                           Text="{Binding CurrencyViewModel.CurrencyCode}"
-                           FontFamily="{DynamicResource DefaultLightFontFamily}"
-                           FontSize="16"
-                           Foreground="{DynamicResource LightDefaultOpacity50}"
-                           VerticalAlignment="Center"/>
-              </StackPanel>
+                       Foreground="{DynamicResource LightDefault}"
+                       Text="{Binding Title}"
+                       Grid.Column="0"
+                       Grid.ColumnSpan="2">
+                <i:Interaction.Behaviors>
+                    <ia:DataTriggerBehavior Binding="{Binding Type}"
+                                            ComparisonCondition="Equal"
+                                            Value="From">
+                        <ia:ChangePropertyAction TargetObject="{Binding #Title}"
+                                                 PropertyName="Text"
+                                                 Value="Send from" />
+                    </ia:DataTriggerBehavior>
+                    <ia:DataTriggerBehavior Binding="{Binding Type}"
+                                            ComparisonCondition="Equal"
+                                            Value="To">
+                        <ia:ChangePropertyAction TargetObject="{Binding #Title}"
+                                                 PropertyName="Text"
+                                                 Value="Receive to" />
+                    </ia:DataTriggerBehavior>
+                </i:Interaction.Behaviors>
+            </TextBlock>
 
-              <Button Margin="0 0 16 0"
-                      Padding="10 6 10 6"
-                      Content="{Binding SelectedAddressDescription}"
-                      HorizontalAlignment="Right"
-                      FontSize="13"
-                      FontFamily="{DynamicResource DefaultFontFamily}"
-                      Foreground="{DynamicResource LightDefaultOpacity50}"
-                      Command="{Binding $parent[ListBox].DataContext.ChangeAddressesCommand}"
-                      CommandParameter="{Binding}"
-                      Grid.Column="1"
-                      ToolTip.Tip="Click to change address">
-                <Button.Styles>
-                  <Style Selector="Button:pointerover Border#BackgroundBorder">
-                    <Setter Property="Background" Value="{DynamicResource LightDefaultOpacity6}"/>
-                  </Style>
-                  <Style Selector="Button:pointerover Line#Underline">
-                    <Setter Property="IsVisible" Value="False"/>
-                  </Style>
-                </Button.Styles>
-                <Button.Template>
-                  <ControlTemplate>
-                    <Border Name="BackgroundBorder"
-                            Padding="{TemplateBinding Padding}"
-                            CornerRadius="8">
-                      <Grid>
-                        <TextBlock Name="TextBlock"
-                                   Text="{TemplateBinding Content}"
-                                   FontSize="{TemplateBinding FontSize}"
-                                   Foreground="{TemplateBinding Foreground}"
-                                   FontFamily="{TemplateBinding FontFamily}"
-                                   FontWeight="{TemplateBinding FontWeight}"
-                                   HorizontalAlignment="Center"
-                                   Padding="0"
-                                   Margin="0 0 0 2"
-                                   LineHeight="16" />
-                        <Line Name="Underline"
-                              Height="1"
-                              Margin="0 17 0 0"
-                              Width="{Binding #TextBlock.Bounds.Width}"
-                              StartPoint="0,0"
-                              EndPoint="{Binding #TextBlock.Bounds.Width, Converter={StaticResource WidthToPointConverter}}"
-                              StrokeThickness="1"
-                              StrokeDashArray="2,2"
-                              Stroke="{DynamicResource LineStrokeBrush}">
-                        </Line>
-                      </Grid>
-                    </Border>
-                  </ControlTemplate>
-                </Button.Template>
-              </Button>
+            <Border Height="1"
+                    Background="{DynamicResource LightDefaultOpacity10}"
+                    VerticalAlignment="Bottom" />
 
-              <Border Name="BottomLine"
-                      Margin="16 0 16 0"
-                      Height="1"
-                      VerticalAlignment="Bottom"
-                      Background="{DynamicResource LightDefaultOpacity10}"
-                      Grid.ColumnSpan="2"/>
-            </Grid>
-          </DataTemplate>
-        </ListBox.ItemTemplate>
-      </ListBox>
-    </Grid>
-  </Border>
+            <ListBox Margin="16 10 16 16"
+                     MaxHeight="460"
+                     ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                     Background="{DynamicResource AlmostTransparentBrush}"
+                     Items="{Binding Currencies}"
+                     SelectionMode="Single"
+                     SelectedItem="{Binding SelectedCurrency}"
+                     Grid.Row="1"
+                     Classes="SelectCurrencyListBox">
+
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <Grid ColumnDefinitions="*,Auto">
+                            <StackPanel Margin="16 14 16 14"
+                                        Orientation="Horizontal"
+                                        VerticalAlignment="Center"
+                                        Grid.Column="0">
+                                <svg:Svg Width="28"
+                                         VerticalAlignment="Center"
+                                         Path="{Binding CurrencyViewModel.IconPath}" />
+                                <TextBlock Margin="17 0 0 0"
+                                           Text="{Binding CurrencyViewModel.Header}"
+                                           FontFamily="{DynamicResource DefaultLightFontFamily}"
+                                           FontSize="18"
+                                           Foreground="{DynamicResource DefaultForegroundBrush}"
+                                           VerticalAlignment="Center" />
+                                <TextBlock Margin="12 0 0 -2"
+                                           FontFamily="{DynamicResource DefaultLightFontFamily}"
+                                           FontSize="16"
+                                           Foreground="{DynamicResource LightDefaultOpacity50}"
+                                           VerticalAlignment="Center">
+                                    <TextBlock.Text>
+                                        <MultiBinding Converter="{StaticResource AmountToStringConverter}">
+                                            <Binding Path="CurrencyViewModel.TotalAmount" Mode="OneWay" />
+                                            <Binding Path="CurrencyViewModel.CurrencyFormat" Mode="OneWay" />
+                                        </MultiBinding>
+                                    </TextBlock.Text>
+                                </TextBlock>
+                                <TextBlock Margin="6 0 0 -2"
+                                           Text="{Binding CurrencyViewModel.CurrencyCode}"
+                                           FontFamily="{DynamicResource DefaultLightFontFamily}"
+                                           FontSize="16"
+                                           Foreground="{DynamicResource LightDefaultOpacity50}"
+                                           VerticalAlignment="Center" />
+                            </StackPanel>
+
+                            <controls:LinkButton Grid.Column="1"
+                                                 Underlined="True"
+                                                 Classes="Dashed WithCorners"
+                                                 Content="{Binding SelectedAddressDescription}"
+                                                 ToolText="Click to change address"
+                                                 Height="30"
+                                                 Margin="0 0 16 0"
+                                                 HorizontalAlignment="Right"
+                                                 Command="{Binding $parent[ListBox].DataContext.ChangeAddressesCommand}"
+                                                 CommandParameter="{Binding}" />
+                            
+                            <Border Name="BottomLine"
+                                    Margin="16 0 16 0"
+                                    Height="1"
+                                    VerticalAlignment="Bottom"
+                                    Background="{DynamicResource LightDefaultOpacity10}"
+                                    Grid.ColumnSpan="2" />
+                        </Grid>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </Grid>
+    </Border>
 </UserControl>

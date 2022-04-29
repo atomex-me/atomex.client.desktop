@@ -1,0 +1,91 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="Atomex.Client.Desktop.Views.AddressView"
+             xmlns:vm="clr-namespace:Atomex.Client.Desktop.ViewModels"
+             xmlns:converters="clr-namespace:Atomex.Client.Desktop.Converters"
+             xmlns:controls="clr-namespace:Atomex.Client.Desktop.Controls">
+
+    <Design.DataContext>
+        <vm:AddressViewModel />
+    </Design.DataContext>
+
+    <UserControl.Resources>
+        <converters:AddressShouldShrinkConverter x:Key="AddressShouldShrinkConverter" />
+        <converters:AddressShouldExpandConverter x:Key="AddressShouldExpandConverter" />
+        <converters:ShortenedAddressConverter x:Key="ShortenedAddressConverter" />
+    </UserControl.Resources>
+
+    <Border Padding="12 0">
+        <Grid Name="AddressItemGrid"
+              ColumnDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto"
+              VerticalAlignment="Stretch">
+            <StackPanel Grid.Column="0"
+                        Orientation="Horizontal">
+
+                <controls:LinkButton Underlined="True"
+                                     Classes="SolidHover"
+                                     FontSize="16"
+                                     Content="{Binding Address}"
+                                     ToolText="{Binding AddressExplorerUri}"
+                                     Command="{Binding OpenInExplorerCommand}"
+                                     IsVisible="{Binding $parent[Border].Bounds.Width,
+                                     Converter={StaticResource AddressShouldExpandConverter}}" />
+
+                <controls:LinkButton Underlined="True"
+                                     Classes="SolidHover"
+                                     FontSize="16"
+                                     Content="{Binding Address, Converter={StaticResource ShortenedAddressConverter}}"
+                                     ToolText="{Binding AddressExplorerUri}"
+                                     Command="{Binding OpenInExplorerCommand}"
+                                     IsVisible="{Binding $parent[Border].Bounds.Width,
+                                     Converter={StaticResource AddressShouldShrinkConverter}}" />
+
+                <controls:CopyButton ToolText="Copy address to clipboard"
+                                     DoneToolText="Copied!"
+                                     Margin="16 0 0 0"
+                                     Command="{Binding CopyCommand}" />
+            </StackPanel>
+
+            <TextBlock Grid.Column="1"
+                       Foreground="{DynamicResource SecondaryForegroundBrush}"
+                       VerticalAlignment="Center"
+                       FontSize="13"
+                       Text="{Binding Path}" />
+
+            <TextBlock Grid.Column="2"
+                       Foreground="{DynamicResource SecondaryForegroundBrush}"
+                       VerticalAlignment="Center"
+                       FontSize="13"
+                       Text="{Binding Type}" />
+
+            <TextBlock Grid.Column="3"
+                       Foreground="{DynamicResource SecondaryForegroundBrush}"
+                       VerticalAlignment="Center"
+                       FontSize="13"
+                       Text="{Binding Balance}" />
+
+            <TextBlock Grid.Column="4"
+                       Foreground="{DynamicResource SecondaryForegroundBrush}"
+                       VerticalAlignment="Center"
+                       FontSize="13"
+                       Text="{Binding TokenBalance}" />
+
+            <controls:IconButton Grid.Column="5"
+                                 Classes="Key"
+                                 HorizontalAlignment="Left"
+                                 Command="{Binding ExportKeyCommand}"
+                                 ToolText="Export address private key" />
+
+            <controls:IconButton Grid.Column="6"
+                                 Classes="Update"
+                                 HorizontalAlignment="Left"
+                                 Classes.Updating="{Binding IsUpdating}"
+                                 Classes.NotUpdating="{Binding !IsUpdating}"
+                                 Command="{Binding UpdateAddressCommand}"
+                                 ToolText="Update address" />
+        </Grid>
+    </Border>
+</UserControl>

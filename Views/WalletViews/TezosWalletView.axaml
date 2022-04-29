@@ -5,13 +5,12 @@
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="Atomex.Client.Desktop.Views.WalletViews.TezosWalletView"
              xmlns:vm="clr-namespace:Atomex.Client.Desktop.ViewModels.WalletViewModels"
-             xmlns:txViewModels="clr-namespace:Atomex.Client.Desktop.ViewModels.TransactionViewModels"
              xmlns:controls="clr-namespace:Atomex.Client.Desktop.Controls"
              xmlns:converters="clr-namespace:Atomex.Client.Desktop.Converters"
-             xmlns:styles="clr-namespace:Atomex.Client.Desktop.Styles"
-             xmlns:helpers="clr-namespace:Atomex.Client.Desktop.Helpers"
              xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
-             xmlns:ia="clr-namespace:Avalonia.Xaml.Interactions.Core;assembly=Avalonia.Xaml.Interactions">
+             xmlns:ia="clr-namespace:Avalonia.Xaml.Interactions.Core;assembly=Avalonia.Xaml.Interactions"
+             xmlns:svg="clr-namespace:Avalonia.Svg.Skia;assembly=Avalonia.Svg.Skia"
+             xmlns:atomexCore="clr-namespace:Atomex;assembly=Atomex.Client.Core">
 
     <Design.DataContext>
         <vm:TezosWalletViewModel />
@@ -20,456 +19,656 @@
     <UserControl.Resources>
         <converters:AmountToStringConverter x:Key="AmountToStringConverter" />
         <converters:DateTimeToTxTimeConverter x:Key="DateTimeToTxTimeConverter" />
-        <converters:TezosDelegationCurrencyFormatConverter x:Key="TezosDelegationCurrencyFormatConverter" />
+        <converters:ShowBuyButton x:Key="ShowBuyButton" />
+        <converters:GreaterThanZeroConverter x:Key="GreaterThanZeroConverter" />
+        <converters:LowerThanZeroConverter x:Key="LowerThanZeroConverter" />
+        <converters:StringToImageConverter x:Key="StringToImageConverter" />
+        <converters:StringsConcatConverter x:Key="StringsConcatConverter" />
+        <converters:AddressShouldShrinkConverter x:Key="AddressShouldShrinkConverter" />
+        <converters:AddressShouldExpandConverter x:Key="AddressShouldExpandConverter" />
+        <converters:ShortenedAddressConverter x:Key="ShortenedAddressConverter" />
+        <converters:EnumToStringEqualConverter x:Key="EnumToStringEqualConverter" />
     </UserControl.Resources>
 
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
-        </Grid.RowDefinitions>
+    <Grid RowDefinitions="Auto,*"
+          Name="DesignGrid">
+        <Grid Grid.Row="0"
+              ColumnDefinitions="Auto,*"
+              Margin="0 40 0 0">
+            <Border Grid.Column="0"
+                    Background="{DynamicResource LightDefaultOpacity10}"
+                    Width="150"
+                    Height="150"
+                    CornerRadius="150" />
+            <svg:Svg Grid.Column="0"
+                     Path="{Binding CurrencyViewModel.IconPath}"
+                     Height="55" />
 
-        <StackPanel Orientation="Horizontal"
-                    HorizontalAlignment="Center"
-                    Margin="10 20 10 10"
-                    Grid.Row="0">
-            <Border Background="{DynamicResource DefaultSubstrateBrush}"
-                    CornerRadius="10"
-                    MinWidth="483"
-                    MinHeight="160">
-                <Grid>
-                    <StackPanel Orientation="Vertical"
-                                IsEnabled="True"
-                                IsVisible="{Binding !IsBalanceUpdating}">
-                        <StackPanel Orientation="Horizontal"
-                                    Margin="20 20 20 0">
-                            <Image Source="{Binding CurrencyViewModel.LargeIconPath}"
-                                   Width="90"
-                                   Height="90"
-                                   VerticalAlignment="Top" />
-                            <StackPanel Orientation="Vertical"
-                                        Margin="20 10 0 0">
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock Foreground="{DynamicResource BalanceBackgroundBrush}"
-                                               FontFamily="{DynamicResource DefaultFontFamily}"
-                                               FontSize="36"
-                                               VerticalAlignment="Bottom"
-                                               HorizontalAlignment="Left"
-                                               Classes="BaseDisabledStyle">
-                                        <TextBlock.Text>
-                                            <MultiBinding Converter="{StaticResource AmountToStringConverter}">
-                                                <Binding Path="CurrencyViewModel.TotalAmount" Mode="OneWay" />
-                                                <Binding Path="CurrencyViewModel.CurrencyFormat" Mode="OneWay" />
-                                            </MultiBinding>
-                                        </TextBlock.Text>
-                                    </TextBlock>
-                                    <TextBlock Text="{Binding CurrencyViewModel.CurrencyCode}"
-                                               Foreground="{DynamicResource BalanceBackgroundBrush}"
-                                               FontFamily="{DynamicResource DefaultFontFamily}"
-                                               VerticalAlignment="Bottom"
-                                               FontSize="22"
-                                               HorizontalAlignment="Left"
-                                               Margin="5 0 0 0"
-                                               Padding="0 0 0 4"
-                                               Classes="BaseDisabledStyle" />
-                                </StackPanel>
-                                <StackPanel Orientation="Horizontal"
-                                            Margin="0 -5 0 0">
-                                    <TextBlock Foreground="{DynamicResource UsdBalanceBackgroundBrush}"
-                                               FontFamily="{DynamicResource DefaultFontFamily}"
-                                               FontSize="24"
-                                               VerticalAlignment="Bottom"
-                                               HorizontalAlignment="Left"
-                                               Classes="BaseDisabledStyle">
-                                        <TextBlock.Text>
-                                            <MultiBinding Converter="{StaticResource AmountToStringConverter}">
-                                                <Binding Path="CurrencyViewModel.TotalAmountInBase" Mode="OneWay" />
-                                                <Binding Path="CurrencyViewModel.BaseCurrencyFormat" Mode="OneWay" />
-                                            </MultiBinding>
-                                        </TextBlock.Text>
-                                    </TextBlock>
-                                    <TextBlock Text="{Binding CurrencyViewModel.BaseCurrencyCode}"
-                                               Foreground="{DynamicResource UsdBalanceBackgroundBrush}"
-                                               FontFamily="{DynamicResource DefaultFontFamily}"
-                                               VerticalAlignment="Bottom"
-                                               FontSize="14"
-                                               HorizontalAlignment="Left"
-                                               Margin="2 0 0 0"
-                                               Padding="0 0 0 2"
-                                               Classes="BaseDisabledStyle" />
-                                </StackPanel>
-                                <Grid HorizontalAlignment="Left"
-                                      IsVisible="{Binding CurrencyViewModel.HasUnconfirmedAmount}"
-                                      Margin="0 10 0 0">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="Auto" />
-                                        <ColumnDefinition Width="Auto" />
-                                        <ColumnDefinition Width="Auto" />
-                                        <ColumnDefinition Width="Auto" />
-                                    </Grid.ColumnDefinitions>
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="27" />
-                                    </Grid.RowDefinitions>
-
-                                    <Border Grid.Column="0"
-                                            Grid.Row="0"
-                                            ToolTip.Placement="AnchorAndGravity"
-                                            ToolTip.VerticalOffset="-32">
-                                        <Path Data="{DynamicResource FontAwesome.QuestionCircleSolid}"
-                                              Fill="{DynamicResource UnconfirmedAmountBrush}"
-                                              Cursor="Help"
-                                              Width="21"
-                                              Height="21"
-                                              Stretch="Uniform" />
-                                        <ToolTip.Tip>
-                                            <TextBlock Text="Unconfirmed" />
-                                        </ToolTip.Tip>
-                                    </Border>
-
-                                    <Border Grid.Column="1"
-                                            Grid.Row="0"
-                                            ToolTip.Placement="AnchorAndGravity"
-                                            ToolTip.VerticalOffset="-32">
-                                        <TextBlock FontFamily="{DynamicResource DefaultFontFamily}"
-                                                   FontSize="14"
-                                                   Foreground="{DynamicResource UnconfirmedAmountBrush}"
-                                                   VerticalAlignment="Center"
-                                                   HorizontalAlignment="Right"
-                                                   Margin="7 0 0 0"
-                                                   Classes="BaseDisabledStyle">
-                                            <TextBlock.Text>
-                                                <MultiBinding Converter="{StaticResource AmountToStringConverter}">
-                                                    <Binding Path="CurrencyViewModel.UnconfirmedAmount" Mode="OneWay" />
-                                                    <Binding Path="CurrencyViewModel.CurrencyFormat" Mode="OneWay" />
-                                                </MultiBinding>
-                                            </TextBlock.Text>
-                                        </TextBlock>
-                                        <ToolTip.Tip>
-                                            <TextBlock Text="Unconfirmed" />
-                                        </ToolTip.Tip>
-                                    </Border>
-
-                                    <Border Grid.Column="2"
-                                            Grid.Row="0"
-                                            ToolTip.Placement="AnchorAndGravity"
-                                            ToolTip.VerticalOffset="-32">
-                                        <TextBlock Text="{Binding CurrencyViewModel.CurrencyCode}"
-                                                   FontFamily="{DynamicResource DefaultFontFamily}"
-                                                   FontSize="8"
-                                                   Foreground="{DynamicResource UnconfirmedAmountBrush}"
-                                                   VerticalAlignment="Center"
-                                                   Margin="4 0 0 0"
-                                                   Padding="0 3 0 0"
-                                                   Classes="BaseDisabledStyle" />
-                                        <ToolTip.Tip>
-                                            <TextBlock Text="Unconfirmed" />
-                                        </ToolTip.Tip>
-                                    </Border>
-
-                                    <Border Grid.Column="3"
-                                            Grid.Row="0"
-                                            ToolTip.Placement="AnchorAndGravity"
-                                            ToolTip.VerticalOffset="-32">
-                                        <TextBlock FontFamily="{DynamicResource DefaultFontFamily}"
-                                                   FontSize="11"
-                                                   Foreground="DarkGray"
-                                                   VerticalAlignment="Center"
-                                                   Margin="7 0 0 0"
-                                                   Padding="0 2 0 0"
-                                                   Classes="BaseDisabledStyle">
-                                            <TextBlock.Text>
-                                                <MultiBinding Converter="{StaticResource AmountToStringConverter}">
-                                                    <Binding Path="CurrencyViewModel.UnconfirmedAmountInBase"
-                                                             Mode="OneWay" />
-                                                    <Binding Path="CurrencyViewModel.BaseCurrencyFormat" Mode="OneWay" />
-                                                </MultiBinding>
-                                            </TextBlock.Text>
-                                        </TextBlock>
-                                        <ToolTip.Tip>
-                                            <TextBlock Text="Unconfirmed" />
-                                        </ToolTip.Tip>
-                                    </Border>
-                                </Grid>
-                            </StackPanel>
+            <StackPanel Grid.Column="1"
+                        Margin="40 0 0 0">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Foreground="{DynamicResource DefaultForegroundBrush}"
+                               FontSize="32"
+                               LineHeight="40">
+                        <TextBlock.Text>
+                            <MultiBinding Converter="{StaticResource AmountToStringConverter}">
+                                <Binding Path="CurrencyViewModel.TotalAmount" Mode="OneWay" />
+                                <Binding Path="CurrencyViewModel.CurrencyFormat" Mode="OneWay" />
+                            </MultiBinding>
+                        </TextBlock.Text>
+                    </TextBlock>
+                    <TextBlock Margin="6 0 0 0"
+                               Foreground="{DynamicResource DefaultForegroundBrush}"
+                               FontSize="32"
+                               LineHeight="40"
+                               Text="{Binding CurrencyViewModel.CurrencyCode}" />
+                    <controls:IconButton Classes="Update Big WithToolTipContent"
+                                         Classes.Updating="{Binding IsBalanceUpdating}"
+                                         Classes.NotUpdating="{Binding !IsBalanceUpdating}"
+                                         Margin="15 0 0 0"
+                                         Command="{Binding UpdateCommand}">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="Update " />
+                            <TextBlock Text="{Binding Currency.Description}" />
                         </StackPanel>
+                    </controls:IconButton>
+                </StackPanel>
 
-                        <StackPanel HorizontalAlignment="Center"
-                                    Margin="10"
-                                    Orientation="Horizontal"
-                                    IsVisible="True">
-                            <controls:RoundedButton
-                                Content="Send"
-                                Margin="0 0 2 0"
-                                Command="{Binding SendCommand}"
-                                IsEnabled="{Binding Currency.IsTransactionsAvailable}"
-                                Classes="WalletMenuButton" />
-                            <controls:RoundedButton
-                                Content="Receive"
-                                Margin="2 0 2 0"
-                                Command="{Binding ReceiveCommand}"
-                                IsEnabled="{Binding Currency.IsTransactionsAvailable}"
-                                Classes="WalletMenuButton" />
-                            <controls:RoundedButton
-                                Content="Convert"
-                                Margin="1 0 1 0"
-                                Command="{Binding ConvertCommand}"
-                                IsEnabled="{Binding Currency.IsSwapAvailable}"
-                                Classes="WalletMenuButton" />
-                            <controls:RoundedButton
-                                Content="Update"
-                                Margin="2 0 1 0"
-                                Command="{Binding UpdateCommand}"
-                                IsEnabled="{Binding Currency.IsTransactionsAvailable}"
-                                Classes="WalletMenuButton" />
-                            <controls:RoundedButton
-                                Content="Addresses"
-                                Margin="2 0 0 0"
-                                Command="{Binding AddressesCommand}"
-                                Classes="WalletMenuButton" />
+                <TextBlock Foreground="{DynamicResource DefaultForegroundBrush}"
+                           FontSize="13"
+                           LineHeight="16">
+                    <TextBlock.Text>
+                        <MultiBinding Converter="{StaticResource AmountToStringConverter}">
+                            <Binding Path="CurrencyViewModel.TotalAmountInBase" Mode="OneWay" />
+                            <Binding Path="CurrencyViewModel.BaseCurrencyFormat" Mode="OneWay" />
+                        </MultiBinding>
+                    </TextBlock.Text>
+                </TextBlock>
+
+                <StackPanel Orientation="Horizontal"
+                            Margin="0 24 0 0">
+                    <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
+                               FontSize="13"
+                               LineHeight="16"
+                               Text="1" />
+                    <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
+                               FontSize="13"
+                               LineHeight="16"
+                               Margin="4 0"
+                               Text="{Binding CurrencyViewModel.CurrencyCode}" />
+                    <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
+                               FontSize="13"
+                               LineHeight="16"
+                               Text="=" />
+                    <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
+                               FontSize="13"
+                               LineHeight="16"
+                               Margin="4 0 0 0">
+                        <TextBlock.Text>
+                            <MultiBinding Converter="{StaticResource AmountToStringConverter}">
+                                <Binding Path="CurrencyViewModel.CurrentQuote" Mode="OneWay" />
+                                <Binding Path="CurrencyViewModel.BaseCurrencyFormat" Mode="OneWay" />
+                            </MultiBinding>
+                        </TextBlock.Text>
+                    </TextBlock>
+
+                    <TextBlock FontSize="13"
+                               LineHeight="16"
+                               Margin="10 0 0 0"
+                               Text="{Binding CurrencyViewModel.DailyChangePercent,
+                               Converter={StaticResource PercentConverter}}"
+                               Classes="Success"
+                               Classes.UnSuccess="{Binding CurrencyViewModel.DailyChangePercent,
+                               Converter={StaticResource LowerThanZeroConverter}}" />
+                </StackPanel>
+
+                <WrapPanel Margin="0 16 0 0"
+                           Orientation="Horizontal"
+                           VerticalAlignment="Top">
+
+                    <controls:RoundedButton Height="46"
+                                            Padding="26 0"
+                                            CornerRadius="{DynamicResource AtomexCornerRadius}"
+                                            Command="{Binding SendCommand}"
+                                            Margin="0 0 12 12">
+                        <StackPanel Orientation="Horizontal">
+                            <svg:Svg HorizontalAlignment="Center"
+                                     Width="24"
+                                     Height="24"
+                                     Path="/Resources/Icons/top-right-arrow.svg" />
+                            <TextBlock Margin="8 0 0 0"
+                                       Text="Send"
+                                       FontSize="18"
+                                       Foreground="{DynamicResource RoundedButtonForegroundBrush}" />
                         </StackPanel>
-                    </StackPanel>
+                    </controls:RoundedButton>
+                    <controls:RoundedButton Height="46"
+                                            Padding="26 0"
+                                            CornerRadius="{DynamicResource AtomexCornerRadius}"
+                                            Command="{Binding ReceiveCommand}"
+                                            Margin="0 0 12 12">
+                        <StackPanel Orientation="Horizontal">
+                            <svg:Svg HorizontalAlignment="Center"
+                                     Width="24"
+                                     Height="24"
+                                     Path="/Resources/Icons/bottom-right-arrow.svg" />
+                            <TextBlock Margin="8 0 0 0"
+                                       Text="Receive"
+                                       FontSize="18"
+                                       Foreground="{DynamicResource RoundedButtonForegroundBrush}" />
+                        </StackPanel>
+                    </controls:RoundedButton>
+                    <controls:RoundedButton Height="46"
+                                            Padding="26 0"
+                                            CornerRadius="{DynamicResource AtomexCornerRadius}"
+                                            Command="{Binding ExchangeCommand}"
+                                            Margin="0 0 12 12"
+                                            Classes="AccentButton">
+                        <StackPanel Orientation="Horizontal">
+                            <svg:Svg HorizontalAlignment="Center"
+                                     Width="24"
+                                     Height="24"
+                                     Path="/Resources/Icons/exchange-arrows.svg" />
+                            <TextBlock Margin="8 0 0 0"
+                                       Text="Exchange"
+                                       FontSize="18"
+                                       Foreground="{DynamicResource DeepBlue}" />
+                        </StackPanel>
+                    </controls:RoundedButton>
+                    <controls:RoundedButton Height="46"
+                                            Padding="26 0"
+                                            CornerRadius="{DynamicResource AtomexCornerRadius}"
+                                            Command="{Binding BuyCommand}"
+                                            Margin="0 0 12 12"
+                                            IsVisible="{Binding CurrencyViewModel.CurrencyCode, Converter={StaticResource ShowBuyButton}}"
+                                            Classes="GrayButton">
+                        <StackPanel Orientation="Horizontal">
+                            <svg:Svg HorizontalAlignment="Center"
+                                     Width="24"
+                                     Height="24"
+                                     Path="/Resources/Icons/plus.svg" />
+                            <TextBlock Margin="8 0 0 0"
+                                       Text="Buy"
+                                       FontSize="18" />
+                        </StackPanel>
+                    </controls:RoundedButton>
+                    <controls:RoundedButton Height="46"
+                                            Padding="26 0"
+                                            CornerRadius="{DynamicResource AtomexCornerRadius}"
+                                            Command="{Binding DelegateCommand}"
+                                            Margin="0 0 12 12"
+                                            Classes="GrayButton">
+                        <TextBlock Text="Delegate"
+                                   FontSize="18" />
+                    </controls:RoundedButton>
+                </WrapPanel>
+            </StackPanel>
+        </Grid>
 
-                    <StackPanel Orientation="Horizontal"
-                                Margin="10"
-                                HorizontalAlignment="Center"
-                                VerticalAlignment="Center"
-                                IsVisible="{Binding IsBalanceUpdating}">
-                        <Image Name="CurrencyLogo"
-                               Classes="CurrencyLogo"
-                               Source="{Binding CurrencyViewModel.LargeIconPath}"
-                               Margin="0 0 0 0"
-                               Width="64"
-                               Height="64"
-                               VerticalAlignment="Top"
-                               IsEnabled="{Binding IsBalanceUpdating}">
-                            <Image.RenderTransform>
-                                <RotateTransform Angle="0" />
-                            </Image.RenderTransform>
-                        </Image>
-                        <TextBlock Name="UpdatingTextBlock"
-                                   Classes="UpdatingTextBlock"
-                                   Text="balance update in progress..."
-                                   Margin="10 0 0 0"
-                                   Foreground="{DynamicResource DefaultForegroundBrush}"
-                                   FontFamily="{DynamicResource DefaultFontFamily}"
-                                   FontSize="15"
-                                   VerticalAlignment="Center"
-                                   IsEnabled="{Binding IsBalanceUpdating}" />
-                    </StackPanel>
+        <TabControl Grid.Row="1"
+                    Margin="0 4 0 0"
+                    Classes="WalletTabControl">
+            <TabItem Margin="0 0 16 0"
+                     Classes="WalletTabItem">
+                <TabItem.Header>
+                    <TextBlock VerticalAlignment="Center"
+                               FontSize="16"
+                               Text="Activity" />
+                </TabItem.Header>
 
-                    <Border>
-                        <Button Classes="ChildViewCloseButtonLight"
-                                Width="24"
-                                Height="24"
-                                Margin="0 5 2 0"
-                                HorizontalAlignment="Right"
-                                VerticalAlignment="Top"
-                                Command="{Binding CancelUpdateCommand}"
-                                IsVisible="{Binding IsBalanceUpdating}" />
-                        <ToolTip.Tip>
-                            <TextBlock Text="Cancel" />
-                        </ToolTip.Tip>
+                <Grid RowDefinitions="Auto,*"
+                      Classes="NoCloseRightPopup">
+                    <Border Grid.Row="0"
+                            Background="{DynamicResource LightDefaultOpacity6}"
+                            VerticalAlignment="Top"
+                            CornerRadius="{DynamicResource AtomexCornerRadius}"
+                            Height="34"
+                            Margin="0 16 0 0"
+                            Padding="12 0">
+                        <Grid ColumnDefinitions="7*,5.5*,3*,4.5*"
+                              VerticalAlignment="Stretch">
+                            <Button Grid.Column="0"
+                                    Padding="0"
+                                    VerticalAlignment="Stretch"
+                                    VerticalContentAlignment="Center"
+                                    IsEnabled="False"
+                                    Classes="EmptyBtnWithContent">
+                                <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
+                                           FontSize="13"
+                                           Text="Description" />
+                            </Button>
+                            
+                            <controls:SortButton Grid.Column="1"
+                                                 Title="Amount"
+                                                 Command="{Binding SetSortTypeCommand}"
+                                                 CommandParameter="{x:Static vm:TxSortField.ByAmount}">
+                                <controls:SortButton.SortIsAsc>
+                                    <MultiBinding Converter="{x:Static BoolConverters.And}">
+                                        <Binding Path="CurrentSortDirection"
+                                                 Converter="{StaticResource EnumToStringEqualConverter}"
+                                                 ConverterParameter="{x:Static vm:SortDirection.Asc}" />
+                                        <Binding Path="CurrentSortField"
+                                                 Converter="{StaticResource EnumToStringEqualConverter}"
+                                                 ConverterParameter="{x:Static vm:TxSortField.ByAmount}" />
+                                    </MultiBinding>
+                                </controls:SortButton.SortIsAsc>
+                                <controls:SortButton.SortIsDesc>
+                                    <MultiBinding Converter="{x:Static BoolConverters.And}">
+                                        <Binding Path="CurrentSortDirection"
+                                                 Converter="{StaticResource EnumToStringEqualConverter}"
+                                                 ConverterParameter="{x:Static vm:SortDirection.Desc}" />
+                                        <Binding Path="CurrentSortField"
+                                                 Converter="{StaticResource EnumToStringEqualConverter}"
+                                                 ConverterParameter="{x:Static vm:TxSortField.ByAmount}" />
+                                    </MultiBinding>
+                                </controls:SortButton.SortIsDesc>
+                            </controls:SortButton>
+                            
+                            <controls:SortButton Grid.Column="2"
+                                                 Title="Status"
+                                                 Command="{Binding SetSortTypeCommand}"
+                                                 CommandParameter="{x:Static vm:TxSortField.ByStatus}">
+                                <controls:SortButton.SortIsAsc>
+                                    <MultiBinding Converter="{x:Static BoolConverters.And}">
+                                        <Binding Path="CurrentSortDirection"
+                                                 Converter="{StaticResource EnumToStringEqualConverter}"
+                                                 ConverterParameter="{x:Static vm:SortDirection.Asc}" />
+                                        <Binding Path="CurrentSortField"
+                                                 Converter="{StaticResource EnumToStringEqualConverter}"
+                                                 ConverterParameter="{x:Static vm:TxSortField.ByStatus}" />
+                                    </MultiBinding>
+                                </controls:SortButton.SortIsAsc>
+                                <controls:SortButton.SortIsDesc>
+                                    <MultiBinding Converter="{x:Static BoolConverters.And}">
+                                        <Binding Path="CurrentSortDirection"
+                                                 Converter="{StaticResource EnumToStringEqualConverter}"
+                                                 ConverterParameter="{x:Static vm:SortDirection.Desc}" />
+                                        <Binding Path="CurrentSortField"
+                                                 Converter="{StaticResource EnumToStringEqualConverter}"
+                                                 ConverterParameter="{x:Static vm:TxSortField.ByStatus}" />
+                                    </MultiBinding>
+                                </controls:SortButton.SortIsDesc>
+                            </controls:SortButton>
+                            <controls:SortButton Grid.Column="3"
+                                                 Title="Time"
+                                                 Command="{Binding SetSortTypeCommand}"
+                                                 CommandParameter="{x:Static vm:TxSortField.ByTime}">
+                                <controls:SortButton.SortIsAsc>
+                                    <MultiBinding Converter="{x:Static BoolConverters.And}">
+                                        <Binding Path="CurrentSortDirection"
+                                                 Converter="{StaticResource EnumToStringEqualConverter}"
+                                                 ConverterParameter="{x:Static vm:SortDirection.Asc}" />
+                                        <Binding Path="CurrentSortField"
+                                                 Converter="{StaticResource EnumToStringEqualConverter}"
+                                                 ConverterParameter="{x:Static vm:TxSortField.ByTime}" />
+                                    </MultiBinding>
+                                </controls:SortButton.SortIsAsc>
+                                <controls:SortButton.SortIsDesc>
+                                    <MultiBinding Converter="{x:Static BoolConverters.And}">
+                                        <Binding Path="CurrentSortDirection"
+                                                 Converter="{StaticResource EnumToStringEqualConverter}"
+                                                 ConverterParameter="{x:Static vm:SortDirection.Desc}" />
+                                        <Binding Path="CurrentSortField"
+                                                 Converter="{StaticResource EnumToStringEqualConverter}"
+                                                 ConverterParameter="{x:Static vm:TxSortField.ByTime}" />
+                                    </MultiBinding>
+                                </controls:SortButton.SortIsDesc>
+                            </controls:SortButton>
+                        </Grid>
                     </Border>
-                </Grid>
-            </Border>
 
-            <Border Background="{DynamicResource DefaultSubstrateBrush}"
-                    CornerRadius="10"
-                    Margin="10 0 0 0"
-                    MaxHeight="160"
-                    MinWidth="350">
-                <Grid>
-                    <StackPanel Orientation="Vertical"
-                                VerticalAlignment="Center"
-                                HorizontalAlignment="Center"
-                                IsVisible="{Binding !HasDelegations}">
-                        <TextBlock Text="No delegations found"
-                                   HorizontalAlignment="Center"
-                                   Foreground="{StaticResource NoDelegationsBrush}" />
-                        <controls:RoundedButton
-                            Margin="0 10 0 0"
-                            VerticalAlignment="Bottom"
-                            HorizontalAlignment="Center"
-                            Content="Delegate"
-                            Classes="WalletMenuButton"
-                            Command="{Binding DelegateCommand}"
-                            IsEnabled="{Binding CanDelegate}" />
-                    </StackPanel>
+                    <ListBox Grid.Row="1"
+                             Background="{DynamicResource AlmostTransparentBrush}"
+                             Items="{Binding Transactions}"
+                             SelectedItem="{Binding SelectedTransaction, Mode=TwoWay}"
+                             HorizontalAlignment="Stretch"
+                             VerticalAlignment="Stretch"
+                             SelectionMode="Single"
+                             Name="TransactionsListBox">
+                        <ListBox.Styles>
+                            <Style Selector="ListBoxItem">
+                                <Setter Property="Padding" Value="0" />
+                                <Setter Property="Height" Value="62" />
+                                <Setter Property="VerticalContentAlignment" Value="Stretch" />
+                                <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                                <Setter Property="Cursor" Value="Hand" />
+                                <Setter Property="BorderThickness" Value="0 0 0 1" />
+                                <Setter Property="BorderBrush" Value="{DynamicResource LightDefaultOpacity10}" />
+                            </Style>
+                            <Style Selector="ListBoxItem:selected /template/ ContentPresenter">
+                                <Setter Property="Background" Value="{DynamicResource LightDefaultOpacity6}" />
+                                <Setter Property="CornerRadius" Value="6" />
+                            </Style>
+                            <Style Selector="ListBoxItem:not(:selected) /template/ ContentPresenter">
+                                <Setter Property="Background" Value="{DynamicResource AlmostTransparentBrush}" />
+                            </Style>
+                        </ListBox.Styles>
 
-                    <ListBox Margin="10 10 10 50"
-                             MaxHeight="140"
-                             Background="#1F000000"
-                             BorderThickness="0"
-                             ScrollViewer.HorizontalScrollBarVisibility="Hidden"
-                             Items="{Binding Delegations}"
-                             IsVisible="{Binding HasDelegations}">
-                        <!-- <ListBox.ItemContainerStyle> -->
-                        <!--     <Style TargetType="{x:Type ListBoxItem}"> -->
-                        <!--         <Setter Property="Background" Value="Transparent" /> -->
-                        <!--         <Setter Property="BorderThickness" Value="0" /> -->
-                        <!--     </Style> -->
-                        <!-- </ListBox.ItemContainerStyle> -->
                         <ListBox.ItemTemplate>
-                            <DataTemplate DataType="{x:Type vm:Delegation}">
-                                <Grid MaxHeight="20">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="34" />
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="*" />
-                                        <!--<ColumnDefinition Width="26"/>-->
-                                    </Grid.ColumnDefinitions>
-                                    <Image Width="30"
-                                           Height="30"
-                                           Margin="2"
-                                           Source="{Binding GetBakerLogo}"
-                                           VerticalAlignment="Center"
-                                           HorizontalAlignment="Center"
-                                           Grid.Column="0" />
-                                    <TextBlock Text="{Binding Address}"
-                                               Margin="3 0 0 0"
-                                               VerticalAlignment="Center"
-                                               FontSize="10"
-                                               FontFamily="{DynamicResource DefaultLightFontFamily}"
-                                               Foreground="{DynamicResource DefaultForegroundBrush}"
-                                               Grid.Column="1" />
-                                    <TextBlock
-                                        Text="{Binding Balance, Converter={StaticResource TezosDelegationCurrencyFormatConverter}}"
-                                        Margin="10 0 5 0"
-                                        VerticalAlignment="Center"
-                                        HorizontalAlignment="Center"
-                                        FontSize="10"
-                                        FontFamily="{DynamicResource DefaultLightFontFamily}"
-                                        Foreground="{DynamicResource DelegatedAmountBrush}"
-                                        Grid.Column="2" />
-                                </Grid>
+                            <DataTemplate>
+                                <Border Padding="12 0">
+                                    <Grid ColumnDefinitions="7*,5.5*,3*,4.5*"
+                                          VerticalAlignment="Stretch">
+
+                                        <ContentControl Grid.Column="0"
+                                                        VerticalAlignment="Center"
+                                                        Content="{Binding}">
+                                            <ContentControl.ContentTemplate>
+                                                <controls:TransactionDescriptionDataTemplateSelector />
+                                            </ContentControl.ContentTemplate>
+                                        </ContentControl>
+
+                                        <StackPanel Grid.Column="1"
+                                                    Orientation="Horizontal">
+                                            <TextBlock VerticalAlignment="Center"
+                                                       FontSize="16"
+                                                       Classes="AmountListBoxItem"
+                                                       Classes.PositiveAmount="{Binding Amount, Converter={StaticResource GreaterThanZeroConverter}}">
+                                                <TextBlock.Text>
+                                                    <MultiBinding Converter="{StaticResource AmountToStringConverter}">
+                                                        <Binding Path="Amount" Mode="OneWay" />
+                                                        <Binding Path="AmountFormat" Mode="OneWay" />
+                                                        <Binding Path="Amount" Mode="OneWay"
+                                                                 Converter="{StaticResource GreaterThanZeroConverter}" />
+                                                    </MultiBinding>
+                                                </TextBlock.Text>
+                                            </TextBlock>
+                                            <TextBlock VerticalAlignment="Center"
+                                                       FontSize="16"
+                                                       Margin="4 0 0 0"
+                                                       Classes="AmountListBoxItem"
+                                                       Classes.PositiveAmount="{Binding Amount, Converter={StaticResource GreaterThanZeroConverter}}"
+                                                       Text="{Binding CurrencyCode}" />
+                                        </StackPanel>
+
+                                        <ContentControl Grid.Column="2" Content="{Binding}">
+                                            <ContentControl.ContentTemplate>
+                                                <controls:TransactionStateDataTemplateSelector />
+                                            </ContentControl.ContentTemplate>
+                                        </ContentControl>
+
+                                        <TextBlock Grid.Column="3"
+                                                   Foreground="{DynamicResource SecondaryForegroundBrush}"
+                                                   VerticalAlignment="Center"
+                                                   FontSize="13"
+                                                   LineHeight="16"
+                                                   Text="{Binding LocalTime, Converter={StaticResource DateTimeToTxTimeConverter}}" />
+                                    </Grid>
+                                </Border>
                             </DataTemplate>
                         </ListBox.ItemTemplate>
                     </ListBox>
-
-                    <controls:RoundedButton
-                        Margin="0 0 10 10"
-                        VerticalAlignment="Bottom"
-                        HorizontalAlignment="Right"
-                        Content="Delegate"
-                        Classes="WalletMenuButton"
-                        Command="{Binding DelegateCommand}"
-                        IsVisible="{Binding HasDelegations}" />
                 </Grid>
-            </Border>
-        </StackPanel>
+            </TabItem>
+            <!-- <TabItem Margin="16 0" -->
+            <!--          Classes="WalletTabItem"> -->
+            <!--     <TabItem.Header> -->
+            <!--         <TextBlock VerticalAlignment="Center" -->
+            <!--                    FontSize="16" -->
+            <!--                    Text="Collectibles" /> -->
+            <!--     </TabItem.Header> -->
+            <!--     <TextBlock Text="Collectibles tab" /> -->
+            <!-- </TabItem> -->
+            <TabItem Margin="16 0 "
+                     Classes="WalletTabItem">
+                <TabItem.Header>
+                    <TextBlock VerticalAlignment="Center"
+                               FontSize="16"
+                               Text="Addresses" />
+                </TabItem.Header>
+                <ContentControl Content="{Binding AddressesViewModel}" />
+            </TabItem>
+            <TabItem Margin="16 0"
+                     Classes="WalletTabItem">
+                <TabItem.Header>
+                    <TextBlock VerticalAlignment="Center"
+                               FontSize="16"
+                               Text="Delegations" />
+                </TabItem.Header>
+                <Grid RowDefinitions="Auto,*">
+                    <Border Grid.Row="0"
+                            Background="{DynamicResource LightDefaultOpacity6}"
+                            VerticalAlignment="Top"
+                            CornerRadius="{DynamicResource AtomexCornerRadius}"
+                            Height="34"
+                            Margin="0 16 0 0"
+                            Padding="12 0">
+                        <Grid ColumnDefinitions="8*,3.5*,3.5*,3*,2*"
+                              VerticalAlignment="Stretch">
+                            <Button Grid.Column="0"
+                                    Padding="0"
+                                    VerticalAlignment="Stretch"
+                                    VerticalContentAlignment="Center"
+                                    IsEnabled="False"
+                                    Classes="EmptyBtnWithContent">
+                                <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
+                                           FontSize="13"
+                                           Text="Address" />
+                            </Button>
+                            <controls:SortButton Grid.Column="1"
+                                                 Title="Balance"
+                                                 Command="{Binding SetDelegationSortTypeCommand}"
+                                                 CommandParameter="{x:Static vm:DelegationSortField.ByBalance}">
+                                <controls:SortButton.SortIsAsc>
+                                    <MultiBinding Converter="{x:Static BoolConverters.And}">
+                                        <Binding Path="CurrentDelegationSortDirection"
+                                                 Converter="{StaticResource EnumToStringEqualConverter}"
+                                                 ConverterParameter="{x:Static vm:SortDirection.Asc}" />
+                                        <Binding Path="CurrentDelegationSortField"
+                                                 Converter="{StaticResource EnumToStringEqualConverter}"
+                                                 ConverterParameter="{x:Static vm:DelegationSortField.ByBalance}" />
+                                    </MultiBinding>
+                                </controls:SortButton.SortIsAsc>
+                                <controls:SortButton.SortIsDesc>
+                                    <MultiBinding Converter="{x:Static BoolConverters.And}">
+                                        <Binding Path="CurrentDelegationSortDirection"
+                                                 Converter="{StaticResource EnumToStringEqualConverter}"
+                                                 ConverterParameter="{x:Static vm:SortDirection.Desc}" />
+                                        <Binding Path="CurrentDelegationSortField"
+                                                 Converter="{StaticResource EnumToStringEqualConverter}"
+                                                 ConverterParameter="{x:Static vm:DelegationSortField.ByBalance}" />
+                                    </MultiBinding>
+                                </controls:SortButton.SortIsDesc>
+                            </controls:SortButton>
+                            <Button Grid.Column="2"
+                                    Padding="0"
+                                    VerticalAlignment="Stretch"
+                                    VerticalContentAlignment="Center"
+                                    IsEnabled="False"
+                                    Classes="EmptyBtnWithContent">
+                                <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
+                                           FontSize="13"
+                                           Text="Validator" />
+                            </Button>
 
-        <DataGrid x:Name="DgTransactions"
-                  Margin="10"
-                  ColumnWidth="*"
-                  AutoGenerateColumns="False"
-                  IsReadOnly="True"
-                  RowDetailsVisibilityMode="VisibleWhenSelected"
-                  SelectionMode="Single"
-                  SelectedIndex="{Binding DGSelectedIndex, Mode=OneWay}"
-                  Items="{Binding Transactions}"
-                  helpers:DataGridHelper.SortInfo="{Binding SortInfo}"
-                  CanUserResizeColumns="True"
-                  Grid.Row="1">
+                            <controls:SortButton Grid.Column="3"
+                                                 Title="Est. ROI, %"
+                                                 Command="{Binding SetDelegationSortTypeCommand}"
+                                                 CommandParameter="{x:Static vm:DelegationSortField.ByRoi}">
+                                <controls:SortButton.SortIsAsc>
+                                    <MultiBinding Converter="{x:Static BoolConverters.And}">
+                                        <Binding Path="CurrentDelegationSortDirection"
+                                                 Converter="{StaticResource EnumToStringEqualConverter}"
+                                                 ConverterParameter="{x:Static vm:SortDirection.Asc}" />
+                                        <Binding Path="CurrentDelegationSortField"
+                                                 Converter="{StaticResource EnumToStringEqualConverter}"
+                                                 ConverterParameter="{x:Static vm:DelegationSortField.ByRoi}" />
+                                    </MultiBinding>
+                                </controls:SortButton.SortIsAsc>
+                                <controls:SortButton.SortIsDesc>
+                                    <MultiBinding Converter="{x:Static BoolConverters.And}">
+                                        <Binding Path="CurrentDelegationSortDirection"
+                                                 Converter="{StaticResource EnumToStringEqualConverter}"
+                                                 ConverterParameter="{x:Static vm:SortDirection.Desc}" />
+                                        <Binding Path="CurrentDelegationSortField"
+                                                 Converter="{StaticResource EnumToStringEqualConverter}"
+                                                 ConverterParameter="{x:Static vm:DelegationSortField.ByRoi}" />
+                                    </MultiBinding>
+                                </controls:SortButton.SortIsDesc>
+                            </controls:SortButton>
 
-            <DataGrid.RowDetailsTemplate>
-                <DataTemplate>
-                    <styles:TypeTest>
-                        <styles:TypeTest.DataTemplate>
-                            <controls:TransactionDetailsDataTemplateSelector />
-                        </styles:TypeTest.DataTemplate>
-                    </styles:TypeTest>
-                </DataTemplate>
-            </DataGrid.RowDetailsTemplate>
+                            <controls:SortButton Grid.Column="4"
+                                                 Title="Status"
+                                                 Command="{Binding SetDelegationSortTypeCommand}"
+                                                 CommandParameter="{x:Static vm:DelegationSortField.ByStatus}">
+                                <controls:SortButton.SortIsAsc>
+                                    <MultiBinding Converter="{x:Static BoolConverters.And}">
+                                        <Binding Path="CurrentDelegationSortDirection"
+                                                 Converter="{StaticResource EnumToStringEqualConverter}"
+                                                 ConverterParameter="{x:Static vm:SortDirection.Asc}" />
+                                        <Binding Path="CurrentDelegationSortField"
+                                                 Converter="{StaticResource EnumToStringEqualConverter}"
+                                                 ConverterParameter="{x:Static vm:DelegationSortField.ByStatus}" />
+                                    </MultiBinding>
+                                </controls:SortButton.SortIsAsc>
+                                <controls:SortButton.SortIsDesc>
+                                    <MultiBinding Converter="{x:Static BoolConverters.And}">
+                                        <Binding Path="CurrentDelegationSortDirection"
+                                                 Converter="{StaticResource EnumToStringEqualConverter}"
+                                                 ConverterParameter="{x:Static vm:SortDirection.Desc}" />
+                                        <Binding Path="CurrentDelegationSortField"
+                                                 Converter="{StaticResource EnumToStringEqualConverter}"
+                                                 ConverterParameter="{x:Static vm:DelegationSortField.ByStatus}" />
+                                    </MultiBinding>
+                                </controls:SortButton.SortIsDesc>
+                            </controls:SortButton>
+                        </Grid>
+                    </Border>
 
-            <DataGrid.Columns>
-                <DataGridTemplateColumn Header="TYPE" CanUserSort="True" MinWidth="65" MaxWidth="65">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <styles:TypeTest>
-                                <styles:TypeTest.DataTemplate>
-                                    <controls:TransactionTypeDataTemplateSelector />
-                                </styles:TypeTest.DataTemplate>
-                            </styles:TypeTest>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
+                    <ListBox Grid.Row="1"
+                             Background="{DynamicResource AlmostTransparentBrush}"
+                             Items="{Binding Delegations}"
+                             HorizontalAlignment="Stretch"
+                             VerticalAlignment="Stretch">
+                        <ListBox.Styles>
+                            <Style Selector="ListBoxItem">
+                                <Setter Property="Padding" Value="0" />
+                                <Setter Property="Height" Value="48" />
+                                <Setter Property="VerticalContentAlignment" Value="Stretch" />
+                                <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                                <Setter Property="BorderThickness" Value="0 0 0 1" />
+                                <Setter Property="BorderBrush" Value="{DynamicResource LightDefaultOpacity10}" />
+                            </Style>
+                            <Style Selector="ListBoxItem:selected /template/ ContentPresenter">
+                                <Setter Property="Background" Value="{DynamicResource AlmostTransparentBrush}" />
+                            </Style>
+                            <Style Selector="ListBoxItem:not(:selected) /template/ ContentPresenter">
+                                <Setter Property="Background" Value="{DynamicResource AlmostTransparentBrush}" />
+                            </Style>
 
-                <DataGridTemplateColumn Header="DESCRIPTION" CanUserSort="False">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <styles:TypeTest>
-                                <styles:TypeTest.DataTemplate>
-                                    <controls:TransactionDescriptionDataTemplateSelector />
-                                </styles:TypeTest.DataTemplate>
-                            </styles:TypeTest>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
+                            <Style Selector="ListBoxItem:pointerover /template/ ContentPresenter">
+                                <Setter Property="Background" Value="{DynamicResource ListBoxItemPointeroverBrush}" />
+                                <Setter Property="CornerRadius" Value="8" />
+                            </Style>
+                        </ListBox.Styles>
 
-                <DataGridTemplateColumn Header="AMOUNT" CanUserSort="True" MinWidth="112" MaxWidth="112">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate DataType="{x:Type txViewModels:TransactionViewModel}">
-                            <StackPanel Classes="DGTemplateContainer" Orientation="Horizontal">
-                                <TextBlock FontFamily="{DynamicResource DefaultFontFamily}"
-                                           VerticalAlignment="Center"
-                                           HorizontalAlignment="Left"
-                                           Name="AmountTextBlock"
-                                           FontSize="13">
-                                    <TextBlock.Text>
-                                        <MultiBinding Converter="{StaticResource AmountToStringConverter}">
-                                            <Binding Path="Amount" Mode="OneWay" />
-                                            <Binding Path="AmountFormat" Mode="OneWay" />
-                                        </MultiBinding>
-                                    </TextBlock.Text>
-                                    <i:Interaction.Behaviors>
-                                        <ia:DataTriggerBehavior Binding="{Binding Amount}"
-                                                                ComparisonCondition="LessThan"
-                                                                Value="0">
-                                            <ia:ChangePropertyAction TargetObject="{Binding #AmountTextBlock}"
-                                                                     PropertyName="Foreground"
-                                                                     Value="{StaticResource NegativeAmountBrush}" />
-                                        </ia:DataTriggerBehavior>
-                                        <ia:DataTriggerBehavior Binding="{Binding Amount}"
-                                                                ComparisonCondition="GreaterThanOrEqual"
-                                                                Value="0">
-                                            <ia:ChangePropertyAction TargetObject="{Binding #AmountTextBlock}"
-                                                                     PropertyName="Foreground"
-                                                                     Value="{StaticResource PositiveAmountBrush}" />
-                                        </ia:DataTriggerBehavior>
-                                    </i:Interaction.Behaviors>
-                                </TextBlock>
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <Border Padding="12 0">
+                                    <Grid ColumnDefinitions="8*,3.5*,3.5*,3*,2*"
+                                          VerticalAlignment="Stretch">
+                                        <controls:LinkButton Grid.Column="0"
+                                                             Underlined="True"
+                                                             Classes="SolidHover"
+                                                             FontSize="16"
+                                                             HorizontalAlignment="Left"
+                                                             Content="{Binding Address}"
+                                                             Command="{Binding $parent[ListBox].DataContext.OpenAddressInExplorerCommand}"
+                                                             CommandParameter="{Binding Address}"
+                                                             IsVisible="{Binding $parent[Border].Bounds.Width,
+                                                             Converter={StaticResource AddressShouldExpandConverter}}">
+                                            <controls:LinkButton.ToolText>
+                                                <MultiBinding Converter="{StaticResource StringsConcatConverter}">
+                                                    <Binding Path="ExplorerUri" />
+                                                    <Binding Path="Address" />
+                                                </MultiBinding>
+                                            </controls:LinkButton.ToolText>
+                                        </controls:LinkButton>
+                                        <controls:LinkButton Grid.Column="0"
+                                                             Underlined="True"
+                                                             Classes="SolidHover"
+                                                             FontSize="16"
+                                                             HorizontalAlignment="Left"
+                                                             Content="{Binding Address, Converter={StaticResource ShortenedAddressConverter}}"
+                                                             Command="{Binding $parent[ListBox].DataContext.OpenAddressInExplorerCommand}"
+                                                             CommandParameter="{Binding Address}"
+                                                             IsVisible="{Binding $parent[Border].Bounds.Width,
+                                                             Converter={StaticResource AddressShouldShrinkConverter}}">
+                                            <controls:LinkButton.ToolText>
+                                                <MultiBinding Converter="{StaticResource StringsConcatConverter}">
+                                                    <Binding Path="ExplorerUri" />
+                                                    <Binding Path="Address" />
+                                                </MultiBinding>
+                                            </controls:LinkButton.ToolText>
+                                        </controls:LinkButton>
 
-                                <TextBlock Text="{Binding CurrencyCode}"
-                                           FontFamily="{DynamicResource DefaultFontFamily}"
-                                           FontSize="8"
-                                           VerticalAlignment="Bottom"
-                                           IsVisible="False"
-                                           Margin="3 0 0 2" />
-                            </StackPanel>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
+                                        <StackPanel Grid.Column="1"
+                                                    Orientation="Horizontal">
+                                            <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
+                                                       VerticalAlignment="Center"
+                                                       FontSize="16"
+                                                       Text="{Binding Balance}" />
 
-                <DataGridTemplateColumn Header="STATE" CanUserSort="True" MinWidth="90" MaxWidth="90">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <styles:TypeTest>
-                                <styles:TypeTest.DataTemplate>
-                                    <controls:TransactionStateDataTemplateSelector />
-                                </styles:TypeTest.DataTemplate>
-                            </styles:TypeTest>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
-                
-                <DataGridTemplateColumn Header="TIME" CanUserSort="True" MinWidth="165" MaxWidth="165">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate DataType="{x:Type txViewModels:TransactionViewModel}">
-                            <TextBlock Classes="DGTemplateContainer" Text="{Binding LocalTime, Converter={StaticResource DateTimeToTxTimeConverter}}" />
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
-            </DataGrid.Columns>
-        </DataGrid>
+                                            <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
+                                                       VerticalAlignment="Center"
+                                                       Margin="4 0 0 0"
+                                                       FontSize="16"
+                                                       Text="{x:Static atomexCore:TezosConfig.Xtz}" />
+                                        </StackPanel>
+
+                                        <StackPanel Grid.Column="2"
+                                                    Orientation="Horizontal">
+                                            <Image Width="22"
+                                                   Height="22"
+                                                   Source="{Binding Baker.Logo, Converter={StaticResource StringToImageConverter}}"
+                                                   VerticalAlignment="Center" />
+
+                                            <TextBlock Foreground="{DynamicResource DefaultForegroundBrush}"
+                                                       VerticalAlignment="Center"
+                                                       FontSize="16"
+                                                       Margin="8 0 0 0"
+                                                       Text="{Binding Baker.Name}" />
+                                        </StackPanel>
+
+                                        <TextBlock Grid.Column="3"
+                                                   Foreground="{DynamicResource SecondaryForegroundBrush}"
+                                                   VerticalAlignment="Center"
+                                                   FontSize="16"
+                                                   Text="{Binding Baker.EstimatedRoi}" />
+
+                                        <TextBlock Grid.Column="4"
+                                                   VerticalAlignment="Center"
+                                                   FontSize="16"
+                                                   Text="{Binding Status}"
+                                                   Name="StatusText">
+                                            <i:Interaction.Behaviors>
+                                                <ia:DataTriggerBehavior Binding="{Binding Status}"
+                                                                        ComparisonCondition="Equal"
+                                                                        Value="Active">
+                                                    <ia:ChangePropertyAction PropertyName="Foreground"
+                                                                             Value="{StaticResource Emerald}" />
+                                                </ia:DataTriggerBehavior>
+                                                <ia:DataTriggerBehavior Binding="{Binding Status}"
+                                                                        ComparisonCondition="Equal"
+                                                                        Value="Confirmed">
+                                                    <ia:ChangePropertyAction PropertyName="Foreground"
+                                                                             Value="{StaticResource BlueSky}" />
+                                                </ia:DataTriggerBehavior>
+                                                <ia:DataTriggerBehavior Binding="{Binding Status}"
+                                                                        ComparisonCondition="Equal"
+                                                                        Value="Pending">
+                                                    <ia:ChangePropertyAction PropertyName="Foreground"
+                                                                             Value="{StaticResource Orange}" />
+                                                </ia:DataTriggerBehavior>
+                                            </i:Interaction.Behaviors>
+                                        </TextBlock>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </Grid>
+            </TabItem>
+        </TabControl>
     </Grid>
 </UserControl>

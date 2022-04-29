@@ -4,15 +4,15 @@ using Atomex.Blockchain.Abstract;
 using Atomex.Blockchain.Ethereum;
 using Atomex.Client.Desktop.Common;
 using Atomex.EthereumTokens;
+using Atomex.ViewModels;
 
 namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
 {
     public class EthereumERC20TransactionViewModel : TransactionViewModel
     {
-        public string From { get; set; }
+        public string From { get; set; }    
         public string To { get; set; }
         public decimal GasPrice { get; set; }
-        public decimal GasLimit { get; set; }
         public decimal GasUsed { get; set; }
         public bool IsInternal { get; set; }
         public string FromExplorerUri => $"{Currency.AddressExplorerUri}{From}";
@@ -35,19 +35,15 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
             From       = tx.From;
             To         = tx.To;
             GasPrice   = EthereumConfig.WeiToGwei((decimal)tx.GasPrice);
-            GasLimit   = (decimal)tx.GasLimit;
             GasUsed    = (decimal)tx.GasUsed;
+            Fee        = EthereumConfig.WeiToEth(tx.GasUsed * tx.GasPrice);
             IsInternal = tx.IsInternal;
-            
-            if (Amount <= 0)
-            {
-                Alias = tx.To;
-            }
 
-            if (Amount > 0)
+            Alias = Amount switch
             {
-                Alias = tx.From;
-            }
+                <= 0 => tx.To.TruncateAddress(),
+                > 0 => tx.From.TruncateAddress()
+            };
         }
 
         public static decimal GetAmount(

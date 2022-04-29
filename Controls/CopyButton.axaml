@@ -1,0 +1,65 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:svg="clr-namespace:Avalonia.Svg.Skia;assembly=Avalonia.Svg.Skia"
+        xmlns:controls="clr-namespace:Atomex.Client.Desktop.Controls"
+        xmlns:converters="clr-namespace:Atomex.Client.Desktop.Converters">
+    <Design.PreviewWith>
+        <Border Padding="80 50" Background="#122B50">
+            <controls:CopyButton ToolText="Copy some content"
+                                 DoneToolText="Copied" />
+        </Border>
+    </Design.PreviewWith>
+
+    <Styles.Resources>
+        <converters:ToolTipOffsetConverter x:Key="ToolTipOffsetConverter" />
+    </Styles.Resources>
+
+    <Style Selector="controls|CopyButton /template/ svg|Svg">
+        <Setter Property="Path" Value="/Resources/Icons/copy.svg" />
+        <Setter Property="Width" Value="24" />
+    </Style>
+    <Style Selector="controls|CopyButton:pointerover /template/ svg|Svg">
+        <Setter Property="Path" Value="/Resources/Icons/copy-light.svg" />
+    </Style>
+
+    <Style Selector="controls|CopyButton">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type controls:CopyButton}">
+                    <Border ToolTip.Placement="AnchorAndGravity"
+                            Width="{TemplateBinding Width}"
+                            Height="{TemplateBinding Height}"
+                            CornerRadius="{TemplateBinding CornerRadius}"
+                            Background="{TemplateBinding Background}">
+                        <Border.Styles>
+                            <Style Selector="Border.IsDone ToolTip">
+                                <Setter Property="Background" Value="{DynamicResource Emerald}" />
+                                <Setter Property="Foreground" Value="{DynamicResource DeepBlue}" />
+                            </Style>
+                        </Border.Styles>
+
+                        <ToolTip.VerticalOffset>
+                            <MultiBinding Converter="{StaticResource ToolTipOffsetConverter}">
+                                <Binding Path="$self.Bounds.Height" />
+                                <Binding Path="#CopyButtonPanel.Bounds.Height" />
+                            </MultiBinding>
+                        </ToolTip.VerticalOffset>
+                        <ToolTip.Tip>
+                            <Panel Name="CopyButtonPanel">
+                                <TextBlock IsVisible="{Binding !$parent[controls:CopyButton].IsDone}"
+                                           TextWrapping="Wrap"
+                                           Text="{Binding $parent[controls:CopyButton].ToolText}" />
+
+                                <TextBlock IsVisible="{Binding $parent[controls:CopyButton].IsDone}"
+                                           TextWrapping="Wrap"
+                                           Text="{Binding $parent[controls:CopyButton].DoneToolText}" />
+                            </Panel>
+                        </ToolTip.Tip>
+
+                        <svg:Svg />
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+</Styles>

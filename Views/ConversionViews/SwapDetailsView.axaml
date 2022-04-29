@@ -7,6 +7,7 @@
              xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
              xmlns:ia="clr-namespace:Avalonia.Xaml.Interactions.Core;assembly=Avalonia.Xaml.Interactions"
              xmlns:converters="clr-namespace:Atomex.Client.Desktop.Converters"
+             xmlns:controls="clr-namespace:Atomex.Client.Desktop.Controls"
              xmlns:svg="clr-namespace:Avalonia.Svg.Skia;assembly=Avalonia.Svg.Skia"
              x:Class="Atomex.Client.Desktop.Views.SwapDetailsView">
     <Design.DataContext>
@@ -16,30 +17,14 @@
     <UserControl.Resources>
         <SolidColorBrush x:Key="PrimaryTextColor" Color="{DynamicResource LightDefault}" />
         <SolidColorBrush x:Key="SecondaryTextColor" Color="DarkGray" />
-
         <converters:DateTimeToTxTimeConverter x:Key="DateTimeToTxTimeConverter" />
     </UserControl.Resources>
 
     <UserControl.Styles>
-        <Style Selector="svg|Svg.InProgress">
-            <Style.Animations>
-                <Animation Duration="0:0:2.5"
-                           IterationCount="INFINITE"
-                           FillMode="Forward"
-                           PlaybackDirection="Normal">
-                    <KeyFrame Cue="0%">
-                        <Setter Property="RotateTransform.Angle" Value="0" />
-                    </KeyFrame>
-                    <KeyFrame Cue="100%">
-                        <Setter Property="RotateTransform.Angle" Value="360" />
-                    </KeyFrame>
-                </Animation>
-            </Style.Animations>
-        </Style>
         <Style Selector="TabControl">
             <Setter Property="Margin" Value="0" />
             <Setter Property="Padding" Value="0" />
-            <Setter Property="Background" Value="{DynamicResource TabControlBackground}" />
+            <Setter Property="Background" Value="{DynamicResource AlmostTransparentBrush}" />
             <Setter Property="Template">
                 <ControlTemplate>
                     <Border BorderBrush="{TemplateBinding BorderBrush}"
@@ -114,100 +99,66 @@
         <Style Selector="TabItem:selected:pointerover /template/ Border#PART_LayoutRoot">
             <Setter Property="TextBlock.Foreground" Value="{StaticResource PrimaryTextColor}" />
         </Style>
-
-        <Style Selector="Button.ExplorerLinkBtn.Icon">
-            <Setter Property="FontFamily" Value="{DynamicResource DefaultFontFamily}" />
-            <Setter Property="BorderThickness" Value="0" />
-        </Style>
-
-        <Style Selector="Button.ExplorerLinkBtn.Icon:pointerover">
-            <Setter Property="Foreground" Value="{DynamicResource ExplorerLinkButtonMouseOverBrush}" />
-        </Style>
-
-        <Style Selector="Button.ExplorerLinkBtn.Icon:pointerover /template/ ContentPresenter#PART_ContentPresenter">
-            <Setter Property="Background" Value="Transparent" />
-            <Setter Property="TextBlock.Foreground" Value="{DynamicResource ExplorerLinkButtonMouseOverBrush}" />
-        </Style>
-        <Style
-            Selector="Button.ExplorerLinkBtn.Icon:not(:pointerover) /template/ ContentPresenter#PART_ContentPresenter">
-            <Setter Property="Background" Value="Transparent" />
-            <Setter Property="TextBlock.Foreground" Value="{DynamicResource ExplorerLinkButtonForegroundBrush}" />
-        </Style>
-
-        <Style Selector="Button.ExplorerLinkBtn.Icon:pointerover Path">
-            <Setter Property="Fill" Value="{DynamicResource ExplorerLinkButtonMouseOverBrush}" />
-        </Style>
-        <Style Selector="Button.ExplorerLinkBtn.Icon:not(:pointerover) Path">
-            <Setter Property="Fill" Value="{DynamicResource ExplorerLinkButtonForegroundBrush}" />
-        </Style>
     </UserControl.Styles>
 
-    <Border Background="{DynamicResource DeepBlue}">
+    <Border Background="{DynamicResource RightPopupBackgroundBrush}"
+            Classes="NoCloseRightPopup">
         <StackPanel Orientation="Vertical">
-            <Button Width="25"
-                    Height="25"
-                    Margin="12 12 0 0"
-                    BorderThickness="0"
-                    VerticalContentAlignment="Center"
-                    Padding="0"
-                    Command="{Binding CloseCommand}"
-                    Classes="ButtonWithIcon">
-                <Path Width="16"
-                      Height="16"
-                      Stretch="Uniform"
-                      Data="{DynamicResource CloseCross}" />
-            </Button>
+            <controls:IconButton Classes="Close"
+                                 HorizontalAlignment="Left"
+                                 Margin="25 25 0 0"
+                                 Command="{Binding CloseCommand}" />
 
             <svg:Svg Name="SwapStatusIcon"
-                     Width="30"
-                     Margin="0 20 0 0">
+                     Width="40"
+                     Margin="0 22 0 0">
                 <i:Interaction.Behaviors>
                     <ia:DataTriggerBehavior Binding="{Binding CompactState}"
                                             ComparisonCondition="Equal"
                                             Value="{Binding InProgress}">
                         <ia:ChangePropertyAction TargetObject="{Binding #SwapStatusIcon}"
                                                  PropertyName="Path"
-                                                 Value="/Resources/Icons/swap-inprogress.svg" />
+                                                 Value="/Resources/Icons/pending-hourglass.svg" />
                     </ia:DataTriggerBehavior>
                     <ia:DataTriggerBehavior Binding="{Binding CompactState}"
                                             ComparisonCondition="Equal"
                                             Value="{Binding Completed}">
                         <ia:ChangePropertyAction TargetObject="{Binding #SwapStatusIcon}"
                                                  PropertyName="Path"
-                                                 Value="/Resources/Icons/swap-completed.svg" />
+                                                 Value="/Resources/Icons/completed-checkbox.svg" />
                     </ia:DataTriggerBehavior>
                     <ia:DataTriggerBehavior Binding="{Binding CompactState}"
                                             ComparisonCondition="Equal"
                                             Value="{Binding Cancelled}">
                         <ia:ChangePropertyAction TargetObject="{Binding #SwapStatusIcon}"
                                                  PropertyName="Path"
-                                                 Value="/Resources/Icons/swap-cancelled.svg" />
+                                                 Value="/Resources/Icons/cancelled-cross.svg" />
                     </ia:DataTriggerBehavior>
                     <ia:DataTriggerBehavior Binding="{Binding CompactState}"
                                             ComparisonCondition="Equal"
                                             Value="{Binding Refunded}">
                         <ia:ChangePropertyAction TargetObject="{Binding #SwapStatusIcon}"
                                                  PropertyName="Path"
-                                                 Value="/Resources/Icons/swap-cancelled.svg" />
+                                                 Value="/Resources/Icons/cancelled-cross.svg" />
                     </ia:DataTriggerBehavior>
                     <ia:DataTriggerBehavior Binding="{Binding CompactState}"
                                             ComparisonCondition="Equal"
                                             Value="{Binding Unsettled}">
                         <ia:ChangePropertyAction TargetObject="{Binding #SwapStatusIcon}"
                                                  PropertyName="Path"
-                                                 Value="/Resources/Icons/swap-cancelled.svg" />
+                                                 Value="/Resources/Icons/cancelled-cross.svg" />
                     </ia:DataTriggerBehavior>
                 </i:Interaction.Behaviors>
             </svg:Svg>
 
             <TextBlock Name="SwapCompactStateTitle"
                        Text="{Binding SwapCompactStateTitle}"
-                       FontFamily="{DynamicResource DefaultLightFontFamily}"
+                       Foreground="{DynamicResource DefaultForegroundBrush}"
                        TextAlignment="Center"
-                       FontSize="22"
-                       Margin="0 14 0 0"
                        HorizontalAlignment="Center"
-                       VerticalAlignment="Center">
+                       FontSize="22"
+                       LineHeight="32"
+                       Margin="0 10 0 0">
                 <i:Interaction.Behaviors>
                     <ia:DataTriggerBehavior Binding="{Binding CompactState}"
                                             ComparisonCondition="Equal"
@@ -249,7 +200,6 @@
 
             <TextBlock Name="SwapCompactStateDescription"
                        Text="{Binding SwapCompactStateDescription}"
-                       FontFamily="{DynamicResource DefaultLightFontFamily}"
                        TextAlignment="Center"
                        FontSize="13"
                        Margin="0 6 0 0"
@@ -294,25 +244,11 @@
                 </i:Interaction.Behaviors>
             </TextBlock>
 
-            <Grid Margin="0 32 0 40">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="40" />
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="16" />
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="40" />
-                </Grid.ColumnDefinitions>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                </Grid.RowDefinitions>
-
-                <Image Source="{Binding FromCurrencyViewModel.LargeIconPath}"
-                       Width="48"
-                       Height="48"
-                       Grid.Column="1"
-                       Grid.Row="0" />
+            <Grid Margin="0 32 0 40" ColumnDefinitions="40,*,16,*,40" RowDefinitions="Auto,Auto,Auto">
+                <svg:Svg Grid.Column="1"
+                         Grid.Row="0"
+                         Width="50"
+                         Path="{Binding FromCurrencyViewModel.IconPath}" />
 
                 <Path Width="14"
                       Height="14"
@@ -323,11 +259,10 @@
                       Data="{DynamicResource SwapArrows}"
                       Fill="{DynamicResource LightDefaultOpacity50}" />
 
-                <Image Source="{Binding ToCurrencyViewModel.LargeIconPath}"
-                       Width="48"
-                       Height="48"
-                       Grid.Column="3"
-                       Grid.Row="0" />
+                <svg:Svg Grid.Column="3"
+                         Grid.Row="0"
+                         Width="50"
+                         Path="{Binding ToCurrencyViewModel.IconPath}" />
 
                 <TextBlock Text="{Binding FromCurrencyCode}"
                            Foreground="{DynamicResource ChildViewHeaderForegroundBrush}"
@@ -382,7 +317,6 @@
                 <TabItem Margin="0 0 23 0">
                     <TabItem.Header>
                         <TextBlock VerticalAlignment="Center"
-                                   FontFamily="{DynamicResource DefaultFontFamily}"
                                    FontSize="13"
                                    Text="Progress" />
                     </TabItem.Header>
@@ -394,7 +328,7 @@
                             <svg:Svg Width="17"
                                      HorizontalAlignment="Left"
                                      Classes="InProgress"
-                                     Path="/Resources/Icons/swap-exchanging.svg"
+                                     Path="/Resources/Icons/in-progress.svg"
                                      IsVisible="{Binding InitializationStepInProgress}" />
                             <svg:Svg Name="InitializationIcon"
                                      IsVisible="{Binding !InitializationStepInProgress}"
@@ -413,14 +347,14 @@
                                                             Value="{Binding CompletedState}">
                                         <ia:ChangePropertyAction TargetObject="{Binding #InitializationIcon}"
                                                                  PropertyName="Path"
-                                                                 Value="/Resources/Icons/swap-completed.svg" />
+                                                                 Value="/Resources/Icons/completed-checkbox.svg" />
                                     </ia:DataTriggerBehavior>
                                     <ia:DataTriggerBehavior Binding="{Binding InitializationStepStatus}"
                                                             ComparisonCondition="Equal"
                                                             Value="{Binding FailedState}">
                                         <ia:ChangePropertyAction TargetObject="{Binding #InitializationIcon}"
                                                                  PropertyName="Path"
-                                                                 Value="/Resources/Icons/swap-failed.svg" />
+                                                                 Value="/Resources/Icons/failed.svg" />
                                     </ia:DataTriggerBehavior>
                                 </i:Interaction.Behaviors>
                             </svg:Svg>
@@ -455,7 +389,7 @@
                             <svg:Svg Width="17"
                                      HorizontalAlignment="Left"
                                      Classes="InProgress"
-                                     Path="/Resources/Icons/swap-exchanging.svg"
+                                     Path="/Resources/Icons/in-progress.svg"
                                      IsVisible="{Binding ExchangingStepInProgress}" />
                             <svg:Svg Name="ExchangingIcon"
                                      IsVisible="{Binding !ExchangingStepInProgress}"
@@ -474,14 +408,14 @@
                                                             Value="{Binding CompletedState}">
                                         <ia:ChangePropertyAction TargetObject="{Binding #ExchangingIcon}"
                                                                  PropertyName="Path"
-                                                                 Value="/Resources/Icons/swap-completed.svg" />
+                                                                 Value="/Resources/Icons/completed-checkbox.svg" />
                                     </ia:DataTriggerBehavior>
                                     <ia:DataTriggerBehavior Binding="{Binding ExchangingStepStatus}"
                                                             ComparisonCondition="Equal"
                                                             Value="{Binding FailedState}">
                                         <ia:ChangePropertyAction TargetObject="{Binding #ExchangingIcon}"
                                                                  PropertyName="Path"
-                                                                 Value="/Resources/Icons/swap-failed.svg" />
+                                                                 Value="/Resources/Icons/failed.svg" />
                                     </ia:DataTriggerBehavior>
                                 </i:Interaction.Behaviors>
                             </svg:Svg>
@@ -516,7 +450,7 @@
                             <svg:Svg Width="17"
                                      HorizontalAlignment="Left"
                                      Classes="InProgress"
-                                     Path="/Resources/Icons/swap-exchanging.svg"
+                                     Path="/Resources/Icons/in-progress.svg"
                                      IsVisible="{Binding CompletionStepInProgress}" />
                             <svg:Svg Name="CompletionIcon"
                                      IsVisible="{Binding !CompletionStepInProgress}"
@@ -535,14 +469,14 @@
                                                             Value="{Binding CompletedState}">
                                         <ia:ChangePropertyAction TargetObject="{Binding #CompletionIcon}"
                                                                  PropertyName="Path"
-                                                                 Value="/Resources/Icons/swap-completed.svg" />
+                                                                 Value="/Resources/Icons/completed-checkbox.svg" />
                                     </ia:DataTriggerBehavior>
                                     <ia:DataTriggerBehavior Binding="{Binding CompletionStepStatus}"
                                                             ComparisonCondition="Equal"
                                                             Value="{Binding FailedState}">
                                         <ia:ChangePropertyAction TargetObject="{Binding #CompletionIcon}"
                                                                  PropertyName="Path"
-                                                                 Value="/Resources/Icons/swap-failed.svg" />
+                                                                 Value="/Resources/Icons/failed.svg" />
                                     </ia:DataTriggerBehavior>
                                 </i:Interaction.Behaviors>
                             </svg:Svg>
@@ -556,25 +490,25 @@
                                        Foreground="{StaticResource PrimaryTextColor}"
                                        FontFamily="{DynamicResource DefaultLightFontFamily}"
                                        FontSize="20"
+                                       Margin="0 0 0 4"
                                        HorizontalAlignment="Left"
                                        VerticalAlignment="Center" />
 
                             <TextBlock Text="{Binding InitializationFirstStepDescription}"
                                        TextWrapping="Wrap"
-                                       Margin="0 4 0 0"
+                                       Margin="0 0 0 2"
                                        Foreground="{StaticResource LightDefaultOpacity50}"
                                        FontFamily="{DynamicResource DefaultLightFontFamily}"
-                                       FontSize="12"
+                                       FontSize="13"
                                        HorizontalAlignment="Left"
                                        VerticalAlignment="Center" />
 
                             <TextBlock Text="{Binding InitializationSecondStepDescription}"
                                        IsVisible="{Binding InitializationSecondStepDescription, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
                                        TextWrapping="Wrap"
-                                       Margin="0 2 0 0"
                                        Foreground="{StaticResource LightDefaultOpacity50}"
                                        FontFamily="{DynamicResource DefaultLightFontFamily}"
-                                       FontSize="12"
+                                       FontSize="13"
                                        HorizontalAlignment="Left"
                                        VerticalAlignment="Center" />
                         </StackPanel>
@@ -586,105 +520,62 @@
                                        Foreground="{StaticResource PrimaryTextColor}"
                                        FontFamily="{DynamicResource DefaultLightFontFamily}"
                                        FontSize="20"
+                                       Margin="0 0 0 4"
                                        HorizontalAlignment="Left"
                                        VerticalAlignment="Center" />
 
-                            <WrapPanel
-                                IsVisible="{Binding ExchangingFirstStepDescription, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+                            <WrapPanel Margin="0 0 0 2"
+                                       IsVisible="{Binding ExchangingFirstStepDescription, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
                                 <TextBlock Text="{Binding ExchangingFirstStepDescription}"
                                            TextWrapping="Wrap"
-                                           Margin="0 4 4 0"
+                                           Margin="0 0 4 0"
                                            Foreground="{StaticResource LightDefaultOpacity50}"
                                            FontFamily="{DynamicResource DefaultLightFontFamily}"
-                                           FontSize="12"
+                                           FontSize="13"
                                            HorizontalAlignment="Left"
                                            VerticalAlignment="Center" />
 
-                                <Border ToolTip.Placement="AnchorAndGravity"
-                                        ToolTip.VerticalOffset="-42"
-                                        VerticalAlignment="Bottom"
-                                        Margin="0 2 0 0"
-                                        IsVisible="{Binding ExchangingFirstStepLinkUrl, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
-
-                                    <Button HorizontalAlignment="Left"
-                                            VerticalAlignment="Bottom"
-                                            Padding="0"
-                                            Command="{Binding OpenTxInExplorerCommand}"
-                                            CommandParameter="{Binding ExchangingFirstStepLinkUrl}"
-                                            Classes="ExplorerLinkBtn Icon">
-                                        <StackPanel Orientation="Horizontal">
-                                            <TextBlock FontFamily="{DynamicResource DefaultFontFamily}"
-                                                       VerticalAlignment="Bottom"
-                                                       FontSize="12"
-                                                       Text="{Binding ExchangingFirstStepLinkText}" />
-                                            <Path Stretch="Uniform"
-                                                  Margin="5 0 0 0"
-                                                  VerticalAlignment="Top"
-                                                  Height="11"
-                                                  Data="{DynamicResource LinkIcon}" />
-                                        </StackPanel>
-                                    </Button>
-
-                                    <ToolTip.Tip>
-                                        <TextBlock Text="{Binding ExchangingFirstStepLinkUrl}" />
-                                    </ToolTip.Tip>
-                                </Border>
+                                <controls:LinkButton Classes="Emerald"
+                                                     IsVisible="{Binding ExchangingFirstStepLinkUrl, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                                                     Command="{Binding OpenTxInExplorerCommand}"
+                                                     CommandParameter="{Binding ExchangingFirstStepLinkUrl}"
+                                                     Content="{Binding ExchangingFirstStepLinkText}"
+                                                     ToolText="{Binding ExchangingFirstStepLinkUrl}" />
 
                                 <TextBlock Text="{Binding ExchangingFirstStepLinkText}"
                                            IsVisible="{Binding ExchangingFirstStepLinkUrl, Converter={x:Static StringConverters.IsNullOrEmpty}}"
                                            TextWrapping="Wrap"
-                                           Margin="0 2 0 0"
                                            Foreground="{StaticResource LightDefaultOpacity50}"
                                            FontFamily="{DynamicResource DefaultLightFontFamily}"
-                                           FontSize="12"
+                                           FontSize="13"
                                            HorizontalAlignment="Left"
                                            VerticalAlignment="Center" />
                             </WrapPanel>
+
                             <WrapPanel
                                 IsVisible="{Binding ExchangingSecondStepDescription, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
                                 <TextBlock Text="{Binding ExchangingSecondStepDescription}"
                                            TextWrapping="Wrap"
-                                           Margin="0 4 4 0"
+                                           Margin="0 0 4 0"
                                            Foreground="{StaticResource LightDefaultOpacity50}"
                                            FontFamily="{DynamicResource DefaultLightFontFamily}"
-                                           FontSize="12"
+                                           FontSize="13"
                                            HorizontalAlignment="Left"
                                            VerticalAlignment="Center" />
 
-                                <Border ToolTip.Placement="AnchorAndGravity"
-                                        ToolTip.VerticalOffset="-42"
-                                        VerticalAlignment="Bottom"
-                                        Margin="0 2 0 0"
-                                        IsVisible="{Binding ExchangingSecondStepLinkUrl, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
-                                    <Button HorizontalAlignment="Left"
-                                            VerticalAlignment="Bottom"
-                                            Padding="0"
-                                            Command="{Binding OpenTxInExplorerCommand}"
-                                            CommandParameter="{Binding ExchangingSecondStepLinkUrl}"
-                                            Classes="ExplorerLinkBtn Icon">
-                                        <StackPanel Orientation="Horizontal">
-                                            <TextBlock FontFamily="{DynamicResource DefaultFontFamily}"
-                                                       VerticalAlignment="Bottom"
-                                                       FontSize="12"
-                                                       Text="{Binding ExchangingSecondStepLinkText}" />
-                                            <Path Stretch="Uniform"
-                                                  Margin="5 0 0 0"
-                                                  VerticalAlignment="Top"
-                                                  Height="11"
-                                                  Data="{DynamicResource LinkIcon}" />
-                                        </StackPanel>
-                                    </Button>
-                                    <ToolTip.Tip>
-                                        <TextBlock Text="{Binding ExchangingSecondStepLinkUrl}" />
-                                    </ToolTip.Tip>
-                                </Border>
+                                <controls:LinkButton Classes="Emerald"
+                                                     IsVisible="{Binding ExchangingSecondStepLinkUrl, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                                                     Command="{Binding OpenTxInExplorerCommand}"
+                                                     CommandParameter="{Binding ExchangingSecondStepLinkUrl}"
+                                                     Content="{Binding ExchangingSecondStepLinkText}"
+                                                     ToolText="{Binding ExchangingSecondStepLinkUrl}" />
+
                                 <TextBlock Text="{Binding ExchangingSecondStepLinkText}"
                                            IsVisible="{Binding ExchangingSecondStepLinkUrl, Converter={x:Static StringConverters.IsNullOrEmpty}}"
                                            TextWrapping="Wrap"
-                                           Margin="0 2 0 0"
                                            Foreground="{StaticResource LightDefaultOpacity50}"
                                            FontFamily="{DynamicResource DefaultLightFontFamily}"
-                                           FontSize="12"
+                                           FontSize="13"
                                            HorizontalAlignment="Left"
                                            VerticalAlignment="Center" />
                             </WrapPanel>
@@ -697,56 +588,34 @@
                                        Foreground="{StaticResource PrimaryTextColor}"
                                        FontFamily="{DynamicResource DefaultLightFontFamily}"
                                        FontSize="20"
+                                       Margin="0 0 0 4"
                                        HorizontalAlignment="Left"
                                        VerticalAlignment="Center" />
 
-                            <WrapPanel
-                                IsVisible="{Binding CompletionFirstStepDescription, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+                            <WrapPanel Margin="0 0 0 2"
+                                       IsVisible="{Binding CompletionFirstStepDescription, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
                                 <TextBlock Text="{Binding CompletionFirstStepDescription}"
                                            TextWrapping="Wrap"
-                                           Margin="0 4 4 0"
+                                           Margin="0 0 4 0"
                                            Foreground="{StaticResource LightDefaultOpacity50}"
                                            FontFamily="{DynamicResource DefaultLightFontFamily}"
-                                           FontSize="12"
+                                           FontSize="13"
                                            HorizontalAlignment="Left"
                                            VerticalAlignment="Center" />
 
-                                <Border ToolTip.Placement="AnchorAndGravity"
-                                        ToolTip.VerticalOffset="-42"
-                                        VerticalAlignment="Bottom"
-                                        Margin="0 2 0 0"
-                                        IsVisible="{Binding CompletionFirstStepLinkUrl, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
-
-                                    <Button HorizontalAlignment="Left"
-                                            VerticalAlignment="Bottom"
-                                            Padding="0"
-                                            Command="{Binding OpenTxInExplorerCommand}"
-                                            CommandParameter="{Binding CompletionFirstStepLinkUrl}"
-                                            Classes="ExplorerLinkBtn Icon">
-                                        <StackPanel Orientation="Horizontal">
-                                            <TextBlock FontFamily="{DynamicResource DefaultFontFamily}"
-                                                       VerticalAlignment="Bottom"
-                                                       FontSize="12"
-                                                       Text="{Binding CompletionFirstStepLinkText}" />
-                                            <Path Stretch="Uniform"
-                                                  Margin="5 0 0 0"
-                                                  VerticalAlignment="Top"
-                                                  Height="11"
-                                                  Data="{DynamicResource LinkIcon}" />
-                                        </StackPanel>
-                                    </Button>
-                                    <ToolTip.Tip>
-                                        <TextBlock Text="{Binding CompletionFirstStepLinkUrl}" />
-                                    </ToolTip.Tip>
-                                </Border>
+                                <controls:LinkButton Classes="Emerald"
+                                                     IsVisible="{Binding CompletionFirstStepLinkUrl, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                                                     Command="{Binding OpenTxInExplorerCommand}"
+                                                     CommandParameter="{Binding CompletionFirstStepLinkUrl}"
+                                                     Content="{Binding CompletionFirstStepLinkText}"
+                                                     ToolText="{Binding CompletionFirstStepLinkUrl}" />
 
                                 <TextBlock Text="{Binding CompletionFirstStepLinkText}"
                                            IsVisible="{Binding CompletionFirstStepLinkUrl, Converter={x:Static StringConverters.IsNullOrEmpty}}"
                                            TextWrapping="Wrap"
-                                           Margin="0 2 0 0"
                                            Foreground="{StaticResource LightDefaultOpacity50}"
                                            FontFamily="{DynamicResource DefaultLightFontFamily}"
-                                           FontSize="12"
+                                           FontSize="13"
                                            HorizontalAlignment="Left"
                                            VerticalAlignment="Center" />
                             </WrapPanel>
@@ -754,49 +623,26 @@
                                 IsVisible="{Binding CompletionSecondStepDescription, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
                                 <TextBlock Text="{Binding CompletionSecondStepDescription}"
                                            TextWrapping="Wrap"
-                                           Margin="0 4 4 0"
+                                           Margin="0 0 4 0"
                                            Foreground="{StaticResource LightDefaultOpacity50}"
                                            FontFamily="{DynamicResource DefaultLightFontFamily}"
-                                           FontSize="12"
+                                           FontSize="13"
                                            HorizontalAlignment="Left"
                                            VerticalAlignment="Center" />
 
-                                <Border ToolTip.Placement="AnchorAndGravity"
-                                        ToolTip.VerticalOffset="-42"
-                                        VerticalAlignment="Bottom"
-                                        Margin="0 2 0 0"
-                                        IsVisible="{Binding CompletionSecondStepLinkUrl, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
-
-                                    <Button HorizontalAlignment="Left"
-                                            VerticalAlignment="Bottom"
-                                            Padding="0"
-                                            Command="{Binding OpenTxInExplorerCommand}"
-                                            CommandParameter="{Binding CompletionSecondStepLinkUrl}"
-                                            Classes="ExplorerLinkBtn Icon">
-                                        <StackPanel Orientation="Horizontal">
-                                            <TextBlock FontFamily="{DynamicResource DefaultFontFamily}"
-                                                       VerticalAlignment="Bottom"
-                                                       FontSize="12"
-                                                       Text="{Binding CompletionSecondStepLinkText}" />
-                                            <Path Stretch="Uniform"
-                                                  Margin="5 0 0 0"
-                                                  VerticalAlignment="Top"
-                                                  Height="11"
-                                                  Data="{DynamicResource LinkIcon}" />
-                                        </StackPanel>
-                                    </Button>
-                                    <ToolTip.Tip>
-                                        <TextBlock Text="{Binding CompletionSecondStepLinkUrl}" />
-                                    </ToolTip.Tip>
-                                </Border>
+                                <controls:LinkButton Classes="Emerald"
+                                                     IsVisible="{Binding CompletionSecondStepLinkUrl, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                                                     Command="{Binding OpenTxInExplorerCommand}"
+                                                     CommandParameter="{Binding CompletionSecondStepLinkUrl}"
+                                                     Content="{Binding CompletionSecondStepLinkText}"
+                                                     ToolText="{Binding CompletionSecondStepLinkUrl}" />
 
                                 <TextBlock Text="{Binding CompletionSecondStepLinkText}"
                                            IsVisible="{Binding CompletionSecondStepLinkUrl, Converter={x:Static StringConverters.IsNullOrEmpty}}"
                                            TextWrapping="Wrap"
-                                           Margin="0 2 0 0"
                                            Foreground="{StaticResource LightDefaultOpacity50}"
                                            FontFamily="{DynamicResource DefaultLightFontFamily}"
-                                           FontSize="12"
+                                           FontSize="13"
                                            HorizontalAlignment="Left"
                                            VerticalAlignment="Center" />
                             </WrapPanel>
@@ -806,25 +652,14 @@
                 <TabItem Margin="23 0 0 0">
                     <TabItem.Header>
                         <TextBlock VerticalAlignment="Center"
-                                   FontFamily="{DynamicResource DefaultFontFamily}"
                                    FontSize="13"
                                    Text="Details" />
                     </TabItem.Header>
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="*" />
-                        </Grid.ColumnDefinitions>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="30" />
-                            <RowDefinition Height="30" />
-                        </Grid.RowDefinitions>
-
+                    <Grid ColumnDefinitions="Auto,*" RowDefinitions="30,30">
                         <TextBlock Grid.Column="0"
                                    Grid.Row="0"
                                    Text="Price:"
                                    Foreground="{StaticResource LightDefaultOpacity50}"
-                                   FontFamily="{DynamicResource DefaultFontFamily}"
                                    FontSize="15" />
 
                         <TextBlock Grid.Column="1"
@@ -832,7 +667,6 @@
                                    Margin="0 0 15 0"
                                    Text="{Binding Price}"
                                    Foreground="{StaticResource PrimaryTextColor}"
-                                   FontFamily="{DynamicResource DefaultFontFamily}"
                                    HorizontalAlignment="Right"
                                    FontSize="15" />
 
@@ -840,7 +674,6 @@
                                    Grid.Row="1"
                                    Text="Date:"
                                    Foreground="{StaticResource LightDefaultOpacity50}"
-                                   FontFamily="{DynamicResource DefaultFontFamily}"
                                    FontSize="15" />
 
                         <TextBlock Grid.Column="1"
@@ -848,7 +681,6 @@
                                    Margin="0 0 15 0"
                                    Text="{Binding TimeStamp, Converter={StaticResource DateTimeToTxTimeConverter}}"
                                    Foreground="{StaticResource PrimaryTextColor}"
-                                   FontFamily="{DynamicResource DefaultFontFamily}"
                                    HorizontalAlignment="Right"
                                    FontSize="15" />
                     </Grid>

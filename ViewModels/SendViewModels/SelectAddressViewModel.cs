@@ -23,9 +23,13 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         ChangeRedeemAddress
     }
 
-    public class SelectAddressViewModel : ViewModelBase
+    public class NavigatableSelectAddress : ViewModelBase
     {
         public Action BackAction { get; set; }
+    }
+
+    public class SelectAddressViewModel : NavigatableSelectAddress
+    {
         public Action<WalletAddressViewModel> ConfirmAction { get; set; }
         public SelectAddressMode SelectAddressMode { get; set; }
         private CurrencyConfig Currency { get; set; }

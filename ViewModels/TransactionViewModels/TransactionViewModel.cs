@@ -1,117 +1,55 @@
 ﻿using System;
-using System.Windows.Input;
-
+using System.Reactive;
 using ReactiveUI;
 using Serilog;
-
 using Atomex.Blockchain;
 using Atomex.Blockchain.Abstract;
-using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
 using Atomex.Core;
+using Avalonia.Controls;
+
 
 namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
 {
-    public class TransactionViewModel : ViewModelBase, ITransactionViewModel
+    public class TransactionViewModelBase : ViewModelBase
     {
         public event EventHandler<TransactionEventArgs> UpdateClicked;
         public event EventHandler<TransactionEventArgs> RemoveClicked;
-
-        public IBlockchainTransaction Transaction { get; }
-        public string Id { get; set; }
-        public CurrencyConfig Currency { get; set; }
-        public BlockchainTransactionState State { get; set; }
-        public BlockchainTransactionType Type { get; set; }
-
-        public string Description { get; set; }
+        public string TxExplorerUri => $"{Currency.TxExplorerUri}{Id}";
         public decimal Amount { get; set; }
         public string AmountFormat { get; set; }
-        public string CurrencyCode { get; set; }
-        public decimal Fee { get; set; }
-        public DateTime Time { get; set; }
+        public string Description { get; set; }
+        public string Id { get; set; }
+        public CurrencyConfig Currency { get; set; }
         public DateTime LocalTime => Time.ToLocalTime();
-        public string TxExplorerUri => $"{Currency.TxExplorerUri}{Id}";
+        public BlockchainTransactionState State { get; set; }
+        public DateTime Time { get; set; }
+        public IBlockchainTransaction Transaction { get; set; }
+        public BlockchainTransactionType Type { get; set; }
+        public Action? OnClose { get; set; }
         public bool CanBeRemoved { get; set; }
-        public string Direction { get; set; }
 
-        private bool _isExpanded;
-        public bool IsExpanded
-        {
-            get => _isExpanded;
-            set { _isExpanded = value; OnPropertyChanged(nameof(IsExpanded)); }
-        }
 
-        public TransactionViewModel()
-        {
-#if DEBUG
-            if (Env.IsInDesignerMode())
-                DesignerMode();
-#endif
-        }
+        private ReactiveCommand<Unit, Unit> _openTxInExplorerCommand;
 
-        public TransactionViewModel(
-            IBlockchainTransaction tx,
-            CurrencyConfig currencyConfig,
-            decimal amount,
-            decimal fee)
-        {
-            Transaction = tx ?? throw new ArgumentNullException(nameof(tx));
-            Id          = Transaction.Id;
-            Currency    = currencyConfig;
-            State       = Transaction.State;
-            Type        = Transaction.Type;
-            Amount      = amount;
+        public ReactiveCommand<Unit, Unit> OpenTxInExplorerCommand => _openTxInExplorerCommand ??=
+            ReactiveCommand.Create(() => App.OpenBrowser(TxExplorerUri));
 
-            var netAmount = amount + fee;
 
-            var currencyViewModel = CurrencyViewModelCreator.CreateViewModel(currencyConfig, false);
+        private ReactiveCommand<string, Unit> _openAddressInExplorerCommand;
 
-            AmountFormat = currencyViewModel.CurrencyFormat;
-            CurrencyCode = currencyViewModel.CurrencyCode;
-            Time         = tx.CreationTime ?? DateTime.UtcNow;
-            CanBeRemoved = tx.State == BlockchainTransactionState.Unknown ||
-                           tx.State == BlockchainTransactionState.Failed ||
-                           tx.State == BlockchainTransactionState.Pending ||
-                           tx.State == BlockchainTransactionState.Unconfirmed;
-
-            Description = GetDescription(
-                type: tx.Type,
-                amount: Amount,
-                netAmount: netAmount,
-                amountDigits: currencyConfig.Digits,
-                currencyCode: currencyConfig.Name);
-            
-            if (Amount <= 0)
+        public ReactiveCommand<string, Unit> OpenAddressInExplorerCommand => _openAddressInExplorerCommand ??=
+            ReactiveCommand.Create<string>((address) =>
             {
-                Direction = "To: ";
-            }
+                if (Uri.TryCreate($"{Currency.AddressExplorerUri}{address}", UriKind.Absolute, out var uri))
+                    App.OpenBrowser(uri.ToString());
+                else
+                    Log.Error("Invalid uri for address explorer");
+            });
 
-            if (Amount > 0)
-            {
-                Direction = "From: ";
-            }
-        }
+        private ReactiveCommand<string, Unit> _copyCommand;
 
-        private ICommand _openTxInExplorerCommand;
-        public ICommand OpenTxInExplorerCommand => _openTxInExplorerCommand ??= ReactiveCommand.Create<string>((id) =>
-        {
-            if (Uri.TryCreate($"{Currency.TxExplorerUri}{id}", UriKind.Absolute, out var uri))
-                App.OpenBrowser(uri.ToString());
-            else
-                Log.Error("Invalid uri for transaction explorer");
-        });
-
-        private ICommand _openAddressInExplorerCommand;
-        public ICommand OpenAddressInExplorerCommand => _openAddressInExplorerCommand ??= ReactiveCommand.Create<string>((address) =>
-        {
-            if (Uri.TryCreate($"{Currency.AddressExplorerUri}{address}", UriKind.Absolute, out var uri))
-                App.OpenBrowser(uri.ToString());
-            else
-                Log.Error("Invalid uri for address explorer");
-        });
-
-        private ICommand _copyCommand;
-        public ICommand CopyCommand => _copyCommand ??= ReactiveCommand.Create<string>((s) =>
+        public ReactiveCommand<string, Unit> CopyCommand => _copyCommand ??= ReactiveCommand.Create<string>((s) =>
         {
             try
             {
@@ -123,22 +61,83 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
             }
         });
 
-        private ICommand _updateCommand;
-        public ICommand UpdateCommand => _updateCommand ??= ReactiveCommand.Create(() =>
-        {
-            UpdateClicked?.Invoke(this, new TransactionEventArgs(Transaction));
-        });
+        private ReactiveCommand<Unit, Unit> _updateCommand;
 
-        private ICommand _removeCommand;
-        public ICommand RemoveCommand => _removeCommand ??= ReactiveCommand.Create(() =>
-        {
-            RemoveClicked?.Invoke(this, new TransactionEventArgs(Transaction));
-        });
+        public ReactiveCommand<Unit, Unit> UpdateCommand => _updateCommand ??= ReactiveCommand.Create(
+            () => UpdateClicked?.Invoke(this, new TransactionEventArgs(Transaction)));
 
-        private void DesignerMode()
+        private ReactiveCommand<Unit, Unit> _removeCommand;
+
+        public ReactiveCommand<Unit, Unit> RemoveCommand => _removeCommand ??= ReactiveCommand.Create(
+            () => RemoveClicked?.Invoke(this, new TransactionEventArgs(Transaction)));
+
+        private ReactiveCommand<Unit, Unit> _onCloseCommand;
+
+        public ReactiveCommand<Unit, Unit> OnCloseCommand => _onCloseCommand ??= ReactiveCommand.Create(
+            () => OnClose?.Invoke());
+
+        protected void DesignerMode()
         {
+            var random = new Random();
             Id = "1234567890abcdefgh1234567890abcdefgh";
             Time = DateTime.UtcNow;
+            Amount = random.Next(-1000, 1000);
+        }
+    }
+
+    public class TransactionViewModel : TransactionViewModelBase
+    {
+        public string CurrencyCode { get; set; }
+        public string FeeCode { get; set; }
+        public decimal Fee { get; set; }
+        public string Direction { get; set; }
+
+        public TransactionViewModel()
+        {
+#if DEBUG
+            if (Design.IsDesignMode)
+                DesignerMode();
+#endif
+        }
+
+        public TransactionViewModel(
+            IBlockchainTransaction tx,
+            CurrencyConfig currencyConfig,
+            decimal amount,
+            decimal fee)
+        {
+            Transaction = tx ?? throw new ArgumentNullException(nameof(tx));
+            Id = Transaction.Id;
+            Currency = currencyConfig;
+            State = Transaction.State;
+            Type = Transaction.Type;
+            Amount = amount;
+            FeeCode = currencyConfig.FeeCode;
+
+            var netAmount = amount + fee;
+
+            var currencyViewModel = CurrencyViewModelCreator.CreateViewModel(currencyConfig, false);
+
+            AmountFormat = currencyViewModel.CurrencyFormat;
+            CurrencyCode = currencyViewModel.CurrencyCode;
+            Time = tx.CreationTime ?? DateTime.UtcNow;
+            CanBeRemoved = tx.State is BlockchainTransactionState.Unknown or
+                BlockchainTransactionState.Failed or
+                BlockchainTransactionState.Pending or
+                BlockchainTransactionState.Unconfirmed;
+
+            Description = GetDescription(
+                type: tx.Type,
+                amount: Amount,
+                netAmount: netAmount,
+                amountDigits: currencyConfig.Digits,
+                currencyCode: currencyConfig.Name);
+
+            Direction = Amount switch
+            {
+                <= 0 => "to ",
+                > 0 => "from "
+            };
         }
 
         public static string GetDescription(
@@ -152,36 +151,39 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
             {
                 return $"Swap payment {Math.Abs(amount).ToString("0." + new string('#', amountDigits))} {currencyCode}";
             }
-            else if (type.HasFlag(BlockchainTransactionType.SwapRefund))
+
+            if (type.HasFlag(BlockchainTransactionType.SwapRefund))
             {
-                return $"Swap refund {Math.Abs(netAmount).ToString("0." + new string('#', amountDigits))} {currencyCode}";
-            }
-            else if (type.HasFlag(BlockchainTransactionType.SwapRedeem))
-            {
-                return $"Swap redeem {Math.Abs(netAmount).ToString("0." + new string('#', amountDigits))} {currencyCode}";
-            }
-            else if (type.HasFlag(BlockchainTransactionType.TokenApprove))
-            {
-                return $"Token approve";
-            }
-            else if (type.HasFlag(BlockchainTransactionType.TokenCall))
-            {
-                return $"Token call";
-            }
-            else if (type.HasFlag(BlockchainTransactionType.SwapCall))
-            {
-                return $"Token swap call";
-            }
-            else if (amount <= 0)
-            {
-                return $"Sent {Math.Abs(netAmount).ToString("0." + new string('#', amountDigits))} {currencyCode}";
-            }
-            else if (amount > 0)
-            {
-                return $"Received {Math.Abs(netAmount).ToString("0." + new string('#', amountDigits))} {currencyCode}";
+                return
+                    $"Swap refund {Math.Abs(netAmount).ToString("0." + new string('#', amountDigits))} {currencyCode}";
             }
 
-            return "Unknown transaction";
+            if (type.HasFlag(BlockchainTransactionType.SwapRedeem))
+            {
+                return
+                    $"Swap redeem {Math.Abs(netAmount).ToString("0." + new string('#', amountDigits))} {currencyCode}";
+            }
+
+            if (type.HasFlag(BlockchainTransactionType.TokenApprove))
+            {
+                return "Token approve";
+            }
+
+            if (type.HasFlag(BlockchainTransactionType.TokenCall))
+            {
+                return "Token call";
+            }
+
+            if (type.HasFlag(BlockchainTransactionType.SwapCall))
+            {
+                return "Token swap call";
+            }
+
+            return amount switch
+            {
+                <= 0 => $"Sent {Math.Abs(netAmount).ToString("0." + new string('#', amountDigits))} {currencyCode}",
+                > 0 => $"Received {Math.Abs(netAmount).ToString("0." + new string('#', amountDigits))} {currencyCode}"
+            };
         }
     }
 }

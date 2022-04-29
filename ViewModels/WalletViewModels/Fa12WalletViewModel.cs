@@ -1,37 +1,27 @@
 using System;
-using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-
 using Serilog;
 using Avalonia.Threading;
-
-using Atomex.Client.Desktop.Common;
-using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
 using Atomex.Client.Desktop.ViewModels.TransactionViewModels;
 using Atomex.Common;
-using Atomex.Core;
 using Atomex.TezosTokens;
+using Atomex.Core;
 using Atomex.Wallet.Tezos;
+using Avalonia.Controls;
+
 
 namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 {
     public class Fa12WalletViewModel : WalletViewModel
     {
-        private ObservableCollection<TezosTokenTransferViewModel> _transactions;
-        public ObservableCollection<TezosTokenTransferViewModel> Transactions
-        {
-            get => _transactions;
-            set { _transactions = value; OnPropertyChanged(nameof(Transactions)); }
-        }
-        
         public Fa12Config Currency => CurrencyViewModel.Currency as Fa12Config;
-        
+
         public Fa12WalletViewModel()
         {
 #if DEBUG
-            if (Env.IsInDesignerMode())
+            if (Design.IsDesignMode)
                 DesignerMode();
 #endif
         }
@@ -39,7 +29,9 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         public Fa12WalletViewModel(
             IAtomexApp app,
             Action<CurrencyConfig> setConversionTab,
-            CurrencyConfig currency) : base(app, setConversionTab, currency)
+            Action<string> setWertCurrency,
+            Action<ViewModelBase?> showRightPopupContent,
+            CurrencyConfig currency) : base(app, setConversionTab, setWertCurrency, showRightPopupContent, currency)
         {
         }
 
@@ -50,28 +42,38 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
         protected sealed override async Task LoadTransactionsAsync()
         {
-            Log.Debug("LoadTransactionsAsync for {@currency}.", Currency.Name);
+            await LoadTransactionsSemaphore.WaitAsync();
 
+            Log.Debug("LoadTransactionsAsync for FA12 {@currency}.", Currency.Name);
             try
             {
                 if (_app.Account == null)
                     return;
 
+                IsTransactionsLoading = true;
+
                 var transactions = (await _app.Account
-                    .GetCurrencyAccount<Fa12Account>(Currency.Name)
-                    .DataRepository
-                    .GetTezosTokenTransfersAsync(Currency.TokenContractAddress)
-                    .ConfigureAwait(false))
+                        .GetCurrencyAccount<Fa12Account>(Currency.Name)
+                        .DataRepository
+                        .GetTezosTokenTransfersAsync(Currency.TokenContractAddress)
+                        .ConfigureAwait(false))
                     .ToList();
 
                 await Dispatcher.UIThread.InvokeAsync(() =>
-                {
-                    Transactions = new ObservableCollection<TezosTokenTransferViewModel>(
-                        transactions.Select(t => new TezosTokenTransferViewModel(t, Currency))
-                            .ToList()
-                            .SortList((t1, t2) => t2.Time.CompareTo(t1.Time)));
-                },
-                DispatcherPriority.Background);
+                    {
+                        var selectedTransactionId = SelectedTransaction?.Id;
+
+                        Transactions = SortTransactions(
+                            transactions
+                                .Select(t => new TezosTokenTransferViewModel(t, Currency))
+                                .ToList()
+                                .ForEachDo(t => t.OnClose = () => ShowRightPopupContent?.Invoke(null)
+                                ));
+
+                        if (selectedTransactionId != null)
+                            SelectedTransaction = Transactions.FirstOrDefault(t => t.Id == selectedTransactionId);
+                    }
+                );
             }
             catch (OperationCanceledException)
             {
@@ -81,8 +83,12 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             {
                 Log.Error(e, "LoadTransactionsAsync error for {@currency}.", Currency?.Name);
             }
+            finally
+            {
+                LoadTransactionsSemaphore.Release();
+            }
         }
-        
+
         protected override void OnReceiveClick()
         {
             var tezosConfig = _app.Account.Currencies.GetByName(TezosConfig.Xtz);
@@ -124,19 +130,18 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             IsBalanceUpdating = false;
         }
 
-        protected override void OnAddressesClick()
+        protected override void LoadAddresses()
         {
             var tezosConfig = _app.Account
                 .Currencies
                 .Get<TezosConfig>(TezosConfig.Xtz);
 
-            var addressesViewModel = new AddressesViewModel(
+            AddressesViewModel = new AddressesViewModel(
                 app: _app,
                 currency: tezosConfig,
                 tokenContract: Currency.TokenContractAddress);
-
-            App.DialogService.Show(addressesViewModel);
         }
+
 #if DEBUG
         protected virtual void DesignerMode()
         {

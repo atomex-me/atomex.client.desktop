@@ -3,8 +3,10 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:converters="clr-namespace:Atomex.Client.Desktop.Converters"
+             xmlns:controls="clr-namespace:Atomex.Client.Desktop.Controls"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="Atomex.Client.Desktop.Views.WalletsView"
+             xmlns:svg="clr-namespace:Avalonia.Svg.Skia;assembly=Avalonia.Svg.Skia"
              xmlns:vm="clr-namespace:Atomex.Client.Desktop.ViewModels">
 
     <Design.DataContext>
@@ -14,43 +16,51 @@
     <UserControl.Resources>
         <converters:WalletsViewMarginConverter x:Key="WalletsViewMarginConverter" />
     </UserControl.Resources>
+    
+    <UserControl.Styles>
+        <Style Selector="Border.WithTezosTokens">
+            <Setter Property="Padding" Value="10 0 10 10" />
+        </Style>
+        
+        <Style Selector="Border.WithoutTezosTokens">
+            <Setter Property="Padding" Value="50 0 50 0" />
+        </Style>
+    </UserControl.Styles>
 
-    <Grid
-        Margin="{Binding $parent[Window].DataContext.IsLinux,
-        Converter={StaticResource WalletsViewMarginConverter}}">
-        <TabControl Name="Wallets"
-                    Items="{Binding Wallets}"
-                    SelectedItem="{Binding Selected}"
-                    Margin="0 5 0 0">
+    <!-- todo: remove -->
+    <Border Classes.WithTezosTokens="{Binding IsTezosTokensSelected}"
+            Classes.WithoutTezosTokens="{Binding !IsTezosTokensSelected}"
+            Margin="{Binding $parent[Window].DataContext.IsLinux,
+            Converter={StaticResource WalletsViewMarginConverter}}"
+            Name="MainControl">
+        <Grid RowDefinitions="Auto,Auto,*">
+            <Grid Grid.Row="0"
+                  Height="75"
+                  ColumnDefinitions="Auto,*,Auto">
+                <controls:IconButton Grid.Column="0"
+                                     Classes="Back"
+                                     Command="{Binding BackCommand}" />
 
-            <TabControl.ItemTemplate>
-                <DataTemplate>
-                    <StackPanel x:Name="walletTabItem" Orientation="Vertical" Background="Transparent">
-                        <ContentControl x:Name="ContentControl"
-                                        HorizontalAlignment="Center"
-                                        VerticalContentAlignment="Center"
-                                        HorizontalContentAlignment="Center"
-                                        Width="64"
-                                        Height="64"
-                                        Opacity="0.8"
-                                        Margin="3 0 3 0">
-                            <Canvas Width="48"
-                                    Height="48"
-                                    Background="{Binding Background}"
-                                    OpacityMask="{Binding OpacityMask}" />
-                        </ContentControl>
+                <TextBlock Grid.Column="1"
+                           Foreground="{DynamicResource ChildViewHeaderForegroundBrush}"
+                           FontFamily="{DynamicResource DefaultLightFontFamily}"
+                           FontSize="22"
+                           HorizontalAlignment="Left"
+                           VerticalAlignment="Center"
+                           Text="{Binding Selected.Header}"
+                           Margin="20 0 0 0"
+                           Name="WindowTitle" />
 
-                        <TextBlock x:Name="HeaderTextBlock"
-                                   Text="{Binding Header}"
-                                   Foreground="{DynamicResource DefaultForegroundBrush}"
-                                   FontFamily="{StaticResource AgencyFb}"
-                                   FontSize="20"
-                                   TextAlignment="Center"
-                                   TextWrapping="Wrap"
-                                   Opacity="{Binding CurrencyOpacityValue}" />
-                    </StackPanel>
-                </DataTemplate>
-            </TabControl.ItemTemplate>
-        </TabControl>
-    </Grid>
+                <controls:IconButton Grid.Column="2"
+                                     Classes="Alert NoEffects" />
+            </Grid>
+
+            <Border Grid.Row="1"
+                    Height="1"
+                    Background="{DynamicResource LightDefaultOpacity10}" />
+
+            <ContentControl Grid.Row="2"
+                            Content="{Binding Selected}" />
+        </Grid>
+    </Border>
 </UserControl>

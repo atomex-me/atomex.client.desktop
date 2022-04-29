@@ -10,231 +10,181 @@
              xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
              xmlns:ia="clr-namespace:Avalonia.Xaml.Interactions.Core;assembly=Avalonia.Xaml.Interactions">
 
-  <Design.DataContext>
-    <vm:WalletMainViewModel/>
-  </Design.DataContext>
+    <Design.DataContext>
+        <vm:WalletMainViewModel />
+    </Design.DataContext>
 
-  <UserControl.Resources>
-    <converters:CalcChildHeightConverter x:Key="CalcChildHeightConverter"/>
-  </UserControl.Resources>
+    <UserControl.Resources>
+        <converters:CalcChildHeightConverter x:Key="CalcChildHeightConverter" />
+        <converters:ToolTipOffsetConverter x:Key="ToolTipOffsetConverter" />
+    </UserControl.Resources>
 
-  <DockPanel x:Name="MainDockerPanel"
-             Width="{Binding $parent[Window].Bounds.Width}"
-             Height="{Binding $parent[Window].Bounds.Height, Converter={StaticResource CalcChildHeightConverter}}">
-    <!-- status bar -->
-    <DockPanel DockPanel.Dock="Bottom"
-               Background="{DynamicResource MainWindowTitleBrush}">
+    <UserControl.Styles>
+        <Style Selector="TextBlock.Connected">
+            <Setter Property="Foreground" Value="{DynamicResource DefaultForegroundBrush}" />
+        </Style>
 
-      <StackPanel Orientation="Horizontal"
-                  DockPanel.Dock="Right"
-                  VerticalAlignment="Center"
-                  Height="20">
+        <Style Selector="TextBlock.Disconnected">
+            <Setter Property="Foreground" Value="{DynamicResource ErrorForegroundBrush}" />
+        </Style>
+    </UserControl.Styles>
 
-        <Border ToolTip.Placement="AnchorAndGravity"
-                ToolTip.VerticalOffset="-32"
-                VerticalAlignment="Center"
-                Cursor="Help"
-                Margin="8 0">
+    <DockPanel Width="{Binding $parent[Window].Bounds.Width}"
+               Height="{Binding $parent[Window].Bounds.Height, Converter={StaticResource CalcChildHeightConverter}}">
+        <!-- status bar -->
+        <DockPanel DockPanel.Dock="Bottom"
+                   Background="{DynamicResource MainWindowTitleBrush}">
 
-            <TextBlock Text="Exchange"
-                       x:Name="ExchangeTextBox"
-                       Padding="0 0 0 1"
-                       FontSize="11"/>
-            <ToolTip.Tip>
-              <TextBlock x:Name="ToolTipTextBoxExchange"
-                         Text="Disconnected"/>
-            </ToolTip.Tip>
-            <i:Interaction.Behaviors>
-              <ia:DataTriggerBehavior Binding="{Binding IsExchangeConnected}"
-                                      ComparisonCondition="NotEqual"
-                                      Value="True">
-                <ia:ChangePropertyAction TargetObject="{Binding #ToolTipTextBoxExchange}"
-                                          PropertyName="Text"
-                                          Value="Disconnected"/>
-                <ia:ChangePropertyAction TargetObject="{Binding #ExchangeTextBox}"
-                                          PropertyName="Foreground"
-                                          Value="{StaticResource StatusBarDisconnectedForeground}"/>
-              </ia:DataTriggerBehavior>
-              <ia:DataTriggerBehavior Binding="{Binding IsExchangeConnected}"
-                                      ComparisonCondition="Equal"
-                                      Value="True">
-                <ia:ChangePropertyAction TargetObject="{Binding #ToolTipTextBoxExchange}"
-                                          PropertyName="Text"
-                                          Value="Connected"/>
-                <ia:ChangePropertyAction TargetObject="{Binding #ExchangeTextBox}"
-                                          PropertyName="Foreground"
-                                          Value="{StaticResource StatusBarConnectedForeground}"/>
-              </ia:DataTriggerBehavior>
-            </i:Interaction.Behaviors>
-        </Border>
+            <StackPanel Orientation="Horizontal"
+                        DockPanel.Dock="Right"
+                        VerticalAlignment="Center"
+                        Height="20">
+                
+                <TextBlock Text="Exchange"
+                           FontSize="12"
+                           Margin="8 0"
+                           VerticalAlignment="Center"
+                           Classes.Connected="{Binding IsExchangeConnected}"
+                           Classes.Disconnected="{Binding !IsExchangeConnected}"
+                           ToolTip.Placement="AnchorAndGravity"
+                           ToolTip.VerticalOffset="-30"
+                           ToolTip.Tip="{Binding IsExchangeConnectedText}" />
 
-        <Rectangle Margin="0 4"
-                   VerticalAlignment="Stretch"
-                   Fill="{DynamicResource StatusBarVersionForeground}"
-                   Width="1"/>
+                <Rectangle Margin="0 4"
+                           VerticalAlignment="Stretch"
+                           Fill="{DynamicResource StatusBarVerticalDelimiterColor}"
+                           Width="1" />
 
-        <Border ToolTip.Placement="AnchorAndGravity"
-                ToolTip.VerticalOffset="-32"
-                VerticalAlignment="Center"
-                Cursor="Help"
-                Margin="8 0">
+                <TextBlock Text="Market Data"
+                           FontSize="12"
+                           Margin="8 0"
+                           VerticalAlignment="Center"
+                           Classes.Connected="{Binding IsMarketDataConnected}"
+                           Classes.Disconnected="{Binding !IsMarketDataConnected}"
+                           ToolTip.Placement="AnchorAndGravity"
+                           ToolTip.VerticalOffset="-30"
+                           ToolTip.Tip="{Binding IsMarketDataConnectedText}" />
 
-          <TextBlock Text="Market Data"
-                     x:Name="MarketTextBox"
-                     Padding="0 0 0 1"
-                     FontSize="11"/>
-          <ToolTip.Tip>
-            <TextBlock x:Name="ToolTipTextBoxMarket"
-                       Text="Disconnected"/>
-          </ToolTip.Tip>
-          <i:Interaction.Behaviors>
-            <ia:DataTriggerBehavior Binding="{Binding IsMarketDataConnected}"
-                                    ComparisonCondition="NotEqual"
-                                    Value="True">
-              <ia:ChangePropertyAction TargetObject="{Binding #ToolTipTextBoxMarket}"
-                                       PropertyName="Text"
-                                       Value="Disconnected"/>
-              <ia:ChangePropertyAction TargetObject="{Binding #MarketTextBox}"
-                                       PropertyName="Foreground"
-                                       Value="{StaticResource StatusBarDisconnectedForeground}"/>
-            </ia:DataTriggerBehavior>
-            <ia:DataTriggerBehavior Binding="{Binding IsMarketDataConnected}"
-                                    ComparisonCondition="Equal"
-                                    Value="True">
-              <ia:ChangePropertyAction TargetObject="{Binding #ToolTipTextBoxMarket}"
-                                        PropertyName="Text"
-                                        Value="Connected"/>
-              <ia:ChangePropertyAction TargetObject="{Binding #MarketTextBox}"
-                                        PropertyName="Foreground"
-                                        Value="{StaticResource StatusBarConnectedForeground}"/>
-            </ia:DataTriggerBehavior>
-          </i:Interaction.Behaviors>
-        </Border>
+                    <Rectangle Margin="0 4"
+                               VerticalAlignment="Stretch"
+                               Fill="{DynamicResource StatusBarVerticalDelimiterColor}"
+                               Width="1" />
 
-        <Rectangle Margin="0 4"
-                    VerticalAlignment="Stretch"
-                    Fill="{DynamicResource StatusBarVersionForeground}"
+                <TextBlock Text="Rates Provider"
+                           FontSize="12"
+                           Margin="8 0"
+                           VerticalAlignment="Center"
+                           Classes.Connected="{Binding IsQuotesProviderAvailable}"
+                           Classes.Disconnected="{Binding !IsQuotesProviderAvailable}"
+                           ToolTip.Placement="AnchorAndGravity"
+                           ToolTip.VerticalOffset="-30"
+                           ToolTip.Tip="{Binding IsQuotesProviderAvailableText}" />
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal"
+                        VerticalAlignment="Center">
+                <TextBlock Text="Version:"
+                           Margin="8 0 4 0"
+                           FontSize="12"
+                           Foreground="{DynamicResource SecondaryForegroundBrush}" />
+
+                <TextBlock Text="{Binding InstalledVersion}"
+                           FontSize="12"
+                           Foreground="{DynamicResource SecondaryForegroundBrush}" />
+            </StackPanel>
+        </DockPanel>
+
+        <!-- left menu -->
+        <DockPanel DockPanel.Dock="Left">
+            <StackPanel Width="220">
+                <Image Source="/Resources/Images/menu_logo.png"
+                       Stretch="None"
+                       HorizontalAlignment="Left"
+                       Margin="32 33 0 55" />
+
+                <controls:MenuButton
+                    Background="Transparent"
+                    Foreground="{DynamicResource LightDefault}"
+                    IsSelected="{Binding IsPortfolioSectionActive}"
+                    HorizontalAlignment="Stretch"
+                    Command="{Binding SelectPortfolio}">
+                    <TextBlock VerticalAlignment="Center"
+                               Margin="32 16 0 16"
+                               Text="Wallet" />
+                </controls:MenuButton>
+
+                <controls:MenuButton
+                    IsSelected="{Binding IsConversionSectionActive}"
+                    HorizontalAlignment="Stretch"
+                    Command="{Binding SelectConversion}">
+                    <TextBlock VerticalAlignment="Center"
+                               Margin="32 16 0 16"
+                               Text="DEX" />
+                </controls:MenuButton>
+
+                <controls:MenuButton
+                    IsSelected="{Binding IsWertSectionActive}"
+                    HorizontalAlignment="Stretch"
+                    Command="{Binding SelectWert}">
+                    <TextBlock VerticalAlignment="Center"
+                               Margin="32 16 0 16"
+                               Text="Buy with card" />
+                </controls:MenuButton>
+            </StackPanel>
+
+            <Border Background="{DynamicResource LightDefaultOpacity6}"
+                    DockPanel.Dock="Right"
                     Width="1" />
+        </DockPanel>
 
-        <Border ToolTip.Placement="AnchorAndGravity"
-                ToolTip.VerticalOffset="-32"
-                VerticalAlignment="Center"
-                Cursor="Help"
-                Margin="8 0">
+        <Grid Name="WalletContentGrid"
+              Background="{DynamicResource AlmostTransparentBrush}"
+              ColumnDefinitions="*,396">
+            <ContentControl Grid.Column="0"
+                            Grid.ColumnSpan="2"
+                            Content="{Binding Content}" />
 
-          <TextBlock Text="Rates Provider"
-                     x:Name="RatesTextBox"
-                     Padding="0 0 0 1"
-                     FontSize="11"/>
-          <ToolTip.Tip>
-            <TextBlock x:Name="ToolTipTextBoxRates"
-                       Text="Disconnected"/>
-          </ToolTip.Tip>
-          <i:Interaction.Behaviors>
-            <ia:DataTriggerBehavior Binding="{Binding IsQuotesProviderAvailable}"
-                                    ComparisonCondition="NotEqual"
-                                    Value="True">
-              <ia:ChangePropertyAction TargetObject="{Binding #ToolTipTextBoxRates}"
-                                       PropertyName="Text"
-                                       Value="Disconnected"/>
-              <ia:ChangePropertyAction TargetObject="{Binding #RatesTextBox}"
-                                       PropertyName="Foreground"
-                                       Value="{StaticResource StatusBarDisconnectedForeground}"/>
-            </ia:DataTriggerBehavior>
-            <ia:DataTriggerBehavior Binding="{Binding IsQuotesProviderAvailable}"
-                                    ComparisonCondition="Equal"
-                                    Value="True">
-              <ia:ChangePropertyAction TargetObject="{Binding #ToolTipTextBoxRates}"
-                                       PropertyName="Text"
-                                       Value="Connected"/>
-              <ia:ChangePropertyAction TargetObject="{Binding #RatesTextBox}"
-                                       PropertyName="Foreground"
-                                       Value="{StaticResource StatusBarConnectedForeground}"/>
-            </ia:DataTriggerBehavior>
-          </i:Interaction.Behaviors>
-        </Border>
-      </StackPanel>
+            <ContentControl Grid.Column="1"
+                            IsEnabled="{Binding RightPopupOpened}"
+                            Classes.WithCloseAnimation="{Binding RightPopupHasContent}"
+                            Content="{Binding RightPopupContent}">
 
-      <StackPanel Orientation="Horizontal"
-                  VerticalAlignment="Center">
-        <TextBlock Text="Version:"
-                   Margin="8 0 4 0"
-                   FontSize="11"
-                   Foreground="{DynamicResource StatusBarVersionForeground}"/>
-        <TextBlock Text="{Binding InstalledVersion}"
-                   FontSize="11"
-                   Foreground="{DynamicResource StatusBarVersionForeground}"/>
-      </StackPanel>
+                <ContentControl.ContentTemplate>
+                    <controls:WalletPopupRightDataTemplateSelector />
+                </ContentControl.ContentTemplate>
+
+                <ContentControl.Styles>
+                    <Style Selector="ContentControl[IsEnabled=True]">
+                        <Style.Animations>
+                            <Animation Duration="0:0:0.35" Easing="QuadraticEaseOut" FillMode="Forward">
+                                <KeyFrame Cue="0%">
+                                    <Setter Property="TranslateTransform.X" Value="396" />
+                                    <Setter Property="Opacity" Value="0"></Setter>
+                                </KeyFrame>
+                                <KeyFrame Cue="100%">
+                                    <Setter Property="TranslateTransform.X" Value="0" />
+                                    <Setter Property="Opacity" Value="1"></Setter>
+                                </KeyFrame>
+                            </Animation>
+                        </Style.Animations>
+                    </Style>
+
+                    <Style Selector="ContentControl.WithCloseAnimation[IsEnabled=False]">
+                        <Style.Animations>
+                            <Animation Duration="0:0:0.35" Easing="QuadraticEaseOut" FillMode="Forward">
+                                <KeyFrame Cue="0%">
+                                    <Setter Property="TranslateTransform.X" Value="0" />
+                                    <Setter Property="Opacity" Value="1"></Setter>
+                                </KeyFrame>
+                                <KeyFrame Cue="100%">
+                                    <Setter Property="TranslateTransform.X" Value="396" />
+                                    <Setter Property="Opacity" Value="0"></Setter>
+                                </KeyFrame>
+                            </Animation>
+                        </Style.Animations>
+                    </Style>
+                </ContentControl.Styles>
+            </ContentControl>
+        </Grid>
     </DockPanel>
-
-    <!-- left menu -->
-    <DockPanel DockPanel.Dock="Left">
-
-      <!--<StackPanel Width="239" DockPanel.Dock="Bottom">
-        <controls:MenuButton
-            IsVisible="False"
-            IsSelected="{Binding IsSettingsSectionActive}"
-            HorizontalAlignment="Stretch"
-            Command="{Binding SelectSettings}">
-          <TextBlock VerticalAlignment="Center"
-                      Margin="32 16 0 16"
-                      Text="Settings"/>
-        </controls:MenuButton>
-      </StackPanel>-->
-
-      <StackPanel Width="239">
-        
-        <Image Source="/Resources/Images/menu_logo.png"
-               Stretch="None"
-               HorizontalAlignment="Left"
-               Margin="32 33 0 55"/>
-        
-        <controls:MenuButton
-            Background="Transparent"
-            Foreground="{DynamicResource LightDefault}"
-            IsSelected="{Binding IsPortfolioSectionActive}"
-            HorizontalAlignment="Stretch"
-            Command="{Binding SelectPortfolio}">
-          <TextBlock VerticalAlignment="Center"
-                     Margin="32 16 0 16"
-                     
-                     Text="Portfolio"/>
-        </controls:MenuButton>
-
-        <controls:MenuButton
-            IsSelected="{Binding IsWalletsSectionActive}"
-            HorizontalAlignment="Stretch"
-            Command="{Binding SelectWallets}">
-          <TextBlock VerticalAlignment="Center"
-                     Margin="32 16 0 16"
-                     Text="Wallets"/>
-        </controls:MenuButton>
-
-        <controls:MenuButton
-            IsSelected="{Binding IsConversionSectionActive}"
-            HorizontalAlignment="Stretch"
-            Command="{Binding SelectConversion}">
-          <TextBlock VerticalAlignment="Center"
-                     Margin="32 16 0 16"
-                     Text="DEX"/>
-        </controls:MenuButton>
-
-        <controls:MenuButton
-            IsSelected="{Binding IsWertSectionActive}"
-            HorizontalAlignment="Stretch"
-            Command="{Binding SelectWert}">
-          <TextBlock VerticalAlignment="Center"
-                     Margin="32 16 0 16"
-                     Text="Buy with card"/>
-        </controls:MenuButton>
-      </StackPanel>
-      
-      <Border Background="{DynamicResource LightDefaultOpacity6}"
-              DockPanel.Dock="Right"
-              Width="1"/>
-    </DockPanel>
-
-    <!-- content -->
-    <ContentControl Content="{Binding Content}"/>
-  </DockPanel>
 </UserControl>

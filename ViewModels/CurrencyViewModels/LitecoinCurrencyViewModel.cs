@@ -1,7 +1,6 @@
 ﻿using Atomex.Client.Desktop.Properties;
 using Atomex.Core;
 using Avalonia.Media;
-using Atomex.Client.Desktop.ViewModels.Abstract;
 using Avalonia.Visuals.Media.Imaging;
 
 
@@ -23,8 +22,8 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
             AccentColor         = Color.FromRgb(r: 191, g: 191, b: 191);
             AmountColor         = Color.FromRgb(r: 231, g: 231, b: 231);
             UnselectedIconBrush = Brushes.White;
-            IconPath            = GetBitmap(PathToImage("litecoin.png"));
-            LargeIconPath       = GetBitmap(PathToImage("litecoin_90x90.png"));
+            IconPath            = $"{PathToIcons}/litecoin.svg";
+            DisabledIconPath    = $"{PathToIcons}/litecoin-disabled.svg";
             FeeName             = Resources.SvMiningFee;
         }
     }

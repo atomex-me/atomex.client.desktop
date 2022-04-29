@@ -2,63 +2,76 @@
         xmlns:x='http://schemas.microsoft.com/winfx/2006/xaml'
         xmlns:controls="clr-namespace:Atomex.Client.Desktop.Controls"
         xmlns:viewModels="clr-namespace:Atomex.Client.Desktop.ViewModels.TransactionViewModels"
-        xmlns:views="clr-namespace:Atomex.Client.Desktop.Views.TransactionViews">
+        xmlns:views="clr-namespace:Atomex.Client.Desktop.Views.TransactionViews"
+        xmlns:svg="clr-namespace:Avalonia.Svg.Skia;assembly=Avalonia.Svg.Skia">
 
     <Styles.Resources>
         <DataTemplate x:Key="UnknownStateTemplate" DataType="viewModels:TransactionViewModel">
-            <Border Background="{StaticResource UnknownBrush}"
-                    CornerRadius="5"
-                    Classes="DGTemplateContainer">
-                <TextBlock Foreground="White"
-                           Text="{Binding State}"
-                           FontSize="11"
-                           Margin="5"
-                           HorizontalAlignment="Center" />
-            </Border>
+            <StackPanel Orientation="Horizontal">
+                <svg:Svg Width="18"
+                         VerticalAlignment="Center"
+                         Path="/Resources/Icons/question-in-circle.svg" />
+                <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
+                           Margin="8 0 0 0"
+                           FontSize="13"
+                           LineHeight="16"
+                           VerticalAlignment="Center"
+                           Text="Unknown" />
+            </StackPanel>
         </DataTemplate>
         <DataTemplate x:Key="PendingStateTemplate" DataType="viewModels:TransactionViewModel">
-            <Border Background="{StaticResource PendingBrush}"
-                    CornerRadius="5"
-                    Classes="DGTemplateContainer">
-                <TextBlock Foreground="White"
-                           Text="{Binding State}"
-                           FontSize="11"
-                           Margin="5"
-                           HorizontalAlignment="Center" />
-            </Border>
+            <StackPanel Orientation="Horizontal">
+                <svg:Svg Width="18"
+                         Classes="InProgress"
+                         VerticalAlignment="Center"
+                         Path="/Resources/Icons/in-progress.svg" />
+                <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
+                           Margin="8 0 0 0"
+                           FontSize="13"
+                           LineHeight="16"
+                           VerticalAlignment="Center"
+                           Text="Pending" />
+            </StackPanel>
         </DataTemplate>
         <DataTemplate x:Key="ConfirmedStateTemplate" DataType="viewModels:TransactionViewModel">
-            <Border Background="{StaticResource ConfirmedBrush}"
-                    CornerRadius="5"
-                    Classes="DGTemplateContainer">
-                <TextBlock Foreground="White"
-                           Text="{Binding State}"
-                           FontSize="11"
-                           Margin="5"
-                           HorizontalAlignment="Center" />
-            </Border>
+            <StackPanel Orientation="Horizontal">
+                <svg:Svg Width="18"
+                         VerticalAlignment="Center"
+                         Path="/Resources/Icons/completed-checkbox.svg" />
+                <TextBlock Foreground="{DynamicResource DefaultForegroundBrush}"
+                           Margin="8 0 0 0"
+                           FontSize="13"
+                           LineHeight="16"
+                           VerticalAlignment="Center"
+                           Text="Confirmed" />
+            </StackPanel>
         </DataTemplate>
         <DataTemplate x:Key="UnconfirmedStateTemplate" DataType="viewModels:TransactionViewModel">
-            <Border Background="{StaticResource UnconfirmedBrush}"
-                    CornerRadius="5"
-                    Classes="DGTemplateContainer">
-                <TextBlock Foreground="White"
-                           Text="{Binding State}"
-                           FontSize="11"
-                           Margin="5"
-                           HorizontalAlignment="Center" />
-            </Border>
+            <StackPanel Orientation="Horizontal">
+                <svg:Svg Width="18"
+                         Classes="InProgress"
+                         VerticalAlignment="Center"
+                         Path="/Resources/Icons/exclamation-mark.svg" />
+                <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
+                           Margin="8 0 0 0"
+                           FontSize="13"
+                           LineHeight="16"
+                           VerticalAlignment="Center"
+                           Text="Unconfirmed" />
+            </StackPanel>
         </DataTemplate>
         <DataTemplate x:Key="FailedStateTemplate" DataType="viewModels:TransactionViewModel">
-            <Border Background="{StaticResource FailedBrush}"
-                    CornerRadius="5"
-                    Classes="DGTemplateContainer">
-                <TextBlock Foreground="White"
-                           Text="{Binding State}"
-                           FontSize="11"
-                           Margin="5"
-                           HorizontalAlignment="Center" />
-            </Border>
+            <StackPanel Orientation="Horizontal">
+                <svg:Svg Width="18"
+                         VerticalAlignment="Center"
+                         Path="/Resources/Icons/cross-in-circle.svg" />
+                <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
+                           Margin="8 0 0 0"
+                           FontSize="13"
+                           LineHeight="16"
+                           VerticalAlignment="Center"
+                           Text="Failed" />
+            </StackPanel>
         </DataTemplate>
 
         <DataTemplate x:Key="SentTypeTemplate">
@@ -109,73 +122,64 @@
                       DataType="viewModels:TezosTransactionViewModel">
             <views:TezosTransactionDetailsView />
         </DataTemplate>
+        <DataTemplate x:Key="TezosTokenTransferDetailsTemplate"
+                      DataType="viewModels:TezosTransactionViewModel">
+            <views:TezosTokenTransferDetailsView />
+        </DataTemplate>
         <DataTemplate x:Key="EthereumTransactionDetailsTemplate"
                       DataType="viewModels:EthereumTransactionViewModel">
             <views:EthereumTransactionDetailsView />
         </DataTemplate>
-        
+
         <DataTemplate x:Key="EthereumERC20TransactionDetailsTemplate"
                       DataType="viewModels:EthereumERC20TransactionViewModel">
-            <views:EthereumTransactionDetailsView />
+            <views:EthereumERC20TransactionDetailsView />
         </DataTemplate>
 
         <DataTemplate x:Key="BtcBasedDescriptionTemplate" DataType="viewModels:TransactionViewModel">
-            <Border Classes="DGTemplateContainer">
-                <TextBlock Text="{Binding Description}" />
-            </Border>
+            <TextBlock Foreground="{DynamicResource DefaultForegroundBrush}"
+                       VerticalAlignment="Center"
+                       FontSize="16"
+                       Text="{Binding Description}" />
         </DataTemplate>
 
         <DataTemplate x:Key="EthAdditionalDescriptionTemplate" DataType="viewModels:EthereumTransactionViewModel">
-            <StackPanel Orientation="Vertical"
-                        Classes="DGTemplateContainer"
-                        Margin="0 5 0 5">
-                <TextBlock Text="{Binding Description}"
-                           Margin="0 0 0 2"/>
+            <StackPanel Orientation="Vertical">
+                <TextBlock Foreground="{DynamicResource DefaultForegroundBrush}"
+                           VerticalAlignment="Center"
+                           FontSize="16"
+                           LineHeight="24"
+                           Text="{Binding Description}" />
                 <StackPanel Orientation="Horizontal">
-                    <TextBlock Text="{Binding Direction}" 
-                               FontSize="12" 
-                               Foreground="Gray"/>
-                    <TextBlock Text="{Binding Alias}" 
-                               FontSize="12" 
-                               Foreground="{StaticResource NegativeAmountBrush}"/>
+                    <TextBlock Text="{Binding Direction}"
+                               FontSize="13"
+                               Foreground="{DynamicResource SecondaryForegroundBrush}" />
+                    <TextBlock Text="{Binding Alias}"
+                               FontSize="13"
+                               Foreground="{DynamicResource SecondaryForegroundBrush}" />
+
                 </StackPanel>
             </StackPanel>
         </DataTemplate>
-        
+
         <DataTemplate x:Key="XtzAdditionalDescriptionTemplate" DataType="viewModels:TezosTransactionViewModel">
-            <StackPanel Orientation="Vertical"
-                        Classes="DGTemplateContainer"
-                        Margin="0 5 0 5">
-                <TextBlock Text="{Binding Description}"
-                           Margin="0 0 0 2"/>
+            <StackPanel Orientation="Vertical">
+                <TextBlock Foreground="{DynamicResource DefaultForegroundBrush}"
+                           VerticalAlignment="Center"
+                           FontSize="16"
+                           LineHeight="24"
+                           Text="{Binding Description}" />
                 <StackPanel Orientation="Horizontal">
                     <TextBlock Text="{Binding Direction}"
-                               FontSize="12"
-                               Foreground="Gray"/>
+                               FontSize="13"
+                               Foreground="{DynamicResource SecondaryForegroundBrush}" />
                     <TextBlock Text="{Binding Alias}"
-                               FontSize="12"
-                               Foreground="{StaticResource NegativeAmountBrush}"/>
+                               FontSize="13"
+                               Foreground="{DynamicResource SecondaryForegroundBrush}" />
                 </StackPanel>
             </StackPanel>
         </DataTemplate>
     </Styles.Resources>
-
-    <Style Selector="Button.ExplorerLinkButton">
-        <Setter Property="FontFamily" Value="{DynamicResource DefaultFontFamily}" />
-        <Setter Property="FontSize" Value="12" />
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="Button">
-                    <TextBlock Text="{TemplateBinding Content}" />
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
-        <Setter Property="Foreground" Value="{DynamicResource ExplorerLinkButtonForegroundBrush}" />
-    </Style>
-
-    <Style Selector="Button.ExplorerLinkButton:pointerover">
-        <Setter Property="Foreground" Value="{DynamicResource ExplorerLinkButtonMouseOverBrush}" />
-    </Style>
 
     <Style Selector="controls|RoundedButton.WalletMenuButton">
         <Setter Property="FontFamily" Value="{DynamicResource DefaultFontFamily}" />
@@ -190,44 +194,92 @@
         <Setter Property="Background" Value="{DynamicResource CheckboxCheckedBrush}" />
     </Style>
 
-    <Style Selector="Image.CurrencyLogo[IsEnabled=True]">
-        <Style.Animations>
-            <Animation Duration="0:0:2.5"
-                       IterationCount="INFINITE"
-                       FillMode="Forward"
-                       PlaybackDirection="Normal">
-                <KeyFrame Cue="0%">
-                    <Setter Property="RotateTransform.Angle" Value="0" />
-                </KeyFrame>
-                <KeyFrame Cue="100%">
-                    <Setter Property="RotateTransform.Angle" Value="360" />
-                </KeyFrame>
-            </Animation>
-        </Style.Animations>
+
+    <Style Selector="TabControl.WalletTabControl">
+        <Setter Property="Margin" Value="0" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="Background" Value="{DynamicResource AlmostTransparentBrush}" />
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Border BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        CornerRadius="0"
+                        Background="{TemplateBinding Background}"
+                        HorizontalAlignment="{TemplateBinding HorizontalAlignment}"
+                        VerticalAlignment="{TemplateBinding VerticalAlignment}">
+                    <DockPanel>
+                        <StackPanel Orientation="Vertical"
+                                    DockPanel.Dock="{TemplateBinding TabStripPlacement}">
+                            <Border BorderThickness="0 0 0 1"
+                                    BorderBrush="{StaticResource LightDefaultOpacity10}">
+                                <ItemsPresenter Name="PART_ItemsPresenter"
+                                                HorizontalAlignment="Left"
+                                                Items="{TemplateBinding Items}"
+                                                ItemsPanel="{TemplateBinding ItemsPanel}"
+                                                Margin="0"
+                                                ItemTemplate="{TemplateBinding ItemTemplate}" />
+                            </Border>
+                        </StackPanel>
+                        <ContentPresenter Name="PART_SelectedContentHost"
+                                          Margin="{TemplateBinding Padding}"
+                                          HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                          VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+                                          Content="{TemplateBinding SelectedContent}"
+                                          ContentTemplate="{TemplateBinding SelectedContentTemplate}" />
+                    </DockPanel>
+                </Border>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+    <Style Selector="TabItem.WalletTabItem">
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="Foreground" Value="{DynamicResource SecondaryForegroundBrush}" />
+        <Setter Property="FontFamily" Value="{DynamicResource DefaultFontFamily}" />
+        <Setter Property="FontWeight" Value="Light" />
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Border Name="PART_LayoutRoot"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        CornerRadius="0"
+                        Height="72"
+                        Padding="0">
+                    <Panel>
+                        <ContentPresenter Name="PART_ContentPresenter"
+                                          ContentTemplate="{TemplateBinding HeaderTemplate}"
+                                          Content="{TemplateBinding Header}"
+                                          HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                          VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                          TextBlock.FontFamily="{TemplateBinding FontFamily}"
+                                          TextBlock.FontSize="{TemplateBinding FontSize}"
+                                          TextBlock.FontWeight="{TemplateBinding FontWeight}" />
+                        <Border Name="PART_SelectedPipe"
+                                Margin="0"
+                                Background="{StaticResource LightDefault}" />
+                    </Panel>
+                </Border>
+            </ControlTemplate>
+        </Setter>
     </Style>
 
-    <Style Selector="TextBlock.UpdatingTextBlock[IsEnabled=True]">
-        <Style.Animations>
-            <Animation Duration="0:0:2.5"
-                       IterationCount="INFINITE"
-                       FillMode="Forward"
-                       PlaybackDirection="Normal">
-                <KeyFrame Cue="0%">
-                    <Setter Property="Opacity" Value="1" />
-                </KeyFrame>
-                <KeyFrame Cue="50%">
-                    <Setter Property="Opacity" Value="0.1" />
-                </KeyFrame>
-
-                <KeyFrame Cue="100%">
-                    <Setter Property="Opacity" Value="1" />
-                </KeyFrame>
-            </Animation>
-        </Style.Animations>
+    <Style Selector="TabItem.WalletTabItem:selected">
+        <Setter Property="TextBlock.Foreground" Value="{DynamicResource DefaultForegroundBrush}" />
     </Style>
-    
-    <Style Selector=":is(Control).DGTemplateContainer">
-        <Setter Property="Margin" Value="10 0 0 0" />
-        <Setter Property="HorizontalAlignment" Value="Left" />
+
+    <!-- PointerOver state -->
+    <Style Selector="TabItem.WalletTabItem:pointerover /template/ Border#PART_LayoutRoot">
+        <Setter Property="TextBlock.Foreground" Value="{DynamicResource SecondaryForegroundBrush}" />
+    </Style>
+
+    <!-- Selected PointerOver state -->
+    <Style Selector="TabItem.WalletTabItem:selected:pointerover /template/ Border#PART_LayoutRoot">
+        <Setter Property="TextBlock.Foreground" Value="{DynamicResource DefaultForegroundBrush}" />
+    </Style>
+
+    <Style Selector="TextBlock.AmountListBoxItem">
+        <Setter Property="Foreground" Value="{DynamicResource SecondaryForegroundBrush}" />
+    </Style>
+    <Style Selector="TextBlock.PositiveAmount">
+        <Setter Property="Foreground" Value="{DynamicResource SuccessForegroundBrush}" />
     </Style>
 </Styles>

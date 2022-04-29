@@ -1,88 +1,114 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Reactive;
 using System.Threading.Tasks;
-using System.Windows.Input;
-
-using Avalonia.Media.Imaging;
 using Avalonia.Threading;
 using Serilog;
 using ReactiveUI;
-
 using Atomex.Blockchain.Tezos;
 using Atomex.Blockchain.Tezos.Internal;
+using Atomex.Blockchain.Tezos.Tzkt;
+using Atomex.Client.Desktop.Common;
 using Atomex.Core;
 using Atomex.Wallet;
+using ReactiveUI.Fody.Helpers;
+
 
 namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 {
-    public class Delegation
+    public enum DelegationSortField
     {
-        public BakerData Baker { get; set; }
-        public string Address { get; set; }
-        public decimal Balance { get; set; }
-        public IBitmap GetBakerLogo => App.ImageService.GetImage(Baker.Logo);
+        ByRoi,
+        ByStatus,
+        ByBalance
     }
 
     public class TezosWalletViewModel : WalletViewModel
     {
         private const int DelegationCheckIntervalInSec = 20;
+        [Reactive] public ObservableCollection<Delegation> Delegations { get; set; }
+        [Reactive] public SortDirection? CurrentDelegationSortDirection { get; set; }
+        [Reactive] public DelegationSortField? CurrentDelegationSortField { get; set; }
 
-        private bool _canDelegate;
-        public bool CanDelegate
-        {
-            get => _canDelegate;
-            set { _canDelegate = value; this.RaisePropertyChanged(nameof(CanDelegate)); }
-        }
-
-        private bool _hasDelegations;
-        public bool HasDelegations
-        {
-            get => _hasDelegations;
-            set { _hasDelegations = value; this.RaisePropertyChanged(nameof(HasDelegations)); }
-        }
-
-        private List<Delegation> _delegations;
-        public List<Delegation> Delegations
-        {
-            get => _delegations;
-            set { _delegations = value; this.RaisePropertyChanged(nameof(Delegations)); }
-        }
+        private bool CanDelegate { get; set; }
+        private bool HasDelegations { get; set; }
+        private DelegateViewModel DelegateViewModel { get; set; }
+        private TezosConfig? Tezos { get; set; }
 
         public TezosWalletViewModel()
             : base()
         {
         }
 
-        public DelegateViewModel DelegateVM { get; set; }
-
-        public TezosWalletViewModel(IAtomexApp app, Action<CurrencyConfig> setConversionTab, CurrencyConfig currency)
-            : base(app, setConversionTab, currency)
+        public TezosWalletViewModel(IAtomexApp app,
+            Action<CurrencyConfig> setConversionTab,
+            Action<string> setWertCurrency,
+            Action<ViewModelBase?> showRightPopupContent,
+            CurrencyConfig currency)
+            : base(app, setConversionTab, setWertCurrency, showRightPopupContent, currency)
         {
-            Delegations = new List<Delegation>();
-            
+            Tezos = currency as TezosConfig;
+            Delegations = new ObservableCollection<Delegation>();
+
+            this.WhenAnyValue(
+                    vm => vm.CurrentDelegationSortDirection,
+                    vm => vm.CurrentDelegationSortField)
+                .WhereAllNotNull()
+                .SubscribeInMainThread(_ => SortDelegations(Delegations));
+
             _ = LoadDelegationInfoAsync();
-            
-            DelegateVM = new DelegateViewModel(_app, async () =>
+            DelegateViewModel = new DelegateViewModel(_app, async () =>
             {
                 await Task.Delay(TimeSpan.FromSeconds(DelegationCheckIntervalInSec))
                     .ConfigureAwait(false);
-            
                 await Dispatcher.UIThread.InvokeAsync(OnUpdateClick);
             });
+
+            CurrentDelegationSortField = DelegationSortField.ByBalance;
+            CurrentDelegationSortDirection = SortDirection.Desc;
+        }
+
+        private void SortDelegations(IEnumerable<Delegation> delegations)
+        {
+            Delegations = CurrentDelegationSortField switch
+            {
+                DelegationSortField.ByRoi when CurrentDelegationSortDirection == SortDirection.Desc
+                    => new ObservableCollection<Delegation>(
+                        delegations.OrderByDescending(d => d.Baker.EstimatedRoi)),
+                DelegationSortField.ByRoi when CurrentDelegationSortDirection == SortDirection.Asc
+                    => new ObservableCollection<Delegation>(
+                        delegations.OrderBy(d => d.Baker.EstimatedRoi)),
+
+                DelegationSortField.ByStatus when CurrentDelegationSortDirection == SortDirection.Desc
+                    => new ObservableCollection<Delegation>(
+                        delegations.OrderByDescending(d => d.Status)),
+                DelegationSortField.ByStatus when CurrentDelegationSortDirection == SortDirection.Asc
+                    => new ObservableCollection<Delegation>(
+                        delegations.OrderBy(d => d.Status)),
+                
+                DelegationSortField.ByBalance when CurrentDelegationSortDirection == SortDirection.Desc
+                    => new ObservableCollection<Delegation>(
+                        delegations.OrderByDescending(d => d.Balance)),
+                DelegationSortField.ByBalance when CurrentDelegationSortDirection == SortDirection.Asc
+                    => new ObservableCollection<Delegation>(
+                        delegations.OrderBy(d => d.Balance)),
+                _ => new ObservableCollection<Delegation>(delegations)
+            };
         }
 
         protected override async void OnBalanceUpdatedEventHandler(object sender, CurrencyEventArgs args)
         {
             try
             {
-                if (Currency.Name == args.Currency)
-                {
-                    // update transactions list
-                    await LoadTransactionsAsync();
+                if (Currency.Name != args.Currency) return;
 
-                    // update delegation info
-                    await LoadDelegationInfoAsync();
-                }
+                // update transactions list
+                await LoadTransactionsAsync();
+
+                // update delegation info
+                await LoadDelegationInfoAsync();
             }
             catch (Exception e)
             {
@@ -94,19 +120,25 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         {
             try
             {
-                var tezos = Currency as TezosConfig;
-
                 var balance = await _app.Account
-                    .GetBalanceAsync(tezos.Name)
+                    .GetBalanceAsync(Tezos.Name)
                     .ConfigureAwait(false);
 
                 var addresses = await _app.Account
-                    .GetUnspentAddressesAsync(tezos.Name)
+                    .GetUnspentAddressesAsync(Tezos.Name)
                     .ConfigureAwait(false);
 
-                var rpc = new Rpc(tezos.RpcNodeUri);
+                var rpc = new Rpc(Tezos.RpcNodeUri);
 
                 var delegations = new List<Delegation>();
+
+                var tzktApi = new TzktApi(Tezos);
+                var head = await tzktApi.GetHeadLevelAsync();
+                var headLevel = head.Value;
+
+                var currentCycle = _app.Account.Network == Network.MainNet
+                    ? Math.Floor((headLevel - 1) / 4096)
+                    : Math.Floor((headLevel - 1) / 2048);
 
                 foreach (var wa in addresses)
                 {
@@ -123,29 +155,37 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                         .GetBaker(@delegate, _app.Account.Network)
                         .ConfigureAwait(false) ?? new BakerData { Address = @delegate };
 
+                    var account = await tzktApi.GetAccountByAddressAsync(wa.Address);
+
+                    var txCycle = _app.Account.Network == Network.MainNet
+                        ? Math.Floor((account.Value.DelegationLevel - 1) / 4096)
+                        : Math.Floor((account.Value.DelegationLevel - 1) / 2048);
+
                     delegations.Add(new Delegation
                     {
                         Baker = baker,
                         Address = wa.Address,
-                        Balance = wa.Balance
+                        ExplorerUri = Tezos.BbUri,
+                        Balance = wa.Balance,
+                        DelegationTime = account.Value.DelegationTime,
+                        Status = currentCycle - txCycle < 2 ? DelegationStatus.Pending :
+                            currentCycle - txCycle < 7 ? DelegationStatus.Confirmed :
+                            DelegationStatus.Active
                     });
 
                     if (!string.IsNullOrEmpty(baker.Logo))
                     {
-                        _ = Task.Run(() =>
-                        {
-                            _ = App.ImageService.LoadImageFromUrl(baker.Logo);
-                        });
+                        _ = Task.Run(() => { _ = App.ImageService.LoadImageFromUrl(baker.Logo); });
                     }
                 }
 
                 await Dispatcher.UIThread.InvokeAsync(() =>
-                {
-                    CanDelegate = balance.Available > 0;
-                    Delegations = delegations;
-                    HasDelegations = delegations.Count > 0;
-                },
-                DispatcherPriority.Background);
+                    {
+                        CanDelegate = balance.Available > 0;
+                        HasDelegations = delegations.Count > 0;
+                        SortDelegations(delegations);
+                    },
+                    DispatcherPriority.Background);
             }
             catch (OperationCanceledException)
             {
@@ -157,12 +197,34 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             }
         }
 
-        private ICommand _delegateCommand;
-        public ICommand DelegateCommand => _delegateCommand ??= (_delegateCommand = ReactiveCommand.Create(OnDelegateClick));
+        private ReactiveCommand<Unit, Unit> _delegateCommand;
+
+        public ReactiveCommand<Unit, Unit> DelegateCommand =>
+            _delegateCommand ??= (_delegateCommand = ReactiveCommand.Create(OnDelegateClick));
+
+        private ReactiveCommand<string, Unit> _openAddressInExplorerCommand;
+
+        public ReactiveCommand<string, Unit> OpenAddressInExplorerCommand => _openAddressInExplorerCommand ??=
+            (_openAddressInExplorerCommand = ReactiveCommand.Create<string>(
+                address => App.OpenBrowser($"{Tezos?.BbUri}{address}")));
+
+
+        private ReactiveCommand<DelegationSortField, Unit> _setDelegationSortTypeCommand;
+
+        public ReactiveCommand<DelegationSortField, Unit> SetDelegationSortTypeCommand =>
+            _setDelegationSortTypeCommand ??= ReactiveCommand.Create<DelegationSortField>(sortField =>
+            {
+                if (CurrentDelegationSortField != sortField)
+                    CurrentDelegationSortField = sortField;
+                else
+                    CurrentDelegationSortDirection = CurrentDelegationSortDirection == SortDirection.Asc
+                        ? SortDirection.Desc
+                        : SortDirection.Asc;
+            });
 
         private void OnDelegateClick()
         {
-            App.DialogService.Show(DelegateVM);
+            App.DialogService.Show(DelegateViewModel);
         }
 
 #if DEBUG
@@ -170,43 +232,48 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         {
             base.DesignerMode();
 
-            Delegations = new List<Delegation>()
+            Delegations = new ObservableCollection<Delegation>()
             {
-                new Delegation
+                new()
                 {
-                    Baker = new BakerData {
+                    Baker = new BakerData
+                    {
                         Logo = "https://api.baking-bad.org/logos/letzbake.png"
                     },
                     Address = "tz1aqcYgG6NuViML5vdWhohHJBYxcDVLNUsE",
                     Balance = 1000.2123m
                 },
-                new Delegation
+                new()
                 {
-                    Baker = new BakerData {
+                    Baker = new BakerData
+                    {
                         Logo = "https://api.baking-bad.org/logos/letzbake.png"
                     },
                     Address = "tz1aqcYgG6NuViML5vdWhohHJBYxcDVLNUsE",
                     Balance = 1000.2123m
                 },
-                new Delegation
+                new()
                 {
-                    Baker = new BakerData {
+                    Baker = new BakerData
+                    {
                         Logo = "https://api.baking-bad.org/logos/letzbake.png"
                     },
                     Address = "tz1aqcYgG6NuViML5vdWhohHJBYxcDVLNUsE",
                     Balance = 1000.2123m
                 },
-                new Delegation
+                new()
                 {
-                    Baker = new BakerData {
+                    Baker = new BakerData
+                    {
                         Logo = "https://api.baking-bad.org/logos/letzbake.png"
                     },
                     Address = "tz1aqcYgG6NuViML5vdWhohHJBYxcDVLNUsE",
                     Balance = 1000.2123m
                 },
-                new Delegation
+                new()
                 {
-                    Baker = new BakerData {
+                    Baker = new BakerData
+                    {
                         Logo = "https://api.baking-bad.org/logos/letzbake.png"
                     },
                     Address = "tz1aqcYgG6NuViML5vdWhohHJBYxcDVLNUsE",

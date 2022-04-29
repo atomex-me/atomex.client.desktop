@@ -7,7 +7,6 @@
              xmlns:vm="clr-namespace:Atomex.Client.Desktop.ViewModels.SendViewModels"
              xmlns:svg="clr-namespace:Avalonia.Svg.Skia;assembly=Avalonia.Svg.Skia"
              xmlns:controls="clr-namespace:Atomex.Client.Desktop.Controls"
-             xmlns:converters="clr-namespace:Atomex.Client.Desktop.Converters"
              xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
              xmlns:ia="clr-namespace:Avalonia.Xaml.Interactions.Core;assembly=Avalonia.Xaml.Interactions">
     <Design.DataContext>
@@ -20,23 +19,13 @@
         <StackPanel Orientation="Vertical">
             <Grid ColumnDefinitions="Auto,*"
                   RowDefinitions="Auto">
-                <Button Grid.Column="0"
-                        Width="28"
-                        Height="28"
-                        Padding="3"
-                        BorderThickness="0"
-                        VerticalContentAlignment="Center"
-                        Command="{Binding BackCommand}"
-                        Classes="ButtonWithIcon">
 
-                    <svg:Svg Width="28"
-                             Path="/Resources/Icons/back.svg"
-                             HorizontalAlignment="Left" />
-                </Button>
+                <controls:IconButton Grid.Column="0"
+                                     Classes="Back"
+                                     Command="{Binding BackCommand}"/>
 
                 <TextBlock Grid.Column="1"
                            FontSize="22"
-                           FontWeight="400"
                            Margin="-28 0 0 0"
                            HorizontalAlignment="Center"
                            Foreground="{DynamicResource LightDefault}">
@@ -45,20 +34,20 @@
                                                 ComparisonCondition="Equal"
                                                 Value="SendFrom">
                             <ia:ChangePropertyAction PropertyName="Text"
-                                                     Value="Send from"/>
+                                                     Value="Send from" />
                         </ia:DataTriggerBehavior>
                         <ia:DataTriggerBehavior Binding="{Binding SelectAddressMode}"
                                                 ComparisonCondition="Equal"
                                                 Value="ReceiveTo">
                             <ia:ChangePropertyAction PropertyName="Text"
-                                                     Value="Receive to"/>
+                                                     Value="Receive to" />
                         </ia:DataTriggerBehavior>
-                      <ia:DataTriggerBehavior Binding="{Binding SelectAddressMode}"
-                                              ComparisonCondition="Equal"
-                                              Value="ChangeRedeemAddress">
-                        <ia:ChangePropertyAction PropertyName="Text"
-                                                 Value="Change redeem address"/>
-                      </ia:DataTriggerBehavior>
+                        <ia:DataTriggerBehavior Binding="{Binding SelectAddressMode}"
+                                                ComparisonCondition="Equal"
+                                                Value="ChangeRedeemAddress">
+                            <ia:ChangePropertyAction PropertyName="Text"
+                                                     Value="Change redeem address" />
+                        </ia:DataTriggerBehavior>
                     </i:Interaction.Behaviors>
                 </TextBlock>
             </Grid>
@@ -77,18 +66,9 @@
                 <TextBox.InnerRightContent>
                     <StackPanel VerticalAlignment="Center"
                                 IsVisible="{Binding SearchPattern, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
-                        <Button Margin="0 0 15 0"
-                                Padding="0"
-                                BorderThickness="0"
-                                VerticalContentAlignment="Center"
-                                Command="{ReflectionBinding $parent[TextBox].Clear}"
-                                Classes="ButtonWithIcon WithoutEffects">
-
-                            <svg:Svg HorizontalAlignment="Center"
-                                     Width="18"
-                                     Height="18"
-                                     Path="/Resources/Icons/subtract.svg" />
-                        </Button>
+                        <controls:IconButton Classes="Clear NoEffects"
+                                             Command="{ReflectionBinding $parent[TextBox].Clear}"
+                                             Margin="0 0 15 0" />
                     </StackPanel>
                 </TextBox.InnerRightContent>
             </TextBox>
@@ -141,8 +121,8 @@
                         Padding="4 5"
                         Margin="8 0 12 0"
                         Command="{Binding ChangeSortDirectionCommand}"
-                        Classes.Rotated="{Binding SortIsAscending}"
-                        Classes.NotRotated="{Binding !SortIsAscending}"
+                        Classes.Rotated="{Binding !SortIsAscending}"
+                        Classes.NotRotated="{Binding SortIsAscending}"
                         Classes="SecondaryButton Sort">
                     <svg:Svg HorizontalAlignment="Center"
                              Width="16"
@@ -208,7 +188,6 @@
                                                FontSize="12"
                                                LineHeight="16"
                                                VerticalAlignment="Center"
-                                               FontFamily="{DynamicResource DefaultFontFamily}"
                                                Foreground="{DynamicResource DefaultForegroundBrush}" />
                                 </Border>
 
@@ -234,29 +213,12 @@
                                         FontSize="16"
                                         Text="{Binding BalanceCode}" />
                                 </StackPanel>
-                                <Border
-                                    ToolTip.Placement="AnchorAndGravity"
-                                    ToolTip.VerticalOffset="-32">
-                                    <Button Margin="0 0 9 0"
-                                            Padding="3"
-                                            BorderThickness="0"
-                                            VerticalContentAlignment="Center"
-                                            Command="{Binding $parent[ListBox].DataContext.CopyAddressCommand}"
-                                            CommandParameter="{Binding WalletAddress}"
-                                            Click="CopyButtonOnClick"
-                                            Classes="ButtonWithIcon">
-
-                                        <svg:Svg HorizontalAlignment="Center"
-                                                 VerticalAlignment="Center"
-                                                 Width="24"
-                                                 Height="24"
-                                                 Path="/Resources/Icons/copy.svg" />
-                                    </Button>
-                                    <ToolTip.Tip>
-                                        <TextBlock Text="Copy address to clipboard"
-                                                   Name="CopyTextBlock" />
-                                    </ToolTip.Tip>
-                                </Border>
+                                
+                                <controls:CopyButton Margin="0 0 9 0"
+                                                     ToolText="Copy address to clipboard"
+                                                     DoneToolText="Copied!"
+                                                     Command="{Binding $parent[ListBox].DataContext.CopyAddressCommand}"
+                                                     CommandParameter="{Binding WalletAddress}" />
                             </StackPanel>
                         </Grid>
                     </DataTemplate>
@@ -271,10 +233,9 @@
                         HorizontalAlignment="Right">
                 <controls:RoundedButton Width="200"
                                         Height="50"
-                                        CornerRadius="6"
+                                        CornerRadius="{DynamicResource AtomexCornerRadius}"
                                         Content="Confirm"
                                         FontSize="18"
-                                        FontFamily="{DynamicResource DefaultFontFamily}"
                                         FontWeight="Normal"
                                         Command="{Binding ConfirmCommand}" />
             </StackPanel>

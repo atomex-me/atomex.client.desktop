@@ -23,6 +23,7 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
     public abstract class CurrencyViewModel : ViewModelBase
     {
         private const string PathToImages = "avares://Atomex.Client.Desktop/Resources/Images";
+        protected const string PathToIcons = "/Resources/Icons";
 
         protected IAccount Account { get; set; }
         private ICurrencyQuotesProvider QuotesProvider { get; set; }
@@ -37,20 +38,16 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
         public Brush IconMaskBrush { get; set; }
         public Color AccentColor { get; set; }
         public Color AmountColor { get; set; }
-        public IImage IconPath { get; set; }
-        public IImage LargeIconPath { get; set; }
-        [Reactive]
-        public decimal TotalAmount { get; set; }
-        [Reactive]
-        public decimal TotalAmountInBase { get; set; }
-        [Reactive]
-        public decimal AvailableAmount { get; set; }
-        [Reactive]
-        public decimal AvailableAmountInBase { get; set; }
-        [Reactive]
-        public decimal UnconfirmedAmount { get; set; }
-        [Reactive]
-        public decimal UnconfirmedAmountInBase { get; set; }
+        public string IconPath { get; set; }
+        public string DisabledIconPath { get; set; }
+        [Reactive] public decimal CurrentQuote { get; set; }
+        [Reactive] public decimal DailyChangePercent { get; set; }
+        [Reactive] public decimal TotalAmount { get; set; }
+        [Reactive] public decimal TotalAmountInBase { get; set; }
+        [Reactive] public decimal AvailableAmount { get; set; }
+        [Reactive] public decimal AvailableAmountInBase { get; set; }
+        [Reactive] public decimal UnconfirmedAmount { get; set; }
+        [Reactive] public decimal UnconfirmedAmountInBase { get; set; }
 
         public string CurrencyCode => Currency.Name;
         public string FeeCurrencyCode => Currency.FeeCode;
@@ -60,11 +57,8 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
         public string BaseCurrencyFormat => "$0.##"; // todo: use base currency format from settings
         public string FeeName { get; set; }
 
-        [ObservableAsProperty]
-        public bool HasUnconfirmedAmount { get; }
-
-        [Reactive]
-        public decimal PortfolioPercent { get; set; }
+        [ObservableAsProperty] public bool HasUnconfirmedAmount { get; }
+        [Reactive] public decimal PortfolioPercent { get; set; }
 
         protected CurrencyViewModel(CurrencyConfig currency)
         {
@@ -135,9 +129,11 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
         {
             var quote = quotesProvider.GetQuote(CurrencyCode, BaseCurrencyCode);
 
-            TotalAmountInBase = TotalAmount.SafeMultiply(quote?.Bid ?? 0m);
-            AvailableAmountInBase = AvailableAmount.SafeMultiply(quote?.Bid ?? 0m);
-            UnconfirmedAmountInBase = UnconfirmedAmount.SafeMultiply(quote?.Bid ?? 0m);
+            TotalAmountInBase = TotalAmount.SafeMultiply(quote?.Bid ?? 0);
+            AvailableAmountInBase = AvailableAmount.SafeMultiply(quote?.Bid ?? 0);
+            UnconfirmedAmountInBase = UnconfirmedAmount.SafeMultiply(quote?.Bid ?? 0);
+            CurrentQuote = quote?.Bid ?? 0;
+            DailyChangePercent = quote?.DailyChangePercent ?? 0;
 
             AmountUpdated?.Invoke(this, EventArgs.Empty);
         }

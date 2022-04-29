@@ -12,8 +12,9 @@ namespace Atomex.Client.Desktop.Converters
         {
             if (value is decimal decimalValue && targetType == typeof(string))
             {
-                decimal percentValue = decimalValue * 100;
-                return $"{percentValue:F}%";
+                var percentValue = decimalValue * 100;
+
+                return percentValue != 0 ? $"{percentValue:F}%" : "0%";
             }
 
             return value;

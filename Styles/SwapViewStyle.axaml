@@ -2,88 +2,77 @@
         xmlns:x='http://schemas.microsoft.com/winfx/2006/xaml'
         xmlns:viewModels="clr-namespace:Atomex.Client.Desktop.ViewModels"
         xmlns:svg="clr-namespace:Avalonia.Svg.Skia;assembly=Avalonia.Svg.Skia">
-
-  <Style Selector="svg|Svg.InProgress">
-    <Style.Animations>
-      <Animation Duration="0:0:2.5"
-                 IterationCount="INFINITE"
-                 FillMode="Forward"
-                 PlaybackDirection="Normal">
-        <KeyFrame Cue="0%">
-          <Setter Property="RotateTransform.Angle" Value="0" />
-        </KeyFrame>
-        <KeyFrame Cue="100%">
-          <Setter Property="RotateTransform.Angle" Value="360" />
-        </KeyFrame>
-      </Animation>
-    </Style.Animations>
-  </Style>
-
-  <Styles.Resources>
+    
+    <Styles.Resources>
         <DataTemplate x:Key="SwapCanceledTemplate" DataType="viewModels:SwapViewModel">
-          <StackPanel Orientation="Horizontal">
-            <svg:Svg Name="SwapStatusIcon"
-                     Width="16"
-                     Path="/Resources/Icons/swap-grid-canceled.svg"/>
-            <TextBlock Margin="8 0 0 0"
-                       Foreground="{DynamicResource LightDefaultOpacity20}"
-                       Text="canceled"
-                       FontSize="16"
-                       FontFamily="{DynamicResource DefaultFontFamily}"/>
-          </StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <svg:Svg Name="SwapStatusIcon"
+                         Width="16"
+                         Path="/Resources/Icons/swap-grid-canceled.svg"
+                         VerticalAlignment="Center" />
+                <TextBlock Margin="8 0 0 0"
+                           Foreground="{DynamicResource LightDefaultOpacity20}"
+                           Text="canceled"
+                           FontSize="16"
+                           VerticalAlignment="Center" />
+            </StackPanel>
         </DataTemplate>
 
         <DataTemplate x:Key="SwapCompletedTemplate" DataType="viewModels:SwapViewModel">
-          <StackPanel Orientation="Horizontal">
-            <svg:Svg Name="SwapStatusIcon"
-                     Width="16"
-                     Path="/Resources/Icons/swap-grid-done.svg"/>
-            <TextBlock Margin="8 0 0 0"
-                       Foreground="{DynamicResource DefaultForegroundBrush}"
-                       Text="completed"
-                       FontSize="16"
-                       FontFamily="{DynamicResource DefaultFontFamily}"/>
-          </StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <svg:Svg Name="SwapStatusIcon"
+                         Width="16"
+                         Path="/Resources/Icons/swap-grid-done.svg"
+                         VerticalAlignment="Center" />
+                <TextBlock Margin="8 0 0 0"
+                           Foreground="{DynamicResource DefaultForegroundBrush}"
+                           Text="completed"
+                           FontSize="16"
+                           VerticalAlignment="Center"/>
+            </StackPanel>
         </DataTemplate>
 
         <DataTemplate x:Key="SwapInProgressTemplate" DataType="viewModels:SwapViewModel">
-          <StackPanel Orientation="Horizontal">
-            <svg:Svg Name="SwapStatusIcon"
-                     Width="16"
-                     Path="/Resources/Icons/swap-grid-inprogress.svg"
-                     Classes="InProgress"/>
-            <TextBlock Margin="8 0 0 0"
-                       Foreground="{DynamicResource DefaultForegroundBrush}"
-                       Text="in progress"
-                       FontSize="16"
-                       FontFamily="{DynamicResource DefaultFontFamily}"/>
-          </StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <svg:Svg Name="SwapStatusIcon"
+                         Width="16"
+                         Path="/Resources/Icons/swap-grid-inprogress.svg"
+                         Classes="InProgress"
+                         VerticalAlignment="Center" />
+                <TextBlock Margin="8 0 0 0"
+                           Foreground="{DynamicResource DefaultForegroundBrush}"
+                           Text="in progress"
+                           FontSize="16"
+                           VerticalAlignment="Center" />
+            </StackPanel>
         </DataTemplate>
 
         <DataTemplate x:Key="SwapRefundTemplate" DataType="viewModels:SwapViewModel">
-          <StackPanel Orientation="Horizontal">
-            <svg:Svg Name="SwapStatusIcon"
-                     Width="16"
-                     Path="/Resources/Icons/swap-grid-failed.svg"/>
-            <TextBlock Margin="8 0 0 0"
-                       Foreground="{DynamicResource DefaultForegroundBrush}"
-                       Text="refunded"
-                       FontSize="16"
-                       FontFamily="{DynamicResource DefaultFontFamily}"/>
-          </StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <svg:Svg Name="SwapStatusIcon"
+                         Width="16"
+                         Path="/Resources/Icons/swap-grid-failed.svg"
+                         VerticalAlignment="Center" />
+                <TextBlock Margin="8 0 0 0"
+                           Foreground="{DynamicResource DefaultForegroundBrush}"
+                           Text="refunded"
+                           FontSize="16"
+                           VerticalAlignment="Center" />
+            </StackPanel>
         </DataTemplate>
 
         <DataTemplate x:Key="SwapUnsettledTemplate" DataType="viewModels:SwapViewModel">
-          <StackPanel Orientation="Horizontal">
-            <svg:Svg Name="SwapStatusIcon"
-                     Width="16"
-                     Path="/Resources/Icons/swap-grid-failed.svg"/>
-            <TextBlock Margin="8 0 0 0"
-                       Foreground="{DynamicResource DefaultForegroundBrush}"
-                       Text="unsettled"
-                       FontSize="16"
-                       FontFamily="{DynamicResource DefaultFontFamily}"/>
-          </StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <svg:Svg Name="SwapStatusIcon"
+                         Width="16"
+                         Path="/Resources/Icons/swap-grid-failed.svg"
+                         VerticalAlignment="Center" />
+                <TextBlock Margin="8 0 0 0"
+                           Foreground="{DynamicResource DefaultForegroundBrush}"
+                           Text="unsettled"
+                           FontSize="16"
+                           VerticalAlignment="Center" />
+            </StackPanel>
         </DataTemplate>
     </Styles.Resources>
 </Styles>

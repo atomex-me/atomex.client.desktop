@@ -2,12 +2,13 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             mc:Ignorable="d" d:DesignWidth="900" d:DesignHeight="850"
              x:Class="Atomex.Client.Desktop.Views.PortfolioView"
              xmlns:vm="clr-namespace:Atomex.Client.Desktop.ViewModels"
-             xmlns:currencyViewModels="clr-namespace:Atomex.Client.Desktop.ViewModels.CurrencyViewModels"
              xmlns:converters="clr-namespace:Atomex.Client.Desktop.Converters"
-             xmlns:oxy="http://oxyplot.org/avalonia">
+             xmlns:controls="clr-namespace:Atomex.Client.Desktop.Controls"
+             xmlns:oxy="http://oxyplot.org/avalonia"
+             xmlns:svg="clr-namespace:Avalonia.Svg.Skia;assembly=Avalonia.Svg.Skia">
 
     <Design.DataContext>
         <vm:PortfolioViewModel />
@@ -15,132 +16,426 @@
 
     <UserControl.Resources>
         <converters:AmountToStringConverter x:Key="AmountToStringConverter" />
-        <converters:StringToUpperCaseConverter x:Key="StringToUpperCaseConverter" />
         <converters:PortfolioToTotalConverter x:Key="PortfolioToTotalConverter" />
+        <converters:PortfolioTooltipPositionXConverter x:Key="PortfolioTooltipPositionXConverter" />
+        <converters:PortfolioTooltipPositionYConverter x:Key="PortfolioTooltipPositionYConverter" />
+        <converters:ObjectsEqualConverter x:Key="ObjectsEqualConverter" />
+        <converters:ShowBuyButton x:Key="ShowBuyButton" />
         <converters:PercentConverter x:Key="PercentConverter" />
+        <converters:LowerThanZeroConverter x:Key="LowerThanZeroConverter" />
     </UserControl.Resources>
-    
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition MaxHeight="500" MinHeight="300" />
-            <RowDefinition />
-        </Grid.RowDefinitions>
 
-        <Grid Grid.Row="0"
-              Margin="0 30 0 30">
+    <Border Padding="50 16 50 0">
+        <Grid RowDefinitions="Auto,*"
+              Name="DesignGrid">
+            <StackPanel Grid.Row="0">
+                <Canvas>
+                    <controls:IconButton Canvas.Right="0"
+                                         Classes="Alert NoEffects" />
+                </Canvas>
 
-            <oxy:PlotView Background="Transparent"
-                          Model="{Binding PlotModel}"
-                          Controller="{Binding ActualController, Mode=TwoWay}"
-                          Opacity="1"
-                          x:Name="PlotView">
+                <Grid Margin="95 76 0 34"
+                      RowDefinitions="Auto,Auto"
+                      ColumnDefinitions="Auto,*">
+                    <oxy:PlotView Grid.Row="0"
+                                  Grid.Column="0"
+                                  Grid.RowSpan="2"
+                                  Height="166"
+                                  Width="440"
+                                  Margin="-144 0 -104 0"
+                                  Background="Transparent"
+                                  Model="{Binding PlotModel}"
+                                  Controller="{Binding ActualController, Mode=TwoWay}"
+                                  x:Name="PlotView"
+                                  ClipToBounds="False">
+                        <oxy:PlotView.DefaultTrackerTemplate>
+                            <ControlTemplate>
+                                <Canvas ClipToBounds="False">
+                                    <Border Name="TooltipBorder"
+                                            CornerRadius="5"
+                                            Background="{DynamicResource DefaultTooltipBackgroundBrush}">
+                                        <Canvas.Left>
+                                            <MultiBinding
+                                                Converter="{StaticResource PortfolioTooltipPositionXConverter}">
+                                                <Binding Path="Position.X" Mode="OneWay" />
+                                                <Binding Path="#TooltipBorder.Bounds.Width" Mode="OneWay" />
+                                                <Binding Path="#PlotView.Bounds.Width" Mode="OneWay" />
+                                                <Binding Path="#PlotView.Bounds.Height" Mode="OneWay" />
+                                            </MultiBinding>
+                                        </Canvas.Left>
+                                        <Canvas.Top>
+                                            <MultiBinding
+                                                Converter="{StaticResource PortfolioTooltipPositionYConverter}">
+                                                <Binding Path="Position.Y" Mode="OneWay" />
+                                                <Binding Path="#TooltipBorder.Bounds.Height" Mode="OneWay" />
+                                            </MultiBinding>
+                                        </Canvas.Top>
+                                        <TextBlock Text="{Binding}"
+                                                   Padding="16 8"
+                                                   Foreground="White"
+                                                   VerticalAlignment="Center"
+                                                   FontSize="12" />
+                                    </Border>
+                                </Canvas>
+                            </ControlTemplate>
+                        </oxy:PlotView.DefaultTrackerTemplate>
+                    </oxy:PlotView>
 
-                <oxy:PlotView.DefaultTrackerTemplate>
-                    <ControlTemplate>
-                        <Canvas>
-                            <Border Canvas.Left="{Binding Position.X}"
-                                    Canvas.Top="{Binding Position.Y}"
-                                    CornerRadius="5"
-                                    Background="{DynamicResource DefaultTooltipBackgroundBrush}">
-                                <TextBlock Text="{Binding}"
-                                           Padding="16 8"
-                                           Foreground="White"
-                                           VerticalAlignment="Center"
-                                           FontFamily="{DynamicResource DefaultFontFamily}"
-                                           FontSize="12" />
-                            </Border>
-                        </Canvas>
-                    </ControlTemplate>
-                </oxy:PlotView.DefaultTrackerTemplate>
 
-            </oxy:PlotView>
+                    <StackPanel Grid.Column="1"
+                                Grid.Row="0">
+                        <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
+                                   Margin="0 5 0 0"
+                                   FontSize="13"
+                                   Text="Total Balance" />
+                        <TextBlock Foreground="{DynamicResource DefaultForegroundBrush}"
+                                   FontSize="40"
+                                   Text="{Binding PortfolioValue, Converter={StaticResource PortfolioToTotalConverter}}" />
+                    </StackPanel>
 
-            <TextBlock Foreground="White"
-                       Text="{Binding PortfolioValue, Converter={StaticResource PortfolioToTotalConverter}}"
-                       FontFamily="{DynamicResource DefaultFontFamily}"
-                       FontSize="30"
-                       VerticalAlignment="Center"
-                       HorizontalAlignment="Center" />
-        </Grid>
+                    <StackPanel Grid.Column="1"
+                                Grid.Row="1"
+                                Margin="0 16 0 0"
+                                Orientation="Horizontal"
+                                VerticalAlignment="Top">
 
-        <!-- Style="{StaticResource CustomDataGrid}" -->
-        <DataGrid Margin="10"
-                  AutoGenerateColumns="False"
-                  IsReadOnly="True"
-                  Items="{Binding AllCurrencies}"
-                  Grid.Row="1">
-            <DataGrid.Columns>
-                <DataGridTemplateColumn Header="CURRENCY" Width="*">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate DataType="{x:Type currencyViewModels:CurrencyViewModel}">
-                            <Grid Margin="5 5 5 5" Background="Transparent">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="48" />
-                                    <ColumnDefinition Width="*" />
-                                </Grid.ColumnDefinitions>
-                                
-                                <Image Source="{Binding LargeIconPath}"
-                                       Grid.Column="0" />
+                        <controls:RoundedButton Height="46"
+                                                Padding="26 0"
+                                                CornerRadius="{DynamicResource AtomexCornerRadius}"
+                                                Command="{Binding SendCommand}">
+                            <StackPanel Orientation="Horizontal">
+                                <svg:Svg HorizontalAlignment="Center"
+                                         Width="24"
+                                         Height="24"
+                                         Path="/Resources/Icons/top-right-arrow.svg" />
+                                <TextBlock Margin="8 0 0 0"
+                                           Text="Send"
+                                           FontSize="18"
+                                           Foreground="{DynamicResource RoundedButtonForegroundBrush}" />
+                            </StackPanel>
+                        </controls:RoundedButton>
+                        <controls:RoundedButton Height="46"
+                                                Padding="26 0"
+                                                CornerRadius="{DynamicResource AtomexCornerRadius}"
+                                                Command="{Binding ReceiveCommand}"
+                                                Margin="12 0 0 0">
+                            <StackPanel Orientation="Horizontal">
+                                <svg:Svg HorizontalAlignment="Center"
+                                         Width="24"
+                                         Height="24"
+                                         Path="/Resources/Icons/bottom-right-arrow.svg" />
+                                <TextBlock Margin="8 0 0 0"
+                                           Text="Receive"
+                                           FontSize="18"
+                                           Foreground="{DynamicResource RoundedButtonForegroundBrush}" />
+                            </StackPanel>
+                        </controls:RoundedButton>
+                        <controls:RoundedButton Height="46"
+                                                Padding="26 0"
+                                                CornerRadius="{DynamicResource AtomexCornerRadius}"
+                                                Command="{Binding ExchangeCommand}"
+                                                Margin="12 0 0 0"
+                                                Classes="AccentButton">
+                            <StackPanel Orientation="Horizontal">
+                                <svg:Svg HorizontalAlignment="Center"
+                                         Width="24"
+                                         Height="24"
+                                         Path="/Resources/Icons/exchange-arrows.svg" />
+                                <TextBlock Margin="8 0 0 0"
+                                           Text="Exchange"
+                                           FontSize="18"
+                                           Foreground="{DynamicResource DeepBlue}" />
+                            </StackPanel>
+                        </controls:RoundedButton>
+                    </StackPanel>
+                </Grid>
 
-                                <!-- Style="{StaticResource BaseTextBlockStyle}" -->
-                                <TextBlock
-                                    Text="{Binding Header, Converter={StaticResource StringToUpperCaseConverter}}"
-                                    FontFamily="{DynamicResource DefaultBoldFontFamily}"
-                                    FontWeight="Bold"
-                                    FontSize="14"
-                                    Margin="7 0 0 0"
-                                    VerticalAlignment="Center"
-                                    Grid.Column="1" />
+                <Border Height="1"
+                        Background="{DynamicResource LightDefaultOpacity20}" />
+            </StackPanel>
+
+            <Grid Grid.Row="1"
+                  Margin="95 24 95 0"
+                  RowDefinitions="Auto,Auto,*">
+                <Grid Grid.Row="0"
+                      ColumnDefinitions="*,Auto">
+                    <TextBlock Grid.Column="0"
+                               VerticalAlignment="Center"
+                               Foreground="{DynamicResource DefaultForegroundBrush}"
+                               FontSize="22"
+                               Text="Coins &amp; Tokens" />
+
+                    <controls:IconButton Grid.Column="1"
+                                         Classes="Settings"
+                                         Margin="0 0 12 0"
+                                         Command="{Binding ManageAssetsCommand}" />
+                </Grid>
+
+                <TextBox Grid.Row="1"
+                         Margin="0 16 0 0"
+                         Height="44"
+                         CornerRadius="8"
+                         Watermark="Search"
+                         FontSize="16"
+                         Text="{Binding SearchPattern, Mode=TwoWay}"
+                         Classes="SearchTextBox">
+                    <TextBox.InnerRightContent>
+                        <StackPanel VerticalAlignment="Center"
+                                    IsVisible="{Binding SearchPattern, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+                            <controls:IconButton Classes="Clear NoEffects"
+                                                 Command="{ReflectionBinding $parent[TextBox].Clear}"
+                                                 Margin="0 0 15 0" />
+                        </StackPanel>
+                    </TextBox.InnerRightContent>
+                </TextBox>
+
+                <ListBox Grid.Row="2"
+                         Background="{DynamicResource AlmostTransparentBrush}"
+                         Margin="0 8 0 0"
+                         Items="{Binding ChoosenCurrencies}"
+                         HorizontalAlignment="Stretch"
+                         SelectionMode="Toggle">
+                    <ListBox.Styles>
+                        <Style Selector="ListBoxItem">
+                            <Setter Property="Padding" Value="0" />
+                            <Setter Property="Height" Value="60" />
+                            <Setter Property="VerticalContentAlignment" Value="Center" />
+                            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                            <Setter Property="Cursor" Value="Hand" />
+                            <Setter Property="BorderThickness" Value="0 0 0 1" />
+                            <Setter Property="BorderBrush" Value="{DynamicResource LightDefaultOpacity10}" />
+                        </Style>
+                        <Style Selector="ListBoxItem:pointerover /template/ ContentPresenter">
+                            <Setter Property="Background" Value="{DynamicResource ListBoxItemPointeroverBrush}" />
+                            <Setter Property="CornerRadius" Value="8" />
+                        </Style>
+
+                        <Style Selector="ListBoxItem:not(:pointerover) /template/ ContentPresenter">
+                            <Setter Property="Background" Value="{DynamicResource AlmostTransparentBrush}" />
+                        </Style>
+                    </ListBox.Styles>
+
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <Grid ColumnDefinitions="*">
+                                <Button Command="{Binding $parent[ListBox].DataContext.SetWalletCurrencyCommand}"
+                                        CommandParameter="{Binding}"
+                                        HorizontalAlignment="Stretch"
+                                        VerticalContentAlignment="Center"
+                                        Padding="0"
+                                        Classes="EmptyBtnWithContent">
+                                    <Grid ColumnDefinitions="*,Auto"
+                                          RowDefinitions="Auto">
+                                        <StackPanel Orientation="Horizontal"
+                                                    Grid.Column="0">
+                                            <svg:Svg Width="28"
+                                                     Margin="16 0"
+                                                     Path="{Binding IconPath}" />
+                                            <TextBlock VerticalAlignment="Center"
+                                                       Foreground="{DynamicResource DefaultForegroundBrush}"
+                                                       FontSize="18"
+                                                       Text="{Binding Header}" />
+                                            <TextBlock VerticalAlignment="Center"
+                                                       Margin="24 0 8 0"
+                                                       Foreground="{DynamicResource SecondaryForegroundBrush}"
+                                                       FontSize="13">
+                                                <TextBlock.Text>
+                                                    <MultiBinding Converter="{StaticResource AmountToStringConverter}">
+                                                        <Binding Path="CurrentQuote" Mode="OneWay" />
+                                                        <Binding Path="BaseCurrencyFormat" Mode="OneWay" />
+                                                    </MultiBinding>
+                                                </TextBlock.Text>
+                                            </TextBlock>
+                                            <TextBlock VerticalAlignment="Center"
+                                                       FontSize="13"
+                                                       Text="{Binding DailyChangePercent, Converter={StaticResource PercentConverter}}"
+                                                       Classes="Success"
+                                                       Classes.UnSuccess="{Binding DailyChangePercent, Converter={StaticResource LowerThanZeroConverter}}" />
+                                        </StackPanel>
+                                        <StackPanel Grid.Column="1"
+                                                    Orientation="Horizontal">
+                                            <StackPanel IsVisible="{Binding !!AvailableAmount}">
+                                                <StackPanel Orientation="Horizontal">
+                                                    <TextBlock HorizontalAlignment="Right"
+                                                               Foreground="{DynamicResource DefaultForegroundBrush}"
+                                                               FontSize="16"
+                                                               Margin="0 0 0 2">
+                                                        <TextBlock.Text>
+                                                            <MultiBinding
+                                                                Converter="{StaticResource AmountToStringConverter}">
+                                                                <Binding Path="AvailableAmount" Mode="OneWay" />
+                                                                <Binding Path="CurrencyFormat" Mode="OneWay" />
+                                                            </MultiBinding>
+                                                        </TextBlock.Text>
+                                                    </TextBlock>
+                                                    <TextBlock HorizontalAlignment="Right"
+                                                               Foreground="{DynamicResource DefaultForegroundBrush}"
+                                                               FontSize="16"
+                                                               Text="{Binding CurrencyCode}"
+                                                               Margin="3 0 0 0" />
+                                                </StackPanel>
+                                                <TextBlock HorizontalAlignment="Right"
+                                                           Foreground="{DynamicResource SecondaryForegroundBrush}"
+                                                           FontSize="13"
+                                                           Margin="0 2 0 0">
+                                                    <TextBlock.Text>
+                                                        <MultiBinding
+                                                            Converter="{StaticResource AmountToStringConverter}">
+                                                            <Binding Path="AvailableAmountInBase" Mode="OneWay" />
+                                                            <Binding Path="BaseCurrencyFormat" Mode="OneWay" />
+                                                        </MultiBinding>
+                                                    </TextBlock.Text>
+                                                </TextBlock>
+                                            </StackPanel>
+
+                                            <TextBlock IsVisible="{Binding !AvailableAmount}"
+                                                       HorizontalAlignment="Right"
+                                                       Foreground="{DynamicResource DefaultForegroundBrush}"
+                                                       FontSize="16"
+                                                       VerticalAlignment="Center"
+                                                       Text="{Binding AvailableAmount}" />
+
+                                            <TextBlock IsVisible="{Binding !AvailableAmount}"
+                                                       HorizontalAlignment="Right"
+                                                       Foreground="{DynamicResource DefaultForegroundBrush}"
+                                                       FontSize="16"
+                                                       VerticalAlignment="Center"
+                                                       Margin="3 0 0 0"
+                                                       Text="{Binding CurrencyCode}" />
+
+                                            <WrapPanel VerticalAlignment="Center">
+                                                <controls:IconButton Classes="MenuDots"
+                                                                     Margin="12 0"
+                                                                     Command="{Binding $parent[ListBox].DataContext.OpenCurrencyPopupCommand}"
+                                                                     CommandParameter="{Binding}" />
+                                                <Popup PlacementMode="Left"
+                                                       VerticalAlignment="Center"
+                                                       WindowManagerAddShadowHint="False"
+                                                       IsLightDismissEnabled="True"
+                                                       Closed="Popup_OnClosed">
+                                                    <Popup.IsOpen>
+                                                        <MultiBinding
+                                                            Converter="{StaticResource ObjectsEqualConverter}">
+                                                            <Binding Path="CurrencyCode" />
+                                                            <Binding
+                                                                Path="$parent[ListBox].DataContext.PopupOpenedCurrency" />
+                                                        </MultiBinding>
+                                                    </Popup.IsOpen>
+                                                    <Border Background="{DynamicResource DeepBlue}"
+                                                            CornerRadius="{DynamicResource AtomexCornerRadius}"
+                                                            Padding="12 16">
+                                                        <StackPanel>
+                                                            <StackPanel.Styles>
+                                                                <Style
+                                                                    Selector="Button:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+                                                                    <Setter Property="Background"
+                                                                            Value="{DynamicResource LightDefaultOpacity6}" />
+                                                                </Style>
+                                                                <Style
+                                                                    Selector="Button:not(:pointerover) /template/ ContentPresenter#PART_ContentPresenter">
+                                                                    <Setter Property="Background"
+                                                                            Value="{DynamicResource AlmostTransparentBrush}" />
+                                                                </Style>
+                                                                <Style
+                                                                    Selector="Button:pressed /template/ ContentPresenter#PART_ContentPresenter">
+                                                                    <Setter Property="Background"
+                                                                            Value="{DynamicResource LightDefaultOpacity6}" />
+                                                                </Style>
+                                                            </StackPanel.Styles>
+
+                                                            <Button Width="180"
+                                                                    Height="40"
+                                                                    Padding="12 0"
+                                                                    CornerRadius="{DynamicResource AtomexCornerRadius}"
+                                                                    VerticalContentAlignment="Center"
+                                                                    Command="{Binding $parent[ListBox].DataContext.SendFromPopupCommand}"
+                                                                    CommandParameter="{Binding}">
+                                                                <StackPanel Orientation="Horizontal"
+                                                                            VerticalAlignment="Stretch">
+                                                                    <TextBlock Text="Send"
+                                                                               Foreground="{DynamicResource DefaultForegroundBrush}"
+                                                                               VerticalAlignment="Center"
+                                                                               FontSize="16" />
+                                                                    <TextBlock Text="{Binding CurrencyCode}"
+                                                                               Foreground="{DynamicResource DefaultForegroundBrush}"
+                                                                               VerticalAlignment="Center"
+                                                                               FontSize="16"
+                                                                               Margin="3 0 0 0" />
+                                                                </StackPanel>
+                                                            </Button>
+                                                            <Button Width="180"
+                                                                    Height="40"
+                                                                    Padding="12 0"
+                                                                    CornerRadius="{DynamicResource AtomexCornerRadius}"
+                                                                    VerticalContentAlignment="Center"
+                                                                    Command="{Binding $parent[ListBox].DataContext.ReceiveFromPopupCommand}"
+                                                                    CommandParameter="{Binding}">
+                                                                <StackPanel Orientation="Horizontal"
+                                                                            VerticalAlignment="Stretch">
+                                                                    <TextBlock Text="Receive"
+                                                                               Foreground="{DynamicResource DefaultForegroundBrush}"
+                                                                               VerticalAlignment="Center"
+                                                                               FontSize="16" />
+                                                                    <TextBlock Text="{Binding CurrencyCode}"
+                                                                               Foreground="{DynamicResource DefaultForegroundBrush}"
+                                                                               VerticalAlignment="Center"
+                                                                               FontSize="16"
+                                                                               Margin="3 0 0 0" />
+                                                                </StackPanel>
+                                                            </Button>
+                                                            <Button Width="180"
+                                                                    Height="40"
+                                                                    Padding="12 0"
+                                                                    CornerRadius="{DynamicResource AtomexCornerRadius}"
+                                                                    VerticalContentAlignment="Center"
+                                                                    Command="{Binding $parent[ListBox].DataContext.ExchangeCommand}"
+                                                                    CommandParameter="{Binding}">
+                                                                <StackPanel Orientation="Horizontal"
+                                                                            VerticalAlignment="Stretch">
+                                                                    <TextBlock Text="Exchange"
+                                                                               Foreground="{DynamicResource DefaultForegroundBrush}"
+                                                                               VerticalAlignment="Center"
+                                                                               FontSize="16" />
+                                                                    <TextBlock Text="{Binding CurrencyCode}"
+                                                                               Foreground="{DynamicResource DefaultForegroundBrush}"
+                                                                               VerticalAlignment="Center"
+                                                                               FontSize="16"
+                                                                               Margin="3 0 0 0" />
+                                                                </StackPanel>
+                                                            </Button>
+                                                            <Button Width="180"
+                                                                    Height="40"
+                                                                    Padding="12 0"
+                                                                    CornerRadius="{DynamicResource AtomexCornerRadius}"
+                                                                    VerticalContentAlignment="Center"
+                                                                    IsVisible="{Binding CurrencyCode, Converter={StaticResource ShowBuyButton}}"
+                                                                    Command="{Binding $parent[ListBox].DataContext.SetWertCurrencyCommand}"
+                                                                    CommandParameter="{Binding}">
+                                                                <StackPanel Orientation="Horizontal"
+                                                                            VerticalAlignment="Stretch">
+                                                                    <TextBlock Text="Buy"
+                                                                               Foreground="{DynamicResource DefaultForegroundBrush}"
+                                                                               VerticalAlignment="Center"
+                                                                               FontSize="16" />
+                                                                    <TextBlock Text="{Binding CurrencyCode}"
+                                                                               Foreground="{DynamicResource DefaultForegroundBrush}"
+                                                                               VerticalAlignment="Center"
+                                                                               FontSize="16"
+                                                                               Margin="3 0 0 0" />
+                                                                </StackPanel>
+                                                            </Button>
+                                                        </StackPanel>
+                                                    </Border>
+                                                </Popup>
+                                            </WrapPanel>
+                                        </StackPanel>
+                                    </Grid>
+                                </Button>
                             </Grid>
                         </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
-                <DataGridTemplateColumn Header="BALANCE">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate DataType="{x:Type currencyViewModels:CurrencyViewModel}">
-                            <StackPanel Orientation="Horizontal"
-                                        HorizontalAlignment="Left"
-                                        Margin="0 0 10 0">
-
-                                <TextBlock FontFamily="{DynamicResource DefaultFontFamily}"
-                                           VerticalAlignment="Center">
-                                    <TextBlock.Text>
-                                        <MultiBinding Converter="{StaticResource AmountToStringConverter}">
-                                            <Binding Path="AvailableAmount" Mode="OneWay" />
-                                            <Binding Path="CurrencyFormat" Mode="OneWay" />
-                                        </MultiBinding>
-                                    </TextBlock.Text>
-                                </TextBlock>
-                                <TextBlock Margin="3 0 0 2"
-                                           Text="{Binding CurrencyCode}"
-                                           FontSize="10"
-                                           VerticalAlignment="Center" />
-                            </StackPanel>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
-                <DataGridTemplateColumn Header="VALUE">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate DataType="{x:Type currencyViewModels:CurrencyViewModel}">
-                            <TextBlock Margin="0 0 10 0"
-                                       FontFamily="{DynamicResource DefaultFontFamily}"
-                                       VerticalAlignment="Center"
-                                       HorizontalAlignment="Left">
-                                <TextBlock.Text>
-                                    <MultiBinding Converter="{StaticResource AmountToStringConverter}">
-                                        <Binding Path="AvailableAmountInBase" Mode="OneWay" />
-                                        <Binding Path="BaseCurrencyFormat" Mode="OneWay" />
-                                    </MultiBinding>
-                                </TextBlock.Text>
-                            </TextBlock>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
-                <DataGridTextColumn Header="% IN PORTFOLIO"
-                                    Binding="{Binding PortfolioPercent, Converter={StaticResource PercentConverter}, Mode=TwoWay}">
-                    
-                </DataGridTextColumn>
-            </DataGrid.Columns>
-        </DataGrid>
-    </Grid>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </Grid>
+        </Grid>
+    </Border>
 </UserControl>

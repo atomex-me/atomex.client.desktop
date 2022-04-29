@@ -2,6 +2,7 @@ using Atomex.Client.Desktop.ViewModels.WalletViewModels;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
+using Avalonia.Media;
 using Avalonia.Threading;
 
 namespace Atomex.Client.Desktop.Views.WalletViews
@@ -12,22 +13,12 @@ namespace Atomex.Client.Desktop.Views.WalletViews
         {
             InitializeComponent();
             
-            var dgTransactions = this.FindControl<DataGrid>("DgTransactions");
-            
-            dgTransactions.CellPointerPressed += (sender, args) =>
-            {
-                var cellIndex = args.Row.GetIndex();
-                Dispatcher.UIThread.InvokeAsync(() =>
-                {
-                    ((TezosTokensWalletViewModel) DataContext!).CellPointerPressed(cellIndex);
-                });
-            };
+#if DEBUG
+            if (!Design.IsDesignMode) return;
 
-            dgTransactions.Sorting += (sender, args) =>
-            {
-                ((TezosTokensWalletViewModel) DataContext!).SortInfo = args.Column.Header.ToString();
-                args.Handled = true;
-            };
+            var designGrid = this.FindControl<Grid>("DesignGrid");
+            designGrid.Background = new SolidColorBrush(Color.FromRgb(0x0F, 0x21, 0x39));
+#endif
         }
 
         private void InitializeComponent()

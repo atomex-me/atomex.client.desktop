@@ -59,7 +59,7 @@ namespace Atomex.Client.Desktop.Views
             InitializeComponent();
             this.AttachDevTools();
 
-            this.PropertyChanged += (s, e) =>
+            PropertyChanged += (s, e) =>
             {
                 if (e.Property == Control.DataContextProperty)
                 {
@@ -73,15 +73,13 @@ namespace Atomex.Client.Desktop.Views
 
             InputManager.Instance.PreProcess.OfType<RawInputEventArgs>()
                 .Throttle(TimeSpan.FromMilliseconds(500))
-                .SubscribeInMainThread(
-                    (_) =>
-                    {
-                        if (_inactivityControlEnabled && _activityTimer != null)
-                        {
-                            _activityTimer.Stop();
-                            _activityTimer.Start();
-                        }
-                    });
+                .SubscribeInMainThread(_ =>
+                {
+                    if (!_inactivityControlEnabled || _activityTimer == null) return;
+
+                    _activityTimer.Stop();
+                    _activityTimer.Start();
+                });
             _isOsx = RuntimeInformation.IsOSPlatform(OSPlatform.OSX);
             _isWin = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
             _isLinux = RuntimeInformation.IsOSPlatform(OSPlatform.Linux);

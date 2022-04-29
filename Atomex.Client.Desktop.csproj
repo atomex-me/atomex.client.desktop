@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
     <PropertyGroup>
-        <OutputType>WinExe</OutputType>
+        <OutputType>Exe</OutputType>
         <TargetFramework>net5.0</TargetFramework>
         <Nullable>enable</Nullable>
         <DefaultItemExcludes>$(DefaultItemExcludes);atomex.client.core\**</DefaultItemExcludes>
@@ -18,14 +18,14 @@
         <AvaloniaResource Include="Resources\Images\*" />
     </ItemGroup>
     <ItemGroup>
-        <PackageReference Include="Avalonia" Version="0.10.12" />
-        <PackageReference Include="Avalonia.Controls.DataGrid" Version="0.10.12" />
-        <PackageReference Include="Avalonia.Desktop" Version="0.10.12" />
-        <PackageReference Include="Avalonia.Diagnostics" Version="0.10.12" />
-        <PackageReference Include="Avalonia.ReactiveUI" Version="0.10.12" />
-        <PackageReference Include="Avalonia.Xaml.Behaviors" Version="0.10.12" />
+        <PackageReference Include="Avalonia" Version="0.10.13" />
+        <PackageReference Include="Avalonia.Controls.DataGrid" Version="0.10.13" />
+        <PackageReference Include="Avalonia.Desktop" Version="0.10.13" />
+        <PackageReference Include="Avalonia.Diagnostics" Version="0.10.13" />
+        <PackageReference Include="Avalonia.ReactiveUI" Version="0.10.13" />
+        <PackageReference Include="Avalonia.Xaml.Behaviors" Version="0.10.13" />
         <PackageReference Include="Avalonia.Svg.Skia" Version="0.10.12" />
-        <PackageReference Include="DialogHost.Avalonia" Version="0.3.1" />
+        <PackageReference Include="DialogHost.Avalonia" Version="0.4.0" />
         <PackageReference Include="Deadpikle.AvaloniaProgressRing" Version="0.9.0" />
         <PackageReference Include="NetSparkleUpdater.SparkleUpdater" Version="2.0.7" />
         <PackageReference Include="NetSparkleUpdater.UI.Avalonia" Version="2.0.8" />
@@ -154,9 +154,6 @@
         <Compile Update="Views\AddressesView.axaml.cs">
             <DependentUpon>AddressesView.axaml</DependentUpon>
         </Compile>
-        <Compile Update="Views\RestoreDialogView.axaml.cs">
-            <DependentUpon>RestoreDialogView.axaml</DependentUpon>
-        </Compile>
         <Compile Update="Views\CustomTitleBars\MacosTitleBarView.axaml.cs">
             <DependentUpon>MacosTitleBarView.axaml</DependentUpon>
             <SubType>Code</SubType>
@@ -178,6 +175,22 @@
         <Compile Update="Views\LinuxUpdateControls.axaml.cs">
             <DependentUpon>LinuxUpdateControls.axaml</DependentUpon>
             <SubType>Code</SubType>
+        </Compile>
+        <Compile Update="Views\TransactionViews\EthereumERC20TransactionDetailsView.axaml.cs">
+          <DependentUpon>EthereumERC20TransactionDetailsView.axaml</DependentUpon>
+          <SubType>Code</SubType>
+        </Compile>
+        <Compile Update="Controls\IconButton.axaml.cs">
+          <DependentUpon>IconButton.axaml</DependentUpon>
+          <SubType>Code</SubType>
+        </Compile>
+        <Compile Update="Controls\LinkButton.axaml.cs">
+          <DependentUpon>LinkButton.axaml</DependentUpon>
+          <SubType>Code</SubType>
+        </Compile>
+        <Compile Update="Controls\SortButton.axaml.cs">
+          <DependentUpon>SortButton.axaml</DependentUpon>
+          <SubType>Code</SubType>
         </Compile>
     </ItemGroup>
     <ItemGroup>

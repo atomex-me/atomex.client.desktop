@@ -3,125 +3,89 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Globalization;
-using System.Windows.Input;
-
+using System.Reactive;
+using System.Threading.Tasks;
 using Serilog;
 using ReactiveUI;
-
 using Atomex.Blockchain.Tezos.Internal;
 using Atomex.Client.Desktop.Common;
+using Atomex.Client.Desktop.ViewModels.WalletViewModels;
 using Atomex.Common;
 using Atomex.Core;
 using Atomex.Cryptography;
 using Atomex.Wallet;
 using Atomex.Wallet.Tezos;
+using Avalonia.Controls;
+using ReactiveUI.Fody.Helpers;
 
 namespace Atomex.Client.Desktop.ViewModels
 {
-    public class AddressInfo : ViewModelBase
+    public enum AddressesSortField
+    {
+        ByPath,
+        ByBalance,
+    }
+
+    public class AddressViewModel : ViewModelBase
     {
         public string Address { get; set; }
+        public string AddressExplorerUri { get; set; }
         public string Type { get; set; }
         public string Path { get; set; }
-
-        private string _balance;
-
-        public string Balance
-        {
-            get => _balance;
-            set
-            {
-                _balance = value;
-                OnPropertyChanged(nameof(Balance));
-            }
-        }
-        public string TokenBalance { get; set; }
-
+        public bool HasTokens { get; set; }
         public Action<string> CopyToClipboard { get; set; }
         public Action<string> OpenInExplorer { get; set; }
         public Action<string> ExportKey { get; set; }
-        public Action<string> UpdateAddress { get; set; }
+        public Func<string, Task>? UpdateAddress { get; set; }
 
-        private bool _isUpdating;
+        [Reactive] public string Balance { get; set; }
+        [Reactive] public string TokenBalance { get; set; }
+        [Reactive] public bool IsUpdating { get; set; }
 
-        public bool IsUpdating
-        {
-            get => _isUpdating;
-            set
+        private ReactiveCommand<Unit, Unit> _updateAddressCommand;
+
+        public ReactiveCommand<Unit, Unit> UpdateAddressCommand => _updateAddressCommand ??=
+            ReactiveCommand.CreateFromTask(async () =>
             {
-                _isUpdating = value;
-                OnPropertyChanged(nameof(IsUpdating));
-            }
-        }
+                if (UpdateAddress == null) return;
+                IsUpdating = true;
+                await UpdateAddress(Address);
+                IsUpdating = false;
+            });
 
-        private ICommand _setAddressUpdating;
+        private ReactiveCommand<Unit, Unit> _copyCommand;
 
-        public ICommand SetAddressUpdating => _setAddressUpdating ??= ReactiveCommand.Create<string>((address) =>
-        {
-            if (IsUpdating) return;
-            IsUpdating = true;
-            UpdateAddress?.Invoke(address);
-        });
+        public ReactiveCommand<Unit, Unit> CopyCommand => _copyCommand ??= ReactiveCommand.Create(
+            () => CopyToClipboard?.Invoke(Address));
 
-        private ICommand _setAddressUpdated;
+        private ReactiveCommand<Unit, Unit> _openInExplorerCommand;
 
-        public ICommand SetAddressUpdated => _setAddressUpdated ??= ReactiveCommand.Create<string>((balance) =>
-        {
-            Balance = balance;
-            IsUpdating = false;
-        });
+        public ReactiveCommand<Unit, Unit> OpenInExplorerCommand => _openInExplorerCommand ??= ReactiveCommand.Create(
+            () => OpenInExplorer?.Invoke(Address));
 
-        private ICommand _copyCommand;
+        private ReactiveCommand<Unit, Unit> _exportKeyCommand;
 
-        public ICommand CopyCommand => _copyCommand ??= ReactiveCommand.Create<string>((s) =>
-        {
-            CopyToClipboard?.Invoke(s);
-        });
-
-        private ICommand _openInExplorerCommand;
-
-        public ICommand OpenInExplorerCommand => _openInExplorerCommand ??= ReactiveCommand.Create<string>((s) =>
-        {
-            OpenInExplorer?.Invoke(Address);
-        });
-
-        private ICommand _exportKeyCommand;
-
-        public ICommand ExportKeyCommand => _exportKeyCommand ??= ReactiveCommand.Create<string>((s) =>
-        {
-            ExportKey?.Invoke(Address);
-        });
+        public ReactiveCommand<Unit, Unit> ExportKeyCommand => _exportKeyCommand ??= ReactiveCommand.Create(
+            () => ExportKey?.Invoke(Address));
     }
 
     public class AddressesViewModel : ViewModelBase, IDisposable
     {
         private const int DefaultTokenPrecision = 9;
+        private const int MinimalUpdateTimeMs = 1000;
         private readonly IAtomexApp _app;
         private CurrencyConfig _currency;
-        private readonly string _tokenContract;
+        private readonly string? _tokenContract;
 
-        public ObservableCollection<AddressInfo> Addresses { get; set; }
-        
-        public bool HasTokens { get; set; }
-
-        private string _warning;
-        public string Warning
-        {
-            get => _warning;
-            set
-            {
-                _warning = value;
-                OnPropertyChanged(nameof(Warning));
-                OnPropertyChanged(nameof(HasWarning));
-            }
-        }
-
-        public bool HasWarning => !string.IsNullOrEmpty(Warning);
+        public bool HasTokens => _currency.Name == TezosConfig.Xtz && _tokenContract != null;
+        [Reactive] public ObservableCollection<AddressViewModel> Addresses { get; set; }
+        [Reactive] public AddressesSortField? CurrentSortField { get; set; }
+        [Reactive] public SortDirection? CurrentSortDirection { get; set; }
 
         public AddressesViewModel()
         {
 #if DEBUG
-            if (Env.IsInDesignerMode())
+            if (Design.IsDesignMode)
                 DesignerMode();
 #endif
         }
@@ -131,24 +95,21 @@ namespace Atomex.Client.Desktop.ViewModels
             CurrencyConfig currency,
             string tokenContract = null)
         {
-            _app           = app ?? throw new ArgumentNullException(nameof(app));
-            _currency      = currency ?? throw new ArgumentNullException(nameof(currency));
+            _app = app ?? throw new ArgumentNullException(nameof(app));
+            _currency = currency ?? throw new ArgumentNullException(nameof(currency));
             _tokenContract = tokenContract;
 
-            ReloadAddresses();
+            this.WhenAnyValue(vm => vm.CurrentSortField, vm => vm.CurrentSortDirection)
+                .WhereAllNotNull()
+                .SubscribeInMainThread(_ => { ReloadAddresses(); });
+
+            CurrentSortField = AddressesSortField.ByPath;
+            CurrentSortDirection = SortDirection.Asc;
 
             _app.Account.BalanceUpdated += OnBalanceUpdatedEventHandler;
         }
 
-        public void OnBalanceUpdatedEventHandler(object? sender, CurrencyEventArgs args)
-        {
-            if (_currency.Name == args.Currency)
-            {
-                ReloadAddresses();
-            }
-        }
-
-        public async void ReloadAddresses()
+        private async Task ReloadAddresses()
         {
             try
             {
@@ -156,61 +117,96 @@ namespace Atomex.Client.Desktop.ViewModels
                     .GetCurrencyAccount(_currency.Name);
 
                 var addresses = (await account
-                    .GetAddressesAsync())
+                        .GetAddressesAsync())
                     .ToList();
 
-                addresses.Sort((a1, a2) =>
+                switch (CurrentSortField)
                 {
-                    var typeResult = a1.KeyType.CompareTo(a2.KeyType);
+                    case AddressesSortField.ByPath when CurrentSortDirection == SortDirection.Desc:
+                        addresses.Sort((a2, a1) =>
+                        {
+                            var typeResult = a1.KeyType.CompareTo(a2.KeyType);
 
-                    if (typeResult != 0)
-                        return typeResult;
+                            if (typeResult != 0)
+                                return typeResult;
 
-                    var accountResult = a1.KeyIndex.Account.CompareTo(a2.KeyIndex.Account);
+                            var accountResult = a1.KeyIndex.Account.CompareTo(a2.KeyIndex.Account);
 
-                    if (accountResult != 0)
-                        return accountResult;
+                            if (accountResult != 0)
+                                return accountResult;
 
-                    var chainResult = a1.KeyIndex.Chain.CompareTo(a2.KeyIndex.Chain);
+                            var chainResult = a1.KeyIndex.Chain.CompareTo(a2.KeyIndex.Chain);
 
-                    return chainResult != 0
-                        ? chainResult
-                        : a1.KeyIndex.Index.CompareTo(a2.KeyIndex.Index);
-                });
+                            return chainResult != 0
+                                ? chainResult
+                                : a1.KeyIndex.Index.CompareTo(a2.KeyIndex.Index);
+                        });
+                        break;
+                    case AddressesSortField.ByPath when CurrentSortDirection == SortDirection.Asc:
+                        addresses.Sort((a1, a2) =>
+                        {
+                            var typeResult = a1.KeyType.CompareTo(a2.KeyType);
 
-                Addresses = new ObservableCollection<AddressInfo>(
+                            if (typeResult != 0)
+                                return typeResult;
+
+                            var accountResult = a1.KeyIndex.Account.CompareTo(a2.KeyIndex.Account);
+
+                            if (accountResult != 0)
+                                return accountResult;
+
+                            var chainResult = a1.KeyIndex.Chain.CompareTo(a2.KeyIndex.Chain);
+
+                            return chainResult != 0
+                                ? chainResult
+                                : a1.KeyIndex.Index.CompareTo(a2.KeyIndex.Index);
+                        });
+                        break;
+                    case AddressesSortField.ByBalance when CurrentSortDirection == SortDirection.Desc:
+                        addresses = addresses.OrderByDescending(a => a.AvailableBalance()).ToList();
+                        break;
+
+                    case AddressesSortField.ByBalance when CurrentSortDirection == SortDirection.Asc:
+                        addresses = addresses.OrderBy(a => a.AvailableBalance()).ToList();
+                        break;
+
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+
+                Addresses = new ObservableCollection<AddressViewModel>(
                     addresses.Select(a =>
                     {
                         var path = a.KeyType == CurrencyConfig.StandardKey && Currencies.IsTezosBased(_currency.Name)
                             ? $"m/44'/{_currency.Bip44Code}'/{a.KeyIndex.Account}'/{a.KeyIndex.Chain}'"
                             : $"m/44'/{_currency.Bip44Code}'/{a.KeyIndex.Account}'/{a.KeyIndex.Chain}/{a.KeyIndex.Index}";
 
-                        return new AddressInfo
+                        return new AddressViewModel
                         {
-                            Address         = a.Address,
-                            Type            = KeyTypeToString(a.KeyType),
-                            Path            = path,
-                            Balance         = $"{a.Balance.ToString(CultureInfo.InvariantCulture)} {_currency.Name}",
-                            CopyToClipboard = CopyToClipboard,
-                            OpenInExplorer  = OpenInExplorer,
-                            UpdateAddress   = UpdateAddress,
-                            ExportKey       = ExportKey
+                            Address = a.Address,
+                            AddressExplorerUri = $"{_currency.AddressExplorerUri}{a.Address}",
+                            Type = KeyTypeToString(a.KeyType),
+                            Path = path,
+                            HasTokens = HasTokens,
+                            Balance = $"{a.Balance.ToString(CultureInfo.InvariantCulture)} {_currency.Name}",
+                            CopyToClipboard = address => App.Clipboard.SetTextAsync(address),
+                            OpenInExplorer = OpenInExplorer,
+                            UpdateAddress = UpdateAddress,
+                            ExportKey = ExportKey
                         };
                     }));
 
                 // token balances
-                if (_currency.Name == TezosConfig.Xtz && _tokenContract != null)
+                if (HasTokens)
                 {
-                    HasTokens = true;
-
                     var tezosAccount = account as TezosAccount;
 
                     var addressesWithTokens = (await tezosAccount
-                        .DataRepository
-                        .GetTezosTokenAddressesByContractAsync(_tokenContract))
+                            .DataRepository
+                            .GetTezosTokenAddressesByContractAsync(_tokenContract))
                         .Where(w => w.Balance != 0)
                         .GroupBy(w => w.Address);
-                        
+
                     foreach (var addressWithTokens in addressesWithTokens)
                     {
                         var addressInfo = Addresses.FirstOrDefault(a => a.Address == addressWithTokens.Key);
@@ -235,37 +231,40 @@ namespace Atomex.Client.Desktop.ViewModels
                         }
                     }
                 }
-
-                OnPropertyChanged(nameof(Addresses));
-                OnPropertyChanged(nameof(HasTokens));
             }
             catch (Exception e)
             {
                 Log.Error(e, "Error while load addresses.");
             }
         }
-        
+
+        private ReactiveCommand<AddressesSortField, Unit> _setSortTypeCommand;
+
+        public ReactiveCommand<AddressesSortField, Unit> SetSortTypeCommand =>
+            _setSortTypeCommand ??= ReactiveCommand.Create<AddressesSortField>(sortField =>
+            {
+                if (CurrentSortField != sortField)
+                    CurrentSortField = sortField;
+                else
+                    CurrentSortDirection = CurrentSortDirection == SortDirection.Asc
+                        ? SortDirection.Desc
+                        : SortDirection.Asc;
+            });
+
+        private async void OnBalanceUpdatedEventHandler(object? sender, CurrencyEventArgs args)
+        {
+            if (_currency.Name != args.Currency) return;
+
+            await ReloadAddresses();
+        }
+
         private string KeyTypeToString(int keyType) =>
             keyType switch
             {
-                CurrencyConfig.StandardKey  => "Standard",
+                CurrencyConfig.StandardKey => "Standard",
                 TezosConfig.Bip32Ed25519Key => "Atomex",
                 _ => throw new NotSupportedException($"Key type {keyType} not supported.")
             };
-
-        private void CopyToClipboard(string address)
-        {
-            try
-            {
-                App.Clipboard.SetTextAsync(address);
-
-                Warning = "Address successfully copied to clipboard.";
-            }
-            catch (Exception e)
-            {
-                Log.Error(e, "Copy to clipboard error");
-            }
-        }
 
         private void OpenInExplorer(string address)
         {
@@ -282,12 +281,14 @@ namespace Atomex.Client.Desktop.ViewModels
             }
         }
 
-        private async void UpdateAddress(string address)
+        private async Task UpdateAddress(string address)
         {
             try
             {
-                await new HdWalletScanner(_app.Account)
+                var updateTask = new HdWalletScanner(_app.Account)
                     .ScanAddressAsync(_currency.Name, address);
+
+                await Task.WhenAll(Task.Delay(MinimalUpdateTimeMs), updateTask);
 
                 if (_currency.Name == TezosConfig.Xtz && _tokenContract != null)
                 {
@@ -307,9 +308,6 @@ namespace Atomex.Client.Desktop.ViewModels
                 }
 
                 ReloadAddresses();
-
-                // var targetAddr = Addresses.FirstOrDefault(a => a.Address == address);
-                // targetAddr!.SetAddressUpdated.Execute(balance.Available.ToString(CultureInfo.InvariantCulture));
             }
             catch (OperationCanceledException)
             {
@@ -331,7 +329,6 @@ namespace Atomex.Client.Desktop.ViewModels
                         text:
                         "Copying the private key to the clipboard may result in the loss of all your coins in the wallet. Are you sure you want to copy the private key?",
                         nextTitle: "Copy",
-                        backAction: () => App.DialogService.Show(this),
                         nextAction: async () =>
                         {
                             var walletAddress = await _app.Account
@@ -373,10 +370,8 @@ namespace Atomex.Client.Desktop.ViewModels
 
                             App.DialogService.Show(MessageViewModel.Success(
                                 text: "Private key successfully copied to clipboard.",
-                                nextAction: () => App.DialogService.Show(this)
+                                nextAction: () => App.DialogService.Close()
                             ));
-
-                            Warning = "Private key successfully copied to clipboard.";
                         }
                     )
                 );
@@ -391,22 +386,22 @@ namespace Atomex.Client.Desktop.ViewModels
         {
             _currency = DesignTime.TestNetCurrencies.First();
 
-            Addresses = new ObservableCollection<AddressInfo>(
-                new List<AddressInfo>
+            Addresses = new ObservableCollection<AddressViewModel>(
+                new List<AddressViewModel>
                 {
-                    new AddressInfo
+                    new AddressViewModel
                     {
                         Address = "mzztP8VVJYxV93EUiiYrJUbL55MLx7KLoM",
                         Path = "m/44'/0'/0'/0/0",
                         Balance = 4.0000000.ToString(CultureInfo.InvariantCulture),
                     },
-                    new AddressInfo
+                    new AddressViewModel
                     {
                         Address = "mzztP8VVJYxV93EUiiYrJUbL55MLx7KLoM",
                         Path = "m/44'/0'/0'/0/0",
                         Balance = 100.ToString(CultureInfo.InvariantCulture),
                     },
-                    new AddressInfo
+                    new AddressViewModel
                     {
                         Address = "mzztP8VVJYxV93EUiiYrJUbL55MLx7KLoM",
                         Path = "m/44'/0'/0'/0/0",
@@ -415,7 +410,7 @@ namespace Atomex.Client.Desktop.ViewModels
                 });
         }
 
-        
+
         public void Dispose()
         {
             _app.Account.BalanceUpdated -= OnBalanceUpdatedEventHandler;

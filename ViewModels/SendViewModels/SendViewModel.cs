@@ -17,6 +17,7 @@ using Atomex.Client.Desktop.Properties;
 using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
 using Atomex.Core;
 using Atomex.MarketData.Abstract;
+using Atomex.ViewModels;
 
 namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 {
@@ -31,7 +32,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
     {
         protected readonly IAtomexApp _app;
         protected CurrencyConfig Currency;
-        public ViewModelBase SelectFromViewModel { get; set; }
+        public NavigatableSelectAddress SelectFromViewModel { get; set; }
         protected SelectAddressViewModel SelectToViewModel { get; set; }
 
         [Reactive] public SendStage Stage { get; set; }
@@ -378,7 +379,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             RecommendedMaxAmountWarningToolTip = "You have tokens that require ETH. Sending this will not leave enough ETH to send or exchange your tokens. We recommend to send no more than 0.073 ETH";
             RecommendedMaxAmountWarningType    = MessageType.Warning;
 
-            Stage = SendStage.Confirmation;
+            Stage = SendStage.Edit;
             SendRecommendedAmountMenu = string.Format(Resources.SendRecommendedAmountMenu, 0.073, "ETH");
             SendEnteredAmountMenu = string.Format(Resources.SendEnteredAmountMenu, 0.073, "ETH");
         }
