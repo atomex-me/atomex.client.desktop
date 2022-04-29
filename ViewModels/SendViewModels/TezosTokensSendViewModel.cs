@@ -20,6 +20,7 @@ using Atomex.TezosTokens;
 using Atomex.ViewModels;
 using Atomex.Wallet.Abstract;
 using Atomex.Wallet.Tezos;
+using Avalonia.Controls;
 
 namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 {
@@ -65,7 +66,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         public TezosTokensSendViewModel()
         {
 #if DEBUG
-            if (Env.IsInDesignerMode())
+            if (Design.IsDesignMode)
                 DesignerMode();
 #endif
         }

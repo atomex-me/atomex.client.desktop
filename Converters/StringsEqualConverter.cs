@@ -15,7 +15,7 @@ namespace Atomex.Client.Desktop.Converters
                 throw new InvalidOperationException("Invalid values");
 
             if (values[0] != AvaloniaProperty.UnsetValue && values[1] != AvaloniaProperty.UnsetValue)
-                return string.Equals((string)values[0], (string)values[1]);
+                return string.Equals(values[0]?.ToString(), values[1]?.ToString());
 
             return false;
         }

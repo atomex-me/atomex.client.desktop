@@ -73,7 +73,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             Action<CurrencyConfig> setConversionTab,
             Action<string> setWertCurrency,
             Action<ViewModelBase?> showRightPopupContent,
-            CurrencyConfig currency)
+            CurrencyConfig? currency)
         {
             _app = app ?? throw new ArgumentNullException(nameof(app));
             SetConversionTab = setConversionTab ?? throw new ArgumentNullException(nameof(setConversionTab));
@@ -82,7 +82,11 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                 showRightPopupContent ?? throw new ArgumentNullException(nameof(showRightPopupContent));
 
             if (currency != null)
+            {
                 CurrencyViewModel = CurrencyViewModelCreator.CreateViewModel(currency);
+                LoadAddresses();
+                _ = LoadTransactionsAsync();
+            }
 
             this.WhenAnyValue(vm => vm.CurrentSortField, vm => vm.CurrentSortDirection)
                 .WhereAllNotNull()
@@ -122,8 +126,6 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             CurrentSortDirection = SortDirection.Desc;
 
             SubscribeToServices();
-            LoadAddresses();
-            _ = LoadTransactionsAsync();
         }
 
         protected virtual void SubscribeToServices()
@@ -196,8 +198,9 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             };
         }
 
-        
+
         protected readonly SemaphoreSlim LoadTransactionsSemaphore = new(1, 1);
+
         protected virtual async Task LoadTransactionsAsync()
         {
             await LoadTransactionsSemaphore.WaitAsync();
@@ -255,7 +258,9 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         public ReactiveCommand<Unit, Unit> ReceiveCommand => _receiveCommand ??= ReactiveCommand.Create(OnReceiveClick);
 
         private ReactiveCommand<Unit, Unit> _exchangeCommand;
-        public ReactiveCommand<Unit, Unit> ExchangeCommand => _exchangeCommand ??= ReactiveCommand.Create(OnConvertClick);
+
+        public ReactiveCommand<Unit, Unit> ExchangeCommand =>
+            _exchangeCommand ??= ReactiveCommand.Create(OnConvertClick);
 
         private ReactiveCommand<Unit, Unit> _updateCommand;
         public ReactiveCommand<Unit, Unit> UpdateCommand => _updateCommand ??= ReactiveCommand.Create(OnUpdateClick);

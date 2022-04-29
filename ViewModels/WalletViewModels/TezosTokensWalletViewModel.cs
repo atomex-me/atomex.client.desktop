@@ -24,6 +24,8 @@ using Atomex.TezosTokens;
 using Atomex.ViewModels;
 using Atomex.Wallet;
 using Atomex.Wallet.Tezos;
+using Avalonia.Controls;
+using ReactiveUI.Fody.Helpers;
 
 namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 {
@@ -253,6 +255,8 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
         public ObservableCollection<TezosTokenContractViewModel> TokensContracts { get; set; }
         public ObservableCollection<TezosTokenViewModel> Tokens { get; set; }
+        [Reactive] public TezosTokenViewModel? SelectedToken { get; set; }
+        [Reactive] public decimal SelectedTokenId { get; set; }
         public ObservableCollection<TezosTokenTransferViewModel> Transfers { get; set; }
 
         private TezosTokenContractViewModel? _tokenContract;
@@ -342,7 +346,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         public TezosTokensWalletViewModel()
         {
 #if DEBUG
-            if (Env.IsInDesignerMode())
+            if (Design.IsDesignMode)
                 DesignerMode();
 #endif
         }
@@ -354,6 +358,10 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             Action<ViewModelBase?> showRightPopupContent
         ) : base(app, setConversionTab, setWertCurrency, showRightPopupContent, null)
         {
+            this.WhenAnyValue(vm => vm.SelectedToken)
+                .SubscribeInMainThread(
+                    selectedToken => SelectedTokenId = selectedToken == null ? -1 : selectedToken.TokenBalance.TokenId);
+            
             _ = ReloadTokenContractsAsync();
         }
 
@@ -443,6 +451,8 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
                 return;
             }
+
+            SelectedToken = null;
 
             var tezosConfig = _app.Account
                 .Currencies
@@ -755,7 +765,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                 }
             };
 
-            _tokenContract = null; // TokensContracts.First();
+            _tokenContract = TokensContracts.First();
 
             var tezosConfig = DesignTime.MainNetCurrencies.Get<TezosConfig>("XTZ");
             var tzktApi = new TzktApi(tezosConfig);

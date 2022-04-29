@@ -5,6 +5,7 @@ using System.Reactive.Linq;
 using System.Threading.Tasks;
 using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.ViewModels.TransactionViewModels;
+using Atomex.Client.Desktop.ViewModels.WalletViewModels;
 using ReactiveUI;
 using Atomex.Core;
 using Atomex.MarketData;
@@ -210,7 +211,17 @@ namespace Atomex.Client.Desktop.ViewModels
 
         private void SelectCurrencyWallet(string? currencyDescription = null)
         {
-            if (currencyDescription != null)
+            // todo: remove
+            if (currencyDescription == PortfolioViewModel.TezosTokens)
+            {
+                WalletsViewModel.Selected = new TezosTokensWalletViewModel(
+                    app: AtomexApp,
+                    setConversionTab: SelectConversion,
+                    setWertCurrency: SelectWert,
+                    showRightPopupContent: ShowRightPopupContent);   
+            }
+
+            else if (currencyDescription != null)
             {
                 WalletsViewModel.Selected = WalletsViewModel
                     .Wallets

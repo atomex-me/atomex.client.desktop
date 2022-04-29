@@ -16,8 +16,20 @@
     <UserControl.Resources>
         <converters:WalletsViewMarginConverter x:Key="WalletsViewMarginConverter" />
     </UserControl.Resources>
+    
+    <UserControl.Styles>
+        <Style Selector="Border.WithTezosTokens">
+            <Setter Property="Padding" Value="10 0 10 10" />
+        </Style>
+        
+        <Style Selector="Border.WithoutTezosTokens">
+            <Setter Property="Padding" Value="50 0 50 0" />
+        </Style>
+    </UserControl.Styles>
 
-    <Border Padding="50 0 50 0"
+    <!-- todo: remove -->
+    <Border Classes.WithTezosTokens="{Binding IsTezosTokensSelected}"
+            Classes.WithoutTezosTokens="{Binding !IsTezosTokensSelected}"
             Margin="{Binding $parent[Window].DataContext.IsLinux,
             Converter={StaticResource WalletsViewMarginConverter}}"
             Name="MainControl">

@@ -29,9 +29,6 @@ namespace Atomex.Client.Desktop.ViewModels
         private const string DefaultPortfolioFormat = "0.00";
         private IAtomexApp App { get; }
         public PlotModel PlotModel { get; set; }
-        [Reactive] public IList<CurrencyViewModel> AllCurrencies { get; set; }
-        [Reactive] public IList<CurrencyViewModel> ChoosenCurrencies { get; set; }
-        [Reactive] public IList<CurrencyViewModel> InitialChoosenCurrencies { get; set; }
         private Color NoTokensColor { get; } = Color.FromArgb(50, 0, 0, 0);
         public SelectCurrencyType SelectCurrencyUseCase { get; set; }
         public Action<CurrencyConfig?> SetDexTab { get; init; }
@@ -41,6 +38,11 @@ namespace Atomex.Client.Desktop.ViewModels
         [Reactive] public string SearchPattern { get; set; }
         [Reactive] public CurrencyViewModel? SelectedCurrency { get; set; }
         [Reactive] public string? PopupOpenedCurrency { get; set; }
+        [Reactive] public IList<CurrencyViewModel> AllCurrencies { get; set; }
+        [Reactive] public IList<CurrencyViewModel> ChoosenCurrencies { get; set; }
+        [Reactive] public IList<CurrencyViewModel> InitialChoosenCurrencies { get; set; }
+
+        private CurrencyViewModel TezosTokensCurrencyViewModel { get; set; }
 
         public PortfolioViewModel()
         {
@@ -85,11 +87,17 @@ namespace Atomex.Client.Desktop.ViewModels
                                     c.Currency.Description.ToLower()
                                         .Contains(searchPattern?.ToLower() ?? string.Empty));
 
-                    ChoosenCurrencies = new List<CurrencyViewModel>(filteredCurrencies);
+                    // todo: remove
+                    ChoosenCurrencies = new List<CurrencyViewModel>(filteredCurrencies?
+                        .Where(c => c.Header != TezosTokens)
+                        .Append(TezosTokensCurrencyViewModel));
                 });
-
+            
             SubscribeToServices();
         }
+        
+        // todo: remove
+        public static string TezosTokens => "Tezos tokens";
 
         private void SubscribeToServices()
         {
@@ -98,6 +106,8 @@ namespace Atomex.Client.Desktop.ViewModels
 
         private void OnAtomexClientChangedEventHandler(object sender, AtomexClientChangedEventArgs e)
         {
+            if (e.AtomexClient is null) return;
+
             AllCurrencies = e.AtomexClient?.Account?.Currencies
                 .Select(c =>
                 {
@@ -106,6 +116,12 @@ namespace Atomex.Client.Desktop.ViewModels
                     return vm;
                 })
                 .ToList() ?? new List<CurrencyViewModel>();
+            
+            // todo: remove
+            var tezosConfig = App.Account.Currencies.Get<TezosConfig>(TezosConfig.Xtz);
+            TezosTokensCurrencyViewModel = new TezosCurrencyViewModel(tezosConfig);
+            TezosTokensCurrencyViewModel.Header = TezosTokens;
+            AllCurrencies.Add(TezosTokensCurrencyViewModel);
 
             var savedCurrenciesArr =
                 e.AtomexClient?.Account?.UserSettings?.InitializedCurrencies ??
@@ -196,6 +212,13 @@ namespace Atomex.Client.Desktop.ViewModels
         public ReactiveCommand<CurrencyViewModel, Unit> SetWalletCurrencyCommand => _setWalletCurrencyCommand ??=
             (_setWalletCurrencyCommand = ReactiveCommand.Create<CurrencyViewModel>(currencyViewModel =>
             {
+                // todo: remove
+                if (currencyViewModel.Header == TezosTokens)
+                {
+                    SetWalletCurrency?.Invoke(TezosTokens);
+                    return;
+                }
+
                 SetWalletCurrency?.Invoke(currencyViewModel.Currency.Description);
             }));
 
@@ -287,7 +310,9 @@ namespace Atomex.Client.Desktop.ViewModels
                 var vm = new ManageAssetsViewModel
                 {
                     AvailableCurrencies = new ObservableCollection<CurrencyWithSelection>(
-                        AllCurrencies.Select(currency => new CurrencyWithSelection
+                        AllCurrencies
+                            .Where(c => c.Header != TezosTokens)
+                            .Select(currency => new CurrencyWithSelection
                         {
                             Currency = currency,
                             IsSelected = InitialChoosenCurrencies.Contains(currency)
@@ -295,9 +320,11 @@ namespace Atomex.Client.Desktop.ViewModels
                     ),
                     OnAssetsChanged = currencies =>
                     {
-                        ChoosenCurrencies = new List<CurrencyViewModel>(currencies);
-                        InitialChoosenCurrencies = new List<CurrencyViewModel>(ChoosenCurrencies);
+                        // todo: remove
+                        ChoosenCurrencies = new List<CurrencyViewModel>(currencies.Append(TezosTokensCurrencyViewModel));
 
+                        InitialChoosenCurrencies = new List<CurrencyViewModel>(ChoosenCurrencies);
+                        
                         App.Account.UserSettings.InitializedCurrencies = ChoosenCurrencies
                             .Select(currency => currency.Currency.Name)
                             .ToArray();

@@ -2,7 +2,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="900"
              x:Class="Atomex.Client.Desktop.Views.WalletViews.TezosTokensWalletView"
              xmlns:vm="clr-namespace:Atomex.Client.Desktop.ViewModels.WalletViewModels"
              xmlns:txViewModels="clr-namespace:Atomex.Client.Desktop.ViewModels.TransactionViewModels"
@@ -19,591 +19,556 @@
         <vm:TezosTokensWalletViewModel />
     </Design.DataContext>
 
-    <!-- <UserControl.Resources> -->
-    <!--     <converters:AmountToStringConverter x:Key="AmountToStringConverter" /> -->
-    <!--     <converters:DateTimeToTxTimeConverter x:Key="DateTimeToTxTimeConverter" /> -->
-    <!--     <converters:BoolToRowSpanConverter x:Key="BoolToRowSpanConverter" /> -->
-    <!-- </UserControl.Resources> -->
-    <!-- -->
-    <!-- <UserControl.Styles> -->
-    <!--     <Style Selector="TabControl.Tokens"> -->
-    <!--         <Setter Property="Margin" Value="0" /> -->
-    <!--         <Setter Property="Padding" Value="0" /> -->
-    <!--         <Setter Property="Background" Value="{DynamicResource TabControlBackground}" /> -->
-    <!--         <Setter Property="Template"> -->
-    <!--             <ControlTemplate> -->
-    <!--                 <Border BorderBrush="{TemplateBinding BorderBrush}" -->
-    <!--                         BorderThickness="{TemplateBinding BorderThickness}" -->
-    <!--                         CornerRadius="0" -->
-    <!--                         Background="{TemplateBinding Background}" -->
-    <!--                         HorizontalAlignment="{TemplateBinding HorizontalAlignment}" -->
-    <!--                         VerticalAlignment="{TemplateBinding VerticalAlignment}"> -->
-    <!--                     <DockPanel> -->
-    <!--                         <ItemsPresenter Name="PART_ItemsPresenter" -->
-    <!--                                         Items="{TemplateBinding Items}" -->
-    <!--                                         ItemsPanel="{TemplateBinding ItemsPanel}" -->
-    <!--                                         ItemTemplate="{TemplateBinding ItemTemplate}" -->
-    <!--                                         Margin="0" -->
-    <!--                                         DockPanel.Dock="{TemplateBinding TabStripPlacement}" /> -->
-    <!--                         <ContentPresenter Name="PART_SelectedContentHost" -->
-    <!--                                           Margin="{TemplateBinding Padding}" -->
-    <!--                                           HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}" -->
-    <!--                                           VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}" -->
-    <!--                                           Content="{TemplateBinding SelectedContent}" -->
-    <!--                                           ContentTemplate="{TemplateBinding SelectedContentTemplate}" /> -->
-    <!--                     </DockPanel> -->
-    <!--                 </Border> -->
-    <!--             </ControlTemplate> -->
-    <!--         </Setter> -->
-    <!--     </Style> -->
-    <!-- -->
-    <!--     <Style Selector="ListBoxItem"> -->
-    <!--         <Setter Property="Padding" Value="0" /> -->
-    <!--         <Setter Property="Cursor" Value="Hand" /> -->
-    <!--         <Setter Property="HorizontalContentAlignment" Value="Stretch" /> -->
-    <!--         <Setter Property="Template"> -->
-    <!--             <ControlTemplate> -->
-    <!--                 <ContentPresenter Name="PART_ContentPresenter" -->
-    <!--                                   Background="{TemplateBinding Background}" -->
-    <!--                                   BorderBrush="{TemplateBinding BorderBrush}" -->
-    <!--                                   BorderThickness="{TemplateBinding BorderThickness}" -->
-    <!--                                   ContentTemplate="{TemplateBinding ContentTemplate}" -->
-    <!--                                   Content="{TemplateBinding Content}" -->
-    <!--                                   Padding="{TemplateBinding Padding}" -->
-    <!--                                   VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}" -->
-    <!--                                   HorizontalContentAlignment="Stretch" /> -->
-    <!--             </ControlTemplate> -->
-    <!--         </Setter> -->
-    <!--     </Style> -->
-    <!-- -->
-    <!--     <Style Selector="TabItem.Tokens"> -->
-    <!--         <Setter Property="Foreground" Value="{DynamicResource GrayBrush5}" /> -->
-    <!--         <Setter Property="FontFamily" Value="{DynamicResource DefaultMediumFontFamily}" /> -->
-    <!--         <Setter Property="FontWeight" Value="{DynamicResource DefaultMediumFontWeight}" /> -->
-    <!--         <Setter Property="FontSize" Value="14" /> -->
-    <!--         <Setter Property="Cursor" Value="Hand" /> -->
-    <!--     </Style> -->
-    <!-- -->
-    <!--     <Style Selector="TabItem.Tokens /template/ Border#PART_LayoutRoot"> -->
-    <!--         <Setter Property="Background" Value="Transparent" /> -->
-    <!--         <Setter Property="TextBlock.Foreground" Value="{DynamicResource GrayBrush5}" /> -->
-    <!--         <Setter Property="Padding" Value="4 0" /> -->
-    <!--     </Style> -->
-    <!-- -->
-    <!--     <Style Selector="TabItem.Tokens /template/ ContentPresenter#PART_ContentPresenter"> -->
-    <!--         <Setter Property="Margin" Value="10 0" /> -->
-    <!--     </Style> -->
-    <!-- -->
-    <!--     <Style Selector="TabItem.Tokens:selected /template/ Border#PART_LayoutRoot"> -->
-    <!--         <Setter Property="Background" Value="{DynamicResource DefaultSubstrateBrush}" /> -->
-    <!--         <Setter Property="TextBlock.Foreground" Value="{DynamicResource DefaultForegroundBrush}" /> -->
-    <!--     </Style> -->
-    <!-- </UserControl.Styles> -->
-    <!-- -->
-    <!-- <Grid Margin="10"> -->
-    <!--     <Grid.RowDefinitions> -->
-    <!--         <RowDefinition Height="Auto" /> -->
-    <!--         <RowDefinition Height="10" /> -->
-    <!--         <RowDefinition Height="*" /> -->
-    <!--     </Grid.RowDefinitions> -->
-    <!--     <Grid.ColumnDefinitions> -->
-    <!--         <ColumnDefinition Width="Auto" /> -->
-    <!--         <ColumnDefinition Width="10" /> -->
-    <!--         <ColumnDefinition Width="*" /> -->
-    <!--     </Grid.ColumnDefinitions> -->
-    <!-- -->
-    <!--     <Border Background="{StaticResource DefaultSubstrateBrush}" -->
-    <!--             Grid.Row="0" -->
-    <!--             Grid.RowSpan="3" -->
-    <!--             Grid.Column="0"> -->
-    <!-- -->
-    <!--         <ListBox Width="300" -->
-    <!--                  Items="{Binding TokensContracts}" -->
-    <!--                  SelectedItem="{Binding TokenContract}" -->
-    <!--                  Margin="0" -->
-    <!--                  ScrollViewer.HorizontalScrollBarVisibility="Hidden" -->
-    <!--                  SelectionMode="Single" -->
-    <!--                  Background="Transparent"> -->
-    <!-- -->
-    <!--             <ListBox.ItemTemplate> -->
-    <!--                 <DataTemplate DataType="{x:Type vm:TezosTokenContractViewModel}"> -->
-    <!--                     <Grid Height="60"> -->
-    <!--                         <Grid.ColumnDefinitions> -->
-    <!--                             <ColumnDefinition Width="60" /> -->
-    <!--                             <ColumnDefinition Width="*" /> -->
-    <!--                         </Grid.ColumnDefinitions> -->
-    <!--                         <Grid.RowDefinitions> -->
-    <!--                             <RowDefinition Height="10" /> -->
-    <!--                             <RowDefinition Height="20" /> -->
-    <!--                             <RowDefinition Height="20" /> -->
-    <!--                             <RowDefinition Height="10" /> -->
-    <!--                         </Grid.RowDefinitions> -->
-    <!-- -->
-    <!--                         <Ellipse Margin="5" -->
-    <!--                                  Grid.Column="0" -->
-    <!--                                  Grid.Row="0" -->
-    <!--                                  Grid.RowSpan="4"> -->
-    <!--                             <Ellipse.Fill> -->
-    <!--                                 <ImageBrush Source="{Binding IconPreview}" -->
-    <!--                                             BitmapInterpolationMode="HighQuality" -->
-    <!--                                             Stretch="Fill" /> -->
-    <!--                             </Ellipse.Fill> -->
-    <!--                         </Ellipse> -->
-    <!-- -->
-    <!--                         <TextBlock Margin="7 0 10 0" -->
-    <!--                                    Text="{Binding Name}" -->
-    <!--                                    FontSize="16" -->
-    <!--                                    FontFamily="{StaticResource DefaultMediumFontFamily}" -->
-    <!--                                    Foreground="{StaticResource DefaultForegroundBrush}" -->
-    <!--                                    VerticalAlignment="Center" -->
-    <!--                                    Grid.Column="1" -->
-    <!--                                    Grid.Row="1" /> -->
-    <!-- -->
-    <!--                         <TextBlock Margin="7 0 10 0" -->
-    <!--                                    Text="{Binding Contract.Address}" -->
-    <!--                                    FontSize="10" -->
-    <!--                                    FontFamily="{StaticResource DefaultLightFontFamily}" -->
-    <!--                                    Foreground="{StaticResource DefaultForegroundBrush}" -->
-    <!--                                    VerticalAlignment="Center" -->
-    <!--                                    Grid.Column="1" -->
-    <!--                                    Grid.Row="2" -->
-    <!--                                    IsVisible="{Binding HasName}" /> -->
-    <!-- -->
-    <!--                         <TextBlock Margin="7 0 10 0" -->
-    <!--                                    Text="{Binding Contract.Address}" -->
-    <!--                                    FontSize="10" -->
-    <!--                                    FontFamily="{StaticResource DefaultLightFontFamily}" -->
-    <!--                                    Foreground="{StaticResource DefaultForegroundBrush}" -->
-    <!--                                    VerticalAlignment="Center" -->
-    <!--                                    Grid.Column="1" -->
-    <!--                                    Grid.Row="0" -->
-    <!--                                    Grid.RowSpan="4" -->
-    <!--                                    IsVisible="{Binding !HasName}" /> -->
-    <!--                     </Grid> -->
-    <!--                 </DataTemplate> -->
-    <!--             </ListBox.ItemTemplate> -->
-    <!--         </ListBox> -->
-    <!--     </Border> -->
-    <!-- -->
-    <!--     <Border Background="{StaticResource DefaultSubstrateBrush}" -->
-    <!--             Grid.Row="0" -->
-    <!--             Grid.Column="2"> -->
-    <!--         <Grid> -->
-    <!--             <Grid.ColumnDefinitions> -->
-    <!--                 <ColumnDefinition /> -->
-    <!--                 <ColumnDefinition Width="Auto" /> -->
-    <!--                 <ColumnDefinition Width="10" /> -->
-    <!--                 <ColumnDefinition Width="Auto" /> -->
-    <!--                 <ColumnDefinition /> -->
-    <!--             </Grid.ColumnDefinitions> -->
-    <!--             <Grid.RowDefinitions> -->
-    <!--                 <RowDefinition /> -->
-    <!--                 <RowDefinition /> -->
-    <!--                 <RowDefinition /> -->
-    <!--                 <RowDefinition Height="10" /> -->
-    <!--                 <RowDefinition /> -->
-    <!--                 <RowDefinition Height="10" /> -->
-    <!--             </Grid.RowDefinitions> -->
-    <!-- -->
-    <!--             <Ellipse Width="90" -->
-    <!--                      Height="90" -->
-    <!--                      Grid.Row="1" -->
-    <!--                      Grid.RowSpan="2" -->
-    <!--                      Grid.Column="1" -->
-    <!--                      Margin="0 10 0 0" -->
-    <!--                      IsVisible="{Binding HasTokenContract}"> -->
-    <!--                 <Ellipse.Fill> -->
-    <!--                     <ImageBrush Source="{Binding TokenContractIconPreview}" -->
-    <!--                                 BitmapInterpolationMode="HighQuality"/> -->
-    <!--                 </Ellipse.Fill> -->
-    <!--             </Ellipse> -->
-    <!--              -->
-    <!--             ~1~ Classes="BaseTextBlockStyle" @1@ -->
-    <!--             <TextBlock Text="{Binding TokenContractName}" -->
-    <!--                        Foreground="{DynamicResource BalanceBackgroundBrush}" -->
-    <!--                        FontSize="30" -->
-    <!--                        VerticalAlignment="Bottom" -->
-    <!--                        Grid.Row="1" -->
-    <!--                        Grid.Column="3" -->
-    <!--                        IsVisible="{Binding IsFa2}" /> -->
-    <!-- -->
-    <!--             <StackPanel Orientation="Horizontal" -->
-    <!--                         Grid.Row="1" -->
-    <!--                         Grid.Column="3" -->
-    <!--                         VerticalAlignment="Bottom" -->
-    <!--                         IsVisible="{Binding IsFa12}"> -->
-    <!-- -->
-    <!--                 ~1~ Style="{StaticResource BaseTextBlockStyle}" @1@ -->
-    <!--                 <TextBlock Foreground="{DynamicResource BalanceBackgroundBrush}" -->
-    <!--                            FontSize="33"> -->
-    <!--                     <TextBlock.Text> -->
-    <!--                         <MultiBinding Converter="{StaticResource AmountToStringConverter}"> -->
-    <!--                             <Binding Path="Balance" Mode="OneWay" /> -->
-    <!--                             <Binding Path="BalanceFormat" Mode="OneWay" /> -->
-    <!--                         </MultiBinding> -->
-    <!--                     </TextBlock.Text> -->
-    <!--                 </TextBlock> -->
-    <!--                 <TextBlock Margin="5 0 0 4" -->
-    <!--                            Text="{Binding BalanceCurrencyCode}" -->
-    <!--                            Foreground="{DynamicResource BalanceBackgroundBrush}" -->
-    <!--                            FontSize="22" -->
-    <!--                            VerticalAlignment="Bottom" /> -->
-    <!--             </StackPanel> -->
-    <!-- -->
-    <!--             ~1~ Style="{StaticResource BaseTextBlockStyle}" @1@ -->
-    <!--             <TextBlock Text="{Binding TokenContractAddress}" -->
-    <!--                        Foreground="LightGray" -->
-    <!--                        FontSize="12" -->
-    <!--                        Grid.Row="2" -->
-    <!--                        Grid.Column="3" -->
-    <!--                        IsVisible="{Binding HasTokenContract}" /> -->
-    <!-- -->
-    <!--             <StackPanel HorizontalAlignment="Center" -->
-    <!--                         Orientation="Horizontal" -->
-    <!--                         Grid.Row="4" -->
-    <!--                         Grid.Column="0" -->
-    <!--                         Grid.ColumnSpan="5"> -->
-    <!--                 <controls:RoundedButton -->
-    <!--                     Content="Send" -->
-    <!--                     Margin="0 0 3 0" -->
-    <!--                     Command="{Binding SendCommand}" -->
-    <!--                     Classes="WalletMenuButton" -->
-    <!--                     IsVisible="{Binding IsFa12}" /> -->
-    <!--                 <controls:RoundedButton -->
-    <!--                     Content="Receive" -->
-    <!--                     Command="{Binding ReceiveCommand}" -->
-    <!--                     Classes="WalletMenuButton" /> -->
-    <!--                 <controls:RoundedButton -->
-    <!--                     Content="Convert" -->
-    <!--                     Margin="3 0 0 0" -->
-    <!--                     Command="{Binding ExchangeCommand}" -->
-    <!--                     Classes="WalletMenuButton" -->
-    <!--                     IsVisible="{Binding IsConvertable}" /> -->
-    <!--                 <controls:RoundedButton -->
-    <!--                     Content="Update" -->
-    <!--                     Margin="3 0 0 0" -->
-    <!--                     Command="{Binding UpdateCommand}" -->
-    <!--                     Classes="WalletMenuButton" /> -->
-    <!--                 <controls:RoundedButton -->
-    <!--                     Content="Addresses" -->
-    <!--                     Margin="3 0 0 0" -->
-    <!--                     Command="{Binding AddressesCommand}" -->
-    <!--                     Classes="WalletMenuButton" /> -->
-    <!--             </StackPanel> -->
-    <!--         </Grid> -->
-    <!--     </Border> -->
-    <!-- -->
-    <!--     <TabControl BorderThickness="0" -->
-    <!--                 Background="Transparent" -->
-    <!--                 SelectedIndex="{Binding SelectedTabIndex}" -->
-    <!--                 Classes="Tokens" -->
-    <!--                 Grid.Column="2" -->
-    <!--                 Grid.Row="2"> -->
-    <!-- -->
-    <!--         <TabItem Header="TOKENS" -->
-    <!--                  Classes="Tokens" -->
-    <!--                  Padding="10" -->
-    <!--                  FontFamily="{DynamicResource DefaultMediumFontFamily}" -->
-    <!--                  IsVisible="{Binding IsFa2}"> -->
-    <!-- -->
-    <!--             ~1~ AlternationCount="2" @1@ -->
-    <!--             ~1~ ScrollViewer.ScrollChanged="TokensScrollChanged" @1@ -->
-    <!--             ~1~ SelectionChanged="TokensSelectionChanged" @1@ -->
-    <!--             <ListBox x:Name="tokensListBox" -->
-    <!--                      Background="{DynamicResource DefaultSubstrateBrush}" -->
-    <!--                      VerticalAlignment="Stretch" -->
-    <!--                      ScrollViewer.HorizontalScrollBarVisibility="Hidden" -->
-    <!--                      Items="{Binding Tokens}"> -->
-    <!--                 <i:Interaction.Behaviors> -->
-    <!--                     <iac:NthChildBehavior /> -->
-    <!--                 </i:Interaction.Behaviors> -->
-    <!--                 <ListBox.Styles> -->
-    <!--                     <Style Selector="ListBoxItem.nth-odd-child"> -->
-    <!--                         <Setter Property="Background" -->
-    <!--                                 Value="{DynamicResource CustomDataGridAlternativeRowBackground}" /> -->
-    <!--                     </Style> -->
-    <!--                     <Style Selector="ListBoxItem.nth-even-child"> -->
-    <!--                         <Setter Property="Background" Value="{DynamicResource CustomDataGridRowBackground}" /> -->
-    <!--                     </Style> -->
-    <!--                 </ListBox.Styles> -->
-    <!--                 <ListBox.ItemTemplate> -->
-    <!--                     <DataTemplate DataType="{x:Type vm:TezosTokenViewModel}"> -->
-    <!--                         ~1~ MouseDown="TokenPreviewMouseDown" @1@ -->
-    <!--                         <Grid Background="Transparent" -->
-    <!--                               ColumnDefinitions="60,Auto,*,30,50,10" -->
-    <!--                               RowDefinitions="11,19,19,11,Auto"> -->
-    <!-- -->
-    <!--                             <Ellipse Margin="5" -->
-    <!--                                      Grid.Column="0" -->
-    <!--                                      Grid.Row="0" -->
-    <!--                                      Grid.RowSpan="4"> -->
-    <!--                                 <Ellipse.Fill> -->
-    <!--                                     <ImageBrush Source="{Binding TokenPreview}" -->
-    <!--                                                 BitmapInterpolationMode="HighQuality" -->
-    <!--                                                 Stretch="Fill" /> -->
-    <!--                                 </Ellipse.Fill> -->
-    <!--                             </Ellipse> -->
-    <!-- -->
-    <!--                             <TextBlock Margin="7 0 10 0" -->
-    <!--                                        Text="{Binding TokenBalance.Name}" -->
-    <!--                                        FontSize="16" -->
-    <!--                                        FontFamily="{StaticResource DefaultMediumFontFamily}" -->
-    <!--                                        Foreground="{StaticResource DefaultForegroundBrush}" -->
-    <!--                                        VerticalAlignment="Center" -->
-    <!--                                        Grid.Column="1" -->
-    <!--                                        Grid.Row="1" -->
-    <!--                                        Grid.RowSpan="{Binding TokenBalance.HasDescription, Converter={StaticResource BoolToRowSpanConverter}}" /> -->
-    <!-- -->
-    <!--                             <TextBlock Margin="7 0 10 0" -->
-    <!--                                        Text="{Binding TokenBalance.Description}" -->
-    <!--                                        FontSize="10" -->
-    <!--                                        FontFamily="{StaticResource DefaultLightFontFamily}" -->
-    <!--                                        Foreground="{StaticResource DefaultForegroundBrush}" -->
-    <!--                                        VerticalAlignment="Center" -->
-    <!--                                        TextWrapping="NoWrap" -->
-    <!--                                        IsVisible="{Binding TokenBalance.Description}" -->
-    <!--                                        Grid.Column="1" -->
-    <!--                                        Grid.Row="2" /> -->
-    <!-- -->
-    <!--                             <TextBlock Margin="0 0 -23 0" -->
-    <!--                                        Text="{Binding Balance}" -->
-    <!--                                        VerticalAlignment="Center" -->
-    <!--                                        HorizontalAlignment="Right" -->
-    <!--                                        FontSize="13" -->
-    <!--                                        FontFamily="{StaticResource DefaultFontFamily}" -->
-    <!--                                        Foreground="{StaticResource DefaultForegroundBrush}" -->
-    <!--                                        Grid.Column="2" -->
-    <!--                                        Grid.Row="1" -->
-    <!--                                        Grid.RowSpan="2" /> -->
-    <!-- -->
-    <!--                             ~1~ ToolTip="{Binding AssetUrl}" @1@ -->
-    <!--                             <controls:IconButton Path="{DynamicResource Material.FileEyeOutline}" -->
-    <!--                                                  Width="17" -->
-    <!--                                                  Height="19" -->
-    <!--                                                  Foreground="{DynamicResource IconButtonForegroundBrush}" -->
-    <!--                                                  MouseOverBrush="{DynamicResource IconButtonMouseOverBrush}" -->
-    <!--                                                  PressedBrush="{DynamicResource IconButtonPressedBrush}" -->
-    <!--                                                  Command="{Binding OpenInBrowser}" -->
-    <!--                                                  Grid.Column="3" -->
-    <!--                                                  Grid.Row="1" -->
-    <!--                                                  Grid.RowSpan="2" -->
-    <!--                                                  IsVisible="{Binding IsIpfsAsset}" -->
-    <!--                                                  Classes="PathButtonStyle" /> -->
-    <!-- -->
-    <!--                             ~1~ ToolTip="Send token" @1@ -->
-    <!--                             <controls:RoundedButton -->
-    <!--                                 Width="50" -->
-    <!--                                 Height="24" -->
-    <!--                                 CornerRadius="10" -->
-    <!--                                 Content="Send" -->
-    <!--                                 Command="{Binding Send}" -->
-    <!--                                 Grid.Column="4" -->
-    <!--                                 Grid.Row="1" -->
-    <!--                                 Grid.RowSpan="2" -->
-    <!--                                 Classes="WalletMenuButton" /> -->
-    <!-- -->
-    <!--                             <Grid Height="50" -->
-    <!--                                   Grid.Row="4" -->
-    <!--                                   Grid.Column="0" -->
-    <!--                                   Grid.ColumnSpan="5" -->
-    <!--                                   IsVisible="{Binding IsExpanded}"> -->
-    <!--                                 <Grid.ColumnDefinitions> -->
-    <!--                                     <ColumnDefinition Width="70" /> -->
-    <!--                                     <ColumnDefinition /> -->
-    <!--                                 </Grid.ColumnDefinitions> -->
-    <!--                                 <Grid.RowDefinitions> -->
-    <!--                                     <RowDefinition Height="5" /> -->
-    <!--                                     <RowDefinition Height="*" /> -->
-    <!--                                     <RowDefinition Height="*" /> -->
-    <!--                                     <RowDefinition Height="5" /> -->
-    <!--                                 </Grid.RowDefinitions> -->
-    <!-- -->
-    <!--                                 <TextBlock Text="Address:" -->
-    <!--                                            Foreground="{DynamicResource TransactionDetailsLineHeaderBrush}" -->
-    <!--                                            HorizontalAlignment="Right" -->
-    <!--                                            VerticalAlignment="Center" -->
-    <!--                                            Grid.Column="0" -->
-    <!--                                            Grid.Row="1" /> -->
-    <!-- -->
-    <!--                                 <StackPanel Orientation="Horizontal" -->
-    <!--                                             Margin="10 0 0 0" -->
-    <!--                                             Grid.Column="1" -->
-    <!--                                             Grid.Row="1"> -->
-    <!-- -->
-    <!--                                     ~1~ ToolTip="{Binding AddressExplorerUri}" @1@ -->
-    <!--                                     <Button Content="{Binding Address}" -->
-    <!--                                             HorizontalAlignment="Left" -->
-    <!--                                             VerticalAlignment="Center" -->
-    <!--                                             Command="{Binding OpenAddressInExplorerCommand}" -->
-    <!--                                             CommandParameter="{Binding Address}" -->
-    <!--                                             Classes="ExplorerLinkButton" /> -->
-    <!-- -->
-    <!--                                     ~1~ ToolTip="Copy address to clipboard" @1@ -->
-    <!--                                     <controls:IconButton HorizontalAlignment="Center" -->
-    <!--                                                          VerticalAlignment="Center" -->
-    <!--                                                          Foreground="{DynamicResource IconButtonForegroundBrush}" -->
-    <!--                                                          MouseOverBrush="{DynamicResource IconButtonMouseOverBrush}" -->
-    <!--                                                          PressedBrush="{DynamicResource IconButtonPressedBrush}" -->
-    <!--                                                          Path="{DynamicResource Octicons.Clippy}" -->
-    <!--                                                          Margin="7 0 0 0" -->
-    <!--                                                          Width="15" -->
-    <!--                                                          Height="15" -->
-    <!--                                                          Command="{Binding CopyAddressCommand}" -->
-    <!--                                                          CommandParameter="{Binding Address}" -->
-    <!--                                                          Classes="PathButtonStyle" /> -->
-    <!--                                 </StackPanel> -->
-    <!-- -->
-    <!--                                 <TextBlock Text="Token Id:" -->
-    <!--                                            Foreground="{DynamicResource TransactionDetailsLineHeaderBrush}" -->
-    <!--                                            HorizontalAlignment="Right" -->
-    <!--                                            VerticalAlignment="Center" -->
-    <!--                                            Grid.Column="0" -->
-    <!--                                            Grid.Row="2" /> -->
-    <!-- -->
-    <!--                                 <TextBlock Text="{Binding TokenBalance.TokenId}" -->
-    <!--                                            Margin="10 0 0 0" -->
-    <!--                                            Foreground="{DynamicResource DefaultForegroundBrush}" -->
-    <!--                                            HorizontalAlignment="Left" -->
-    <!--                                            VerticalAlignment="Center" -->
-    <!--                                            Grid.Column="1" -->
-    <!--                                            Grid.Row="2" /> -->
-    <!-- -->
-    <!--                             </Grid> -->
-    <!--                         </Grid> -->
-    <!--                     </DataTemplate> -->
-    <!--                 </ListBox.ItemTemplate> -->
-    <!--             </ListBox> -->
-    <!--         </TabItem> -->
-    <!-- -->
-    <!--         ~1~ mah:ControlsHelper.HeaderFontSize="15" @1@ -->
-    <!--         <TabItem Header="TRANSFERS" -->
-    <!--                  Classes="Tokens" -->
-    <!--                  Padding="10" -->
-    <!--                  FontFamily="{DynamicResource DefaultMediumFontFamily}"> -->
-    <!--             ~1~ <TabItem.Style> @1@ -->
-    <!--             ~1~     <Style TargetType="TabItem" @1@ -->
-    <!--             ~1~            BasedOn="{StaticResource MetroTabItem}"> @1@ -->
-    <!--             ~1~         <Style.Triggers> @1@ -->
-    <!--             ~1~             <Trigger Property="IsSelected" Value="True"> @1@ -->
-    <!--             ~1~                 <Setter Property="Background" @1@ -->
-    <!--             ~1~                         Value="{DynamicResource DefaultSubstrateBrush}"/> @1@ -->
-    <!--             ~1~             </Trigger> @1@ -->
-    <!--             ~1~             <Trigger Property="IsSelected" Value="False"> @1@ -->
-    <!--             ~1~                 <Setter Property="Background" @1@ -->
-    <!--             ~1~                         Value="Transparent"/> @1@ -->
-    <!--             ~1~             </Trigger> @1@ -->
-    <!--             ~1~         </Style.Triggers> @1@ -->
-    <!--             ~1~     </Style> @1@ -->
-    <!--             ~1~ </TabItem.Style> @1@ -->
-    <!-- -->
-    <!--             <DataGrid x:Name="DgTransactions" -->
-    <!--                       ColumnWidth="*" -->
-    <!--                       AutoGenerateColumns="False" -->
-    <!--                       IsReadOnly="True" -->
-    <!--                       RowDetailsVisibilityMode="VisibleWhenSelected" -->
-    <!--                       SelectionMode="Single" -->
-    <!--                       SelectedIndex="{Binding DGSelectedIndex, Mode=OneWay}" -->
-    <!--                       Items="{Binding Transfers}" -->
-    <!--                       helpers:DataGridHelper.SortInfo="{Binding SortInfo}" -->
-    <!--                       CanUserResizeColumns="True" -->
-    <!--                       Grid.Row="1"> -->
-    <!-- -->
-    <!--                 <DataGrid.RowDetailsTemplate> -->
-    <!--                     <DataTemplate> -->
-    <!--                         <transactionViews:TezosTokenTransferDetailsView /> -->
-    <!--                     </DataTemplate> -->
-    <!--                 </DataGrid.RowDetailsTemplate> -->
-    <!-- -->
-    <!--                 <DataGrid.Columns> -->
-    <!--                     <DataGridTemplateColumn Header="TYPE" CanUserSort="True" MinWidth="65" MaxWidth="65"> -->
-    <!--                         <DataGridTemplateColumn.CellTemplate> -->
-    <!--                             <DataTemplate> -->
-    <!--                                 <styles:TypeTest> -->
-    <!--                                     <styles:TypeTest.DataTemplate> -->
-    <!--                                         <controls:TransactionTypeDataTemplateSelector /> -->
-    <!--                                     </styles:TypeTest.DataTemplate> -->
-    <!--                                 </styles:TypeTest> -->
-    <!--                             </DataTemplate> -->
-    <!--                         </DataGridTemplateColumn.CellTemplate> -->
-    <!--                     </DataGridTemplateColumn> -->
-    <!-- -->
-    <!--                     <DataGridTemplateColumn Header="DESCRIPTION" CanUserSort="False"> -->
-    <!--                         <DataGridTemplateColumn.CellTemplate> -->
-    <!--                             <DataTemplate> -->
-    <!--                                 <styles:TypeTest> -->
-    <!--                                     <styles:TypeTest.DataTemplate> -->
-    <!--                                         <controls:TransactionDescriptionDataTemplateSelector /> -->
-    <!--                                     </styles:TypeTest.DataTemplate> -->
-    <!--                                 </styles:TypeTest> -->
-    <!--                             </DataTemplate> -->
-    <!--                         </DataGridTemplateColumn.CellTemplate> -->
-    <!--                     </DataGridTemplateColumn> -->
-    <!-- -->
-    <!--                     <DataGridTemplateColumn Header="AMOUNT" CanUserSort="True" MinWidth="112" MaxWidth="112"> -->
-    <!--                         <DataGridTemplateColumn.CellTemplate> -->
-    <!--                             <DataTemplate DataType="{x:Type txViewModels:TransactionViewModel}"> -->
-    <!--                                 <StackPanel Classes="DGTemplateContainer" Orientation="Horizontal"> -->
-    <!--                                     <TextBlock VerticalAlignment="Center" -->
-    <!--                                                HorizontalAlignment="Left" -->
-    <!--                                                Name="AmountTextBlock" -->
-    <!--                                                FontSize="13"> -->
-    <!--                                         <TextBlock.Text> -->
-    <!--                                             <MultiBinding Converter="{StaticResource AmountToStringConverter}"> -->
-    <!--                                                 <Binding Path="Amount" Mode="OneWay" /> -->
-    <!--                                                 <Binding Path="AmountFormat" Mode="OneWay" /> -->
-    <!--                                             </MultiBinding> -->
-    <!--                                         </TextBlock.Text> -->
-    <!--                                         <i:Interaction.Behaviors> -->
-    <!--                                             <ia:DataTriggerBehavior Binding="{Binding Amount}" -->
-    <!--                                                                     ComparisonCondition="LessThan" -->
-    <!--                                                                     Value="0"> -->
-    <!--                                                 <ia:ChangePropertyAction TargetObject="{Binding #AmountTextBlock}" -->
-    <!--                                                                          PropertyName="Foreground" -->
-    <!--                                                                          Value="{StaticResource NegativeAmountBrush}" /> -->
-    <!--                                             </ia:DataTriggerBehavior> -->
-    <!--                                             <ia:DataTriggerBehavior Binding="{Binding Amount}" -->
-    <!--                                                                     ComparisonCondition="GreaterThanOrEqual" -->
-    <!--                                                                     Value="0"> -->
-    <!--                                                 <ia:ChangePropertyAction TargetObject="{Binding #AmountTextBlock}" -->
-    <!--                                                                          PropertyName="Foreground" -->
-    <!--                                                                          Value="{StaticResource PositiveAmountBrush}" /> -->
-    <!--                                             </ia:DataTriggerBehavior> -->
-    <!--                                         </i:Interaction.Behaviors> -->
-    <!--                                     </TextBlock> -->
-    <!-- -->
-    <!--                                     <TextBlock Text="{Binding CurrencyCode}" -->
-    <!--                                                FontSize="8" -->
-    <!--                                                VerticalAlignment="Bottom" -->
-    <!--                                                IsVisible="False" -->
-    <!--                                                Margin="3 0 0 2" /> -->
-    <!--                                 </StackPanel> -->
-    <!--                             </DataTemplate> -->
-    <!--                         </DataGridTemplateColumn.CellTemplate> -->
-    <!--                     </DataGridTemplateColumn> -->
-    <!-- -->
-    <!--                     <DataGridTemplateColumn Header="STATE" CanUserSort="True" MinWidth="90" MaxWidth="90"> -->
-    <!--                         <DataGridTemplateColumn.CellTemplate> -->
-    <!--                             <DataTemplate> -->
-    <!--                                 <styles:TypeTest> -->
-    <!--                                     <styles:TypeTest.DataTemplate> -->
-    <!--                                         <controls:TransactionStateDataTemplateSelector /> -->
-    <!--                                     </styles:TypeTest.DataTemplate> -->
-    <!--                                 </styles:TypeTest> -->
-    <!--                             </DataTemplate> -->
-    <!--                         </DataGridTemplateColumn.CellTemplate> -->
-    <!--                     </DataGridTemplateColumn> -->
-    <!-- -->
-    <!--                     <DataGridTemplateColumn Header="TIME" CanUserSort="True" MinWidth="165" MaxWidth="165"> -->
-    <!--                         <DataGridTemplateColumn.CellTemplate> -->
-    <!--                             <DataTemplate DataType="{x:Type txViewModels:TransactionViewModel}"> -->
-    <!--                                 <TextBlock Classes="DGTemplateContainer" -->
-    <!--                                            Text="{Binding LocalTime, Converter={StaticResource DateTimeToTxTimeConverter}}" /> -->
-    <!--                             </DataTemplate> -->
-    <!--                         </DataGridTemplateColumn.CellTemplate> -->
-    <!--                     </DataGridTemplateColumn> -->
-    <!--                 </DataGrid.Columns> -->
-    <!--             </DataGrid> -->
-    <!--         </TabItem> -->
-    <!--     </TabControl> -->
-    <!-- </Grid> -->
+    <UserControl.Resources>
+        <converters:AmountToStringConverter x:Key="AmountToStringConverter" />
+        <converters:DateTimeToTxTimeConverter x:Key="DateTimeToTxTimeConverter" />
+        <converters:BoolToRowSpanConverter x:Key="BoolToRowSpanConverter" />
+        <converters:StringsEqualConverter x:Key="StringsEqualConverter" />
+    </UserControl.Resources>
+
+    <UserControl.Styles>
+        <Style Selector="TabControl.Tokens">
+            <Setter Property="Margin" Value="0" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="Background" Value="{DynamicResource TabControlBackground}" />
+            <Setter Property="Template">
+                <ControlTemplate>
+                    <Border BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="0"
+                            Background="{TemplateBinding Background}"
+                            HorizontalAlignment="{TemplateBinding HorizontalAlignment}"
+                            VerticalAlignment="{TemplateBinding VerticalAlignment}">
+                        <DockPanel>
+                            <ItemsPresenter Name="PART_ItemsPresenter"
+                                            Items="{TemplateBinding Items}"
+                                            ItemsPanel="{TemplateBinding ItemsPanel}"
+                                            ItemTemplate="{TemplateBinding ItemTemplate}"
+                                            Margin="0"
+                                            DockPanel.Dock="{TemplateBinding TabStripPlacement}" />
+                            <ContentPresenter Name="PART_SelectedContentHost"
+                                              Margin="{TemplateBinding Padding}"
+                                              HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                              VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+                                              Content="{TemplateBinding SelectedContent}"
+                                              ContentTemplate="{TemplateBinding SelectedContentTemplate}" />
+                        </DockPanel>
+                    </Border>
+                </ControlTemplate>
+            </Setter>
+        </Style>
+
+        <Style Selector="ListBoxItem">
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+            <Setter Property="Template">
+                <ControlTemplate>
+                    <ContentPresenter Name="PART_ContentPresenter"
+                                      Background="{TemplateBinding Background}"
+                                      BorderBrush="{TemplateBinding BorderBrush}"
+                                      BorderThickness="{TemplateBinding BorderThickness}"
+                                      ContentTemplate="{TemplateBinding ContentTemplate}"
+                                      Content="{TemplateBinding Content}"
+                                      Padding="{TemplateBinding Padding}"
+                                      VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+                                      HorizontalContentAlignment="Stretch" />
+                </ControlTemplate>
+            </Setter>
+        </Style>
+
+        <Style Selector="TabItem.Tokens">
+            <Setter Property="Foreground" Value="{DynamicResource GrayBrush5}" />
+            <Setter Property="FontFamily" Value="{DynamicResource DefaultMediumFontFamily}" />
+            <Setter Property="FontWeight" Value="{DynamicResource DefaultMediumFontWeight}" />
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="Cursor" Value="Hand" />
+        </Style>
+
+        <Style Selector="TabItem.Tokens /template/ Border#PART_LayoutRoot">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="TextBlock.Foreground" Value="{DynamicResource GrayBrush5}" />
+            <Setter Property="Padding" Value="4 0" />
+        </Style>
+
+        <Style Selector="TabItem.Tokens /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Margin" Value="10 0" />
+        </Style>
+
+        <Style Selector="TabItem.Tokens:selected /template/ Border#PART_LayoutRoot">
+            <Setter Property="Background" Value="{DynamicResource DefaultSubstrateBrush}" />
+            <Setter Property="TextBlock.Foreground" Value="{DynamicResource DefaultForegroundBrush}" />
+        </Style>
+    </UserControl.Styles>
+
+    <Grid RowDefinitions="Auto,10,*" ColumnDefinitions="Auto,10,*"
+          Name="DesignGrid">
+        <Border Background="{StaticResource DefaultSubstrateBrush}"
+                Grid.Row="0"
+                Grid.RowSpan="3"
+                Grid.Column="0">
+
+            <ListBox Width="300"
+                     Items="{Binding TokensContracts}"
+                     SelectedItem="{Binding TokenContract}"
+                     Margin="0"
+                     ScrollViewer.HorizontalScrollBarVisibility="Hidden"
+                     SelectionMode="Single"
+                     Background="Transparent">
+
+                <ListBox.ItemTemplate>
+                    <DataTemplate DataType="{x:Type vm:TezosTokenContractViewModel}">
+                        <Grid Height="60" ColumnDefinitions="60,*" RowDefinitions="10,20,20,10">
+
+                            <Ellipse Margin="5"
+                                     Grid.Column="0"
+                                     Grid.Row="0"
+                                     Grid.RowSpan="4">
+                                <Ellipse.Fill>
+                                    <ImageBrush Source="{Binding IconPreview}"
+                                                BitmapInterpolationMode="HighQuality"
+                                                Stretch="Fill" />
+                                </Ellipse.Fill>
+                            </Ellipse>
+
+                            <TextBlock Margin="7 0 10 0"
+                                       Text="{Binding Name}"
+                                       FontSize="16"
+                                       FontFamily="{StaticResource DefaultMediumFontFamily}"
+                                       Foreground="{StaticResource DefaultForegroundBrush}"
+                                       VerticalAlignment="Center"
+                                       Grid.Column="1"
+                                       Grid.Row="1" />
+
+                            <TextBlock Margin="7 0 10 0"
+                                       Text="{Binding Contract.Address}"
+                                       FontSize="10"
+                                       FontFamily="{StaticResource DefaultLightFontFamily}"
+                                       Foreground="{StaticResource DefaultForegroundBrush}"
+                                       VerticalAlignment="Center"
+                                       Grid.Column="1"
+                                       Grid.Row="2"
+                                       IsVisible="{Binding HasName}" />
+
+                            <TextBlock Margin="7 0 10 0"
+                                       Text="{Binding Contract.Address}"
+                                       FontSize="10"
+                                       FontFamily="{StaticResource DefaultLightFontFamily}"
+                                       Foreground="{StaticResource DefaultForegroundBrush}"
+                                       VerticalAlignment="Center"
+                                       Grid.Column="1"
+                                       Grid.Row="0"
+                                       Grid.RowSpan="4"
+                                       IsVisible="{Binding !HasName}" />
+                        </Grid>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </Border>
+
+        <Border Background="{StaticResource DefaultSubstrateBrush}"
+                Grid.Row="0"
+                Grid.Column="2">
+            <Grid ColumnDefinitions="*,Auto,10,Auto,*" RowDefinitions="*,*,*,10,*,10">
+
+                <Ellipse Width="90"
+                         Height="90"
+                         Grid.Row="1"
+                         Grid.RowSpan="2"
+                         Grid.Column="1"
+                         Margin="0 10 0 0"
+                         IsVisible="{Binding HasTokenContract}">
+                    <Ellipse.Fill>
+                        <ImageBrush Source="{Binding TokenContractIconPreview}"
+                                    BitmapInterpolationMode="HighQuality" />
+                    </Ellipse.Fill>
+                </Ellipse>
+
+                <!-- Classes="BaseTextBlockStyle" -->
+                <TextBlock Text="{Binding TokenContractName}"
+                           Foreground="{DynamicResource BalanceBackgroundBrush}"
+                           FontSize="30"
+                           VerticalAlignment="Bottom"
+                           Grid.Row="1"
+                           Grid.Column="3"
+                           IsVisible="{Binding IsFa2}" />
+
+                <StackPanel Orientation="Horizontal"
+                            Grid.Row="1"
+                            Grid.Column="3"
+                            VerticalAlignment="Bottom"
+                            IsVisible="{Binding IsFa12}">
+
+                    <!-- Style="{StaticResource BaseTextBlockStyle}" -->
+                    <TextBlock Foreground="{DynamicResource BalanceBackgroundBrush}"
+                               FontSize="33">
+                        <TextBlock.Text>
+                            <MultiBinding Converter="{StaticResource AmountToStringConverter}">
+                                <Binding Path="Balance" Mode="OneWay" />
+                                <Binding Path="BalanceFormat" Mode="OneWay" />
+                            </MultiBinding>
+                        </TextBlock.Text>
+                    </TextBlock>
+                    <TextBlock Margin="5 0 0 4"
+                               Text="{Binding BalanceCurrencyCode}"
+                               Foreground="{DynamicResource BalanceBackgroundBrush}"
+                               FontSize="22"
+                               VerticalAlignment="Bottom" />
+                </StackPanel>
+
+                <!-- Style="{StaticResource BaseTextBlockStyle}" -->
+                <TextBlock Text="{Binding TokenContractAddress}"
+                           Foreground="LightGray"
+                           FontSize="12"
+                           Grid.Row="2"
+                           Grid.Column="3"
+                           IsVisible="{Binding HasTokenContract}" />
+
+                <StackPanel HorizontalAlignment="Center"
+                            Orientation="Horizontal"
+                            Grid.Row="4"
+                            Grid.Column="0"
+                            Grid.ColumnSpan="5">
+                    <controls:RoundedButton
+                        Content="Send"
+                        Margin="0 0 3 0"
+                        Command="{Binding SendCommand}"
+                        Classes="WalletMenuButton"
+                        IsVisible="{Binding IsFa12}" />
+                    <controls:RoundedButton
+                        Content="Receive"
+                        Command="{Binding ReceiveCommand}"
+                        Classes="WalletMenuButton" />
+                    <controls:RoundedButton
+                        Content="Convert"
+                        Margin="3 0 0 0"
+                        Command="{Binding ExchangeCommand}"
+                        Classes="WalletMenuButton"
+                        IsVisible="{Binding IsConvertable}" />
+                    <controls:RoundedButton
+                        Content="Update"
+                        Margin="3 0 0 0"
+                        Command="{Binding UpdateCommand}"
+                        Classes="WalletMenuButton" />
+                    <controls:RoundedButton
+                        Content="Addresses"
+                        Margin="3 0 0 0"
+                        Command="{Binding AddressesCommand}"
+                        Classes="WalletMenuButton" />
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <TabControl BorderThickness="0"
+                    Background="Transparent"
+                    SelectedIndex="{Binding SelectedTabIndex}"
+                    Classes="Tokens"
+                    Grid.Column="2"
+                    Grid.Row="2">
+
+            <TabItem Header="TOKENS"
+                     Classes="Tokens"
+                     Padding="10"
+                     FontFamily="{DynamicResource DefaultMediumFontFamily}"
+                     IsVisible="{Binding IsFa2}">
+
+                <!-- AlternationCount="2" -->
+                <!-- ScrollViewer.ScrollChanged="TokensScrollChanged" -->
+                <!-- SelectionChanged="TokensSelectionChanged" -->
+                <ListBox x:Name="tokensListBox"
+                         Background="{DynamicResource DefaultSubstrateBrush}"
+                         VerticalAlignment="Stretch"
+                         ScrollViewer.HorizontalScrollBarVisibility="Hidden"
+                         Items="{Binding Tokens}"
+                         SelectedItem="{Binding SelectedToken}"
+                         SelectionMode="Single">
+                    <i:Interaction.Behaviors>
+                        <iac:NthChildBehavior />
+                    </i:Interaction.Behaviors>
+                    <ListBox.Styles>
+                        <Style Selector="ListBoxItem:selected /template/ ContentPresenter">
+                            <Setter Property="Background" Value="Transparent" />
+                        </Style>
+                        
+                        <Style Selector="ListBoxItem.nth-odd-child">
+                            <Setter Property="Background"
+                                    Value="{DynamicResource CustomDataGridAlternativeRowBackground}" />
+                        </Style>
+                        <Style Selector="ListBoxItem.nth-even-child">
+                            <Setter Property="Background" Value="{DynamicResource CustomDataGridRowBackground}" />
+                        </Style>
+                    </ListBox.Styles>
+                    <ListBox.ItemTemplate>
+                        <DataTemplate DataType="{x:Type vm:TezosTokenViewModel}">
+                            <!-- MouseDown="TokenPreviewMouseDown" -->
+                            <Grid Background="Transparent"
+                                  ColumnDefinitions="60,Auto,*,30,50,10"
+                                  RowDefinitions="11,19,19,11,Auto">
+
+                                <Ellipse Margin="5"
+                                         Grid.Column="0"
+                                         Grid.Row="0"
+                                         Grid.RowSpan="4">
+                                    <Ellipse.Fill>
+                                        <ImageBrush Source="{Binding TokenPreview}"
+                                                    BitmapInterpolationMode="HighQuality"
+                                                    Stretch="Fill" />
+                                    </Ellipse.Fill>
+                                </Ellipse>
+
+                                <TextBlock Margin="7 0 10 0"
+                                           Text="{Binding TokenBalance.Name}"
+                                           FontSize="16"
+                                           FontFamily="{StaticResource DefaultMediumFontFamily}"
+                                           Foreground="{StaticResource DefaultForegroundBrush}"
+                                           VerticalAlignment="Center"
+                                           Grid.Column="1"
+                                           Grid.Row="1"
+                                           Grid.RowSpan="{Binding TokenBalance.HasDescription, Converter={StaticResource BoolToRowSpanConverter}}" />
+
+                                <TextBlock Margin="7 0 10 0"
+                                           Text="{Binding TokenBalance.Description}"
+                                           FontSize="10"
+                                           FontFamily="{StaticResource DefaultLightFontFamily}"
+                                           Foreground="{StaticResource DefaultForegroundBrush}"
+                                           VerticalAlignment="Center"
+                                           TextWrapping="NoWrap"
+                                           IsVisible="{Binding TokenBalance.Description}"
+                                           Grid.Column="1"
+                                           Grid.Row="2" />
+
+                                <TextBlock Margin="0 0 -23 0"
+                                           Text="{Binding Balance}"
+                                           VerticalAlignment="Center"
+                                           HorizontalAlignment="Right"
+                                           FontSize="13"
+                                           FontFamily="{StaticResource DefaultFontFamily}"
+                                           Foreground="{StaticResource DefaultForegroundBrush}"
+                                           Grid.Column="2"
+                                           Grid.Row="1"
+                                           Grid.RowSpan="2" />
+
+                                <!-- ~1~ ToolTip="{Binding AssetUrl}" @1@ -->
+                                <!-- todo: this -->
+                                <!-- <controls:IconButton Path="{DynamicResource Material.FileEyeOutline}" -->
+                                <!--                      Width="17" -->
+                                <!--                      Height="19" -->
+                                <!--                      Foreground="{DynamicResource IconButtonForegroundBrush}" -->
+                                <!--                      MouseOverBrush="{DynamicResource IconButtonMouseOverBrush}" -->
+                                <!--                      PressedBrush="{DynamicResource IconButtonPressedBrush}" -->
+                                <!--                      Command="{Binding OpenInBrowser}" -->
+                                <!--                      Grid.Column="3" -->
+                                <!--                      Grid.Row="1" -->
+                                <!--                      Grid.RowSpan="2" -->
+                                <!--                      IsVisible="{Binding IsIpfsAsset}" -->
+                                <!--                      Classes="PathButtonStyle" /> -->
+
+                                <!-- ToolTip="Send token" -->
+                                <controls:RoundedButton
+                                    Width="50"
+                                    Height="24"
+                                    CornerRadius="10"
+                                    Content="Send"
+                                    Command="{Binding Send}"
+                                    Grid.Column="4"
+                                    Grid.Row="1"
+                                    Grid.RowSpan="2"
+                                    Classes="WalletMenuButton" />
+                                
+                                <Grid Height="50"
+                                      Grid.Row="4"
+                                      Grid.Column="0"
+                                      Grid.ColumnSpan="5"
+                                      ColumnDefinitions="70,*"
+                                      RowDefinitions="5,*,*,5">
+                                    <Grid.IsVisible>
+                                        <MultiBinding Converter="{StaticResource StringsEqualConverter}">
+                                            <Binding Path="$parent[ListBox].DataContext.SelectedTokenId" />
+                                            <Binding Path="TokenBalance.TokenId" />
+                                        </MultiBinding>
+                                    </Grid.IsVisible>
+                                    
+                                    <TextBlock Text="Address:"
+                                               Foreground="{DynamicResource TransactionDetailsLineHeaderBrush}"
+                                               HorizontalAlignment="Right"
+                                               VerticalAlignment="Center"
+                                               Grid.Column="0"
+                                               Grid.Row="1" />
+
+                                    <StackPanel Orientation="Horizontal"
+                                                Margin="10 0 0 0"
+                                                Grid.Column="1"
+                                                Grid.Row="1">
+
+                                        <!-- ToolTip="{Binding AddressExplorerUri}" -->
+                                        <Button Content="{Binding Address}"
+                                                HorizontalAlignment="Left"
+                                                VerticalAlignment="Center"
+                                                Command="{Binding OpenAddressInExplorerCommand}"
+                                                CommandParameter="{Binding Address}"
+                                                Classes="ExplorerLinkButton" />
+
+                                        <!-- ToolTip="Copy address to clipboard" -->
+                                        <controls:CopyButton HorizontalAlignment="Center"
+                                                             VerticalAlignment="Center"
+                                                             Margin="7 0 0 0"
+                                                             Command="{Binding CopyAddressCommand}"
+                                                             CommandParameter="{Binding Address}"
+                                                             ToolText="Copy address to clipboard"
+                                                             DoneToolText="Copied"/>
+                                    </StackPanel>
+
+                                    <TextBlock Text="Token Id:"
+                                               Foreground="{DynamicResource TransactionDetailsLineHeaderBrush}"
+                                               HorizontalAlignment="Right"
+                                               VerticalAlignment="Center"
+                                               Grid.Column="0"
+                                               Grid.Row="2" />
+
+                                    <TextBlock Text="{Binding TokenBalance.TokenId}"
+                                               Margin="10 0 0 0"
+                                               Foreground="{DynamicResource DefaultForegroundBrush}"
+                                               HorizontalAlignment="Left"
+                                               VerticalAlignment="Center"
+                                               Grid.Column="1"
+                                               Grid.Row="2" />
+
+                                </Grid>
+                            </Grid>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </TabItem>
+
+            <!-- mah:ControlsHelper.HeaderFontSize="15" -->
+            <TabItem Header="TRANSFERS"
+                     Classes="Tokens"
+                     Padding="10"
+                     FontFamily="{DynamicResource DefaultMediumFontFamily}">
+                <!-- <TabItem.Style> -->
+                <!--     <Style TargetType="TabItem" -->
+                <!--            BasedOn="{StaticResource MetroTabItem}"> -->
+                <!--         <Style.Triggers> -->
+                <!--             <Trigger Property="IsSelected" Value="True"> -->
+                <!--                 <Setter Property="Background" -->
+                <!--                         Value="{DynamicResource DefaultSubstrateBrush}"/> -->
+                <!--             </Trigger> -->
+                <!--             <Trigger Property="IsSelected" Value="False"> -->
+                <!--                 <Setter Property="Background" -->
+                <!--                         Value="Transparent"/> -->
+                <!--             </Trigger> -->
+                <!--         </Style.Triggers> -->
+                <!--     </Style> -->
+                <!-- </TabItem.Style> -->
+
+                <DataGrid x:Name="DgTransactions"
+                          ColumnWidth="*"
+                          AutoGenerateColumns="False"
+                          IsReadOnly="True"
+                          RowDetailsVisibilityMode="VisibleWhenSelected"
+                          SelectionMode="Single"
+                          SelectedIndex="{Binding DGSelectedIndex, Mode=OneWay}"
+                          Items="{Binding Transfers}"
+                          helpers:DataGridHelper.SortInfo="{Binding SortInfo}"
+                          CanUserResizeColumns="True"
+                          Grid.Row="1">
+
+                    <DataGrid.RowDetailsTemplate>
+                        <DataTemplate>
+                            <transactionViews:TezosTokenTransferDetailsView />
+                        </DataTemplate>
+                    </DataGrid.RowDetailsTemplate>
+
+                    <DataGrid.Columns>
+                        <DataGridTemplateColumn Header="TYPE" CanUserSort="True" MinWidth="65" MaxWidth="65">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <styles:TypeTest>
+                                        <styles:TypeTest.DataTemplate>
+                                            <controls:TransactionTypeDataTemplateSelector />
+                                        </styles:TypeTest.DataTemplate>
+                                    </styles:TypeTest>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+
+                        <DataGridTemplateColumn Header="DESCRIPTION" CanUserSort="False">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <styles:TypeTest>
+                                        <styles:TypeTest.DataTemplate>
+                                            <controls:TransactionDescriptionDataTemplateSelector />
+                                        </styles:TypeTest.DataTemplate>
+                                    </styles:TypeTest>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+
+                        <DataGridTemplateColumn Header="AMOUNT" CanUserSort="True" MinWidth="112" MaxWidth="112">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate DataType="{x:Type txViewModels:TransactionViewModel}">
+                                    <StackPanel Classes="DGTemplateContainer" Orientation="Horizontal">
+                                        <TextBlock VerticalAlignment="Center"
+                                                   HorizontalAlignment="Left"
+                                                   Name="AmountTextBlock"
+                                                   FontSize="13">
+                                            <TextBlock.Text>
+                                                <MultiBinding Converter="{StaticResource AmountToStringConverter}">
+                                                    <Binding Path="Amount" Mode="OneWay" />
+                                                    <Binding Path="AmountFormat" Mode="OneWay" />
+                                                </MultiBinding>
+                                            </TextBlock.Text>
+                                            <i:Interaction.Behaviors>
+                                                <ia:DataTriggerBehavior Binding="{Binding Amount}"
+                                                                        ComparisonCondition="LessThan"
+                                                                        Value="0">
+                                                    <ia:ChangePropertyAction TargetObject="{Binding #AmountTextBlock}"
+                                                                             PropertyName="Foreground"
+                                                                             Value="{StaticResource NegativeAmountBrush}" />
+                                                </ia:DataTriggerBehavior>
+                                                <ia:DataTriggerBehavior Binding="{Binding Amount}"
+                                                                        ComparisonCondition="GreaterThanOrEqual"
+                                                                        Value="0">
+                                                    <ia:ChangePropertyAction TargetObject="{Binding #AmountTextBlock}"
+                                                                             PropertyName="Foreground"
+                                                                             Value="{StaticResource PositiveAmountBrush}" />
+                                                </ia:DataTriggerBehavior>
+                                            </i:Interaction.Behaviors>
+                                        </TextBlock>
+
+                                        <TextBlock Text="{Binding CurrencyCode}"
+                                                   FontSize="8"
+                                                   VerticalAlignment="Bottom"
+                                                   IsVisible="False"
+                                                   Margin="3 0 0 2" />
+                                    </StackPanel>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+
+                        <DataGridTemplateColumn Header="STATE" CanUserSort="True" MinWidth="90" MaxWidth="90">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <styles:TypeTest>
+                                        <styles:TypeTest.DataTemplate>
+                                            <controls:TransactionStateDataTemplateSelector />
+                                        </styles:TypeTest.DataTemplate>
+                                    </styles:TypeTest>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+
+                        <DataGridTemplateColumn Header="TIME" CanUserSort="True" MinWidth="165" MaxWidth="165">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate DataType="{x:Type txViewModels:TransactionViewModel}">
+                                    <TextBlock Classes="DGTemplateContainer"
+                                               Text="{Binding LocalTime, Converter={StaticResource DateTimeToTxTimeConverter}}" />
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </TabItem>
+        </TabControl>
+    </Grid>
 </UserControl>

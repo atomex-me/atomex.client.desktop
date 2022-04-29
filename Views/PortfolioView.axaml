@@ -234,7 +234,7 @@
                                             <TextBlock VerticalAlignment="Center"
                                                        Foreground="{DynamicResource DefaultForegroundBrush}"
                                                        FontSize="18"
-                                                       Text="{Binding Currency.Description}" />
+                                                       Text="{Binding Header}" />
                                             <TextBlock VerticalAlignment="Center"
                                                        Margin="24 0 8 0"
                                                        Foreground="{DynamicResource SecondaryForegroundBrush}"
