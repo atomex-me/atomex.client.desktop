@@ -139,5 +139,5 @@ jobs:
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
           automatic_release_tag: "${{ env.VER }}"
-          prerelease: false
+          draft: true
           files: dist/*
