@@ -25,11 +25,15 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Atomex.Wallets.Tezos", "ato
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Atomex.Blockchain", "..\Atomex.Blockchain\Atomex.Blockchain.csproj", "{67736FD7-EA29-49B4-8D40-90868138CE20}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Atomex.Blockchain.Bitcoin", "..\Atomex.Blockchain.Bitcoin\Atomex.Blockchain.Bitcoin.csproj", "{A9BA7CA5-08CC-4B41-B5D3-6254104F67AA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Atomex.Blockchain.Bitcoin", "..\Atomex.Blockchain.Bitcoin\Atomex.Blockchain.Bitcoin.csproj", "{A9BA7CA5-08CC-4B41-B5D3-6254104F67AA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Atomex.Blockchain.Ethereum", "..\Atomex.Blockchain.Ethereum\Atomex.Blockchain.Ethereum.csproj", "{6462D424-74DA-4EAB-A96C-BE86C7C4BDD6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Atomex.Blockchain.Ethereum", "..\Atomex.Blockchain.Ethereum\Atomex.Blockchain.Ethereum.csproj", "{6462D424-74DA-4EAB-A96C-BE86C7C4BDD6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Atomex.Blockchain.Tezos", "..\Atomex.Blockchain.Tezos\Atomex.Blockchain.Tezos.csproj", "{27E89B12-7900-4CEA-A7A9-E03311FA8FAD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Atomex.Blockchain.Tezos", "..\Atomex.Blockchain.Tezos\Atomex.Blockchain.Tezos.csproj", "{27E89B12-7900-4CEA-A7A9-E03311FA8FAD}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Atomex.Client", "..\Atomex.Client\Atomex.Client.csproj", "{30D57F5A-62F5-4978-8894-11245384030C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Atomex.MarketData", "..\Atomex.MarketData\Atomex.MarketData.csproj", "{8AD6024E-9D2E-471D-81E1-F00F639286C1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -206,6 +210,30 @@ Global
 		{27E89B12-7900-4CEA-A7A9-E03311FA8FAD}.Release|x64.Build.0 = Release|Any CPU
 		{27E89B12-7900-4CEA-A7A9-E03311FA8FAD}.Release|x86.ActiveCfg = Release|Any CPU
 		{27E89B12-7900-4CEA-A7A9-E03311FA8FAD}.Release|x86.Build.0 = Release|Any CPU
+		{30D57F5A-62F5-4978-8894-11245384030C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{30D57F5A-62F5-4978-8894-11245384030C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{30D57F5A-62F5-4978-8894-11245384030C}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{30D57F5A-62F5-4978-8894-11245384030C}.Debug|x64.Build.0 = Debug|Any CPU
+		{30D57F5A-62F5-4978-8894-11245384030C}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{30D57F5A-62F5-4978-8894-11245384030C}.Debug|x86.Build.0 = Debug|Any CPU
+		{30D57F5A-62F5-4978-8894-11245384030C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{30D57F5A-62F5-4978-8894-11245384030C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{30D57F5A-62F5-4978-8894-11245384030C}.Release|x64.ActiveCfg = Release|Any CPU
+		{30D57F5A-62F5-4978-8894-11245384030C}.Release|x64.Build.0 = Release|Any CPU
+		{30D57F5A-62F5-4978-8894-11245384030C}.Release|x86.ActiveCfg = Release|Any CPU
+		{30D57F5A-62F5-4978-8894-11245384030C}.Release|x86.Build.0 = Release|Any CPU
+		{8AD6024E-9D2E-471D-81E1-F00F639286C1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8AD6024E-9D2E-471D-81E1-F00F639286C1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8AD6024E-9D2E-471D-81E1-F00F639286C1}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{8AD6024E-9D2E-471D-81E1-F00F639286C1}.Debug|x64.Build.0 = Debug|Any CPU
+		{8AD6024E-9D2E-471D-81E1-F00F639286C1}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{8AD6024E-9D2E-471D-81E1-F00F639286C1}.Debug|x86.Build.0 = Debug|Any CPU
+		{8AD6024E-9D2E-471D-81E1-F00F639286C1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8AD6024E-9D2E-471D-81E1-F00F639286C1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8AD6024E-9D2E-471D-81E1-F00F639286C1}.Release|x64.ActiveCfg = Release|Any CPU
+		{8AD6024E-9D2E-471D-81E1-F00F639286C1}.Release|x64.Build.0 = Release|Any CPU
+		{8AD6024E-9D2E-471D-81E1-F00F639286C1}.Release|x86.ActiveCfg = Release|Any CPU
+		{8AD6024E-9D2E-471D-81E1-F00F639286C1}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
