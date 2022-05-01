@@ -3,18 +3,19 @@ using System.Diagnostics;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
+
+using Avalonia.Threading;
+using ReactiveUI;
+using ReactiveUI.Fody.Helpers;
+
 using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.ViewModels.TransactionViewModels;
 using Atomex.Client.Desktop.ViewModels.WalletViewModels;
-using ReactiveUI;
 using Atomex.Core;
 using Atomex.MarketData;
 using Atomex.MarketData.Abstract;
 using Atomex.Services;
 using Atomex.Services.Abstract;
-using Avalonia.Threading;
-using ReactiveUI.Fody.Helpers;
-
 
 namespace Atomex.Client.Desktop.ViewModels
 {
@@ -112,7 +113,7 @@ namespace Atomex.Client.Desktop.ViewModels
         [Reactive] public ViewModelBase? RightPopupContent { get; set; }
         [Reactive] public bool RightPopupOpened { get; set; }
         [Reactive] public ViewModelBase Content { get; set; }
-        [Reactive] public string InstalledVersion { get; set; }
+        [Reactive] public string? InstalledVersion { get; set; }
         [Reactive] public bool IsExchangeConnected { get; set; }
         [Reactive] public bool IsMarketDataConnected { get; set; }
         [Reactive] public bool IsQuotesProviderAvailable { get; set; }
@@ -125,14 +126,13 @@ namespace Atomex.Client.Desktop.ViewModels
         [ObservableAsProperty] public bool IsWertSectionActive { get; }
         [ObservableAsProperty] public bool RightPopupHasContent { get; }
 
-
         private void SubscribeToServices()
         {
             AtomexApp.AtomexClientChanged += OnAtomexClientChangedEventHandler;
             AtomexApp.QuotesProvider.AvailabilityChanged += OnQuotesProviderAvailabilityChangedEventHandler;
         }
 
-        private void OnAtomexClientChangedEventHandler(object sender, AtomexClientChangedEventArgs args)
+        private void OnAtomexClientChangedEventHandler(object? sender, AtomexClientChangedEventArgs args)
         {
             var atomexClient = args.AtomexClient;
             if (atomexClient?.Account == null)
@@ -146,7 +146,7 @@ namespace Atomex.Client.Desktop.ViewModels
             atomexClient.ServiceDisconnected += OnAtomexClientServiceStateChangedEventHandler;
         }
 
-        private void OnAtomexClientServiceStateChangedEventHandler(object sender, AtomexClientServiceEventArgs args)
+        private void OnAtomexClientServiceStateChangedEventHandler(object? sender, AtomexClientServiceEventArgs args)
         {
             if (sender is not IAtomexClient atomexClient)
                 return;
@@ -161,7 +161,7 @@ namespace Atomex.Client.Desktop.ViewModels
             atomexClient.SubscribeToMarketData(SubscriptionType.DepthTwenty);
         }
 
-        private void OnQuotesProviderAvailabilityChangedEventHandler(object sender, EventArgs args)
+        private void OnQuotesProviderAvailabilityChangedEventHandler(object? sender, EventArgs args)
         {
             if (sender is not ICurrencyQuotesProvider provider)
                 return;
@@ -180,10 +180,13 @@ namespace Atomex.Client.Desktop.ViewModels
                     _ = Dispatcher.UIThread.InvokeAsync(async () =>
                     {
                         await Task.Delay(TimeSpan.FromMilliseconds(DelayBeforeSwitchingSwapDetailsMs + 100));
+
                         if (!RightPopupOpened)
                         {
                             RightPopupContent = null;
-                            WalletsViewModel.Selected.SelectedTransaction = null;
+
+                            if (WalletsViewModel.Selected?.SelectedTransaction != null)
+                                WalletsViewModel.Selected.SelectedTransaction = null;
                         }
                     });
                     return;
@@ -257,10 +260,11 @@ namespace Atomex.Client.Desktop.ViewModels
             Content = WertViewModel;
         }
 
-        private static string GetAssemblyFileVersion()
+        private static string? GetAssemblyFileVersion()
         {
             var assembly = System.Reflection.Assembly.GetExecutingAssembly();
             var fileVersion = FileVersionInfo.GetVersionInfo(assembly.Location);
+
             return fileVersion.FileVersion;
         }
     }
