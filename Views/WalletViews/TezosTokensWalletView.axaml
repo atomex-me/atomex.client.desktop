@@ -305,7 +305,9 @@
                                 <Ellipse Margin="5"
                                          Grid.Column="0"
                                          Grid.Row="0"
-                                         Grid.RowSpan="4">
+                                         Grid.RowSpan="4"
+                                         Width="50"
+                                         Height="50">
                                     <Ellipse.Fill>
                                         <ImageBrush Source="{Binding TokenPreview}"
                                                     BitmapInterpolationMode="HighQuality"

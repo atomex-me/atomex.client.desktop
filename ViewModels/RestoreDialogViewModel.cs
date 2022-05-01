@@ -16,7 +16,7 @@ namespace Atomex.Client.Desktop.ViewModels
         private string _restoringEntityTitle = "wallet";
 
         public string Title => string.Format(CultureInfo.CurrentCulture,
-            "Restoring {0} data from blockchain, it will take some time. You can cancel restoring or hide this window with close button and continue restoring in the background.",
+            "Restoring {0} data from blockchain, it will take some time. You can cancel restoring or hide this window with close button, restoring will continue in the background.",
             _restoringEntityTitle);
 
         public RestoreDialogViewModel(IAtomexApp app)

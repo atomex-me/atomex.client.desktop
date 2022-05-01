@@ -236,7 +236,7 @@ namespace Atomex.Client.Desktop.ViewModels
         public ReactiveCommand<CurrencyViewModel, Unit> OpenCurrencyPopupCommand => _openCurrencyPopupCommand ??=
             (_openCurrencyPopupCommand = ReactiveCommand.Create<CurrencyViewModel>(currencyViewModel =>
             {
-                PopupOpenedCurrency = currencyViewModel.CurrencyCode;
+                PopupOpenedCurrency = currencyViewModel.Header;
             }));
 
         private ReactiveCommand<Unit, Unit> _sendCommand;
