@@ -24,7 +24,7 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
 #endif
         }
 
-        public TezosTransactionViewModel(TezosTransaction tx, TezosConfig tezosConfig)
+        public TezosTransactionViewModel(TezosTransaction_OLD tx, TezosConfig tezosConfig)
             : base(tx, tezosConfig, GetAmount(tx, tezosConfig), GetFee(tx))
         {
             From       = tx.From;
@@ -51,7 +51,7 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
             }
         }
 
-        private static decimal GetAmount(TezosTransaction tx, TezosConfig tezosConfig)
+        private static decimal GetAmount(TezosTransaction_OLD tx, TezosConfig tezosConfig)
         {
             var result = 0m;
 
@@ -69,7 +69,7 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
             return result;
         }
 
-        private static decimal GetFee(TezosTransaction tx)
+        private static decimal GetFee(TezosTransaction_OLD tx)
         {
             var result = 0m;
 

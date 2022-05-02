@@ -18,7 +18,7 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
 
         private readonly TezosConfig _tezosConfig;
 
-        public IBlockchainTransaction Transaction { get; }
+        public IBlockchainTransaction_OLD Transaction { get; }
         public string Id { get; set; }
         public BlockchainTransactionState State { get; set; }
         public BlockchainTransactionType Type { get; set; }

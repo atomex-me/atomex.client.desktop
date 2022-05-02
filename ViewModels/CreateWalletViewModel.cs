@@ -24,7 +24,7 @@ namespace Atomex.Client.Desktop.ViewModels
         private const int WriteDerivedKeyPasswordViewIIndex = 5;
         private const int CreateStoragePasswordViewIIndex = 6;
 
-        public event Action<IAccount> OnAccountCreated;
+        public event Action<IAccount_OLD> OnAccountCreated;
         public event Action OnCanceled;
 
         private IAtomexApp App { get; }
@@ -151,7 +151,7 @@ namespace Atomex.Client.Desktop.ViewModels
         public CreateWalletViewModel(
             IAtomexApp app,
             CreateWalletScenario scenario,
-            Action<IAccount> onAccountCreated = null,
+            Action<IAccount_OLD> onAccountCreated = null,
             Action onCanceled = null)
         {
             App = app ?? throw new ArgumentNullException(nameof(app));
@@ -195,7 +195,7 @@ namespace Atomex.Client.Desktop.ViewModels
                 {
                     if (Step == ViewIndexes.Length - 1)
                     {
-                        OnAccountCreated?.Invoke((IAccount) arg);
+                        OnAccountCreated?.Invoke((IAccount_OLD) arg);
                         return;
                     }
 

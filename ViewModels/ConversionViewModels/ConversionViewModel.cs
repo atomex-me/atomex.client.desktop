@@ -564,7 +564,7 @@ namespace Atomex.Client.Desktop.ViewModels
 
                 if (!availableAddresses.Any())
                 {
-                    availableAddresses = new List<WalletAddress>()
+                    availableAddresses = new List<WalletAddress_OLD>()
                     {
                         await _app.Account
                             .GetFreeExternalAddressAsync(currencyName)

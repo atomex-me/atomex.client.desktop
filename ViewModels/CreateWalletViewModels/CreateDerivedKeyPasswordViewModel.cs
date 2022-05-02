@@ -110,7 +110,7 @@ namespace Atomex.Client.Desktop.ViewModels.CreateWalletViewModels
                 }
             }
 
-            var wallet = new HdWallet(
+            var wallet = new HdWallet_OLD(
                 mnemonic: StepData.Mnemonic,
                 wordList: StepData.Language,
                 passPhrase: PasswordVM.SecurePass,

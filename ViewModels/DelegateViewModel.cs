@@ -25,7 +25,7 @@ namespace Atomex.Client.Desktop.ViewModels
 {
     internal class TezosTxFill
     {
-        public TezosTransaction? Tx { get; set; }
+        public TezosTransaction_OLD? Tx { get; set; }
         public Error? Error { get; set; }
     }
 
@@ -330,7 +330,7 @@ namespace Atomex.Client.Desktop.ViewModels
 
             try
             {
-                var tx = new TezosTransaction
+                var tx = new TezosTransaction_OLD
                 {
                     StorageLimit      = _tezosConfig.StorageLimit,
                     GasLimit          = _tezosConfig.GasLimit,

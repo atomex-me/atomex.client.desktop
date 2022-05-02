@@ -14,7 +14,7 @@ namespace Atomex.Client.Desktop.ViewModels.CreateWalletViewModels
     public class CreateStoragePasswordViewModel : StepViewModel
     {
         private IAtomexApp App { get; }
-        private HdWallet Wallet { get; set; }
+        private HdWallet_OLD Wallet { get; set; }
 
         private string _warning;
 
@@ -84,7 +84,7 @@ namespace Atomex.Client.Desktop.ViewModels.CreateWalletViewModels
 
         public override void Initialize(object o)
         {
-            Wallet = (HdWallet) o;
+            Wallet = (HdWallet_OLD) o;
         }
 
         public override void Back()
@@ -130,7 +130,7 @@ namespace Atomex.Client.Desktop.ViewModels.CreateWalletViewModels
                     if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX)) clientType = ClientType.AvaloniaMac;
                     if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux)) clientType = ClientType.AvaloniaLinux;
 
-                    var acc = new Account(
+                    var acc = new Account_OLD(
                         Wallet,
                         PasswordVM.SecurePass,
                         App.CurrenciesProvider,

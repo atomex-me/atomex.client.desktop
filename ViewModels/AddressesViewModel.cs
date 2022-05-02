@@ -276,7 +276,7 @@ namespace Atomex.Client.Desktop.ViewModels
         {
             try
             {
-                await new HdWalletScanner(_app.Account)
+                await new HdWalletScanner_OLD(_app.Account)
                     .ScanAddressAsync(_currency.Name, address);
 
                 if (_currency.Name == TezosConfig.Xtz && _tokenContract != null)
@@ -327,7 +327,7 @@ namespace Atomex.Client.Desktop.ViewModels
                             var walletAddress = await _app.Account
                                 .GetAddressAsync(_currency.Name, address);
 
-                            var hdWallet = _app.Account.Wallet as HdWallet;
+                            var hdWallet = _app.Account.Wallet as HdWallet_OLD;
 
                             using var privateKey = hdWallet.KeyStorage.GetPrivateKey(
                                 currency: _currency,

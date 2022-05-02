@@ -568,8 +568,8 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             });
         }
 
-        public static async Task<WalletAddress> GetTokenAddressAsync(
-            IAccount account,
+        public static async Task<WalletAddress_OLD> GetTokenAddressAsync(
+            IAccount_OLD account,
             string address,
             string tokenContract,
             decimal tokenId,

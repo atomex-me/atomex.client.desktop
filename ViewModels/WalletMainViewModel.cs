@@ -139,7 +139,7 @@ namespace Atomex.Client.Desktop.ViewModels
         
         private void OnAtomexClientServiceStateChangedEventHandler(object sender, AtomexClientServiceEventArgs args)
         {
-            if (sender is not IAtomexClient atomexClient)
+            if (sender is not IAtomexClient_OLD atomexClient)
                 return;
             
             IsExchangeConnected = atomexClient.IsServiceConnected(AtomexClientService.Exchange);

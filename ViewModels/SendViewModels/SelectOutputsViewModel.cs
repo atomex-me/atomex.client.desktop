@@ -301,7 +301,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         [Reactive] public string CopyButtonToolTip { get; set; }
         public BitcoinBasedTxOutput Output { get; set; }
         public BitcoinBasedConfig Config { get; set; }
-        public WalletAddress? WalletAddress { get; set; }
+        public WalletAddress_OLD? WalletAddress { get; set; }
         public decimal Balance => Config.SatoshiToCoin(Output.Value);
         public string BalanceString => $"{Balance.ToString(Config.Format, CultureInfo.CurrentCulture)} {Config.Name}";
         public string Address => Output.DestinationAddress(Config.Network);

@@ -103,8 +103,8 @@ namespace Atomex.Client.Desktop.ViewModels
                 ? (_app.Account
                     .GetCurrencyAccount(Currency.Name) as IHasTokens)
                     ?.GetUnspentTokenAddressesAsync()
-                    .WaitForResult() ?? new List<WalletAddress>()
-                : new List<WalletAddress>();
+                    .WaitForResult() ?? new List<WalletAddress_OLD>()
+                : new List<WalletAddress_OLD>();
 
             // get all active addresses
             var activeAddresses = _app.Account
@@ -119,7 +119,7 @@ namespace Atomex.Client.Desktop.ViewModels
 
             FromAddressList = activeAddresses
                 .Concat(tokenAddresses)
-                .Concat(new WalletAddress[] { freeAddress })
+                .Concat(new WalletAddress_OLD[] { freeAddress })
                 .GroupBy(w => w.Address)
                 .Select(g =>
                 {

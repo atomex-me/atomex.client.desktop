@@ -48,7 +48,7 @@ namespace Atomex.Client.Desktop.ViewModels
         private async void ScanCurrenciesAsync(string[] currenciesArr)
         {
             var currencies = _app.Account.Currencies.ToList();
-            var hdWalletScanner = new HdWalletScanner(_app.Account);
+            var hdWalletScanner = new HdWalletScanner_OLD(_app.Account);
 
             if (currenciesArr != null)
             {

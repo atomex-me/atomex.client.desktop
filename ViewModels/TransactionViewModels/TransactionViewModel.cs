@@ -17,7 +17,7 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
         public event EventHandler<TransactionEventArgs> UpdateClicked;
         public event EventHandler<TransactionEventArgs> RemoveClicked;
 
-        public IBlockchainTransaction Transaction { get; }
+        public IBlockchainTransaction_OLD Transaction { get; }
         public string Id { get; set; }
         public CurrencyConfig Currency { get; set; }
         public BlockchainTransactionState State { get; set; }
@@ -50,7 +50,7 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
         }
 
         public TransactionViewModel(
-            IBlockchainTransaction tx,
+            IBlockchainTransaction_OLD tx,
             CurrencyConfig currencyConfig,
             decimal amount,
             decimal fee)

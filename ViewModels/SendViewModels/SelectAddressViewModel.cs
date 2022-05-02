@@ -45,7 +45,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         }
 
         public SelectAddressViewModel(
-            IAccount account,
+            IAccount_OLD account,
             CurrencyConfig currency,
             SelectAddressMode mode = SelectAddressMode.ReceiveTo,
             string? selectedAddress = null,
@@ -203,7 +203,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
         private ICommand _copyAddressCommand;
         public ICommand CopyAddressCommand =>
-            _copyAddressCommand ??= (_copyAddressCommand = ReactiveCommand.Create((WalletAddress address) =>
+            _copyAddressCommand ??= (_copyAddressCommand = ReactiveCommand.Create((WalletAddress_OLD address) =>
             {
                 _ = App.Clipboard.SetTextAsync(address.Address);
 

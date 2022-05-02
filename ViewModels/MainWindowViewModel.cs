@@ -292,7 +292,7 @@ namespace Atomex.Client.Desktop.ViewModels
                     if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX)) clientType = ClientType.AvaloniaMac;
                     if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux)) clientType = ClientType.AvaloniaLinux;
 
-                    var _ = Account.LoadFromFile(
+                    var _ = Account_OLD.LoadFromFile(
                         pathToAccount: pathToAccount,
                         password: password,
                         currenciesProvider: AtomexApp.CurrenciesProvider,

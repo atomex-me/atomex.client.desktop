@@ -17,7 +17,7 @@ namespace Atomex.Client.Desktop.ViewModels
     {
         private readonly IAtomexApp _app;
         public TezosConfig Currency { get; set; }
-        public WalletAddress WalletAddress { get; set; }
+        public WalletAddress_OLD WalletAddress { get; set; }
         public bool UseDefaultFee { get; set; }
         public string From { get; set; }
         public string To { get; set; }
@@ -57,7 +57,7 @@ namespace Atomex.Client.Desktop.ViewModels
 
         private async void Send()
         {
-            var wallet = (HdWallet) _app.Account.Wallet;
+            var wallet = (HdWallet_OLD) _app.Account.Wallet;
             var keyStorage = wallet.KeyStorage;
             var tezos = Currency;
 
@@ -77,7 +77,7 @@ namespace Atomex.Client.Desktop.ViewModels
                     .WaitAsync(WalletAddress.Address, tezosAccount)
                     .ConfigureAwait(false);
 
-                var tx = new TezosTransaction
+                var tx = new TezosTransaction_OLD
                 {
                     StorageLimit = Currency.StorageLimit,
                     GasLimit     = Currency.GasLimit,

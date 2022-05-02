@@ -102,8 +102,8 @@ namespace Atomex.Client.Desktop.ViewModels.ConversionViewModels
     {
         private readonly SelectCurrencyType _type;
 
-        public IEnumerable<WalletAddress> AvailableAddresses { get; set; }
-        [Reactive] public WalletAddress? SelectedAddress { get; set; }
+        public IEnumerable<WalletAddress_OLD> AvailableAddresses { get; set; }
+        [Reactive] public WalletAddress_OLD? SelectedAddress { get; set; }
         [Reactive] public bool IsNew { get; set; }
         public override string? ShortAddressDescription => SelectedAddress?.Address?.TruncateAddress();
         public override IFromSource? FromSource => SelectedAddress?.Address != null
@@ -113,8 +113,8 @@ namespace Atomex.Client.Desktop.ViewModels.ConversionViewModels
         public SelectCurrencyWithAddressViewModelItem(
             CurrencyViewModel currencyViewModel,
             SelectCurrencyType type,
-            IEnumerable<WalletAddress> availableAddresses,
-            WalletAddress? selectedAddress = null)
+            IEnumerable<WalletAddress_OLD> availableAddresses,
+            WalletAddress_OLD? selectedAddress = null)
             : base(currencyViewModel)
         {
             _type = type;
@@ -213,7 +213,7 @@ namespace Atomex.Client.Desktop.ViewModels.ConversionViewModels
                         }
                         else
                         {
-                            itemWithAddress.SelectedAddress = selectedAvaialbleAddress ?? new WalletAddress
+                            itemWithAddress.SelectedAddress = selectedAvaialbleAddress ?? new WalletAddress_OLD
                             {
                                 Address = walletAddressViewModel.Address,
                                 Currency = currency.Name
@@ -228,10 +228,10 @@ namespace Atomex.Client.Desktop.ViewModels.ConversionViewModels
             }
         });
 
-        private readonly IAccount _account;
+        private readonly IAccount_OLD _account;
 
         public SelectCurrencyViewModel(
-            IAccount account,
+            IAccount_OLD account,
             SelectCurrencyType type,
             IEnumerable<SelectCurrencyViewModelItem> currencies,
             SelectCurrencyViewModelItem? selected = null)
@@ -308,7 +308,7 @@ namespace Atomex.Client.Desktop.ViewModels.ConversionViewModels
                     }
                     else
                     {
-                        var address = new WalletAddress
+                        var address = new WalletAddress_OLD
                         {
                             Address = "0xE9C251cbB4881f9e056e40135E7d3EA9A7d037df",
                             Balance = 1.2m
@@ -317,7 +317,7 @@ namespace Atomex.Client.Desktop.ViewModels.ConversionViewModels
                         return new SelectCurrencyWithAddressViewModelItem(
                             currencyViewModel: CurrencyViewModelCreator.CreateViewModel(c, subscribeToUpdates: false),
                             type: SelectCurrencyType.From,
-                            availableAddresses: new WalletAddress[] { address },
+                            availableAddresses: new WalletAddress_OLD[] { address },
                             selectedAddress: address);
                     }
                  });

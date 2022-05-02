@@ -14,7 +14,7 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
         DateTime LocalTime { get; }
         BlockchainTransactionState State { get; set; }
         DateTime Time { get; set; }
-        IBlockchainTransaction Transaction { get; }
+        IBlockchainTransaction_OLD Transaction { get; }
         BlockchainTransactionType Type { get; set; }
     }
 }

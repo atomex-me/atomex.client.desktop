@@ -24,7 +24,7 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
     {
         private const string PathToImages = "avares://Atomex.Client.Desktop/Resources/Images";
 
-        protected IAccount Account { get; set; }
+        protected IAccount_OLD Account { get; set; }
         private ICurrencyQuotesProvider QuotesProvider { get; set; }
 
         public event EventHandler AmountUpdated;
@@ -97,7 +97,7 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
             return Task.Run(UpdateAsync);
         }
 
-        public void SubscribeToUpdates(IAccount account)
+        public void SubscribeToUpdates(IAccount_OLD account)
         {
             Account = account;
             Account.BalanceUpdated += OnBalanceChangedEventHandler;

@@ -244,7 +244,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
             try
             {
-                var scanner = new HdWalletScanner(_app.Account);
+                var scanner = new HdWalletScanner_OLD(_app.Account);
 
                 await scanner.ScanAsync(
                     currency: Currency.Name,

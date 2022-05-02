@@ -33,7 +33,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Atomex.Blockchain.Tezos", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Atomex.Client", "atomex.client.core\Atomex.Client\Atomex.Client.csproj", "{30D57F5A-62F5-4978-8894-11245384030C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Atomex.MarketData", "atomex.client.core\Atomex.MarketData\Atomex.MarketData.csproj", "{8AD6024E-9D2E-471D-81E1-F00F639286C1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Atomex.MarketData", "atomex.client.core\Atomex.MarketData\Atomex.MarketData.csproj", "{8AD6024E-9D2E-471D-81E1-F00F639286C1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Atomex.Swaps", "atomex.client.core\Atomex.Swaps\Atomex.Swaps.csproj", "{CFBD56CA-76E7-4D56-9E4F-20AA759CA0A9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -234,6 +236,18 @@ Global
 		{8AD6024E-9D2E-471D-81E1-F00F639286C1}.Release|x64.Build.0 = Release|Any CPU
 		{8AD6024E-9D2E-471D-81E1-F00F639286C1}.Release|x86.ActiveCfg = Release|Any CPU
 		{8AD6024E-9D2E-471D-81E1-F00F639286C1}.Release|x86.Build.0 = Release|Any CPU
+		{CFBD56CA-76E7-4D56-9E4F-20AA759CA0A9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CFBD56CA-76E7-4D56-9E4F-20AA759CA0A9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CFBD56CA-76E7-4D56-9E4F-20AA759CA0A9}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{CFBD56CA-76E7-4D56-9E4F-20AA759CA0A9}.Debug|x64.Build.0 = Debug|Any CPU
+		{CFBD56CA-76E7-4D56-9E4F-20AA759CA0A9}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{CFBD56CA-76E7-4D56-9E4F-20AA759CA0A9}.Debug|x86.Build.0 = Debug|Any CPU
+		{CFBD56CA-76E7-4D56-9E4F-20AA759CA0A9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CFBD56CA-76E7-4D56-9E4F-20AA759CA0A9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CFBD56CA-76E7-4D56-9E4F-20AA759CA0A9}.Release|x64.ActiveCfg = Release|Any CPU
+		{CFBD56CA-76E7-4D56-9E4F-20AA759CA0A9}.Release|x64.Build.0 = Release|Any CPU
+		{CFBD56CA-76E7-4D56-9E4F-20AA759CA0A9}.Release|x86.ActiveCfg = Release|Any CPU
+		{CFBD56CA-76E7-4D56-9E4F-20AA759CA0A9}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

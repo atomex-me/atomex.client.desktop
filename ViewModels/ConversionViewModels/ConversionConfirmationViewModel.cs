@@ -265,14 +265,14 @@ namespace Atomex.Client.Desktop.ViewModels
             }
         }
         
-        private async Task<IEnumerable<WalletAddress>> GetFromAddressesAsync()
+        private async Task<IEnumerable<WalletAddress_OLD>> GetFromAddressesAsync()
         {
             if (FromSource is FromAddress fromAddress)
             {
                 var walletAddress = await _app.Account
                     .GetAddressAsync(FromCurrencyViewModel.Currency.Name, fromAddress.Address);
 
-                return new WalletAddress[] { walletAddress };
+                return new WalletAddress_OLD[] { walletAddress };
             }
             else if (FromSource is FromOutputs fromOutputs)
             {

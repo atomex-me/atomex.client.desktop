@@ -45,7 +45,7 @@ namespace Atomex.Client.Desktop.ViewModels
         private ICommand _selectWalletCommand;
         public ICommand SelectWalletCommand => _selectWalletCommand ??= ReactiveCommand.Create<WalletInfo>(info =>
         {
-            IAccount account = null;
+            IAccount_OLD account = null;
 
             var unlockViewModel = new UnlockViewModel(
                 walletName: info.Name,
@@ -56,7 +56,7 @@ namespace Atomex.Client.Desktop.ViewModels
                     if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX)) clientType = ClientType.AvaloniaMac;
                     if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux)) clientType = ClientType.AvaloniaLinux;
                 
-                    account = Account.LoadFromFile(
+                    account = Account_OLD.LoadFromFile(
                         pathToAccount: info.Path,
                         password: password,
                         currenciesProvider: AtomexApp.CurrenciesProvider,
@@ -72,7 +72,7 @@ namespace Atomex.Client.Desktop.ViewModels
                 goBack: () => ShowContent(this),
                 onUnlock: () =>
                 {
-                    var atomexClient = new WebSocketAtomexClient(
+                    var atomexClient = new WebSocketAtomexClient_OLD(
                         configuration: App.Configuration,
                         account: account,
                         symbolsProvider: AtomexApp.SymbolsProvider);
