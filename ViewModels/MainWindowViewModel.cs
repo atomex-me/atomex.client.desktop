@@ -336,6 +336,8 @@ namespace Atomex.Client.Desktop.ViewModels
                     if (AccountRestored) continue;
 
                     var messages = await Atomex.ViewModels.Helpers.GetUserMessages(userId);
+                    
+                    if (messages == null) return;
 
                     foreach (var message in messages.Where(message => !message.IsReaded))
                     {
