@@ -46,16 +46,17 @@
                     Grid.Column="0"
                     Grid.Row="0">
 
-            <TextBlock Margin="0 40 0 32"
-                       Text="Exchange"
-                       FontSize="32"
-                       FontFamily="{DynamicResource DefaultLightFontFamily}"
-                       HorizontalAlignment="Center"
-                       Foreground="{DynamicResource DefaultForegroundBrush}" />
+            <!-- <TextBlock Margin="0 40 0 32" -->
+            <!--            Text="Exchange" -->
+            <!--            FontSize="32" -->
+            <!--            FontFamily="{DynamicResource DefaultLightFontFamily}" -->
+            <!--            HorizontalAlignment="Center" -->
+            <!--            Foreground="{DynamicResource DefaultForegroundBrush}" /> -->
 
             <!-- from currency view -->
             <views:ConversionCurrencyView Width="486"
                                           Height="102"
+                                          Margin="0 40 0 0"
                                           DataContext="{Binding FromViewModel}" />
 
             <Grid ColumnDefinitions="486,1"
