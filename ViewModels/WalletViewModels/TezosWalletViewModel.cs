@@ -55,7 +55,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
         public DelegateViewModel DelegateVM { get; set; }
 
-        public TezosWalletViewModel(IAtomexApp app, Action<CurrencyConfig> setConversionTab, CurrencyConfig currency)
+        public TezosWalletViewModel(IAtomexApp app, Action<CurrencyConfig_OLD> setConversionTab, CurrencyConfig_OLD currency)
             : base(app, setConversionTab, currency)
         {
             Delegations = new List<Delegation>();

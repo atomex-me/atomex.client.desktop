@@ -9,7 +9,7 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
 {
     public class KusdCurrencyViewModel : CurrencyViewModel
     {
-        public KusdCurrencyViewModel(CurrencyConfig currency)
+        public KusdCurrencyViewModel(CurrencyConfig_OLD currency)
             : base(currency)
         {
             var iconBrush = new ImageBrush(GetBitmap(PathToImage("kusd_90x90.png")));

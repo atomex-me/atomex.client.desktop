@@ -26,7 +26,7 @@ namespace Atomex.Client.Desktop.ViewModels
     {
         private const int PixelsPerModule = 20;
 
-        [Reactive] public CurrencyConfig Currency { get; set; }
+        [Reactive] public CurrencyConfig_OLD Currency { get; set; }
         [Reactive] public WalletAddressViewModel SelectedAddress { get; set; }
         [Reactive] public bool IsCopied { get; set; }
         [Reactive] public IBitmap QrCode { get; private set; }
@@ -45,7 +45,7 @@ namespace Atomex.Client.Desktop.ViewModels
 
         public ReceiveViewModel(
             IAtomexApp app,
-            CurrencyConfig currency,
+            CurrencyConfig_OLD currency,
             string tokenContract = null,
             string tokenType = null)
         {

@@ -10,12 +10,12 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
     {
         public static IWalletViewModel CreateViewModel(
             IAtomexApp app,
-            Action<CurrencyConfig> setConversionTab,
-            CurrencyConfig currency)
+            Action<CurrencyConfig_OLD> setConversionTab,
+            CurrencyConfig_OLD currency)
         {
             return currency switch
             {
-                BitcoinBasedConfig _ or
+                BitcoinBasedConfig_OLD _ or
                     Erc20Config _ or
                     EthereumConfig _ => new WalletViewModel(
                         app: app,

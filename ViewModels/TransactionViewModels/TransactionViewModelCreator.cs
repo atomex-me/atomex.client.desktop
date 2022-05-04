@@ -13,12 +13,12 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
     {
         public static TransactionViewModel CreateViewModel(
             IBlockchainTransaction_OLD tx,
-            CurrencyConfig currencyConfig)
+            CurrencyConfig_OLD currencyConfig)
         {
             return tx.Currency switch
             {
-                "BTC"   => (TransactionViewModel)new BitcoinBasedTransactionViewModel(tx as IBitcoinBasedTransaction_OLD, currencyConfig as BitcoinBasedConfig),
-                "LTC"   => new BitcoinBasedTransactionViewModel(tx as IBitcoinBasedTransaction_OLD, currencyConfig as BitcoinBasedConfig),
+                "BTC"   => (TransactionViewModel)new BitcoinBasedTransactionViewModel(tx as IBitcoinBasedTransaction_OLD, currencyConfig as BitcoinBasedConfig_OLD),
+                "LTC"   => new BitcoinBasedTransactionViewModel(tx as IBitcoinBasedTransaction_OLD, currencyConfig as BitcoinBasedConfig_OLD),
                 "USDT"  => new EthereumERC20TransactionViewModel(tx as EthereumTransaction, currencyConfig as Erc20Config),
                 "TBTC"  => new EthereumERC20TransactionViewModel(tx as EthereumTransaction, currencyConfig as Erc20Config),
                 "WBTC"  => new EthereumERC20TransactionViewModel(tx as EthereumTransaction, currencyConfig as Erc20Config),

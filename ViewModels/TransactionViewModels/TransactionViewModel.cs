@@ -19,7 +19,7 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
 
         public IBlockchainTransaction_OLD Transaction { get; }
         public string Id { get; set; }
-        public CurrencyConfig Currency { get; set; }
+        public CurrencyConfig_OLD Currency { get; set; }
         public BlockchainTransactionState State { get; set; }
         public BlockchainTransactionType Type { get; set; }
 
@@ -51,7 +51,7 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
 
         public TransactionViewModel(
             IBlockchainTransaction_OLD tx,
-            CurrencyConfig currencyConfig,
+            CurrencyConfig_OLD currencyConfig,
             decimal amount,
             decimal fee)
         {

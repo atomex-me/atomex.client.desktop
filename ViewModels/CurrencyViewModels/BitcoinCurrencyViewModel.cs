@@ -13,7 +13,7 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
 {
     public class BitcoinCurrencyViewModel : CurrencyViewModel
     {
-        public BitcoinCurrencyViewModel(CurrencyConfig currency)
+        public BitcoinCurrencyViewModel(CurrencyConfig_OLD currency)
             : base(currency)
         {
             var iconBrush                         = new ImageBrush(GetBitmap(PathToImage("bitcoin_90x90.png")));

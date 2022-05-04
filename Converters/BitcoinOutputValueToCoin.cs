@@ -10,7 +10,7 @@ namespace Atomex.Client.Desktop.Converters
         public object Convert(IList<object> values, Type targetType, object parameter, CultureInfo culture)
         {
             if (values is not { Count: 2 } || values[0] is not long satoshi ||
-                values[1] is not BitcoinBasedConfig bitcoinBasedConfig)
+                values[1] is not BitcoinBasedConfig_OLD bitcoinBasedConfig)
                 throw new InvalidOperationException("Invalid values");
 
             return bitcoinBasedConfig.SatoshiToCoin(satoshi);

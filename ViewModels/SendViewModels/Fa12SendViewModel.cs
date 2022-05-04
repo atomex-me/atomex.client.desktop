@@ -30,7 +30,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
         public Fa12SendViewModel(
             IAtomexApp app,
-            CurrencyConfig currency)
+            CurrencyConfig_OLD currency)
             : base(app, currency)
         {
             SelectFromViewModel = new SelectAddressViewModel(_app.Account, Currency, SelectAddressMode.SendFrom)

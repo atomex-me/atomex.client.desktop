@@ -40,7 +40,7 @@ namespace Atomex.Client.Desktop.ViewModels
                     if (fromOutputs.Outputs.Count() > 1)
                         return $"{fromOutputs.Outputs.Count()} outputs";
 
-                    var network = (FromCurrencyViewModel?.Currency as BitcoinBasedConfig)?.Network;
+                    var network = (FromCurrencyViewModel?.Currency as BitcoinBasedConfig_OLD)?.Network;
 
                     if (network != null)
                         return fromOutputs.Outputs
@@ -276,7 +276,7 @@ namespace Atomex.Client.Desktop.ViewModels
             }
             else if (FromSource is FromOutputs fromOutputs)
             {
-                var config = (BitcoinBasedConfig)FromCurrencyViewModel.Currency;
+                var config = (BitcoinBasedConfig_OLD)FromCurrencyViewModel.Currency;
 
                 return await Task.WhenAll(fromOutputs.Outputs
                     .Select(o => o.DestinationAddress(config.Network))

@@ -30,7 +30,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
         public Erc20SendViewModel(
             IAtomexApp app,
-            CurrencyConfig currency)
+            CurrencyConfig_OLD currency)
             : base(app, currency)
         {
         }

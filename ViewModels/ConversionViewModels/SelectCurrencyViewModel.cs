@@ -60,7 +60,7 @@ namespace Atomex.Client.Desktop.ViewModels.ConversionViewModels
                 .WhereNotNull()
                 .Select(outputs =>
                 {
-                    var currency             = (BitcoinBasedConfig)CurrencyViewModel.Currency;
+                    var currency             = (BitcoinBasedConfig_OLD)CurrencyViewModel.Currency;
                     var totalAmountInSatoshi = outputs.Sum(o => o.Value);
                     var totalAmount          = currency.SatoshiToCoin(totalAmountInSatoshi);
                     var totalAmountString    = totalAmount.ToString(CurrencyViewModel.CurrencyFormat);
@@ -166,7 +166,7 @@ namespace Atomex.Client.Desktop.ViewModels.ConversionViewModels
             if (i is SelectCurrencyWithOutputsViewModelItem itemWithOutputs && Type == SelectCurrencyType.From)
             {
                 var bitcoinBasedAccount = _account
-                    .GetCurrencyAccount<BitcoinBasedAccount>(currency.Name);
+                    .GetCurrencyAccount<BitcoinBasedAccount_OLD>(currency.Name);
 
                 var outputs = (await bitcoinBasedAccount
                     .GetAvailableOutputsAsync())
@@ -176,10 +176,10 @@ namespace Atomex.Client.Desktop.ViewModels.ConversionViewModels
                     outputs: outputs.Select(o => new OutputViewModel()
                     {
                         Output = o,
-                        Config = (BitcoinBasedConfig)currency,
+                        Config = (BitcoinBasedConfig_OLD)currency,
                         IsSelected = itemWithOutputs?.SelectedOutputs?.Any(so => so.TxId == o.TxId && so.Index == o.Index) ?? true
                     }),
-                    config: (BitcoinBasedConfig)currency,
+                    config: (BitcoinBasedConfig_OLD)currency,
                     account: bitcoinBasedAccount)
                 {
                     BackAction = () => { App.DialogService.Show(this); },
@@ -279,7 +279,7 @@ namespace Atomex.Client.Desktop.ViewModels.ConversionViewModels
             Type = SelectCurrencyType.From;
 
             var currencies = DesignTime.TestNetCurrencies
-                .Select<CurrencyConfig, SelectCurrencyViewModelItem>(c =>
+                .Select<CurrencyConfig_OLD, SelectCurrencyViewModelItem>(c =>
                 {
                     if (Atomex.Currencies.IsBitcoinBased(c.Name))
                     {

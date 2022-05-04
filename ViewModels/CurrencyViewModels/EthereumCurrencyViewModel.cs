@@ -8,7 +8,7 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
 {
     public class EthereumCurrencyViewModel : CurrencyViewModel
     {
-        public EthereumCurrencyViewModel(CurrencyConfig currency)
+        public EthereumCurrencyViewModel(CurrencyConfig_OLD currency)
             : base(currency)
         {
             var iconBrush = new ImageBrush(GetBitmap(PathToImage("ethereum_90x90.png")));

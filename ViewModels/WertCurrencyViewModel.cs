@@ -54,7 +54,7 @@ namespace Atomex.Client.Desktop.ViewModels
         }
 
         public string Header => CurrencyViewModel.Header;
-        public CurrencyConfig Currency => CurrencyViewModel.Currency;
+        public CurrencyConfig_OLD Currency => CurrencyViewModel.Currency;
 
         public IBrush Background => IsSelected
             ? CurrencyViewModel.IconBrush
@@ -91,7 +91,7 @@ namespace Atomex.Client.Desktop.ViewModels
         {
         }
 
-        public WertCurrencyViewModel(CurrencyConfig currency, IAtomexApp app, WertApi wertApi)
+        public WertCurrencyViewModel(CurrencyConfig_OLD currency, IAtomexApp app, WertApi wertApi)
         {
             _app = app ?? throw new ArgumentNullException(nameof(app));
             _api = wertApi ?? throw new ArgumentNullException(nameof(wertApi));

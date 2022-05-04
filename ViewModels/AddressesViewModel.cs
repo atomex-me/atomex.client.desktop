@@ -97,7 +97,7 @@ namespace Atomex.Client.Desktop.ViewModels
     {
         private const int DefaultTokenPrecision = 9;
         private readonly IAtomexApp _app;
-        private CurrencyConfig _currency;
+        private CurrencyConfig_OLD _currency;
         private readonly string _tokenContract;
 
         public ObservableCollection<AddressInfo> Addresses { get; set; }
@@ -128,7 +128,7 @@ namespace Atomex.Client.Desktop.ViewModels
 
         public AddressesViewModel(
             IAtomexApp app,
-            CurrencyConfig currency,
+            CurrencyConfig_OLD currency,
             string tokenContract = null)
         {
             _app           = app ?? throw new ArgumentNullException(nameof(app));
@@ -171,7 +171,7 @@ namespace Atomex.Client.Desktop.ViewModels
                 Addresses = new ObservableCollection<AddressInfo>(
                     addresses.Select(a =>
                     {
-                        var path = a.KeyType == CurrencyConfig.StandardKey && Currencies.IsTezosBased(_currency.Name)
+                        var path = a.KeyType == CurrencyConfig_OLD.StandardKey && Currencies.IsTezosBased(_currency.Name)
                             ? $"m/44'/{_currency.Bip44Code}'/{a.KeyIndex.Account}'/{a.KeyIndex.Chain}'"
                             : $"m/44'/{_currency.Bip44Code}'/{a.KeyIndex.Account}'/{a.KeyIndex.Chain}/{a.KeyIndex.Index}";
 
@@ -238,7 +238,7 @@ namespace Atomex.Client.Desktop.ViewModels
         private string KeyTypeToString(int keyType) =>
             keyType switch
             {
-                CurrencyConfig.StandardKey  => "Standard",
+                CurrencyConfig_OLD.StandardKey  => "Standard",
                 TezosConfig.Bip32Ed25519Key => "Atomex",
                 _ => throw new NotSupportedException($"Key type {keyType} not supported.")
             };
@@ -338,7 +338,7 @@ namespace Atomex.Client.Desktop.ViewModels
 
                             if (Currencies.IsBitcoinBased(_currency.Name))
                             {
-                                var btcBasedConfig = _currency as BitcoinBasedConfig;
+                                var btcBasedConfig = _currency as BitcoinBasedConfig_OLD;
 
                                 var wif = new NBitcoin.Key(unsecuredPrivateKey)
                                     .GetWif(btcBasedConfig.Network)

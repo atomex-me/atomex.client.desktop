@@ -9,7 +9,7 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
 {
     public class TzbtcCurrencyViewModel : CurrencyViewModel
     {
-        public TzbtcCurrencyViewModel(CurrencyConfig currency)
+        public TzbtcCurrencyViewModel(CurrencyConfig_OLD currency)
             : base(currency)
         {
             var iconBrush = new ImageBrush(GetBitmap(PathToImage("tzbtc_90x90_dark.png")));

@@ -50,10 +50,10 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         }
 
         protected IAtomexApp _app;
-        protected Action<CurrencyConfig> SetConversionTab { get; set; }
+        protected Action<CurrencyConfig_OLD> SetConversionTab { get; set; }
 
         public string Header => CurrencyViewModel.Header;
-        public CurrencyConfig Currency => CurrencyViewModel.Currency;
+        public CurrencyConfig_OLD Currency => CurrencyViewModel.Currency;
 
         public IBrush Background => IsSelected
             ? CurrencyViewModel.IconBrush
@@ -102,8 +102,8 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
         public WalletViewModel(
             IAtomexApp app,
-            Action<CurrencyConfig> setConversionTab,
-            CurrencyConfig currency)
+            Action<CurrencyConfig_OLD> setConversionTab,
+            CurrencyConfig_OLD currency)
         {
             _app = app ?? throw new ArgumentNullException(nameof(app));
             SetConversionTab = setConversionTab ?? throw new ArgumentNullException(nameof(setConversionTab));

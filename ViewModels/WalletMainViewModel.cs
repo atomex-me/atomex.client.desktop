@@ -189,7 +189,7 @@ namespace Atomex.Client.Desktop.ViewModels
             RefreshAllMenus();
         }
         
-        public void SelectConversion(CurrencyConfig? fromCurrency = null)
+        public void SelectConversion(CurrencyConfig_OLD? fromCurrency = null)
         {
             Content = ConversionViewModel;
             if (fromCurrency != null)

@@ -11,7 +11,7 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
     {
         public decimal AvailableAmountInChainCurrency { get; set; }
 
-        public TetherCurrencyViewModel(CurrencyConfig currency)
+        public TetherCurrencyViewModel(CurrencyConfig_OLD currency)
             : base(currency)
         {
             var iconBrush = new ImageBrush(GetBitmap(PathToImage("tether_90x90.png")));

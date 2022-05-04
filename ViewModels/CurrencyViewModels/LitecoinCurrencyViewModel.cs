@@ -9,7 +9,7 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
 {
     public class LitecoinCurrencyViewModel : CurrencyViewModel
     {
-        public LitecoinCurrencyViewModel(CurrencyConfig currency)
+        public LitecoinCurrencyViewModel(CurrencyConfig_OLD currency)
             : base(currency)
         {
             var iconBrush = new ImageBrush(GetBitmap(PathToImage("litecoin_90x90.png")));

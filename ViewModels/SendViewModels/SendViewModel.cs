@@ -30,7 +30,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
     public abstract class SendViewModel : ViewModelBase
     {
         protected readonly IAtomexApp _app;
-        protected CurrencyConfig Currency;
+        protected CurrencyConfig_OLD Currency;
         public ViewModelBase SelectFromViewModel { get; set; }
         protected SelectAddressViewModel SelectToViewModel { get; set; }
 
@@ -191,7 +191,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
         public SendViewModel(
             IAtomexApp app,
-            CurrencyConfig currency)
+            CurrencyConfig_OLD currency)
         {
             _app = app ?? throw new ArgumentNullException(nameof(app));
             Currency = currency ?? throw new ArgumentNullException(nameof(currency));

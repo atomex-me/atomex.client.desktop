@@ -28,7 +28,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         public Action BackAction { get; set; }
         public Action<WalletAddressViewModel> ConfirmAction { get; set; }
         public SelectAddressMode SelectAddressMode { get; set; }
-        private CurrencyConfig Currency { get; set; }
+        private CurrencyConfig_OLD Currency { get; set; }
         private ObservableCollection<WalletAddressViewModel> InitialMyAddresses { get; set; }
         [Reactive] public ObservableCollection<WalletAddressViewModel> MyAddresses { get; set; }
         [Reactive] public string SearchPattern { get; set; }
@@ -46,7 +46,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
         public SelectAddressViewModel(
             IAccount_OLD account,
-            CurrencyConfig currency,
+            CurrencyConfig_OLD currency,
             SelectAddressMode mode = SelectAddressMode.ReceiveTo,
             string? selectedAddress = null,
             decimal? selectedTokenId = null,

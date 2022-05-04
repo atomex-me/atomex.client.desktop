@@ -19,6 +19,7 @@ using Atomex.Client.Desktop.Properties;
 using Atomex.Common;
 using Atomex.Core;
 using Atomex.Wallet.BitcoinBased;
+using Atomex.Wallets.Bitcoin;
 
 namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 {
@@ -29,8 +30,8 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
         public string FeeRateFormat => "0.#";
 
-        private BitcoinBasedConfig Config => (BitcoinBasedConfig)Currency;
-        private BitcoinBasedAccount Account => _app.Account.GetCurrencyAccount<BitcoinBasedAccount>(Currency.Name);
+        private BitcoinBasedConfig_OLD Config => (BitcoinBasedConfig_OLD)Currency;
+        private BitcoinBasedAccount_OLD Account => _app.Account.GetCurrencyAccount<BitcoinBasedAccount_OLD>(Currency.Name);
 
         public BitcoinBasedSendViewModel()
             : base()
@@ -43,7 +44,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
         public BitcoinBasedSendViewModel(
             IAtomexApp app,
-            CurrencyConfig currency)
+            CurrencyConfig_OLD currency)
             : base(app, currency)
         {
             this.WhenAnyValue(vm => vm.Outputs)

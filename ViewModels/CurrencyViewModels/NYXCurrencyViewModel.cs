@@ -9,7 +9,7 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
 {
     public class NYXCurrencyViewModel : CurrencyViewModel
     {
-        public NYXCurrencyViewModel(CurrencyConfig currency)
+        public NYXCurrencyViewModel(CurrencyConfig_OLD currency)
             : base(currency)
         {
             var iconBrush = new ImageBrush(GetBitmap(PathToImage("tezos_90x90.png")));

@@ -11,7 +11,7 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
     {
         public decimal AvailableAmountInChainCurrency { get; set; }
 
-        public TbtcCurrencyViewModel(CurrencyConfig currency)
+        public TbtcCurrencyViewModel(CurrencyConfig_OLD currency)
             : base(currency)
         {
             var iconBrush = new ImageBrush(GetBitmap(PathToImage("tbtc_90x90_dark.png")));

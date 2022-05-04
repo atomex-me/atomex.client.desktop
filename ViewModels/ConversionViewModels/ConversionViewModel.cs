@@ -254,7 +254,7 @@ namespace Atomex.Client.Desktop.ViewModels
                         if (isBtcBased)
                         {
                             RedeemFromAddress = _app.Account
-                                .GetCurrencyAccount<BitcoinBasedAccount>(i.CurrencyViewModel.Currency.Name)
+                                .GetCurrencyAccount<BitcoinBasedAccount_OLD>(i.CurrencyViewModel.Currency.Name)
                                 .GetFreeInternalAddressAsync()
                                 .WaitForResult()
                                 .Address;
@@ -542,7 +542,7 @@ namespace Atomex.Client.Desktop.ViewModels
             if (Atomex.Currencies.IsBitcoinBased(currencyName))
             {
                 var availableOutputs = (await _app.Account
-                    .GetCurrencyAccount<BitcoinBasedAccount>(currencyName)
+                    .GetCurrencyAccount<BitcoinBasedAccount_OLD>(currencyName)
                     .GetAvailableOutputsAsync()
                     .ConfigureAwait(false))
                     .Cast<BitcoinBasedTxOutput>();
@@ -640,7 +640,7 @@ namespace Atomex.Client.Desktop.ViewModels
             return result;
         }
 
-        public async void SetFromCurrency(CurrencyConfig fromCurrency)
+        public async void SetFromCurrency(CurrencyConfig_OLD fromCurrency)
         {
             FromViewModel.CurrencyViewModel = FromCurrencies?.FirstOrDefault(vm => vm.Currency.Name == fromCurrency.Name);
 

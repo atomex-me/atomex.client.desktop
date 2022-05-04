@@ -8,11 +8,11 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 {
     public static class SendViewModelCreator
     {
-        public static SendViewModel CreateViewModel(IAtomexApp app, CurrencyConfig currency)
+        public static SendViewModel CreateViewModel(IAtomexApp app, CurrencyConfig_OLD currency)
         {
             return currency switch
             {
-                BitcoinBasedConfig _ => new BitcoinBasedSendViewModel(app, currency),
+                BitcoinBasedConfig_OLD _ => new BitcoinBasedSendViewModel(app, currency),
                 Erc20Config _        => new Erc20SendViewModel(app, currency),
                 EthereumConfig _     => new EthereumSendViewModel(app, currency),
                 Fa12Config _         => new Fa12SendViewModel(app, currency),

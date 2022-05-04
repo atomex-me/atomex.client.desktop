@@ -27,7 +27,7 @@ namespace Atomex.Client.Desktop.Controls
 
             switch (tx.Currency)
             {
-                case BitcoinBasedConfig:
+                case BitcoinBasedConfig_OLD:
                     return App.TemplateService.GetTxDescriptionTemplate(TxDescriptionTemplate.BtcBasedDescriptionTemplate);
                 case TezosConfig:
                     return App.TemplateService.GetTxDescriptionTemplate(TxDescriptionTemplate.XtzAdditionalDescriptionTemplate);

@@ -15,7 +15,7 @@ namespace Atomex.Client.Desktop.ViewModels
     public class WalletsViewModel : ViewModelBase
     {
         private IAtomexApp App { get; }
-        private Action<CurrencyConfig> SetConversionTab { get; }
+        private Action<CurrencyConfig_OLD> SetConversionTab { get; }
 
         private ObservableCollection<IWalletViewModel> _wallets;
 
@@ -56,7 +56,7 @@ namespace Atomex.Client.Desktop.ViewModels
 #endif
         }
 
-        public WalletsViewModel(IAtomexApp app,  Action<CurrencyConfig> setConversionTab)
+        public WalletsViewModel(IAtomexApp app,  Action<CurrencyConfig_OLD> setConversionTab)
         {
             App = app ?? throw new ArgumentNullException(nameof(app));
             SetConversionTab = setConversionTab;

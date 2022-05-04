@@ -37,7 +37,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
         public TezosSendViewModel(
             IAtomexApp app,
-            CurrencyConfig currency)
+            CurrencyConfig_OLD currency)
             : base(app, currency)
         {
             CheckAmountCommand = ReactiveCommand.Create<MaxAmountEstimation, MaxAmountEstimation>(estimation => estimation);

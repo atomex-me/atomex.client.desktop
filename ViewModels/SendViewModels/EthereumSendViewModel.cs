@@ -50,7 +50,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
         public EthereumSendViewModel(
             IAtomexApp app,
-            CurrencyConfig currency)
+            CurrencyConfig_OLD currency)
             : base(app, currency)
         {
             var updateGasPriceCommand = ReactiveCommand.CreateFromTask(UpdateGasPrice);

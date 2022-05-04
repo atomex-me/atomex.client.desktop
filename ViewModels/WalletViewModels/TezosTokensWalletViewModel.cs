@@ -358,7 +358,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
         public TezosTokensWalletViewModel(
             IAtomexApp app,
-            Action<CurrencyConfig> setConversionTab) : base(app, setConversionTab, null)
+            Action<CurrencyConfig_OLD> setConversionTab) : base(app, setConversionTab, null)
         {
             _ = ReloadTokenContractsAsync();
         }

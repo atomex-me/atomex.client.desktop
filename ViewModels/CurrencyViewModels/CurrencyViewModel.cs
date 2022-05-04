@@ -29,8 +29,8 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
 
         public event EventHandler AmountUpdated;
 
-        public CurrencyConfig Currency { get; set; }
-        public CurrencyConfig ChainCurrency { get; set; }
+        public CurrencyConfig_OLD Currency { get; set; }
+        public CurrencyConfig_OLD ChainCurrency { get; set; }
         public string Header { get; set; }
         public Brush IconBrush { get; set; }
         public IBrush UnselectedIconBrush { get; set; }
@@ -66,7 +66,7 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
         [Reactive]
         public decimal PortfolioPercent { get; set; }
 
-        protected CurrencyViewModel(CurrencyConfig currency)
+        protected CurrencyViewModel(CurrencyConfig_OLD currency)
         {
             Currency = currency ?? throw new ArgumentNullException(nameof(currency));
 

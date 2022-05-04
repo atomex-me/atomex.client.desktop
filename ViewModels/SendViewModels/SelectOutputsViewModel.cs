@@ -24,8 +24,8 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 {
     public class SelectOutputsViewModel : ViewModelBase
     {
-        private BitcoinBasedAccount Account { get; }
-        public BitcoinBasedConfig Config { get; set; }
+        private BitcoinBasedAccount_OLD Account { get; }
+        public BitcoinBasedConfig_OLD Config { get; set; }
         public Action BackAction { get; set; }
         public Action<IEnumerable<BitcoinBasedTxOutput>> ConfirmAction { get; set; }
         private ObservableCollection<OutputViewModel> InitialOutputs { get; set; }
@@ -40,8 +40,8 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
         public SelectOutputsViewModel(
             IEnumerable<OutputViewModel> outputs,
-            BitcoinBasedConfig config,
-            BitcoinBasedAccount account)
+            BitcoinBasedConfig_OLD config,
+            BitcoinBasedAccount_OLD account)
         {
 #if DEBUG
             if (Design.IsDesignMode)
@@ -281,7 +281,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             Outputs = new ObservableCollection<OutputViewModel>(outputs.Select(output => new OutputViewModel
             {
                 Output = output,
-                Config = (BitcoinBasedConfig)btcCurrencyConfig
+                Config = (BitcoinBasedConfig_OLD)btcCurrencyConfig
             }));
         }
     }
@@ -300,7 +300,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         [Reactive] public bool IsSelected { get; set; }
         [Reactive] public string CopyButtonToolTip { get; set; }
         public BitcoinBasedTxOutput Output { get; set; }
-        public BitcoinBasedConfig Config { get; set; }
+        public BitcoinBasedConfig_OLD Config { get; set; }
         public WalletAddress_OLD? WalletAddress { get; set; }
         public decimal Balance => Config.SatoshiToCoin(Output.Value);
         public string BalanceString => $"{Balance.ToString(Config.Format, CultureInfo.CurrentCulture)} {Config.Name}";
