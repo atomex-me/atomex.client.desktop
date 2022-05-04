@@ -4,11 +4,9 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using System.Windows.Input;
-
 using Avalonia.Threading;
 using ReactiveUI;
 using Serilog;
-
 using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.Controls;
 using Atomex.Client.Desktop.Properties;
@@ -170,7 +168,7 @@ namespace Atomex.Client.Desktop.ViewModels
             {
                 HasAccount = false;
                 MainView?.StopInactivityControl();
-                
+
                 return;
             }
 
@@ -228,7 +226,7 @@ namespace Atomex.Client.Desktop.ViewModels
                                 _ = SignOut();
                             }
                         });
-                    
+
                     App.DialogService.Show(messageViewModel);
                     return;
                 }
@@ -279,10 +277,7 @@ namespace Atomex.Client.Desktop.ViewModels
             var accountName = new DirectoryInfo(accountDirectory).Name;
 
             var wasClosed = false;
-            Dispatcher.UIThread.InvokeAsync(() =>
-            {
-                wasClosed = App.DialogService.Close();
-            });
+            Dispatcher.UIThread.InvokeAsync(() => { wasClosed = App.DialogService.Close(); });
 
             _unlockViewModel = new UnlockViewModel(
                 walletName: accountName,
@@ -300,16 +295,36 @@ namespace Atomex.Client.Desktop.ViewModels
                         clientType: clientType);
                 },
                 goBack: async () => await SignOut(),
-                onUnlock: () =>
+                onUnlock: async () =>
                 {
                     ShowContent(WalletMainViewModel);
 
-                    if (wasClosed)
+                    var userId = Atomex.ViewModels.Helpers.GetUserId(AtomexApp.Account);
+                    var messages = await Atomex.ViewModels.Helpers.GetUserMessages(userId);
+                    if (messages != null)
+                    {
+                        foreach (var message in messages.Where(message => !message.IsReaded))
+                        {
+                            _ = Dispatcher.UIThread.InvokeAsync(() =>
+                            {
+                                App.DialogService.Show(
+                                    MessageViewModel.Success(
+                                        title: Resources.CvWarning,
+                                        text: message.Message,
+                                        nextAction: async () =>
+                                        {
+                                            await Atomex.ViewModels.Helpers.MarkUserMessageReaded(message.Id);
+                                            App.DialogService.Close();
+                                        }));
+                            });
+                        }
+                    }
+                    else if (wasClosed)
                     {
                         App.DialogService.ShowPrevious();
                     }
                 });
-            
+
             ShowContent(_unlockViewModel);
         }
 
@@ -333,49 +348,26 @@ namespace Atomex.Client.Desktop.ViewModels
             {
                 while (_hasAccount)
                 {
-                    if (AccountRestored) continue;
+                    if (AccountRestored || Content is UnlockViewModel) continue;
 
                     var messages = await Atomex.ViewModels.Helpers.GetUserMessages(userId);
-                    
-                    if (messages == null) return;
+
+                    if (messages == null) continue;
 
                     foreach (var message in messages.Where(message => !message.IsReaded))
                     {
-                        if (Content is UnlockViewModel)
+                        _ = Dispatcher.UIThread.InvokeAsync(() =>
                         {
-                            _unlockViewModel.Unlocked = null;
-                            _unlockViewModel.Unlocked = () =>
-                            {
-                                ShowContent(WalletMainViewModel);
-                                _ = Dispatcher.UIThread.InvokeAsync(() =>
-                                {
-                                    App.DialogService.Show(
-                                        MessageViewModel.Success(
-                                            title: Resources.CvWarning,
-                                            text: message.Message,
-                                            nextAction: async () =>
-                                            {
-                                                await Atomex.ViewModels.Helpers.MarkUserMessageReaded(message.Id);
-                                                App.DialogService.Close();
-                                            }));
-                                });
-                            };
-                        }
-                        else
-                        {
-                            _ = Dispatcher.UIThread.InvokeAsync(() =>
-                            {
-                                App.DialogService.Show(
-                                    MessageViewModel.Success(
-                                        title: Resources.CvWarning,
-                                        text: message.Message,
-                                        nextAction: async () =>
-                                        {
-                                            await Atomex.ViewModels.Helpers.MarkUserMessageReaded(message.Id);
-                                            App.DialogService.Close();
-                                        }));
-                            });
-                        }
+                            App.DialogService.Show(
+                                MessageViewModel.Success(
+                                    title: Resources.CvWarning,
+                                    text: message.Message,
+                                    nextAction: async () =>
+                                    {
+                                        await Atomex.ViewModels.Helpers.MarkUserMessageReaded(message.Id);
+                                        App.DialogService.Close();
+                                    }));
+                        });
 
                         break;
                     }
