@@ -55,7 +55,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                 var transactions = (await _app.Account
                         .GetCurrencyAccount<Fa12Account>(Currency.Name)
                         .DataRepository
-                        .GetTezosTokenTransfersAsync(Currency.TokenContractAddress)
+                        .GetTezosTokenTransfersAsync(Currency.TokenContractAddress, offset: 0, limit: int.MaxValue)
                         .ConfigureAwait(false))
                     .ToList();
 
