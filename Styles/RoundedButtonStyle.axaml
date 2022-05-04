@@ -27,9 +27,9 @@
         </Setter>
     </Style>
 
-    <Style Selector="controls|RoundedButton:focus">
-        <Setter Property="Background" Value="{DynamicResource RoundedButtonMouseOverBrush}" />
-    </Style>
+    <!-- <Style Selector="controls|RoundedButton:focus"> -->
+    <!--     <Setter Property="Background" Value="{DynamicResource RoundedButtonMouseOverBrush}" /> -->
+    <!-- </Style> -->
 
     <!-- IsMouseOver -->
     <Style Selector="controls|RoundedButton:pointerover">
@@ -58,9 +58,9 @@
         <Setter Property="Background" Value="{DynamicResource AccentButtonBackgroundBrush}" />
         <Setter Property="Foreground" Value="{DynamicResource AccentButtonForegroundBrush}" />
     </Style>
-    <Style Selector="controls|RoundedButton.AccentButton:focus">
-        <Setter Property="Background" Value="{DynamicResource AccentButtonMouseOverBrush}" />
-    </Style>
+    <!-- <Style Selector="controls|RoundedButton.AccentButton:focus"> -->
+    <!--     <Setter Property="Background" Value="{DynamicResource AccentButtonMouseOverBrush}" /> -->
+    <!-- </Style> -->
     <!-- IsMouseOver -->
     <Style Selector="controls|RoundedButton.AccentButton:pointerover">
         <Setter Property="Background" Value="{DynamicResource AccentButtonMouseOverBrush}" />
