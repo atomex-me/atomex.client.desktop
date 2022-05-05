@@ -84,7 +84,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
             var tezosConfig = _app.Account
                 .Currencies
-                .Get<TezosConfig>(TezosConfig.Xtz);
+                .Get<TezosConfig_OLD>(TezosConfig_OLD.Xtz);
 
             var updateCurrencyCodeCommand = ReactiveCommand.Create(UpdateCurrencyCode);
             var updateAmountCommand = ReactiveCommand.CreateFromTask(UpdateAmount);
@@ -153,7 +153,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 });
 
             CurrencyCode = string.Empty;
-            FeeCurrencyCode = TezosConfig.Xtz;
+            FeeCurrencyCode = TezosConfig_OLD.Xtz;
             BaseCurrencyCode = DefaultBaseCurrencyCode;
 
             FeeCurrencyFormat = tezosConfig.FeeFormat;
@@ -250,7 +250,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         {
             var tezosConfig = _app.Account
                 .Currencies
-                .Get<TezosConfig>(TezosConfig.Xtz);
+                .Get<TezosConfig_OLD>(TezosConfig_OLD.Xtz);
 
             if (string.IsNullOrEmpty(To))
             {
@@ -314,7 +314,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             }
 
             var xtzAddress = await _app.Account
-                .GetAddressAsync(TezosConfig.Xtz, From);
+                .GetAddressAsync(TezosConfig_OLD.Xtz, From);
 
             if (xtzAddress == null)
             {
@@ -373,7 +373,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             {
                 var tezosConfig = _app.Account
                     .Currencies
-                    .Get<TezosConfig>(TezosConfig.Xtz);
+                    .Get<TezosConfig_OLD>(TezosConfig_OLD.Xtz);
 
                 if (From == null)
                 {
@@ -424,7 +424,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             {
                 var tezosConfig = _app.Account
                     .Currencies
-                    .Get<TezosConfig>(TezosConfig.Xtz);
+                    .Get<TezosConfig_OLD>(TezosConfig_OLD.Xtz);
 
                 if (From == null)
                 {
@@ -477,7 +477,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 else
                 {
                     var xtzAddress = await _app.Account
-                        .GetAddressAsync(TezosConfig.Xtz, From);
+                        .GetAddressAsync(TezosConfig_OLD.Xtz, From);
 
                     if (xtzAddress == null)
                     {
@@ -510,7 +510,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             {
                 var tezosConfig = _app.Account
                     .Currencies
-                    .Get<TezosConfig>(TezosConfig.Xtz);
+                    .Get<TezosConfig_OLD>(TezosConfig_OLD.Xtz);
 
                 if (From == null)
                 {
@@ -576,7 +576,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             string tokenType)
         {
             var tezosAccount = account
-                .GetCurrencyAccount<TezosAccount>(TezosConfig.Xtz);
+                .GetCurrencyAccount<TezosAccount>(TezosConfig_OLD.Xtz);
 
             return await tezosAccount
                 .DataRepository

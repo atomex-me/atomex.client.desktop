@@ -24,13 +24,13 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
 #endif
         }
 
-        public TezosTransactionViewModel(TezosTransaction_OLD tx, TezosConfig tezosConfig)
+        public TezosTransactionViewModel(TezosTransaction_OLD tx, TezosConfig_OLD tezosConfig)
             : base(tx, tezosConfig, GetAmount(tx, tezosConfig), GetFee(tx))
         {
             From       = tx.From;
             To         = tx.To;
             GasLimit   = tx.GasLimit;
-            Fee        = TezosConfig.MtzToTz(tx.Fee);
+            Fee        = TezosConfig_OLD.MtzToTz(tx.Fee);
             IsInternal = tx.IsInternal;
             
             if (!string.IsNullOrEmpty(tx.Alias))
@@ -51,7 +51,7 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
             }
         }
 
-        private static decimal GetAmount(TezosTransaction_OLD tx, TezosConfig tezosConfig)
+        private static decimal GetAmount(TezosTransaction_OLD tx, TezosConfig_OLD tezosConfig)
         {
             var result = 0m;
 
@@ -74,7 +74,7 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
             var result = 0m;
 
             if (tx.Type.HasFlag(BlockchainTransactionType.Output))
-                result += TezosConfig.MtzToTz(tx.Fee);
+                result += TezosConfig_OLD.MtzToTz(tx.Fee);
 
             tx.InternalTxs?.ForEach(t => result += GetFee(t));
 

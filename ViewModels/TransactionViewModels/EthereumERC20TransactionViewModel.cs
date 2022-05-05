@@ -34,7 +34,7 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
         {
             From       = tx.From;
             To         = tx.To;
-            GasPrice   = EthereumConfig.WeiToGwei((decimal)tx.GasPrice);
+            GasPrice   = EthereumConfig_ETH.WeiToGwei((decimal)tx.GasPrice);
             GasLimit   = (decimal)tx.GasLimit;
             GasUsed    = (decimal)tx.GasUsed;
             IsInternal = tx.IsInternal;

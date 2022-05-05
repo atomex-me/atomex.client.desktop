@@ -32,7 +32,7 @@ namespace Atomex.Client.Desktop.ViewModels
     public class DelegateViewModel : ViewModelBase
     {
         private readonly IAtomexApp _app;
-        private readonly TezosConfig _tezosConfig;
+        private readonly TezosConfig_OLD _tezosConfig;
         
         [Reactive] public WalletAddressViewModel? SelectedAddress { get; set; }
         [Reactive] public int WalletAddressIndex { get; set; }
@@ -106,7 +106,7 @@ namespace Atomex.Client.Desktop.ViewModels
                 else
                 {
                     var walletAddress = _app.Account
-                        .GetCurrencyAccount(TezosConfig.Xtz)
+                        .GetCurrencyAccount(TezosConfig_OLD.Xtz)
                         .GetAddressAsync(SelectedAddress.Address)
                         .WaitForResult();
 
@@ -153,7 +153,7 @@ namespace Atomex.Client.Desktop.ViewModels
             _app = app ?? throw new ArgumentNullException(nameof(app));
 
             _onDelegate = onDelegate;
-            _tezosConfig = _app.Account.Currencies.Get<TezosConfig>(TezosConfig.Xtz);
+            _tezosConfig = _app.Account.Currencies.Get<TezosConfig_OLD>(TezosConfig_OLD.Xtz);
 
             this.WhenAnyValue(vm => vm.WalletAddressIndex)
                 .SubscribeInMainThread(i => SelectedAddress = FromAddressList?.ElementAt(i));
@@ -346,7 +346,7 @@ namespace Atomex.Client.Desktop.ViewModels
                 };
 
                 var walletAddress = _app.Account
-                    .GetCurrencyAccount(TezosConfig.Xtz)
+                    .GetCurrencyAccount(TezosConfig_OLD.Xtz)
                     .GetAddressAsync(SelectedAddress.Address, cancellationToken)
                     .WaitForResult();
 
@@ -358,7 +358,7 @@ namespace Atomex.Client.Desktop.ViewModels
                 var (isSuccess, isRunSuccess, hasReveal) = await tx.FillOperationsAsync(
                     securePublicKey: securePublicKey,
                     tezosConfig: _tezosConfig,
-                    headOffset: TezosConfig.HeadOffset,
+                    headOffset: TezosConfig_OLD.HeadOffset,
                     cancellationToken: cancellationToken);
 
                 if (!isSuccess)

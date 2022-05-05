@@ -19,7 +19,7 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
             iconBrush.BitmapInterpolationMode = BitmapInterpolationMode.HighQuality;
             iconMaskBrush.BitmapInterpolationMode = BitmapInterpolationMode.HighQuality;
             
-            ChainCurrency       = new EthereumConfig();
+            ChainCurrency       = new EthereumConfig_ETH();
             Header              = Currency.Description;
             IconBrush           = iconBrush;
             IconMaskBrush       = iconMaskBrush;

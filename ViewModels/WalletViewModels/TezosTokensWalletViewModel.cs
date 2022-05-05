@@ -35,7 +35,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
     public class TezosTokenViewModel : ViewModelBase, IExpandable
     {
         private bool _isPreviewDownloading = false;
-        public TezosConfig TezosConfig { get; set; }
+        public TezosConfig_OLD TezosConfig { get; set; }
         public TokenBalance TokenBalance { get; set; }
         public string Address { get; set; }
 
@@ -401,7 +401,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         private async Task ReloadTokenContractsAsync()
         {
             var tokensContractsViewModels = (await _app.Account
-                .GetCurrencyAccount<TezosAccount>(TezosConfig.Xtz)
+                .GetCurrencyAccount<TezosAccount>(TezosConfig_OLD.Xtz)
                 .DataRepository
                 .GetTezosTokenContractsAsync())
                 .Select(c => new TezosTokenContractViewModel
@@ -458,7 +458,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
             var tezosConfig = _app.Account
                 .Currencies
-                .Get<TezosConfig>(TezosConfig.Xtz);
+                .Get<TezosConfig_OLD>(TezosConfig_OLD.Xtz);
 
             if (tokenContract.IsFa12)
             {
@@ -506,7 +506,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             else if (tokenContract.IsFa2)
             {
                 var tezosAccount = _app.Account
-                    .GetCurrencyAccount<TezosAccount>(TezosConfig.Xtz);
+                    .GetCurrencyAccount<TezosAccount>(TezosConfig_OLD.Xtz);
 
                 var tokenAddresses = await tezosAccount
                     .DataRepository
@@ -586,7 +586,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         {
             var tezosConfig = _app.Account
                 .Currencies
-                .GetByName(TezosConfig.Xtz);
+                .GetByName(TezosConfig_OLD.Xtz);
 
             var receiveViewModel = new ReceiveViewModel(
                 app: _app,
@@ -628,7 +628,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             try
             {
                 var tezosAccount = _app.Account
-                    .GetCurrencyAccount<TezosAccount>(TezosConfig.Xtz);
+                    .GetCurrencyAccount<TezosAccount>(TezosConfig_OLD.Xtz);
 
                 var tezosTokensScanner = new TezosTokensScanner(tezosAccount);
 
@@ -661,7 +661,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         {
             var tezosConfig = _app.Account
                 .Currencies
-                .Get<TezosConfig>(TezosConfig.Xtz);
+                .Get<TezosConfig_OLD>(TezosConfig_OLD.Xtz);
 
             var addressesViewModel = new AddressesViewModel(
                 app: _app,
@@ -771,7 +771,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
             _tokenContract = null; // TokensContracts.First();
 
-            var tezosConfig = DesignTime.MainNetCurrencies.Get<TezosConfig>("XTZ");
+            var tezosConfig = DesignTime.MainNetCurrencies.Get<TezosConfig_OLD>("XTZ");
             var tzktApi = new TzktApi(tezosConfig);
 
             var address = "tz1YS2CmS5o24bDz9XNr84DSczBXuq4oGHxr";

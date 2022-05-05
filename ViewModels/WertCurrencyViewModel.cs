@@ -197,7 +197,7 @@ namespace Atomex.Client.Desktop.ViewModels
 
         protected virtual string GetDefaultAddress()
         {
-            if (Currency is TezosConfig || Currency is EthereumConfig)
+            if (Currency is TezosConfig_OLD || Currency is EthereumConfig_ETH)
             {
                 var activeAddressViewModel = FromAddressList
                     .Where(vm => vm.HasActivity && vm.AvailableBalance > 0)

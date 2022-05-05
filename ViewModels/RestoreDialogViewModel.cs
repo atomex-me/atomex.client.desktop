@@ -68,15 +68,15 @@ namespace Atomex.Client.Desktop.ViewModels
                 
                 await Task.Run(() =>
                         Task.WhenAll(primaryCurrencies
-                            .Where(currency => currency.Name != TezosConfig.Xtz)
+                            .Where(currency => currency.Name != TezosConfig_OLD.Xtz)
                             .Select(currency =>
                                 hdWalletScanner.ScanAsync(currency.Name, cancellationToken: _cancellation.Token))),
                     _cancellation.Token);
 
-                if (currenciesArr == null || Array.IndexOf(currenciesArr, TezosConfig.Xtz) != -1)
+                if (currenciesArr == null || Array.IndexOf(currenciesArr, TezosConfig_OLD.Xtz) != -1)
                 {
                     var tezosAccount = _app.Account
-                        .GetCurrencyAccount<TezosAccount>(TezosConfig.Xtz);
+                        .GetCurrencyAccount<TezosAccount>(TezosConfig_OLD.Xtz);
 
                     var tezosTokensScanner = new TezosTokensScanner(tezosAccount);
                     
@@ -96,7 +96,7 @@ namespace Atomex.Client.Desktop.ViewModels
                 
                 await Task.Run(() =>
                         Task.WhenAll(tokenCurrencies
-                            .Where(currency => currency is not TezosConfig)
+                            .Where(currency => currency is not TezosConfig_OLD)
                             .Select(currency =>
                                 hdWalletScanner.ScanAsync(currency.Name, cancellationToken: _cancellation.Token))),
                     _cancellation.Token);

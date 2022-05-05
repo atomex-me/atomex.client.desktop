@@ -16,7 +16,7 @@ namespace Atomex.Client.Desktop.ViewModels
     public class DelegateConfirmationViewModel : ViewModelBase
     {
         private readonly IAtomexApp _app;
-        public TezosConfig Currency { get; set; }
+        public TezosConfig_OLD Currency { get; set; }
         public WalletAddress_OLD WalletAddress { get; set; }
         public bool UseDefaultFee { get; set; }
         public string From { get; set; }
@@ -100,7 +100,7 @@ namespace Atomex.Client.Desktop.ViewModels
                 var _ = await tx.FillOperationsAsync(
                     securePublicKey: securePublicKey,
                     tezosConfig: Currency,
-                    headOffset: TezosConfig.HeadOffset);
+                    headOffset: TezosConfig_OLD.HeadOffset);
 
                 var signResult = await tx
                     .SignAsync(keyStorage, WalletAddress, Currency);

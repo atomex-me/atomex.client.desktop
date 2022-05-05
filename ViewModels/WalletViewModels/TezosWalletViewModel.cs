@@ -94,7 +94,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         {
             try
             {
-                var tezos = Currency as TezosConfig;
+                var tezos = Currency as TezosConfig_OLD;
 
                 var balance = await _app.Account
                     .GetBalanceAsync(tezos.Name)

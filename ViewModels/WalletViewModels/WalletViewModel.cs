@@ -311,7 +311,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
             var transactions = new List<TransactionViewModel>
             {
-                new BitcoinBasedTransactionViewModel(new BitcoinBasedTransaction("BTC", Transaction.Create(Network.TestNet)), DesignTime.TestNetCurrencies.Get<BitcoinConfig>("BTC"))
+                new BitcoinBasedTransactionViewModel(new BitcoinBasedTransaction("BTC", Transaction.Create(Network.TestNet)), DesignTime.TestNetCurrencies.Get<BitcoinConfig_OLD>("BTC"))
                 {
                     Description  = "Sent 0.00124 BTC",
                     Amount       = -0.00124m,
@@ -319,7 +319,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                     CurrencyCode = CurrencyViewModel.CurrencyCode,
                     Time         = DateTime.Now,
                 },
-                new BitcoinBasedTransactionViewModel(new BitcoinBasedTransaction("BTC", Transaction.Create(Network.TestNet)), DesignTime.TestNetCurrencies.Get<BitcoinConfig>("BTC"))
+                new BitcoinBasedTransactionViewModel(new BitcoinBasedTransaction("BTC", Transaction.Create(Network.TestNet)), DesignTime.TestNetCurrencies.Get<BitcoinConfig_OLD>("BTC"))
                 {
                     Description  = "Received 1.00666 BTC",
                     Amount       = 1.00666m,

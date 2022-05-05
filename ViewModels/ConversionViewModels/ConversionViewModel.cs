@@ -1104,8 +1104,8 @@ namespace Atomex.Client.Desktop.ViewModels
                 .Select(detailsVisible => detailsVisible ? Swaps?[DGSelectedIndex]?.Details : null)
                 .ToPropertyExInMainThread(this, vm => vm.SwapDetailsViewModel);
 
-            var btc = DesignTime.TestNetCurrencies.Get<BitcoinConfig>("BTC");
-            var ltc = DesignTime.TestNetCurrencies.Get<LitecoinConfig>("LTC");
+            var btc = DesignTime.TestNetCurrencies.Get<BitcoinConfig_OLD>("BTC");
+            var ltc = DesignTime.TestNetCurrencies.Get<LitecoinConfig_OLD>("LTC");
 
             var btcViewModel = CurrencyViewModelCreator.CreateViewModel(btc, subscribeToUpdates: false);
             var ltcViewModel = CurrencyViewModelCreator.CreateViewModel(ltc, subscribeToUpdates: false);

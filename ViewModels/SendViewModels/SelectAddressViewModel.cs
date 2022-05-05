@@ -152,7 +152,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
         public WalletAddressViewModel? SelectDefaultAddress()
         {
-            if (Currency is TezosConfig or EthereumConfig)
+            if (Currency is TezosConfig_OLD or EthereumConfig_ETH)
             {
                 var activeAddressViewModel = MyAddresses
                     .Where(vm => vm.HasActivity && vm.AvailableBalance > 0)

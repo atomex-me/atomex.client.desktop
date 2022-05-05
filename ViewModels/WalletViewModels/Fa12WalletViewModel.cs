@@ -85,7 +85,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         
         protected override void OnReceiveClick()
         {
-            var tezosConfig = _app.Account.Currencies.GetByName(TezosConfig.Xtz);
+            var tezosConfig = _app.Account.Currencies.GetByName(TezosConfig_OLD.Xtz);
 
             var receiveViewModel = new ReceiveViewModel(
                 app: _app,
@@ -128,7 +128,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         {
             var tezosConfig = _app.Account
                 .Currencies
-                .Get<TezosConfig>(TezosConfig.Xtz);
+                .Get<TezosConfig_OLD>(TezosConfig_OLD.Xtz);
 
             var addressesViewModel = new AddressesViewModel(
                 app: _app,

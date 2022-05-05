@@ -47,7 +47,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
             SelectToViewModel = new SelectAddressViewModel(
                 _app.Account,
-                _app.Account.Currencies.Get<TezosConfig>(TezosConfig.Xtz))
+                _app.Account.Currencies.Get<TezosConfig_OLD>(TezosConfig_OLD.Xtz))
             {
                 BackAction = () => { App.DialogService.Show(SelectFromViewModel); },
                 ConfirmAction = walletAddressViewModel =>

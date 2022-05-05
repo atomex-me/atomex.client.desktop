@@ -29,9 +29,9 @@ namespace Atomex.Client.Desktop.Controls
             {
                 case BitcoinBasedConfig_OLD:
                     return App.TemplateService.GetTxDescriptionTemplate(TxDescriptionTemplate.BtcBasedDescriptionTemplate);
-                case TezosConfig:
+                case TezosConfig_OLD:
                     return App.TemplateService.GetTxDescriptionTemplate(TxDescriptionTemplate.XtzAdditionalDescriptionTemplate);
-                case EthereumConfig:
+                case EthereumConfig_ETH:
                     return App.TemplateService.GetTxDescriptionTemplate(TxDescriptionTemplate.EthAdditionalDescriptionTemplate);
                 default:
                     return App.TemplateService.GetTxDescriptionTemplate(TxDescriptionTemplate.BtcBasedDescriptionTemplate);

@@ -189,7 +189,7 @@ namespace Atomex.Client.Desktop.ViewModels
                     }));
 
                 // token balances
-                if (_currency.Name == TezosConfig.Xtz && _tokenContract != null)
+                if (_currency.Name == TezosConfig_OLD.Xtz && _tokenContract != null)
                 {
                     HasTokens = true;
 
@@ -239,7 +239,7 @@ namespace Atomex.Client.Desktop.ViewModels
             keyType switch
             {
                 CurrencyConfig_OLD.StandardKey  => "Standard",
-                TezosConfig.Bip32Ed25519Key => "Atomex",
+                TezosConfig_OLD.Bip32Ed25519Key => "Atomex",
                 _ => throw new NotSupportedException($"Key type {keyType} not supported.")
             };
 
@@ -279,11 +279,11 @@ namespace Atomex.Client.Desktop.ViewModels
                 await new HdWalletScanner_OLD(_app.Account)
                     .ScanAddressAsync(_currency.Name, address);
 
-                if (_currency.Name == TezosConfig.Xtz && _tokenContract != null)
+                if (_currency.Name == TezosConfig_OLD.Xtz && _tokenContract != null)
                 {
                     // update tezos token balance
                     var tezosAccount = _app.Account
-                        .GetCurrencyAccount<TezosAccount>(TezosConfig.Xtz);
+                        .GetCurrencyAccount<TezosAccount>(TezosConfig_OLD.Xtz);
 
                     await new TezosTokensScanner(tezosAccount)
                         .ScanContractAsync(address, _tokenContract);

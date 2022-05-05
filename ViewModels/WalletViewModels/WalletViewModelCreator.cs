@@ -17,7 +17,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             {
                 BitcoinBasedConfig_OLD _ or
                     Erc20Config _ or
-                    EthereumConfig _ => new WalletViewModel(
+                    EthereumConfig_ETH _ => new WalletViewModel(
                         app: app,
                         setConversionTab: setConversionTab,
                         currency: currency),
@@ -27,7 +27,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                     setConversionTab: setConversionTab,
                     currency: currency),
 
-                TezosConfig _ => new TezosWalletViewModel(
+                TezosConfig_OLD _ => new TezosWalletViewModel(
                     app: app,
                     setConversionTab: setConversionTab,
                     currency: currency),

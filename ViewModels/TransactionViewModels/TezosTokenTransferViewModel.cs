@@ -16,7 +16,7 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
     {
         public const int MaxAmountDecimals = AddressesHelper.MaxTokenCurrencyFormatDecimals;
 
-        private readonly TezosConfig _tezosConfig;
+        private readonly TezosConfig_OLD _tezosConfig;
 
         public IBlockchainTransaction_OLD Transaction { get; }
         public string Id { get; set; }
@@ -56,7 +56,7 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
 #endif
         }
 
-        public TezosTokenTransferViewModel(TokenTransfer tx, TezosConfig tezosConfig)
+        public TezosTokenTransferViewModel(TokenTransfer tx, TezosConfig_OLD tezosConfig)
         {
             _tezosConfig = tezosConfig ?? throw new ArgumentNullException(nameof(tezosConfig));
 
