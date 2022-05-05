@@ -10,7 +10,8 @@
              xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
              xmlns:ia="clr-namespace:Avalonia.Xaml.Interactions.Core;assembly=Avalonia.Xaml.Interactions"
              xmlns:svg="clr-namespace:Avalonia.Svg.Skia;assembly=Avalonia.Svg.Skia"
-             xmlns:atomexCore="clr-namespace:Atomex;assembly=Atomex.Client.Core">
+             xmlns:atomexCore="clr-namespace:Atomex;assembly=Atomex.Client.Core"
+             xmlns:atomexBlockchainTezos="clr-namespace:Atomex.Blockchain.Tezos;assembly=Atomex.Client.Core">
 
     <Design.DataContext>
         <vm:TezosWalletViewModel />
@@ -237,7 +238,7 @@
                                            FontSize="13"
                                            Text="Description" />
                             </Button>
-                            
+
                             <controls:SortButton Grid.Column="1"
                                                  Title="Amount"
                                                  Command="{Binding SetSortTypeCommand}"
@@ -263,7 +264,7 @@
                                     </MultiBinding>
                                 </controls:SortButton.SortIsDesc>
                             </controls:SortButton>
-                            
+
                             <controls:SortButton Grid.Column="2"
                                                  Title="Status"
                                                  Command="{Binding SetSortTypeCommand}"
@@ -433,7 +434,7 @@
                             Height="34"
                             Margin="0 16 0 0"
                             Padding="12 0">
-                        <Grid ColumnDefinitions="8*,3.5*,3.5*,3*,2*"
+                        <Grid ColumnDefinitions="7.5*,3.3*,3.2*,2.5*,3.5*"
                               VerticalAlignment="Stretch">
                             <Button Grid.Column="0"
                                     Padding="0"
@@ -565,7 +566,7 @@
                         <ListBox.ItemTemplate>
                             <DataTemplate>
                                 <Border Padding="12 0">
-                                    <Grid ColumnDefinitions="8*,3.5*,3.5*,3*,2*"
+                                    <Grid ColumnDefinitions="7.5*,3.3*,3.2*,2.5*,3.5*"
                                           VerticalAlignment="Stretch">
                                         <controls:LinkButton Grid.Column="0"
                                                              Underlined="True"
@@ -636,32 +637,43 @@
                                                    FontSize="16"
                                                    Text="{Binding Baker.EstimatedRoi}" />
 
-                                        <TextBlock Grid.Column="4"
-                                                   VerticalAlignment="Center"
-                                                   FontSize="16"
-                                                   Text="{Binding Status}"
-                                                   Name="StatusText">
-                                            <i:Interaction.Behaviors>
-                                                <ia:DataTriggerBehavior Binding="{Binding Status}"
-                                                                        ComparisonCondition="Equal"
-                                                                        Value="Active">
-                                                    <ia:ChangePropertyAction PropertyName="Foreground"
-                                                                             Value="{StaticResource Emerald}" />
-                                                </ia:DataTriggerBehavior>
-                                                <ia:DataTriggerBehavior Binding="{Binding Status}"
-                                                                        ComparisonCondition="Equal"
-                                                                        Value="Confirmed">
-                                                    <ia:ChangePropertyAction PropertyName="Foreground"
-                                                                             Value="{StaticResource BlueSky}" />
-                                                </ia:DataTriggerBehavior>
-                                                <ia:DataTriggerBehavior Binding="{Binding Status}"
-                                                                        ComparisonCondition="Equal"
-                                                                        Value="Pending">
-                                                    <ia:ChangePropertyAction PropertyName="Foreground"
-                                                                             Value="{StaticResource Orange}" />
-                                                </ia:DataTriggerBehavior>
-                                            </i:Interaction.Behaviors>
-                                        </TextBlock>
+                                        <Grid Grid.Column="4"
+                                              ColumnDefinitions="*,Auto">
+                                            <TextBlock Grid.Column="0"
+                                                       VerticalAlignment="Center"
+                                                       FontSize="16"
+                                                       Text="{Binding StatusString}"
+                                                       Name="StatusText">
+                                                <i:Interaction.Behaviors>
+                                                    <ia:DataTriggerBehavior Binding="{Binding Status}"
+                                                                            ComparisonCondition="Equal"
+                                                                            Value="{x:Static atomexBlockchainTezos:DelegationStatus.Active}">
+                                                        <ia:ChangePropertyAction PropertyName="Foreground"
+                                                            Value="{StaticResource Emerald}" />
+                                                    </ia:DataTriggerBehavior>
+                                                    <ia:DataTriggerBehavior Binding="{Binding Status}"
+                                                                            ComparisonCondition="Equal"
+                                                                            Value="{x:Static atomexBlockchainTezos:DelegationStatus.Confirmed}">
+                                                        <ia:ChangePropertyAction PropertyName="Foreground"
+                                                            Value="{StaticResource BlueSky}" />
+                                                    </ia:DataTriggerBehavior>
+                                                    <ia:DataTriggerBehavior Binding="{Binding Status}"
+                                                                            ComparisonCondition="Equal"
+                                                                            Value="{x:Static atomexBlockchainTezos:DelegationStatus.Pending}">
+                                                        <ia:ChangePropertyAction PropertyName="Foreground"
+                                                            Value="{StaticResource Orange}" />
+                                                    </ia:DataTriggerBehavior>
+                                                    <ia:DataTriggerBehavior Binding="{Binding Status}"
+                                                                            ComparisonCondition="Equal"
+                                                                            Value="{x:Static atomexBlockchainTezos:DelegationStatus.NotDelegated}">
+                                                        <ia:ChangePropertyAction PropertyName="Foreground"
+                                                            Value="{StaticResource SecondaryForegroundBrush}" />
+                                                    </ia:DataTriggerBehavior>
+                                                </i:Interaction.Behaviors>
+                                            </TextBlock>
+                                            <controls:IconButton Grid.Column="1"
+                                                                 Classes="MenuDots" />
+                                        </Grid>
                                     </Grid>
                                 </Border>
                             </DataTemplate>

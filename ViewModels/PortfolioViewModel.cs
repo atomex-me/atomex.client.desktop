@@ -282,7 +282,7 @@ namespace Atomex.Client.Desktop.ViewModels
                             SelectedCurrency = currencyViewModel;
                         }
                     };
-
+                
                 SelectedCurrency = null;
                 Desktop.App.DialogService.Show(selectReceiveCurrencyViewModel);
             });
@@ -291,7 +291,11 @@ namespace Atomex.Client.Desktop.ViewModels
 
         public ReactiveCommand<CurrencyViewModel, Unit> ReceiveFromPopupCommand => _receiveFromPopupCommand ??=
             _receiveFromPopupCommand = ReactiveCommand.Create<CurrencyViewModel>(
-                currencyViewModel => ShowReceiveWindow(currencyViewModel.Currency));
+                currencyViewModel =>
+                {
+                    PopupOpenedCurrency = null;
+                    ShowReceiveWindow(currencyViewModel.Currency);
+                });
 
         private ReactiveCommand<CurrencyViewModel, Unit> _exchangeCommand;
 

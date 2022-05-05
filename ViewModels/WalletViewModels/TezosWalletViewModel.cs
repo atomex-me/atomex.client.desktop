@@ -149,7 +149,19 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                     var @delegate = accountData["delegate"]?.ToString();
 
                     if (string.IsNullOrEmpty(@delegate))
+                    {
+                        delegations.Add(new Delegation
+                        {
+                            Baker = null,
+                            Address = wa.Address,
+                            ExplorerUri = Tezos.BbUri,
+                            Balance = wa.Balance,
+                            DelegationTime = null,
+                            Status = DelegationStatus.NotDelegated
+                        });
+                        
                         continue;
+                    }
 
                     var baker = await BbApi
                         .GetBaker(@delegate, _app.Account.Network)
