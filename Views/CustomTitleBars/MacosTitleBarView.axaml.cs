@@ -6,6 +6,7 @@ using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 
 using Atomex.Client.Desktop.Common;
+using Avalonia.Threading;
 
 namespace Atomex.Client.Desktop.Views.CustomTitleBars
 {
@@ -54,8 +55,15 @@ namespace Atomex.Client.Desktop.Views.CustomTitleBars
 
                 titleBarBackground = this.FindControl<DockPanel>("TitleBarBackground");
                 titleAndWindowIconWrapper = this.FindControl<StackPanel>("TitleAndWindowIconWrapper");
-
+                
                 SubscribeToWindowState();
+
+                // todo: remove this
+                Dispatcher.UIThread.InvokeAsync(async() =>
+                {
+                    await Task.Delay(50);
+                    titleBarBackground.Opacity = 0.9999;
+                });
             }
         }
 
