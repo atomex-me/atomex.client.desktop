@@ -7,7 +7,8 @@
              xmlns:vm="clr-namespace:Atomex.Client.Desktop.ViewModels"
              xmlns:walletVm="clr-namespace:Atomex.Client.Desktop.ViewModels.WalletViewModels"
              xmlns:controls="clr-namespace:Atomex.Client.Desktop.Controls"
-             xmlns:views="clr-namespace:Atomex.Client.Desktop.Views">
+             xmlns:views="clr-namespace:Atomex.Client.Desktop.Views"
+             xmlns:abstract="clr-namespace:Atomex.Client.Desktop.ViewModels.Abstract">
 
     <Design.DataContext>
         <vm:AddressesViewModel />
@@ -46,7 +47,7 @@
                         <MultiBinding Converter="{x:Static BoolConverters.And}">
                             <Binding Path="CurrentSortDirection"
                                      Converter="{StaticResource EnumToStringEqualConverter}"
-                                     ConverterParameter="{x:Static walletVm:SortDirection.Asc}" />
+                                     ConverterParameter="{x:Static abstract:SortDirection.Asc}" />
                             <Binding Path="CurrentSortField"
                                      Converter="{StaticResource EnumToStringEqualConverter}"
                                      ConverterParameter="{x:Static vm:AddressesSortField.ByPath}" />
@@ -56,7 +57,7 @@
                         <MultiBinding Converter="{x:Static BoolConverters.And}">
                             <Binding Path="CurrentSortDirection"
                                      Converter="{StaticResource EnumToStringEqualConverter}"
-                                     ConverterParameter="{x:Static walletVm:SortDirection.Desc}" />
+                                     ConverterParameter="{x:Static abstract:SortDirection.Desc}" />
                             <Binding Path="CurrentSortField"
                                      Converter="{StaticResource EnumToStringEqualConverter}"
                                      ConverterParameter="{x:Static vm:AddressesSortField.ByPath}" />
@@ -85,7 +86,7 @@
                         <MultiBinding Converter="{x:Static BoolConverters.And}">
                             <Binding Path="CurrentSortDirection"
                                      Converter="{StaticResource EnumToStringEqualConverter}"
-                                     ConverterParameter="{x:Static walletVm:SortDirection.Asc}" />
+                                     ConverterParameter="{x:Static abstract:SortDirection.Asc}" />
                             <Binding Path="CurrentSortField"
                                      Converter="{StaticResource EnumToStringEqualConverter}"
                                      ConverterParameter="{x:Static vm:AddressesSortField.ByBalance}" />
@@ -95,7 +96,7 @@
                         <MultiBinding Converter="{x:Static BoolConverters.And}">
                             <Binding Path="CurrentSortDirection"
                                      Converter="{StaticResource EnumToStringEqualConverter}"
-                                     ConverterParameter="{x:Static walletVm:SortDirection.Desc}" />
+                                     ConverterParameter="{x:Static abstract:SortDirection.Desc}" />
                             <Binding Path="CurrentSortField"
                                      Converter="{StaticResource EnumToStringEqualConverter}"
                                      ConverterParameter="{x:Static vm:AddressesSortField.ByBalance}" />

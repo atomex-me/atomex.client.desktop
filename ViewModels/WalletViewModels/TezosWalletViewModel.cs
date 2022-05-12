@@ -12,6 +12,7 @@ using Atomex.Blockchain.Tezos;
 using Atomex.Blockchain.Tezos.Internal;
 using Atomex.Blockchain.Tezos.Tzkt;
 using Atomex.Client.Desktop.Common;
+using Atomex.Client.Desktop.ViewModels.Abstract;
 using Atomex.Core;
 using Atomex.Wallet;
 using ReactiveUI.Fody.Helpers;
@@ -19,13 +20,6 @@ using ReactiveUI.Fody.Helpers;
 
 namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 {
-    public enum DelegationSortField
-    {
-        ByRoi,
-        ByStatus,
-        ByBalance
-    }
-
     public class TezosWalletViewModel : WalletViewModel
     {
         private const int DelegationCheckIntervalInSec = 20;

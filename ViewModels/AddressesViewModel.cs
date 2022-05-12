@@ -9,6 +9,7 @@ using Serilog;
 using ReactiveUI;
 using Atomex.Blockchain.Tezos.Internal;
 using Atomex.Client.Desktop.Common;
+using Atomex.Client.Desktop.ViewModels.Abstract;
 using Atomex.Client.Desktop.ViewModels.WalletViewModels;
 using Atomex.Common;
 using Atomex.Core;

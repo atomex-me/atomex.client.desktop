@@ -14,6 +14,7 @@ using Serilog;
 
 using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.Properties;
+using Atomex.Client.Desktop.ViewModels.Abstract;
 using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
 using Atomex.Core;
 using Atomex.MarketData.Abstract;
@@ -21,13 +22,6 @@ using Atomex.ViewModels;
 
 namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 {
-    public enum SendStage
-    {
-        Edit,
-        Confirmation,
-        AdditionalConfirmation
-    }
-
     public abstract class SendViewModel : ViewModelBase
     {
         protected readonly IAtomexApp _app;

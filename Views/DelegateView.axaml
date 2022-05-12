@@ -2,221 +2,300 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="500"
+             mc:Ignorable="d" d:DesignWidth="700" d:DesignHeight="600"
              x:Class="Atomex.Client.Desktop.Views.DelegateView"
-             xmlns:vm="clr-namespace:Atomex.ViewModels;assembly=Atomex.Client.Core"
              xmlns:controls="clr-namespace:Atomex.Client.Desktop.Controls"
              xmlns:helpers="clr-namespace:Atomex.Client.Desktop.Helpers"
              xmlns:converters="clr-namespace:Atomex.Client.Desktop.Converters"
-             xmlns:mah="clr-namespace:AvaloniaProgressRing;assembly=AvaloniaProgressRing"
              xmlns:viewModels="clr-namespace:Atomex.Client.Desktop.ViewModels"
              xmlns:behaviors="clr-namespace:Atomex.Client.Desktop.Helpers"
              xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
              xmlns:ia="clr-namespace:Avalonia.Xaml.Interactions.Core;assembly=Avalonia.Xaml.Interactions"
-             Height="500"
-             Width="600">
-  <Design.DataContext>
-    <viewModels:DelegateViewModel/>
-  </Design.DataContext>
+             xmlns:svg="clr-namespace:Avalonia.Svg.Skia;assembly=Avalonia.Svg.Skia"
+             xmlns:abstract="clr-namespace:Atomex.Client.Desktop.ViewModels.Abstract"
+             xmlns:atomex="clr-namespace:Atomex;assembly=Atomex.Client.Core"
+             Height="600"
+             Width="700">
+    <Design.DataContext>
+        <viewModels:DelegateViewModel />
+    </Design.DataContext>
 
-  <UserControl.Resources>
-    <converters:TezosDelegationCurrencyFormatConverter x:Key="TezosDelegationCurrencyFormatConverter"/>
-    <converters:StringToDecimalConverter x:Key="StringToDecimalConverter"/>
-  </UserControl.Resources>
+    <UserControl.Resources>
+        <converters:EnumToStringNotEqualConverter x:Key="EnumToStringNotEqualConverter" />
+        <converters:EnumToStringEqualConverter x:Key="EnumToStringEqualConverter" />
+        <converters:PercentConverter x:Key="PercentConverter" />
+        <converters:LowerThanZeroConverter x:Key="LowerThanZeroConverter" />
+        <converters:GreaterThanZeroConverter x:Key="GreaterThanZeroConverter" />
+    </UserControl.Resources>
 
-  <Border Classes="ChildViewBorder">
-    <Grid Width="600">
-      <StackPanel Orientation="Vertical"
-                  IsEnabled="{Binding !DelegationCheck}">
-        <Border Margin="0 20 0 10"
-                Height="33"
-                VerticalAlignment="Top"
-                HorizontalAlignment="Stretch"
-                Background="{DynamicResource ChildViewHeaderBackgroundBrush}">
-          <TextBlock Text="Delegate"
-                     Foreground="{DynamicResource ChildViewHeaderForegroundBrush}"
-                     FontFamily="{DynamicResource DefaultLightFontFamily}"
-                     FontSize="25"
-                     HorizontalAlignment="Center"
-                     VerticalAlignment="Center"/>
-        </Border>
+    <UserControl.Styles>
+        <Style Selector="TextBlock.BakerFull">
+            <Setter Property="Foreground" Value="{DynamicResource Orange}" />
+        </Style>
+        <Style Selector="TextBlock.BakerNotFull">
+            <Setter Property="Foreground" Value="{DynamicResource DefaultForegroundBrush}" />
+        </Style>
+    </UserControl.Styles>
 
-        <TextBlock Text="Delegating to a bakery."
-                   Foreground="{DynamicResource DefaultForegroundBrush}"
-                   FontFamily="{DynamicResource DefaultLightFontFamily}"
-                   FontSize="15"
-                   Margin="40 20 40 15"
-                   TextWrapping="Wrap"
-                   HorizontalAlignment="Center"/>
+    <Border Classes="ChildViewBorder"
+            Padding="24 0 24 16">
+        <StackPanel Orientation="Vertical">
+            <Grid ColumnDefinitions="Auto,*"
+                  RowDefinitions="72">
+                <!-- back button -->
+                <controls:IconButton Grid.Column="0"
+                                     Classes="Back"
+                                     IsVisible="{Binding Stage,
+                                     Converter={StaticResource EnumToStringNotEqualConverter},
+                                     ConverterParameter={x:Static abstract:SendStage.Edit}}"
+                                     Command="{Binding UndoConfirmStageCommand}" />
 
-        <TextBlock Text="Loading bakers, please wait..."
-                   IsVisible="{Binding BakersLoading}"
-                   Foreground="{DynamicResource DefaultForegroundBrush}"
-                   FontFamily="{DynamicResource DefaultLightFontFamily}"
-                   FontSize="15"
-                   Margin="40 20 40 40"
-                   TextWrapping="Wrap"
-                   HorizontalAlignment="Center"/>
-                
-        <ComboBox IsVisible="{Binding !BakersLoading}"
-                  Width="510"
-                  MinHeight="68"
-                  HorizontalAlignment="Center"
-                  Margin="0 5 0 5"
-                  Items="{Binding FromBakersList}"
-                  SelectedItem="{Binding BakerViewModel}"
-                  helpers:ComboBoxHelper.CornerRadius="20"
-                  Classes="BakersComboBox"/>
+                <!-- window title -->
+                <TextBlock Grid.Column="1"
+                           Foreground="{DynamicResource DefaultForegroundBrush}"
+                           FontSize="22"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center">
+                    <i:Interaction.Behaviors>
+                        <ia:DataTriggerBehavior Binding="{Binding Stage}"
+                                                ComparisonCondition="Equal"
+                                                Value="{x:Static abstract:SendStage.Edit}">
+                            <ia:ChangePropertyAction PropertyName="Text"
+                                                     Value="Delegate 1 address to..." />
+                            <ia:ChangePropertyAction PropertyName="Margin"
+                                                     Value="0" />
+                        </ia:DataTriggerBehavior>
+                        <ia:DataTriggerBehavior Binding="{Binding Stage}"
+                                                ComparisonCondition="Equal"
+                                                Value="{x:Static abstract:SendStage.Confirmation}">
+                            <ia:ChangePropertyAction PropertyName="Text"
+                                                     Value="Confirm Delegation" />
+                            <ia:ChangePropertyAction PropertyName="Margin"
+                                                     Value="-28 0 0 0" />
+                        </ia:DataTriggerBehavior>
+                    </i:Interaction.Behaviors>
+                </TextBlock>
+            </Grid>
 
-        <StackPanel Orientation="Horizontal"
-                    HorizontalAlignment="Center">
-          <Border Classes="FieldHeader">
-            <TextBlock Text="To Address:"
-                       Margin="0 0 7 0"
-                       Foreground="{DynamicResource DefaultForegroundBrush}"
-                       FontFamily="{DynamicResource DefaultMediumFontFamily}"
-                       FontSize="13"
-                       VerticalAlignment="Center"
-                       HorizontalAlignment="Right"/>
-          </Border>
-          <TextBox Width="410"
-                   Height="40"
-                   Margin="0 5 0 5"
-                   FontSize="12"
-                   Text="{Binding Address, Mode=TwoWay}"
-                   Background="{DynamicResource DefaultSubstrateBrush}"
-                   Foreground="{DynamicResource DefaultForegroundBrush}"
-                   helpers:TextBoxHelper.CornerRadius="0 20 20 0"
-                   Classes="CustomTextBox AmountTextBox"/>
+            <!-- separator -->
+            <Border Height="1"
+                    Margin="-24 0 -24 0"
+                    Background="{DynamicResource LightDefaultOpacity10}" />
+
+            <TextBox Margin="0 16 0 0"
+                     Height="44"
+                     CornerRadius="8"
+                     Watermark="Search baker"
+                     FontSize="16"
+                     Text="{Binding SearchPattern, Mode=TwoWay}"
+                     Classes="SearchTextBox">
+                <TextBox.InnerRightContent>
+                    <StackPanel VerticalAlignment="Center"
+                                IsVisible="{Binding SearchPattern, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+                        <controls:IconButton Classes="Clear NoEffects"
+                                             Command="{ReflectionBinding $parent[TextBox].Clear}"
+                                             Margin="0 0 15 0" />
+                    </StackPanel>
+                </TextBox.InnerRightContent>
+            </TextBox>
+
+            <Border Background="{DynamicResource LightDefaultOpacity6}"
+                    VerticalAlignment="Top"
+                    CornerRadius="{DynamicResource AtomexCornerRadius}"
+                    Height="34"
+                    Margin="0 16 0 0"
+                    Padding="12 0">
+                <Grid ColumnDefinitions="10*,2*,2.5*"
+                      VerticalAlignment="Stretch">
+                    <controls:SortButton Grid.Column="0"
+                                         Title="Validator"
+                                         Command="{Binding SetSortTypeCommand}"
+                                         CommandParameter="{x:Static abstract:DelegationSortField.ByValidator}">
+                        <controls:SortButton.SortIsAsc>
+                            <MultiBinding Converter="{x:Static BoolConverters.And}">
+                                <Binding Path="CurrentSortDirection"
+                                         Converter="{StaticResource EnumToStringEqualConverter}"
+                                         ConverterParameter="{x:Static abstract:SortDirection.Asc}" />
+                                <Binding Path="CurrentSortField"
+                                         Converter="{StaticResource EnumToStringEqualConverter}"
+                                         ConverterParameter="{x:Static abstract:DelegationSortField.ByValidator}" />
+                            </MultiBinding>
+                        </controls:SortButton.SortIsAsc>
+                        <controls:SortButton.SortIsDesc>
+                            <MultiBinding Converter="{x:Static BoolConverters.And}">
+                                <Binding Path="CurrentSortDirection"
+                                         Converter="{StaticResource EnumToStringEqualConverter}"
+                                         ConverterParameter="{x:Static abstract:SortDirection.Desc}" />
+                                <Binding Path="CurrentSortField"
+                                         Converter="{StaticResource EnumToStringEqualConverter}"
+                                         ConverterParameter="{x:Static abstract:DelegationSortField.ByValidator}" />
+                            </MultiBinding>
+                        </controls:SortButton.SortIsDesc>
+                    </controls:SortButton>
+                    <controls:SortButton Grid.Column="1"
+                                         Title="Min, XTZ"
+                                         HorizontalAlignment="Right"
+                                         Command="{Binding SetSortTypeCommand}"
+                                         CommandParameter="{x:Static abstract:DelegationSortField.ByMinTez}">
+                        <controls:SortButton.SortIsAsc>
+                            <MultiBinding Converter="{x:Static BoolConverters.And}">
+                                <Binding Path="CurrentSortDirection"
+                                         Converter="{StaticResource EnumToStringEqualConverter}"
+                                         ConverterParameter="{x:Static abstract:SortDirection.Asc}" />
+                                <Binding Path="CurrentSortField"
+                                         Converter="{StaticResource EnumToStringEqualConverter}"
+                                         ConverterParameter="{x:Static abstract:DelegationSortField.ByMinTez}" />
+                            </MultiBinding>
+                        </controls:SortButton.SortIsAsc>
+                        <controls:SortButton.SortIsDesc>
+                            <MultiBinding Converter="{x:Static BoolConverters.And}">
+                                <Binding Path="CurrentSortDirection"
+                                         Converter="{StaticResource EnumToStringEqualConverter}"
+                                         ConverterParameter="{x:Static abstract:SortDirection.Desc}" />
+                                <Binding Path="CurrentSortField"
+                                         Converter="{StaticResource EnumToStringEqualConverter}"
+                                         ConverterParameter="{x:Static abstract:DelegationSortField.ByMinTez}" />
+                            </MultiBinding>
+                        </controls:SortButton.SortIsDesc>
+                    </controls:SortButton>
+                    <controls:SortButton Grid.Column="2"
+                                         Title="Est. ROI, %"
+                                         HorizontalAlignment="Right"
+                                         Command="{Binding SetSortTypeCommand}"
+                                         CommandParameter="{x:Static abstract:DelegationSortField.ByRoi}">
+                        <controls:SortButton.SortIsAsc>
+                            <MultiBinding Converter="{x:Static BoolConverters.And}">
+                                <Binding Path="CurrentSortDirection"
+                                         Converter="{StaticResource EnumToStringEqualConverter}"
+                                         ConverterParameter="{x:Static abstract:SortDirection.Asc}" />
+                                <Binding Path="CurrentSortField"
+                                         Converter="{StaticResource EnumToStringEqualConverter}"
+                                         ConverterParameter="{x:Static abstract:DelegationSortField.ByRoi}" />
+                            </MultiBinding>
+                        </controls:SortButton.SortIsAsc>
+                        <controls:SortButton.SortIsDesc>
+                            <MultiBinding Converter="{x:Static BoolConverters.And}">
+                                <Binding Path="CurrentSortDirection"
+                                         Converter="{StaticResource EnumToStringEqualConverter}"
+                                         ConverterParameter="{x:Static abstract:SortDirection.Desc}" />
+                                <Binding Path="CurrentSortField"
+                                         Converter="{StaticResource EnumToStringEqualConverter}"
+                                         ConverterParameter="{x:Static abstract:DelegationSortField.ByRoi}" />
+                            </MultiBinding>
+                        </controls:SortButton.SortIsDesc>
+                    </controls:SortButton>
+                </Grid>
+            </Border>
+
+            <ListBox Background="{DynamicResource AlmostTransparentBrush}"
+                     Items="{Binding BakersList}"
+                     Height="336"
+                     HorizontalAlignment="Stretch"
+                     SelectionMode="Single">
+                <ListBox.Styles>
+                    <Style Selector="ListBoxItem">
+                        <Setter Property="Padding" Value="12 0" />
+                        <Setter Property="Height" Value="60" />
+                        <Setter Property="VerticalContentAlignment" Value="Center" />
+                        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                        <Setter Property="Cursor" Value="Hand" />
+                        <Setter Property="BorderThickness" Value="0 0 0 1" />
+                        <Setter Property="Background" Value="{DynamicResource AlmostTransparentBrush}" />
+                        <Setter Property="BorderBrush" Value="{DynamicResource LightDefaultOpacity10}" />
+                    </Style>
+                    <Style Selector="ListBoxItem:pointerover /template/ ContentPresenter">
+                        <Setter Property="Background" Value="{DynamicResource ListBoxItemPointeroverBrush}" />
+                        <Setter Property="CornerRadius" Value="8" />
+                    </Style>
+                    <Style Selector="ListBoxItem:selected /template/ ContentPresenter">
+                        <Setter Property="Background" Value="{DynamicResource Blue}" />
+                        <Setter Property="CornerRadius" Value="8" />
+                    </Style>
+                </ListBox.Styles>
+
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <Grid ColumnDefinitions="10*,2*,2.5*"
+                              RowDefinitions="Auto">
+                            <StackPanel Orientation="Horizontal"
+                                        Grid.Column="0">
+                                <Image Width="32"
+                                       Height="32"
+                                       Source="{Binding BitmapLogo}" />
+
+                                <StackPanel Margin="16 0 0 0"
+                                            VerticalAlignment="Center">
+                                    <TextBlock VerticalAlignment="Center"
+                                               Foreground="{DynamicResource DefaultForegroundBrush}"
+                                               FontSize="16"
+                                               LineHeight="22"
+                                               Text="{Binding Name}" />
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock VerticalAlignment="Center"
+                                                   FontSize="13"
+                                                   Classes.BakerFull="{Binding StakingAvailable,
+                                                   Converter={StaticResource LowerThanZeroConverter}}"
+                                                   Classes.BakerNotFull="{Binding StakingAvailable,
+                                                   Converter={StaticResource GreaterThanZeroConverter}}"
+                                                   Text="Free space" />
+                                        <TextBlock VerticalAlignment="Center"
+                                                   Margin="4 0 0 0"
+                                                   Classes.BakerFull="{Binding StakingAvailable,
+                                                   Converter={StaticResource LowerThanZeroConverter}}"
+                                                   Classes.BakerNotFull="{Binding StakingAvailable,
+                                                   Converter={StaticResource GreaterThanZeroConverter}}"
+                                                   FontSize="13"
+                                                   Text="{Binding FreeSpaceFormatted}" />
+                                        <TextBlock VerticalAlignment="Center"
+                                                   Margin="4 0 0 0"
+                                                   FontSize="13"
+                                                   Foreground="{DynamicResource Orange}"
+                                                   IsVisible="{Binding StakingAvailable,
+                                                   Converter={StaticResource LowerThanZeroConverter}}"
+                                                   Text="(baker is full)" />
+                                    </StackPanel>
+                                </StackPanel>
+                            </StackPanel>
+
+                            <StackPanel Grid.Column="1"
+                                        VerticalAlignment="Center"
+                                        HorizontalAlignment="Right"
+                                        Orientation="Horizontal">
+                                <TextBlock FontSize="16"
+                                           Foreground="{DynamicResource DefaultForegroundBrush}"
+                                           Text="{Binding MinDelegation}" />
+                                <TextBlock FontSize="16"
+                                           Foreground="{DynamicResource DefaultForegroundBrush}"
+                                           Margin="4 0 0 0"
+                                           Text="{x:Static atomex:TezosConfig.Xtz}" />
+                            </StackPanel>
+
+                            <TextBlock Grid.Column="2"
+                                       VerticalAlignment="Center"
+                                       FontSize="16"
+                                       Foreground="{DynamicResource DefaultForegroundBrush}"
+                                       HorizontalAlignment="Right"
+                                       Text="{Binding Roi, Converter={StaticResource PercentConverter}}" />
+                        </Grid>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+
+            <!-- separator -->
+            <Border Height="1"
+                    Margin="-24 0 -24 0"
+                    Background="{DynamicResource LightDefaultOpacity10}" />
+
+            <StackPanel Orientation="Horizontal"
+                        Margin="0 16 0 0"
+                        HorizontalAlignment="Right">
+                <controls:RoundedButton Width="200"
+                                        Height="50"
+                                        CornerRadius="{DynamicResource AtomexCornerRadius}"
+                                        FontSize="18"
+                                        Content="Next"
+                                        Command="{Binding NextCommand}" />
+            </StackPanel>
         </StackPanel>
-
-        <StackPanel Orientation="Horizontal"
-                    HorizontalAlignment="Center">
-          <Border Classes="FieldHeader">
-            <TextBlock Text="From Address:"
-                       Margin="0 0 7 0"
-                       Foreground="{DynamicResource DefaultForegroundBrush}"
-                       FontFamily="{DynamicResource DefaultMediumFontFamily}"
-                       FontSize="13"
-                       VerticalAlignment="Center"
-                       HorizontalAlignment="Right"/>
-          </Border>
-          <ComboBox Width="410"
-                    Height="40"
-                    Margin="0 5 0 5"
-                    Padding="10 6 0 6"
-                    Classes="CurrencyComboBox"
-                    Items="{Binding FromAddressList}"
-                    SelectedIndex="{Binding WalletAddressIndex, Mode=TwoWay}"
-                    Background="{DynamicResource DefaultSubstrateBrush}"
-                    Foreground="{DynamicResource DefaultForegroundBrush}"
-                    helpers:ComboBoxHelper.CornerRadius="0 20 20 0">
-            <ComboBox.ItemTemplate>
-              <DataTemplate DataType="{x:Type vm:WalletAddressViewModel}">
-                <DockPanel>
-                  <TextBlock
-                      DockPanel.Dock="Right"
-                      Margin="10 0 0 0"
-                      Text="{Binding AvailableBalance, Converter={StaticResource TezosDelegationCurrencyFormatConverter}}"
-                      Foreground="{DynamicResource AmountBrush}"
-                      FontSize="12"
-                      VerticalAlignment="Center"/>
-                  <TextBlock
-                      Text="{Binding Address}"
-                      Foreground="{DynamicResource DefaultForegroundBrush}"
-                      FontSize="12"
-                      HorizontalAlignment="Left"
-                      VerticalAlignment="Center"/>
-                </DockPanel>
-              </DataTemplate>
-            </ComboBox.ItemTemplate>
-          </ComboBox>
-        </StackPanel>
-
-        <StackPanel Orientation="Horizontal"
-                    HorizontalAlignment="Center"/>
-
-        <StackPanel Orientation="Horizontal"
-                    HorizontalAlignment="Center"
-                    IsEnabled="{Binding !UseDefaultFee}"
-                    Classes="BaseDisabledStyle">
-          <Border Classes="FieldHeader">
-            <TextBlock Text="Fee:"
-                       Margin="0 0 7 0"
-                       Foreground="{DynamicResource DefaultForegroundBrush}"
-                       FontFamily="{DynamicResource DefaultMediumFontFamily}"
-                       FontSize="13"
-                       VerticalAlignment="Center"
-                       HorizontalAlignment="Right"/>
-          </Border>
-
-          <TextBox Width="410"
-                   Height="40"
-                   Margin="0 5 0 5"
-                   FontSize="18"
-                   Background="{DynamicResource DefaultSubstrateBrush}"
-                   Foreground="{DynamicResource DefaultForegroundBrush}"
-                   Text="{Binding Fee, Converter={StaticResource StringToDecimalConverter}}"
-                   helpers:TextBoxHelper.CornerRadius="0 20 20 0"
-                   helpers:AmountTextBoxHelper.CurrencyCode="{Binding FeeCurrencyCode}"
-                   helpers:AmountTextBoxHelper.BaseCurrencyCode="{Binding BaseCurrencyCode}"
-                   Classes="CustomTextBox AmountTextBox">
-            <helpers:AmountTextBoxHelper.AmountInBase>
-              <MultiBinding Converter="{StaticResource AmountToStringConverter}">
-                <Binding Path="FeeInBase" Mode="OneWay"/>
-                <Binding Path="BaseCurrencyFormat" Mode="OneWay"/>
-              </MultiBinding>
-            </helpers:AmountTextBoxHelper.AmountInBase>
-            <i:Interaction.Behaviors>
-              <behaviors:AmountBehavior Format="{Binding FeeFormat}"/>
-            </i:Interaction.Behaviors>
-          </TextBox>
-        </StackPanel>
-
-        <ToggleSwitch HorizontalAlignment="Center"
-                      OffContent="Use default fee"
-                      OnContent="Use default fee"
-                      BorderBrush="{DynamicResource DefaultForegroundBrush}"
-                      FontFamily="{DynamicResource DefaultLightFontFamily}"
-                      Foreground="{DynamicResource DefaultForegroundBrush}"
-                      FontSize="13"
-                      Margin="10"
-                      IsChecked="{Binding UseDefaultFee, Mode=TwoWay}"/>
-
-        <TextBlock Text="{Binding Warning}"
-                   Foreground="{DynamicResource WarningForegroundBrush}"
-                   FontFamily="{DynamicResource DefaultLightFontFamily}"
-                   FontSize="13"
-                   Margin="20 5 20 0"
-                   TextWrapping="Wrap"
-                   HorizontalAlignment="Center"
-                   VerticalAlignment="Bottom"/>
-
-        <StackPanel Orientation="Horizontal"
-                    HorizontalAlignment="Center"
-                    Margin="0 20 0 20">
-          <controls:RoundedButton Width="100"
-                                  Height="40"
-                                  Margin="0 0 3 0"
-                                  CornerRadius="20 0 0 20"
-                                  Content="Cancel"
-                                  Command="{Binding BackCommand}"/>
-          <controls:RoundedButton Width="100"
-                                  Height="40"
-                                  CornerRadius="0 20 20 0"
-                                  Content="Delegate"
-                                  Command="{Binding NextCommand}"/>
-        </StackPanel>
-      </StackPanel>
-
-      <Border Background="{DynamicResource DefaultSubstrateBrush}"
-              IsVisible="{Binding DelegationCheck}"/>
-
-      <mah:ProgressRing Width="80"
-                        Height="80"
-                        Foreground="{DynamicResource DefaultProgressRingBrush}"
-                        IsActive="{Binding DelegationCheck}"
-                        IsVisible="{Binding DelegationCheck}"/>
-    </Grid>
-  </Border>
+    </Border>
 </UserControl>

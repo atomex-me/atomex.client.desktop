@@ -13,6 +13,7 @@ using Serilog;
 using Atomex.Blockchain;
 using Atomex.Blockchain.BitcoinBased;
 using Atomex.Client.Desktop.Common;
+using Atomex.Client.Desktop.ViewModels.Abstract;
 using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
 using Atomex.Client.Desktop.ViewModels.SendViewModels;
 using Atomex.Client.Desktop.ViewModels.TransactionViewModels;
@@ -26,19 +27,6 @@ using Network = NBitcoin.Network;
 
 namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 {
-    public enum TxSortField
-    {
-        ByAmount,
-        ByStatus,
-        ByTime
-    }
-
-    public enum SortDirection
-    {
-        Asc,
-        Desc
-    }
-
     public class WalletViewModel : ViewModelBase, IWalletViewModel
     {
         protected IAtomexApp _app;

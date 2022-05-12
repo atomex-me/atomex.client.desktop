@@ -11,7 +11,8 @@
              xmlns:ia="clr-namespace:Avalonia.Xaml.Interactions.Core;assembly=Avalonia.Xaml.Interactions"
              xmlns:svg="clr-namespace:Avalonia.Svg.Skia;assembly=Avalonia.Svg.Skia"
              xmlns:atomexCore="clr-namespace:Atomex;assembly=Atomex.Client.Core"
-             xmlns:atomexBlockchainTezos="clr-namespace:Atomex.Blockchain.Tezos;assembly=Atomex.Client.Core">
+             xmlns:atomexBlockchainTezos="clr-namespace:Atomex.Blockchain.Tezos;assembly=Atomex.Client.Core"
+             xmlns:abstract="clr-namespace:Atomex.Client.Desktop.ViewModels.Abstract">
 
     <Design.DataContext>
         <vm:TezosWalletViewModel />
@@ -31,6 +32,7 @@
         <converters:ObjectsEqualConverter x:Key="ObjectsEqualConverter" />
         <converters:EnumToStringEqualConverter x:Key="EnumToStringEqualConverter" />
         <converters:EnumToStringNotEqualConverter x:Key="EnumToStringNotEqualConverter" />
+        <converters:PercentConverter x:Key="PercentConverter" />
     </UserControl.Resources>
 
 
@@ -236,25 +238,25 @@
                             <controls:SortButton Grid.Column="1"
                                                  Title="Amount"
                                                  Command="{Binding SetSortTypeCommand}"
-                                                 CommandParameter="{x:Static vm:TxSortField.ByAmount}">
+                                                 CommandParameter="{x:Static abstract:TxSortField.ByAmount}">
                                 <controls:SortButton.SortIsAsc>
                                     <MultiBinding Converter="{x:Static BoolConverters.And}">
                                         <Binding Path="CurrentSortDirection"
                                                  Converter="{StaticResource EnumToStringEqualConverter}"
-                                                 ConverterParameter="{x:Static vm:SortDirection.Asc}" />
+                                                 ConverterParameter="{x:Static abstract:SortDirection.Asc}" />
                                         <Binding Path="CurrentSortField"
                                                  Converter="{StaticResource EnumToStringEqualConverter}"
-                                                 ConverterParameter="{x:Static vm:TxSortField.ByAmount}" />
+                                                 ConverterParameter="{x:Static abstract:TxSortField.ByAmount}" />
                                     </MultiBinding>
                                 </controls:SortButton.SortIsAsc>
                                 <controls:SortButton.SortIsDesc>
                                     <MultiBinding Converter="{x:Static BoolConverters.And}">
                                         <Binding Path="CurrentSortDirection"
                                                  Converter="{StaticResource EnumToStringEqualConverter}"
-                                                 ConverterParameter="{x:Static vm:SortDirection.Desc}" />
+                                                 ConverterParameter="{x:Static abstract:SortDirection.Desc}" />
                                         <Binding Path="CurrentSortField"
                                                  Converter="{StaticResource EnumToStringEqualConverter}"
-                                                 ConverterParameter="{x:Static vm:TxSortField.ByAmount}" />
+                                                 ConverterParameter="{x:Static abstract:TxSortField.ByAmount}" />
                                     </MultiBinding>
                                 </controls:SortButton.SortIsDesc>
                             </controls:SortButton>
@@ -262,50 +264,50 @@
                             <controls:SortButton Grid.Column="2"
                                                  Title="Status"
                                                  Command="{Binding SetSortTypeCommand}"
-                                                 CommandParameter="{x:Static vm:TxSortField.ByStatus}">
+                                                 CommandParameter="{x:Static abstract:TxSortField.ByStatus}">
                                 <controls:SortButton.SortIsAsc>
                                     <MultiBinding Converter="{x:Static BoolConverters.And}">
                                         <Binding Path="CurrentSortDirection"
                                                  Converter="{StaticResource EnumToStringEqualConverter}"
-                                                 ConverterParameter="{x:Static vm:SortDirection.Asc}" />
+                                                 ConverterParameter="{x:Static abstract:SortDirection.Asc}" />
                                         <Binding Path="CurrentSortField"
                                                  Converter="{StaticResource EnumToStringEqualConverter}"
-                                                 ConverterParameter="{x:Static vm:TxSortField.ByStatus}" />
+                                                 ConverterParameter="{x:Static abstract:TxSortField.ByStatus}" />
                                     </MultiBinding>
                                 </controls:SortButton.SortIsAsc>
                                 <controls:SortButton.SortIsDesc>
                                     <MultiBinding Converter="{x:Static BoolConverters.And}">
                                         <Binding Path="CurrentSortDirection"
                                                  Converter="{StaticResource EnumToStringEqualConverter}"
-                                                 ConverterParameter="{x:Static vm:SortDirection.Desc}" />
+                                                 ConverterParameter="{x:Static abstract:SortDirection.Desc}" />
                                         <Binding Path="CurrentSortField"
                                                  Converter="{StaticResource EnumToStringEqualConverter}"
-                                                 ConverterParameter="{x:Static vm:TxSortField.ByStatus}" />
+                                                 ConverterParameter="{x:Static abstract:TxSortField.ByStatus}" />
                                     </MultiBinding>
                                 </controls:SortButton.SortIsDesc>
                             </controls:SortButton>
                             <controls:SortButton Grid.Column="3"
                                                  Title="Time"
                                                  Command="{Binding SetSortTypeCommand}"
-                                                 CommandParameter="{x:Static vm:TxSortField.ByTime}">
+                                                 CommandParameter="{x:Static abstract:TxSortField.ByTime}">
                                 <controls:SortButton.SortIsAsc>
                                     <MultiBinding Converter="{x:Static BoolConverters.And}">
                                         <Binding Path="CurrentSortDirection"
                                                  Converter="{StaticResource EnumToStringEqualConverter}"
-                                                 ConverterParameter="{x:Static vm:SortDirection.Asc}" />
+                                                 ConverterParameter="{x:Static abstract:SortDirection.Asc}" />
                                         <Binding Path="CurrentSortField"
                                                  Converter="{StaticResource EnumToStringEqualConverter}"
-                                                 ConverterParameter="{x:Static vm:TxSortField.ByTime}" />
+                                                 ConverterParameter="{x:Static abstract:TxSortField.ByTime}" />
                                     </MultiBinding>
                                 </controls:SortButton.SortIsAsc>
                                 <controls:SortButton.SortIsDesc>
                                     <MultiBinding Converter="{x:Static BoolConverters.And}">
                                         <Binding Path="CurrentSortDirection"
                                                  Converter="{StaticResource EnumToStringEqualConverter}"
-                                                 ConverterParameter="{x:Static vm:SortDirection.Desc}" />
+                                                 ConverterParameter="{x:Static abstract:SortDirection.Desc}" />
                                         <Binding Path="CurrentSortField"
                                                  Converter="{StaticResource EnumToStringEqualConverter}"
-                                                 ConverterParameter="{x:Static vm:TxSortField.ByTime}" />
+                                                 ConverterParameter="{x:Static abstract:TxSortField.ByTime}" />
                                     </MultiBinding>
                                 </controls:SortButton.SortIsDesc>
                             </controls:SortButton>
@@ -443,25 +445,25 @@
                             <controls:SortButton Grid.Column="1"
                                                  Title="Balance"
                                                  Command="{Binding SetDelegationSortTypeCommand}"
-                                                 CommandParameter="{x:Static vm:DelegationSortField.ByBalance}">
+                                                 CommandParameter="{x:Static abstract:DelegationSortField.ByBalance}">
                                 <controls:SortButton.SortIsAsc>
                                     <MultiBinding Converter="{x:Static BoolConverters.And}">
                                         <Binding Path="CurrentDelegationSortDirection"
                                                  Converter="{StaticResource EnumToStringEqualConverter}"
-                                                 ConverterParameter="{x:Static vm:SortDirection.Asc}" />
+                                                 ConverterParameter="{x:Static abstract:SortDirection.Asc}" />
                                         <Binding Path="CurrentDelegationSortField"
                                                  Converter="{StaticResource EnumToStringEqualConverter}"
-                                                 ConverterParameter="{x:Static vm:DelegationSortField.ByBalance}" />
+                                                 ConverterParameter="{x:Static abstract:DelegationSortField.ByBalance}" />
                                     </MultiBinding>
                                 </controls:SortButton.SortIsAsc>
                                 <controls:SortButton.SortIsDesc>
                                     <MultiBinding Converter="{x:Static BoolConverters.And}">
                                         <Binding Path="CurrentDelegationSortDirection"
                                                  Converter="{StaticResource EnumToStringEqualConverter}"
-                                                 ConverterParameter="{x:Static vm:SortDirection.Desc}" />
+                                                 ConverterParameter="{x:Static abstract:SortDirection.Desc}" />
                                         <Binding Path="CurrentDelegationSortField"
                                                  Converter="{StaticResource EnumToStringEqualConverter}"
-                                                 ConverterParameter="{x:Static vm:DelegationSortField.ByBalance}" />
+                                                 ConverterParameter="{x:Static abstract:DelegationSortField.ByBalance}" />
                                     </MultiBinding>
                                 </controls:SortButton.SortIsDesc>
                             </controls:SortButton>
@@ -479,25 +481,25 @@
                             <controls:SortButton Grid.Column="3"
                                                  Title="Est. ROI, %"
                                                  Command="{Binding SetDelegationSortTypeCommand}"
-                                                 CommandParameter="{x:Static vm:DelegationSortField.ByRoi}">
+                                                 CommandParameter="{x:Static abstract:DelegationSortField.ByRoi}">
                                 <controls:SortButton.SortIsAsc>
                                     <MultiBinding Converter="{x:Static BoolConverters.And}">
                                         <Binding Path="CurrentDelegationSortDirection"
                                                  Converter="{StaticResource EnumToStringEqualConverter}"
-                                                 ConverterParameter="{x:Static vm:SortDirection.Asc}" />
+                                                 ConverterParameter="{x:Static abstract:SortDirection.Asc}" />
                                         <Binding Path="CurrentDelegationSortField"
                                                  Converter="{StaticResource EnumToStringEqualConverter}"
-                                                 ConverterParameter="{x:Static vm:DelegationSortField.ByRoi}" />
+                                                 ConverterParameter="{x:Static abstract:DelegationSortField.ByRoi}" />
                                     </MultiBinding>
                                 </controls:SortButton.SortIsAsc>
                                 <controls:SortButton.SortIsDesc>
                                     <MultiBinding Converter="{x:Static BoolConverters.And}">
                                         <Binding Path="CurrentDelegationSortDirection"
                                                  Converter="{StaticResource EnumToStringEqualConverter}"
-                                                 ConverterParameter="{x:Static vm:SortDirection.Desc}" />
+                                                 ConverterParameter="{x:Static abstract:SortDirection.Desc}" />
                                         <Binding Path="CurrentDelegationSortField"
                                                  Converter="{StaticResource EnumToStringEqualConverter}"
-                                                 ConverterParameter="{x:Static vm:DelegationSortField.ByRoi}" />
+                                                 ConverterParameter="{x:Static abstract:DelegationSortField.ByRoi}" />
                                     </MultiBinding>
                                 </controls:SortButton.SortIsDesc>
                             </controls:SortButton>
@@ -505,25 +507,25 @@
                             <controls:SortButton Grid.Column="4"
                                                  Title="Status"
                                                  Command="{Binding SetDelegationSortTypeCommand}"
-                                                 CommandParameter="{x:Static vm:DelegationSortField.ByStatus}">
+                                                 CommandParameter="{x:Static abstract:DelegationSortField.ByStatus}">
                                 <controls:SortButton.SortIsAsc>
                                     <MultiBinding Converter="{x:Static BoolConverters.And}">
                                         <Binding Path="CurrentDelegationSortDirection"
                                                  Converter="{StaticResource EnumToStringEqualConverter}"
-                                                 ConverterParameter="{x:Static vm:SortDirection.Asc}" />
+                                                 ConverterParameter="{x:Static abstract:SortDirection.Asc}" />
                                         <Binding Path="CurrentDelegationSortField"
                                                  Converter="{StaticResource EnumToStringEqualConverter}"
-                                                 ConverterParameter="{x:Static vm:DelegationSortField.ByStatus}" />
+                                                 ConverterParameter="{x:Static abstract:DelegationSortField.ByStatus}" />
                                     </MultiBinding>
                                 </controls:SortButton.SortIsAsc>
                                 <controls:SortButton.SortIsDesc>
                                     <MultiBinding Converter="{x:Static BoolConverters.And}">
                                         <Binding Path="CurrentDelegationSortDirection"
                                                  Converter="{StaticResource EnumToStringEqualConverter}"
-                                                 ConverterParameter="{x:Static vm:SortDirection.Desc}" />
+                                                 ConverterParameter="{x:Static abstract:SortDirection.Desc}" />
                                         <Binding Path="CurrentDelegationSortField"
                                                  Converter="{StaticResource EnumToStringEqualConverter}"
-                                                 ConverterParameter="{x:Static vm:DelegationSortField.ByStatus}" />
+                                                 ConverterParameter="{x:Static abstract:DelegationSortField.ByStatus}" />
                                     </MultiBinding>
                                 </controls:SortButton.SortIsDesc>
                             </controls:SortButton>
