@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive;
+using System.Reactive.Linq;
 using System.Threading.Tasks;
 using Avalonia.Threading;
 using Serilog;
@@ -31,6 +32,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         [Reactive] public ObservableCollection<Delegation> Delegations { get; set; }
         [Reactive] public SortDirection? CurrentDelegationSortDirection { get; set; }
         [Reactive] public DelegationSortField? CurrentDelegationSortField { get; set; }
+        [Reactive] public string? DelegationAddressPopupOpened { get; set; }
 
         private bool CanDelegate { get; set; }
         private bool HasDelegations { get; set; }
@@ -57,8 +59,12 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                     vm => vm.CurrentDelegationSortField)
                 .WhereAllNotNull()
                 .SubscribeInMainThread(_ => SortDelegations(Delegations));
+            
+            DelegateCommand.Merge(UndelegateCommand)
+                .SubscribeInMainThread(_ => DelegationAddressPopupOpened = null);
 
             _ = LoadDelegationInfoAsync();
+            
             DelegateViewModel = new DelegateViewModel(_app, async () =>
             {
                 await Task.Delay(TimeSpan.FromSeconds(DelegationCheckIntervalInSec))
@@ -87,7 +93,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                 DelegationSortField.ByStatus when CurrentDelegationSortDirection == SortDirection.Asc
                     => new ObservableCollection<Delegation>(
                         delegations.OrderBy(d => d.Status)),
-                
+
                 DelegationSortField.ByBalance when CurrentDelegationSortDirection == SortDirection.Desc
                     => new ObservableCollection<Delegation>(
                         delegations.OrderByDescending(d => d.Balance)),
@@ -159,7 +165,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                             DelegationTime = null,
                             Status = DelegationStatus.NotDelegated
                         });
-                        
+
                         continue;
                     }
 
@@ -209,10 +215,15 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             }
         }
 
-        private ReactiveCommand<Unit, Unit> _delegateCommand;
+        private ReactiveCommand<string, Unit> _delegateCommand;
 
-        public ReactiveCommand<Unit, Unit> DelegateCommand =>
-            _delegateCommand ??= (_delegateCommand = ReactiveCommand.Create(OnDelegateClick));
+        public ReactiveCommand<string, Unit> DelegateCommand =>
+            _delegateCommand ??= (_delegateCommand = ReactiveCommand.Create<string>(OnDelegateClick));
+
+        private ReactiveCommand<string, Unit> _undelegateCommand;
+
+        public ReactiveCommand<string, Unit> UndelegateCommand =>
+            _undelegateCommand ??= (_undelegateCommand = ReactiveCommand.Create<string>(Undelegate));
 
         private ReactiveCommand<string, Unit> _openAddressInExplorerCommand;
 
@@ -234,9 +245,27 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                         : SortDirection.Asc;
             });
 
-        private void OnDelegateClick()
+
+        private ReactiveCommand<string, Unit> _openDelegationPopupCommand;
+
+        public ReactiveCommand<string, Unit> OpenDelegationPopupCommand => _openDelegationPopupCommand ??=
+            (_openDelegationPopupCommand = ReactiveCommand.Create<string>(
+                address => DelegationAddressPopupOpened = address));
+
+        private void OnDelegateClick(string addressToDelegate)
         {
             App.DialogService.Show(DelegateViewModel);
+        }
+
+        private void Undelegate(string undelegateAddress)
+        {
+            var messageViewModel = MessageViewModel.Message(
+                title: "Confirm undelegating",
+                text: $"Are you sure you want to stop delegating {undelegateAddress} address?",
+                nextTitle: "Undelegate",
+                nextAction: () => App.DialogService.Close());
+
+            App.DialogService.Show(messageViewModel);
         }
 
 #if DEBUG

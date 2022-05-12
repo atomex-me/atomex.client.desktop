@@ -28,8 +28,11 @@
         <converters:AddressShouldShrinkConverter x:Key="AddressShouldShrinkConverter" />
         <converters:AddressShouldExpandConverter x:Key="AddressShouldExpandConverter" />
         <converters:ShortenedAddressConverter x:Key="ShortenedAddressConverter" />
+        <converters:ObjectsEqualConverter x:Key="ObjectsEqualConverter" />
         <converters:EnumToStringEqualConverter x:Key="EnumToStringEqualConverter" />
+        <converters:EnumToStringNotEqualConverter x:Key="EnumToStringNotEqualConverter" />
     </UserControl.Resources>
+
 
     <Grid RowDefinitions="Auto,*"
           Name="DesignGrid">
@@ -192,15 +195,6 @@
                                        Text="Buy"
                                        FontSize="18" />
                         </StackPanel>
-                    </controls:RoundedButton>
-                    <controls:RoundedButton Height="46"
-                                            Padding="26 0"
-                                            CornerRadius="{DynamicResource AtomexCornerRadius}"
-                                            Command="{Binding DelegateCommand}"
-                                            Margin="0 0 12 12"
-                                            Classes="GrayButton">
-                        <TextBlock Text="Delegate"
-                                   FontSize="18" />
                     </controls:RoundedButton>
                 </WrapPanel>
             </StackPanel>
@@ -672,7 +666,94 @@
                                                 </i:Interaction.Behaviors>
                                             </TextBlock>
                                             <controls:IconButton Grid.Column="1"
-                                                                 Classes="MenuDots" />
+                                                                 Classes="MenuDots"
+                                                                 Command="{Binding $parent[ListBox].DataContext.OpenDelegationPopupCommand}"
+                                                                 CommandParameter="{Binding Address}">
+                                                <Popup PlacementMode="Left"
+                                                       VerticalAlignment="Center"
+                                                       WindowManagerAddShadowHint="False"
+                                                       IsLightDismissEnabled="True"
+                                                       Closed="Popup_OnClosed">
+                                                    <Popup.IsOpen>
+                                                        <MultiBinding
+                                                            Converter="{StaticResource ObjectsEqualConverter}">
+                                                            <Binding Path="Address" />
+                                                            <Binding
+                                                                Path="$parent[ListBox].DataContext.DelegationAddressPopupOpened" />
+                                                        </MultiBinding>
+                                                    </Popup.IsOpen>
+                                                    <Border Background="{DynamicResource DeepBlue}"
+                                                            CornerRadius="{DynamicResource AtomexCornerRadius}"
+                                                            Padding="12 16">
+                                                        <StackPanel>
+                                                            <StackPanel.Styles>
+                                                                <Style
+                                                                    Selector="Button:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+                                                                    <Setter Property="Background"
+                                                                            Value="{DynamicResource LightDefaultOpacity6}" />
+                                                                </Style>
+                                                                <Style
+                                                                    Selector="Button:not(:pointerover) /template/ ContentPresenter#PART_ContentPresenter">
+                                                                    <Setter Property="Background"
+                                                                            Value="{DynamicResource AlmostTransparentBrush}" />
+                                                                </Style>
+                                                                <Style
+                                                                    Selector="Button:pressed /template/ ContentPresenter#PART_ContentPresenter">
+                                                                    <Setter Property="Background"
+                                                                            Value="{DynamicResource LightDefaultOpacity6}" />
+                                                                </Style>
+                                                            </StackPanel.Styles>
+                                                            <StackPanel Orientation="Vertical"
+                                                                        IsVisible="{Binding Status,
+                                                                        Converter={StaticResource EnumToStringEqualConverter},
+                                                                        ConverterParameter={x:Static atomexBlockchainTezos:DelegationStatus.Active}}">
+                                                                <Button Width="180"
+                                                                        Height="40"
+                                                                        Padding="12 0"
+                                                                        CornerRadius="{DynamicResource AtomexCornerRadius}"
+                                                                        VerticalContentAlignment="Center"
+                                                                        Command="{Binding $parent[ListBox].DataContext.DelegateCommand}"
+                                                                        CommandParameter="{Binding Address}">
+                                                                    <TextBlock Text="Change Validator"
+                                                                               Foreground="{DynamicResource DefaultForegroundBrush}"
+                                                                               VerticalAlignment="Center"
+                                                                               FontSize="16" />
+                                                                </Button>
+                                                                <Button Width="180"
+                                                                        Height="40"
+                                                                        Padding="12 0"
+                                                                        CornerRadius="{DynamicResource AtomexCornerRadius}"
+                                                                        VerticalContentAlignment="Center"
+                                                                        Command="{Binding $parent[ListBox].DataContext.UndelegateCommand}"
+                                                                        CommandParameter="{Binding Address}">
+                                                                    <TextBlock Text="Undelegate"
+                                                                               Foreground="{DynamicResource DefaultForegroundBrush}"
+                                                                               VerticalAlignment="Center"
+                                                                               FontSize="16" />
+                                                                </Button>
+                                                            </StackPanel>
+
+                                                            <StackPanel Orientation="Vertical"
+                                                                        IsVisible="{Binding Status,
+                                                                        Converter={StaticResource EnumToStringNotEqualConverter},
+                                                                        ConverterParameter={x:Static atomexBlockchainTezos:DelegationStatus.Active}}">
+                                                                <Button Width="180"
+                                                                        Height="40"
+                                                                        Padding="12 0"
+                                                                        CornerRadius="{DynamicResource AtomexCornerRadius}"
+                                                                        VerticalContentAlignment="Center"
+                                                                        Command="{Binding $parent[ListBox].DataContext.DelegateCommand}"
+                                                                        CommandParameter="{Binding Address}">
+                                                                    <TextBlock Text="Delegate"
+                                                                               Foreground="{DynamicResource DefaultForegroundBrush}"
+                                                                               VerticalAlignment="Center"
+                                                                               FontSize="16" />
+                                                                </Button>
+                                                            </StackPanel>
+                                                        </StackPanel>
+                                                    </Border>
+                                                </Popup>
+                                            </controls:IconButton>
                                         </Grid>
                                     </Grid>
                                 </Border>

@@ -1,3 +1,4 @@
+using System;
 using Atomex.Client.Desktop.ViewModels.WalletViewModels;
 using Avalonia;
 using Avalonia.Controls;
@@ -24,6 +25,12 @@ namespace Atomex.Client.Desktop.Views.WalletViews
         private void InitializeComponent()
         {
             AvaloniaXamlLoader.Load(this);
+        }
+        
+        private void Popup_OnClosed(object? sender, EventArgs e)
+        {
+            if (DataContext is not TezosWalletViewModel tezosWalletViewModel) return;
+            tezosWalletViewModel.DelegationAddressPopupOpened = null;
         }
     }
 }
