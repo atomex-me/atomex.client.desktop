@@ -38,6 +38,7 @@ namespace Atomex.Client.Desktop.ViewModels
         [Reactive] public WalletAddressViewModel? SelectedAddress { get; set; }
         [Reactive] public int WalletAddressIndex { get; set; }
         [Reactive] public List<BakerViewModel>? BakersList { get; set; }
+        [Reactive] public BakerViewModel? SelectedBaker { get; set; }
         [Reactive] public List<BakerViewModel>? InitialBakersList { get; set; }
         [Reactive] public bool BakersLoading { get; set; }
         [Reactive] public List<WalletAddressViewModel> FromAddressList { get; set; }
@@ -63,10 +64,35 @@ namespace Atomex.Client.Desktop.ViewModels
         public ReactiveCommand<Unit, Unit> BackCommand =>
             _backCommand ??= ReactiveCommand.Create(() => { App.DialogService.Close(); });
 
-        private ReactiveCommand<Unit, Unit> _nextCommand;
+        public ReactiveCommand<Unit, Unit> NextCommand;
 
-        public ReactiveCommand<Unit, Unit> NextCommand => _nextCommand ??= ReactiveCommand.CreateFromTask(async () =>
+        private ReactiveCommand<Unit, Unit> _undoConfirmStageCommand;
+
+        public ReactiveCommand<Unit, Unit> UndoConfirmStageCommand => _undoConfirmStageCommand ??=
+            ReactiveCommand.Create(
+                () => { Stage = SendStage.Edit; });
+
+        private ReactiveCommand<DelegationSortField, Unit> _setSortTypeCommand;
+
+        public ReactiveCommand<DelegationSortField, Unit> SetSortTypeCommand =>
+            _setSortTypeCommand ??= ReactiveCommand.Create<DelegationSortField>(sortField =>
+            {
+                if (CurrentSortField != sortField)
+                    CurrentSortField = sortField;
+                else
+                    CurrentSortDirection = CurrentSortDirection == SortDirection.Asc
+                        ? SortDirection.Desc
+                        : SortDirection.Asc;
+            });
+
+        private async Task HandleNext()
         {
+            if (Stage == SendStage.Edit)
+            {
+                Stage = SendStage.Confirmation;
+                return;
+            }
+
             if (DelegationCheck)
                 return;
 
@@ -143,26 +169,7 @@ namespace Atomex.Client.Desktop.ViewModels
             {
                 DelegationCheck = false;
             }
-        });
-
-        private ReactiveCommand<Unit, Unit> _undoConfirmStageCommand;
-
-        public ReactiveCommand<Unit, Unit> UndoConfirmStageCommand => _undoConfirmStageCommand ??=
-            ReactiveCommand.Create(
-                () => { Stage = SendStage.Edit; });
-
-        private ReactiveCommand<DelegationSortField, Unit> _setSortTypeCommand;
-
-        public ReactiveCommand<DelegationSortField, Unit> SetSortTypeCommand =>
-            _setSortTypeCommand ??= ReactiveCommand.Create<DelegationSortField>(sortField =>
-            {
-                if (CurrentSortField != sortField)
-                    CurrentSortField = sortField;
-                else
-                    CurrentSortDirection = CurrentSortDirection == SortDirection.Asc
-                        ? SortDirection.Desc
-                        : SortDirection.Asc;
-            });
+        }
 
         private readonly Action _onDelegate;
 
@@ -248,6 +255,14 @@ namespace Atomex.Client.Desktop.ViewModels
                 .WhereAllNotNull()
                 .Where(_ => BakersList != null)
                 .SubscribeInMainThread(_ => BakersList = GetSortedBakersList(BakersList));
+
+            var canNextExecute = this.WhenAnyValue(
+                    vm => vm.SelectedBaker, 
+                    vm => vm.SearchPattern,
+                    (bakerViewModel, password) => bakerViewModel != null)
+                .ObserveOn(RxApp.MainThreadScheduler);
+            
+            NextCommand = ReactiveCommand.CreateFromTask(HandleNext, canNextExecute);
 
             FeeFormat = _tezosConfig.FeeFormat;
             FeeCurrencyCode = _tezosConfig.FeeCode;
