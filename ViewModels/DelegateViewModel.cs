@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Reactive;
+using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Avalonia.Threading;
@@ -15,7 +16,6 @@ using Atomex.Blockchain.Tezos.Internal;
 using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.Properties;
 using Atomex.Client.Desktop.ViewModels.Abstract;
-using Atomex.Client.Desktop.ViewModels.SendViewModels;
 using Atomex.Common;
 using Atomex.Core;
 using Atomex.MarketData.Abstract;
@@ -38,6 +38,7 @@ namespace Atomex.Client.Desktop.ViewModels
         [Reactive] public WalletAddressViewModel? SelectedAddress { get; set; }
         [Reactive] public int WalletAddressIndex { get; set; }
         [Reactive] public List<BakerViewModel>? BakersList { get; set; }
+        [Reactive] public List<BakerViewModel>? InitialBakersList { get; set; }
         [Reactive] public bool BakersLoading { get; set; }
         [Reactive] public List<WalletAddressViewModel> FromAddressList { get; set; }
         [Reactive] public BakerViewModel? BakerViewModel { get; set; }
@@ -53,12 +54,14 @@ namespace Atomex.Client.Desktop.ViewModels
         [Reactive] public string Warning { get; set; }
         [Reactive] public SendStage Stage { get; set; }
         [Reactive] public string SearchPattern { get; set; }
-        [Reactive] public DelegationSortField CurrentSortField { get; set; }
-        [Reactive] public SortDirection CurrentSortDirection { get; set; }
-        
+        [Reactive] public DelegationSortField? CurrentSortField { get; set; }
+        [Reactive] public SortDirection? CurrentSortDirection { get; set; }
+
 
         private ReactiveCommand<Unit, Unit> _backCommand;
-        public ReactiveCommand<Unit, Unit> BackCommand => _backCommand ??= ReactiveCommand.Create(() => { App.DialogService.Close(); });
+
+        public ReactiveCommand<Unit, Unit> BackCommand =>
+            _backCommand ??= ReactiveCommand.Create(() => { App.DialogService.Close(); });
 
         private ReactiveCommand<Unit, Unit> _nextCommand;
 
@@ -143,9 +146,11 @@ namespace Atomex.Client.Desktop.ViewModels
         });
 
         private ReactiveCommand<Unit, Unit> _undoConfirmStageCommand;
-        public ReactiveCommand<Unit, Unit> UndoConfirmStageCommand => _undoConfirmStageCommand ??= ReactiveCommand.Create(
-            () => { Stage = SendStage.Edit; });
-        
+
+        public ReactiveCommand<Unit, Unit> UndoConfirmStageCommand => _undoConfirmStageCommand ??=
+            ReactiveCommand.Create(
+                () => { Stage = SendStage.Edit; });
+
         private ReactiveCommand<DelegationSortField, Unit> _setSortTypeCommand;
 
         public ReactiveCommand<DelegationSortField, Unit> SetSortTypeCommand =>
@@ -220,17 +225,40 @@ namespace Atomex.Client.Desktop.ViewModels
                         BakerViewModel = baker;
                 });
 
+            this.WhenAnyValue(vm => vm.SearchPattern)
+                .WhereNotNull()
+                .Select(searchPattern => searchPattern.ToLower())
+                .SubscribeInMainThread(searchPattern =>
+                {
+                    if (searchPattern == string.Empty)
+                    {
+                        BakersList = new List<BakerViewModel>(InitialBakersList);
+                        CurrentSortField = null;
+                        return;
+                    }
+
+                    BakersList = GetSortedBakersList(InitialBakersList)
+                        .Where(baker => baker.Name.ToLower().Contains(searchPattern))
+                        .ToList();
+                });
+
+            this.WhenAnyValue(
+                    vm => vm.CurrentSortField,
+                    vm => vm.CurrentSortDirection)
+                .WhereAllNotNull()
+                .Where(_ => BakersList != null)
+                .SubscribeInMainThread(_ => BakersList = GetSortedBakersList(BakersList));
+
             FeeFormat = _tezosConfig.FeeFormat;
             FeeCurrencyCode = _tezosConfig.FeeCode;
             BaseCurrencyCode = "USD";
             BaseCurrencyFormat = "$0.00";
             UseDefaultFee = true;
             Stage = SendStage.Edit;
+            CurrentSortDirection = SortDirection.Desc;
 
             SubscribeToServices();
-
             _ = LoadBakerList();
-
             PrepareWallet().WaitForResult();
         }
 
@@ -258,7 +286,7 @@ namespace Atomex.Client.Desktop.ViewModels
                         })
                         .ToList();
 
-                    bakers.ForEach(bakerVM => _ = App.ImageService.LoadImageFromUrl(bakerVM.Logo));
+                    bakers.ForEach(bakerVm => _ = App.ImageService.LoadImageFromUrl(bakerVm.Logo));
                 });
             }
             catch (Exception e)
@@ -270,8 +298,32 @@ namespace Atomex.Client.Desktop.ViewModels
             {
                 BakersLoading = false;
                 BakersList = bakers;
+                InitialBakersList = new List<BakerViewModel>(BakersList);
                 //UseDefaultFee = _useDefaultFee;
             }, DispatcherPriority.Background);
+        }
+
+        private List<BakerViewModel> GetSortedBakersList(IEnumerable<BakerViewModel>? bakersList)
+        {
+            return CurrentSortField switch
+            {
+                DelegationSortField.ByRoi when CurrentSortDirection == SortDirection.Desc
+                    => new List<BakerViewModel>(bakersList.OrderByDescending(baker => baker.Roi)),
+                DelegationSortField.ByRoi when CurrentSortDirection == SortDirection.Asc
+                    => new List<BakerViewModel>(bakersList.OrderBy(baker => baker.Roi)),
+
+                DelegationSortField.ByMinTez when CurrentSortDirection == SortDirection.Desc
+                    => new List<BakerViewModel>(bakersList.OrderByDescending(baker => baker.MinDelegation)),
+                DelegationSortField.ByMinTez when CurrentSortDirection == SortDirection.Asc
+                    => new List<BakerViewModel>(bakersList.OrderBy(baker => baker.MinDelegation)),
+
+                DelegationSortField.ByValidator when CurrentSortDirection == SortDirection.Desc
+                    => new List<BakerViewModel>(bakersList.OrderByDescending(baker => baker.Name)),
+                DelegationSortField.ByValidator when CurrentSortDirection == SortDirection.Asc
+                    => new List<BakerViewModel>(bakersList.OrderBy(baker => baker.Name)),
+
+                _ => InitialBakersList
+            };
         }
 
         private async Task PrepareWallet()
