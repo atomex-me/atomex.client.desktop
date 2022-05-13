@@ -301,6 +301,8 @@
                                         CornerRadius="{DynamicResource AtomexCornerRadius}"
                                         FontSize="18"
                                         Content="Next"
+                                        IsEnabled="{Binding SelectedBaker,
+                                            Converter={x:Static ObjectConverters.IsNotNull}}"
                                         Command="{Binding NextCommand}" />
             </StackPanel>
         </StackPanel>

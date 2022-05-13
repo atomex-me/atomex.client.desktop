@@ -38,8 +38,8 @@ namespace Atomex.Client.Desktop.ViewModels
         [Reactive] public WalletAddressViewModel? SelectedAddress { get; set; }
         [Reactive] public int WalletAddressIndex { get; set; }
         [Reactive] public List<BakerViewModel>? BakersList { get; set; }
-        [Reactive] public BakerViewModel? SelectedBaker { get; set; }
         [Reactive] public List<BakerViewModel>? InitialBakersList { get; set; }
+        [Reactive] public BakerViewModel? SelectedBaker { get; set; }
         [Reactive] public bool BakersLoading { get; set; }
         [Reactive] public List<WalletAddressViewModel> FromAddressList { get; set; }
         [Reactive] public BakerViewModel? BakerViewModel { get; set; }
@@ -64,7 +64,8 @@ namespace Atomex.Client.Desktop.ViewModels
         public ReactiveCommand<Unit, Unit> BackCommand =>
             _backCommand ??= ReactiveCommand.Create(() => { App.DialogService.Close(); });
 
-        public ReactiveCommand<Unit, Unit> NextCommand;
+        private ReactiveCommand<Unit, Unit> _nextCommand;
+        public ReactiveCommand<Unit, Unit> NextCommand => _nextCommand ??= ReactiveCommand.CreateFromTask(HandleNext);
 
         private ReactiveCommand<Unit, Unit> _undoConfirmStageCommand;
 
@@ -255,14 +256,6 @@ namespace Atomex.Client.Desktop.ViewModels
                 .WhereAllNotNull()
                 .Where(_ => BakersList != null)
                 .SubscribeInMainThread(_ => BakersList = GetSortedBakersList(BakersList));
-
-            var canNextExecute = this.WhenAnyValue(
-                    vm => vm.SelectedBaker, 
-                    vm => vm.SearchPattern,
-                    (bakerViewModel, password) => bakerViewModel != null)
-                .ObserveOn(RxApp.MainThreadScheduler);
-            
-            NextCommand = ReactiveCommand.CreateFromTask(HandleNext, canNextExecute);
 
             FeeFormat = _tezosConfig.FeeFormat;
             FeeCurrencyCode = _tezosConfig.FeeCode;
