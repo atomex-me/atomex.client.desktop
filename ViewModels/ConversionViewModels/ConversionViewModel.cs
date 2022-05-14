@@ -15,6 +15,7 @@ using Atomex.Abstract;
 using Atomex.Blockchain.BitcoinBased;
 using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.Properties;
+using Atomex.Client.Desktop.ViewModels.Abstract;
 using Atomex.Client.Desktop.ViewModels.ConversionViewModels;
 using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
 using Atomex.Client.Desktop.ViewModels.SendViewModels;

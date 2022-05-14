@@ -11,6 +11,7 @@
              xmlns:ia="clr-namespace:Avalonia.Xaml.Interactions.Core;assembly=Avalonia.Xaml.Interactions"
              xmlns:abstract="clr-namespace:Atomex.Client.Desktop.ViewModels.Abstract"
              xmlns:atomex="clr-namespace:Atomex;assembly=Atomex.Client.Core"
+             xmlns:svg="clr-namespace:Avalonia.Svg.Skia;assembly=Avalonia.Svg.Skia"
              Height="600"
              Width="700">
     <Design.DataContext>
@@ -23,6 +24,7 @@
         <converters:PercentConverter x:Key="PercentConverter" />
         <converters:LowerThanZeroConverter x:Key="LowerThanZeroConverter" />
         <converters:GreaterThanZeroConverter x:Key="GreaterThanZeroConverter" />
+        <converters:ShortenedAddressConverter x:Key="ShortenedAddressConverter" />
     </UserControl.Resources>
 
     <UserControl.Styles>
@@ -32,7 +34,7 @@
         <Style Selector="TextBlock.BakerNotFull">
             <Setter Property="Foreground" Value="{DynamicResource DefaultForegroundBrush}" />
         </Style>
-        
+
         <Style Selector="TextBlock.EditStageTitle">
             <Setter Property="Margin" Value="0" />
         </Style>
@@ -88,222 +90,379 @@
                     Margin="-24 0 -24 0"
                     Background="{DynamicResource LightDefaultOpacity10}" />
 
-            <TextBox Margin="0 16 0 0"
-                     Height="44"
-                     CornerRadius="8"
-                     Watermark="Search baker"
-                     FontSize="16"
-                     Text="{Binding SearchPattern, Mode=TwoWay}"
-                     Classes="SearchTextBox">
-                <TextBox.InnerRightContent>
-                    <StackPanel VerticalAlignment="Center"
-                                IsVisible="{Binding SearchPattern, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
-                        <controls:IconButton Classes="Clear NoEffects"
-                                             Command="{ReflectionBinding $parent[TextBox].Clear}"
-                                             Margin="0 0 15 0" />
-                    </StackPanel>
-                </TextBox.InnerRightContent>
-            </TextBox>
+            <StackPanel
+                IsVisible="{Binding Stage,
+                            Converter={StaticResource EnumToStringEqualConverter},
+                            ConverterParameter={x:Static abstract:SendStage.Edit}}">
+                <TextBox Margin="0 16 0 0"
+                         Height="44"
+                         CornerRadius="8"
+                         Watermark="Search baker"
+                         FontSize="16"
+                         Text="{Binding SearchPattern, Mode=TwoWay}"
+                         Classes="SearchTextBox">
+                    <TextBox.InnerRightContent>
+                        <StackPanel VerticalAlignment="Center"
+                                    IsVisible="{Binding SearchPattern, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+                            <controls:IconButton Classes="Clear NoEffects"
+                                                 Command="{ReflectionBinding $parent[TextBox].Clear}"
+                                                 Margin="0 0 15 0" />
+                        </StackPanel>
+                    </TextBox.InnerRightContent>
+                </TextBox>
 
-            <Border Background="{DynamicResource LightDefaultOpacity6}"
-                    VerticalAlignment="Top"
-                    CornerRadius="{DynamicResource AtomexCornerRadius}"
-                    Height="34"
-                    Margin="0 16 0 0"
-                    Padding="12 0">
-                <Grid ColumnDefinitions="10*,2*,2.5*"
-                      VerticalAlignment="Stretch">
-                    <controls:SortButton Grid.Column="0"
-                                         Title="Validator"
-                                         Command="{Binding SetSortTypeCommand}"
-                                         CommandParameter="{x:Static abstract:DelegationSortField.ByValidator}">
-                        <controls:SortButton.SortIsAsc>
-                            <MultiBinding Converter="{x:Static BoolConverters.And}">
-                                <Binding Path="CurrentSortDirection"
-                                         Converter="{StaticResource EnumToStringEqualConverter}"
-                                         ConverterParameter="{x:Static abstract:SortDirection.Asc}" />
-                                <Binding Path="CurrentSortField"
-                                         Converter="{StaticResource EnumToStringEqualConverter}"
-                                         ConverterParameter="{x:Static abstract:DelegationSortField.ByValidator}" />
-                            </MultiBinding>
-                        </controls:SortButton.SortIsAsc>
-                        <controls:SortButton.SortIsDesc>
-                            <MultiBinding Converter="{x:Static BoolConverters.And}">
-                                <Binding Path="CurrentSortDirection"
-                                         Converter="{StaticResource EnumToStringEqualConverter}"
-                                         ConverterParameter="{x:Static abstract:SortDirection.Desc}" />
-                                <Binding Path="CurrentSortField"
-                                         Converter="{StaticResource EnumToStringEqualConverter}"
-                                         ConverterParameter="{x:Static abstract:DelegationSortField.ByValidator}" />
-                            </MultiBinding>
-                        </controls:SortButton.SortIsDesc>
-                    </controls:SortButton>
-                    <controls:SortButton Grid.Column="1"
-                                         Title="Min, XTZ"
-                                         HorizontalAlignment="Right"
-                                         Command="{Binding SetSortTypeCommand}"
-                                         CommandParameter="{x:Static abstract:DelegationSortField.ByMinTez}">
-                        <controls:SortButton.SortIsAsc>
-                            <MultiBinding Converter="{x:Static BoolConverters.And}">
-                                <Binding Path="CurrentSortDirection"
-                                         Converter="{StaticResource EnumToStringEqualConverter}"
-                                         ConverterParameter="{x:Static abstract:SortDirection.Asc}" />
-                                <Binding Path="CurrentSortField"
-                                         Converter="{StaticResource EnumToStringEqualConverter}"
-                                         ConverterParameter="{x:Static abstract:DelegationSortField.ByMinTez}" />
-                            </MultiBinding>
-                        </controls:SortButton.SortIsAsc>
-                        <controls:SortButton.SortIsDesc>
-                            <MultiBinding Converter="{x:Static BoolConverters.And}">
-                                <Binding Path="CurrentSortDirection"
-                                         Converter="{StaticResource EnumToStringEqualConverter}"
-                                         ConverterParameter="{x:Static abstract:SortDirection.Desc}" />
-                                <Binding Path="CurrentSortField"
-                                         Converter="{StaticResource EnumToStringEqualConverter}"
-                                         ConverterParameter="{x:Static abstract:DelegationSortField.ByMinTez}" />
-                            </MultiBinding>
-                        </controls:SortButton.SortIsDesc>
-                    </controls:SortButton>
-                    <controls:SortButton Grid.Column="2"
-                                         Title="Est. ROI, %"
-                                         HorizontalAlignment="Right"
-                                         Command="{Binding SetSortTypeCommand}"
-                                         CommandParameter="{x:Static abstract:DelegationSortField.ByRoi}">
-                        <controls:SortButton.SortIsAsc>
-                            <MultiBinding Converter="{x:Static BoolConverters.And}">
-                                <Binding Path="CurrentSortDirection"
-                                         Converter="{StaticResource EnumToStringEqualConverter}"
-                                         ConverterParameter="{x:Static abstract:SortDirection.Asc}" />
-                                <Binding Path="CurrentSortField"
-                                         Converter="{StaticResource EnumToStringEqualConverter}"
-                                         ConverterParameter="{x:Static abstract:DelegationSortField.ByRoi}" />
-                            </MultiBinding>
-                        </controls:SortButton.SortIsAsc>
-                        <controls:SortButton.SortIsDesc>
-                            <MultiBinding Converter="{x:Static BoolConverters.And}">
-                                <Binding Path="CurrentSortDirection"
-                                         Converter="{StaticResource EnumToStringEqualConverter}"
-                                         ConverterParameter="{x:Static abstract:SortDirection.Desc}" />
-                                <Binding Path="CurrentSortField"
-                                         Converter="{StaticResource EnumToStringEqualConverter}"
-                                         ConverterParameter="{x:Static abstract:DelegationSortField.ByRoi}" />
-                            </MultiBinding>
-                        </controls:SortButton.SortIsDesc>
-                    </controls:SortButton>
-                </Grid>
-            </Border>
+                <Border Background="{DynamicResource LightDefaultOpacity6}"
+                        VerticalAlignment="Top"
+                        CornerRadius="{DynamicResource AtomexCornerRadius}"
+                        Height="34"
+                        Margin="0 16 0 0"
+                        Padding="12 0">
+                    <Grid ColumnDefinitions="10*,2*,2.5*"
+                          VerticalAlignment="Stretch">
+                        <controls:SortButton Grid.Column="0"
+                                             Title="Validator"
+                                             Command="{Binding SetSortTypeCommand}"
+                                             CommandParameter="{x:Static abstract:DelegationSortField.ByValidator}">
+                            <controls:SortButton.SortIsAsc>
+                                <MultiBinding Converter="{x:Static BoolConverters.And}">
+                                    <Binding Path="CurrentSortDirection"
+                                             Converter="{StaticResource EnumToStringEqualConverter}"
+                                             ConverterParameter="{x:Static abstract:SortDirection.Asc}" />
+                                    <Binding Path="CurrentSortField"
+                                             Converter="{StaticResource EnumToStringEqualConverter}"
+                                             ConverterParameter="{x:Static abstract:DelegationSortField.ByValidator}" />
+                                </MultiBinding>
+                            </controls:SortButton.SortIsAsc>
+                            <controls:SortButton.SortIsDesc>
+                                <MultiBinding Converter="{x:Static BoolConverters.And}">
+                                    <Binding Path="CurrentSortDirection"
+                                             Converter="{StaticResource EnumToStringEqualConverter}"
+                                             ConverterParameter="{x:Static abstract:SortDirection.Desc}" />
+                                    <Binding Path="CurrentSortField"
+                                             Converter="{StaticResource EnumToStringEqualConverter}"
+                                             ConverterParameter="{x:Static abstract:DelegationSortField.ByValidator}" />
+                                </MultiBinding>
+                            </controls:SortButton.SortIsDesc>
+                        </controls:SortButton>
+                        <controls:SortButton Grid.Column="1"
+                                             Title="Min, XTZ"
+                                             HorizontalAlignment="Right"
+                                             Command="{Binding SetSortTypeCommand}"
+                                             CommandParameter="{x:Static abstract:DelegationSortField.ByMinTez}">
+                            <controls:SortButton.SortIsAsc>
+                                <MultiBinding Converter="{x:Static BoolConverters.And}">
+                                    <Binding Path="CurrentSortDirection"
+                                             Converter="{StaticResource EnumToStringEqualConverter}"
+                                             ConverterParameter="{x:Static abstract:SortDirection.Asc}" />
+                                    <Binding Path="CurrentSortField"
+                                             Converter="{StaticResource EnumToStringEqualConverter}"
+                                             ConverterParameter="{x:Static abstract:DelegationSortField.ByMinTez}" />
+                                </MultiBinding>
+                            </controls:SortButton.SortIsAsc>
+                            <controls:SortButton.SortIsDesc>
+                                <MultiBinding Converter="{x:Static BoolConverters.And}">
+                                    <Binding Path="CurrentSortDirection"
+                                             Converter="{StaticResource EnumToStringEqualConverter}"
+                                             ConverterParameter="{x:Static abstract:SortDirection.Desc}" />
+                                    <Binding Path="CurrentSortField"
+                                             Converter="{StaticResource EnumToStringEqualConverter}"
+                                             ConverterParameter="{x:Static abstract:DelegationSortField.ByMinTez}" />
+                                </MultiBinding>
+                            </controls:SortButton.SortIsDesc>
+                        </controls:SortButton>
+                        <controls:SortButton Grid.Column="2"
+                                             Title="Est. ROI, %"
+                                             HorizontalAlignment="Right"
+                                             Command="{Binding SetSortTypeCommand}"
+                                             CommandParameter="{x:Static abstract:DelegationSortField.ByRoi}">
+                            <controls:SortButton.SortIsAsc>
+                                <MultiBinding Converter="{x:Static BoolConverters.And}">
+                                    <Binding Path="CurrentSortDirection"
+                                             Converter="{StaticResource EnumToStringEqualConverter}"
+                                             ConverterParameter="{x:Static abstract:SortDirection.Asc}" />
+                                    <Binding Path="CurrentSortField"
+                                             Converter="{StaticResource EnumToStringEqualConverter}"
+                                             ConverterParameter="{x:Static abstract:DelegationSortField.ByRoi}" />
+                                </MultiBinding>
+                            </controls:SortButton.SortIsAsc>
+                            <controls:SortButton.SortIsDesc>
+                                <MultiBinding Converter="{x:Static BoolConverters.And}">
+                                    <Binding Path="CurrentSortDirection"
+                                             Converter="{StaticResource EnumToStringEqualConverter}"
+                                             ConverterParameter="{x:Static abstract:SortDirection.Desc}" />
+                                    <Binding Path="CurrentSortField"
+                                             Converter="{StaticResource EnumToStringEqualConverter}"
+                                             ConverterParameter="{x:Static abstract:DelegationSortField.ByRoi}" />
+                                </MultiBinding>
+                            </controls:SortButton.SortIsDesc>
+                        </controls:SortButton>
+                    </Grid>
+                </Border>
 
-            <ListBox Background="{DynamicResource AlmostTransparentBrush}"
-                     Items="{Binding BakersList}"
-                     SelectedItem="{Binding SelectedBaker}"
-                     Height="336"
-                     HorizontalAlignment="Stretch"
-                     SelectionMode="Single">
-                <ListBox.Styles>
-                    <Style Selector="ListBoxItem">
-                        <Setter Property="Padding" Value="12 0" />
-                        <Setter Property="Height" Value="60" />
-                        <Setter Property="VerticalContentAlignment" Value="Center" />
-                        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-                        <Setter Property="Cursor" Value="Hand" />
-                        <Setter Property="BorderThickness" Value="0 0 0 1" />
-                        <Setter Property="Background" Value="{DynamicResource AlmostTransparentBrush}" />
-                        <Setter Property="BorderBrush" Value="{DynamicResource LightDefaultOpacity10}" />
-                    </Style>
-                    <Style Selector="ListBoxItem:pointerover /template/ ContentPresenter">
-                        <Setter Property="Background" Value="{DynamicResource ListBoxItemPointeroverBrush}" />
-                        <Setter Property="CornerRadius" Value="8" />
-                    </Style>
-                    <Style Selector="ListBoxItem:selected /template/ ContentPresenter">
-                        <Setter Property="Background" Value="{DynamicResource Blue}" />
-                        <Setter Property="CornerRadius" Value="8" />
-                    </Style>
-                </ListBox.Styles>
+                <ListBox Background="{DynamicResource AlmostTransparentBrush}"
+                         Items="{Binding BakersList}"
+                         SelectedItem="{Binding SelectedBaker}"
+                         Height="336"
+                         HorizontalAlignment="Stretch"
+                         SelectionMode="Single">
+                    <ListBox.Styles>
+                        <Style Selector="ListBoxItem">
+                            <Setter Property="Padding" Value="12 0" />
+                            <Setter Property="Height" Value="60" />
+                            <Setter Property="VerticalContentAlignment" Value="Center" />
+                            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                            <Setter Property="Cursor" Value="Hand" />
+                            <Setter Property="BorderThickness" Value="0 0 0 1" />
+                            <Setter Property="Background" Value="{DynamicResource AlmostTransparentBrush}" />
+                            <Setter Property="BorderBrush" Value="{DynamicResource LightDefaultOpacity10}" />
+                        </Style>
+                        <Style Selector="ListBoxItem:pointerover /template/ ContentPresenter">
+                            <Setter Property="Background" Value="{DynamicResource ListBoxItemPointeroverBrush}" />
+                            <Setter Property="CornerRadius" Value="8" />
+                        </Style>
+                        <Style Selector="ListBoxItem:selected /template/ ContentPresenter">
+                            <Setter Property="Background" Value="{DynamicResource Blue}" />
+                            <Setter Property="CornerRadius" Value="8" />
+                        </Style>
+                    </ListBox.Styles>
 
-                <ListBox.ItemTemplate>
-                    <DataTemplate>
-                        <Grid ColumnDefinitions="10*,2*,2.5*"
-                              RowDefinitions="Auto">
-                            <StackPanel Orientation="Horizontal"
-                                        Grid.Column="0">
-                                <Image Width="32"
-                                       Height="32"
-                                       Source="{Binding BitmapLogo}" />
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <Grid ColumnDefinitions="10*,2*,2.5*"
+                                  RowDefinitions="Auto">
+                                <StackPanel Orientation="Horizontal"
+                                            Grid.Column="0">
+                                    <Image Width="32"
+                                           Height="32"
+                                           Source="{Binding BitmapLogo}" />
 
-                                <StackPanel Margin="16 0 0 0"
-                                            VerticalAlignment="Center">
-                                    <TextBlock VerticalAlignment="Center"
-                                               Foreground="{DynamicResource DefaultForegroundBrush}"
-                                               FontSize="16"
-                                               LineHeight="22"
-                                               Text="{Binding Name}" />
-                                    <StackPanel Orientation="Horizontal">
+                                    <StackPanel Margin="16 0 0 0"
+                                                VerticalAlignment="Center">
                                         <TextBlock VerticalAlignment="Center"
-                                                   FontSize="13"
-                                                   Classes.BakerFull="{Binding StakingAvailable,
-                                                   Converter={StaticResource LowerThanZeroConverter}}"
-                                                   Classes.BakerNotFull="{Binding StakingAvailable,
+                                                   Foreground="{DynamicResource DefaultForegroundBrush}"
+                                                   FontSize="16"
+                                                   LineHeight="22"
+                                                   Text="{Binding Name}" />
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock VerticalAlignment="Center"
+                                                       FontSize="13"
+                                                       Classes.BakerFull="{Binding StakingAvailable,
+                                                       Converter={StaticResource LowerThanZeroConverter}}"
+                                                       Classes.BakerNotFull="{Binding StakingAvailable,
                                                    Converter={StaticResource GreaterThanZeroConverter}}"
-                                                   Text="Free space" />
-                                        <TextBlock VerticalAlignment="Center"
-                                                   Margin="4 0 0 0"
-                                                   Classes.BakerFull="{Binding StakingAvailable,
-                                                   Converter={StaticResource LowerThanZeroConverter}}"
-                                                   Classes.BakerNotFull="{Binding StakingAvailable,
+                                                       Text="Free space" />
+                                            <TextBlock VerticalAlignment="Center"
+                                                       Margin="4 0 0 0"
+                                                       Classes.BakerFull="{Binding StakingAvailable,
+                                                       Converter={StaticResource LowerThanZeroConverter}}"
+                                                       Classes.BakerNotFull="{Binding StakingAvailable,
                                                    Converter={StaticResource GreaterThanZeroConverter}}"
-                                                   FontSize="13"
-                                                   Text="{Binding FreeSpaceFormatted}" />
-                                        <TextBlock VerticalAlignment="Center"
-                                                   Margin="4 0 0 0"
-                                                   FontSize="13"
-                                                   Foreground="{DynamicResource Orange}"
-                                                   IsVisible="{Binding StakingAvailable,
-                                                   Converter={StaticResource LowerThanZeroConverter}}"
-                                                   Text="(baker is full)" />
+                                                       FontSize="13"
+                                                       Text="{Binding FreeSpaceFormatted}" />
+                                            <TextBlock VerticalAlignment="Center"
+                                                       Margin="4 0 0 0"
+                                                       FontSize="13"
+                                                       Foreground="{DynamicResource Orange}"
+                                                       IsVisible="{Binding StakingAvailable,
+                                                       Converter={StaticResource LowerThanZeroConverter}}"
+                                                       Text="(baker is full)" />
+                                        </StackPanel>
                                     </StackPanel>
                                 </StackPanel>
-                            </StackPanel>
 
-                            <StackPanel Grid.Column="1"
-                                        VerticalAlignment="Center"
-                                        HorizontalAlignment="Right"
-                                        Orientation="Horizontal">
-                                <TextBlock FontSize="16"
+                                <StackPanel Grid.Column="1"
+                                            VerticalAlignment="Center"
+                                            HorizontalAlignment="Right"
+                                            Orientation="Horizontal">
+                                    <TextBlock FontSize="16"
+                                               Foreground="{DynamicResource DefaultForegroundBrush}"
+                                               Text="{Binding MinDelegation}" />
+                                    <TextBlock FontSize="16"
+                                               Foreground="{DynamicResource DefaultForegroundBrush}"
+                                               Margin="4 0 0 0"
+                                               Text="{x:Static atomex:TezosConfig.Xtz}" />
+                                </StackPanel>
+
+                                <TextBlock Grid.Column="2"
+                                           VerticalAlignment="Center"
+                                           FontSize="16"
                                            Foreground="{DynamicResource DefaultForegroundBrush}"
-                                           Text="{Binding MinDelegation}" />
-                                <TextBlock FontSize="16"
-                                           Foreground="{DynamicResource DefaultForegroundBrush}"
-                                           Margin="4 0 0 0"
-                                           Text="{x:Static atomex:TezosConfig.Xtz}" />
-                            </StackPanel>
+                                           HorizontalAlignment="Right"
+                                           Text="{Binding Roi, Converter={StaticResource PercentConverter}}" />
+                            </Grid>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
 
-                            <TextBlock Grid.Column="2"
-                                       VerticalAlignment="Center"
-                                       FontSize="16"
-                                       Foreground="{DynamicResource DefaultForegroundBrush}"
-                                       HorizontalAlignment="Right"
-                                       Text="{Binding Roi, Converter={StaticResource PercentConverter}}" />
-                        </Grid>
-                    </DataTemplate>
-                </ListBox.ItemTemplate>
-            </ListBox>
+                <!-- separator -->
+                <Border Height="1"
+                        Margin="-24 0 -24 0"
+                        Background="{DynamicResource LightDefaultOpacity10}" />
 
-            <!-- separator -->
-            <Border Height="1"
-                    Margin="-24 0 -24 0"
-                    Background="{DynamicResource LightDefaultOpacity10}" />
-
-            <StackPanel Orientation="Horizontal"
-                        Margin="0 16 0 0"
-                        HorizontalAlignment="Right">
-                <controls:RoundedButton Width="200"
-                                        Height="50"
-                                        CornerRadius="{DynamicResource AtomexCornerRadius}"
-                                        FontSize="18"
-                                        Content="Next"
-                                        IsEnabled="{Binding SelectedBaker,
+                <StackPanel Orientation="Horizontal"
+                            Margin="0 16 0 0"
+                            HorizontalAlignment="Right">
+                    <controls:RoundedButton Width="200"
+                                            Height="50"
+                                            CornerRadius="{DynamicResource AtomexCornerRadius}"
+                                            FontSize="18"
+                                            Content="Next"
+                                            IsEnabled="{Binding SelectedBaker,
                                             Converter={x:Static ObjectConverters.IsNotNull}}"
-                                        Command="{Binding NextCommand}" />
+                                            Command="{Binding NextCommand}" />
+                </StackPanel>
+            </StackPanel>
+
+            <StackPanel
+                IsVisible="{Binding Stage,
+                            Converter={StaticResource EnumToStringEqualConverter},
+                            ConverterParameter={x:Static abstract:SendStage.Confirmation}}">
+                <Border Width="440"
+                        Height="74"
+                        HorizontalAlignment="Center"
+                        Margin="0 32 0 0"
+                        Padding="16 0"
+                        CornerRadius="{DynamicResource AtomexCornerRadius}"
+                        BorderBrush="{DynamicResource LightDefaultOpacity10}"
+                        BorderThickness="1">
+                    <Grid ColumnDefinitions="Auto,*,Auto">
+                        <Image Grid.Column="0"
+                               Width="32"
+                               Height="32"
+                               HorizontalAlignment="Left"
+                               Source="{Binding SelectedBaker.BitmapLogo}" />
+                        <StackPanel Grid.Column="1"
+                                    Margin="16 0 0 0"
+                                    VerticalAlignment="Center">
+                            <TextBlock VerticalAlignment="Center"
+                                       Foreground="{DynamicResource DefaultForegroundBrush}"
+                                       FontSize="16"
+                                       LineHeight="22"
+                                       Text="{Binding SelectedBaker.Name}" />
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock VerticalAlignment="Center"
+                                           FontSize="13"
+                                           Classes.BakerFull="{Binding SelectedBaker.StakingAvailable,
+                                                       Converter={StaticResource LowerThanZeroConverter}}"
+                                           Classes.BakerNotFull="{Binding SelectedBaker.StakingAvailable,
+                                                   Converter={StaticResource GreaterThanZeroConverter}}"
+                                           Text="Free space" />
+                                <TextBlock VerticalAlignment="Center"
+                                           Margin="4 0 0 0"
+                                           Classes.BakerFull="{Binding SelectedBaker.StakingAvailable,
+                                                       Converter={StaticResource LowerThanZeroConverter}}"
+                                           Classes.BakerNotFull="{Binding SelectedBaker.StakingAvailable,
+                                                   Converter={StaticResource GreaterThanZeroConverter}}"
+                                           FontSize="13"
+                                           Text="{Binding SelectedBaker.FreeSpaceFormatted}" />
+                                <TextBlock VerticalAlignment="Center"
+                                           Margin="4 0 0 0"
+                                           FontSize="13"
+                                           Foreground="{DynamicResource Orange}"
+                                           IsVisible="{Binding SelectedBaker.StakingAvailable,
+                                                       Converter={StaticResource LowerThanZeroConverter}}"
+                                           Text="(baker is full)" />
+                            </StackPanel>
+                        </StackPanel>
+
+                        <StackPanel Grid.Column="2"
+                                    VerticalAlignment="Center">
+                            <StackPanel Orientation="Horizontal"
+                                        HorizontalAlignment="Right"
+                                        Margin="0 0 0 1">
+                                <TextBlock Text="min"
+                                           FontSize="13"
+                                           Foreground="{DynamicResource SecondaryForegroundBrush}" />
+                                <TextBlock Text="{Binding SelectedBaker.MinDelegation}"
+                                           Foreground="{DynamicResource SecondaryForegroundBrush}"
+                                           Margin="3 0 0 0"
+                                           FontSize="13" />
+                                <TextBlock Text="{x:Static atomex:TezosConfig.Xtz}"
+                                           Foreground="{DynamicResource SecondaryForegroundBrush}"
+                                           Margin="3 0 0 0"
+                                           FontSize="13" />
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal"
+                                        HorizontalAlignment="Right"
+                                        Margin="0 1 0 0">
+                                <TextBlock Text="Est. ROI"
+                                           FontSize="13"
+                                           Foreground="{DynamicResource SecondaryForegroundBrush}" />
+                                <TextBlock
+                                    Text="{Binding SelectedBaker.Roi,
+                                    Converter={StaticResource PercentConverter}}"
+                                    Foreground="{DynamicResource SecondaryForegroundBrush}"
+                                    Margin="3 0 0 0"
+                                    FontSize="13" />
+                            </StackPanel>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+
+                <Grid ColumnDefinitions="*,Auto"
+                      RowDefinitions="Auto,Auto,Auto"
+                      Width="440"
+                      Margin="0 25 0 0"
+                      HorizontalAlignment="Center">
+                    <TextBlock Grid.Column="0"
+                               Grid.Row="0"
+                               Foreground="{DynamicResource SecondaryForegroundBrush}"
+                               FontSize="16"
+                               VerticalAlignment="Center"
+                               Text="From address" />
+
+                    <StackPanel Grid.Column="1"
+                                Grid.Row="0"
+                                HorizontalAlignment="Right"
+                                Orientation="Horizontal">
+                        <svg:Svg HorizontalAlignment="Center"
+                                 Width="18"
+                                 Height="18"
+                                 Path="/Resources/Icons/tezos.svg" />
+                        <TextBlock Margin="6 0 0 0"
+                                   Foreground="{DynamicResource DefaultForegroundBrush}"
+                                   FontSize="16"
+                                   VerticalAlignment="Center"
+                                   Text="{Binding SelectedAddress.Address,
+                                   Converter={StaticResource ShortenedAddressConverter},
+                                   ConverterParameter={x:Static abstract:AddressTruncateType.Short}}" />
+                        
+                        <controls:CopyButton ToolText="Copy your delegating address"
+                                             DoneToolText="Copied!"
+                                             Margin="6 0 0 0"
+                                             Command="{Binding CopyCommand}"
+                                             CommandParameter="{Binding SelectedAddress.Address}"/>
+                    </StackPanel>
+                    
+                    <TextBlock Grid.Column="0"
+                               Grid.Row="1"
+                               Foreground="{DynamicResource SecondaryForegroundBrush}"
+                               FontSize="16"
+                               VerticalAlignment="Center"
+                               Text="To address" />
+
+                    <StackPanel Grid.Column="1"
+                                Grid.Row="1"
+                                HorizontalAlignment="Right"
+                                Orientation="Horizontal">
+                        <Image Width="18"
+                               Height="18"
+                               Source="{Binding SelectedBaker.BitmapLogo}" />
+                        <TextBlock Margin="6 0 0 0"
+                                   Foreground="{DynamicResource DefaultForegroundBrush}"
+                                   FontSize="16"
+                                   VerticalAlignment="Center"
+                                   Text="{Binding SelectedBaker.Address,
+                                   Converter={StaticResource ShortenedAddressConverter},
+                                   ConverterParameter={x:Static abstract:AddressTruncateType.Short}}" />
+                        
+                        <controls:CopyButton ToolText="Copy baker address"
+                                             DoneToolText="Copied!"
+                                             Margin="6 0 0 0"
+                                             Command="{Binding CopyCommand}"
+                                             CommandParameter="{Binding SelectedAddress.Address}"/>
+                    </StackPanel>
+                </Grid>
             </StackPanel>
         </StackPanel>
     </Border>

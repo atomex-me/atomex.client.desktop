@@ -24,24 +24,24 @@ using Avalonia.Controls;
 
 namespace Atomex.Client.Desktop.ViewModels
 {
-    internal class TezosTxFill
-    {
-        public TezosTransaction? Tx { get; set; }
-        public Error? Error { get; set; }
-    }
+    // internal class TezosTxFill
+    // {
+    //     public TezosTransaction? Tx { get; set; }
+    //     public Error? Error { get; set; }
+    // }
 
     public class DelegateViewModel : ViewModelBase
     {
         private readonly IAtomexApp _app;
         private readonly TezosConfig _tezosConfig;
-
+        
+        [Reactive] public List<WalletAddressViewModel> FromAddressList { get; set; }
         [Reactive] public WalletAddressViewModel? SelectedAddress { get; set; }
         [Reactive] public int WalletAddressIndex { get; set; }
         [Reactive] public List<BakerViewModel>? BakersList { get; set; }
         [Reactive] public List<BakerViewModel>? InitialBakersList { get; set; }
         [Reactive] public BakerViewModel? SelectedBaker { get; set; }
         [Reactive] public bool BakersLoading { get; set; }
-        [Reactive] public List<WalletAddressViewModel> FromAddressList { get; set; }
         [Reactive] public BakerViewModel? BakerViewModel { get; set; }
         [Reactive] public decimal Fee { get; set; }
         [Reactive] public string BaseCurrencyFormat { get; set; }
@@ -84,6 +84,20 @@ namespace Atomex.Client.Desktop.ViewModels
                     CurrentSortDirection = CurrentSortDirection == SortDirection.Asc
                         ? SortDirection.Desc
                         : SortDirection.Asc;
+            });
+        
+        private ReactiveCommand<string, Unit> _copyCommand;
+
+        public ReactiveCommand<string, Unit> CopyCommand => _copyCommand ??= ReactiveCommand.Create<string>(data =>
+            {
+                try
+                {
+                    App.Clipboard.SetTextAsync(data);
+                }
+                catch (Exception e)
+                {
+                    Log.Error(e, "Copy to clipboard error");
+                }
             });
 
         private async Task HandleNext()
@@ -505,6 +519,17 @@ namespace Atomex.Client.Desktop.ViewModels
                     Address = "tz1sdfldjsflksjdlkf123sfa",
                     Fee = 5,
                     MinDelegation = 100.001m,
+                    Roi = 6.56m,
+                    StakingAvailable = -10000.000000m
+                },
+                new BakerViewModel()
+                {
+                    Logo = "https://api.baking-bad.org/logos/tezoshodl.png",
+                    Name = "TezosHODL",
+                    Address = "tz1sdfldjsflksjdlkf123sfa",
+                    Fee = 5,
+                    MinDelegation = 100.001m,
+                    Roi = 6.56m,
                     StakingAvailable = 10000.000000m
                 }
             };
@@ -514,6 +539,19 @@ namespace Atomex.Client.Desktop.ViewModels
             Address = "tz1sdfldjsflksjdlkf123sfa";
             Fee = 5;
             FeeInBase = 123m;
+
+            Stage = SendStage.Confirmation;
+            SelectedBaker = BakersList[0];
+            
+            SelectedAddress = new WalletAddressViewModel
+            {
+                Address = "tz3bvNMQ95vfAYtG8193ymshqjSvmxiCUuR5",
+                HasActivity = true,
+                AvailableBalance = 123.456789m,
+                CurrencyFormat = "F8",
+                CurrencyCode = TezosConfig.Xtz,
+                IsFreeAddress = false,
+            };
         }
 #endif
     }
