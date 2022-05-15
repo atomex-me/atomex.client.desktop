@@ -349,9 +349,9 @@ namespace Atomex.Client.Desktop.ViewModels
                 while (_hasAccount)
                 {
                     if (AccountRestored || Content is UnlockViewModel) continue;
-
                     var messages = await Atomex.ViewModels.Helpers.GetUserMessages(userId);
-
+                    await Task.Delay(delayInterval);
+                    
                     if (messages == null) continue;
 
                     foreach (var message in messages.Where(message => !message.IsReaded))
@@ -371,8 +371,6 @@ namespace Atomex.Client.Desktop.ViewModels
 
                         break;
                     }
-
-                    await Task.Delay(delayInterval);
                 }
             });
         }

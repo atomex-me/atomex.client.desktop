@@ -502,10 +502,6 @@
                         HorizontalAlignment="Center"
                         Margin="0 32 0 60">
                 <controls:RoundedButton Width="440"
-                                        Height="50"
-                                        CornerRadius="{DynamicResource AtomexCornerRadius}"
-                                        FontSize="18"
-                                        FontWeight="Normal"
                                         Command="{Binding NextCommand}"
                                         IsEnabled="{Binding CanSend}">
                     <i:Interaction.Behaviors>

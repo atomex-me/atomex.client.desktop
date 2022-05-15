@@ -134,7 +134,6 @@
 
                     <controls:RoundedButton Height="46"
                                             Padding="26 0"
-                                            CornerRadius="{DynamicResource AtomexCornerRadius}"
                                             Command="{Binding SendCommand}"
                                             Margin="0 0 12 12">
                         <StackPanel Orientation="Horizontal">
@@ -150,7 +149,6 @@
                     </controls:RoundedButton>
                     <controls:RoundedButton Height="46"
                                             Padding="26 0"
-                                            CornerRadius="{DynamicResource AtomexCornerRadius}"
                                             Command="{Binding ReceiveCommand}"
                                             Margin="0 0 12 12">
                         <StackPanel Orientation="Horizontal">
@@ -166,7 +164,6 @@
                     </controls:RoundedButton>
                     <controls:RoundedButton Height="46"
                                             Padding="26 0"
-                                            CornerRadius="{DynamicResource AtomexCornerRadius}"
                                             Command="{Binding ExchangeCommand}"
                                             Margin="0 0 12 12"
                                             Classes="AccentButton">
@@ -183,7 +180,6 @@
                     </controls:RoundedButton>
                     <controls:RoundedButton Height="46"
                                             Padding="26 0"
-                                            CornerRadius="{DynamicResource AtomexCornerRadius}"
                                             Command="{Binding BuyCommand}"
                                             Margin="0 0 12 12"
                                             IsVisible="{Binding CurrencyViewModel.CurrencyCode, Converter={StaticResource ShowBuyButton}}"
@@ -430,7 +426,7 @@
                             Height="34"
                             Margin="0 16 0 0"
                             Padding="12 0">
-                        <Grid ColumnDefinitions="7.5*,3.3*,3.2*,2.5*,3.5*"
+                        <Grid ColumnDefinitions="7.5*,3.3*,3.7*,2*,3.5*"
                               VerticalAlignment="Stretch">
                             <Button Grid.Column="0"
                                     Padding="0"
@@ -562,7 +558,7 @@
                         <ListBox.ItemTemplate>
                             <DataTemplate>
                                 <Border Padding="12 0">
-                                    <Grid ColumnDefinitions="7.5*,3.3*,3.2*,2.5*,3.5*"
+                                    <Grid ColumnDefinitions="7.5*,3.3*,3.7*,2*,3.5*"
                                           VerticalAlignment="Stretch">
                                         <controls:LinkButton Grid.Column="0"
                                                              Underlined="True"
@@ -631,7 +627,7 @@
                                                    Foreground="{DynamicResource SecondaryForegroundBrush}"
                                                    VerticalAlignment="Center"
                                                    FontSize="16"
-                                                   Text="{Binding Baker.EstimatedRoi}" />
+                                                   Text="{Binding Baker.EstimatedRoi, Converter={StaticResource PercentConverter}}" />
 
                                         <Grid Grid.Column="4"
                                               ColumnDefinitions="*,Auto">
@@ -707,8 +703,8 @@
                                                             </StackPanel.Styles>
                                                             <StackPanel Orientation="Vertical"
                                                                         IsVisible="{Binding Status,
-                                                                        Converter={StaticResource EnumToStringEqualConverter},
-                                                                        ConverterParameter={x:Static atomexBlockchainTezos:DelegationStatus.Active}}">
+                                                                        Converter={StaticResource EnumToStringNotEqualConverter},
+                                                                        ConverterParameter={x:Static atomexBlockchainTezos:DelegationStatus.NotDelegated}}">
                                                                 <Button Width="180"
                                                                         Height="40"
                                                                         Padding="12 0"
@@ -737,8 +733,8 @@
 
                                                             <StackPanel Orientation="Vertical"
                                                                         IsVisible="{Binding Status,
-                                                                        Converter={StaticResource EnumToStringNotEqualConverter},
-                                                                        ConverterParameter={x:Static atomexBlockchainTezos:DelegationStatus.Active}}">
+                                                                        Converter={StaticResource EnumToStringEqualConverter},
+                                                                        ConverterParameter={x:Static atomexBlockchainTezos:DelegationStatus.NotDelegated}}">
                                                                 <Button Width="180"
                                                                         Height="40"
                                                                         Padding="12 0"

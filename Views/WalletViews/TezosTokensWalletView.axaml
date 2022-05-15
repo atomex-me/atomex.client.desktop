@@ -362,6 +362,7 @@
                                     Width="50"
                                     Height="24"
                                     CornerRadius="10"
+                                    FontSize="13"
                                     Content="Send"
                                     Command="{Binding Send}"
                                     Grid.Column="4"

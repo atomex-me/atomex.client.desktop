@@ -102,13 +102,8 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             App.DialogService.Show(receiveViewModel);
         }
 
-        protected override async void OnUpdateClick()
+        protected override async Task OnUpdateClick()
         {
-            if (IsBalanceUpdating)
-                return;
-
-            IsBalanceUpdating = true;
-
             _cancellation = new CancellationTokenSource();
 
             try
@@ -119,15 +114,13 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             }
             catch (OperationCanceledException)
             {
-                Log.Debug("Wallet update operation canceled.");
+                Log.Debug("Wallet update operation canceled");
             }
             catch (Exception e)
             {
-                Log.Error(e, "Fa12WalletViewModel.OnUpdateClick error.");
+                Log.Error(e, "Fa12WalletViewModel OnUpdate error");
                 // todo: message to user!?
             }
-
-            IsBalanceUpdating = false;
         }
 
         protected override void LoadAddresses()

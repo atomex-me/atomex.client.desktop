@@ -27,7 +27,7 @@
     <StyleInclude Source="/Styles/MainWindowStyle.axaml"/>
     <StyleInclude Source="/Styles/ChildViewStyle.axaml"/>
     <StyleInclude Source="/Styles/ButtonStyle.axaml"/>
-    <StyleInclude Source="/Styles/RoundedButtonStyle.axaml"/>
+    <StyleInclude Source="/Controls/RoundedButton.axaml"/>
     <StyleInclude Source="/Styles/RadioButtonStyle.axaml"/>
     <StyleInclude Source="/Controls/IconButton.axaml"/>
     <StyleInclude Source="/Controls/CopyButton.axaml"/>

@@ -599,13 +599,8 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             SetConversionTab?.Invoke(currency);
         }
 
-        protected override async void OnUpdateClick()
+        protected override async Task OnUpdateClick()
         {
-            if (IsBalanceUpdating)
-                return;
-
-            IsBalanceUpdating = true;
-
             _cancellation = new CancellationTokenSource();
 
             var updatingModalVm = MessageViewModel.Message(
@@ -647,7 +642,6 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             }
 
             App.DialogService.Close();
-            IsBalanceUpdating = false;
         }
 
         protected void OnAddressesClick()

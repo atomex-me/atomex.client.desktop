@@ -13,6 +13,7 @@ namespace Atomex.Client.Desktop.ViewModels
         public decimal Roi { get; set; }
         public decimal MinDelegation { get; set; }
         public decimal StakingAvailable { get; set; }
+        public bool IsCurrentlyActive { get; set; }
 
         public string FreeSpaceFormatted => StakingAvailable.ToString(StakingAvailable switch
         {

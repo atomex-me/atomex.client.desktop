@@ -111,6 +111,7 @@
                                     Margin="0 5 0 5"
                                     CornerRadius="0 20 20 0"
                                     Content="Generate"
+                                    FontSize="13"
                                     HorizontalAlignment="Center"
                                     Command="{Binding MnemonicCommand}" />
         </StackPanel>

@@ -53,19 +53,13 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                     vm => vm.CurrentDelegationSortField)
                 .WhereAllNotNull()
                 .SubscribeInMainThread(_ => SortDelegations(Delegations));
-            
+
             DelegateCommand.Merge(UndelegateCommand)
                 .SubscribeInMainThread(_ => DelegationAddressPopupOpened = null);
 
             _ = LoadDelegationInfoAsync();
             
-            DelegateViewModel = new DelegateViewModel(_app, async () =>
-            {
-                await Task.Delay(TimeSpan.FromSeconds(DelegationCheckIntervalInSec))
-                    .ConfigureAwait(false);
-                await Dispatcher.UIThread.InvokeAsync(OnUpdateClick);
-            });
-
+            DelegateViewModel = new DelegateViewModel(_app);
             CurrentDelegationSortField = DelegationSortField.ByBalance;
             CurrentDelegationSortDirection = SortDirection.Desc;
         }
@@ -76,10 +70,10 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             {
                 DelegationSortField.ByRoi when CurrentDelegationSortDirection == SortDirection.Desc
                     => new ObservableCollection<Delegation>(
-                        delegations.OrderByDescending(d => d.Baker.EstimatedRoi)),
+                        delegations.OrderByDescending(d => d.Baker?.EstimatedRoi ?? 0)),
                 DelegationSortField.ByRoi when CurrentDelegationSortDirection == SortDirection.Asc
                     => new ObservableCollection<Delegation>(
-                        delegations.OrderBy(d => d.Baker.EstimatedRoi)),
+                        delegations.OrderBy(d => d.Baker?.EstimatedRoi ?? 0)),
 
                 DelegationSortField.ByStatus when CurrentDelegationSortDirection == SortDirection.Desc
                     => new ObservableCollection<Delegation>(
@@ -248,6 +242,8 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
         private void OnDelegateClick(string addressToDelegate)
         {
+            var delegation = Delegations.First(d => d.Address == addressToDelegate);
+            DelegateViewModel.InitializeWith(delegation);
             App.DialogService.Show(DelegateViewModel);
         }
 
