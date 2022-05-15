@@ -304,7 +304,7 @@
                             HorizontalAlignment="Right">
                     <controls:RoundedButton Width="200"
                                             Content="Next"
-                                            Command="{Binding NextCommand}">
+                                            Command="{Binding CheckDelegationCommand}">
                         <controls:RoundedButton.IsEnabled>
                             <MultiBinding Converter="{x:Static BoolConverters.And}">
                                 <Binding Path="SelectedBaker"
@@ -509,7 +509,7 @@
                             </TextBlock.Text>
                         </TextBlock>
                     </StackPanel>
-                    
+
                     <TextBlock Grid.Column="0"
                                Grid.ColumnSpan="2"
                                Grid.Row="3"
@@ -519,7 +519,7 @@
                                Margin="0 3 0 0"
                                Foreground="{DynamicResource ErrorForegroundBrush}"
                                VerticalAlignment="Center" />
-                    
+
                     <TextBlock Grid.Column="0"
                                Grid.ColumnSpan="2"
                                Grid.Row="3"
@@ -531,8 +531,8 @@
                                VerticalAlignment="Center">
                         <TextBlock.IsVisible>
                             <MultiBinding Converter="{x:Static BoolConverters.And}">
-                                <Binding Path="Warning" Converter="{x:Static StringConverters.IsNullOrEmpty}"/>
-                                <Binding Path="ChoosenBakerIsOverdelegated"/>
+                                <Binding Path="Warning" Converter="{x:Static StringConverters.IsNullOrEmpty}" />
+                                <Binding Path="ChoosenBakerIsOverdelegated" />
                             </MultiBinding>
                         </TextBlock.IsVisible>
                     </TextBlock>
@@ -542,10 +542,17 @@
                                             Grid.Row="4"
                                             Margin="0 25 0 44"
                                             Content="Confirm Delegation"
-                                            IsEnabled="{Binding Warning,
-                                            Converter={x:Static StringConverters.IsNullOrEmpty}}"
                                             Command="{Binding SendCommand}"
-                                            Classes.Loading="{Binding IsSending}"/>
+                                            Classes.Loading="{Binding IsSending}">
+                        <controls:RoundedButton.IsEnabled>
+                            <MultiBinding Converter="{x:Static BoolConverters.And}">
+                                <Binding Path="Warning"
+                                         Converter="{x:Static StringConverters.IsNullOrEmpty}" />
+                                <Binding Path="IsChecking"
+                                         Converter="{x:Static BoolConverters.Not}" />
+                            </MultiBinding>
+                        </controls:RoundedButton.IsEnabled>
+                    </controls:RoundedButton>
                 </Grid>
             </StackPanel>
         </StackPanel>

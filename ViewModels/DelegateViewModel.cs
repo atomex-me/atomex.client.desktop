@@ -53,6 +53,7 @@ namespace Atomex.Client.Desktop.ViewModels
         [Reactive] public DelegationSortField? CurrentSortField { get; set; }
         [Reactive] public SortDirection? CurrentSortDirection { get; set; }
         [ObservableAsProperty] public bool IsSending { get; }
+        [ObservableAsProperty] public bool IsChecking { get; }
 
 
         private ReactiveCommand<Unit, Unit> _backCommand;
@@ -60,10 +61,10 @@ namespace Atomex.Client.Desktop.ViewModels
         public ReactiveCommand<Unit, Unit> BackCommand =>
             _backCommand ??= ReactiveCommand.Create(() => { App.DialogService.Close(); });
 
-        private ReactiveCommand<Unit, Unit> _nextCommand;
+        private ReactiveCommand<Unit, Unit> _checkDelegationCommand;
 
-        public ReactiveCommand<Unit, Unit> NextCommand =>
-            _nextCommand ??= ReactiveCommand.CreateFromTask(CheckDelegation);
+        public ReactiveCommand<Unit, Unit> CheckDelegationCommand =>
+            _checkDelegationCommand ??= ReactiveCommand.CreateFromTask(CheckDelegation);
 
         private ReactiveCommand<Unit, Unit> _sendCommand;
 
@@ -359,6 +360,7 @@ namespace Atomex.Client.Desktop.ViewModels
                     ChoosenBakerIsOverdelegated = selectedBaker.StakingAvailable - DelegateAddressBalance < 0);
 
             SendCommand.IsExecuting.ToPropertyExInMainThread(this, vm => vm.IsSending);
+            CheckDelegationCommand.IsExecuting.ToPropertyExInMainThread(this, vm => vm.IsChecking);
 
             FeeFormat = _tezosConfig.FeeFormat;
             FeeCurrencyCode = _tezosConfig.FeeCode;
@@ -577,17 +579,12 @@ namespace Atomex.Client.Desktop.ViewModels
                     headOffset: TezosConfig.HeadOffset,
                     cancellationToken: cancellationToken);
 
-                return (
-                    tx,
-                    isSuccess,
-                    isRunSuccess
-                );
+                return (tx, isSuccess, isRunSuccess);
             }
             catch (Exception e)
             {
                 Log.Error(e, "Autofill transaction error");
-                return new Error(Errors.TransactionCreationError,
-                    "Autofill transaction error. Try again later.");
+                return new Error(Errors.TransactionCreationError, "Autofill transaction error. Try again later.");
             }
         }
 

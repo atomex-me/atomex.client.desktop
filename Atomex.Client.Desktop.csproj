@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
     <PropertyGroup>
-        <OutputType>Exe</OutputType>
+        <OutputType>WinExe</OutputType>
         <TargetFramework>net5.0</TargetFramework>
         <Nullable>enable</Nullable>
         <DefaultItemExcludes>$(DefaultItemExcludes);atomex.client.core\**</DefaultItemExcludes>
@@ -160,9 +160,6 @@
         </Compile>
         <Compile Update="Views\DelegateView.axaml.cs">
             <DependentUpon>DelegateView.axaml</DependentUpon>
-        </Compile>
-        <Compile Update="Views\DelegateConfirmationView.axaml.cs">
-            <DependentUpon>DelegateConfirmationView.axaml</DependentUpon>
         </Compile>
         <Compile Update="Views\ReceiveView.axaml.cs">
             <DependentUpon>ReceiveView.axaml</DependentUpon>
