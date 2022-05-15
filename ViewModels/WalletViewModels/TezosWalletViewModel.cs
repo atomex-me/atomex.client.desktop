@@ -17,6 +17,8 @@ using Atomex.Core;
 using Atomex.Wallet;
 using ReactiveUI.Fody.Helpers;
 
+// ReSharper disable All
+
 
 namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 {
@@ -58,7 +60,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                 .SubscribeInMainThread(_ => DelegationAddressPopupOpened = null);
 
             _ = LoadDelegationInfoAsync();
-            
+
             DelegateViewModel = new DelegateViewModel(_app);
             CurrentDelegationSortField = DelegationSortField.ByBalance;
             CurrentDelegationSortDirection = SortDirection.Desc;
@@ -211,7 +213,8 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         private ReactiveCommand<string, Unit> _undelegateCommand;
 
         public ReactiveCommand<string, Unit> UndelegateCommand =>
-            _undelegateCommand ??= (_undelegateCommand = ReactiveCommand.Create<string>(Undelegate));
+            _undelegateCommand ??= (_undelegateCommand = ReactiveCommand.Create<string>(
+                undelegateAddress => _ = DelegateViewModel.Undelegate(undelegateAddress)));
 
         private ReactiveCommand<string, Unit> _openAddressInExplorerCommand;
 
@@ -242,20 +245,9 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
         private void OnDelegateClick(string addressToDelegate)
         {
-            var delegation = Delegations.First(d => d.Address == addressToDelegate);
+            var delegation = Delegations.First(delegation => delegation.Address == addressToDelegate);
             DelegateViewModel.InitializeWith(delegation);
             App.DialogService.Show(DelegateViewModel);
-        }
-
-        private void Undelegate(string undelegateAddress)
-        {
-            var messageViewModel = MessageViewModel.Message(
-                title: "Confirm undelegating",
-                text: $"Are you sure you want to stop delegating {undelegateAddress} address?",
-                nextTitle: "Undelegate",
-                nextAction: () => App.DialogService.Close());
-
-            App.DialogService.Show(messageViewModel);
         }
 
 #if DEBUG

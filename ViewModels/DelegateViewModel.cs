@@ -71,7 +71,7 @@ namespace Atomex.Client.Desktop.ViewModels
             async () =>
             {
                 await Task.Delay(Constants.DelayBeforeSendMs);
-                await Send();
+                await Send(fee: Fee);
             });
 
         private ReactiveCommand<Unit, Unit> _undoConfirmStageCommand;
@@ -153,7 +153,49 @@ namespace Atomex.Client.Desktop.ViewModels
             }
         }
 
-        private async Task Send()
+        public async Task Undelegate(string address)
+        {
+            DelegateAddress = address;
+            SelectedBaker = null;
+
+            var autofillOperation = await RunAutofillOperation(
+                DelegateAddress,
+                null,
+                default);
+
+            if (autofillOperation.HasError)
+            {
+                App.DialogService.Show(MessageViewModel.Message(
+                    title: "Error",
+                    nextTitle: "Close",
+                    text: autofillOperation.Error.Description,
+                    nextAction: () => App.DialogService.Close()));
+                return;
+            }
+
+            var (tx, isSuccess, isRunSuccess) = autofillOperation.Value;
+
+            if (!isSuccess || !isRunSuccess)
+            {
+                App.DialogService.Show(MessageViewModel.Message(
+                    title: "Error",
+                    nextTitle: "Close",
+                    text: "Autofill transaction failed.",
+                    nextAction: () => App.DialogService.Close()));
+                return;
+            }
+
+            var messageViewModel = MessageViewModel.Message(
+                title: "Confirm undelegating",
+                text: "Are you sure you want to send transaction, " +
+                      $"that will stop delegating {address} with fee {tx.Fee} {TezosConfig.Xtz}?",
+                nextTitle: "Undelegate",
+                nextAction: () => _ = Send(fee: tx.Fee));
+
+            App.DialogService.Show(messageViewModel);
+        }
+
+        private async Task Send(decimal fee)
         {
             var wallet = (HdWallet)_app.Account.Wallet;
             var keyStorage = wallet.KeyStorage;
@@ -181,14 +223,16 @@ namespace Atomex.Client.Desktop.ViewModels
                     StorageLimit = _tezosConfig.StorageLimit,
                     GasLimit = _tezosConfig.GasLimit,
                     From = walletAddress.Address,
-                    To = SelectedBaker!.Address,
-                    Fee = Fee.ToMicroTez(),
+                    Fee = fee.ToMicroTez(),
                     Currency = _tezosConfig.Name,
                     CreationTime = DateTime.UtcNow,
                     UseRun = true,
                     UseOfflineCounter = true,
                     OperationType = OperationType.Delegation
                 };
+
+                if (SelectedBaker?.Address != null)
+                    tx.To = SelectedBaker.Address;
 
                 using var securePublicKey = _app.Account.Wallet.GetPublicKey(
                     currency: _tezosConfig,
@@ -227,10 +271,14 @@ namespace Atomex.Client.Desktop.ViewModels
 
                     return;
                 }
-                
+
+                var operationType = SelectedBaker?.Address != null
+                    ? "delegated"
+                    : "undelegated";
+
                 App.DialogService.Show(
                     MessageViewModel.Success(
-                        text: "Successful delegation, it will updated in delegations list very soon!",
+                        text: $"Successfully {operationType}, your delegations list will updated very soon!",
                         _tezosConfig.TxExplorerUri,
                         result.Value,
                         nextAction: () => App.DialogService.Close()));
@@ -437,7 +485,14 @@ namespace Atomex.Client.Desktop.ViewModels
                     .GetDelegate(SelectedBaker?.Address)
                     .ConfigureAwait(false);
             }
-            catch
+            catch (HttpRequestException)
+            {
+                return new Error(
+                    Errors.InvalidConnection,
+                    "A network error has occurred while checking baker data, " +
+                    "check your internet connection and try again.");
+            }
+            catch (Exception)
             {
                 return new Error(Errors.WrongDelegationAddress, "Wrong delegation address.");
             }
@@ -451,14 +506,49 @@ namespace Atomex.Client.Desktop.ViewModels
                 return new Error(Errors.AlreadyDelegated,
                     $"Already delegated from {DelegateAddress} to {SelectedBaker?.Address}.");
 
+            var autofillOperation = await RunAutofillOperation(
+                DelegateAddress,
+                SelectedBaker!.Address,
+                cancellationToken);
+
+            if (autofillOperation.HasError)
+                return autofillOperation.Error;
+
+            var (tx, isSuccess, isRunSuccess) = autofillOperation.Value;
+
+            if (!isSuccess || !isRunSuccess)
+                return new Error(Errors.TransactionCreationError, "Autofill transaction failed.");
+
+            if (UseDefaultFee)
+            {
+                Fee = tx.Fee;
+
+                if (Fee > DelegateAddressBalance)
+                    return new Error(Errors.TransactionCreationError,
+                        $"Insufficient funds at the address {DelegateAddress}.");
+            }
+            else
+            {
+                if (Fee < tx.Fee)
+                    return new Error(Errors.TransactionCreationError,
+                        $"Fee less than minimum {tx.Fee.ToString(CultureInfo.CurrentCulture)}.");
+            }
+
+            return true;
+        }
+
+        private async Task<Result<(TezosTransaction tx, bool isSuccess, bool isRunSuccess)>> RunAutofillOperation(
+            string delegateAddress,
+            string? bakerAddress,
+            CancellationToken cancellationToken)
+        {
             try
             {
                 var tx = new TezosTransaction
                 {
                     StorageLimit = _tezosConfig.StorageLimit,
                     GasLimit = _tezosConfig.GasLimit,
-                    From = DelegateAddress,
-                    To = SelectedBaker?.Address,
+                    From = delegateAddress,
                     Fee = 0,
                     Currency = _tezosConfig.Name,
                     CreationTime = DateTime.UtcNow,
@@ -468,9 +558,12 @@ namespace Atomex.Client.Desktop.ViewModels
                     OperationType = OperationType.Delegation
                 };
 
+                if (bakerAddress != null)
+                    tx.To = bakerAddress;
+
                 var walletAddress = _app.Account
                     .GetCurrencyAccount(TezosConfig.Xtz)
-                    .GetAddressAsync(DelegateAddress, cancellationToken)
+                    .GetAddressAsync(delegateAddress, cancellationToken)
                     .WaitForResult();
 
                 using var securePublicKey = _app.Account.Wallet.GetPublicKey(
@@ -478,45 +571,24 @@ namespace Atomex.Client.Desktop.ViewModels
                     keyIndex: walletAddress.KeyIndex,
                     keyType: walletAddress.KeyType);
 
-                var (isSuccess, isRunSuccess, hasReveal) = await tx.FillOperationsAsync(
+                var (isSuccess, isRunSuccess, _) = await tx.FillOperationsAsync(
                     securePublicKey: securePublicKey,
                     tezosConfig: _tezosConfig,
                     headOffset: TezosConfig.HeadOffset,
                     cancellationToken: cancellationToken);
 
-                if (!isSuccess)
-                    return new Error(Errors.TransactionCreationError, $"Autofill transaction failed.");
-
-                if (UseDefaultFee)
-                {
-                    if (isRunSuccess)
-                    {
-                        Fee = tx.Fee;
-                    }
-                    else
-                    {
-                        return new Error(Errors.TransactionCreationError, $"Autofill transaction failed.");
-                    }
-
-                    if (Fee > DelegateAddressBalance)
-                        return new Error(Errors.TransactionCreationError,
-                            $"Insufficient funds at the address {DelegateAddress}.");
-                }
-                else
-                {
-                    if (isRunSuccess && Fee < tx.Fee)
-                        return new Error(Errors.TransactionCreationError,
-                            $"Fee less than minimum {tx.Fee.ToString(CultureInfo.InvariantCulture)}.");
-                }
+                return (
+                    tx,
+                    isSuccess,
+                    isRunSuccess
+                );
             }
             catch (Exception e)
             {
-                Log.Error(e, "Autofill delegation error.");
-
-                return new Error(Errors.TransactionCreationError, $"Autofill delegation error. Try again later.");
+                Log.Error(e, "Autofill transaction error");
+                return new Error(Errors.TransactionCreationError,
+                    "Autofill transaction error. Try again later.");
             }
-
-            return true;
         }
 
         private void SubscribeToServices()
@@ -537,7 +609,7 @@ namespace Atomex.Client.Desktop.ViewModels
             if (quote != null)
                 FeeInBase = Fee.SafeMultiply(quote.Bid);
         }
-        
+
         private void OnQuotesProviderAvailabilityChangedEventHandler(object? sender, EventArgs args)
         {
             if (sender is not ICurrencyQuotesProvider provider)
