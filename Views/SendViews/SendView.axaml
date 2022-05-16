@@ -12,6 +12,7 @@
              xmlns:behaviors="clr-namespace:Atomex.Client.Desktop.Helpers"
              xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
              xmlns:ia="clr-namespace:Avalonia.Xaml.Interactions.Core;assembly=Avalonia.Xaml.Interactions"
+             xmlns:abstract="clr-namespace:Atomex.Client.Desktop.ViewModels.Abstract"
              Width="700">
 
     <Design.DataContext>
@@ -61,7 +62,7 @@
                                      Classes="Back"
                                      IsVisible="{Binding Stage,
                                      Converter={StaticResource EnumToStringNotEqualConverter},
-                                     ConverterParameter={x:Static vm:SendStage.Edit}}"
+                                     ConverterParameter={x:Static abstract:SendStage.Edit}}"
                                      Command="{Binding UndoConfirmStageCommand}"/>
 
                 <!-- window title -->
@@ -527,10 +528,6 @@
                         HorizontalAlignment="Center"
                         Margin="0 32 0 60">
                 <controls:RoundedButton Width="440"
-                                        Height="50"
-                                        CornerRadius="{DynamicResource AtomexCornerRadius}"
-                                        FontSize="18"
-                                        FontWeight="Normal"
                                         Command="{Binding NextCommand}"
                                         IsEnabled="{Binding CanSend}">
                     <i:Interaction.Behaviors>

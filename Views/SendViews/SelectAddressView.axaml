@@ -232,11 +232,7 @@
             <StackPanel Orientation="Horizontal"
                         HorizontalAlignment="Right">
                 <controls:RoundedButton Width="200"
-                                        Height="50"
-                                        CornerRadius="{DynamicResource AtomexCornerRadius}"
                                         Content="Confirm"
-                                        FontSize="18"
-                                        FontWeight="Normal"
                                         Command="{Binding ConfirmCommand}" />
             </StackPanel>
         </StackPanel>

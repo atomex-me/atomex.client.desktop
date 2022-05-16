@@ -108,8 +108,6 @@
                         Margin="0 16 0 0">
                 <controls:RoundedButton Height="46"
                                         Padding="26 0"
-                                        CornerRadius="{DynamicResource AtomexCornerRadius}"
-                                        FontWeight="Normal"
                                         Command="{Binding CopyCommand}"
                                         IsEnabled="{Binding !IsCopied}"
                                         Classes.Copied="{Binding IsCopied}"

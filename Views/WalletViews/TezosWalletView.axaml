@@ -2,7 +2,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="800"
              x:Class="Atomex.Client.Desktop.Views.WalletViews.TezosWalletView"
              xmlns:vm="clr-namespace:Atomex.Client.Desktop.ViewModels.WalletViewModels"
              xmlns:controls="clr-namespace:Atomex.Client.Desktop.Controls"
@@ -10,7 +10,9 @@
              xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
              xmlns:ia="clr-namespace:Avalonia.Xaml.Interactions.Core;assembly=Avalonia.Xaml.Interactions"
              xmlns:svg="clr-namespace:Avalonia.Svg.Skia;assembly=Avalonia.Svg.Skia"
-             xmlns:atomexCore="clr-namespace:Atomex;assembly=Atomex.Client.Core">
+             xmlns:atomexCore="clr-namespace:Atomex;assembly=Atomex.Client.Core"
+             xmlns:atomexBlockchainTezos="clr-namespace:Atomex.Blockchain.Tezos;assembly=Atomex.Client.Core"
+             xmlns:abstract="clr-namespace:Atomex.Client.Desktop.ViewModels.Abstract">
 
     <Design.DataContext>
         <vm:TezosWalletViewModel />
@@ -27,8 +29,12 @@
         <converters:AddressShouldShrinkConverter x:Key="AddressShouldShrinkConverter" />
         <converters:AddressShouldExpandConverter x:Key="AddressShouldExpandConverter" />
         <converters:ShortenedAddressConverter x:Key="ShortenedAddressConverter" />
+        <converters:ObjectsEqualConverter x:Key="ObjectsEqualConverter" />
         <converters:EnumToStringEqualConverter x:Key="EnumToStringEqualConverter" />
+        <converters:EnumToStringNotEqualConverter x:Key="EnumToStringNotEqualConverter" />
+        <converters:PercentConverter x:Key="PercentConverter" />
     </UserControl.Resources>
+
 
     <Grid RowDefinitions="Auto,*"
           Name="DesignGrid">
@@ -128,7 +134,6 @@
 
                     <controls:RoundedButton Height="46"
                                             Padding="26 0"
-                                            CornerRadius="{DynamicResource AtomexCornerRadius}"
                                             Command="{Binding SendCommand}"
                                             Margin="0 0 12 12">
                         <StackPanel Orientation="Horizontal">
@@ -144,7 +149,6 @@
                     </controls:RoundedButton>
                     <controls:RoundedButton Height="46"
                                             Padding="26 0"
-                                            CornerRadius="{DynamicResource AtomexCornerRadius}"
                                             Command="{Binding ReceiveCommand}"
                                             Margin="0 0 12 12">
                         <StackPanel Orientation="Horizontal">
@@ -160,7 +164,6 @@
                     </controls:RoundedButton>
                     <controls:RoundedButton Height="46"
                                             Padding="26 0"
-                                            CornerRadius="{DynamicResource AtomexCornerRadius}"
                                             Command="{Binding ExchangeCommand}"
                                             Margin="0 0 12 12"
                                             Classes="AccentButton">
@@ -177,7 +180,6 @@
                     </controls:RoundedButton>
                     <controls:RoundedButton Height="46"
                                             Padding="26 0"
-                                            CornerRadius="{DynamicResource AtomexCornerRadius}"
                                             Command="{Binding BuyCommand}"
                                             Margin="0 0 12 12"
                                             IsVisible="{Binding CurrencyViewModel.CurrencyCode, Converter={StaticResource ShowBuyButton}}"
@@ -191,15 +193,6 @@
                                        Text="Buy"
                                        FontSize="18" />
                         </StackPanel>
-                    </controls:RoundedButton>
-                    <controls:RoundedButton Height="46"
-                                            Padding="26 0"
-                                            CornerRadius="{DynamicResource AtomexCornerRadius}"
-                                            Command="{Binding DelegateCommand}"
-                                            Margin="0 0 12 12"
-                                            Classes="GrayButton">
-                        <TextBlock Text="Delegate"
-                                   FontSize="18" />
                     </controls:RoundedButton>
                 </WrapPanel>
             </StackPanel>
@@ -237,80 +230,80 @@
                                            FontSize="13"
                                            Text="Description" />
                             </Button>
-                            
+
                             <controls:SortButton Grid.Column="1"
                                                  Title="Amount"
                                                  Command="{Binding SetSortTypeCommand}"
-                                                 CommandParameter="{x:Static vm:TxSortField.ByAmount}">
+                                                 CommandParameter="{x:Static abstract:TxSortField.ByAmount}">
                                 <controls:SortButton.SortIsAsc>
                                     <MultiBinding Converter="{x:Static BoolConverters.And}">
                                         <Binding Path="CurrentSortDirection"
                                                  Converter="{StaticResource EnumToStringEqualConverter}"
-                                                 ConverterParameter="{x:Static vm:SortDirection.Asc}" />
+                                                 ConverterParameter="{x:Static abstract:SortDirection.Asc}" />
                                         <Binding Path="CurrentSortField"
                                                  Converter="{StaticResource EnumToStringEqualConverter}"
-                                                 ConverterParameter="{x:Static vm:TxSortField.ByAmount}" />
+                                                 ConverterParameter="{x:Static abstract:TxSortField.ByAmount}" />
                                     </MultiBinding>
                                 </controls:SortButton.SortIsAsc>
                                 <controls:SortButton.SortIsDesc>
                                     <MultiBinding Converter="{x:Static BoolConverters.And}">
                                         <Binding Path="CurrentSortDirection"
                                                  Converter="{StaticResource EnumToStringEqualConverter}"
-                                                 ConverterParameter="{x:Static vm:SortDirection.Desc}" />
+                                                 ConverterParameter="{x:Static abstract:SortDirection.Desc}" />
                                         <Binding Path="CurrentSortField"
                                                  Converter="{StaticResource EnumToStringEqualConverter}"
-                                                 ConverterParameter="{x:Static vm:TxSortField.ByAmount}" />
+                                                 ConverterParameter="{x:Static abstract:TxSortField.ByAmount}" />
                                     </MultiBinding>
                                 </controls:SortButton.SortIsDesc>
                             </controls:SortButton>
-                            
+
                             <controls:SortButton Grid.Column="2"
                                                  Title="Status"
                                                  Command="{Binding SetSortTypeCommand}"
-                                                 CommandParameter="{x:Static vm:TxSortField.ByStatus}">
+                                                 CommandParameter="{x:Static abstract:TxSortField.ByStatus}">
                                 <controls:SortButton.SortIsAsc>
                                     <MultiBinding Converter="{x:Static BoolConverters.And}">
                                         <Binding Path="CurrentSortDirection"
                                                  Converter="{StaticResource EnumToStringEqualConverter}"
-                                                 ConverterParameter="{x:Static vm:SortDirection.Asc}" />
+                                                 ConverterParameter="{x:Static abstract:SortDirection.Asc}" />
                                         <Binding Path="CurrentSortField"
                                                  Converter="{StaticResource EnumToStringEqualConverter}"
-                                                 ConverterParameter="{x:Static vm:TxSortField.ByStatus}" />
+                                                 ConverterParameter="{x:Static abstract:TxSortField.ByStatus}" />
                                     </MultiBinding>
                                 </controls:SortButton.SortIsAsc>
                                 <controls:SortButton.SortIsDesc>
                                     <MultiBinding Converter="{x:Static BoolConverters.And}">
                                         <Binding Path="CurrentSortDirection"
                                                  Converter="{StaticResource EnumToStringEqualConverter}"
-                                                 ConverterParameter="{x:Static vm:SortDirection.Desc}" />
+                                                 ConverterParameter="{x:Static abstract:SortDirection.Desc}" />
                                         <Binding Path="CurrentSortField"
                                                  Converter="{StaticResource EnumToStringEqualConverter}"
-                                                 ConverterParameter="{x:Static vm:TxSortField.ByStatus}" />
+                                                 ConverterParameter="{x:Static abstract:TxSortField.ByStatus}" />
                                     </MultiBinding>
                                 </controls:SortButton.SortIsDesc>
                             </controls:SortButton>
                             <controls:SortButton Grid.Column="3"
                                                  Title="Time"
                                                  Command="{Binding SetSortTypeCommand}"
-                                                 CommandParameter="{x:Static vm:TxSortField.ByTime}">
+                                                 CommandParameter="{x:Static abstract:TxSortField.ByTime}">
                                 <controls:SortButton.SortIsAsc>
                                     <MultiBinding Converter="{x:Static BoolConverters.And}">
                                         <Binding Path="CurrentSortDirection"
                                                  Converter="{StaticResource EnumToStringEqualConverter}"
-                                                 ConverterParameter="{x:Static vm:SortDirection.Asc}" />
+                                                 ConverterParameter="{x:Static abstract:SortDirection.Asc}" />
                                         <Binding Path="CurrentSortField"
                                                  Converter="{StaticResource EnumToStringEqualConverter}"
-                                                 ConverterParameter="{x:Static vm:TxSortField.ByTime}" />
+                                                 ConverterParameter="{x:Static abstract:TxSortField.ByTime}" />
                                     </MultiBinding>
                                 </controls:SortButton.SortIsAsc>
                                 <controls:SortButton.SortIsDesc>
                                     <MultiBinding Converter="{x:Static BoolConverters.And}">
                                         <Binding Path="CurrentSortDirection"
                                                  Converter="{StaticResource EnumToStringEqualConverter}"
-                                                 ConverterParameter="{x:Static vm:SortDirection.Desc}" />
+                                                 ConverterParameter="{x:Static abstract:SortDirection.Desc}" />
                                         <Binding Path="CurrentSortField"
                                                  Converter="{StaticResource EnumToStringEqualConverter}"
-                                                 ConverterParameter="{x:Static vm:TxSortField.ByTime}" />
+                                                 ConverterParameter="{x:Static abstract:TxSortField.ByTime}" />
                                     </MultiBinding>
                                 </controls:SortButton.SortIsDesc>
                             </controls:SortButton>
@@ -433,7 +426,7 @@
                             Height="34"
                             Margin="0 16 0 0"
                             Padding="12 0">
-                        <Grid ColumnDefinitions="8*,3.5*,3.5*,3*,2*"
+                        <Grid ColumnDefinitions="7.5*,3.3*,3.7*,2*,3.5*"
                               VerticalAlignment="Stretch">
                             <Button Grid.Column="0"
                                     Padding="0"
@@ -448,25 +441,25 @@
                             <controls:SortButton Grid.Column="1"
                                                  Title="Balance"
                                                  Command="{Binding SetDelegationSortTypeCommand}"
-                                                 CommandParameter="{x:Static vm:DelegationSortField.ByBalance}">
+                                                 CommandParameter="{x:Static abstract:DelegationSortField.ByBalance}">
                                 <controls:SortButton.SortIsAsc>
                                     <MultiBinding Converter="{x:Static BoolConverters.And}">
                                         <Binding Path="CurrentDelegationSortDirection"
                                                  Converter="{StaticResource EnumToStringEqualConverter}"
-                                                 ConverterParameter="{x:Static vm:SortDirection.Asc}" />
+                                                 ConverterParameter="{x:Static abstract:SortDirection.Asc}" />
                                         <Binding Path="CurrentDelegationSortField"
                                                  Converter="{StaticResource EnumToStringEqualConverter}"
-                                                 ConverterParameter="{x:Static vm:DelegationSortField.ByBalance}" />
+                                                 ConverterParameter="{x:Static abstract:DelegationSortField.ByBalance}" />
                                     </MultiBinding>
                                 </controls:SortButton.SortIsAsc>
                                 <controls:SortButton.SortIsDesc>
                                     <MultiBinding Converter="{x:Static BoolConverters.And}">
                                         <Binding Path="CurrentDelegationSortDirection"
                                                  Converter="{StaticResource EnumToStringEqualConverter}"
-                                                 ConverterParameter="{x:Static vm:SortDirection.Desc}" />
+                                                 ConverterParameter="{x:Static abstract:SortDirection.Desc}" />
                                         <Binding Path="CurrentDelegationSortField"
                                                  Converter="{StaticResource EnumToStringEqualConverter}"
-                                                 ConverterParameter="{x:Static vm:DelegationSortField.ByBalance}" />
+                                                 ConverterParameter="{x:Static abstract:DelegationSortField.ByBalance}" />
                                     </MultiBinding>
                                 </controls:SortButton.SortIsDesc>
                             </controls:SortButton>
@@ -484,25 +477,25 @@
                             <controls:SortButton Grid.Column="3"
                                                  Title="Est. ROI, %"
                                                  Command="{Binding SetDelegationSortTypeCommand}"
-                                                 CommandParameter="{x:Static vm:DelegationSortField.ByRoi}">
+                                                 CommandParameter="{x:Static abstract:DelegationSortField.ByRoi}">
                                 <controls:SortButton.SortIsAsc>
                                     <MultiBinding Converter="{x:Static BoolConverters.And}">
                                         <Binding Path="CurrentDelegationSortDirection"
                                                  Converter="{StaticResource EnumToStringEqualConverter}"
-                                                 ConverterParameter="{x:Static vm:SortDirection.Asc}" />
+                                                 ConverterParameter="{x:Static abstract:SortDirection.Asc}" />
                                         <Binding Path="CurrentDelegationSortField"
                                                  Converter="{StaticResource EnumToStringEqualConverter}"
-                                                 ConverterParameter="{x:Static vm:DelegationSortField.ByRoi}" />
+                                                 ConverterParameter="{x:Static abstract:DelegationSortField.ByRoi}" />
                                     </MultiBinding>
                                 </controls:SortButton.SortIsAsc>
                                 <controls:SortButton.SortIsDesc>
                                     <MultiBinding Converter="{x:Static BoolConverters.And}">
                                         <Binding Path="CurrentDelegationSortDirection"
                                                  Converter="{StaticResource EnumToStringEqualConverter}"
-                                                 ConverterParameter="{x:Static vm:SortDirection.Desc}" />
+                                                 ConverterParameter="{x:Static abstract:SortDirection.Desc}" />
                                         <Binding Path="CurrentDelegationSortField"
                                                  Converter="{StaticResource EnumToStringEqualConverter}"
-                                                 ConverterParameter="{x:Static vm:DelegationSortField.ByRoi}" />
+                                                 ConverterParameter="{x:Static abstract:DelegationSortField.ByRoi}" />
                                     </MultiBinding>
                                 </controls:SortButton.SortIsDesc>
                             </controls:SortButton>
@@ -510,25 +503,25 @@
                             <controls:SortButton Grid.Column="4"
                                                  Title="Status"
                                                  Command="{Binding SetDelegationSortTypeCommand}"
-                                                 CommandParameter="{x:Static vm:DelegationSortField.ByStatus}">
+                                                 CommandParameter="{x:Static abstract:DelegationSortField.ByStatus}">
                                 <controls:SortButton.SortIsAsc>
                                     <MultiBinding Converter="{x:Static BoolConverters.And}">
                                         <Binding Path="CurrentDelegationSortDirection"
                                                  Converter="{StaticResource EnumToStringEqualConverter}"
-                                                 ConverterParameter="{x:Static vm:SortDirection.Asc}" />
+                                                 ConverterParameter="{x:Static abstract:SortDirection.Asc}" />
                                         <Binding Path="CurrentDelegationSortField"
                                                  Converter="{StaticResource EnumToStringEqualConverter}"
-                                                 ConverterParameter="{x:Static vm:DelegationSortField.ByStatus}" />
+                                                 ConverterParameter="{x:Static abstract:DelegationSortField.ByStatus}" />
                                     </MultiBinding>
                                 </controls:SortButton.SortIsAsc>
                                 <controls:SortButton.SortIsDesc>
                                     <MultiBinding Converter="{x:Static BoolConverters.And}">
                                         <Binding Path="CurrentDelegationSortDirection"
                                                  Converter="{StaticResource EnumToStringEqualConverter}"
-                                                 ConverterParameter="{x:Static vm:SortDirection.Desc}" />
+                                                 ConverterParameter="{x:Static abstract:SortDirection.Desc}" />
                                         <Binding Path="CurrentDelegationSortField"
                                                  Converter="{StaticResource EnumToStringEqualConverter}"
-                                                 ConverterParameter="{x:Static vm:DelegationSortField.ByStatus}" />
+                                                 ConverterParameter="{x:Static abstract:DelegationSortField.ByStatus}" />
                                     </MultiBinding>
                                 </controls:SortButton.SortIsDesc>
                             </controls:SortButton>
@@ -565,7 +558,7 @@
                         <ListBox.ItemTemplate>
                             <DataTemplate>
                                 <Border Padding="12 0">
-                                    <Grid ColumnDefinitions="8*,3.5*,3.5*,3*,2*"
+                                    <Grid ColumnDefinitions="7.5*,3.3*,3.7*,2*,3.5*"
                                           VerticalAlignment="Stretch">
                                         <controls:LinkButton Grid.Column="0"
                                                              Underlined="True"
@@ -616,52 +609,152 @@
                                                        Text="{x:Static atomexCore:TezosConfig.Xtz}" />
                                         </StackPanel>
 
-                                        <StackPanel Grid.Column="2"
-                                                    Orientation="Horizontal">
+                                        <Grid Grid.Column="2"
+                                              ColumnDefinitions="Auto,*">
                                             <Image Width="22"
                                                    Height="22"
                                                    Source="{Binding Baker.Logo, Converter={StaticResource StringToImageConverter}}"
                                                    VerticalAlignment="Center" />
 
-                                            <TextBlock Foreground="{DynamicResource DefaultForegroundBrush}"
+                                            <TextBlock Grid.Column="1"
+                                                       Foreground="{DynamicResource DefaultForegroundBrush}"
                                                        VerticalAlignment="Center"
+                                                       TextTrimming="CharacterEllipsis"
                                                        FontSize="16"
                                                        Margin="8 0 0 0"
                                                        Text="{Binding Baker.Name}" />
-                                        </StackPanel>
+                                        </Grid>
 
                                         <TextBlock Grid.Column="3"
                                                    Foreground="{DynamicResource SecondaryForegroundBrush}"
                                                    VerticalAlignment="Center"
                                                    FontSize="16"
-                                                   Text="{Binding Baker.EstimatedRoi}" />
+                                                   Text="{Binding Baker.EstimatedRoi, Converter={StaticResource PercentConverter}}" />
 
-                                        <TextBlock Grid.Column="4"
-                                                   VerticalAlignment="Center"
-                                                   FontSize="16"
-                                                   Text="{Binding Status}"
-                                                   Name="StatusText">
-                                            <i:Interaction.Behaviors>
-                                                <ia:DataTriggerBehavior Binding="{Binding Status}"
-                                                                        ComparisonCondition="Equal"
-                                                                        Value="Active">
-                                                    <ia:ChangePropertyAction PropertyName="Foreground"
-                                                                             Value="{StaticResource Emerald}" />
-                                                </ia:DataTriggerBehavior>
-                                                <ia:DataTriggerBehavior Binding="{Binding Status}"
-                                                                        ComparisonCondition="Equal"
-                                                                        Value="Confirmed">
-                                                    <ia:ChangePropertyAction PropertyName="Foreground"
-                                                                             Value="{StaticResource BlueSky}" />
-                                                </ia:DataTriggerBehavior>
-                                                <ia:DataTriggerBehavior Binding="{Binding Status}"
-                                                                        ComparisonCondition="Equal"
-                                                                        Value="Pending">
-                                                    <ia:ChangePropertyAction PropertyName="Foreground"
-                                                                             Value="{StaticResource Orange}" />
-                                                </ia:DataTriggerBehavior>
-                                            </i:Interaction.Behaviors>
-                                        </TextBlock>
+                                        <Grid Grid.Column="4"
+                                              ColumnDefinitions="*,Auto">
+                                            <TextBlock Grid.Column="0"
+                                                       VerticalAlignment="Center"
+                                                       FontSize="16"
+                                                       Text="{Binding StatusString}"
+                                                       Name="StatusText">
+                                                <i:Interaction.Behaviors>
+                                                    <ia:DataTriggerBehavior Binding="{Binding Status}"
+                                                                            ComparisonCondition="Equal"
+                                                                            Value="{x:Static atomexBlockchainTezos:DelegationStatus.Active}">
+                                                        <ia:ChangePropertyAction PropertyName="Foreground"
+                                                            Value="{StaticResource Emerald}" />
+                                                    </ia:DataTriggerBehavior>
+                                                    <ia:DataTriggerBehavior Binding="{Binding Status}"
+                                                                            ComparisonCondition="Equal"
+                                                                            Value="{x:Static atomexBlockchainTezos:DelegationStatus.Confirmed}">
+                                                        <ia:ChangePropertyAction PropertyName="Foreground"
+                                                            Value="{StaticResource BlueSky}" />
+                                                    </ia:DataTriggerBehavior>
+                                                    <ia:DataTriggerBehavior Binding="{Binding Status}"
+                                                                            ComparisonCondition="Equal"
+                                                                            Value="{x:Static atomexBlockchainTezos:DelegationStatus.Pending}">
+                                                        <ia:ChangePropertyAction PropertyName="Foreground"
+                                                            Value="{StaticResource Orange}" />
+                                                    </ia:DataTriggerBehavior>
+                                                    <ia:DataTriggerBehavior Binding="{Binding Status}"
+                                                                            ComparisonCondition="Equal"
+                                                                            Value="{x:Static atomexBlockchainTezos:DelegationStatus.NotDelegated}">
+                                                        <ia:ChangePropertyAction PropertyName="Foreground"
+                                                            Value="{StaticResource SecondaryForegroundBrush}" />
+                                                    </ia:DataTriggerBehavior>
+                                                </i:Interaction.Behaviors>
+                                            </TextBlock>
+                                            <controls:IconButton Grid.Column="1"
+                                                                 Classes="MenuDots"
+                                                                 Command="{Binding $parent[ListBox].DataContext.OpenDelegationPopupCommand}"
+                                                                 CommandParameter="{Binding Address}">
+                                                <Popup PlacementMode="Left"
+                                                       VerticalAlignment="Center"
+                                                       WindowManagerAddShadowHint="False"
+                                                       IsLightDismissEnabled="True"
+                                                       Closed="Popup_OnClosed">
+                                                    <Popup.IsOpen>
+                                                        <MultiBinding
+                                                            Converter="{StaticResource ObjectsEqualConverter}">
+                                                            <Binding Path="Address" />
+                                                            <Binding
+                                                                Path="$parent[ListBox].DataContext.DelegationAddressPopupOpened" />
+                                                        </MultiBinding>
+                                                    </Popup.IsOpen>
+                                                    <Border Background="{DynamicResource DeepBlue}"
+                                                            CornerRadius="{DynamicResource AtomexCornerRadius}"
+                                                            Padding="12 16">
+                                                        <StackPanel>
+                                                            <StackPanel.Styles>
+                                                                <Style
+                                                                    Selector="Button:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+                                                                    <Setter Property="Background"
+                                                                            Value="{DynamicResource LightDefaultOpacity6}" />
+                                                                </Style>
+                                                                <Style
+                                                                    Selector="Button:not(:pointerover) /template/ ContentPresenter#PART_ContentPresenter">
+                                                                    <Setter Property="Background"
+                                                                            Value="{DynamicResource AlmostTransparentBrush}" />
+                                                                </Style>
+                                                                <Style
+                                                                    Selector="Button:pressed /template/ ContentPresenter#PART_ContentPresenter">
+                                                                    <Setter Property="Background"
+                                                                            Value="{DynamicResource LightDefaultOpacity6}" />
+                                                                </Style>
+                                                            </StackPanel.Styles>
+                                                            <StackPanel Orientation="Vertical"
+                                                                        IsVisible="{Binding Status,
+                                                                        Converter={StaticResource EnumToStringNotEqualConverter},
+                                                                        ConverterParameter={x:Static atomexBlockchainTezos:DelegationStatus.NotDelegated}}">
+                                                                <Button Width="180"
+                                                                        Height="40"
+                                                                        Padding="12 0"
+                                                                        CornerRadius="{DynamicResource AtomexCornerRadius}"
+                                                                        VerticalContentAlignment="Center"
+                                                                        Command="{Binding $parent[ListBox].DataContext.DelegateCommand}"
+                                                                        CommandParameter="{Binding Address}">
+                                                                    <TextBlock Text="Change Validator"
+                                                                               Foreground="{DynamicResource DefaultForegroundBrush}"
+                                                                               VerticalAlignment="Center"
+                                                                               FontSize="16" />
+                                                                </Button>
+                                                                <Button Width="180"
+                                                                        Height="40"
+                                                                        Padding="12 0"
+                                                                        CornerRadius="{DynamicResource AtomexCornerRadius}"
+                                                                        VerticalContentAlignment="Center"
+                                                                        Command="{Binding $parent[ListBox].DataContext.UndelegateCommand}"
+                                                                        CommandParameter="{Binding Address}">
+                                                                    <TextBlock Text="Undelegate"
+                                                                               Foreground="{DynamicResource DefaultForegroundBrush}"
+                                                                               VerticalAlignment="Center"
+                                                                               FontSize="16" />
+                                                                </Button>
+                                                            </StackPanel>
+
+                                                            <StackPanel Orientation="Vertical"
+                                                                        IsVisible="{Binding Status,
+                                                                        Converter={StaticResource EnumToStringEqualConverter},
+                                                                        ConverterParameter={x:Static atomexBlockchainTezos:DelegationStatus.NotDelegated}}">
+                                                                <Button Width="180"
+                                                                        Height="40"
+                                                                        Padding="12 0"
+                                                                        CornerRadius="{DynamicResource AtomexCornerRadius}"
+                                                                        VerticalContentAlignment="Center"
+                                                                        Command="{Binding $parent[ListBox].DataContext.DelegateCommand}"
+                                                                        CommandParameter="{Binding Address}">
+                                                                    <TextBlock Text="Delegate"
+                                                                               Foreground="{DynamicResource DefaultForegroundBrush}"
+                                                                               VerticalAlignment="Center"
+                                                                               FontSize="16" />
+                                                                </Button>
+                                                            </StackPanel>
+                                                        </StackPanel>
+                                                    </Border>
+                                                </Popup>
+                                            </controls:IconButton>
+                                        </Grid>
                                     </Grid>
                                 </Border>
                             </DataTemplate>

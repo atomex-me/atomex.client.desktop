@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive;
+using System.Reactive.Linq;
 using System.Threading.Tasks;
 using Avalonia.Threading;
 using Serilog;
@@ -11,26 +12,23 @@ using Atomex.Blockchain.Tezos;
 using Atomex.Blockchain.Tezos.Internal;
 using Atomex.Blockchain.Tezos.Tzkt;
 using Atomex.Client.Desktop.Common;
+using Atomex.Client.Desktop.ViewModels.Abstract;
 using Atomex.Core;
 using Atomex.Wallet;
 using ReactiveUI.Fody.Helpers;
 
+// ReSharper disable All
+
 
 namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 {
-    public enum DelegationSortField
-    {
-        ByRoi,
-        ByStatus,
-        ByBalance
-    }
-
     public class TezosWalletViewModel : WalletViewModel
     {
         private const int DelegationCheckIntervalInSec = 20;
         [Reactive] public ObservableCollection<Delegation> Delegations { get; set; }
         [Reactive] public SortDirection? CurrentDelegationSortDirection { get; set; }
         [Reactive] public DelegationSortField? CurrentDelegationSortField { get; set; }
+        [Reactive] public string? DelegationAddressPopupOpened { get; set; }
 
         private bool CanDelegate { get; set; }
         private bool HasDelegations { get; set; }
@@ -58,14 +56,12 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                 .WhereAllNotNull()
                 .SubscribeInMainThread(_ => SortDelegations(Delegations));
 
-            _ = LoadDelegationInfoAsync();
-            DelegateViewModel = new DelegateViewModel(_app, async () =>
-            {
-                await Task.Delay(TimeSpan.FromSeconds(DelegationCheckIntervalInSec))
-                    .ConfigureAwait(false);
-                await Dispatcher.UIThread.InvokeAsync(OnUpdateClick);
-            });
+            DelegateCommand.Merge(UndelegateCommand)
+                .SubscribeInMainThread(_ => DelegationAddressPopupOpened = null);
 
+            _ = LoadDelegationInfoAsync();
+
+            DelegateViewModel = new DelegateViewModel(_app);
             CurrentDelegationSortField = DelegationSortField.ByBalance;
             CurrentDelegationSortDirection = SortDirection.Desc;
         }
@@ -76,10 +72,10 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             {
                 DelegationSortField.ByRoi when CurrentDelegationSortDirection == SortDirection.Desc
                     => new ObservableCollection<Delegation>(
-                        delegations.OrderByDescending(d => d.Baker.EstimatedRoi)),
+                        delegations.OrderByDescending(d => d.Baker?.EstimatedRoi ?? 0)),
                 DelegationSortField.ByRoi when CurrentDelegationSortDirection == SortDirection.Asc
                     => new ObservableCollection<Delegation>(
-                        delegations.OrderBy(d => d.Baker.EstimatedRoi)),
+                        delegations.OrderBy(d => d.Baker?.EstimatedRoi ?? 0)),
 
                 DelegationSortField.ByStatus when CurrentDelegationSortDirection == SortDirection.Desc
                     => new ObservableCollection<Delegation>(
@@ -87,7 +83,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                 DelegationSortField.ByStatus when CurrentDelegationSortDirection == SortDirection.Asc
                     => new ObservableCollection<Delegation>(
                         delegations.OrderBy(d => d.Status)),
-                
+
                 DelegationSortField.ByBalance when CurrentDelegationSortDirection == SortDirection.Desc
                     => new ObservableCollection<Delegation>(
                         delegations.OrderByDescending(d => d.Balance)),
@@ -149,7 +145,19 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                     var @delegate = accountData["delegate"]?.ToString();
 
                     if (string.IsNullOrEmpty(@delegate))
+                    {
+                        delegations.Add(new Delegation
+                        {
+                            Baker = null,
+                            Address = wa.Address,
+                            ExplorerUri = Tezos.BbUri,
+                            Balance = wa.Balance,
+                            DelegationTime = null,
+                            Status = DelegationStatus.NotDelegated
+                        });
+
                         continue;
+                    }
 
                     var baker = await BbApi
                         .GetBaker(@delegate, _app.Account.Network)
@@ -197,10 +205,16 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             }
         }
 
-        private ReactiveCommand<Unit, Unit> _delegateCommand;
+        private ReactiveCommand<string, Unit> _delegateCommand;
 
-        public ReactiveCommand<Unit, Unit> DelegateCommand =>
-            _delegateCommand ??= (_delegateCommand = ReactiveCommand.Create(OnDelegateClick));
+        public ReactiveCommand<string, Unit> DelegateCommand =>
+            _delegateCommand ??= (_delegateCommand = ReactiveCommand.Create<string>(OnDelegateClick));
+
+        private ReactiveCommand<string, Unit> _undelegateCommand;
+
+        public ReactiveCommand<string, Unit> UndelegateCommand =>
+            _undelegateCommand ??= (_undelegateCommand = ReactiveCommand.Create<string>(
+                undelegateAddress => _ = DelegateViewModel.Undelegate(undelegateAddress)));
 
         private ReactiveCommand<string, Unit> _openAddressInExplorerCommand;
 
@@ -222,8 +236,17 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                         : SortDirection.Asc;
             });
 
-        private void OnDelegateClick()
+
+        private ReactiveCommand<string, Unit> _openDelegationPopupCommand;
+
+        public ReactiveCommand<string, Unit> OpenDelegationPopupCommand => _openDelegationPopupCommand ??=
+            (_openDelegationPopupCommand = ReactiveCommand.Create<string>(
+                address => DelegationAddressPopupOpened = address));
+
+        private void OnDelegateClick(string addressToDelegate)
         {
+            var delegation = Delegations.First(delegation => delegation.Address == addressToDelegate);
+            DelegateViewModel.InitializeWith(delegation);
             App.DialogService.Show(DelegateViewModel);
         }
 
@@ -238,7 +261,8 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                 {
                     Baker = new BakerData
                     {
-                        Logo = "https://api.baking-bad.org/logos/letzbake.png"
+                        Logo = "https://api.baking-bad.org/logos/letzbake.png",
+                        Name = "Tez Phoenix Reborn 2.0",
                     },
                     Address = "tz1aqcYgG6NuViML5vdWhohHJBYxcDVLNUsE",
                     Balance = 1000.2123m
@@ -247,7 +271,8 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                 {
                     Baker = new BakerData
                     {
-                        Logo = "https://api.baking-bad.org/logos/letzbake.png"
+                        Logo = "https://api.baking-bad.org/logos/letzbake.png",
+                        Name = "Tez Phoenix Reborn 2.0"
                     },
                     Address = "tz1aqcYgG6NuViML5vdWhohHJBYxcDVLNUsE",
                     Balance = 1000.2123m
@@ -256,7 +281,8 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                 {
                     Baker = new BakerData
                     {
-                        Logo = "https://api.baking-bad.org/logos/letzbake.png"
+                        Logo = "https://api.baking-bad.org/logos/letzbake.png",
+                        Name = "Tez Phoenix Reborn 2.0"
                     },
                     Address = "tz1aqcYgG6NuViML5vdWhohHJBYxcDVLNUsE",
                     Balance = 1000.2123m
@@ -265,7 +291,8 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                 {
                     Baker = new BakerData
                     {
-                        Logo = "https://api.baking-bad.org/logos/letzbake.png"
+                        Logo = "https://api.baking-bad.org/logos/letzbake.png",
+                        Name = "Tez Phoenix Reborn 2.0"
                     },
                     Address = "tz1aqcYgG6NuViML5vdWhohHJBYxcDVLNUsE",
                     Balance = 1000.2123m
@@ -274,7 +301,8 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                 {
                     Baker = new BakerData
                     {
-                        Logo = "https://api.baking-bad.org/logos/letzbake.png"
+                        Logo = "https://api.baking-bad.org/logos/letzbake.png",
+                        Name = "Tez Phoenix Reborn 2.0"
                     },
                     Address = "tz1aqcYgG6NuViML5vdWhohHJBYxcDVLNUsE",
                     Balance = 1000.2123m

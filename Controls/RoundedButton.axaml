@@ -1,13 +1,40 @@
 <Styles xmlns='https://github.com/avaloniaui'
         xmlns:x='http://schemas.microsoft.com/winfx/2006/xaml'
-        xmlns:controls="clr-namespace:Atomex.Client.Desktop.Controls">
+        xmlns:controls="clr-namespace:Atomex.Client.Desktop.Controls"
+        xmlns:svg="clr-namespace:Avalonia.Svg.Skia;assembly=Avalonia.Svg.Skia">
+
+    <Design.PreviewWith>
+        <Border Padding="40 100" Background="#122B50">
+            <StackPanel Orientation="Vertical"
+                        Width="440">
+                <controls:RoundedButton Height="52"
+                                        FontSize="18"
+                                        Content="Disabled Button"
+                                        IsEnabled="False" />
+
+                <controls:RoundedButton Height="52"
+                                        FontSize="18"
+                                        Margin="0 10 0 0"
+                                        Content="Enabled Button" />
+
+                <controls:RoundedButton Height="52"
+                                        FontSize="18"
+                                        Margin="0 10 0 0"
+                                        Classes="Loading"
+                                        Content="Loading button" />
+            </StackPanel>
+
+        </Border>
+    </Design.PreviewWith>
 
     <Style Selector="controls|RoundedButton">
         <Setter Property="Background" Value="{DynamicResource RoundedButtonBackgroundBrush}" />
         <Setter Property="Foreground" Value="{DynamicResource RoundedButtonForegroundBrush}" />
         <Setter Property="FontFamily" Value="{DynamicResource DefaultButtonFontFamily}" />
-        <Setter Property="FontWeight" Value="{DynamicResource DefaultButtonFontWeight}" />
-        <Setter Property="FontSize" Value="13" />
+        <Setter Property="FontWeight" Value="Normal" />
+        <Setter Property="CornerRadius" Value="{DynamicResource AtomexCornerRadius}" />
+        <Setter Property="FontSize" Value="18" />
+        <Setter Property="Height" Value="52" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type controls:RoundedButton}">
@@ -21,6 +48,24 @@
                                               HorizontalAlignment="Center"
                                               VerticalAlignment="Center" />
                         </Grid>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style Selector="controls|RoundedButton.Loading">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type controls:RoundedButton}">
+                    <Border Name="border"
+                            BorderThickness="0"
+                            CornerRadius="{TemplateBinding CornerRadius}"
+                            Background="{DynamicResource RoundedButtonDisabledBrush}"
+                            Padding="{TemplateBinding Padding}">
+                        <svg:Svg Path="/Resources/Icons/in-progress.svg"
+                                 Classes="InProgress"
+                                 Width="18" />
                     </Border>
                 </ControlTemplate>
             </Setter.Value>

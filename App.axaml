@@ -27,14 +27,13 @@
     <StyleInclude Source="/Styles/MainWindowStyle.axaml"/>
     <StyleInclude Source="/Styles/ChildViewStyle.axaml"/>
     <StyleInclude Source="/Styles/ButtonStyle.axaml"/>
-    <StyleInclude Source="/Styles/RoundedButtonStyle.axaml"/>
+    <StyleInclude Source="/Controls/RoundedButton.axaml"/>
     <StyleInclude Source="/Styles/RadioButtonStyle.axaml"/>
     <StyleInclude Source="/Controls/IconButton.axaml"/>
     <StyleInclude Source="/Controls/CopyButton.axaml"/>
     <StyleInclude Source="/Controls/LinkButton.axaml"/>
     <StyleInclude Source="/Controls/SortButton.axaml"/>
     <StyleInclude Source="/Styles/CustomComboBoxStyle.axaml"/>
-    <StyleInclude Source="/Styles/BakersComboBoxStyle.axaml"/>
     <StyleInclude Source="/Styles/CustomTextBoxStyle.axaml"/>
     <StyleInclude Source="/Styles/AtomexTextBoxStyle.axaml"/>
     <StyleInclude Source="/Styles/AmountTextBoxStyle.axaml"/>

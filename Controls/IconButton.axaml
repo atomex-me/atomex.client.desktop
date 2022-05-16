@@ -35,8 +35,12 @@
 
                 </StackPanel>
 
-                <StackPanel Margin="0 25 0 0 " Orientation="Horizontal">
+                <StackPanel Margin="0 25 0 0 "
+                            Orientation="Horizontal">
                     <controls:IconButton Classes="Question"
+                                         ToolText="Some tooltip text"
+                                         Margin="10 0 0 0" />
+                    <controls:IconButton Classes="Question Orange"
                                          ToolText="Some tooltip text"
                                          Margin="10 0 0 0" />
                     <controls:IconButton Classes="Trash"
@@ -60,6 +64,21 @@
                     
                     <controls:IconButton Classes="ViewAsset"
                                          Margin="10 0 0 0" />
+                </StackPanel>
+                
+                <StackPanel Margin="0 25 0 0 "
+                            Orientation="Horizontal">
+                    
+                    <StackPanel Orientation="Horizontal">
+                        <controls:IconButton Classes="Warning NoEffects" />
+                        <TextBlock Text="The transfer amount (including commission) exceeds the amount of available funds!"
+                                   MaxWidth="300"
+                                   TextWrapping="Wrap"
+                                   FontSize="16"
+                                   Margin="6 0 0 0"
+                                   Foreground="{DynamicResource WarningForegroundBrush}"
+                                   VerticalAlignment="Bottom" />
+                    </StackPanel>
                 </StackPanel>
             </StackPanel>
 
@@ -236,6 +255,13 @@
     <Style Selector="controls|IconButton.Question:pointerover /template/ svg|Svg">
         <Setter Property="Path" Value="/Resources/Icons/question-light.svg" />
     </Style>
+    <Style Selector="controls|IconButton.Question.Orange /template/ svg|Svg">
+        <Setter Property="Path" Value="/Resources/Icons/question-orange.svg" />
+        <Setter Property="Width" Value="12" />
+    </Style>
+    <Style Selector="controls|IconButton.Question.Orange:pointerover /template/ svg|Svg">
+        <Setter Property="Path" Value="/Resources/Icons/question-orange.svg" />
+    </Style>
 
     <Style Selector="controls|IconButton.Trash">
         <Setter Property="Width" Value="28" />
@@ -373,5 +399,14 @@
     <Style Selector="controls|IconButton.ViewAsset svg|Svg">
         <Setter Property="Path" Value="/Resources/Icons/view-asset.svg" />
         <Setter Property="Width" Value="22" />
+    </Style>
+    
+    <Style Selector="controls|IconButton.Warning">
+        <Setter Property="Width" Value="24" />
+        <Setter Property="Height" Value="24" />
+    </Style>
+    <Style Selector="controls|IconButton.Warning svg|Svg">
+        <Setter Property="Path" Value="/Resources/Icons/warning.svg" />
+        <Setter Property="Width" Value="24" />
     </Style>
 </Styles>

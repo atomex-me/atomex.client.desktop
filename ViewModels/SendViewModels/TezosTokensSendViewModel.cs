@@ -14,6 +14,7 @@ using Serilog;
 using Atomex.Blockchain.Tezos;
 using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.Properties;
+using Atomex.Client.Desktop.ViewModels.Abstract;
 using Atomex.Core;
 using Atomex.MarketData.Abstract;
 using Atomex.TezosTokens;

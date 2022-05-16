@@ -562,11 +562,7 @@
             </StackPanel>
             <!-- exchange button -->
             <controls:RoundedButton Width="486"
-                                    Height="52"
-                                    CornerRadius="{DynamicResource AtomexCornerRadius}"
                                     Content="Exchange"
-                                    FontSize="18"
-                                    FontWeight="Normal"
                                     Command="{Binding ConvertCommand}"
                                     IsEnabled="{Binding CanExchange}">
                 <controls:RoundedButton.IsVisible>

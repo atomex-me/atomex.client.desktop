@@ -91,10 +91,6 @@
                         HorizontalAlignment="Right"
                         IsVisible="{Binding IsNextVisible}">
                 <controls:RoundedButton Width="200"
-                                        Height="50"
-                                        CornerRadius="{DynamicResource AtomexCornerRadius}"
-                                        FontSize="18"
-                                        FontWeight="Normal"
                                         Content="{Binding NextText}"
                                         Command="{Binding NextCommand}" />
             </StackPanel>

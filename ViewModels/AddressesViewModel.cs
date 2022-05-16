@@ -9,7 +9,7 @@ using Serilog;
 using ReactiveUI;
 using Atomex.Blockchain.Tezos.Internal;
 using Atomex.Client.Desktop.Common;
-using Atomex.Client.Desktop.ViewModels.WalletViewModels;
+using Atomex.Client.Desktop.ViewModels.Abstract;
 using Atomex.Common;
 using Atomex.Core;
 using Atomex.Cryptography;
@@ -72,7 +72,6 @@ namespace Atomex.Client.Desktop.ViewModels
     public class AddressesViewModel : ViewModelBase, IDisposable
     {
         private const int DefaultTokenPrecision = 9;
-        private const int MinimalUpdateTimeMs = 1000;
         private readonly IAtomexApp _app;
         private CurrencyConfig _currency;
         private readonly string? _tokenContract;
@@ -288,7 +287,7 @@ namespace Atomex.Client.Desktop.ViewModels
                 var updateTask = new HdWalletScanner(_app.Account)
                     .ScanAddressAsync(_currency.Name, address);
 
-                await Task.WhenAll(Task.Delay(MinimalUpdateTimeMs), updateTask);
+                await Task.WhenAll(Task.Delay(Constants.MinimalAddressUpdateTimeMs), updateTask);
 
                 if (_currency.Name == TezosConfig.Xtz && _tokenContract != null)
                 {

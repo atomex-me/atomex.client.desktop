@@ -13,6 +13,7 @@ using Serilog;
 using Atomex.Blockchain;
 using Atomex.Blockchain.BitcoinBased;
 using Atomex.Client.Desktop.Common;
+using Atomex.Client.Desktop.ViewModels.Abstract;
 using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
 using Atomex.Client.Desktop.ViewModels.SendViewModels;
 using Atomex.Client.Desktop.ViewModels.TransactionViewModels;
@@ -26,19 +27,6 @@ using Network = NBitcoin.Network;
 
 namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 {
-    public enum TxSortField
-    {
-        ByAmount,
-        ByStatus,
-        ByTime
-    }
-
-    public enum SortDirection
-    {
-        Asc,
-        Desc
-    }
-
     public class WalletViewModel : ViewModelBase, IWalletViewModel
     {
         protected IAtomexApp _app;
@@ -46,7 +34,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         [Reactive] public TransactionViewModelBase? SelectedTransaction { get; set; }
         private TransactionViewModelBase? PreviousSelectedTransaction { get; set; }
         [Reactive] public CurrencyViewModel CurrencyViewModel { get; set; }
-        [Reactive] public bool IsBalanceUpdating { get; set; }
+        [ObservableAsProperty] public bool IsBalanceUpdating { get; }
         [Reactive] public TxSortField? CurrentSortField { get; set; }
         [Reactive] public SortDirection? CurrentSortDirection { get; set; }
         protected bool IsTransactionsLoading { get; set; }
@@ -121,6 +109,10 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
                     PreviousSelectedTransaction = selectedTransaction;
                 });
+            
+            UpdateCommand
+                .IsExecuting
+                .ToPropertyExInMainThread(this, vm => vm.IsBalanceUpdating);
 
             CurrentSortField = TxSortField.ByTime;
             CurrentSortDirection = SortDirection.Desc;
@@ -263,7 +255,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             _exchangeCommand ??= ReactiveCommand.Create(OnConvertClick);
 
         private ReactiveCommand<Unit, Unit> _updateCommand;
-        public ReactiveCommand<Unit, Unit> UpdateCommand => _updateCommand ??= ReactiveCommand.Create(OnUpdateClick);
+        public ReactiveCommand<Unit, Unit> UpdateCommand => _updateCommand ??= ReactiveCommand.CreateFromTask(OnUpdateClick);
 
         private ReactiveCommand<Unit, Unit> _cancelUpdateCommand;
 
@@ -307,13 +299,8 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             SetConversionTab?.Invoke(Currency);
         }
 
-        protected virtual async void OnUpdateClick()
+        protected virtual async Task OnUpdateClick()
         {
-            if (IsBalanceUpdating)
-                return;
-
-            IsBalanceUpdating = true;
-
             _cancellation = new CancellationTokenSource();
 
             try
@@ -336,8 +323,6 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                 Log.Error(e, "WalletViewModel.OnUpdateClick");
                 // todo: message to user!?
             }
-
-            IsBalanceUpdating = false;
         }
 
         private void UpdateTransactionEventHandler(object sender, TransactionEventArgs args)

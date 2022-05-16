@@ -277,11 +277,7 @@
       <!-- confirm exchange button -->
       <controls:RoundedButton Margin="0 16 0 0"
                               Width="400"
-                              Height="52"
-                              CornerRadius="{DynamicResource AtomexCornerRadius}"
                               Content="Confirm exchange"
-                              FontSize="18"
-                              FontWeight="Normal"
                               Command="{Binding NextCommand}"/>
     </StackPanel>
   </Border>
