@@ -343,15 +343,23 @@ namespace Atomex.Client.Desktop.ViewModels
         private void StartLookingForUserMessages(TimeSpan delayInterval)
         {
             var userId = Atomex.ViewModels.Helpers.GetUserId(AtomexApp.Account);
+            var firstRun = true;
 
             _ = Task.Run(async () =>
             {
                 while (_hasAccount)
                 {
+                    if (firstRun)
+                    {
+                        firstRun = false;
+                    }
+                    else
+                    {
+                        await Task.Delay(delayInterval);   
+                    }
+
                     if (AccountRestored || Content is UnlockViewModel) continue;
                     var messages = await Atomex.ViewModels.Helpers.GetUserMessages(userId);
-                    await Task.Delay(delayInterval);
-                    
                     if (messages == null) continue;
 
                     foreach (var message in messages.Where(message => !message.IsReaded))

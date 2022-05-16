@@ -2,7 +2,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="800"
              x:Class="Atomex.Client.Desktop.Views.WalletViews.TezosWalletView"
              xmlns:vm="clr-namespace:Atomex.Client.Desktop.ViewModels.WalletViewModels"
              xmlns:controls="clr-namespace:Atomex.Client.Desktop.Controls"
@@ -609,19 +609,21 @@
                                                        Text="{x:Static atomexCore:TezosConfig.Xtz}" />
                                         </StackPanel>
 
-                                        <StackPanel Grid.Column="2"
-                                                    Orientation="Horizontal">
+                                        <Grid Grid.Column="2"
+                                              ColumnDefinitions="Auto,*">
                                             <Image Width="22"
                                                    Height="22"
                                                    Source="{Binding Baker.Logo, Converter={StaticResource StringToImageConverter}}"
                                                    VerticalAlignment="Center" />
 
-                                            <TextBlock Foreground="{DynamicResource DefaultForegroundBrush}"
+                                            <TextBlock Grid.Column="1"
+                                                       Foreground="{DynamicResource DefaultForegroundBrush}"
                                                        VerticalAlignment="Center"
+                                                       TextTrimming="CharacterEllipsis"
                                                        FontSize="16"
                                                        Margin="8 0 0 0"
                                                        Text="{Binding Baker.Name}" />
-                                        </StackPanel>
+                                        </Grid>
 
                                         <TextBlock Grid.Column="3"
                                                    Foreground="{DynamicResource SecondaryForegroundBrush}"

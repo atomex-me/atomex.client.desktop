@@ -261,7 +261,8 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                 {
                     Baker = new BakerData
                     {
-                        Logo = "https://api.baking-bad.org/logos/letzbake.png"
+                        Logo = "https://api.baking-bad.org/logos/letzbake.png",
+                        Name = "Tez Phoenix Reborn 2.0",
                     },
                     Address = "tz1aqcYgG6NuViML5vdWhohHJBYxcDVLNUsE",
                     Balance = 1000.2123m
@@ -270,7 +271,8 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                 {
                     Baker = new BakerData
                     {
-                        Logo = "https://api.baking-bad.org/logos/letzbake.png"
+                        Logo = "https://api.baking-bad.org/logos/letzbake.png",
+                        Name = "Tez Phoenix Reborn 2.0"
                     },
                     Address = "tz1aqcYgG6NuViML5vdWhohHJBYxcDVLNUsE",
                     Balance = 1000.2123m
@@ -279,7 +281,8 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                 {
                     Baker = new BakerData
                     {
-                        Logo = "https://api.baking-bad.org/logos/letzbake.png"
+                        Logo = "https://api.baking-bad.org/logos/letzbake.png",
+                        Name = "Tez Phoenix Reborn 2.0"
                     },
                     Address = "tz1aqcYgG6NuViML5vdWhohHJBYxcDVLNUsE",
                     Balance = 1000.2123m
@@ -288,7 +291,8 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                 {
                     Baker = new BakerData
                     {
-                        Logo = "https://api.baking-bad.org/logos/letzbake.png"
+                        Logo = "https://api.baking-bad.org/logos/letzbake.png",
+                        Name = "Tez Phoenix Reborn 2.0"
                     },
                     Address = "tz1aqcYgG6NuViML5vdWhohHJBYxcDVLNUsE",
                     Balance = 1000.2123m
@@ -297,7 +301,8 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                 {
                     Baker = new BakerData
                     {
-                        Logo = "https://api.baking-bad.org/logos/letzbake.png"
+                        Logo = "https://api.baking-bad.org/logos/letzbake.png",
+                        Name = "Tez Phoenix Reborn 2.0"
                     },
                     Address = "tz1aqcYgG6NuViML5vdWhohHJBYxcDVLNUsE",
                     Balance = 1000.2123m
