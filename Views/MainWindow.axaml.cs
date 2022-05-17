@@ -16,7 +16,9 @@ using System.Timers;
 using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.ViewModels;
 using Avalonia.Controls.ApplicationLifetimes;
+using Avalonia.Controls.Notifications;
 using Avalonia.Interactivity;
+using Avalonia.Threading;
 using NetSparkleUpdater;
 using NetSparkleUpdater.Enums;
 using NetSparkleUpdater.SignatureVerifiers;
@@ -54,6 +56,8 @@ namespace Atomex.Client.Desktop.Views
 
         private MainWindowViewModel ctx;
 
+        
+        WindowNotificationManager notificationManager;
         public MainWindow()
         {
             InitializeComponent();
@@ -123,6 +127,19 @@ namespace Atomex.Client.Desktop.Views
                 ctx.UpdateDownloadProgress =
                     (int) ((double) args.BytesReceived / (double) args.TotalBytesToReceive * 100);
             };
+            
+            notificationManager = new WindowNotificationManager(this);
+
+            Dispatcher.UIThread.InvokeAsync(async () =>
+            {
+                await Task.Delay(10000);
+                var notif = new Notification("title", "message", NotificationType.Success, TimeSpan.FromSeconds(3));
+                var notif2 = new Notification("title", "message", NotificationType.Error, TimeSpan.FromSeconds(6));
+                notificationManager.Show(notif);
+                await Task.Delay(5000);
+                notificationManager.Margin = new Thickness(0, 100, 0, 0);
+                notificationManager.Show(notif2);
+            });
         }
 
         private void ManualUpdate_Click()

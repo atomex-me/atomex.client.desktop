@@ -24,8 +24,55 @@
     </UserControl.Resources>
 
     <Grid RowDefinitions="Auto,*"
+          ColumnDefinitions="*,280"
           Name="DesignGrid">
+
+        <Border Grid.Row="0"
+                Grid.Column="1"
+                ZIndex="9"
+                Margin="0 -25 -10 0"
+                Width="280"
+                Height="100"
+                VerticalAlignment="Top"
+                IsEnabled="True"
+                CornerRadius="{DynamicResource AtomexCornerRadius}"
+                Background="{DynamicResource DeepBlue}">
+            <Border.Styles>
+                <Style Selector="Border[IsEnabled=True]">
+                    <Style.Animations>
+                        <Animation Duration="0:0:0.35" Easing="QuadraticEaseOut" FillMode="Forward">
+                            <KeyFrame Cue="0%">
+                                <Setter Property="TranslateTransform.X" Value="396" />
+                                <Setter Property="Opacity" Value="0" />
+                            </KeyFrame>
+                            <KeyFrame Cue="100%">
+                                <Setter Property="TranslateTransform.X" Value="0" />
+                                <Setter Property="Opacity" Value="1" />
+                            </KeyFrame>
+                        </Animation>
+                    </Style.Animations>
+                </Style>
+
+                <Style Selector="Border[IsEnabled=False]">
+                    <Style.Animations>
+                        <Animation Duration="0:0:0.35" Easing="QuadraticEaseOut" FillMode="Forward">
+                            <KeyFrame Cue="0%">
+                                <Setter Property="TranslateTransform.X" Value="0" />
+                                <Setter Property="Opacity" Value="1" />
+                            </KeyFrame>
+                            <KeyFrame Cue="100%">
+                                <Setter Property="TranslateTransform.X" Value="396" />
+                                <Setter Property="Opacity" Value="0" />
+                            </KeyFrame>
+                        </Animation>
+                    </Style.Animations>
+                </Style>
+            </Border.Styles>
+        </Border>
+
         <Grid Grid.Row="0"
+              Grid.Column="0"
+              Grid.ColumnSpan="2"
               ColumnDefinitions="Auto,*"
               Margin="0 40 0 0">
             <Border Grid.Column="0"
@@ -56,10 +103,10 @@
                                LineHeight="40"
                                Text="{Binding CurrencyViewModel.CurrencyCode}" />
                     <controls:IconButton Classes="Update Big WithToolTipContent"
-                                         Classes.Updating="{Binding IsBalanceUpdating}"
-                                         Classes.NotUpdating="{Binding !IsBalanceUpdating}"
-                                         Margin="15 0 0 0"
-                                         Command="{Binding UpdateCommand}">
+                                            Classes.Updating="{Binding IsBalanceUpdating}"
+                                            Classes.NotUpdating="{Binding !IsBalanceUpdating}"
+                                            Margin="15 0 0 0"
+                                            Command="{Binding UpdateCommand}">
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="Update " />
                             <TextBlock Text="{Binding Currency.Description}" />
@@ -186,6 +233,8 @@
         </Grid>
 
         <TabControl Grid.Row="1"
+                    Grid.Column="0"
+                    Grid.ColumnSpan="2"
                     Margin="0 4 0 0"
                     Classes="WalletTabControl">
             <TabItem Margin="0 0 16 0"
@@ -217,7 +266,7 @@
                                            FontSize="13"
                                            Text="Description" />
                             </Button>
-                            
+
                             <controls:SortButton Grid.Column="1"
                                                  Title="Amount"
                                                  Command="{Binding SetSortTypeCommand}"
@@ -243,7 +292,7 @@
                                     </MultiBinding>
                                 </controls:SortButton.SortIsDesc>
                             </controls:SortButton>
-                            
+
                             <controls:SortButton Grid.Column="2"
                                                  Title="Status"
                                                  Command="{Binding SetSortTypeCommand}"
