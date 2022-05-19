@@ -18,7 +18,7 @@ namespace Atomex.Client.Desktop.Services
 
         public AtomexNotificationsEventArgs(IEnumerable<AtomexNotification> atomexNotifications)
         {
-            AtomexNotifications = new List<AtomexNotification>(atomexNotifications);
+            AtomexNotifications = atomexNotifications;
         }
     }
 
@@ -45,8 +45,8 @@ namespace Atomex.Client.Desktop.Services
             if (atomexClient?.Account == null)
                 return;
 
-            App.Account.UserData.Notifications ??= new List<AtomexNotification>();
-            NotificationsUpdated?.Invoke(this, new AtomexNotificationsEventArgs(App.Account.UserData.Notifications));
+            // App.Account.UserData.Notifications ??= new List<AtomexNotification>();
+            // NotificationsUpdated?.Invoke(this, new AtomexNotificationsEventArgs(App.Account.UserData.Notifications));
 
             App.Account.BalanceUpdated += OnBalanceUpdatedEventHandler!;
             App.Account.UnconfirmedTransactionAdded += OnUnconfirmedTransactionAdded!;
@@ -76,23 +76,23 @@ namespace Atomex.Client.Desktop.Services
             }
         }
 
-        private void Show(string title, string message, NotificationType type = NotificationType.Information)
+        private static void Show(string title, string message, NotificationType type = NotificationType.Information)
         {
             _ = Dispatcher.UIThread.InvokeAsync(() =>
             {
-                var atomexNotification = new AtomexNotification
-                {
-                    Id = Guid.NewGuid().ToString("N"),
-                    Message = message,
-                    IsRead = false,
-                    Time = DateTime.Now,
-                    AtomexNotificationType = AtomexNotificationType.Info
-                };
+                // var atomexNotification = new AtomexNotification
+                // {
+                //     Id = Guid.NewGuid().ToString("N"),
+                //     Message = message,
+                //     IsRead = false,
+                //     Time = DateTime.Now,
+                //     AtomexNotificationType = AtomexNotificationType.Info
+                // };
 
-                App.Account.UserData.Notifications ??= new List<AtomexNotification>();
-                App.Account.UserData.Notifications.Add(atomexNotification);
+                // App.Account.UserData.Notifications ??= new List<AtomexNotification>();
+                // App.Account.UserData.Notifications.Add(atomexNotification);
 
-                Save();
+                // Save();
 
                 Manager.Show(new Notification(
                     title,
@@ -123,20 +123,9 @@ namespace Atomex.Client.Desktop.Services
         public void ReadById(string id)
         {
             if (App.Account.UserData.Notifications == null) return;
-
-            // var changedNotification = App.Account.UserData.Notifications
-            //     .FirstOrDefault(notification => notification.Id == id);
-            //
-            // if (changedNotification != null)
-            // {
-            //     changedNotification.IsRead = true;
-            //     App.Account.UserData.Notifications = App.Account.UserData.Notifications
-            //         .Select(notification => notification.Id == id ? not)
-            // }
-
             var changedNotificationIndex = App.Account.UserData.Notifications
                 .FindIndex(n => n.Id == id);
-
+            
             App.Account.UserData.Notifications[changedNotificationIndex].IsRead = true;
 
             Save();

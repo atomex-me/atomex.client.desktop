@@ -19,9 +19,9 @@ namespace Atomex.Client.Desktop.ViewModels
 {
     public class NotificationsViewModel : ViewModelBase
     {
-        // private IAtomexApp AtomexApp;
         [Reactive] public bool IsOpened { get; set; }
-        [Reactive] public ObservableCollection<AtomexNotification> Notifications { get; set; }
+        [Reactive] private ObservableCollection<NotificationViewModel> Notifications { get; set; }
+        [ObservableAsProperty] public bool HasUnread { get; }
         [Reactive] public int SelectedIndex { get; set; }
 
         public NotificationsViewModel()
@@ -33,37 +33,41 @@ namespace Atomex.Client.Desktop.ViewModels
             }
 
             this.WhenAnyValue(vm => vm.SelectedIndex)
-                .Where(index => Notifications != null && index != null && index >= 0)
-                .SubscribeInMainThread(idx =>
-                {
-                    Log.Fatal($"{idx}");
-                    if (Notifications[idx].IsRead) return;
-                    App.NotificationsService.ReadById(Notifications[idx].Id);
-                });
+                .WhereNotNull()
+                .Where(_ => Notifications != null)
+                .Where(index => index >= 0)
+                .Where(index => !Notifications![index].IsRead)
+                .Select(index => Notifications![index].Id)
+                .SubscribeInMainThread(notificationId => { App.NotificationsService.ReadById(notificationId); });
 
+            this.WhenAnyValue(vm => vm.Notifications)
+                .WhereNotNull()
+                .Select(notifications => notifications.Any(n => !n.IsRead))
+                .ToPropertyExInMainThread(this, vm => vm.HasUnread);
+
+            SelectedIndex = -1;
             App.NotificationsService.NotificationsUpdated += OnNotificationsUpdated;
         }
-
-        // public NotificationsViewModel()
-        // {
-        //     // AtomexApp = atomexApp ?? throw new ArgumentNullException(nameof(atomexApp));
-        // }
 
 
         private void OnNotificationsUpdated(object sender, AtomexNotificationsEventArgs args)
         {
-            // var selectedIdx = SelectedIndex;
-            // Notifications = new ObservableCollection<AtomexNotification>();
-
             Dispatcher.UIThread.InvokeAsync(() =>
             {
-                
-                var notList = args.AtomexNotifications.ToList();
-                
-                if (notList.Count > 1)
-                    Notifications = new ObservableCollection<AtomexNotification>(
-                            notList.Remove(el => el.));
-                // SelectedIndex = selectedIdx;
+                var selectedNotificationIdx = SelectedIndex;
+                var incomeNotifications = args.AtomexNotifications
+                    .Select(n => new NotificationViewModel()
+                    {
+                        Id = n.Id,
+                        Message = n.Message,
+                        Time = n.Time,
+                        IsRead = n.IsRead,
+                        Type = n.AtomexNotificationType
+                    })
+                    .OrderByDescending(n => n.Time);
+
+                Notifications = new ObservableCollection<NotificationViewModel>(incomeNotifications);
+                SelectedIndex = selectedNotificationIdx;
             });
         }
 
@@ -83,32 +87,32 @@ namespace Atomex.Client.Desktop.ViewModels
         {
             IsOpened = true;
 
-            Notifications = new ObservableCollection<AtomexNotification>(new List<AtomexNotification>
+            Notifications = new ObservableCollection<NotificationViewModel>(new List<NotificationViewModel>
             {
-                new AtomexNotification()
+                new()
                 {
-                    AtomexNotificationType = AtomexNotificationType.Swap,
+                    Type = AtomexNotificationType.Swap,
                     Message = "0.035 ETH exchanged for 0.13523 BTC",
                     Time = DateTime.Now,
                     IsRead = false
                 },
-                new AtomexNotification()
+                new()
                 {
-                    AtomexNotificationType = AtomexNotificationType.Outcome,
+                    Type = AtomexNotificationType.Outcome,
                     Message = "0.018723 ETH sent to the external address",
                     Time = DateTime.Now,
                     IsRead = true
                 },
-                new AtomexNotification()
+                new()
                 {
-                    AtomexNotificationType = AtomexNotificationType.Income,
+                    Type = AtomexNotificationType.Income,
                     Message = "0.035 ETH received from the external address",
                     Time = DateTime.Now,
                     IsRead = false
                 },
-                new AtomexNotification()
+                new()
                 {
-                    AtomexNotificationType = AtomexNotificationType.Outcome,
+                    Type = AtomexNotificationType.Outcome,
                     Message = "0.018723 ETH sent to the external address",
                     Time = DateTime.Now,
                     IsRead = true
@@ -116,5 +120,14 @@ namespace Atomex.Client.Desktop.ViewModels
             });
         }
 #endif
+    }
+
+    public class NotificationViewModel : ViewModelBase
+    {
+        [Reactive] public string Id { get; set; }
+        [Reactive] public string Message { get; set; }
+        [Reactive] public DateTime Time { get; set; }
+        [Reactive] public bool IsRead { get; set; }
+        [Reactive] public AtomexNotificationType Type { get; set; }
     }
 }

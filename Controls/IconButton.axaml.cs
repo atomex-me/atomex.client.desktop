@@ -12,7 +12,8 @@ namespace Atomex.Client.Desktop.Controls
             AffectsRender<IconButton>(
                 ToolTextProperty,
                 ContentProperty,
-                IsActiveProperty
+                IsActiveProperty,
+                WithRedDotProperty
             );
         }
         
@@ -39,6 +40,15 @@ namespace Atomex.Client.Desktop.Controls
         {
             get { return GetValue(IsActiveProperty); }
             set { SetValue(IsActiveProperty, value); }
+        }
+        
+        public static readonly StyledProperty<bool> WithRedDotProperty =
+            AvaloniaProperty.Register<IconButton, bool>(nameof(WithRedDot));
+
+        public bool WithRedDot
+        {
+            get { return GetValue(WithRedDotProperty); }
+            set { SetValue(WithRedDotProperty, value); }
         }
     }
 }

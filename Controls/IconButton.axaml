@@ -46,44 +46,46 @@
                     <controls:IconButton Classes="Trash"
                                          ToolText="Remove transaction from list"
                                          Margin="10 0 0 0" />
-                    
+
                     <controls:IconButton Classes="Settings"
                                          Margin="10 0 0 0" />
-                                        
+
                     <controls:IconButton Classes="Clear NoEffects"
                                          Margin="10 0 0 0" />
-                    
+
                     <controls:IconButton Classes="MenuDots"
                                          Margin="10 0 0 0" />
-                    
+
                     <controls:IconButton Classes="Alert NoEffects"
                                          Margin="10 0 0 0" />
-                    
+
                     <controls:IconButton Classes="Swap"
                                          Margin="10 0 0 0" />
-                    
+
                     <controls:IconButton Classes="ViewAsset"
                                          Margin="10 0 0 0" />
                 </StackPanel>
-                
+
                 <StackPanel Margin="0 25 0 0" Orientation="Horizontal">
                     <controls:IconButton Classes="Alert NoEffects"
                                          IsActive="True"
+                                         WithRedDot="True"
                                          Margin="10 0 0 0" />
                 </StackPanel>
-                
+
                 <StackPanel Margin="0 25 0 0 "
                             Orientation="Horizontal">
-                    
+
                     <StackPanel Orientation="Horizontal">
                         <controls:IconButton Classes="Warning NoEffects" />
-                        <TextBlock Text="The transfer amount (including commission) exceeds the amount of available funds!"
-                                   MaxWidth="300"
-                                   TextWrapping="Wrap"
-                                   FontSize="16"
-                                   Margin="6 0 0 0"
-                                   Foreground="{DynamicResource WarningForegroundBrush}"
-                                   VerticalAlignment="Bottom" />
+                        <TextBlock
+                            Text="The transfer amount (including commission) exceeds the amount of available funds!"
+                            MaxWidth="300"
+                            TextWrapping="Wrap"
+                            FontSize="16"
+                            Margin="6 0 0 0"
+                            Foreground="{DynamicResource WarningForegroundBrush}"
+                            VerticalAlignment="Bottom" />
                     </StackPanel>
                 </StackPanel>
             </StackPanel>
@@ -99,7 +101,7 @@
         <Setter Property="Background" Value="{DynamicResource ButtonBackgroundPointerOver}" />
         <Setter Property="BorderBrush" Value="{DynamicResource ButtonBorderBrushPointerOver}" />
     </Style>
-    
+
     <Style Selector=":is(controls|IconButton):pressed /template/ Border">
         <Setter Property="Background" Value="{DynamicResource ButtonBackgroundPressed}" />
         <Setter Property="BorderBrush" Value="{DynamicResource ButtonBorderBrushPressed}" />
@@ -131,25 +133,35 @@
                             Height="{TemplateBinding Height}"
                             CornerRadius="{TemplateBinding CornerRadius}"
                             Background="{TemplateBinding Background}">
-                        <Border.Styles>
-                            <Style Selector="Border ToolTip">
-                                <Setter Property="IsVisible"
-                                        Value="{Binding $parent[controls:IconButton].ToolText,
-                                        Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
-                            </Style>
-                        </Border.Styles>
-                        <ToolTip.VerticalOffset>
-                            <MultiBinding Converter="{StaticResource ToolTipOffsetConverter}">
-                                <Binding Path="$self.Bounds.Height" />
-                                <Binding Path="#ToolTipTextContent.Bounds.Height" />
-                            </MultiBinding>
-                        </ToolTip.VerticalOffset>
-                        <ToolTip.Tip>
-                            <TextBlock Name="ToolTipTextContent"
-                                       TextWrapping="Wrap"
-                                       Text="{Binding $parent[controls:IconButton].ToolText}" />
-                        </ToolTip.Tip>
-                        <svg:Svg />
+                        <Panel>
+                            <Panel.Styles>
+                                <Style Selector="Panel ToolTip">
+                                    <Setter Property="IsVisible"
+                                            Value="{Binding $parent[controls:IconButton].ToolText,
+                                            Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+                                </Style>
+                            </Panel.Styles>
+                            <ToolTip.VerticalOffset>
+                                <MultiBinding Converter="{StaticResource ToolTipOffsetConverter}">
+                                    <Binding Path="$self.Bounds.Height" />
+                                    <Binding Path="#ToolTipTextContent.Bounds.Height" />
+                                </MultiBinding>
+                            </ToolTip.VerticalOffset>
+                            <ToolTip.Tip>
+                                <TextBlock Name="ToolTipTextContent"
+                                           TextWrapping="Wrap"
+                                           Text="{Binding $parent[controls:IconButton].ToolText}" />
+                            </ToolTip.Tip>
+
+                            <Border Width="9"
+                                    Height="9"
+                                    Background="{DynamicResource DarkRed}"
+                                    IsVisible="{TemplateBinding WithRedDot}"
+                                    Margin="10 -14 0 0"
+                                    ZIndex="1"
+                                    CornerRadius="10" />
+                            <svg:Svg />
+                        </Panel>
                     </Border>
                 </ControlTemplate>
             </Setter.Value>
@@ -331,7 +343,7 @@
     <Style Selector="controls|IconButton.Close:pointerover svg|Svg">
         <Setter Property="Path" Value="/Resources/Icons/close-light.svg" />
     </Style>
-    
+
     <Style Selector="controls|IconButton.Settings">
         <Setter Property="Width" Value="28" />
         <Setter Property="Height" Value="28" />
@@ -343,7 +355,7 @@
     <Style Selector="controls|IconButton.Settings:pointerover svg|Svg">
         <Setter Property="Path" Value="/Resources/Icons/settings-light.svg" />
     </Style>
-    
+
     <Style Selector="controls|IconButton.Clear">
         <Setter Property="Width" Value="24" />
         <Setter Property="Height" Value="24" />
@@ -355,7 +367,7 @@
     <Style Selector="controls|IconButton.Clear:pointerover svg|Svg">
         <Setter Property="Path" Value="/Resources/Icons/subtract-light.svg" />
     </Style>
-    
+
     <Style Selector="controls|IconButton.MenuDots">
         <Setter Property="Width" Value="26" />
         <Setter Property="Height" Value="26" />
@@ -367,7 +379,7 @@
     <Style Selector="controls|IconButton.MenuDots:pointerover svg|Svg">
         <Setter Property="Path" Value="/Resources/Icons/menu-dots-light.svg" />
     </Style>
-    
+
     <Style Selector="controls|IconButton.Alert">
         <Setter Property="Width" Value="44" />
         <Setter Property="Height" Value="44" />
@@ -390,7 +402,7 @@
     <Style Selector="controls|IconButton.Alert[IsActive=True] svg|Svg">
         <Setter Property="Path" Value="/Resources/Icons/notification-bell-light.svg" />
     </Style>
-    
+
     <Style Selector="controls|IconButton.Swap">
         <Setter Property="Width" Value="40" />
         <Setter Property="Height" Value="40" />
@@ -403,7 +415,7 @@
     <Style Selector="controls|IconButton.Swap:pointerover svg|Svg">
         <Setter Property="Path" Value="/Resources/Icons/swap-arrows-vertical-light.svg" />
     </Style>
-    
+
     <Style Selector="controls|IconButton.ViewAsset">
         <Setter Property="Width" Value="28" />
         <Setter Property="Height" Value="28" />
@@ -412,7 +424,7 @@
         <Setter Property="Path" Value="/Resources/Icons/view-asset.svg" />
         <Setter Property="Width" Value="22" />
     </Style>
-    
+
     <Style Selector="controls|IconButton.Warning">
         <Setter Property="Width" Value="24" />
         <Setter Property="Height" Value="24" />

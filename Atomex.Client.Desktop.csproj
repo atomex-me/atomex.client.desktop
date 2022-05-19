@@ -189,6 +189,14 @@
           <DependentUpon>SortButton.axaml</DependentUpon>
           <SubType>Code</SubType>
         </Compile>
+        <Compile Update="Controls\WalletCurrency.axaml.cs">
+          <DependentUpon>WalletCurrency.axaml</DependentUpon>
+          <SubType>Code</SubType>
+        </Compile>
+        <Compile Update="Controls\TransactionsList.axaml.cs">
+          <SubType>Code</SubType>
+          <DependentUpon>TransactionsList.axaml</DependentUpon>
+        </Compile>
     </ItemGroup>
     <ItemGroup>
         <ProjectReference Include="atomex.client.core\Atomex.Client.Core\Atomex.Client.Core.csproj">

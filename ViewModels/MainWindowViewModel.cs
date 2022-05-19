@@ -355,7 +355,8 @@ namespace Atomex.Client.Desktop.ViewModels
                     }
                     else
                     {
-                        await Task.Delay(delayInterval);   
+                        await Task.Delay(delayInterval);
+                        if (!_hasAccount) return;
                     }
 
                     if (AccountRestored || Content is UnlockViewModel) continue;

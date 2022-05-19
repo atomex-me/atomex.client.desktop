@@ -13,9 +13,70 @@
         <vm:NotificationsViewModel />
     </Design.DataContext>
 
+    <UserControl.Resources>
+        <DataTemplate x:Key="NotificationTemplate"
+                      DataType="vm:NotificationViewModel">
+            <Grid ColumnDefinitions="Auto,*,Auto">
+                <svg:Svg Grid.Column="0"
+                         Margin="12 0"
+                         Width="18"
+                         IsVisible="{Binding Type,
+                                             Converter={x:Static converters:EnumToStringEqualConverter.Instance},
+                                             ConverterParameter={x:Static atomexWallet:AtomexNotificationType.Outcome}}"
+                         Path="/Resources/Icons/top-right-arrow-gray.svg" />
+                <svg:Svg Grid.Column="0"
+                         Margin="12 0"
+                         Width="18"
+                         IsVisible="{Binding Type,
+                                             Converter={x:Static converters:EnumToStringEqualConverter.Instance},
+                                             ConverterParameter={x:Static atomexWallet:AtomexNotificationType.Income}}"
+                         Path="/Resources/Icons/bottom-right-arrow-gray.svg" />
+                <svg:Svg Grid.Column="0"
+                         Margin="12 0"
+                         Width="18"
+                         IsVisible="{Binding Type,
+                                             Converter={x:Static converters:EnumToStringEqualConverter.Instance},
+                                             ConverterParameter={x:Static atomexWallet:AtomexNotificationType.Swap}}"
+                         Path="/Resources/Icons/two-arrows.svg" />
+
+                <svg:Svg Grid.Column="0"
+                         Margin="12 0"
+                         Width="18"
+                         IsVisible="{Binding Type,
+                                             Converter={x:Static converters:EnumToStringEqualConverter.Instance},
+                                             ConverterParameter={x:Static atomexWallet:AtomexNotificationType.Info}}"
+                         Path="/Resources/Icons/warning.svg" />
+
+                <StackPanel Grid.Column="1">
+                    <TextBlock Foreground="{DynamicResource DefaultForegroundBrush}"
+                               FontSize="13"
+                               Margin="0 0 0 3"
+                               Text="{Binding Message}" />
+
+                    <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
+                               Margin="0 3 0 0"
+                               FontSize="13"
+                               Text="{Binding Time}" />
+                </StackPanel>
+
+                <Border Grid.Column="2"
+                        Width="6"
+                        Height="6"
+                        Margin="0 0 12 0"
+                        Background="{DynamicResource Blue}"
+                        IsVisible="{Binding !IsRead}"
+                        CornerRadius="10">
+                </Border>
+            </Grid>
+        </DataTemplate>
+    </UserControl.Resources>
+
     <WrapPanel>
-        <controls:IconButton Classes="Alert NoEffects"
+        <controls:IconButton IsVisible="False"
+                             Classes="Alert NoEffects"
+                             WithRedDot="{Binding HasUnread}"
                              IsActive="{Binding IsOpened}"
+                             Margin="16 0 0 0"
                              Command="{Binding ChangeOpenedStateCommand}" />
         <Popup PlacementMode="Left"
                VerticalAlignment="Center"
@@ -59,6 +120,7 @@
                              SelectedIndex="{Binding SelectedIndex}"
                              HorizontalAlignment="Stretch"
                              SelectionMode="Single"
+                             ItemTemplate="{StaticResource NotificationTemplate}"
                              MaxHeight="400">
                         <ListBox.Styles>
                             <Style Selector="ListBoxItem">
@@ -73,62 +135,6 @@
                                 <Setter Property="Background" Value="{DynamicResource LightDefaultOpacity6}" />
                             </Style>
                         </ListBox.Styles>
-                        <ListBox.ItemTemplate>
-                            <DataTemplate>
-                                <Grid ColumnDefinitions="Auto,*,Auto">
-                                    <svg:Svg Grid.Column="0"
-                                             Margin="12 0"
-                                             Width="18"
-                                             IsVisible="{Binding AtomexNotificationType,
-                                             Converter={x:Static converters:EnumToStringEqualConverter.Instance},
-                                             ConverterParameter={x:Static atomexWallet:AtomexNotificationType.Outcome}}"
-                                             Path="/Resources/Icons/top-right-arrow-gray.svg" />
-                                    <svg:Svg Grid.Column="0"
-                                             Margin="12 0"
-                                             Width="18"
-                                             IsVisible="{Binding AtomexNotificationType,
-                                             Converter={x:Static converters:EnumToStringEqualConverter.Instance},
-                                             ConverterParameter={x:Static atomexWallet:AtomexNotificationType.Income}}"
-                                             Path="/Resources/Icons/bottom-right-arrow-gray.svg" />
-                                    <svg:Svg Grid.Column="0"
-                                             Margin="12 0"
-                                             Width="18"
-                                             IsVisible="{Binding AtomexNotificationType,
-                                             Converter={x:Static converters:EnumToStringEqualConverter.Instance},
-                                             ConverterParameter={x:Static atomexWallet:AtomexNotificationType.Swap}}"
-                                             Path="/Resources/Icons/two-arrows.svg" />
-
-                                    <svg:Svg Grid.Column="0"
-                                             Margin="12 0"
-                                             Width="18"
-                                             IsVisible="{Binding AtomexNotificationType,
-                                             Converter={x:Static converters:EnumToStringEqualConverter.Instance},
-                                             ConverterParameter={x:Static atomexWallet:AtomexNotificationType.Info}}"
-                                             Path="/Resources/Icons/warning.svg" />
-
-                                    <StackPanel Grid.Column="1">
-                                        <TextBlock Foreground="{DynamicResource DefaultForegroundBrush}"
-                                                   FontSize="13"
-                                                   Margin="0 0 0 3"
-                                                   Text="{Binding Message}" />
-
-                                        <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
-                                                   Margin="0 3 0 0"
-                                                   FontSize="13"
-                                                   Text="{Binding Time}" />
-                                    </StackPanel>
-
-                                    <Border Grid.Column="2"
-                                            Width="6"
-                                            Height="6"
-                                            Margin="0 0 12 0"
-                                            Background="{DynamicResource Blue}"
-                                            IsVisible="{Binding !IsRead}"
-                                            CornerRadius="10">
-                                    </Border>
-                                </Grid>
-                            </DataTemplate>
-                        </ListBox.ItemTemplate>
                     </ListBox>
                 </StackPanel>
             </Border>
