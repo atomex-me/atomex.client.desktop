@@ -15,6 +15,7 @@ using Serilog;
 using Atomex.Blockchain.Tezos;
 using Atomex.Blockchain.Tezos.Tzkt;
 using Atomex.Client.Desktop.Common;
+using Atomex.Client.Desktop.ViewModels.Abstract;
 using Atomex.Client.Desktop.ViewModels.SendViewModels;
 using Atomex.Client.Desktop.ViewModels.TransactionViewModels;
 using Atomex.Common;
@@ -521,12 +522,12 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                         SendCallback = SendCallback
                     }));
             }
-
-            OnPropertyChanged(nameof(Tokens));
+            CurrentSortDirection = SortDirection.Desc;
+            CurrentSortField = TxSortField.ByTime;
             
+            OnPropertyChanged(nameof(Tokens));
             SelectedTabIndex = tokenContract.IsFa2 ? 0 : 1;
             OnPropertyChanged(nameof(SelectedTabIndex));
-
             OnPropertyChanged(nameof(TokenContractIconPreview));
         }
 
