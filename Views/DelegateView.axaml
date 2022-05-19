@@ -16,8 +16,6 @@
     </Design.DataContext>
 
     <UserControl.Resources>
-        <converters:EnumToStringNotEqualConverter x:Key="EnumToStringNotEqualConverter" />
-        <converters:EnumToStringEqualConverter x:Key="EnumToStringEqualConverter" />
         <converters:PercentConverter x:Key="PercentConverter" />
         <converters:LowerThanZeroConverter x:Key="LowerThanZeroConverter" />
         <converters:GreaterThanZeroConverter x:Key="GreaterThanZeroConverter" />
@@ -43,14 +41,14 @@
                 <controls:IconButton Grid.Column="0"
                                      Classes="Back"
                                      IsVisible="{Binding Stage,
-                                     Converter={StaticResource EnumToStringNotEqualConverter},
+                                     Converter={x:Static converters:EnumToStringNotEqualConverter.Instance},
                                      ConverterParameter={x:Static abstract:SendStage.Edit}}"
                                      Command="{Binding UndoConfirmStageCommand}" />
 
                 <!-- window title -->
                 <TextBlock Grid.Column="1"
                            IsVisible="{Binding Stage,
-                           Converter={StaticResource EnumToStringEqualConverter},
+                           Converter={x:Static converters:EnumToStringEqualConverter.Instance},
                            ConverterParameter={x:Static abstract:SendStage.Edit}}"
                            Foreground="{DynamicResource DefaultForegroundBrush}"
                            FontSize="22"
@@ -60,7 +58,7 @@
 
                 <TextBlock Grid.Column="1"
                            IsVisible="{Binding Stage,
-                           Converter={StaticResource EnumToStringEqualConverter},
+                           Converter={x:Static converters:EnumToStringEqualConverter.Instance},
                            ConverterParameter={x:Static abstract:SendStage.Confirmation}}"
                            Foreground="{DynamicResource DefaultForegroundBrush}"
                            FontSize="22"
@@ -76,7 +74,7 @@
 
             <StackPanel
                 IsVisible="{Binding Stage,
-                            Converter={StaticResource EnumToStringEqualConverter},
+                            Converter={x:Static converters:EnumToStringEqualConverter.Instance},
                             ConverterParameter={x:Static abstract:SendStage.Edit}}">
                 <TextBox Margin="0 16 0 0"
                          Height="44"
@@ -110,20 +108,20 @@
                             <controls:SortButton.SortIsAsc>
                                 <MultiBinding Converter="{x:Static BoolConverters.And}">
                                     <Binding Path="CurrentSortDirection"
-                                             Converter="{StaticResource EnumToStringEqualConverter}"
+                                             Converter="{x:Static converters:EnumToStringEqualConverter.Instance}"
                                              ConverterParameter="{x:Static abstract:SortDirection.Asc}" />
                                     <Binding Path="CurrentSortField"
-                                             Converter="{StaticResource EnumToStringEqualConverter}"
+                                             Converter="{x:Static converters:EnumToStringEqualConverter.Instance}"
                                              ConverterParameter="{x:Static abstract:DelegationSortField.ByValidator}" />
                                 </MultiBinding>
                             </controls:SortButton.SortIsAsc>
                             <controls:SortButton.SortIsDesc>
                                 <MultiBinding Converter="{x:Static BoolConverters.And}">
                                     <Binding Path="CurrentSortDirection"
-                                             Converter="{StaticResource EnumToStringEqualConverter}"
+                                             Converter="{x:Static converters:EnumToStringEqualConverter.Instance}"
                                              ConverterParameter="{x:Static abstract:SortDirection.Desc}" />
                                     <Binding Path="CurrentSortField"
-                                             Converter="{StaticResource EnumToStringEqualConverter}"
+                                             Converter="{x:Static converters:EnumToStringEqualConverter.Instance}"
                                              ConverterParameter="{x:Static abstract:DelegationSortField.ByValidator}" />
                                 </MultiBinding>
                             </controls:SortButton.SortIsDesc>
@@ -136,20 +134,20 @@
                             <controls:SortButton.SortIsAsc>
                                 <MultiBinding Converter="{x:Static BoolConverters.And}">
                                     <Binding Path="CurrentSortDirection"
-                                             Converter="{StaticResource EnumToStringEqualConverter}"
+                                             Converter="{x:Static converters:EnumToStringEqualConverter.Instance}"
                                              ConverterParameter="{x:Static abstract:SortDirection.Asc}" />
                                     <Binding Path="CurrentSortField"
-                                             Converter="{StaticResource EnumToStringEqualConverter}"
+                                             Converter="{x:Static converters:EnumToStringEqualConverter.Instance}"
                                              ConverterParameter="{x:Static abstract:DelegationSortField.ByMinTez}" />
                                 </MultiBinding>
                             </controls:SortButton.SortIsAsc>
                             <controls:SortButton.SortIsDesc>
                                 <MultiBinding Converter="{x:Static BoolConverters.And}">
                                     <Binding Path="CurrentSortDirection"
-                                             Converter="{StaticResource EnumToStringEqualConverter}"
+                                             Converter="{x:Static converters:EnumToStringEqualConverter.Instance}"
                                              ConverterParameter="{x:Static abstract:SortDirection.Desc}" />
                                     <Binding Path="CurrentSortField"
-                                             Converter="{StaticResource EnumToStringEqualConverter}"
+                                             Converter="{x:Static converters:EnumToStringEqualConverter.Instance}"
                                              ConverterParameter="{x:Static abstract:DelegationSortField.ByMinTez}" />
                                 </MultiBinding>
                             </controls:SortButton.SortIsDesc>
@@ -162,20 +160,20 @@
                             <controls:SortButton.SortIsAsc>
                                 <MultiBinding Converter="{x:Static BoolConverters.And}">
                                     <Binding Path="CurrentSortDirection"
-                                             Converter="{StaticResource EnumToStringEqualConverter}"
+                                             Converter="{x:Static converters:EnumToStringEqualConverter.Instance}"
                                              ConverterParameter="{x:Static abstract:SortDirection.Asc}" />
                                     <Binding Path="CurrentSortField"
-                                             Converter="{StaticResource EnumToStringEqualConverter}"
+                                             Converter="{x:Static converters:EnumToStringEqualConverter.Instance}"
                                              ConverterParameter="{x:Static abstract:DelegationSortField.ByRoi}" />
                                 </MultiBinding>
                             </controls:SortButton.SortIsAsc>
                             <controls:SortButton.SortIsDesc>
                                 <MultiBinding Converter="{x:Static BoolConverters.And}">
                                     <Binding Path="CurrentSortDirection"
-                                             Converter="{StaticResource EnumToStringEqualConverter}"
+                                             Converter="{x:Static converters:EnumToStringEqualConverter.Instance}"
                                              ConverterParameter="{x:Static abstract:SortDirection.Desc}" />
                                     <Binding Path="CurrentSortField"
-                                             Converter="{StaticResource EnumToStringEqualConverter}"
+                                             Converter="{x:Static converters:EnumToStringEqualConverter.Instance}"
                                              ConverterParameter="{x:Static abstract:DelegationSortField.ByRoi}" />
                                 </MultiBinding>
                             </controls:SortButton.SortIsDesc>
@@ -319,7 +317,7 @@
 
             <StackPanel
                 IsVisible="{Binding Stage,
-                            Converter={StaticResource EnumToStringEqualConverter},
+                            Converter={x:Static converters:EnumToStringEqualConverter.Instance},
                             ConverterParameter={x:Static abstract:SendStage.Confirmation}}">
                 <Border Width="440"
                         Height="74"

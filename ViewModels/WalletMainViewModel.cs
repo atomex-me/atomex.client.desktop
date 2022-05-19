@@ -3,11 +3,9 @@ using System.Diagnostics;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
-
 using Avalonia.Threading;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
-
 using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.ViewModels.TransactionViewModels;
 using Atomex.Client.Desktop.ViewModels.WalletViewModels;
@@ -96,6 +94,7 @@ namespace Atomex.Client.Desktop.ViewModels
 
             SettingsViewModel = new SettingsViewModel(AtomexApp);
             WertViewModel = new WertViewModel(AtomexApp);
+            NotificationsViewModel = new NotificationsViewModel();
 
             SelectPortfolio();
             SubscribeToServices();
@@ -103,12 +102,13 @@ namespace Atomex.Client.Desktop.ViewModels
             InstalledVersion = GetAssemblyFileVersion();
         }
 
-        private IAtomexApp AtomexApp { get; set; }
-        private PortfolioViewModel PortfolioViewModel { get; set; }
-        private WalletsViewModel WalletsViewModel { get; set; }
-        private ConversionViewModel ConversionViewModel { get; set; }
-        private SettingsViewModel SettingsViewModel { get; set; }
-        private WertViewModel WertViewModel { get; set; }
+        private IAtomexApp AtomexApp { get; }
+        private PortfolioViewModel PortfolioViewModel { get; }
+        private WalletsViewModel WalletsViewModel { get; }
+        private ConversionViewModel ConversionViewModel { get; }
+        private SettingsViewModel SettingsViewModel { get; }
+        private WertViewModel WertViewModel { get; }
+        private NotificationsViewModel NotificationsViewModel { get; }
 
         [Reactive] public ViewModelBase? RightPopupContent { get; set; }
         [Reactive] public bool RightPopupOpened { get; set; }
@@ -221,7 +221,7 @@ namespace Atomex.Client.Desktop.ViewModels
                     app: AtomexApp,
                     setConversionTab: SelectConversion,
                     setWertCurrency: SelectWert,
-                    showRightPopupContent: ShowRightPopupContent);   
+                    showRightPopupContent: ShowRightPopupContent);
             }
 
             else if (currencyDescription != null)

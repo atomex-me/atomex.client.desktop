@@ -66,6 +66,12 @@
                                          Margin="10 0 0 0" />
                 </StackPanel>
                 
+                <StackPanel Margin="0 25 0 0" Orientation="Horizontal">
+                    <controls:IconButton Classes="Alert NoEffects"
+                                         IsActive="True"
+                                         Margin="10 0 0 0" />
+                </StackPanel>
+                
                 <StackPanel Margin="0 25 0 0 "
                             Orientation="Horizontal">
                     
@@ -93,7 +99,7 @@
         <Setter Property="Background" Value="{DynamicResource ButtonBackgroundPointerOver}" />
         <Setter Property="BorderBrush" Value="{DynamicResource ButtonBorderBrushPointerOver}" />
     </Style>
-
+    
     <Style Selector=":is(controls|IconButton):pressed /template/ Border">
         <Setter Property="Background" Value="{DynamicResource ButtonBackgroundPressed}" />
         <Setter Property="BorderBrush" Value="{DynamicResource ButtonBorderBrushPressed}" />
@@ -378,6 +384,12 @@
     <Style Selector="controls|IconButton.Alert:pointerover svg|Svg">
         <Setter Property="Path" Value="/Resources/Icons/notification-bell-light.svg" />
     </Style>
+    <Style Selector="controls|IconButton.Alert[IsActive=True] /template/ Border">
+        <Setter Property="Background" Value="{DynamicResource LightDefaultOpacity20}" />
+    </Style>
+    <Style Selector="controls|IconButton.Alert[IsActive=True] svg|Svg">
+        <Setter Property="Path" Value="/Resources/Icons/notification-bell-light.svg" />
+    </Style>
     
     <Style Selector="controls|IconButton.Swap">
         <Setter Property="Width" Value="40" />
@@ -406,7 +418,7 @@
         <Setter Property="Height" Value="24" />
     </Style>
     <Style Selector="controls|IconButton.Warning svg|Svg">
-        <Setter Property="Path" Value="/Resources/Icons/warning.svg" />
+        <Setter Property="Path" Value="/Resources/Icons/warning-orange.svg" />
         <Setter Property="Width" Value="24" />
     </Style>
 </Styles>

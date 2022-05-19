@@ -36,7 +36,7 @@
         <Grid RowDefinitions="Auto,Auto,*">
             <Grid Grid.Row="0"
                   Height="75"
-                  ColumnDefinitions="Auto,*,Auto">
+                  ColumnDefinitions="Auto,Auto">
                 <controls:IconButton Grid.Column="0"
                                      Classes="Back"
                                      Command="{Binding BackCommand}" />
@@ -50,9 +50,6 @@
                            Text="{Binding Selected.Header}"
                            Margin="20 0 0 0"
                            Name="WindowTitle" />
-
-                <controls:IconButton Grid.Column="2"
-                                     Classes="Alert NoEffects" />
             </Grid>
 
             <Border Grid.Row="1"

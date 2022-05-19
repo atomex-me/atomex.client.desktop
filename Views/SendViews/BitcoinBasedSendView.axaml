@@ -43,8 +43,6 @@
     <UserControl.Resources>
         <converters:AmountToStringConverter x:Key="AmountToStringConverter" />
         <converters:AmountToStringInBracketsConverter x:Key="AmountToStringInBracketsConverter" />
-        <converters:EnumToStringEqualConverter x:Key="EnumToStringEqualConverter" />
-        <converters:EnumToStringNotEqualConverter x:Key="EnumToStringNotEqualConverter" />
         <converters:StringToDecimalConverter x:Key="StringToDecimalConverter" />
     </UserControl.Resources>
 
@@ -58,7 +56,7 @@
                 <controls:IconButton Grid.Column="0"
                                      Classes="Back"
                                      IsVisible="{Binding Stage,
-                                     Converter={StaticResource EnumToStringNotEqualConverter},
+                                     Converter={x:Static converters:EnumToStringNotEqualConverter.Instance},
                                      ConverterParameter={x:Static abstract:SendStage.Edit}}"
                                      Command="{Binding UndoConfirmStageCommand}"/>
 
@@ -70,7 +68,7 @@
                            VerticalAlignment="Center"
                            Classes="SendTitle"
                            Classes.ConfirmationTitle="{Binding Stage,
-                     Converter={StaticResource EnumToStringEqualConverter},
+                     Converter={x:Static converters:EnumToStringEqualConverter.Instance},
                      ConverterParameter=Confirmation}">
                     <i:Interaction.Behaviors>
                         <ia:DataTriggerBehavior Binding="{Binding Stage}"
@@ -99,10 +97,10 @@
                             ContentTemplate="{StaticResource CurrencySendItemTemplate}"
                             Margin="0 32 0 0"
                             IsVisible="{Binding Stage,
-                        Converter={StaticResource EnumToStringNotEqualConverter},
+                        Converter={x:Static converters:EnumToStringNotEqualConverter.Instance},
                         ConverterParameter=AdditionalConfirmation}"
                             IsEnabled="{Binding Stage,
-                        Converter={StaticResource EnumToStringEqualConverter},
+                        Converter={x:Static converters:EnumToStringEqualConverter.Instance},
                         ConverterParameter=Edit}" />
 
             <!-- to -->
@@ -110,7 +108,7 @@
                         HorizontalAlignment="Center"
                         Margin="0 12 0 0"
                         IsVisible="{Binding Stage,
-                    Converter={StaticResource EnumToStringNotEqualConverter},
+                    Converter={x:Static converters:EnumToStringNotEqualConverter.Instance},
                     ConverterParameter=AdditionalConfirmation}">
                 <Border Width="50"
                         Margin="-50 0 0 0">
@@ -129,14 +127,14 @@
                         VerticalAlignment="Center"
                         Classes="Editable"
                         Classes.ReadOnly="{Binding Stage,
-                  Converter={StaticResource EnumToStringEqualConverter},
+                  Converter={x:Static converters:EnumToStringEqualConverter.Instance},
                   ConverterParameter=Confirmation}">
                     <Button Padding="20 0"
                             Width="440"
                             Height="80"
                             Command="{Binding SelectToCommand}"
                             IsEnabled="{Binding Stage,
-                    Converter={StaticResource EnumToStringEqualConverter},
+                    Converter={x:Static converters:EnumToStringEqualConverter.Instance},
                     ConverterParameter=Edit}"
                             VerticalContentAlignment="Center"
                             Classes="EmptyBtnWithContent">
@@ -179,7 +177,7 @@
             <!-- edit stage -->
             <StackPanel Margin="0 12 0 0"
                         IsVisible="{Binding Stage,
-                    Converter={StaticResource EnumToStringEqualConverter},
+                    Converter={x:Static converters:EnumToStringEqualConverter.Instance},
                     ConverterParameter=Edit}">
                 <!-- amount -->
                 <StackPanel Orientation="Horizontal"
@@ -275,10 +273,10 @@
                                FontFamily="{DynamicResource DefaultLightFontFamily}"
                                Classes="Message"
                                Classes.Warning="{Binding WarningType,
-                               Converter={StaticResource EnumToStringEqualConverter},
+                               Converter={x:Static converters:EnumToStringEqualConverter.Instance},
                                ConverterParameter=Warning}"
                                Classes.Error="{Binding WarningType,
-                               Converter={StaticResource EnumToStringEqualConverter},
+                               Converter={x:Static converters:EnumToStringEqualConverter.Instance},
                                ConverterParameter=Error}" />
 
                     <controls:IconButton Classes="Question WithToolTipContent"
@@ -288,10 +286,10 @@
                         <TextBlock TextWrapping="Wrap"
                                    Text="{Binding WarningToolTip}"
                                    Classes.Warning="{Binding WarningType,
-                                           Converter={StaticResource EnumToStringEqualConverter},
+                                           Converter={x:Static converters:EnumToStringEqualConverter.Instance},
                                            ConverterParameter=Warning}"
                                    Classes.Error="{Binding WarningType,
-                                           Converter={StaticResource EnumToStringEqualConverter},
+                                           Converter={x:Static converters:EnumToStringEqualConverter.Instance},
                                            ConverterParameter=Error}" />
                     </controls:IconButton>
                 </StackPanel>
@@ -380,7 +378,7 @@
             <!-- confirmation stage -->
             <StackPanel Margin="0 18 0 0"
                         IsVisible="{Binding Stage,
-                    Converter={StaticResource EnumToStringEqualConverter},
+                    Converter={x:Static converters:EnumToStringEqualConverter.Instance},
                     ConverterParameter=Confirmation}"
                         Width="440"
                         HorizontalAlignment="Center">

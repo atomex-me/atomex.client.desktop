@@ -11,7 +11,8 @@ namespace Atomex.Client.Desktop.Controls
         {
             AffectsRender<IconButton>(
                 ToolTextProperty,
-                ContentProperty
+                ContentProperty,
+                IsActiveProperty
             );
         }
         
@@ -24,11 +25,20 @@ namespace Atomex.Client.Desktop.Controls
                 enableDataValidation: true);
 
         private string _toolText;
-
         public string ToolText
         {
             get { return _toolText; }
             set { SetAndRaise(ToolTextProperty, ref _toolText, value); }
+        }
+        
+        
+        public static readonly StyledProperty<bool> IsActiveProperty =
+            AvaloniaProperty.Register<IconButton, bool>(nameof(IsActive));
+
+        public bool IsActive
+        {
+            get { return GetValue(IsActiveProperty); }
+            set { SetValue(IsActiveProperty, value); }
         }
     }
 }

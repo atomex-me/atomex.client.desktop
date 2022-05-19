@@ -43,7 +43,6 @@
 
   <Styles.Resources>
     <converters:AmountToStringConverter x:Key="AmountToStringConverter"/>
-    <converters:EnumToStringEqualConverter x:Key="EnumToStringEqualConverter"/>
 
     <DataTemplate x:Key="CurrencySendItemTemplate"
                   DataType="{x:Type currencySendVm:SendViewModel}">
@@ -67,7 +66,7 @@
                 VerticalAlignment="Center"
                 Classes="Editable"
                 Classes.ReadOnly="{Binding Stage,
-                  Converter={StaticResource EnumToStringEqualConverter},
+                  Converter={x:Static converters:EnumToStringEqualConverter.Instance},
                   ConverterParameter=Confirmation}">
           <Button Padding="20 0"
                   Width="440"

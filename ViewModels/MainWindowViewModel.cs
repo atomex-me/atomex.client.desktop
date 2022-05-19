@@ -177,8 +177,8 @@ namespace Atomex.Client.Desktop.ViewModels
             HasAccount = true;
 
             // auto sign out after timeout
-            if (MainView != null && account.UserSettings.AutoSignOut)
-                MainView.StartInactivityControl(TimeSpan.FromMinutes(account.UserSettings.PeriodOfInactivityInMin));
+            if (MainView != null && account.UserData.AutoSignOut)
+                MainView.StartInactivityControl(TimeSpan.FromMinutes(account.UserData.PeriodOfInactivityInMin));
 
             StartLookingForUserMessages(TimeSpan.FromSeconds(90));
         }
@@ -255,7 +255,7 @@ namespace Atomex.Client.Desktop.ViewModels
         private async Task<bool> WhetherToCancelClosingAsync()
         {
             if (AtomexApp.Account == null) return false;
-            if (!AtomexApp.Account.UserSettings.ShowActiveSwapWarning)
+            if (!AtomexApp.Account.UserData.ShowActiveSwapWarning)
                 return false;
 
             var hasActiveSwaps = await HasActiveSwapsAsync();
