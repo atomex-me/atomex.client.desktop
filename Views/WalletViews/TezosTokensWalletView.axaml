@@ -16,10 +16,8 @@
 
     <UserControl.Resources>
         <converters:AmountToStringConverter x:Key="AmountToStringConverter" />
-        <converters:DateTimeToTxTimeConverter x:Key="DateTimeToTxTimeConverter" />
         <converters:BoolToRowSpanConverter x:Key="BoolToRowSpanConverter" />
         <converters:ObjectsEqualConverter x:Key="ObjectsEqualConverter" />
-        <converters:GreaterThanZeroConverter x:Key="GreaterThanZeroConverter" />
         <converters:StringsConcatConverter x:Key="StringsConcatConverter" />
     </UserControl.Resources>
 
@@ -323,7 +321,8 @@
                                            VerticalAlignment="Center"
                                            Grid.Column="1"
                                            Grid.Row="1"
-                                           Grid.RowSpan="{Binding TokenBalance.HasDescription, Converter={StaticResource BoolToRowSpanConverter}}" />
+                                           Grid.RowSpan="{Binding TokenBalance.HasDescription,
+                                           Converter={StaticResource BoolToRowSpanConverter}}" />
 
                                 <TextBlock Margin="7 0 10 0"
                                            Text="{Binding TokenBalance.Description}"
