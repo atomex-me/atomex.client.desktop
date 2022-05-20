@@ -10,6 +10,7 @@ using ReactiveUI.Fody.Helpers;
 using Serilog;
 
 using Atomex.Client.Desktop.Common;
+using Avalonia.Controls;
 
 namespace Atomex.Client.Desktop.ViewModels
 {
@@ -31,7 +32,7 @@ namespace Atomex.Client.Desktop.ViewModels
         public UnlockViewModel()
         {
 #if DEBUG
-            if (Env.IsInDesignerMode())
+            if (Design.IsDesignMode)
                 DesignerMode();
 #endif
         }

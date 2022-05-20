@@ -4,6 +4,7 @@ using Atomex.Wallet.Abstract;
 using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.ViewModels.CreateWalletViewModels;
 using System.Collections.Generic;
+using Avalonia.Controls;
 using ReactiveUI;
 
 namespace Atomex.Client.Desktop.ViewModels
@@ -143,7 +144,7 @@ namespace Atomex.Client.Desktop.ViewModels
         public CreateWalletViewModel()
         {
 #if DEBUG
-            if (Env.IsInDesignerMode())
+            if (Design.IsDesignMode)
                 DesignerMode();
 #endif
         }

@@ -5,6 +5,7 @@ using Atomex.Blockchain.Ethereum;
 using Atomex.Client.Desktop.Common;
 using Atomex.EthereumTokens;
 using Atomex.ViewModels;
+using Avalonia.Controls;
 
 namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
 {
@@ -22,7 +23,7 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
         public EthereumERC20TransactionViewModel()
         {
 #if DEBUG
-            if (Env.IsInDesignerMode())
+            if (Design.IsDesignMode)
                 DesignerMode();
 #endif
         }

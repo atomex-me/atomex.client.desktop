@@ -7,6 +7,7 @@ using ReactiveUI;
 using Atomex.Client.Desktop.Common;
 using Atomex.Services;
 using Atomex.Wallet.Abstract;
+using Avalonia.Controls;
 
 namespace Atomex.Client.Desktop.ViewModels
 {
@@ -27,7 +28,7 @@ namespace Atomex.Client.Desktop.ViewModels
             MainWindowViewModel mainWindowWM)
         {
 #if DEBUG
-            if (Env.IsInDesignerMode())
+            if (Design.IsDesignMode)
                 DesignerMode();
 #endif
             AtomexApp = app ?? throw new ArgumentNullException(nameof(app));

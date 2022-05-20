@@ -22,14 +22,13 @@ namespace Atomex.Client.Desktop.Controls
                 nameof(ToolText),
                 o => o.ToolText,
                 (o, v) => o.ToolText = v,
-                defaultBindingMode: BindingMode.TwoWay,
-                enableDataValidation: true);
+                defaultBindingMode: BindingMode.TwoWay);
 
         private string _toolText;
         public string ToolText
         {
-            get { return _toolText; }
-            set { SetAndRaise(ToolTextProperty, ref _toolText, value); }
+            get => _toolText;
+            set => SetAndRaise(ToolTextProperty, ref _toolText, value);
         }
         
         
@@ -38,8 +37,8 @@ namespace Atomex.Client.Desktop.Controls
 
         public bool IsActive
         {
-            get { return GetValue(IsActiveProperty); }
-            set { SetValue(IsActiveProperty, value); }
+            get => GetValue(IsActiveProperty);
+            set => SetValue(IsActiveProperty, value);
         }
         
         public static readonly StyledProperty<bool> WithRedDotProperty =
@@ -47,8 +46,8 @@ namespace Atomex.Client.Desktop.Controls
 
         public bool WithRedDot
         {
-            get { return GetValue(WithRedDotProperty); }
-            set { SetValue(WithRedDotProperty, value); }
+            get => GetValue(WithRedDotProperty);
+            set => SetValue(WithRedDotProperty, value);
         }
     }
 }

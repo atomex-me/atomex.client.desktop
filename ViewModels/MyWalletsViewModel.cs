@@ -12,6 +12,7 @@ using Atomex.LiteDb;
 using Atomex.Services;
 using Atomex.Wallet;
 using Atomex.Wallet.Abstract;
+using Avalonia.Controls;
 
 namespace Atomex.Client.Desktop.ViewModels
 {
@@ -26,7 +27,7 @@ namespace Atomex.Client.Desktop.ViewModels
         public MyWalletsViewModel()
         {
 #if DEBUG
-            if (Env.IsInDesignerMode())
+            if (Design.IsDesignMode)
                 DesignerMode();
 #endif
         }
