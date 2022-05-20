@@ -60,6 +60,7 @@
 
         <controls:WalletCurrency Grid.Row="0"
                                  Grid.Column="0"
+                                 Grid.ColumnSpan="2"
                                  Margin="0 40 0 0"
                                  CurrencyViewModel="{Binding CurrencyViewModel}"
                                  IsBalanceUpdating="{Binding IsBalanceUpdating}"

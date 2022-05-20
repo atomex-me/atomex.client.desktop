@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.Reactive;
+using System.Reactive.Linq;
 using System.Runtime.InteropServices;
 using System.Windows.Input;
-
 using ReactiveUI;
-
 using Atomex.Client.Desktop.Common;
 using Atomex.Common;
 using Atomex.Core;
@@ -13,6 +13,7 @@ using Atomex.Services;
 using Atomex.Wallet;
 using Atomex.Wallet.Abstract;
 using Avalonia.Controls;
+using ReactiveUI.Fody.Helpers;
 
 namespace Atomex.Client.Desktop.ViewModels
 {
@@ -23,6 +24,7 @@ namespace Atomex.Client.Desktop.ViewModels
         private Action DoAfterAtomexClientChanged;
 
         public IEnumerable<WalletInfo> Wallets { get; set; }
+        [Reactive] public WalletInfo? SelectedWallet { get; set; }
 
         public MyWalletsViewModel()
         {
@@ -38,13 +40,22 @@ namespace Atomex.Client.Desktop.ViewModels
         {
             AtomexApp = app ?? throw new ArgumentNullException(nameof(app));
             Wallets = WalletInfo.AvailableWallets();
+
+            this.WhenAnyValue(vm => vm.SelectedWallet)
+                .WhereNotNull()
+                .InvokeCommandInMainThread(SelectWalletCommand);
+
             AtomexApp.AtomexClientChanged += OnAtomexClientChangedEventHandler;
 
             ShowContent += showContent;
         }
 
-        private ICommand _selectWalletCommand;
-        public ICommand SelectWalletCommand => _selectWalletCommand ??= ReactiveCommand.Create<WalletInfo>(info =>
+        private ReactiveCommand<WalletInfo, Unit> _selectWalletCommand;
+
+        public ReactiveCommand<WalletInfo, Unit> SelectWalletCommand => _selectWalletCommand ??=
+            ReactiveCommand.Create<WalletInfo>(OnSelectWallet);
+
+        private void OnSelectWallet(WalletInfo info)
         {
             IAccount account = null;
 
@@ -53,10 +64,11 @@ namespace Atomex.Client.Desktop.ViewModels
                 unlockAction: password =>
                 {
                     var clientType = ClientType.Unknown;
-                    if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) clientType = ClientType.AvaloniaWindows;
+                    if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                        clientType = ClientType.AvaloniaWindows;
                     if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX)) clientType = ClientType.AvaloniaMac;
                     if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux)) clientType = ClientType.AvaloniaLinux;
-                
+
                     account = Account.LoadFromFile(
                         pathToAccount: info.Path,
                         password: password,
@@ -70,7 +82,11 @@ namespace Atomex.Client.Desktop.ViewModels
                             }
                         });
                 },
-                goBack: () => ShowContent(this),
+                goBack: () =>
+                {
+                    ShowContent(this);
+                    SelectedWallet = null;
+                },
                 onUnlock: () =>
                 {
                     var atomexClient = new WebSocketAtomexClient(
@@ -82,11 +98,11 @@ namespace Atomex.Client.Desktop.ViewModels
                 });
 
             ShowContent?.Invoke(unlockViewModel);
-        });
+        }
 
         private void TezosTransactionsDeleted()
         {
-            var xtzCurrencies = new[] {"XTZ", "TZBTC", "KUSD"};
+            var xtzCurrencies = new[] { "XTZ", "TZBTC", "KUSD" };
             var restoreDialogViewModel = new RestoreDialogViewModel(AtomexApp);
             restoreDialogViewModel.ScanCurrenciesAsync(xtzCurrencies);
         }
@@ -108,11 +124,11 @@ namespace Atomex.Client.Desktop.ViewModels
         {
             Wallets = new List<WalletInfo>
             {
-                new WalletInfo {Name = "default", Path = "wallets/default/", Network = Network.MainNet},
-                new WalletInfo {Name = "market_maker", Path = "wallets/marketmaker/", Network = Network.MainNet},
-                new WalletInfo {Name = "wallet1", Path = "wallets/default/", Network = Network.TestNet},
-                new WalletInfo {Name = "my_first_wallet", Path = "wallets/marketmaker/", Network = Network.TestNet},
-                new WalletInfo {Name = "mega_wallet", Path = "wallets/marketmaker/", Network = Network.MainNet}
+                new WalletInfo { Name = "default", Path = "wallets/default/", Network = Network.MainNet },
+                new WalletInfo { Name = "market_maker", Path = "wallets/marketmaker/", Network = Network.MainNet },
+                new WalletInfo { Name = "wallet1", Path = "wallets/default/", Network = Network.TestNet },
+                new WalletInfo { Name = "my_first_wallet", Path = "wallets/marketmaker/", Network = Network.TestNet },
+                new WalletInfo { Name = "mega_wallet", Path = "wallets/marketmaker/", Network = Network.MainNet }
             };
         }
     }

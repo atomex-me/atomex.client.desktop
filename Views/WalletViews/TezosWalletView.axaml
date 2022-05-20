@@ -93,7 +93,7 @@
                             Height="34"
                             Margin="0 16 0 0"
                             Padding="12 0">
-                        <Grid ColumnDefinitions="7.5*,3.3*,3.7*,2*,3.5*"
+                        <Grid ColumnDefinitions="7.5*,3.3*,3.2*,2.5*,3.5*"
                               VerticalAlignment="Stretch">
                             <Button Grid.Column="0"
                                     Padding="0"
@@ -225,7 +225,7 @@
                         <ListBox.ItemTemplate>
                             <DataTemplate>
                                 <Border Padding="12 0">
-                                    <Grid ColumnDefinitions="7.5*,3.3*,3.7*,2*,3.5*"
+                                    <Grid ColumnDefinitions="7.5*,3.3*,3.7*,2.5*,3.5*"
                                           VerticalAlignment="Stretch">
                                         <controls:LinkButton Grid.Column="0"
                                                              Underlined="True"
