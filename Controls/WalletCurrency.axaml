@@ -7,14 +7,13 @@
 
     <Design.PreviewWith>
         <Border Padding="40 10"
-                Background="#122B50"
                 Width="600">
             <controls:WalletCurrency CurrencyViewModel="{x:Static common:DesignTime.BtcCurrencyViewModel}" />
         </Border>
     </Design.PreviewWith>
 
-    <Design.DesignStyle>
-    </Design.DesignStyle>
+    <!-- <Design.DesignStyle> -->
+    <!-- </Design.DesignStyle> -->
 
     <Styles.Resources>
         <converters:AmountToStringConverter x:Key="AmountToStringConverter" />

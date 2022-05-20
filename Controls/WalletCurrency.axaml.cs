@@ -2,6 +2,9 @@ using System.Windows.Input;
 using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Primitives;
+using Avalonia.Media;
+using Avalonia.Styling;
 
 namespace Atomex.Client.Desktop.Controls
 {
@@ -14,7 +17,22 @@ namespace Atomex.Client.Desktop.Controls
                 IsBalanceUpdatingProperty
             );
         }
-        
+
+        public WalletCurrency()
+        {
+            if (Design.IsDesignMode)
+            {
+                Design.SetDesignStyle(this,
+                    new Style(x => x.OfType<WalletCurrency>())
+                    {
+                        Setters =
+                        {
+                            new Setter(BackgroundProperty, new SolidColorBrush(new Color(0, 0xFF, 0, 0)))
+                        }
+                    });
+            }
+        }
+
         public static readonly DirectProperty<WalletCurrency, CurrencyViewModel> CurrencyViewModelProperty =
             AvaloniaProperty.RegisterDirect<WalletCurrency, CurrencyViewModel>(
                 nameof(CurrencyViewModel),
@@ -22,66 +40,72 @@ namespace Atomex.Client.Desktop.Controls
                 (o, v) => o.CurrencyViewModel = v);
 
         private CurrencyViewModel _currencyViewModel;
+
         public CurrencyViewModel CurrencyViewModel
         {
             get { return _currencyViewModel; }
             set { SetAndRaise(CurrencyViewModelProperty, ref _currencyViewModel, value); }
         }
-        
+
 
         public static readonly DirectProperty<WalletCurrency, ICommand> UpdateCommandProperty =
             AvaloniaProperty.RegisterDirect<WalletCurrency, ICommand>(nameof(UpdateCommand),
                 control => control.UpdateCommand, (control, command) => control.UpdateCommand = command);
 
         private ICommand _updateCommand;
+
         public ICommand UpdateCommand
         {
             get => _updateCommand;
             set => SetAndRaise(UpdateCommandProperty, ref _updateCommand, value);
         }
-        
-        
+
+
         public static readonly DirectProperty<WalletCurrency, ICommand> SendCommandProperty =
             AvaloniaProperty.RegisterDirect<WalletCurrency, ICommand>(nameof(SendCommand),
                 control => control.SendCommand, (control, command) => control.SendCommand = command);
 
         private ICommand _sendCommand;
+
         public ICommand SendCommand
         {
             get => _sendCommand;
             set => SetAndRaise(SendCommandProperty, ref _sendCommand, value);
         }
-        
-        
+
+
         public static readonly DirectProperty<WalletCurrency, ICommand> ReceiveCommandProperty =
             AvaloniaProperty.RegisterDirect<WalletCurrency, ICommand>(nameof(ReceiveCommand),
                 control => control.ReceiveCommand, (control, command) => control.ReceiveCommand = command);
-        
+
         private ICommand _receiveCommand;
+
         public ICommand ReceiveCommand
         {
             get => _receiveCommand;
             set => SetAndRaise(ReceiveCommandProperty, ref _receiveCommand, value);
         }
-        
-        
+
+
         public static readonly DirectProperty<WalletCurrency, ICommand> ExchangeCommandProperty =
             AvaloniaProperty.RegisterDirect<WalletCurrency, ICommand>(nameof(ExchangeCommand),
                 control => control.ExchangeCommand, (control, command) => control.ExchangeCommand = command);
-        
+
         private ICommand _exchangeCommand;
+
         public ICommand ExchangeCommand
         {
             get => _exchangeCommand;
             set => SetAndRaise(ExchangeCommandProperty, ref _exchangeCommand, value);
         }
-        
-        
+
+
         public static readonly DirectProperty<WalletCurrency, ICommand> BuyCommandProperty =
             AvaloniaProperty.RegisterDirect<WalletCurrency, ICommand>(nameof(BuyCommand),
                 control => control.BuyCommand, (control, command) => control.BuyCommand = command);
-        
+
         private ICommand _buyCommand;
+
         public ICommand BuyCommand
         {
             get => _buyCommand;
