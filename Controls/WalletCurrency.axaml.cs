@@ -1,8 +1,10 @@
+using System;
 using System.Windows.Input;
 using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
+using Avalonia.Markup.Xaml;
 using Avalonia.Media;
 using Avalonia.Styling;
 
@@ -16,6 +18,9 @@ namespace Atomex.Client.Desktop.Controls
                 CurrencyViewModelProperty,
                 IsBalanceUpdatingProperty
             );
+            
+            var baseLight = (IStyle)AvaloniaXamlLoader.Load(
+                new Uri("avares://Avalonia.Themes.Default/Accents/BaseLight.xaml"));
         }
 
         public WalletCurrency()

@@ -6,6 +6,12 @@
              xmlns:controls="clr-namespace:Atomex.Client.Desktop.Controls"
              x:Class="Atomex.Client.Desktop.Controls.WalletCurr">
     
-    
+    <Design.PreviewWith>
+        <Border Background="red" Width="100" Height="100"></Border>
+    </Design.PreviewWith>
+            
+<controls:WalletCurr.Styles>
+
+</controls:WalletCurr.Styles>
     
 </controls:WalletCurr>
