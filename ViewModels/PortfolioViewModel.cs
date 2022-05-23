@@ -132,7 +132,7 @@ namespace Atomex.Client.Desktop.ViewModels
             AllCurrencies.Add(TezosTokensCurrencyViewModel);
 
             var savedCurrenciesArr =
-                e.AtomexClient?.Account?.UserSettings?.InitializedCurrencies ??
+                e.AtomexClient?.Account?.UserData?.InitializedCurrencies ??
                 AllCurrencies.Select(c => c.Currency.Name).ToArray();
 
             ChoosenCurrencies = new List<CurrencyViewModel>(AllCurrencies)
@@ -324,11 +324,11 @@ namespace Atomex.Client.Desktop.ViewModels
 
                         InitialChoosenCurrencies = new List<CurrencyViewModel>(ChoosenCurrencies);
                         
-                        App.Account.UserSettings.InitializedCurrencies = ChoosenCurrencies
+                        App.Account.UserData.InitializedCurrencies = ChoosenCurrencies
                             .Select(currency => currency.Currency.Name)
                             .ToArray();
 
-                        App.Account.UserSettings.SaveToFile(App.Account.SettingsFilePath);
+                        App.Account.UserData.SaveToFile(App.Account.SettingsFilePath);
                     }
                 };
 
