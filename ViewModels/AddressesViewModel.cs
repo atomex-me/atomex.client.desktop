@@ -285,7 +285,7 @@ namespace Atomex.Client.Desktop.ViewModels
                     var tezosAccount = _app.Account
                         .GetCurrencyAccount<TezosAccount>(TezosConfig_OLD.Xtz);
 
-                    await new TezosTokensScanner(tezosAccount)
+                    await new TezosTokensScanner_OLD(tezosAccount)
                         .ScanContractAsync(address, _tokenContract);
 
                     // reload balances for all tezos tokens account
