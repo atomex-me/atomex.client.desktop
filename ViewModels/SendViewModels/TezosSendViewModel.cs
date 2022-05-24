@@ -200,7 +200,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 }
 
                 var (fa12TransferFee, _) = await _app.Account
-                    .GetCurrencyAccount<Fa12Account>("TZBTC")
+                    .GetCurrencyAccount<Fa12Account_OLD>("TZBTC")
                     .EstimateTransferFeeAsync(From);
 
                 var maxAmount = UseDefaultFee
@@ -254,7 +254,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             }
 
             var (fa12TransferFee, _) = await _app.Account
-                .GetCurrencyAccount<Fa12Account>("TZBTC")
+                .GetCurrencyAccount<Fa12Account_OLD>("TZBTC")
                 .EstimateTransferFeeAsync(From);
 
             var maxAmount = UseDefaultFee

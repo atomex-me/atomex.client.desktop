@@ -83,7 +83,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             try
             {
                 var account = _app.Account
-                    .GetCurrencyAccount<Fa12Account>(Currency.Name);
+                    .GetCurrencyAccount<Fa12Account_OLD>(Currency.Name);
 
                 var maxAmountEstimation = await account
                     .EstimateMaxAmountToSendAsync(
@@ -130,7 +130,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 if (!UseDefaultFee)
                 {
                     var account = _app.Account
-                        .GetCurrencyAccount<Fa12Account>(Currency.Name);
+                        .GetCurrencyAccount<Fa12Account_OLD>(Currency.Name);
 
                     var maxAmountEstimation = await account
                         .EstimateMaxAmountToSendAsync(
@@ -173,7 +173,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             try
             {
                 var account = _app.Account
-                    .GetCurrencyAccount<Fa12Account>(Currency.Name);
+                    .GetCurrencyAccount<Fa12Account_OLD>(Currency.Name);
 
                 var maxAmountEstimation = await account
                     .EstimateMaxAmountToSendAsync(
@@ -227,7 +227,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
         protected override async Task<Error> Send(CancellationToken cancellationToken = default)
         {
-            var tokenConfig = (Fa12Config)Currency;
+            var tokenConfig = (Fa12Config_OLD)Currency;
             var tokenContract = tokenConfig.TokenContractAddress;
             const int tokenId = 0;
             const string? tokenType = "FA12";
@@ -240,10 +240,10 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 tokenType: tokenType);
 
             var currencyName = _app.Account.Currencies
-                .FirstOrDefault(c => c is Fa12Config fa12 && fa12.TokenContractAddress == tokenContract)
+                .FirstOrDefault(c => c is Fa12Config_OLD fa12 && fa12.TokenContractAddress == tokenContract)
                 ?.Name ?? "FA12";
 
-            var tokenAccount = _app.Account.GetTezosTokenAccount<Fa12Account>(
+            var tokenAccount = _app.Account.GetTezosTokenAccount<Fa12Account_OLD>(
                 currency: currencyName,
                 tokenContract: tokenContract,
                 tokenId: tokenId);

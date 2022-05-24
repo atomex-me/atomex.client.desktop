@@ -22,7 +22,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                         setConversionTab: setConversionTab,
                         currency: currency),
 
-                Fa12Config _ => new Fa12WalletViewModel(
+                Fa12Config_OLD _ => new Fa12WalletViewModel(
                     app: app,
                     setConversionTab: setConversionTab,
                     currency: currency),

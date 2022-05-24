@@ -26,7 +26,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             set { _transactions = value; OnPropertyChanged(nameof(Transactions)); }
         }
         
-        public Fa12Config Currency => CurrencyViewModel.Currency as Fa12Config;
+        public Fa12Config_OLD Currency => CurrencyViewModel.Currency as Fa12Config_OLD;
         
         public Fa12WalletViewModel()
         {
@@ -58,7 +58,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                     return;
 
                 var transactions = (await _app.Account
-                    .GetCurrencyAccount<Fa12Account>(Currency.Name)
+                    .GetCurrencyAccount<Fa12Account_OLD>(Currency.Name)
                     .DataRepository
                     .GetTezosTokenTransfersAsync(Currency.TokenContractAddress)
                     .ConfigureAwait(false))
@@ -108,7 +108,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             try
             {
                 await _app.Account
-                    .GetCurrencyAccount<Fa12Account>(Currency.Name)
+                    .GetCurrencyAccount<Fa12Account_OLD>(Currency.Name)
                     .UpdateBalanceAsync(_cancellation.Token);
             }
             catch (OperationCanceledException)

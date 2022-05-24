@@ -459,7 +459,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     }
 
                     var tokenAccount = _app.Account
-                        .GetTezosTokenAccount<TezosTokenAccount>(fromTokenAddress.Currency, TokenContract, TokenId);
+                        .GetTezosTokenAccount<TezosTokenAccount_OLD>(fromTokenAddress.Currency, TokenContract, TokenId);
 
                     var (estimatedFee, isEnougth) = await tokenAccount
                         .EstimateTransferFeeAsync(From);
@@ -604,7 +604,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             else
             {
                 CurrencyCode = _app.Account.Currencies
-                    .FirstOrDefault(c => c is Fa12Config fa12 && fa12.TokenContractAddress == TokenContract)
+                    .FirstOrDefault(c => c is Fa12Config_OLD fa12 && fa12.TokenContractAddress == TokenContract)
                     ?.Name.ToUpper() ?? "TOKENS";
                 CurrencyFormat = DefaultCurrencyFormat;
             }
@@ -627,10 +627,10 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             if (tokenAddress.Currency == "FA12")
             {
                 var currencyName = App.AtomexApp.Account.Currencies
-                    .FirstOrDefault(c => c is Fa12Config fa12 && fa12.TokenContractAddress == TokenContract)
+                    .FirstOrDefault(c => c is Fa12Config_OLD fa12 && fa12.TokenContractAddress == TokenContract)
                     ?.Name ?? "FA12";
 
-                var tokenAccount = App.AtomexApp.Account.GetTezosTokenAccount<Fa12Account>(
+                var tokenAccount = App.AtomexApp.Account.GetTezosTokenAccount<Fa12Account_OLD>(
                     currency: currencyName,
                     tokenContract: TokenContract,
                     tokenId: TokenId);
@@ -645,7 +645,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             }
             else
             {
-                var tokenAccount = App.AtomexApp.Account.GetTezosTokenAccount<Fa2Account>(
+                var tokenAccount = App.AtomexApp.Account.GetTezosTokenAccount<Fa2Account_OLD>(
                     currency: "FA2",
                     tokenContract: TokenContract,
                     tokenId: TokenId);

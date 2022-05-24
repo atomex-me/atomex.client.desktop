@@ -292,7 +292,7 @@ namespace Atomex.Client.Desktop.ViewModels
                     foreach (var currency in _app.Account.Currencies)
                         if (Currencies.IsTezosToken(currency.Name))
                             _app.Account
-                                .GetCurrencyAccount<TezosTokenAccount>(currency.Name)
+                                .GetCurrencyAccount<TezosTokenAccount_OLD>(currency.Name)
                                 .ReloadBalances();
                 }
 

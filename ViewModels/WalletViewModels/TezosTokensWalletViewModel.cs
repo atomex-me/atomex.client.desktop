@@ -331,7 +331,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         }
 
         public bool IsConvertable => _app.Account.Currencies
-            .Any(c => c is Fa12Config fa12 && fa12.TokenContractAddress == TokenContractAddress);
+            .Any(c => c is Fa12Config_OLD fa12 && fa12.TokenContractAddress == TokenContractAddress);
 
         public string Header => "Tezos Tokens";
         public decimal Balance { get; set; }
@@ -462,7 +462,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
             if (tokenContract.IsFa12)
             {
-                var tokenAccount = _app.Account.GetTezosTokenAccount<Fa12Account>(
+                var tokenAccount = _app.Account.GetTezosTokenAccount<Fa12Account_OLD>(
                     currency: Fa12,
                     tokenContract: tokenContract.Contract.Address,
                     tokenId: 0);
@@ -475,7 +475,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
                 var tezosTokenConfig = _app.Account.Currencies
                     .FirstOrDefault(c => Currencies.IsTezosToken(c.Name) &&
-                                         c is Fa12Config fa12Config &&
+                                         c is Fa12Config_OLD fa12Config &&
                                          fa12Config.TokenContractAddress == tokenContract.Contract.Address);
 
                 Balance = tokenAccount
@@ -601,7 +601,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         {
             var currency = _app.Account
                 .Currencies
-                .FirstOrDefault(c => c is Fa12Config fa12 && fa12.TokenContractAddress == TokenContractAddress);
+                .FirstOrDefault(c => c is Fa12Config_OLD fa12 && fa12.TokenContractAddress == TokenContractAddress);
 
             SetConversionTab?.Invoke(currency);
         }
@@ -640,7 +640,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                 foreach (var currency in _app.Account.Currencies)
                     if (Currencies.IsTezosToken(currency.Name))
                         _app.Account
-                            .GetCurrencyAccount<TezosTokenAccount>(currency.Name)
+                            .GetCurrencyAccount<TezosTokenAccount_OLD>(currency.Name)
                             .ReloadBalances();
             }
             catch (OperationCanceledException)
