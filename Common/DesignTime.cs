@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Linq;
+using System.Reactive;
 using System.Reflection;
-
 using Microsoft.Extensions.Configuration;
-
 using Atomex.Abstract;
+using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
 using Atomex.Common.Configuration;
 using Atomex.Core;
+using ReactiveUI;
 
 namespace Atomex.Client.Desktop.Common
 {
@@ -32,5 +33,22 @@ namespace Atomex.Client.Desktop.Common
 
         public static readonly ISymbols TestNetSymbols
             = new Symbols(SymbolsConfiguration.GetSection(Network.TestNet.ToString()));
+
+        public static CurrencyViewModel BtcCurrencyViewModel { get; } = GetCurrencyViewModel(
+            TestNetCurrencies.Get<BitcoinConfig>("BTC"));
+
+
+        private static CurrencyViewModel GetCurrencyViewModel(CurrencyConfig config)
+        {
+            var currencyViewModel = CurrencyViewModelCreator.CreateViewModel(
+                config, subscribeToUpdates: false);
+
+            currencyViewModel.TotalAmount = 123.32m;
+            currencyViewModel.TotalAmountInBase = 34500.56m;
+
+            return currencyViewModel;
+        }
+
+        public static readonly ReactiveCommand<Unit, Unit> EmptyCommand = ReactiveCommand.Create(() => { });
     }
 }

@@ -13,6 +13,7 @@ using Atomex.Client.Desktop.Properties;
 using Atomex.Common;
 using Atomex.Services;
 using Atomex.Wallet;
+using Avalonia.Controls;
 
 namespace Atomex.Client.Desktop.ViewModels
 {
@@ -44,7 +45,7 @@ namespace Atomex.Client.Desktop.ViewModels
         public MainWindowViewModel()
         {
 #if DEBUG
-            if (Env.IsInDesignerMode())
+            if (Design.IsDesignMode)
                 DesignerMode();
 #endif
         }
@@ -355,7 +356,8 @@ namespace Atomex.Client.Desktop.ViewModels
                     }
                     else
                     {
-                        await Task.Delay(delayInterval);   
+                        await Task.Delay(delayInterval);
+                        if (!_hasAccount) return;
                     }
 
                     if (AccountRestored || Content is UnlockViewModel) continue;

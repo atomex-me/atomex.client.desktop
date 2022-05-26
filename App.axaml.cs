@@ -35,6 +35,7 @@ namespace Atomex.Client.Desktop
         public static TemplateService TemplateService;
         public static ImageService ImageService;
         public static IClipboard Clipboard;
+        public static NotificationsService NotificationsService;
 
         public override void Initialize()
         {
@@ -83,6 +84,7 @@ namespace Atomex.Client.Desktop
             {
                 var mainWindow = new MainWindow();
                 DialogService = new DialogService();
+                NotificationsService = new NotificationsService(AtomexApp, mainWindow.NotificationManager);
 
                 var mainWindowViewModel = new MainWindowViewModel(AtomexApp, mainWindow);
 

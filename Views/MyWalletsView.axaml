@@ -73,6 +73,7 @@
                                  MaxHeight="450"
                                  ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                                  Items="{Binding Wallets}"
+                                 SelectedItem="{Binding SelectedWallet}"
                                  SelectionMode="Single">
                             <ListBox.ItemTemplate>
                                 <DataTemplate>
@@ -99,13 +100,6 @@
                                                    FontFamily="{DynamicResource DefaultLightFontFamily}" />
 
                                         <i:Interaction.Behaviors>
-                                            <ia:EventTriggerBehavior EventName="DoubleTapped"
-                                                                     SourceObject="{Binding #Wallet}">
-                                                <ia:InvokeCommandAction
-                                                    Command="{Binding $parent[ListBox].DataContext.SelectWalletCommand}"
-                                                    CommandParameter="{Binding ElementName=WalletListBox, Path=SelectedItem}" />
-                                            </ia:EventTriggerBehavior>
-
                                             <ia:DataTriggerBehavior Binding="{Binding Network}"
                                                                     ComparisonCondition="Equal"
                                                                     Value="0">

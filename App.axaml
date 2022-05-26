@@ -33,6 +33,8 @@
     <StyleInclude Source="/Controls/CopyButton.axaml"/>
     <StyleInclude Source="/Controls/LinkButton.axaml"/>
     <StyleInclude Source="/Controls/SortButton.axaml"/>
+    <StyleInclude Source="/Controls/WalletCurrency.axaml"/>
+    <StyleInclude Source="/Controls/TransactionsList.axaml"/>
     <StyleInclude Source="/Styles/CustomComboBoxStyle.axaml"/>
     <StyleInclude Source="/Styles/CustomTextBoxStyle.axaml"/>
     <StyleInclude Source="/Styles/AtomexTextBoxStyle.axaml"/>

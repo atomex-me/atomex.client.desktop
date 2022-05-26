@@ -1,0 +1,143 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="440" d:DesignHeight="550"
+             x:Class="Atomex.Client.Desktop.Views.NotificationsView"
+             xmlns:vm="clr-namespace:Atomex.Client.Desktop.ViewModels"
+             xmlns:controls="clr-namespace:Atomex.Client.Desktop.Controls"
+             xmlns:converters="clr-namespace:Atomex.Client.Desktop.Converters"
+             xmlns:atomexWallet="clr-namespace:Atomex.Wallet;assembly=Atomex.Client.Core"
+             xmlns:svg="clr-namespace:Avalonia.Svg.Skia;assembly=Avalonia.Svg.Skia">
+    <Design.DataContext>
+        <vm:NotificationsViewModel />
+    </Design.DataContext>
+
+    <UserControl.Resources>
+        <DataTemplate x:Key="NotificationTemplate"
+                      DataType="vm:NotificationViewModel">
+            <Grid ColumnDefinitions="Auto,*,Auto">
+                <svg:Svg Grid.Column="0"
+                         Margin="12 0"
+                         Width="18"
+                         IsVisible="{Binding Type,
+                                             Converter={x:Static converters:EnumToStringEqualConverter.Instance},
+                                             ConverterParameter={x:Static atomexWallet:AtomexNotificationType.Outcome}}"
+                         Path="/Resources/Icons/top-right-arrow-gray.svg" />
+                <svg:Svg Grid.Column="0"
+                         Margin="12 0"
+                         Width="18"
+                         IsVisible="{Binding Type,
+                                             Converter={x:Static converters:EnumToStringEqualConverter.Instance},
+                                             ConverterParameter={x:Static atomexWallet:AtomexNotificationType.Income}}"
+                         Path="/Resources/Icons/bottom-right-arrow-gray.svg" />
+                <svg:Svg Grid.Column="0"
+                         Margin="12 0"
+                         Width="18"
+                         IsVisible="{Binding Type,
+                                             Converter={x:Static converters:EnumToStringEqualConverter.Instance},
+                                             ConverterParameter={x:Static atomexWallet:AtomexNotificationType.Swap}}"
+                         Path="/Resources/Icons/two-arrows.svg" />
+
+                <svg:Svg Grid.Column="0"
+                         Margin="12 0"
+                         Width="18"
+                         IsVisible="{Binding Type,
+                                             Converter={x:Static converters:EnumToStringEqualConverter.Instance},
+                                             ConverterParameter={x:Static atomexWallet:AtomexNotificationType.Info}}"
+                         Path="/Resources/Icons/warning.svg" />
+
+                <StackPanel Grid.Column="1">
+                    <TextBlock Foreground="{DynamicResource DefaultForegroundBrush}"
+                               FontSize="13"
+                               Margin="0 0 0 3"
+                               Text="{Binding Message}" />
+
+                    <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
+                               Margin="0 3 0 0"
+                               FontSize="13"
+                               Text="{Binding Time}" />
+                </StackPanel>
+
+                <Border Grid.Column="2"
+                        Width="6"
+                        Height="6"
+                        Margin="0 0 12 0"
+                        Background="{DynamicResource Blue}"
+                        IsVisible="{Binding !IsRead}"
+                        CornerRadius="10">
+                </Border>
+            </Grid>
+        </DataTemplate>
+    </UserControl.Resources>
+
+    <WrapPanel>
+        <controls:IconButton IsVisible="False"
+                             Classes="Alert NoEffects"
+                             WithRedDot="{Binding HasUnread}"
+                             IsActive="{Binding IsOpened}"
+                             Margin="16 0 0 0"
+                             Command="{Binding ChangeOpenedStateCommand}" />
+        <Popup PlacementMode="Left"
+               VerticalAlignment="Center"
+               WindowManagerAddShadowHint="False"
+               IsLightDismissEnabled="True"
+               Closed="Popup_OnClosed"
+               IsOpen="{Binding IsOpened}">
+            <Border Background="{DynamicResource DeepBlue}"
+                    CornerRadius="{DynamicResource AtomexCornerRadius}"
+                    Height="500"
+                    Width="434"
+                    Padding="16 0">
+                <StackPanel>
+                    <Grid ColumnDefinitions="Auto,*"
+                          Height="48"
+                          VerticalAlignment="Top">
+                        <TextBlock Grid.Column="0"
+                                   Foreground="{DynamicResource DefaultForegroundBrush}"
+                                   VerticalAlignment="Center"
+                                   FontSize="13"
+                                   Text="Notifications" />
+                        <controls:LinkButton Grid.Column="1"
+                                             Underlined="True"
+                                             Classes="Dashed"
+                                             HorizontalAlignment="Right"
+                                             Command="{Binding MarkAllAsReadCommand}"
+                                             Content="Mark all as read" />
+                    </Grid>
+
+                    <Border Height="1"
+                            Background="{DynamicResource LightDefaultOpacity10}" />
+
+                    <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
+                               FontSize="13"
+                               Margin="0 12 0 0"
+                               Text="Today" />
+
+                    <ListBox Background="{DynamicResource AlmostTransparentBrush}"
+                             Margin="0 10 0 0"
+                             Items="{Binding Notifications}"
+                             SelectedIndex="{Binding SelectedIndex}"
+                             HorizontalAlignment="Stretch"
+                             SelectionMode="Single"
+                             ItemTemplate="{StaticResource NotificationTemplate}"
+                             MaxHeight="400">
+                        <ListBox.Styles>
+                            <Style Selector="ListBoxItem">
+                                <Setter Property="Padding" Value="0" />
+                                <Setter Property="Height" Value="52" />
+                                <Setter Property="VerticalContentAlignment" Value="Center" />
+                                <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                                <Setter Property="Cursor" Value="Hand" />
+                                <Setter Property="CornerRadius" Value="8" />
+                            </Style>
+                            <Style Selector="ListBoxItem:selected /template/ ContentPresenter">
+                                <Setter Property="Background" Value="{DynamicResource LightDefaultOpacity6}" />
+                            </Style>
+                        </ListBox.Styles>
+                    </ListBox>
+                </StackPanel>
+            </Border>
+        </Popup>
+    </WrapPanel>
+</UserControl>

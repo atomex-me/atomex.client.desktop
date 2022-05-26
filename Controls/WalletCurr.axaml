@@ -1,0 +1,17 @@
+<controls:WalletCurr xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             xmlns:controls="clr-namespace:Atomex.Client.Desktop.Controls"
+             x:Class="Atomex.Client.Desktop.Controls.WalletCurr">
+    
+    <Design.PreviewWith>
+        <Border Background="red" Width="100" Height="100"></Border>
+    </Design.PreviewWith>
+            
+<controls:WalletCurr.Styles>
+
+</controls:WalletCurr.Styles>
+    
+</controls:WalletCurr>

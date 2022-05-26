@@ -3,7 +3,6 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Reactive.Linq;
-using System.Globalization;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using Atomex.Client.Desktop.Controls;
@@ -15,8 +14,8 @@ using Avalonia.Markup.Xaml;
 using System.Timers;
 using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.ViewModels;
-using Avalonia.Controls.ApplicationLifetimes;
-using Avalonia.Interactivity;
+using Avalonia.Controls.Notifications;
+using Avalonia.Threading;
 using NetSparkleUpdater;
 using NetSparkleUpdater.Enums;
 using NetSparkleUpdater.SignatureVerifiers;
@@ -37,12 +36,10 @@ namespace Atomex.Client.Desktop.Views
 
     public class MainWindow : Window, IMainView
     {
-        private Timer _activityTimer;
-        private bool _inactivityControlEnabled;
         public event CancelEventHandler MainViewClosing;
         public event EventHandler Inactivity;
 
-        private readonly string NETSPARKLE_PK = "76FH2gIo7D5mpPPfnard5C9cVwq8TFaxpo/Wi2Iem/E=";
+        private const string NetsparklePk = "76FH2gIo7D5mpPPfnard5C9cVwq8TFaxpo/Wi2Iem/E=";
         private SparkleUpdater _sparkle;
         private AppCastItem _lastUpdate;
         private bool _isOsx;
@@ -51,8 +48,11 @@ namespace Atomex.Client.Desktop.Views
         private string _appcastUrl;
         private string _updateDownloadPath;
         private IUpdater _atomexUpdater;
+        private MainWindowViewModel _ctx;
+        private Timer _activityTimer;
+        private bool _inactivityControlEnabled;
+        public WindowNotificationManager NotificationManager;
 
-        private MainWindowViewModel ctx;
 
         public MainWindow()
         {
@@ -61,17 +61,15 @@ namespace Atomex.Client.Desktop.Views
 
             PropertyChanged += (s, e) =>
             {
-                if (e.Property == Control.DataContextProperty)
-                {
-                    ctx = (MainWindowViewModel) e.NewValue!;
-
-                    ctx.OnUpdateAction = ManualUpdate_Click;
-                }
+                if (e.Property != DataContextProperty) return;
+                
+                _ctx = (MainWindowViewModel) e.NewValue!;
+                _ctx.OnUpdateAction = ManualUpdate_Click;
             };
 
             Closing += (sender, args) => MainViewClosing?.Invoke(sender, args);
 
-            InputManager.Instance.PreProcess.OfType<RawInputEventArgs>()
+            InputManager.Instance!.PreProcess.OfType<RawInputEventArgs>()
                 .Throttle(TimeSpan.FromMilliseconds(500))
                 .SubscribeInMainThread(_ =>
                 {
@@ -80,6 +78,7 @@ namespace Atomex.Client.Desktop.Views
                     _activityTimer.Stop();
                     _activityTimer.Start();
                 });
+            
             _isOsx = RuntimeInformation.IsOSPlatform(OSPlatform.OSX);
             _isWin = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
             _isLinux = RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
@@ -94,7 +93,7 @@ namespace Atomex.Client.Desktop.Views
             _sparkle = new SparkleUpdater(
                 _appcastUrl,
                 new Ed25519Checker(SecurityMode.OnlyVerifySoftwareDownloads,
-                    NETSPARKLE_PK))
+                    NetsparklePk))
             {
                 UserInteractionMode = UserInteractionMode.DownloadNoInstall
             };
@@ -114,31 +113,32 @@ namespace Atomex.Client.Desktop.Views
             _sparkle.DownloadFinished += (item, path) =>
             {
                 Log.Information($"Updating download finished ${path}");
-                ctx.UpdateDownloadProgress = 100;
+                _ctx.UpdateDownloadProgress = 100;
                 _updateDownloadPath = path;
             };
 
             _sparkle.DownloadMadeProgress += (sender, item, args) =>
             {
-                ctx.UpdateDownloadProgress =
+                _ctx.UpdateDownloadProgress =
                     (int) ((double) args.BytesReceived / (double) args.TotalBytesToReceive * 100);
             };
+            
+            NotificationManager = new WindowNotificationManager(this);
         }
 
         private void ManualUpdate_Click()
         {
-            if (_lastUpdate != null)
-            {
-                if (_isOsx)
-                {
-                    _atomexUpdater.InstallUpdate(_lastUpdate);
-                    return;
-                }
+            if (_lastUpdate == null) return;
 
-                if (_isWin || _isLinux)
-                {
-                    _atomexUpdater.InstallUpdate(_lastUpdate, _updateDownloadPath);
-                }
+            if (_isOsx)
+            {
+                _atomexUpdater.InstallUpdate(_lastUpdate);
+                return;
+            }
+
+            if (_isWin || _isLinux)
+            {
+                _atomexUpdater.InstallUpdate(_lastUpdate, _updateDownloadPath);
             }
         }
 
@@ -172,8 +172,8 @@ namespace Atomex.Client.Desktop.Views
                     try
                     {
                         _lastUpdate = _updateInfo.Updates.Last();
-                        ctx.HasUpdates = true;
-                        ctx.UpdateVersion = _lastUpdate.Version;
+                        _ctx.HasUpdates = true;
+                        _ctx.UpdateVersion = _lastUpdate.Version;
                         await _sparkle.InitAndBeginDownload(_lastUpdate);
 
                         if (_atomexUpdater != null)
@@ -189,7 +189,7 @@ namespace Atomex.Client.Desktop.Views
                         if (_isWin)
                             _atomexUpdater = new WindowsUpdater(_appcastUrl,
                                 new Ed25519Checker(SecurityMode.OnlyVerifySoftwareDownloads,
-                                    NETSPARKLE_PK))
+                                    NetsparklePk))
                             {
                                 SignatureVerifier = _sparkle.SignatureVerifier,
                                 UpdateDownloader = _sparkle.UpdateDownloader

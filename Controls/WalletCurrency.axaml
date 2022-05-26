@@ -1,0 +1,216 @@
+<Styles xmlns='https://github.com/avaloniaui'
+        xmlns:x='http://schemas.microsoft.com/winfx/2006/xaml'
+        xmlns:controls="clr-namespace:Atomex.Client.Desktop.Controls"
+        xmlns:converters="clr-namespace:Atomex.Client.Desktop.Converters"
+        xmlns:common="clr-namespace:Atomex.Client.Desktop.Common"
+        xmlns:svg="clr-namespace:Avalonia.Svg.Skia;assembly=Avalonia.Svg.Skia">
+
+    <Design.PreviewWith>
+        <Border Padding="40 10"
+                Width="600">
+            <controls:WalletCurrency CurrencyViewModel="{x:Static common:DesignTime.BtcCurrencyViewModel}" />
+        </Border>
+    </Design.PreviewWith>
+
+    <!-- <Design.DesignStyle> -->
+    <!-- </Design.DesignStyle> -->
+
+    <Styles.Resources>
+        <converters:AmountToStringConverter x:Key="AmountToStringConverter" />
+        <converters:DateTimeToTxTimeConverter x:Key="DateTimeToTxTimeConverter" />
+        <converters:ShowBuyButton x:Key="ShowBuyButton" />
+        <converters:GreaterThanZeroConverter x:Key="GreaterThanZeroConverter" />
+        <converters:LowerThanZeroConverter x:Key="LowerThanZeroConverter" />
+        <converters:PercentConverter x:Key="PercentConverter" />
+    </Styles.Resources>
+
+    <Style Selector="controls|WalletCurrency">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate>
+                    <Grid ColumnDefinitions="Auto,*">
+                        <Border Grid.Column="0"
+                                Background="{DynamicResource LightDefaultOpacity10}"
+                                Width="150"
+                                Height="150"
+                                CornerRadius="150" />
+                        <svg:Svg Grid.Column="0"
+                                 Path="{Binding CurrencyViewModel.IconPath,
+                                 RelativeSource={RelativeSource TemplatedParent}}"
+                                 Height="55" />
+
+                        <StackPanel Grid.Column="1"
+                                    Margin="40 0 0 0">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Foreground="{DynamicResource DefaultForegroundBrush}"
+                                           FontSize="32"
+                                           LineHeight="40">
+                                    <TextBlock.Text>
+                                        <MultiBinding Converter="{StaticResource AmountToStringConverter}">
+                                            <Binding RelativeSource="{RelativeSource TemplatedParent}"
+                                                     Path="CurrencyViewModel.TotalAmount"
+                                                     Mode="OneWay" />
+                                            <Binding RelativeSource="{RelativeSource TemplatedParent}"
+                                                     Path="CurrencyViewModel.CurrencyFormat"
+                                                     Mode="OneWay" />
+                                        </MultiBinding>
+                                    </TextBlock.Text>
+                                </TextBlock>
+
+                                <TextBlock Margin="6 0 0 0"
+                                           Foreground="{DynamicResource DefaultForegroundBrush}"
+                                           FontSize="32"
+                                           LineHeight="40"
+                                           Text="{Binding CurrencyViewModel.CurrencyCode,
+                                           RelativeSource={RelativeSource TemplatedParent}}" />
+                                <controls:IconButton Classes="Update Big WithToolTipContent"
+                                                     Classes.Updating="{TemplateBinding IsBalanceUpdating}"
+                                                     Classes.NotUpdating="{TemplateBinding IsBalanceUpdating,
+                                                     Converter={x:Static BoolConverters.Not}}"
+                                                     Margin="15 0 0 0"
+                                                     Command="{TemplateBinding UpdateCommand}">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="Update " />
+                                        <TextBlock
+                                            Text="{Binding CurrencyViewModel.Currency.Description,
+                                            RelativeSource={RelativeSource TemplatedParent}}" />
+                                    </StackPanel>
+                                </controls:IconButton>
+                            </StackPanel>
+
+                            <TextBlock Foreground="{DynamicResource DefaultForegroundBrush}"
+                                       FontSize="13"
+                                       LineHeight="16">
+                                <TextBlock.Text>
+                                    <MultiBinding Converter="{StaticResource AmountToStringConverter}">
+                                        <Binding RelativeSource="{RelativeSource TemplatedParent}"
+                                                 Path="CurrencyViewModel.TotalAmountInBase"
+                                                 Mode="OneWay" />
+                                        <Binding RelativeSource="{RelativeSource TemplatedParent}"
+                                                 Path="CurrencyViewModel.BaseCurrencyFormat"
+                                                 Mode="OneWay" />
+                                    </MultiBinding>
+                                </TextBlock.Text>
+                            </TextBlock>
+
+                            <StackPanel Orientation="Horizontal"
+                                        Margin="0 24 0 0">
+                                <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
+                                           FontSize="13"
+                                           LineHeight="16"
+                                           Text="1" />
+                                <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
+                                           FontSize="13"
+                                           LineHeight="16"
+                                           Margin="4 0"
+                                           Text="{Binding CurrencyViewModel.CurrencyCode,
+                                           RelativeSource={RelativeSource TemplatedParent}}" />
+                                <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
+                                           FontSize="13"
+                                           LineHeight="16"
+                                           Text="=" />
+                                <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
+                                           FontSize="13"
+                                           LineHeight="16"
+                                           Margin="4 0 0 0">
+                                    <TextBlock.Text>
+                                        <MultiBinding Converter="{StaticResource AmountToStringConverter}">
+                                            <Binding RelativeSource="{RelativeSource TemplatedParent}"
+                                                     Path="CurrencyViewModel.CurrentQuote"
+                                                     Mode="OneWay" />
+                                            <Binding RelativeSource="{RelativeSource TemplatedParent}"
+                                                     Path="CurrencyViewModel.BaseCurrencyFormat"
+                                                     Mode="OneWay" />
+                                        </MultiBinding>
+                                    </TextBlock.Text>
+                                </TextBlock>
+
+                                <TextBlock FontSize="13"
+                                           LineHeight="16"
+                                           Margin="10 0 0 0"
+                                           Text="{Binding CurrencyViewModel.DailyChangePercent,
+                                           RelativeSource={RelativeSource TemplatedParent},
+                                           Converter={StaticResource PercentConverter}}"
+                                           Classes="Success"
+                                           Classes.UnSuccess="{Binding CurrencyViewModel.DailyChangePercent,
+                                           RelativeSource={RelativeSource TemplatedParent},
+                                           Converter={StaticResource LowerThanZeroConverter}}" />
+                            </StackPanel>
+
+                            <WrapPanel Margin="0 16 0 0"
+                                       Orientation="Horizontal"
+
+                                       VerticalAlignment="Top">
+
+                                <controls:RoundedButton Height="46"
+                                                        Padding="26 0"
+                                                        Command="{TemplateBinding SendCommand}"
+                                                        Margin="0 0 12 12">
+                                    <StackPanel Orientation="Horizontal">
+                                        <svg:Svg HorizontalAlignment="Center"
+                                                 Width="24"
+                                                 Height="24"
+                                                 Path="/Resources/Icons/top-right-arrow.svg" />
+                                        <TextBlock Margin="8 0 0 0"
+                                                   Text="Send"
+                                                   FontSize="18"
+                                                   Foreground="{DynamicResource RoundedButtonForegroundBrush}" />
+                                    </StackPanel>
+                                </controls:RoundedButton>
+                                <controls:RoundedButton Height="46"
+                                                        Padding="26 0"
+                                                        Command="{TemplateBinding ReceiveCommand}"
+                                                        Margin="0 0 12 12">
+                                    <StackPanel Orientation="Horizontal">
+                                        <svg:Svg HorizontalAlignment="Center"
+                                                 Width="24"
+                                                 Height="24"
+                                                 Path="/Resources/Icons/bottom-right-arrow.svg" />
+                                        <TextBlock Margin="8 0 0 0"
+                                                   Text="Receive"
+                                                   FontSize="18"
+                                                   Foreground="{DynamicResource RoundedButtonForegroundBrush}" />
+                                    </StackPanel>
+                                </controls:RoundedButton>
+                                <controls:RoundedButton Height="46"
+                                                        Padding="26 0"
+                                                        Command="{TemplateBinding ExchangeCommand}"
+                                                        Margin="0 0 12 12"
+                                                        Classes="AccentButton">
+                                    <StackPanel Orientation="Horizontal">
+                                        <svg:Svg HorizontalAlignment="Center"
+                                                 Width="24"
+                                                 Height="24"
+                                                 Path="/Resources/Icons/exchange-arrows.svg" />
+                                        <TextBlock Margin="8 0 0 0"
+                                                   Text="Exchange"
+                                                   FontSize="18"
+                                                   Foreground="{DynamicResource DeepBlue}" />
+                                    </StackPanel>
+                                </controls:RoundedButton>
+                                <controls:RoundedButton Height="46"
+                                                        Padding="26 0"
+                                                        Command="{TemplateBinding BuyCommand}"
+                                                        Margin="0 0 12 12"
+                                                        IsVisible="{Binding CurrencyViewModel.CurrencyCode,
+                                                        RelativeSource={RelativeSource TemplatedParent},
+                                                        Converter={StaticResource ShowBuyButton}}"
+                                                        Classes="GrayButton">
+                                    <StackPanel Orientation="Horizontal">
+                                        <svg:Svg HorizontalAlignment="Center"
+                                                 Width="24"
+                                                 Height="24"
+                                                 Path="/Resources/Icons/plus.svg" />
+                                        <TextBlock Margin="8 0 0 0"
+                                                   Text="Buy"
+                                                   FontSize="18" />
+                                    </StackPanel>
+                                </controls:RoundedButton>
+                            </WrapPanel>
+                        </StackPanel>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+</Styles>

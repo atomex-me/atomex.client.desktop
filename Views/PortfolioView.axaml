@@ -30,11 +30,6 @@
         <Grid RowDefinitions="Auto,*"
               Name="DesignGrid">
             <StackPanel Grid.Row="0">
-                <Canvas>
-                    <controls:IconButton Canvas.Right="0"
-                                         Classes="Alert NoEffects" />
-                </Canvas>
-
                 <Grid Margin="95 76 0 34"
                       RowDefinitions="Auto,Auto"
                       ColumnDefinitions="Auto,*">
@@ -245,7 +240,8 @@
                                                            Foreground="{DynamicResource SecondaryForegroundBrush}"
                                                            FontSize="13">
                                                     <TextBlock.Text>
-                                                        <MultiBinding Converter="{StaticResource AmountToStringConverter}">
+                                                        <MultiBinding
+                                                            Converter="{StaticResource AmountToStringConverter}">
                                                             <Binding Path="CurrentQuote" Mode="OneWay" />
                                                             <Binding Path="BaseCurrencyFormat" Mode="OneWay" />
                                                         </MultiBinding>

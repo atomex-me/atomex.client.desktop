@@ -3,6 +3,7 @@ using Atomex.Blockchain.Abstract;
 using Atomex.Blockchain.Ethereum;
 using Atomex.Client.Desktop.Common;
 using Atomex.ViewModels;
+using Avalonia.Controls;
 
 namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
 {
@@ -24,7 +25,7 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
         public EthereumTransactionViewModel()
         {
 #if DEBUG
-            if (Env.IsInDesignerMode())
+            if (Design.IsDesignMode)
                 DesignerMode();
 #endif
         }

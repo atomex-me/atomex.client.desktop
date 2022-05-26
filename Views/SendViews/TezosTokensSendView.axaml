@@ -42,7 +42,6 @@
     <UserControl.Resources>
         <converters:AmountToStringConverter x:Key="AmountToStringConverter" />
         <converters:AmountToStringInBracketsConverter x:Key="AmountToStringInBracketsConverter" />
-        <converters:EnumToStringEqualConverter x:Key="EnumToStringEqualConverter" />
         <converters:StringToDecimalConverter x:Key="StringToDecimalConverter" />
     </UserControl.Resources>
 
@@ -351,11 +350,11 @@
                                FontFamily="{DynamicResource DefaultLightFontFamily}"
                                Classes="Message"
                                Classes.Warning="{Binding WarningType,
-                       Converter={StaticResource EnumToStringEqualConverter},
-                       ConverterParameter=Warning}"
+                               Converter={x:Static converters:EnumToStringEqualConverter.Instance},
+                               ConverterParameter=Warning}"
                                Classes.Error="{Binding WarningType,
-                       Converter={StaticResource EnumToStringEqualConverter},
-                       ConverterParameter=Error}" />
+                               Converter={x:Static converters:EnumToStringEqualConverter.Instance},
+                               ConverterParameter=Error}" />
 
                     <controls:IconButton Classes="Question WithToolTipContent"
                                          VerticalAlignment="Center"
@@ -364,10 +363,10 @@
                         <TextBlock TextWrapping="Wrap"
                                    Text="{Binding WarningToolTip}"
                                    Classes.Warning="{Binding WarningType,
-                                   Converter={StaticResource EnumToStringEqualConverter},
+                                   Converter={x:Static converters:EnumToStringEqualConverter.Instance},
                                    ConverterParameter=Warning}"
                                    Classes.Error="{Binding WarningType,
-                                   Converter={StaticResource EnumToStringEqualConverter},
+                                   Converter={x:Static converters:EnumToStringEqualConverter.Instance},
                                    ConverterParameter=Error}" />
                     </controls:IconButton>
                 </StackPanel>

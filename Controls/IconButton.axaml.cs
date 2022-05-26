@@ -11,7 +11,9 @@ namespace Atomex.Client.Desktop.Controls
         {
             AffectsRender<IconButton>(
                 ToolTextProperty,
-                ContentProperty
+                ContentProperty,
+                IsActiveProperty,
+                WithRedDotProperty
             );
         }
         
@@ -20,15 +22,32 @@ namespace Atomex.Client.Desktop.Controls
                 nameof(ToolText),
                 o => o.ToolText,
                 (o, v) => o.ToolText = v,
-                defaultBindingMode: BindingMode.TwoWay,
-                enableDataValidation: true);
+                defaultBindingMode: BindingMode.TwoWay);
 
         private string _toolText;
-
         public string ToolText
         {
-            get { return _toolText; }
-            set { SetAndRaise(ToolTextProperty, ref _toolText, value); }
+            get => _toolText;
+            set => SetAndRaise(ToolTextProperty, ref _toolText, value);
+        }
+        
+        
+        public static readonly StyledProperty<bool> IsActiveProperty =
+            AvaloniaProperty.Register<IconButton, bool>(nameof(IsActive));
+
+        public bool IsActive
+        {
+            get => GetValue(IsActiveProperty);
+            set => SetValue(IsActiveProperty, value);
+        }
+        
+        public static readonly StyledProperty<bool> WithRedDotProperty =
+            AvaloniaProperty.Register<IconButton, bool>(nameof(WithRedDot));
+
+        public bool WithRedDot
+        {
+            get => GetValue(WithRedDotProperty);
+            set => SetValue(WithRedDotProperty, value);
         }
     }
 }

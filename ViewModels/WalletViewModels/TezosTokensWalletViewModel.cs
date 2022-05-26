@@ -15,6 +15,7 @@ using Serilog;
 using Atomex.Blockchain.Tezos;
 using Atomex.Blockchain.Tezos.Tzkt;
 using Atomex.Client.Desktop.Common;
+using Atomex.Client.Desktop.ViewModels.Abstract;
 using Atomex.Client.Desktop.ViewModels.SendViewModels;
 using Atomex.Client.Desktop.ViewModels.TransactionViewModels;
 using Atomex.Common;
@@ -256,7 +257,6 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         public ObservableCollection<TezosTokenContractViewModel> TokensContracts { get; set; }
         public ObservableCollection<TezosTokenViewModel> Tokens { get; set; }
         [Reactive] public TezosTokenViewModel? SelectedToken { get; set; }
-        public ObservableCollection<TezosTokenTransferViewModel> Transfers { get; set; }
 
         private TezosTokenContractViewModel? _tokenContract;
 
@@ -369,7 +369,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         private void OnAtomexClientChanged(object sender, AtomexClientChangedEventArgs e)
         {
             Tokens?.Clear();
-            Transfers?.Clear();
+            Transactions?.Clear();
             TokensContracts?.Clear();
             TokenContract = null;
         }
@@ -439,11 +439,9 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             if (tokenContract == null)
             {
                 Tokens = new ObservableCollection<TezosTokenViewModel>();
-                Transfers = new ObservableCollection<TezosTokenTransferViewModel>();
+                Transactions = new ObservableCollection<TransactionViewModelBase>();
 
                 OnPropertyChanged(nameof(Tokens));
-                OnPropertyChanged(nameof(Transfers));
-
                 return;
             }
 
@@ -487,7 +485,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                 OnPropertyChanged(nameof(BalanceFormat));
                 OnPropertyChanged(nameof(BalanceCurrencyCode));
 
-                Transfers = new ObservableCollection<TezosTokenTransferViewModel>((await tokenAccount
+                Transactions = new ObservableCollection<TransactionViewModelBase>((await tokenAccount
                         .DataRepository
                         .GetTezosTokenTransfersAsync(tokenContract.Contract.Address, offset: 0, limit: int.MaxValue))
                     .Select(t => new TezosTokenTransferViewModel(t, tezosConfig))
@@ -506,7 +504,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                     .DataRepository
                     .GetTezosTokenAddressesByContractAsync(tokenContract.Contract.Address);
 
-                Transfers = new ObservableCollection<TezosTokenTransferViewModel>((await tezosAccount
+                Transactions = new ObservableCollection<TransactionViewModelBase>((await tezosAccount
                         .DataRepository
                         .GetTezosTokenTransfersAsync(tokenContract.Contract.Address, offset: 0, limit: int.MaxValue))
                     .Select(t => new TezosTokenTransferViewModel(t, tezosConfig))
@@ -524,13 +522,12 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                         SendCallback = SendCallback
                     }));
             }
-
+            CurrentSortDirection = SortDirection.Desc;
+            CurrentSortField = TxSortField.ByTime;
+            
             OnPropertyChanged(nameof(Tokens));
-            OnPropertyChanged(nameof(Transfers));
-
             SelectedTabIndex = tokenContract.IsFa2 ? 0 : 1;
             OnPropertyChanged(nameof(SelectedTabIndex));
-
             OnPropertyChanged(nameof(TokenContractIconPreview));
         }
 
@@ -781,7 +778,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                 .WaitForResult()
                 .Value;
 
-            Transfers = new ObservableCollection<TezosTokenTransferViewModel>(transfers
+            Transactions = new ObservableCollection<TransactionViewModelBase>(transfers
                 .Select(t => new TezosTokenTransferViewModel(t, tezosConfig)));
         }
 #endif

@@ -45,7 +45,8 @@ namespace Atomex.Client.Desktop.Services
                     await using MemoryStream memory = new();
                     bmp.Save(memory, ImageFormat.Png);
                     memory.Position = 0;
-                    Images[url] = new Bitmap(memory);
+                    Images
+                        [url] = new Bitmap(memory);
 
                     successCallback?.Invoke();
                 }

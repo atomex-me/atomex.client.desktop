@@ -39,7 +39,7 @@
                         DockPanel.Dock="Right"
                         VerticalAlignment="Center"
                         Height="20">
-                
+
                 <TextBlock Text="Exchange"
                            FontSize="12"
                            Margin="8 0"
@@ -65,10 +65,10 @@
                            ToolTip.VerticalOffset="-30"
                            ToolTip.Tip="{Binding IsMarketDataConnectedText}" />
 
-                    <Rectangle Margin="0 4"
-                               VerticalAlignment="Stretch"
-                               Fill="{DynamicResource StatusBarVerticalDelimiterColor}"
-                               Width="1" />
+                <Rectangle Margin="0 4"
+                           VerticalAlignment="Stretch"
+                           Fill="{DynamicResource StatusBarVerticalDelimiterColor}"
+                           Width="1" />
 
                 <TextBlock Text="Rates Provider"
                            FontSize="12"
@@ -145,6 +145,12 @@
                             Content="{Binding Content}" />
 
             <ContentControl Grid.Column="1"
+                            VerticalAlignment="Top"
+                            HorizontalAlignment="Right"
+                            Margin="0 16 50 0"
+                            Content="{Binding NotificationsViewModel}" />
+
+            <ContentControl Grid.Column="1"
                             IsEnabled="{Binding RightPopupOpened}"
                             Classes.WithCloseAnimation="{Binding RightPopupHasContent}"
                             Content="{Binding RightPopupContent}">
@@ -159,11 +165,11 @@
                             <Animation Duration="0:0:0.35" Easing="QuadraticEaseOut" FillMode="Forward">
                                 <KeyFrame Cue="0%">
                                     <Setter Property="TranslateTransform.X" Value="396" />
-                                    <Setter Property="Opacity" Value="0"></Setter>
+                                    <Setter Property="Opacity" Value="0" />
                                 </KeyFrame>
                                 <KeyFrame Cue="100%">
                                     <Setter Property="TranslateTransform.X" Value="0" />
-                                    <Setter Property="Opacity" Value="1"></Setter>
+                                    <Setter Property="Opacity" Value="1" />
                                 </KeyFrame>
                             </Animation>
                         </Style.Animations>
@@ -174,11 +180,11 @@
                             <Animation Duration="0:0:0.35" Easing="QuadraticEaseOut" FillMode="Forward">
                                 <KeyFrame Cue="0%">
                                     <Setter Property="TranslateTransform.X" Value="0" />
-                                    <Setter Property="Opacity" Value="1"></Setter>
+                                    <Setter Property="Opacity" Value="1" />
                                 </KeyFrame>
                                 <KeyFrame Cue="100%">
                                     <Setter Property="TranslateTransform.X" Value="396" />
-                                    <Setter Property="Opacity" Value="0"></Setter>
+                                    <Setter Property="Opacity" Value="0" />
                                 </KeyFrame>
                             </Animation>
                         </Style.Animations>
