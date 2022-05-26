@@ -1,12 +1,7 @@
-using System;
 using System.Windows.Input;
 using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
 using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Controls.Primitives;
-using Avalonia.Markup.Xaml;
-using Avalonia.Media;
-using Avalonia.Styling;
 
 namespace Atomex.Client.Desktop.Controls
 {
@@ -19,24 +14,24 @@ namespace Atomex.Client.Desktop.Controls
                 IsBalanceUpdatingProperty
             );
             
-            var baseLight = (IStyle)AvaloniaXamlLoader.Load(
-                new Uri("avares://Avalonia.Themes.Default/Accents/BaseLight.xaml"));
+            // var baseLight = (IStyle)AvaloniaXamlLoader.Load(
+            //     new Uri("avares://Avalonia.Themes.Default/Accents/BaseLight.xaml"));
         }
 
-        public WalletCurrency()
-        {
-            if (Design.IsDesignMode)
-            {
-                Design.SetDesignStyle(this,
-                    new Style(x => x.OfType<WalletCurrency>())
-                    {
-                        Setters =
-                        {
-                            new Setter(BackgroundProperty, new SolidColorBrush(new Color(0, 0xFF, 0, 0)))
-                        }
-                    });
-            }
-        }
+        // public WalletCurrency()
+        // {
+        //     if (Design.IsDesignMode)
+        //     {
+        //         Design.SetDesignStyle(this,
+        //             new Style(x => x.OfType<WalletCurrency>())
+        //             {
+        //                 Setters =
+        //                 {
+        //                     new Setter(BackgroundProperty, new SolidColorBrush(new Color(0, 0xFF, 0, 0)))
+        //                 }
+        //             });
+        //     }
+        // }
 
         public static readonly DirectProperty<WalletCurrency, CurrencyViewModel> CurrencyViewModelProperty =
             AvaloniaProperty.RegisterDirect<WalletCurrency, CurrencyViewModel>(
@@ -48,8 +43,8 @@ namespace Atomex.Client.Desktop.Controls
 
         public CurrencyViewModel CurrencyViewModel
         {
-            get { return _currencyViewModel; }
-            set { SetAndRaise(CurrencyViewModelProperty, ref _currencyViewModel, value); }
+            get => _currencyViewModel;
+            set => SetAndRaise(CurrencyViewModelProperty, ref _currencyViewModel, value);
         }
 
 
