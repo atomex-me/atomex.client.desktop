@@ -130,6 +130,14 @@
                                Margin="32 16 0 16"
                                Text="Buy with card" />
                 </controls:MenuButton>
+                <controls:MenuButton
+                    IsSelected="{Binding IsDappsSectionActive}"
+                    HorizontalAlignment="Stretch"
+                    Command="{Binding SelectDapps}">
+                    <TextBlock VerticalAlignment="Center"
+                               Margin="32 16 0 16"
+                               Text="Dapps" />
+                </controls:MenuButton>
             </StackPanel>
 
             <Border Background="{DynamicResource LightDefaultOpacity6}"
