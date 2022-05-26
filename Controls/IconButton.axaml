@@ -18,8 +18,9 @@
                     <controls:IconButton Classes="Key"
                                          Margin="10 0 0 0" />
 
-                    <controls:IconButton Classes="Twitter NoEffects"
-                                         Margin="10 0 0 0" />
+                    <controls:IconButton Classes="Twitter"
+                                         Margin="10 0 0 0"
+                                         ToolText="Twitter address" />
 
                     <controls:IconButton Classes="Telegram NoEffects"
                                          Margin="10 0 0 0" />
@@ -128,41 +129,47 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type controls:IconButton}">
-                    <Border ToolTip.Placement="AnchorAndGravity"
-                            Width="{TemplateBinding Width}"
-                            Height="{TemplateBinding Height}"
-                            CornerRadius="{TemplateBinding CornerRadius}"
-                            Background="{TemplateBinding Background}">
-                        <Panel>
-                            <Panel.Styles>
-                                <Style Selector="Panel ToolTip">
-                                    <Setter Property="IsVisible"
-                                            Value="{Binding $parent[controls:IconButton].ToolText,
-                                            Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
-                                </Style>
-                            </Panel.Styles>
-                            <ToolTip.VerticalOffset>
-                                <MultiBinding Converter="{StaticResource ToolTipOffsetConverter}">
-                                    <Binding Path="$self.Bounds.Height" />
-                                    <Binding Path="#ToolTipTextContent.Bounds.Height" />
-                                </MultiBinding>
-                            </ToolTip.VerticalOffset>
-                            <ToolTip.Tip>
-                                <TextBlock Name="ToolTipTextContent"
-                                           TextWrapping="Wrap"
-                                           Text="{Binding $parent[controls:IconButton].ToolText}" />
-                            </ToolTip.Tip>
-
-                            <Border Width="9"
-                                    Height="9"
-                                    Background="{DynamicResource DarkRed}"
-                                    IsVisible="{TemplateBinding WithRedDot}"
-                                    Margin="10 -14 0 0"
-                                    ZIndex="1"
-                                    CornerRadius="10" />
-                            <svg:Svg />
-                        </Panel>
-                    </Border>
+                    <Panel>
+                        <Border ToolTip.Placement="AnchorAndGravity"
+                                Width="{TemplateBinding Width}"
+                                Height="{TemplateBinding Height}"
+                                CornerRadius="{TemplateBinding CornerRadius}"
+                                Background="{TemplateBinding Background}">
+                            <Border ToolTip.Placement="AnchorAndGravity"
+                                    Width="{TemplateBinding Width}"
+                                    Height="{TemplateBinding Height}"
+                                    CornerRadius="{TemplateBinding CornerRadius}"
+                                    Background="{TemplateBinding Background}">
+                                <Border.Styles>
+                                    <Style Selector="Border ToolTip">
+                                        <Setter Property="IsVisible"
+                                                Value="{Binding $parent[controls:IconButton].ToolText,
+                                        Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+                                    </Style>
+                                </Border.Styles>
+                                <ToolTip.VerticalOffset>
+                                    <MultiBinding Converter="{StaticResource ToolTipOffsetConverter}">
+                                        <Binding Path="$self.Bounds.Height" />
+                                        <Binding Path="#ToolTipTextContent.Bounds.Height" />
+                                    </MultiBinding>
+                                </ToolTip.VerticalOffset>
+                                <ToolTip.Tip>
+                                    <TextBlock Name="ToolTipTextContent"
+                                               TextWrapping="Wrap"
+                                               Text="{Binding $parent[controls:IconButton].ToolText}" />
+                                </ToolTip.Tip>
+                                <svg:Svg />
+                            </Border>
+                        </Border>
+                        
+                        <Border Width="9"
+                                Height="9"
+                                Background="{DynamicResource DarkRed}"
+                                IsVisible="{TemplateBinding WithRedDot}"
+                                Margin="10 -14 0 0"
+                                ZIndex="1"
+                                CornerRadius="10" />
+                    </Panel>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
