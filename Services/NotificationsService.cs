@@ -48,8 +48,9 @@ namespace Atomex.Client.Desktop.Services
             // App.Account.UserData.Notifications ??= new List<AtomexNotification>();
             // NotificationsUpdated?.Invoke(this, new AtomexNotificationsEventArgs(App.Account.UserData.Notifications));
 
-            App.Account.BalanceUpdated += OnBalanceUpdatedEventHandler!;
-            App.Account.UnconfirmedTransactionAdded += OnUnconfirmedTransactionAdded!;
+            // todo: remove after Notifications layout will done;
+            // App.Account.BalanceUpdated += OnBalanceUpdatedEventHandler!;
+            // App.Account.UnconfirmedTransactionAdded += OnUnconfirmedTransactionAdded!;
         }
 
         private void OnBalanceUpdatedEventHandler(object sender, CurrencyEventArgs args)
