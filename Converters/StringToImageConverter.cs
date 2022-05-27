@@ -1,29 +1,11 @@
-﻿using System;
-using System.Globalization;
-using Avalonia.Data.Converters;
-using Atomex.Client.Desktop.ViewModels.WalletViewModels;
+﻿using Avalonia.Data.Converters;
+using Avalonia.Media.Imaging;
 
 namespace Atomex.Client.Desktop.Converters
 {
-    public class StringToImageConverter : IValueConverter
+    public static class StringConverters
     {
-        #region IValueConverter Members
-
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            if (value is string stringUrl)
-            {
-                return App.ImageService.GetImage(stringUrl);
-            }
-
-            return value;
-        }
-
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            return value;
-        }
-
-        #endregion
+        public static readonly IValueConverter ToImage =
+            new FuncValueConverter<string, IBitmap>(stringUrl => App.ImageService.GetImage(stringUrl!));
     }
 }

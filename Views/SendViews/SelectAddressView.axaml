@@ -7,6 +7,7 @@
              xmlns:vm="clr-namespace:Atomex.Client.Desktop.ViewModels.SendViewModels"
              xmlns:svg="clr-namespace:Avalonia.Svg.Skia;assembly=Avalonia.Svg.Skia"
              xmlns:controls="clr-namespace:Atomex.Client.Desktop.Controls"
+             xmlns:abstract="clr-namespace:Atomex.Client.Desktop.ViewModels.Abstract"
              xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
              xmlns:ia="clr-namespace:Avalonia.Xaml.Interactions.Core;assembly=Avalonia.Xaml.Interactions">
     <Design.DataContext>
@@ -22,7 +23,7 @@
 
                 <controls:IconButton Grid.Column="0"
                                      Classes="Back"
-                                     Command="{Binding BackCommand}"/>
+                                     Command="{Binding BackCommand}" />
 
                 <TextBlock Grid.Column="1"
                            FontSize="22"
@@ -32,21 +33,27 @@
                     <i:Interaction.Behaviors>
                         <ia:DataTriggerBehavior Binding="{Binding SelectAddressMode}"
                                                 ComparisonCondition="Equal"
-                                                Value="SendFrom">
+                                                Value="{x:Static abstract:SelectAddressMode.SendFrom}">
                             <ia:ChangePropertyAction PropertyName="Text"
                                                      Value="Send from" />
                         </ia:DataTriggerBehavior>
                         <ia:DataTriggerBehavior Binding="{Binding SelectAddressMode}"
                                                 ComparisonCondition="Equal"
-                                                Value="ReceiveTo">
+                                                Value="{x:Static abstract:SelectAddressMode.ReceiveTo}">
                             <ia:ChangePropertyAction PropertyName="Text"
                                                      Value="Receive to" />
                         </ia:DataTriggerBehavior>
                         <ia:DataTriggerBehavior Binding="{Binding SelectAddressMode}"
                                                 ComparisonCondition="Equal"
-                                                Value="ChangeRedeemAddress">
+                                                Value="{x:Static abstract:SelectAddressMode.ChangeRedeemAddress}">
                             <ia:ChangePropertyAction PropertyName="Text"
                                                      Value="Change redeem address" />
+                        </ia:DataTriggerBehavior>
+                        <ia:DataTriggerBehavior Binding="{Binding SelectAddressMode}"
+                                                ComparisonCondition="Equal"
+                                                Value="{x:Static abstract:SelectAddressMode.Connect}">
+                            <ia:ChangePropertyAction PropertyName="Text"
+                                                     Value="Select address to connect" />
                         </ia:DataTriggerBehavior>
                     </i:Interaction.Behaviors>
                 </TextBlock>
@@ -213,7 +220,7 @@
                                         FontSize="16"
                                         Text="{Binding BalanceCode}" />
                                 </StackPanel>
-                                
+
                                 <controls:CopyButton Margin="0 0 9 0"
                                                      ToolText="Copy address to clipboard"
                                                      DoneToolText="Copied!"

@@ -2,8 +2,10 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             mc:Ignorable="d" d:DesignWidth="680" d:DesignHeight="450"
              xmlns:vm="clr-namespace:Atomex.Client.Desktop.ViewModels"
+             xmlns:converters="clr-namespace:Atomex.Client.Desktop.Converters"
+             xmlns:controls="clr-namespace:Atomex.Client.Desktop.Controls"
              x:Class="Atomex.Client.Desktop.Views.DappsView">
 
     <Design.DataContext>
@@ -16,15 +18,54 @@
         </Style>
     </Design.DesignStyle>
 
-    <UserControl.Styles>
 
-    </UserControl.Styles>
+    <Border>
+        <StackPanel>
+            <Border Background="{DynamicResource LightDefaultOpacity6}"
+                    CornerRadius="{DynamicResource AtomexCornerRadius}"
+                    VerticalAlignment="Top"
+                    Height="34"
+                    Margin="0 16 0 0"
+                    Padding="12 0">
 
-    <Border Padding="20">
-        <StackPanel Orientation="Vertical">
-            <TextBlock Foreground="{DynamicResource DefaultForegroundBrush}"
-                       FontSize="22"
-                       Text="Connected Dapps:" />
+                <Grid Name="HeaderGrid"
+                      ColumnDefinitions="3*,5*,2*"
+                      VerticalAlignment="Stretch">
+
+                    <Button Grid.Column="0"
+                            Padding="0"
+                            VerticalAlignment="Stretch"
+                            VerticalContentAlignment="Center"
+                            IsEnabled="False"
+                            Classes="EmptyBtnWithContent">
+                        <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
+                                   FontSize="13"
+                                   Text="Dapp" />
+                    </Button>
+
+                    <Button Grid.Column="1"
+                            Padding="0"
+                            VerticalAlignment="Stretch"
+                            VerticalContentAlignment="Center"
+                            IsEnabled="False"
+                            Classes="EmptyBtnWithContent">
+                        <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
+                                   FontSize="13"
+                                   Text="Address" />
+                    </Button>
+
+                    <Button Grid.Column="2"
+                            Padding="0"
+                            VerticalAlignment="Stretch"
+                            VerticalContentAlignment="Center"
+                            IsEnabled="False"
+                            Classes="EmptyBtnWithContent">
+                        <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
+                                   FontSize="13"
+                                   Text="Date connected" />
+                    </Button>
+                </Grid>
+            </Border>
 
             <ListBox Background="{DynamicResource AlmostTransparentBrush}"
                      Items="{Binding Dapps}"
@@ -51,6 +92,47 @@
                         <Setter Property="CornerRadius" Value="8" />
                     </Style>
                 </ListBox.Styles>
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <Grid ColumnDefinitions="3*,5*,2*"
+                              Background="Transparent"
+                              VerticalAlignment="Center"
+                              HorizontalAlignment="Stretch"
+                              RowDefinitions="Auto">
+                            <Grid Grid.Column="0"
+                                  ColumnDefinitions="Auto,*">
+                                <Image Width="22"
+                                       Height="22"
+                                       Source="{Binding BitmapLogo,
+                                       Converter={x:Static converters:StringConverters.ToImage}}"
+                                       VerticalAlignment="Center" />
+
+                                <TextBlock Grid.Column="1"
+                                           Foreground="{DynamicResource DefaultForegroundBrush}"
+                                           VerticalAlignment="Center"
+                                           TextTrimming="CharacterEllipsis"
+                                           FontSize="16"
+                                           Margin="8 0 0 0"
+                                           Text="{Binding Name}" />
+                            </Grid>
+
+                            <StackPanel Grid.Column="1"
+                                        Orientation="Horizontal">
+                                <controls:LinkButton Underlined="True"
+                                                     Classes="SolidHover"
+                                                     FontSize="16"
+                                                     Content="{Binding ConnectedAddress}"
+                                                     ToolText="{Binding ConnectedAddress}"
+                                                     Command="{Binding OpenInExplorerCommand}" />
+                                
+                                <controls:CopyButton ToolText="Copy address to clipboard"
+                                                     DoneToolText="Copied!"
+                                                     Margin="16 0 0 0"
+                                                     Command="{Binding CopyCommand}" />
+                            </StackPanel>
+                        </Grid>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
             </ListBox>
         </StackPanel>
     </Border>

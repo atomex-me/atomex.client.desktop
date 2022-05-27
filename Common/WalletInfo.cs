@@ -12,6 +12,7 @@ namespace Atomex.Client.Desktop.Common
     {
         private const string DefaultWalletsDirectory = "wallets";
         public const string DefaultWalletFileName = "atomex.wallet";
+        public const string BeaconDbFileName = "beacon.db";
 
         public string Name { get; set; }
         public string Path { get; set; }

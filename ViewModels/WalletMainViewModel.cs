@@ -44,10 +44,6 @@ namespace Atomex.Client.Desktop.ViewModels
             this.WhenAnyValue(vm => vm.Content)
                 .Select(content => content is WertViewModel)
                 .ToPropertyExInMainThread(this, vm => vm.IsWertSectionActive);
-            
-            this.WhenAnyValue(vm => vm.Content)
-                .Select(content => content is DappsViewModel)
-                .ToPropertyExInMainThread(this, vm => vm.IsDappsSectionActive);
 
             this.WhenAnyValue(vm => vm.RightPopupContent)
                 .WhereNotNull()
@@ -95,8 +91,7 @@ namespace Atomex.Client.Desktop.ViewModels
             {
                 ShowRightPopupContent = ShowRightPopupContent
             };
-
-            DappsViewModel = new DappsViewModel(AtomexApp);
+            
             SettingsViewModel = new SettingsViewModel(AtomexApp);
             WertViewModel = new WertViewModel(AtomexApp);
             NotificationsViewModel = new NotificationsViewModel();
@@ -113,7 +108,6 @@ namespace Atomex.Client.Desktop.ViewModels
         private ConversionViewModel ConversionViewModel { get; }
         private SettingsViewModel SettingsViewModel { get; }
         private WertViewModel WertViewModel { get; }
-        private DappsViewModel DappsViewModel { get; }
         private NotificationsViewModel NotificationsViewModel { get; }
 
         [Reactive] public ViewModelBase? RightPopupContent { get; set; }
@@ -130,7 +124,6 @@ namespace Atomex.Client.Desktop.ViewModels
         [ObservableAsProperty] public bool IsConversionSectionActive { get; }
         [ObservableAsProperty] public bool IsSettingsSectionActive { get; }
         [ObservableAsProperty] public bool IsWertSectionActive { get; }
-        [ObservableAsProperty] public bool IsDappsSectionActive { get; }
         [ObservableAsProperty] public bool RightPopupHasContent { get; }
 
         private void SubscribeToServices()
@@ -265,11 +258,6 @@ namespace Atomex.Client.Desktop.ViewModels
             }
 
             Content = WertViewModel;
-        }
-        
-        public void SelectDapps()
-        {
-            Content = DappsViewModel;
         }
 
         private static string? GetAssemblyFileVersion()

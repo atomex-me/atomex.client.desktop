@@ -111,6 +111,18 @@ namespace Atomex.Client.Desktop.Controls
             get => _buyCommand;
             set => SetAndRaise(BuyCommandProperty, ref _buyCommand, value);
         }
+        
+        public static readonly DirectProperty<WalletCurrency, ICommand> ConnectDappCommandProperty =
+            AvaloniaProperty.RegisterDirect<WalletCurrency, ICommand>(nameof(ConnectDappCommand),
+                control => control.ConnectDappCommand, (control, command) => control.ConnectDappCommand = command);
+
+        private ICommand _connectDappCommand;
+
+        public ICommand ConnectDappCommand
+        {
+            get => _connectDappCommand;
+            set => SetAndRaise(ConnectDappCommandProperty, ref _connectDappCommand, value);
+        }
 
         public static readonly StyledProperty<bool> IsBalanceUpdatingProperty =
             AvaloniaProperty.Register<WalletCurrency, bool>(nameof(IsBalanceUpdating));

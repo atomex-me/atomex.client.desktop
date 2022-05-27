@@ -18,7 +18,6 @@
     </Design.DataContext>
 
     <UserControl.Resources>
-        <converters:StringToImageConverter x:Key="StringToImageConverter" />
         <converters:StringsConcatConverter x:Key="StringsConcatConverter" />
         <converters:AddressShouldShrinkConverter x:Key="AddressShouldShrinkConverter" />
         <converters:AddressShouldExpandConverter x:Key="AddressShouldExpandConverter" />
@@ -30,7 +29,7 @@
 
     <Grid RowDefinitions="Auto,*"
           Name="DesignGrid">
-        
+
         <controls:WalletCurrency Grid.Row="0"
                                  Grid.Column="0"
                                  Margin="0 40 0 0"
@@ -40,7 +39,8 @@
                                  ReceiveCommand="{Binding ReceiveCommand}"
                                  ExchangeCommand="{Binding ExchangeCommand}"
                                  BuyCommand="{Binding BuyCommand}"
-                                 UpdateCommand="{Binding UpdateCommand}" />
+                                 UpdateCommand="{Binding UpdateCommand}"
+                                 ConnectDappCommand="{Binding ConnectDappCommand}" />
 
         <TabControl Grid.Row="1"
                     Margin="0 4 0 0"
@@ -280,7 +280,8 @@
                                               ColumnDefinitions="Auto,*">
                                             <Image Width="22"
                                                    Height="22"
-                                                   Source="{Binding Baker.Logo, Converter={StaticResource StringToImageConverter}}"
+                                                   Source="{Binding Baker.Logo,
+                                                   Converter={x:Static converters:StringConverters.ToImage}}"
                                                    VerticalAlignment="Center" />
 
                                             <TextBlock Grid.Column="1"
@@ -428,6 +429,16 @@
                         </ListBox.ItemTemplate>
                     </ListBox>
                 </Grid>
+            </TabItem>
+
+            <TabItem Margin="16 0 "
+                     Classes="WalletTabItem">
+                <TabItem.Header>
+                    <TextBlock VerticalAlignment="Center"
+                               FontSize="16"
+                               Text="Dapps" />
+                </TabItem.Header>
+                <ContentControl Content="{Binding DappsViewModel}" />
             </TabItem>
         </TabControl>
     </Grid>

@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
     <PropertyGroup>
-        <OutputType>WinExe</OutputType>
+        <OutputType>Exe</OutputType>
         <TargetFramework>net5.0</TargetFramework>
         <Nullable>enable</Nullable>
         <DefaultItemExcludes>$(DefaultItemExcludes);atomex.client.core\**</DefaultItemExcludes>
@@ -27,6 +27,7 @@
         <PackageReference Include="Avalonia.Svg.Skia" Version="0.10.13" />
         <PackageReference Include="DialogHost.Avalonia" Version="0.4.0" />
         <PackageReference Include="Deadpikle.AvaloniaProgressRing" Version="0.9.0" />
+        <PackageReference Include="Matrix.Sdk" Version="0.0.7" />
         <PackageReference Include="NetSparkleUpdater.SparkleUpdater" Version="2.0.7" />
         <PackageReference Include="NetSparkleUpdater.UI.Avalonia" Version="2.0.8" />
         <PackageReference Include="OxyPlot.Avalonia" Version="2.1.0-20201211.2" />
@@ -35,6 +36,7 @@
         <PackageReference Include="Sentry.Serilog" Version="3.15.0" />
         <PackageReference Include="Serilog.Settings.Configuration" Version="3.1.0" />
         <PackageReference Include="Serilog.Sinks.Console" Version="3.1.1" />
+        <PackageReference Include="Serilog.Extensions.Logging" Version="3.1.0" />
         <PackageReference Include="ReactiveUI.Fody" Version="16.4.1" />
     </ItemGroup>
 
@@ -199,6 +201,7 @@
         </Compile>
     </ItemGroup>
     <ItemGroup>
+        <ProjectReference Include="..\beacon-dotnet-sdk\Beacon.Sdk\Beacon.Sdk.csproj" />
         <ProjectReference Include="atomex.client.core\Atomex.Client.Core\Atomex.Client.Core.csproj">
             <GlobalPropertiesToRemove></GlobalPropertiesToRemove>
         </ProjectReference>

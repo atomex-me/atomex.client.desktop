@@ -29,6 +29,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         [Reactive] public SortDirection? CurrentDelegationSortDirection { get; set; }
         [Reactive] public DelegationSortField? CurrentDelegationSortField { get; set; }
         [Reactive] public string? DelegationAddressPopupOpened { get; set; }
+        [Reactive] public DappsViewModel DappsViewModel { get; set; }
 
         private bool CanDelegate { get; set; }
         private bool HasDelegations { get; set; }
@@ -62,6 +63,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             _ = LoadDelegationInfoAsync();
 
             DelegateViewModel = new DelegateViewModel(_app);
+            DappsViewModel = new DappsViewModel(_app);
             CurrentDelegationSortField = DelegationSortField.ByBalance;
             CurrentDelegationSortDirection = SortDirection.Desc;
         }
@@ -235,7 +237,14 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                         ? SortDirection.Desc
                         : SortDirection.Asc;
             });
+        
+        private ReactiveCommand<Unit, Unit> _connectDappCommand;
 
+        public ReactiveCommand<Unit, Unit> ConnectDappCommand =>
+            _connectDappCommand ??= ReactiveCommand.Create(() =>
+            {
+                App.DialogService.Show(DappsViewModel.SelectAddressViewModel);
+            });
 
         private ReactiveCommand<string, Unit> _openDelegationPopupCommand;
 
