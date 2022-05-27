@@ -62,7 +62,7 @@ namespace Atomex.Client.Desktop.ViewModels
             var tezos = Currency;
 
             var tezosAccount = _app.Account
-                .GetCurrencyAccount<TezosAccount>("XTZ");
+                .GetCurrencyAccount<TezosAccount_OLD>("XTZ");
 
             try
             {
@@ -73,7 +73,7 @@ namespace Atomex.Client.Desktop.ViewModels
                     .LockAsync(WalletAddress.Address);
 
                 // temporary fix: check operation sequence
-                await TezosOperationsSequencer
+                await TezosOperationsSequencer_OLD
                     .WaitAsync(WalletAddress.Address, tezosAccount)
                     .ConfigureAwait(false);
 

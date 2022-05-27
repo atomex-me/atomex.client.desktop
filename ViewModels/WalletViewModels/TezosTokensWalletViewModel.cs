@@ -401,7 +401,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         private async Task ReloadTokenContractsAsync()
         {
             var tokensContractsViewModels = (await _app.Account
-                .GetCurrencyAccount<TezosAccount>(TezosConfig_OLD.Xtz)
+                .GetCurrencyAccount<TezosAccount_OLD>(TezosConfig_OLD.Xtz)
                 .DataRepository
                 .GetTezosTokenContractsAsync())
                 .Select(c => new TezosTokenContractViewModel
@@ -506,7 +506,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             else if (tokenContract.IsFa2)
             {
                 var tezosAccount = _app.Account
-                    .GetCurrencyAccount<TezosAccount>(TezosConfig_OLD.Xtz);
+                    .GetCurrencyAccount<TezosAccount_OLD>(TezosConfig_OLD.Xtz);
 
                 var tokenAddresses = await tezosAccount
                     .DataRepository
@@ -628,7 +628,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             try
             {
                 var tezosAccount = _app.Account
-                    .GetCurrencyAccount<TezosAccount>(TezosConfig_OLD.Xtz);
+                    .GetCurrencyAccount<TezosAccount_OLD>(TezosConfig_OLD.Xtz);
 
                 var tezosTokensScanner = new TezosTokensScanner_OLD(tezosAccount);
 

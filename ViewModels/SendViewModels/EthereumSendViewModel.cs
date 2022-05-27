@@ -118,7 +118,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         private async void CheckTokensAsync()
         {
             var account = _app.Account
-                .GetCurrencyAccount<EthereumAccount>(Currency.Name);
+                .GetCurrencyAccount<EthereumAccount_OLD>(Currency.Name);
 
             var unpsentTokens = await account
                 .GetUnspentTokenAddressesAsync()
@@ -169,7 +169,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             try
             {
                 var account = _app.Account
-                    .GetCurrencyAccount<EthereumAccount>(Currency.Name);
+                    .GetCurrencyAccount<EthereumAccount_OLD>(Currency.Name);
 
                 var maxAmountEstimation = await account.EstimateMaxAmountToSendAsync(
                     from: From,
@@ -206,7 +206,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 if (!UseDefaultFee)
                 {
                     var account = _app.Account
-                        .GetCurrencyAccount<EthereumAccount>(Currency.Name);
+                        .GetCurrencyAccount<EthereumAccount_OLD>(Currency.Name);
 
                     // estimate max amount with new GasPrice
                     var maxAmountEstimation = await account.EstimateMaxAmountToSendAsync(
@@ -230,7 +230,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             try
             {
                 var account = _app.Account
-                    .GetCurrencyAccount<EthereumAccount>(Currency.Name);
+                    .GetCurrencyAccount<EthereumAccount_OLD>(Currency.Name);
 
                 var maxAmountEstimation = await account
                     .EstimateMaxAmountToSendAsync(
@@ -368,7 +368,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         protected override Task<Error> Send(CancellationToken cancellationToken = default)
         {
             var account = _app.Account
-                .GetCurrencyAccount<EthereumAccount>(Currency.Name);
+                .GetCurrencyAccount<EthereumAccount_OLD>(Currency.Name);
 
             return account.SendAsync(
                 from: From,

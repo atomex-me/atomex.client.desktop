@@ -576,7 +576,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             string tokenType)
         {
             var tezosAccount = account
-                .GetCurrencyAccount<TezosAccount>(TezosConfig_OLD.Xtz);
+                .GetCurrencyAccount<TezosAccount_OLD>(TezosConfig_OLD.Xtz);
 
             return await tezosAccount
                 .DataRepository

@@ -193,7 +193,7 @@ namespace Atomex.Client.Desktop.ViewModels
                 {
                     HasTokens = true;
 
-                    var tezosAccount = account as TezosAccount;
+                    var tezosAccount = account as TezosAccount_OLD;
 
                     var addressesWithTokens = (await tezosAccount
                         .DataRepository
@@ -283,7 +283,7 @@ namespace Atomex.Client.Desktop.ViewModels
                 {
                     // update tezos token balance
                     var tezosAccount = _app.Account
-                        .GetCurrencyAccount<TezosAccount>(TezosConfig_OLD.Xtz);
+                        .GetCurrencyAccount<TezosAccount_OLD>(TezosConfig_OLD.Xtz);
 
                     await new TezosTokensScanner_OLD(tezosAccount)
                         .ScanContractAsync(address, _tokenContract);

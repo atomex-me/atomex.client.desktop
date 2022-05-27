@@ -76,7 +76,7 @@ namespace Atomex.Client.Desktop.ViewModels
                 if (currenciesArr == null || Array.IndexOf(currenciesArr, TezosConfig_OLD.Xtz) != -1)
                 {
                     var tezosAccount = _app.Account
-                        .GetCurrencyAccount<TezosAccount>(TezosConfig_OLD.Xtz);
+                        .GetCurrencyAccount<TezosAccount_OLD>(TezosConfig_OLD.Xtz);
 
                     var tezosTokensScanner = new TezosTokensScanner_OLD(tezosAccount);
                     
