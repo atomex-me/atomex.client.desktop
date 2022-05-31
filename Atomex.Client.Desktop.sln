@@ -37,7 +37,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Atomex.MarketData", "atomex
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Atomex.Swaps", "atomex.client.core\Atomex.Swaps\Atomex.Swaps.csproj", "{CFBD56CA-76E7-4D56-9E4F-20AA759CA0A9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Atomex.Tests", "..\Atomex.Tests\Atomex.Tests.csproj", "{D4AC5576-1BDF-4D0E-9426-43D880F454B4}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Atomex.Tests", "atomex.client.core\Atomex.Tests\Atomex.Tests.csproj", "{D4AC5576-1BDF-4D0E-9426-43D880F454B4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
