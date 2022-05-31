@@ -105,29 +105,24 @@ namespace Atomex.Client.Desktop.ViewModels
                 OnConnect = Connect
             };
 
-            // _ = Task.Run(async () =>
-            // {
-            //     if (AtomexApp.AtomexClient.Account == null) return;
-            //     
-            //     BeaconWalletClient = beaconServicesProvider.GetRequiredService<IWalletBeaconClient>();
-            //     BeaconWalletClient.OnBeaconMessageReceived += OnBeaconWalletClientMessageReceived;
-            //     await BeaconWalletClient.InitAsync();
-            //     BeaconWalletClient.Connect();
-            //     
-            //     Log.Debug("{@Sender}: WalletClient connected {@Connected}", "Beacon", BeaconWalletClient.Connected);
-            //     Log.Debug("{@Sender}: WalletClient logged in {@LoggedIn}", "Beacon", BeaconWalletClient.LoggedIn);
-            // });
+            _ = Task.Run(async () =>
+            {
+                if (AtomexApp.AtomexClient.Account == null) return;
+                
+                BeaconWalletClient = BeaconServicesProvider.GetRequiredService<IWalletBeaconClient>();
+                BeaconWalletClient.OnBeaconMessageReceived += OnBeaconWalletClientMessageReceived;
+                await BeaconWalletClient.InitAsync();
+                BeaconWalletClient.Connect();
+                
+                Log.Debug("{@Sender}: WalletClient connected {@Connected}", "Beacon", BeaconWalletClient.Connected);
+                Log.Debug("{@Sender}: WalletClient logged in {@LoggedIn}", "Beacon", BeaconWalletClient.LoggedIn);
+            });
         }
 
         private async void Connect(string qrCodeString)
         {
             if (AtomexApp.AtomexClient.Account == null) return;
-
-            BeaconWalletClient = BeaconServicesProvider.GetRequiredService<IWalletBeaconClient>();
-            BeaconWalletClient.OnBeaconMessageReceived += OnBeaconWalletClientMessageReceived;
-            await BeaconWalletClient.InitAsync();
-            BeaconWalletClient.Connect();
-
+            
             Log.Debug("{@Sender}: WalletClient connected {@Connected}", "Beacon", BeaconWalletClient.Connected);
             Log.Debug("{@Sender}: WalletClient logged in {@LoggedIn}", "Beacon", BeaconWalletClient.LoggedIn);
 
@@ -196,10 +191,11 @@ namespace Atomex.Client.Desktop.ViewModels
                     var response = new PermissionResponse(
                         id: request.Id,
                         senderId: BeaconWalletClient.SenderId,
+                        appMetadata: BeaconWalletClient.Metadata,
                         network: network,
                         scopes: scopes,
                         publicKey: walletKey.PubKey.ToString(),
-                        appMetadata: BeaconWalletClient.Metadata,
+                        address: walletKey.PubKey.Address,
                         version: request.Version);
 
                     _ = BeaconWalletClient.SendResponseAsync(receiverId: e.SenderId, response);
