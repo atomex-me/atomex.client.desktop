@@ -1,9 +1,9 @@
 using System;
 using System.Collections.ObjectModel;
-using System.Linq;
 using System.Reactive;
 using System.Text;
 using System.Threading.Tasks;
+using Atomex.Blockchain.Tezos;
 using Atomex.Blockchain.Tezos.Internal;
 using Atomex.Client.Desktop.ViewModels.Abstract;
 using Atomex.Client.Desktop.ViewModels.SendViewModels;
@@ -11,12 +11,14 @@ using Atomex.Cryptography;
 using Atomex.Services;
 using Atomex.ViewModels;
 using Atomex.Wallet;
+using Atomex.Common;
 using Avalonia.Controls;
 using Avalonia.Media.Imaging;
 using Beacon.Sdk;
 using Beacon.Sdk.Beacon;
 using Beacon.Sdk.Beacon.Operation;
 using Beacon.Sdk.Beacon.Permission;
+using Beacon.Sdk.Beacon.Sign;
 using Matrix.Sdk;
 using Microsoft.Extensions.DependencyInjection;
 using Netezos.Keys;
@@ -87,6 +89,8 @@ namespace Atomex.Client.Desktop.ViewModels
             AtomexApp.AtomexClientChanged += OnAtomexClientChangedEventHandler;
 
             Tezos = (TezosConfig)AtomexApp.Account.Currencies.GetByName(TezosConfig.Xtz);
+            
+            // todo: recreate after balance updated
             SelectAddressViewModel =
                 new SelectAddressViewModel(AtomexApp.Account, Tezos, SelectAddressMode.Connect)
                 {
@@ -108,12 +112,12 @@ namespace Atomex.Client.Desktop.ViewModels
             _ = Task.Run(async () =>
             {
                 if (AtomexApp.AtomexClient.Account == null) return;
-                
+
                 BeaconWalletClient = BeaconServicesProvider.GetRequiredService<IWalletBeaconClient>();
                 BeaconWalletClient.OnBeaconMessageReceived += OnBeaconWalletClientMessageReceived;
                 await BeaconWalletClient.InitAsync();
                 BeaconWalletClient.Connect();
-                
+
                 Log.Debug("{@Sender}: WalletClient connected {@Connected}", "Beacon", BeaconWalletClient.Connected);
                 Log.Debug("{@Sender}: WalletClient logged in {@LoggedIn}", "Beacon", BeaconWalletClient.LoggedIn);
             });
@@ -122,7 +126,7 @@ namespace Atomex.Client.Desktop.ViewModels
         private async void Connect(string qrCodeString)
         {
             if (AtomexApp.AtomexClient.Account == null) return;
-            
+
             Log.Debug("{@Sender}: WalletClient connected {@Connected}", "Beacon", BeaconWalletClient.Connected);
             Log.Debug("{@Sender}: WalletClient logged in {@LoggedIn}", "Beacon", BeaconWalletClient.LoggedIn);
 
@@ -136,7 +140,7 @@ namespace Atomex.Client.Desktop.ViewModels
                 return JsonConvert.DeserializeObject<P2PPairingRequest>(message);
             }
         }
-        
+
         private void OnBeaconWalletClientMessageReceived(object? sender, BeaconMessageEventArgs e)
         {
             var message = e.Request;
@@ -150,64 +154,63 @@ namespace Atomex.Client.Desktop.ViewModels
             {
                 case BeaconMessageType.permission_request:
                 {
-                    var request = message as PermissionRequest;
+                    if (message is not PermissionRequest permissionRequest) return;
 
-                    var network = request!.Network.Type switch
-                    {
-                        NetworkType.mainnet => new Network
-                        {
-                            Type = NetworkType.mainnet,
-                            Name = "Mainnet",
-                            RpcUrl = "https://rpc.tzkt.io/mainnet"
-                        },
-                        _ => new Network
-                        {
-                            Type = NetworkType.ithacanet,
-                            Name = "Ithacanet",
-                            RpcUrl = "https://rpc.tzkt.io/ithacanet"
-                        }
-                    };
+                    if (permissionRequest?.Network.Type != null &&
+                        string.IsNullOrEmpty(permissionRequest.Network.RpcUrl))
+                        permissionRequest.Network.RpcUrl = $"https://rpc.tzkt.io/{permissionRequest.Network.Type}";
 
-                    // change response sign to encrypt permission
-                    var scopes = request.Scopes
-                        .Select(s => s == PermissionScope.sign ? PermissionScope.encrypt : s)
-                        .ToList();
-                    
+                    if (permissionRequest?.Network.Type != null && string.IsNullOrEmpty(permissionRequest.Network.Name))
+                        permissionRequest.Network.Name = string.Concat(
+                            permissionRequest.Network.Type.ToString()[0].ToString().ToUpper(),
+                            permissionRequest.Network.Type.ToString().AsSpan(1));
+
+                    // // swap sign permission to encrypt
+                    // var scopes = request?.Scopes
+                    //     .Select(s => s == PermissionScope.sign ? PermissionScope.encrypt : s)
+                    //     .ToList();
+
+                    // if (request!.Scopes.Any(s => s == PermissionScope.sign))
+                    //     request.Scopes.Add(PermissionScope.encrypt);
+
                     var hdWallet = AtomexApp.Account.Wallet as HdWallet;
-                    
+
                     using var privateKey = hdWallet!.KeyStorage.GetPrivateKey(
                         currency: Tezos,
                         keyIndex: AddressToConnect.WalletAddress.KeyIndex,
                         keyType: AddressToConnect.WalletAddress.KeyType);
-                    
-                    var unsecuredPrivateKey = privateKey.ToUnsecuredBytes();
-                    
-                    var base58Private = unsecuredPrivateKey.Length == 32
-                        ? Base58Check.Encode(unsecuredPrivateKey, Prefix.Edsk)
-                        : Base58Check.Encode(unsecuredPrivateKey, Prefix.EdskSecretKey);
-                    
-                    var walletKey = Key.FromBase58(base58Private);
 
+                    var unsecuredPrivateKey = privateKey.ToUnsecuredBytes();
+
+                    // var base58Private = unsecuredPrivateKey.Length == 32
+                    //     ? Base58Check.Encode(unsecuredPrivateKey, Prefix.Edsk)
+                    //     : Base58Check.Encode(unsecuredPrivateKey, Prefix.EdskSecretKey);
+
+                    // var walletKey = Key.FromBase58(base58Private);
+
+                    var walletKey = Key.FromBytes(unsecuredPrivateKey);
+                    
                     var response = new PermissionResponse(
-                        id: request.Id,
+                        id: permissionRequest!.Id,
                         senderId: BeaconWalletClient.SenderId,
                         appMetadata: BeaconWalletClient.Metadata,
-                        network: network,
-                        scopes: scopes,
+                        network: permissionRequest.Network,
+                        scopes: permissionRequest.Scopes,
                         publicKey: walletKey.PubKey.ToString(),
                         address: walletKey.PubKey.Address,
-                        version: request.Version);
+                        version: permissionRequest.Version);
 
                     _ = BeaconWalletClient.SendResponseAsync(receiverId: e.SenderId, response);
                     break;
                 }
                 case BeaconMessageType.operation_request:
                 {
-                    var request = message as OperationRequest;
+                    if (message is not OperationRequest operationRequest) return;
 
-                    if (request!.OperationDetails.Count <= 0) return;
+                    // todo: return error response;
+                    if (operationRequest.OperationDetails.Count <= 0) return;
 
-                    var operation = request.OperationDetails[0];
+                    var operation = operationRequest.OperationDetails[0];
 
                     if (long.TryParse(operation?.Amount, out var amount))
                     {
@@ -215,10 +218,10 @@ namespace Atomex.Client.Desktop.ViewModels
                         //     await MakeTransactionAsync(walletKey, operation.Destination, amount);
 
                         var response = new OperationResponse(
-                            id: request.Id,
+                            id: operationRequest.Id,
                             senderId: BeaconWalletClient.SenderId,
                             transactionHash: "txHash",
-                            request.Version);
+                            operationRequest.Version);
 
                         _ = BeaconWalletClient.SendResponseAsync(receiverId: e.SenderId, response);
                     }
@@ -226,7 +229,44 @@ namespace Atomex.Client.Desktop.ViewModels
                     break;
                 }
                 case BeaconMessageType.sign_payload_request:
+                {
+                    if (message is not SignPayloadRequest signRequest) return;
+
+                    byte[] dataToSign;
+
+                    try
+                    {
+                        dataToSign = Hex.FromString(signRequest.Payload);
+                    }
+                    catch (Exception)
+                    {
+                        // data is not in HEX format
+                        dataToSign = Encoding.UTF8.GetBytes(signRequest.Payload);
+                    }
+
+                    var hdWallet = AtomexApp.Account.Wallet as HdWallet;
+
+                    using var privateKey = hdWallet!.KeyStorage.GetPrivateKey(
+                        currency: Tezos,
+                        keyIndex: AddressToConnect.WalletAddress.KeyIndex,
+                        keyType: AddressToConnect.WalletAddress.KeyType);
+
+                    var signedMessage = TezosSigner.SignHash(
+                        data: dataToSign,
+                        privateKey: privateKey.ToUnsecuredBytes(),
+                        watermark: null,
+                        isExtendedKey: privateKey.Length == 64);
+
+                    // todo: check signing method
+                    var response = new SignPayloadResponse(
+                        signature: signedMessage.EncodedSignature,
+                        version: signRequest.Version,
+                        id: signRequest.Id,
+                        senderId: BeaconWalletClient.SenderId);
+
+                    _ = BeaconWalletClient.SendResponseAsync(receiverId: e.SenderId, response);
                     break;
+                }
                 case BeaconMessageType.broadcast_request:
                     break;
                 case BeaconMessageType.permission_response:
