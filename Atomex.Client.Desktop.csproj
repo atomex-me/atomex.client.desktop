@@ -1,6 +1,5 @@
 <Project Sdk="Microsoft.NET.Sdk" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
     <PropertyGroup>
-        <OutputType>WinExe</OutputType>
         <TargetFramework>net5.0</TargetFramework>
         <Nullable>enable</Nullable>
         <DefaultItemExcludes>$(DefaultItemExcludes);atomex.client.core\**</DefaultItemExcludes>
@@ -10,38 +9,51 @@
         <AssemblyVersion>1.2.11</AssemblyVersion>
         <Version>1.2.11</Version>
     </PropertyGroup>
+    <Choose>
+        <When Condition=" '$(Configuration)' == 'Debug' ">
+            <PropertyGroup>
+                <OutputType>Exe</OutputType>
+            </PropertyGroup>
+        </When>
+        <Otherwise>
+            <PropertyGroup>
+                <OutputType>WinExe</OutputType>
+            </PropertyGroup>
+        </Otherwise>
+    </Choose>
+
     <ItemGroup>
-        <AvaloniaResource Include="Assets\**" />
-        <AvaloniaResource Include="Resources\*" />
-        <AvaloniaResource Include="Resources\Fonts\*" />
-        <AvaloniaResource Include="Resources\Icons\*" />
-        <AvaloniaResource Include="Resources\Images\*" />
+        <AvaloniaResource Include="Assets\**"/>
+        <AvaloniaResource Include="Resources\*"/>
+        <AvaloniaResource Include="Resources\Fonts\*"/>
+        <AvaloniaResource Include="Resources\Icons\*"/>
+        <AvaloniaResource Include="Resources\Images\*"/>
     </ItemGroup>
     <ItemGroup>
-        <PackageReference Include="Avalonia" Version="0.10.14" />
-        <PackageReference Include="Avalonia.Controls.DataGrid" Version="0.10.14" />
-        <PackageReference Include="Avalonia.Desktop" Version="0.10.14" />
-        <PackageReference Include="Avalonia.Diagnostics" Version="0.10.14" />
-        <PackageReference Include="Avalonia.ReactiveUI" Version="0.10.14" />
-        <PackageReference Include="Avalonia.Xaml.Behaviors" Version="0.10.13.3" />
-        <PackageReference Include="Avalonia.Svg.Skia" Version="0.10.13" />
-        <PackageReference Include="DialogHost.Avalonia" Version="0.4.0" />
-        <PackageReference Include="Deadpikle.AvaloniaProgressRing" Version="0.9.0" />
-        <PackageReference Include="NetSparkleUpdater.SparkleUpdater" Version="2.0.7" />
-        <PackageReference Include="NetSparkleUpdater.UI.Avalonia" Version="2.0.8" />
-        <PackageReference Include="OxyPlot.Avalonia" Version="2.1.0-20201211.2" />
-        <PackageReference Include="QRCoder" Version="1.4.1" />
-        <PackageReference Include="runtime.osx.10.10-x64.CoreCompat.System.Drawing" Version="5.8.64" />
-        <PackageReference Include="Sentry.Serilog" Version="3.15.0" />
-        <PackageReference Include="Serilog.Settings.Configuration" Version="3.1.0" />
-        <PackageReference Include="Serilog.Sinks.Console" Version="3.1.1" />
-        <PackageReference Include="ReactiveUI.Fody" Version="16.4.1" />
+        <PackageReference Include="Avalonia" Version="0.10.14"/>
+        <PackageReference Include="Avalonia.Controls.DataGrid" Version="0.10.14"/>
+        <PackageReference Include="Avalonia.Desktop" Version="0.10.14"/>
+        <PackageReference Include="Avalonia.Diagnostics" Version="0.10.14"/>
+        <PackageReference Include="Avalonia.ReactiveUI" Version="0.10.14"/>
+        <PackageReference Include="Avalonia.Xaml.Behaviors" Version="0.10.13.3"/>
+        <PackageReference Include="Avalonia.Svg.Skia" Version="0.10.13"/>
+        <PackageReference Include="DialogHost.Avalonia" Version="0.4.0"/>
+        <PackageReference Include="Deadpikle.AvaloniaProgressRing" Version="0.9.0"/>
+        <PackageReference Include="NetSparkleUpdater.SparkleUpdater" Version="2.0.7"/>
+        <PackageReference Include="NetSparkleUpdater.UI.Avalonia" Version="2.0.8"/>
+        <PackageReference Include="OxyPlot.Avalonia" Version="2.1.0-20201211.2"/>
+        <PackageReference Include="QRCoder" Version="1.4.1"/>
+        <PackageReference Include="runtime.osx.10.10-x64.CoreCompat.System.Drawing" Version="5.8.64"/>
+        <PackageReference Include="Sentry.Serilog" Version="3.15.0"/>
+        <PackageReference Include="Serilog.Settings.Configuration" Version="3.1.0"/>
+        <PackageReference Include="Serilog.Sinks.Console" Version="3.1.1"/>
+        <PackageReference Include="ReactiveUI.Fody" Version="16.4.1"/>
     </ItemGroup>
 
 
     <ItemGroup>
-        <None Remove="config.debug.json" />
-        <None Remove="config.json" />
+        <None Remove="config.debug.json"/>
+        <None Remove="config.json"/>
     </ItemGroup>
     <ItemGroup>
         <EmbeddedResource Include="config.debug.json">
@@ -57,12 +69,12 @@
             <DependentUpon>UnsavedChangesDialogView.axaml</DependentUpon>
         </Compile>
         <Compile Update="Properties\Resources.Designer.cs">
-          <DesignTime>True</DesignTime>
-          <AutoGen>True</AutoGen>
-          <DependentUpon>Resources.resx</DependentUpon>
+            <DesignTime>True</DesignTime>
+            <AutoGen>True</AutoGen>
+            <DependentUpon>Resources.resx</DependentUpon>
         </Compile>
         <Compile Update="Views\ConversionViews\ConversionCurrencyView.axaml.cs">
-          <DependentUpon>ConversionCurrencyView.axaml</DependentUpon>
+            <DependentUpon>ConversionCurrencyView.axaml</DependentUpon>
         </Compile>
         <Compile Update="Views\StartView.axaml.cs">
             <DependentUpon>StartView.axaml</DependentUpon>
@@ -174,28 +186,28 @@
             <SubType>Code</SubType>
         </Compile>
         <Compile Update="Views\TransactionViews\EthereumERC20TransactionDetailsView.axaml.cs">
-          <DependentUpon>EthereumERC20TransactionDetailsView.axaml</DependentUpon>
-          <SubType>Code</SubType>
+            <DependentUpon>EthereumERC20TransactionDetailsView.axaml</DependentUpon>
+            <SubType>Code</SubType>
         </Compile>
         <Compile Update="Controls\IconButton.axaml.cs">
-          <DependentUpon>IconButton.axaml</DependentUpon>
-          <SubType>Code</SubType>
+            <DependentUpon>IconButton.axaml</DependentUpon>
+            <SubType>Code</SubType>
         </Compile>
         <Compile Update="Controls\LinkButton.axaml.cs">
-          <DependentUpon>LinkButton.axaml</DependentUpon>
-          <SubType>Code</SubType>
+            <DependentUpon>LinkButton.axaml</DependentUpon>
+            <SubType>Code</SubType>
         </Compile>
         <Compile Update="Controls\SortButton.axaml.cs">
-          <DependentUpon>SortButton.axaml</DependentUpon>
-          <SubType>Code</SubType>
+            <DependentUpon>SortButton.axaml</DependentUpon>
+            <SubType>Code</SubType>
         </Compile>
         <Compile Update="Controls\WalletCurrency.axaml.cs">
-          <DependentUpon>WalletCurrency.axaml</DependentUpon>
-          <SubType>Code</SubType>
+            <DependentUpon>WalletCurrency.axaml</DependentUpon>
+            <SubType>Code</SubType>
         </Compile>
         <Compile Update="Controls\TransactionsList.axaml.cs">
-          <SubType>Code</SubType>
-          <DependentUpon>TransactionsList.axaml</DependentUpon>
+            <SubType>Code</SubType>
+            <DependentUpon>TransactionsList.axaml</DependentUpon>
         </Compile>
     </ItemGroup>
     <ItemGroup>
@@ -204,9 +216,9 @@
         </ProjectReference>
     </ItemGroup>
     <ItemGroup>
-      <EmbeddedResource Update="Properties\Resources.resx">
-        <Generator>ResXFileCodeGenerator</Generator>
-        <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-      </EmbeddedResource>
+        <EmbeddedResource Update="Properties\Resources.resx">
+            <Generator>ResXFileCodeGenerator</Generator>
+            <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+        </EmbeddedResource>
     </ItemGroup>
 </Project>

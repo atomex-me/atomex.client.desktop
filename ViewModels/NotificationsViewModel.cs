@@ -26,11 +26,13 @@ namespace Atomex.Client.Desktop.ViewModels
 
         public NotificationsViewModel()
         {
+#if DEBUG
             if (Design.IsDesignMode)
             {
                 DesignerMode();
                 return;
             }
+# endif
 
             this.WhenAnyValue(vm => vm.SelectedIndex)
                 .WhereNotNull()

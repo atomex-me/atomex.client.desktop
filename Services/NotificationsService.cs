@@ -35,7 +35,7 @@ namespace Atomex.Client.Desktop.Services
             Manager = manager;
             App = atomexApp;
 
-            App.AtomexClientChanged += OnAtomexClientChangedEventHandler!;
+            // App.AtomexClientChanged += OnAtomexClientChangedEventHandler!;
         }
 
         private void OnAtomexClientChangedEventHandler(object sender, AtomexClientChangedEventArgs args)
