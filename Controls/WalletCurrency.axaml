@@ -19,8 +19,6 @@
         <converters:AmountToStringConverter x:Key="AmountToStringConverter" />
         <converters:DateTimeToTxTimeConverter x:Key="DateTimeToTxTimeConverter" />
         <converters:ShowBuyButton x:Key="ShowBuyButton" />
-        <converters:GreaterThanZeroConverter x:Key="GreaterThanZeroConverter" />
-        <converters:LowerThanZeroConverter x:Key="LowerThanZeroConverter" />
         <converters:PercentConverter x:Key="PercentConverter" />
     </Styles.Resources>
 
@@ -134,7 +132,7 @@
                                            Classes="Success"
                                            Classes.UnSuccess="{Binding CurrencyViewModel.DailyChangePercent,
                                            RelativeSource={RelativeSource TemplatedParent},
-                                           Converter={StaticResource LowerThanZeroConverter}}" />
+                                           Converter={x:Static converters:NumericConverters.LowerThanZero}}" />
                             </StackPanel>
 
                             <WrapPanel Margin="0 16 0 0"

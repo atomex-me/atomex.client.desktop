@@ -304,6 +304,7 @@
                                                        VerticalAlignment="Center"
                                                        FontSize="16"
                                                        Text="{Binding StatusString}"
+                                                       TextTrimming="CharacterEllipsis"
                                                        Name="StatusText">
                                                 <i:Interaction.Behaviors>
                                                     <ia:DataTriggerBehavior Binding="{Binding Status}"

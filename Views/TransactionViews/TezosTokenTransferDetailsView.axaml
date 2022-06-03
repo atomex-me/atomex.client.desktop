@@ -17,7 +17,6 @@
     </Design.DataContext>
 
     <UserControl.Resources>
-        <converters:GreaterThanZeroConverter x:Key="GreaterThanZeroConverter" />
         <converters:AmountToStringConverter x:Key="AmountToStringConverter" />
         <converters:DateTimeToTxTimeConverter x:Key="DateTimeToTxTimeConverter" />
     </UserControl.Resources>
@@ -124,7 +123,7 @@
                                 <Binding Path="Amount" Mode="OneWay" />
                                 <Binding Path="AmountFormat" Mode="OneWay" />
                                 <Binding Path="Amount" Mode="OneWay"
-                                         Converter="{StaticResource GreaterThanZeroConverter}" />
+                                         Converter="{x:Static converters:NumericConverters.GreaterThanZero}" />
                             </MultiBinding>
                         </TextBlock.Text>
                     </TextBlock>
