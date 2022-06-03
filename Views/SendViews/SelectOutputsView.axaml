@@ -24,7 +24,7 @@
                   RowDefinitions="Auto">
                 <controls:IconButton Grid.Column="0"
                                      Classes="Back"
-                                     Command="{Binding BackCommand}"/>
+                                     Command="{Binding BackCommand}" />
 
                 <TextBlock Grid.Column="1"
                            FontSize="22"
@@ -164,7 +164,7 @@
                                        Foreground="{DynamicResource SecondaryForegroundBrush}"
                                        FontSize="16"
                                        Text="{Binding BalanceString}" />
-                            
+
                             <controls:CopyButton Grid.Column="2"
                                                  Margin="0 0 9 0"
                                                  ToolText="Copy address to clipboard"
@@ -190,7 +190,7 @@
                                LineHeight="16"
                                FontSize="13"
                                Foreground="{DynamicResource SecondaryForegroundBrush}"
-                               Text="{Binding TotalSelected}" />
+                               Text="{Binding TotalSelectedString}" />
                     <TextBlock HorizontalAlignment="Right"
                                Margin="0 2 0 0"
                                LineHeight="16"
@@ -202,6 +202,8 @@
                 <controls:RoundedButton Grid.Column="1"
                                         Width="200"
                                         Content="Confirm"
+                                        IsEnabled="{Binding TotalSelected,
+                                        Converter={x:Static converters:NumericConverters.GreaterThanZero}}"
                                         Command="{Binding ConfirmCommand}" />
             </Grid>
         </StackPanel>

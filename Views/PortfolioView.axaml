@@ -23,7 +23,6 @@
         <converters:ObjectsNotEqualConverter x:Key="ObjectsNotEqualConverter" />
         <converters:ShowBuyButton x:Key="ShowBuyButton" />
         <converters:PercentConverter x:Key="PercentConverter" />
-        <converters:LowerThanZeroConverter x:Key="LowerThanZeroConverter" />
     </UserControl.Resources>
 
     <Border Padding="50 16 50 0">
@@ -249,9 +248,11 @@
                                                 </TextBlock>
                                                 <TextBlock VerticalAlignment="Center"
                                                            FontSize="13"
-                                                           Text="{Binding DailyChangePercent, Converter={StaticResource PercentConverter}}"
+                                                           Text="{Binding DailyChangePercent,
+                                                           Converter={StaticResource PercentConverter}}"
                                                            Classes="Success"
-                                                           Classes.UnSuccess="{Binding DailyChangePercent, Converter={StaticResource LowerThanZeroConverter}}" />
+                                                           Classes.UnSuccess="{Binding DailyChangePercent,
+                                                           Converter={x:Static converters:NumericConverters.LowerThanZero}}" />
                                             </StackPanel>
                                         </StackPanel>
                                         <StackPanel Grid.Column="1"

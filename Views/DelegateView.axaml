@@ -17,8 +17,6 @@
 
     <UserControl.Resources>
         <converters:PercentConverter x:Key="PercentConverter" />
-        <converters:LowerThanZeroConverter x:Key="LowerThanZeroConverter" />
-        <converters:GreaterThanZeroConverter x:Key="GreaterThanZeroConverter" />
         <converters:ShortenedAddressConverter x:Key="ShortenedAddressConverter" />
         <converters:AmountToStringConverter x:Key="AmountToStringConverter" />
     </UserControl.Resources>
@@ -245,16 +243,16 @@
                                             <TextBlock VerticalAlignment="Center"
                                                        FontSize="13"
                                                        Classes.BakerFull="{Binding StakingAvailable,
-                                                       Converter={StaticResource LowerThanZeroConverter}}"
+                                                       Converter={x:Static converters:NumericConverters.LowerThanZero}}"
                                                        Classes.BakerNotFull="{Binding StakingAvailable,
-                                                   Converter={StaticResource GreaterThanZeroConverter}}"
+                                                   Converter={x:Static converters:NumericConverters.GreaterThanZero}}"
                                                        Text="Free space" />
                                             <TextBlock VerticalAlignment="Center"
                                                        Margin="4 0 0 0"
                                                        Classes.BakerFull="{Binding StakingAvailable,
-                                                       Converter={StaticResource LowerThanZeroConverter}}"
+                                                       Converter={x:Static converters:NumericConverters.LowerThanZero}}"
                                                        Classes.BakerNotFull="{Binding StakingAvailable,
-                                                   Converter={StaticResource GreaterThanZeroConverter}}"
+                                                   Converter={x:Static converters:NumericConverters.GreaterThanZero}}"
                                                        FontSize="13"
                                                        Text="{Binding FreeSpaceFormatted}" />
                                             <TextBlock VerticalAlignment="Center"
@@ -262,7 +260,7 @@
                                                        FontSize="13"
                                                        Foreground="{DynamicResource Orange}"
                                                        IsVisible="{Binding StakingAvailable,
-                                                       Converter={StaticResource LowerThanZeroConverter}}"
+                                                       Converter={x:Static converters:NumericConverters.LowerThanZero}}"
                                                        Text="(baker is full)" />
                                         </StackPanel>
                                     </StackPanel>
@@ -347,16 +345,16 @@
                                 <TextBlock VerticalAlignment="Center"
                                            FontSize="13"
                                            Classes.BakerFull="{Binding SelectedBaker.StakingAvailable,
-                                                       Converter={StaticResource LowerThanZeroConverter}}"
+                                                       Converter={x:Static converters:NumericConverters.LowerThanZero}}"
                                            Classes.BakerNotFull="{Binding SelectedBaker.StakingAvailable,
-                                                   Converter={StaticResource GreaterThanZeroConverter}}"
+                                                   Converter={x:Static converters:NumericConverters.GreaterThanZero}}"
                                            Text="Free space" />
                                 <TextBlock VerticalAlignment="Center"
                                            Margin="4 0 0 0"
                                            Classes.BakerFull="{Binding SelectedBaker.StakingAvailable,
-                                                       Converter={StaticResource LowerThanZeroConverter}}"
+                                                       Converter={x:Static converters:NumericConverters.LowerThanZero}}"
                                            Classes.BakerNotFull="{Binding SelectedBaker.StakingAvailable,
-                                                   Converter={StaticResource GreaterThanZeroConverter}}"
+                                                   Converter={x:Static converters:NumericConverters.GreaterThanZero}}"
                                            FontSize="13"
                                            Text="{Binding SelectedBaker.FreeSpaceFormatted}" />
                                 <TextBlock VerticalAlignment="Center"
@@ -364,7 +362,7 @@
                                            FontSize="13"
                                            Foreground="{DynamicResource Orange}"
                                            IsVisible="{Binding SelectedBaker.StakingAvailable,
-                                                       Converter={StaticResource LowerThanZeroConverter}}"
+                                                       Converter={x:Static converters:NumericConverters.LowerThanZero}}"
                                            Text="(baker is full)" />
                             </StackPanel>
                         </StackPanel>
