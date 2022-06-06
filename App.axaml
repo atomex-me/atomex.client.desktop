@@ -56,5 +56,6 @@
     <StyleInclude Source="/Styles/CustomCheckBoxStyle.axaml"/>
     <StyleInclude Source="/Styles/CollapsedAnimation.axaml"/>
     <StyleInclude Source="/Styles/SelectCurrencyListBoxStyle.axaml"/>
+    <StyleInclude Source="/Styles/PopupStyle.axaml"/>
   </Application.Styles>
 </Application>

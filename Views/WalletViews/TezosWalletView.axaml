@@ -353,32 +353,12 @@
                                                     <Border Background="{DynamicResource DeepBlue}"
                                                             CornerRadius="{DynamicResource AtomexCornerRadius}"
                                                             Padding="12 16">
-                                                        <StackPanel>
-                                                            <StackPanel.Styles>
-                                                                <Style
-                                                                    Selector="Button:pointerover /template/ ContentPresenter#PART_ContentPresenter">
-                                                                    <Setter Property="Background"
-                                                                            Value="{DynamicResource LightDefaultOpacity6}" />
-                                                                </Style>
-                                                                <Style
-                                                                    Selector="Button:not(:pointerover) /template/ ContentPresenter#PART_ContentPresenter">
-                                                                    <Setter Property="Background"
-                                                                            Value="{DynamicResource AlmostTransparentBrush}" />
-                                                                </Style>
-                                                                <Style
-                                                                    Selector="Button:pressed /template/ ContentPresenter#PART_ContentPresenter">
-                                                                    <Setter Property="Background"
-                                                                            Value="{DynamicResource LightDefaultOpacity6}" />
-                                                                </Style>
-                                                            </StackPanel.Styles>
+                                                        <StackPanel Classes="Popup">
                                                             <StackPanel Orientation="Vertical"
                                                                         IsVisible="{Binding Status,
                                                                         Converter={x:Static converters:EnumToStringNotEqualConverter.Instance},
                                                                         ConverterParameter={x:Static atomexBlockchainTezos:DelegationStatus.NotDelegated}}">
-                                                                <Button Width="180"
-                                                                        Height="40"
-                                                                        Padding="12 0"
-                                                                        CornerRadius="{DynamicResource AtomexCornerRadius}"
+                                                                <Button CornerRadius="{DynamicResource AtomexCornerRadius}"
                                                                         VerticalContentAlignment="Center"
                                                                         Command="{Binding $parent[ListBox].DataContext.DelegateCommand}"
                                                                         CommandParameter="{Binding Address}">
@@ -387,10 +367,7 @@
                                                                                VerticalAlignment="Center"
                                                                                FontSize="16" />
                                                                 </Button>
-                                                                <Button Width="180"
-                                                                        Height="40"
-                                                                        Padding="12 0"
-                                                                        CornerRadius="{DynamicResource AtomexCornerRadius}"
+                                                                <Button CornerRadius="{DynamicResource AtomexCornerRadius}"
                                                                         VerticalContentAlignment="Center"
                                                                         Command="{Binding $parent[ListBox].DataContext.UndelegateCommand}"
                                                                         CommandParameter="{Binding Address}">
@@ -405,10 +382,7 @@
                                                                         IsVisible="{Binding Status,
                                                                         Converter={x:Static converters:EnumToStringEqualConverter.Instance},
                                                                         ConverterParameter={x:Static atomexBlockchainTezos:DelegationStatus.NotDelegated}}">
-                                                                <Button Width="180"
-                                                                        Height="40"
-                                                                        Padding="12 0"
-                                                                        CornerRadius="{DynamicResource AtomexCornerRadius}"
+                                                                <Button CornerRadius="{DynamicResource AtomexCornerRadius}"
                                                                         VerticalContentAlignment="Center"
                                                                         Command="{Binding $parent[ListBox].DataContext.DelegateCommand}"
                                                                         CommandParameter="{Binding Address}">
@@ -437,7 +411,8 @@
                                FontSize="16"
                                Text="Tokens" />
                 </TabItem.Header>
-                <ContentControl Content="{Binding TezosTokensViewModel}" />
+                <ContentControl Content="{Binding TezosTokensViewModel}"
+                                Margin="0 16 0 0" />
             </TabItem>
         </TabControl>
     </Grid>

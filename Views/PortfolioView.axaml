@@ -335,29 +335,8 @@
                                                         <Border Background="{DynamicResource DeepBlue}"
                                                                 CornerRadius="{DynamicResource AtomexCornerRadius}"
                                                                 Padding="12 16">
-                                                            <StackPanel>
-                                                                <StackPanel.Styles>
-                                                                    <Style
-                                                                        Selector="Button:pointerover /template/ ContentPresenter#PART_ContentPresenter">
-                                                                        <Setter Property="Background"
-                                                                            Value="{DynamicResource LightDefaultOpacity6}" />
-                                                                    </Style>
-                                                                    <Style
-                                                                        Selector="Button:not(:pointerover) /template/ ContentPresenter#PART_ContentPresenter">
-                                                                        <Setter Property="Background"
-                                                                            Value="{DynamicResource AlmostTransparentBrush}" />
-                                                                    </Style>
-                                                                    <Style
-                                                                        Selector="Button:pressed /template/ ContentPresenter#PART_ContentPresenter">
-                                                                        <Setter Property="Background"
-                                                                            Value="{DynamicResource LightDefaultOpacity6}" />
-                                                                    </Style>
-                                                                </StackPanel.Styles>
-
-                                                                <Button Width="180"
-                                                                        Height="40"
-                                                                        Padding="12 0"
-                                                                        CornerRadius="{DynamicResource AtomexCornerRadius}"
+                                                            <StackPanel Classes="Popup">
+                                                                <Button CornerRadius="{DynamicResource AtomexCornerRadius}"
                                                                         VerticalContentAlignment="Center"
                                                                         Command="{Binding $parent[ListBox].DataContext.SendFromPopupCommand}"
                                                                         CommandParameter="{Binding}">
@@ -374,10 +353,7 @@
                                                                             Margin="3 0 0 0" />
                                                                     </StackPanel>
                                                                 </Button>
-                                                                <Button Width="180"
-                                                                        Height="40"
-                                                                        Padding="12 0"
-                                                                        CornerRadius="{DynamicResource AtomexCornerRadius}"
+                                                                <Button CornerRadius="{DynamicResource AtomexCornerRadius}"
                                                                         VerticalContentAlignment="Center"
                                                                         Command="{Binding $parent[ListBox].DataContext.ReceiveFromPopupCommand}"
                                                                         CommandParameter="{Binding}">
@@ -394,10 +370,7 @@
                                                                             Margin="3 0 0 0" />
                                                                     </StackPanel>
                                                                 </Button>
-                                                                <Button Width="180"
-                                                                        Height="40"
-                                                                        Padding="12 0"
-                                                                        CornerRadius="{DynamicResource AtomexCornerRadius}"
+                                                                <Button CornerRadius="{DynamicResource AtomexCornerRadius}"
                                                                         VerticalContentAlignment="Center"
                                                                         Command="{Binding $parent[ListBox].DataContext.ExchangeCommand}"
                                                                         CommandParameter="{Binding}">
@@ -414,10 +387,7 @@
                                                                             Margin="3 0 0 0" />
                                                                     </StackPanel>
                                                                 </Button>
-                                                                <Button Width="180"
-                                                                        Height="40"
-                                                                        Padding="12 0"
-                                                                        CornerRadius="{DynamicResource AtomexCornerRadius}"
+                                                                <Button CornerRadius="{DynamicResource AtomexCornerRadius}"
                                                                         VerticalContentAlignment="Center"
                                                                         IsVisible="{Binding CurrencyCode, Converter={StaticResource ShowBuyButton}}"
                                                                         Command="{Binding $parent[ListBox].DataContext.SetWertCurrencyCommand}"

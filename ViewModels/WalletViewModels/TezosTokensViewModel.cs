@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive;
@@ -6,11 +7,17 @@ using System.Reactive.Linq;
 using System.Threading.Tasks;
 using Atomex.Blockchain.Tezos;
 using Atomex.Client.Desktop.Common;
+using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
+using Atomex.Common;
+using Atomex.Core;
+using Atomex.MarketData.Abstract;
 using Atomex.Services;
 using Atomex.Wallet;
 using Atomex.Wallet.Tezos;
 using Avalonia.Threading;
 using DynamicData;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using Serilog;
@@ -30,11 +37,15 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             _app = app ?? throw new ArgumentNullException(nameof(app));
             _app.AtomexClientChanged += OnAtomexClientChanged;
             _app.Account.BalanceUpdated += OnBalanceUpdatedEventHandler;
+            _app.QuotesProvider.QuotesUpdated += OnQuotesUpdatedEventHandler;
 
             this.WhenAnyValue(vm => vm.Contracts)
                 .WhereNotNull()
-                .Select(_ => Unit.Default)
-                .InvokeCommandInMainThread(LoadTokensCommand);
+                .SubscribeInMainThread(async _ =>
+                {
+                    await LoadTokens();
+                    OnQuotesUpdatedEventHandler(_app.QuotesProvider, EventArgs.Empty);
+                });
 
             _ = ReloadTokenContractsAsync();
         }
@@ -50,7 +61,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             Contracts = new ObservableCollection<TokenContract>(contracts);
         }
 
-        private async void LoadTokens()
+        private async Task LoadTokens()
         {
             var tezosConfig = _app.Account
                 .Currencies
@@ -70,22 +81,38 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
                 var tokenGroups = tokenWalletAddresses
                     .Where(walletAddress => walletAddress.Balance != 0)
-                    .GroupBy(walletAddress => walletAddress.TokenBalance.TokenId);
-                
+                    .GroupBy(walletAddress => new
+                    {
+                        walletAddress.TokenBalance.TokenId,
+                        walletAddress.TokenBalance.Contract
+                    });
 
-                var tokensViewModels = new ObservableCollection<TezosTokenViewModel>();
-                // .Select(walletAddress => new TezosTokenViewModel
-                // {
-                //     TezosConfig = tezosConfig,
-                //     TokenBalance = walletAddress.TokenBalance,
-                //     Address = walletAddress.Address
-                // }));
+                var tokensViewModels = tokenGroups
+                    .Select(walletAddressGroup =>
+                        walletAddressGroup.Skip(1).Aggregate(walletAddressGroup.First(), (result, walletAddress) =>
+                        {
+                            result.Balance += walletAddress.Balance;
+                            result.TokenBalance.ParsedBalance = result.TokenBalance.GetTokenBalance() +
+                                                                walletAddress.TokenBalance.GetTokenBalance();
+
+                            return result;
+                        }))
+                    .Select(walletAddress => new TezosTokenViewModel
+                    {
+                        TezosConfig = tezosConfig,
+                        TokenBalance = walletAddress.TokenBalance,
+                        Address = walletAddress.Address,
+                        Contract = contract
+                    });
 
                 tokens.AddRange(tokensViewModels);
             }
 
             Log.Fatal("Tokens collection updated");
-            Tokens = new ObservableCollection<TezosTokenViewModel>(tokens);
+
+            Tokens = new ObservableCollection<TezosTokenViewModel>(
+                tokens.OrderByDescending(token => token.Contract.Name?.ToLower() == "kusd")
+                    .ThenByDescending(token => token.Contract.Name?.ToLower() == "tzbtc"));
             //
             // var tokens = Contracts?.AggregateAsync(
             //     new ObservableCollection<TezosTokenViewModel>(),
@@ -96,11 +123,6 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             //         return tokens;
             //     });
         }
-
-        private ReactiveCommand<Unit, Unit> _loadTokensCommand;
-
-        private ReactiveCommand<Unit, Unit> LoadTokensCommand => _loadTokensCommand ??=
-            ReactiveCommand.Create(LoadTokens);
 
 
         private ReactiveCommand<Unit, Unit> _setTokenCommand;
@@ -129,6 +151,21 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             {
                 Log.Error(e, "Account balance updated event handler error");
             }
+        }
+
+        private void OnQuotesUpdatedEventHandler(object sender, EventArgs args)
+        {
+            if (sender is not ICurrencyQuotesProvider quotesProvider)
+                return;
+
+            Tokens.ForEachDo(token =>
+            {
+                var quote = quotesProvider.GetQuote(token.TokenBalance.Symbol.ToLower());
+                if (quote == null) return;
+                
+                token.CurrentQuote = quote.Bid;
+                token.BalanceInBase = token.TokenBalance.GetTokenBalance().SafeMultiply(quote.Bid);
+            });
         }
 
         public TezosTokensViewModel()

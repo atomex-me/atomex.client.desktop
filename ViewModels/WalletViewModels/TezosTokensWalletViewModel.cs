@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
+using System.Reactive;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
@@ -33,9 +34,14 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
     public class TezosTokenViewModel : ViewModelBase
     {
         private bool _isPreviewDownloading;
+        public string BaseCurrencyFormat => "$0.##"; // todo: use from settings
         public TezosConfig TezosConfig { get; set; }
         public TokenBalance TokenBalance { get; set; }
+        public TokenContract Contract { get; set; }
         public string Address { get; set; }
+        [Reactive] public decimal BalanceInBase { get; set; }
+        [Reactive] public decimal CurrentQuote { get; set; }
+        [Reactive] public bool IsPopupOpened { get; set; }
 
         private ThumbsApi ThumbsApi => new ThumbsApi(
             new ThumbsApiSettings
@@ -77,7 +83,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         }
 
         public string Balance => TokenBalance.Balance != "1"
-            ? $"{TokenBalance.GetTokenBalance().ToString($"F{Math.Min(TokenBalance.Decimals, AddressesHelper.MaxTokenCurrencyFormatDecimals)}", CultureInfo.InvariantCulture)}  {TokenBalance.Symbol}"
+            ? $"{TokenBalance.GetTokenBalance().ToString($"F{Math.Min(TokenBalance.Decimals, AddressesHelper.MaxTokenCurrencyFormatDecimals)}", CultureInfo.CurrentCulture)}  {TokenBalance.Symbol}"
             : "";
 
         private ICommand _openInBrowser;
@@ -91,6 +97,11 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             else
                 Log.Error("Invalid uri for ipfs asset");
         });
+
+        private ReactiveCommand<Unit, Unit> _openPopupCommand;
+
+        private ReactiveCommand<Unit, Unit> OpenPopupCommand => _openPopupCommand ??=
+            ReactiveCommand.Create(() => { IsPopupOpened = !IsPopupOpened; });
 
         public bool IsIpfsAsset =>
             TokenBalance.ArtifactUri != null && ThumbsApi.HasIpfsPrefix(TokenBalance.ArtifactUri);

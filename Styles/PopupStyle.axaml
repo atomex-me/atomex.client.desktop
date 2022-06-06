@@ -1,0 +1,24 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Design.PreviewWith>
+        <Border Padding="20">
+            <!-- Add Controls for Previewer Here -->
+        </Border>
+    </Design.PreviewWith>
+    
+    <Style Selector="StackPanel.Popup Button">
+        <Setter Property="Width" Value="180" />
+        <Setter Property="Height" Value="40" />
+        <Setter Property="Padding" Value="12 0" />
+    </Style>
+    <Style Selector="StackPanel.Popup Button:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource LightDefaultOpacity6}" />
+    </Style>
+    <Style
+        Selector="StackPanel.Popup Button:not(:pointerover) /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource AlmostTransparentBrush}" />
+    </Style>
+    <Style Selector="StackPanel.Popup Button:pressed /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource LightDefaultOpacity6}" />
+    </Style>
+</Styles>
