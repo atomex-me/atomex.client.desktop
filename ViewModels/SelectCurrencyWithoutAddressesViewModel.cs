@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using Atomex.Client.Desktop.Common;
+using Atomex.Client.Desktop.ViewModels.Abstract;
 using Atomex.Client.Desktop.ViewModels.ConversionViewModels;
 using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
 using Avalonia.Controls;
