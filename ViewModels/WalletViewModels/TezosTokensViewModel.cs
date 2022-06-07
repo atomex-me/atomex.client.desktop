@@ -32,7 +32,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         private const string FA12 = "FA12";
         private readonly IAtomexApp _app;
         [Reactive] private ObservableCollection<TokenContract>? Contracts { get; set; }
-        public ObservableCollection<TezosTokenViewModel> Tokens { get; set; }
+        [Reactive] public ObservableCollection<TezosTokenViewModel> Tokens { get; set; }
 
         public TezosTokensViewModel(IAtomexApp app)
         {
