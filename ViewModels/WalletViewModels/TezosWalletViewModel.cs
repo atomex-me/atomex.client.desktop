@@ -13,18 +13,16 @@ using Atomex.Blockchain.Tezos.Internal;
 using Atomex.Blockchain.Tezos.Tzkt;
 using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.ViewModels.Abstract;
+using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
 using Atomex.Core;
 using Atomex.Wallet;
 using ReactiveUI.Fody.Helpers;
-
-// ReSharper disable All
 
 
 namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 {
     public class TezosWalletViewModel : WalletViewModel
     {
-        private const int DelegationCheckIntervalInSec = 20;
         [Reactive] public ObservableCollection<Delegation> Delegations { get; set; }
         [Reactive] public SortDirection? CurrentDelegationSortDirection { get; set; }
         [Reactive] public DelegationSortField? CurrentDelegationSortField { get; set; }
@@ -43,8 +41,9 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
         public TezosWalletViewModel(IAtomexApp app,
             Action<CurrencyConfig> setConversionTab,
-            Action<string> setWertCurrency,
+            Action<string>? setWertCurrency,
             Action<ViewModelBase?> showRightPopupContent,
+            Action<TezosTokenViewModel> showTezosToken,
             CurrencyConfig currency)
             : base(app, setConversionTab, setWertCurrency, showRightPopupContent, currency)
         {
@@ -63,7 +62,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             _ = LoadDelegationInfoAsync();
 
             DelegateViewModel = new DelegateViewModel(_app);
-            TezosTokensViewModel = new TezosTokensViewModel(_app);
+            TezosTokensViewModel = new TezosTokensViewModel(_app, showTezosToken);
             CurrentDelegationSortField = DelegationSortField.ByBalance;
             CurrentDelegationSortDirection = SortDirection.Desc;
         }

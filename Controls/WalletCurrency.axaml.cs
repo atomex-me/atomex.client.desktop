@@ -1,7 +1,7 @@
 using System.Windows.Input;
-using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Media.Imaging;
 
 namespace Atomex.Client.Desktop.Controls
 {
@@ -10,10 +10,19 @@ namespace Atomex.Client.Desktop.Controls
         static WalletCurrency()
         {
             AffectsRender<WalletCurrency>(
-                CurrencyViewModelProperty,
+                IconPathProperty,
+                TokenPreviewProperty,
+                TotalAmountProperty,
+                TotalAmountInBaseProperty,
+                DailyChangePercentProperty,
+                CurrentQuoteProperty,
+                CurrencyFormatProperty,
+                CurrencyCodeProperty,
+                CurrencyDescriptionProperty,
+                BaseCurrencyFormatProperty,
                 IsBalanceUpdatingProperty
             );
-            
+
             // var baseLight = (IStyle)AvaloniaXamlLoader.Load(
             //     new Uri("avares://Avalonia.Themes.Default/Accents/BaseLight.xaml"));
         }
@@ -32,20 +41,6 @@ namespace Atomex.Client.Desktop.Controls
         //             });
         //     }
         // }
-
-        public static readonly DirectProperty<WalletCurrency, CurrencyViewModel> CurrencyViewModelProperty =
-            AvaloniaProperty.RegisterDirect<WalletCurrency, CurrencyViewModel>(
-                nameof(CurrencyViewModel),
-                o => o.CurrencyViewModel,
-                (o, v) => o.CurrencyViewModel = v);
-
-        private CurrencyViewModel _currencyViewModel;
-
-        public CurrencyViewModel CurrencyViewModel
-        {
-            get => _currencyViewModel;
-            set => SetAndRaise(CurrencyViewModelProperty, ref _currencyViewModel, value);
-        }
 
 
         public static readonly DirectProperty<WalletCurrency, ICommand> UpdateCommandProperty =
@@ -119,6 +114,146 @@ namespace Atomex.Client.Desktop.Controls
         {
             get => GetValue(IsBalanceUpdatingProperty);
             set => SetValue(IsBalanceUpdatingProperty, value);
+        }
+
+        public static readonly DirectProperty<WalletCurrency, string?> IconPathProperty =
+            AvaloniaProperty.RegisterDirect<WalletCurrency, string?>(
+                nameof(IconPath),
+                o => o.IconPath,
+                (o, v) => o.IconPath = v);
+
+        private string? _iconPath;
+
+        public string? IconPath
+        {
+            get => _iconPath;
+            set => SetAndRaise(IconPathProperty, ref _iconPath, value);
+        }
+
+        public static readonly DirectProperty<WalletCurrency, IBitmap?> TokenPreviewProperty =
+            AvaloniaProperty.RegisterDirect<WalletCurrency, IBitmap?>(
+                nameof(TokenPreview),
+                o => o.TokenPreview,
+                (o, v) => o.TokenPreview = v);
+
+        private IBitmap? _tokenPreview;
+
+        public IBitmap? TokenPreview
+        {
+            get => _tokenPreview;
+            set => SetAndRaise(TokenPreviewProperty, ref _tokenPreview, value);
+        }
+
+        public static readonly DirectProperty<WalletCurrency, decimal> TotalAmountProperty =
+            AvaloniaProperty.RegisterDirect<WalletCurrency, decimal>(
+                nameof(TotalAmount),
+                o => o.TotalAmount,
+                (o, v) => o.TotalAmount = v);
+
+        private decimal _totalAmount;
+
+        public decimal TotalAmount
+        {
+            get => _totalAmount;
+            set => SetAndRaise(TotalAmountProperty, ref _totalAmount, value);
+        }
+
+        public static readonly DirectProperty<WalletCurrency, decimal> TotalAmountInBaseProperty =
+            AvaloniaProperty.RegisterDirect<WalletCurrency, decimal>(
+                nameof(TotalAmountInBase),
+                o => o.TotalAmountInBase,
+                (o, v) => o.TotalAmountInBase = v);
+
+        private decimal _totalAmountInBase;
+
+        public decimal TotalAmountInBase
+        {
+            get => _totalAmountInBase;
+            set => SetAndRaise(TotalAmountInBaseProperty, ref _totalAmountInBase, value);
+        }
+
+        public static readonly DirectProperty<WalletCurrency, decimal?> DailyChangePercentProperty =
+            AvaloniaProperty.RegisterDirect<WalletCurrency, decimal?>(
+                nameof(DailyChangePercent),
+                o => o.DailyChangePercent,
+                (o, v) => o.DailyChangePercent = v);
+
+        private decimal? _dailyChangePercent;
+
+        public decimal? DailyChangePercent
+        {
+            get => _dailyChangePercent;
+            set => SetAndRaise(DailyChangePercentProperty, ref _dailyChangePercent, value);
+        }
+
+        public static readonly DirectProperty<WalletCurrency, decimal> CurrentQuoteProperty =
+            AvaloniaProperty.RegisterDirect<WalletCurrency, decimal>(
+                nameof(CurrentQuote),
+                o => o.CurrentQuote,
+                (o, v) => o.CurrentQuote = v);
+
+        private decimal _currentQuote;
+
+        public decimal CurrentQuote
+        {
+            get => _currentQuote;
+            set => SetAndRaise(CurrentQuoteProperty, ref _currentQuote, value);
+        }
+
+        public static readonly DirectProperty<WalletCurrency, string> CurrencyFormatProperty =
+            AvaloniaProperty.RegisterDirect<WalletCurrency, string>(
+                nameof(CurrencyFormat),
+                o => o.CurrencyFormat,
+                (o, v) => o.CurrencyFormat = v);
+
+        private string _currencyFormat;
+
+        public string CurrencyFormat
+        {
+            get => _currencyFormat;
+            set => SetAndRaise(CurrencyFormatProperty, ref _currencyFormat, value);
+        }
+
+        public static readonly DirectProperty<WalletCurrency, string> CurrencyCodeProperty =
+            AvaloniaProperty.RegisterDirect<WalletCurrency, string>(
+                nameof(CurrencyCode),
+                o => o.CurrencyCode,
+                (o, v) => o.CurrencyCode = v);
+
+        private string _currencyCode;
+
+        public string CurrencyCode
+        {
+            get => _currencyCode;
+            set => SetAndRaise(CurrencyCodeProperty, ref _currencyCode, value);
+        }
+
+        public static readonly DirectProperty<WalletCurrency, string> CurrencyDescriptionProperty =
+            AvaloniaProperty.RegisterDirect<WalletCurrency, string>(
+                nameof(CurrencyDescription),
+                o => o.CurrencyDescription,
+                (o, v) => o.CurrencyDescription = v);
+
+        private string _currencyDescription;
+
+        public string CurrencyDescription
+        {
+            get => _currencyDescription;
+            set => SetAndRaise(CurrencyDescriptionProperty, ref _currencyDescription, value);
+        }
+
+        public static readonly DirectProperty<WalletCurrency, string> BaseCurrencyFormatProperty =
+            AvaloniaProperty.RegisterDirect<WalletCurrency, string>(
+                nameof(BaseCurrencyFormat),
+                o => o.BaseCurrencyFormat,
+                (o, v) => o.BaseCurrencyFormat = v);
+
+        private string _baseCurrencyFormat;
+
+        public string BaseCurrencyFormat
+        {
+            get => _baseCurrencyFormat;
+            set => SetAndRaise(BaseCurrencyFormatProperty, ref _baseCurrencyFormat, value);
         }
     }
 }

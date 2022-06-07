@@ -31,12 +31,16 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         private const string FA2 = "FA2";
         private const string FA12 = "FA12";
         private readonly IAtomexApp _app;
+        private Action<TezosTokenViewModel> ShowTezosToken { get; }
         [Reactive] private ObservableCollection<TokenContract>? Contracts { get; set; }
         [Reactive] public ObservableCollection<TezosTokenViewModel> Tokens { get; set; }
 
-        public TezosTokensViewModel(IAtomexApp app)
+
+        public TezosTokensViewModel(IAtomexApp app, Action<TezosTokenViewModel> showTezosToken)
         {
             _app = app ?? throw new ArgumentNullException(nameof(app));
+            ShowTezosToken = showTezosToken ?? throw new ArgumentNullException(nameof(showTezosToken));
+
             _app.AtomexClientChanged += OnAtomexClientChanged;
             _app.Account.BalanceUpdated += OnBalanceUpdatedEventHandler;
             _app.QuotesProvider.QuotesUpdated += OnQuotesUpdatedEventHandler;
@@ -76,7 +80,6 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                     .DataRepository
                     .GetTezosTokenAddressesByContractAsync(contract.Address);
 
-
                 var tokenGroups = tokenWalletAddresses
                     .Where(walletAddress => walletAddress.Balance != 0)
                     .GroupBy(walletAddress => new
@@ -111,10 +114,14 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         }
 
 
-        private ReactiveCommand<Unit, Unit> _setTokenCommand;
+        private ReactiveCommand<TezosTokenViewModel, Unit> _setTokenCommand;
 
-        private ReactiveCommand<Unit, Unit> SetTokenCommand => _setTokenCommand ??=
-            ReactiveCommand.Create(() => { });
+        private ReactiveCommand<TezosTokenViewModel, Unit> SetTokenCommand => _setTokenCommand ??=
+            ReactiveCommand.Create<TezosTokenViewModel>(tezosTokenViewModel =>
+            {
+                var a = 5;
+                ShowTezosToken.Invoke(tezosTokenViewModel);
+            });
 
         private void OnAtomexClientChanged(object sender, AtomexClientChangedEventArgs e)
         {
@@ -140,7 +147,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         {
             if (sender is not ICurrencyQuotesProvider quotesProvider)
                 return;
-            
+
             var tokens = await LoadTokens();
 
             Tokens = new ObservableCollection<TezosTokenViewModel>(tokens

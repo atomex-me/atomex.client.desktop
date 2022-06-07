@@ -1,4 +1,5 @@
 using System;
+using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
 using Atomex.Client.Desktop.ViewModels.WalletViewModels;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;

@@ -2,29 +2,29 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:walletViewModels="clr-namespace:Atomex.Client.Desktop.ViewModels.WalletViewModels"
+             xmlns:controls="clr-namespace:Atomex.Client.Desktop.Controls"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             x:Class="Atomex.Client.Desktop.Views.WalletViews.Fa12WalletView"
-             xmlns:vm="clr-namespace:Atomex.Client.Desktop.ViewModels.WalletViewModels"
-             xmlns:controls="clr-namespace:Atomex.Client.Desktop.Controls">
+             x:Class="Atomex.Client.Desktop.Views.WalletViews.TezosTokenWalletView">
 
     <Design.DataContext>
-        <vm:Fa12WalletViewModel />
+        <walletViewModels:TezosTokenWalletViewModel />
     </Design.DataContext>
 
     <Grid RowDefinitions="Auto,*"
-          Name="DesignGrid">
+          ColumnDefinitions="*,280">
 
         <controls:WalletCurrency Grid.Row="0"
                                  Grid.Column="0"
+                                 Grid.ColumnSpan="2"
                                  Margin="0 40 0 0"
-                                 IconPath="{Binding CurrencyViewModel.IconPath}"
-                                 TotalAmount="{Binding CurrencyViewModel.TotalAmount}"
-                                 TotalAmountInBase="{Binding CurrencyViewModel.TotalAmountInBase}"
-                                 DailyChangePercent="{Binding CurrencyViewModel.DailyChangePercent}"
-                                 CurrencyCode="{Binding CurrencyViewModel.CurrencyCode}"
-                                 CurrencyFormat="{Binding CurrencyViewModel.CurrencyFormat}"
-                                 BaseCurrencyFormat="{Binding CurrencyViewModel.BaseCurrencyFormat}"
-                                 CurrentQuote="{Binding CurrencyViewModel.CurrentQuote}"
+                                 TokenPreview="{Binding TokenViewModel.TokenPreview}"
+                                 TotalAmount="{Binding TokenViewModel.DecimalBalance}"
+                                 TotalAmountInBase="{Binding TokenViewModel.BalanceInBase}"
+                                 CurrencyCode="{Binding TokenViewModel.TokenBalance.Symbol}"
+                                 CurrencyFormat="{Binding TokenFormat}"
+                                 BaseCurrencyFormat="{Binding TokenViewModel.BaseCurrencyFormat}"
+                                 CurrentQuote="{Binding TokenViewModel.CurrentQuote}"
                                  IsBalanceUpdating="{Binding IsBalanceUpdating}"
                                  SendCommand="{Binding SendCommand}"
                                  ReceiveCommand="{Binding ReceiveCommand}"
@@ -33,8 +33,10 @@
                                  UpdateCommand="{Binding UpdateCommand}" />
 
         <TabControl Grid.Row="1"
-                    Margin="0 4 0 0"
+                    Grid.Column="0"
+                    Grid.ColumnSpan="2"
                     SelectedIndex="{Binding SelectedTabIndex}"
+                    Margin="0 4 0 0"
                     Classes="WalletTabControl">
             <TabItem Margin="0 0 16 0"
                      Classes="WalletTabItem">
@@ -51,15 +53,6 @@
                                            CurrentSortDirection="{Binding CurrentSortDirection}"
                                            SetSortTypeCommand="{Binding SetSortTypeCommand}" />
             </TabItem>
-            <!-- <TabItem Margin="16 0" -->
-            <!--          Classes="WalletTabItem"> -->
-            <!--     <TabItem.Header> -->
-            <!--         <TextBlock VerticalAlignment="Center" -->
-            <!--                    FontSize="16" -->
-            <!--                    Text="Collectibles" /> -->
-            <!--     </TabItem.Header> -->
-            <!--     <TextBlock Text="Collectibles tab" /> -->
-            <!-- </TabItem> -->
             <TabItem Margin="16 0 0 0"
                      Classes="WalletTabItem">
                 <TabItem.Header>
@@ -67,7 +60,7 @@
                                FontSize="16"
                                Text="Addresses" />
                 </TabItem.Header>
-                <ContentControl Content="{Binding AddressesViewModel}" />
+                <!-- <ContentControl Content="{Binding AddressesViewModel}" /> -->
             </TabItem>
         </TabControl>
     </Grid>

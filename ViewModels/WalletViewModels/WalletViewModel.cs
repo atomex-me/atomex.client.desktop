@@ -37,13 +37,13 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         [ObservableAsProperty] public bool IsBalanceUpdating { get; }
         [Reactive] public TxSortField? CurrentSortField { get; set; }
         [Reactive] public SortDirection? CurrentSortDirection { get; set; }
+        [Reactive] public int SelectedTabIndex { get; set; }
         protected bool IsTransactionsLoading { get; set; }
         public AddressesViewModel AddressesViewModel { get; set; }
-        protected Action<CurrencyConfig> SetConversionTab { get; }
-        private Action<string> SetWertCurrency { get; }
+        protected Action<CurrencyConfig>? SetConversionTab { get; }
+        private Action<string>? SetWertCurrency { get; }
         protected Action<ViewModelBase?> ShowRightPopupContent { get; }
-
-        public string Header => CurrencyViewModel.Header;
+        public string Header { get; set; }
         public CurrencyConfig Currency => CurrencyViewModel.Currency;
 
         protected CancellationTokenSource _cancellation { get; set; }
@@ -58,20 +58,23 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
         public WalletViewModel(
             IAtomexApp app,
-            Action<CurrencyConfig> setConversionTab,
-            Action<string> setWertCurrency,
+            Action<CurrencyConfig>? setConversionTab,
+            Action<string>? setWertCurrency,
             Action<ViewModelBase?> showRightPopupContent,
             CurrencyConfig? currency)
         {
             _app = app ?? throw new ArgumentNullException(nameof(app));
-            SetConversionTab = setConversionTab ?? throw new ArgumentNullException(nameof(setConversionTab));
-            SetWertCurrency = setWertCurrency ?? throw new ArgumentNullException(nameof(setWertCurrency));
-            ShowRightPopupContent =
-                showRightPopupContent ?? throw new ArgumentNullException(nameof(showRightPopupContent));
+            ShowRightPopupContent = showRightPopupContent ??
+                                    throw new ArgumentNullException(nameof(showRightPopupContent));
+            
+            SetConversionTab = setConversionTab;
+            SetWertCurrency = setWertCurrency;
 
             if (currency != null)
             {
                 CurrencyViewModel = CurrencyViewModelCreator.CreateViewModel(currency);
+                Header = CurrencyViewModel.Header;
+                
                 LoadAddresses();
                 _ = LoadTransactionsAsync();
             }
@@ -109,7 +112,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
                     PreviousSelectedTransaction = selectedTransaction;
                 });
-            
+
             UpdateCommand
                 .IsExecuting
                 .ToPropertyExInMainThread(this, vm => vm.IsBalanceUpdating);
@@ -255,7 +258,9 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             _exchangeCommand ??= ReactiveCommand.Create(OnConvertClick);
 
         private ReactiveCommand<Unit, Unit> _updateCommand;
-        public ReactiveCommand<Unit, Unit> UpdateCommand => _updateCommand ??= ReactiveCommand.CreateFromTask(OnUpdateClick);
+
+        public ReactiveCommand<Unit, Unit> UpdateCommand =>
+            _updateCommand ??= ReactiveCommand.CreateFromTask(OnUpdateClick);
 
         private ReactiveCommand<Unit, Unit> _cancelUpdateCommand;
 

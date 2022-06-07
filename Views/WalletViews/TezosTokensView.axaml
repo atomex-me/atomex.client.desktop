@@ -5,7 +5,6 @@
              xmlns:walletViewModels="clr-namespace:Atomex.Client.Desktop.ViewModels.WalletViewModels"
              xmlns:converters="clr-namespace:Atomex.Client.Desktop.Converters"
              xmlns:controls="clr-namespace:Atomex.Client.Desktop.Controls"
-             xmlns:abstract="clr-namespace:Atomex.Client.Desktop.ViewModels.Abstract"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="Atomex.Client.Desktop.Views.WalletViews.TezosTokensView">
 
@@ -56,8 +55,8 @@
                               RowDefinitions="Auto">
                             <StackPanel Orientation="Horizontal"
                                         Grid.Column="0">
-                                <Ellipse Width="28"
-                                         Height="28">
+                                <Ellipse Width="30"
+                                         Height="30">
                                     <Ellipse.Fill>
                                         <ImageBrush Source="{Binding TokenPreview}"
                                                     BitmapInterpolationMode="HighQuality"
