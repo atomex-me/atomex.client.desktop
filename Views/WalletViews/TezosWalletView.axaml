@@ -30,7 +30,7 @@
 
     <Grid RowDefinitions="Auto,*"
           Name="DesignGrid">
-        
+
         <controls:WalletCurrency Grid.Row="0"
                                  Grid.Column="0"
                                  Margin="0 40 0 0"
@@ -358,19 +358,21 @@
                                                                         IsVisible="{Binding Status,
                                                                         Converter={x:Static converters:EnumToStringNotEqualConverter.Instance},
                                                                         ConverterParameter={x:Static atomexBlockchainTezos:DelegationStatus.NotDelegated}}">
-                                                                <Button CornerRadius="{DynamicResource AtomexCornerRadius}"
-                                                                        VerticalContentAlignment="Center"
-                                                                        Command="{Binding $parent[ListBox].DataContext.DelegateCommand}"
-                                                                        CommandParameter="{Binding Address}">
+                                                                <Button
+                                                                    CornerRadius="{DynamicResource AtomexCornerRadius}"
+                                                                    VerticalContentAlignment="Center"
+                                                                    Command="{Binding $parent[ListBox].DataContext.DelegateCommand}"
+                                                                    CommandParameter="{Binding Address}">
                                                                     <TextBlock Text="Change Validator"
                                                                                Foreground="{DynamicResource DefaultForegroundBrush}"
                                                                                VerticalAlignment="Center"
                                                                                FontSize="16" />
                                                                 </Button>
-                                                                <Button CornerRadius="{DynamicResource AtomexCornerRadius}"
-                                                                        VerticalContentAlignment="Center"
-                                                                        Command="{Binding $parent[ListBox].DataContext.UndelegateCommand}"
-                                                                        CommandParameter="{Binding Address}">
+                                                                <Button
+                                                                    CornerRadius="{DynamicResource AtomexCornerRadius}"
+                                                                    VerticalContentAlignment="Center"
+                                                                    Command="{Binding $parent[ListBox].DataContext.UndelegateCommand}"
+                                                                    CommandParameter="{Binding Address}">
                                                                     <TextBlock Text="Undelegate"
                                                                                Foreground="{DynamicResource DefaultForegroundBrush}"
                                                                                VerticalAlignment="Center"
@@ -382,10 +384,11 @@
                                                                         IsVisible="{Binding Status,
                                                                         Converter={x:Static converters:EnumToStringEqualConverter.Instance},
                                                                         ConverterParameter={x:Static atomexBlockchainTezos:DelegationStatus.NotDelegated}}">
-                                                                <Button CornerRadius="{DynamicResource AtomexCornerRadius}"
-                                                                        VerticalContentAlignment="Center"
-                                                                        Command="{Binding $parent[ListBox].DataContext.DelegateCommand}"
-                                                                        CommandParameter="{Binding Address}">
+                                                                <Button
+                                                                    CornerRadius="{DynamicResource AtomexCornerRadius}"
+                                                                    VerticalContentAlignment="Center"
+                                                                    Command="{Binding $parent[ListBox].DataContext.DelegateCommand}"
+                                                                    CommandParameter="{Binding Address}">
                                                                     <TextBlock Text="Delegate"
                                                                                Foreground="{DynamicResource DefaultForegroundBrush}"
                                                                                VerticalAlignment="Center"
@@ -411,8 +414,7 @@
                                FontSize="16"
                                Text="Tokens" />
                 </TabItem.Header>
-                <ContentControl Content="{Binding TezosTokensViewModel}"
-                                Margin="0 16 0 0" />
+                <ContentControl Content="{Binding TezosTokensViewModel}" />
             </TabItem>
         </TabControl>
     </Grid>

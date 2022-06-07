@@ -1,6 +1,8 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics.Tracing;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
@@ -41,11 +43,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
             this.WhenAnyValue(vm => vm.Contracts)
                 .WhereNotNull()
-                .SubscribeInMainThread(async _ =>
-                {
-                    await LoadTokens();
-                    OnQuotesUpdatedEventHandler(_app.QuotesProvider, EventArgs.Empty);
-                });
+                .SubscribeInMainThread(_ => OnQuotesUpdatedEventHandler(_app.QuotesProvider, EventArgs.Empty));
 
             _ = ReloadTokenContractsAsync();
         }
@@ -61,7 +59,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             Contracts = new ObservableCollection<TokenContract>(contracts);
         }
 
-        private async Task LoadTokens()
+        private async Task<IEnumerable<TezosTokenViewModel>> LoadTokens()
         {
             var tezosConfig = _app.Account
                 .Currencies
@@ -102,26 +100,14 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                         TezosConfig = tezosConfig,
                         TokenBalance = walletAddress.TokenBalance,
                         Address = walletAddress.Address,
-                        Contract = contract
+                        Contract = contract,
                     });
 
                 tokens.AddRange(tokensViewModels);
             }
 
-            Log.Fatal("Tokens collection updated");
-
-            Tokens = new ObservableCollection<TezosTokenViewModel>(
-                tokens.OrderByDescending(token => token.Contract.Name?.ToLower() == "kusd")
-                    .ThenByDescending(token => token.Contract.Name?.ToLower() == "tzbtc"));
-            //
-            // var tokens = Contracts?.AggregateAsync(
-            //     new ObservableCollection<TezosTokenViewModel>(),
-            //     async Task<IEnumerable<TezosTokenViewModel>>(tokens, contract) =>
-            //     {
-            //
-            //
-            //         return tokens;
-            //     });
+            return tokens
+                .Where(token => !token.TokenBalance.IsNft);
         }
 
 
@@ -132,10 +118,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
         private void OnAtomexClientChanged(object sender, AtomexClientChangedEventArgs e)
         {
-            // Tokens?.Clear();
-            // Transactions?.Clear();
             Contracts?.Clear();
-            // TokenContract = null;
         }
 
         private async void OnBalanceUpdatedEventHandler(object sender, CurrencyEventArgs args)
@@ -153,19 +136,26 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             }
         }
 
-        private void OnQuotesUpdatedEventHandler(object sender, EventArgs args)
+        private async void OnQuotesUpdatedEventHandler(object sender, EventArgs args)
         {
             if (sender is not ICurrencyQuotesProvider quotesProvider)
                 return;
+            
+            var tokens = await LoadTokens();
 
-            Tokens.ForEachDo(token =>
-            {
-                var quote = quotesProvider.GetQuote(token.TokenBalance.Symbol.ToLower());
-                if (quote == null) return;
-                
-                token.CurrentQuote = quote.Bid;
-                token.BalanceInBase = token.TokenBalance.GetTokenBalance().SafeMultiply(quote.Bid);
-            });
+            Tokens = new ObservableCollection<TezosTokenViewModel>(tokens
+                .Select(token =>
+                {
+                    var quote = quotesProvider.GetQuote(token.TokenBalance.Symbol.ToLower());
+                    if (quote == null) return token;
+
+                    token.CurrentQuote = quote.Bid;
+                    token.BalanceInBase = token.TokenBalance.GetTokenBalance().SafeMultiply(quote.Bid);
+                    return token;
+                })
+                .OrderByDescending(token => token.Contract.Name?.ToLower() == "tzbtc")
+                .ThenByDescending(token => token.Contract.Name?.ToLower() == "kusd")
+                .ThenByDescending(token => token.BalanceInBase));
         }
 
         public TezosTokensViewModel()
