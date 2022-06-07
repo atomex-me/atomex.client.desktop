@@ -239,8 +239,7 @@ namespace Atomex.Client.Desktop.ViewModels
             this.WhenAnyValue(vm => vm.ToCurrencyViewModelItem)
                 .SubscribeInMainThread(i =>
                 {
-                    if (i == null || i is not SelectCurrencyWithAddressViewModelItem item ||
-                        item.SelectedAddress == null)
+                    if (i is not SelectCurrencyWithAddressViewModelItem item || item.SelectedAddress == null)
                     {
                         UseRedeemAddress = false;
                         RedeemFromAddress = null;

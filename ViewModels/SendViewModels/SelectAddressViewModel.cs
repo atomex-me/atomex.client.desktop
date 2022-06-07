@@ -2,27 +2,20 @@ using System;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive;
+using System.Reactive.Linq;
 using System.Windows.Input;
-
 using Avalonia.Controls;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
-
 using Atomex.Common;
 using Atomex.Core;
 using Atomex.ViewModels;
 using Atomex.Wallet.Abstract;
 using Atomex.Client.Desktop.Common;
+using Atomex.Client.Desktop.ViewModels.Abstract;
 
 namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 {
-    public enum SelectAddressMode
-    {
-        SendFrom,
-        ReceiveTo,
-        ChangeRedeemAddress
-    }
-
     public class NavigatableSelectAddress : ViewModelBase
     {
         public Action BackAction { get; set; }
@@ -39,6 +32,8 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         [Reactive] private bool SortIsAscending { get; set; }
         [Reactive] private bool SortByDate { get; set; }
         [Reactive] public WalletAddressViewModel? SelectedAddress { get; set; }
+        [ObservableAsProperty] public bool CanConfirm { get; }
+        [ObservableAsProperty] public bool ExternalWarning { get; }
 
         public SelectAddressViewModel()
         {
@@ -131,6 +126,32 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     }
                 });
 
+            this.WhenAnyValue(vm => vm.SelectedAddress, vm => vm.SearchPattern)
+                .Select(value =>
+                {
+                    var (address, searchPattern) = value;
+                    if (SelectAddressMode == SelectAddressMode.SendFrom)
+                    {
+                        return address != null;
+                    }
+
+                    return currency.IsValidAddress(address?.Address ?? searchPattern);
+                })
+                .ToPropertyExInMainThread(this, vm => vm.CanConfirm);
+
+            this.WhenAnyValue(vm => vm.SearchPattern)
+                .Where(_ => MyAddresses != null)
+                .Select(searchPattern =>
+                {
+                    if (SelectAddressMode != SelectAddressMode.SendFrom && !string.IsNullOrEmpty(searchPattern))
+                    {
+                        return MyAddresses!.Count == 0 && currency.IsValidAddress(searchPattern);
+                    }
+
+                    return false;
+                })
+                .ToPropertyExInMainThread(this, vm => vm.ExternalWarning);
+
             Currency = currency;
             SelectAddressMode = mode;
 
@@ -164,11 +185,12 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
                 if (activeAddressViewModel != null)
                 {
-                    SelectedAddress = activeAddressViewModel;   
+                    SelectedAddress = activeAddressViewModel;
                 }
                 else
                 {
-                    SelectedAddress = MyAddresses.FirstOrDefault(vm => vm.IsFreeAddress) ?? MyAddresses.FirstOrDefault();
+                    SelectedAddress = MyAddresses.FirstOrDefault(vm => vm.IsFreeAddress) ??
+                                      MyAddresses.FirstOrDefault();
                 }
             }
             else
@@ -180,18 +202,22 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         }
 
         private ReactiveCommand<Unit, Unit> _backCommand;
+
         public ReactiveCommand<Unit, Unit> BackCommand => _backCommand ??=
             (_backCommand = ReactiveCommand.Create(() => { BackAction?.Invoke(); }));
 
         private ReactiveCommand<Unit, Unit> _changeSortTypeCommand;
+
         public ReactiveCommand<Unit, Unit> ChangeSortTypeCommand => _changeSortTypeCommand ??=
             (_changeSortTypeCommand = ReactiveCommand.Create(() => { SortByDate = !SortByDate; }));
 
         private ReactiveCommand<Unit, Unit> _changeSortDirectionCommand;
+
         public ReactiveCommand<Unit, Unit> ChangeSortDirectionCommand => _changeSortDirectionCommand ??=
             (_changeSortDirectionCommand = ReactiveCommand.Create(() => { SortIsAscending = !SortIsAscending; }));
 
         private ReactiveCommand<Unit, Unit> _confirmCommand;
+
         public ReactiveCommand<Unit, Unit> ConfirmCommand => _confirmCommand ??=
             (_confirmCommand = ReactiveCommand.Create(() =>
             {
