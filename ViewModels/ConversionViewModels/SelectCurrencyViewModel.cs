@@ -13,6 +13,7 @@ using Network = NBitcoin.Network;
 
 using Atomex.Blockchain.BitcoinBased;
 using Atomex.Client.Desktop.Common;
+using Atomex.Client.Desktop.ViewModels.Abstract;
 using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
 using Atomex.Client.Desktop.ViewModels.SendViewModels;
 using Atomex.Common;
@@ -23,12 +24,6 @@ using Atomex.Wallet.BitcoinBased;
 
 namespace Atomex.Client.Desktop.ViewModels.ConversionViewModels
 {
-    public enum SelectCurrencyType
-    {
-        From,
-        To
-    }
-
     public abstract class SelectCurrencyViewModelItem : ViewModelBase
     {
         [Reactive] public CurrencyViewModel CurrencyViewModel { get; set; }
