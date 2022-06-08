@@ -416,7 +416,8 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                 tokenContract: TokenContract.Contract.Address,
                 tokenId: 0,
                 tokenType: TokenContract.Contract.GetContractType(),
-                getTokenPreview: GetTokenPreview,
+                // getTokenPreview: GetTokenPreview,
+                tokenPreview: null,
                 balanceFormat: BalanceFormat,
                 from: null);
 
@@ -433,7 +434,8 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                 tokenContract: tokenViewModel.TokenBalance.Contract,
                 tokenId: tokenViewModel.TokenBalance.TokenId,
                 tokenType: TokenContract.Contract.GetContractType(),
-                getTokenPreview: GetTokenPreview,
+                // getTokenPreview: GetTokenPreview,
+                tokenPreview: null,
                 from: tokenViewModel.Address);
 
             App.DialogService.Show(sendViewModel.SelectToViewModel);

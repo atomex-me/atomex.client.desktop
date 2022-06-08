@@ -9,8 +9,7 @@
              xmlns:controls="clr-namespace:Atomex.Client.Desktop.Controls"
              xmlns:abstract="clr-namespace:Atomex.Client.Desktop.ViewModels.Abstract"
              xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
-             xmlns:ia="clr-namespace:Avalonia.Xaml.Interactions.Core;assembly=Avalonia.Xaml.Interactions"
-             xmlns:converters="clr-namespace:Atomex.Client.Desktop.Converters">
+             xmlns:ia="clr-namespace:Avalonia.Xaml.Interactions.Core;assembly=Avalonia.Xaml.Interactions">
     <Design.DataContext>
         <vm:SelectAddressViewModel />
     </Design.DataContext>

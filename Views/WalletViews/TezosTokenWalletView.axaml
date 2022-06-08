@@ -22,6 +22,7 @@
                                  TotalAmount="{Binding TokenViewModel.DecimalBalance}"
                                  TotalAmountInBase="{Binding TokenViewModel.BalanceInBase}"
                                  CurrencyCode="{Binding TokenViewModel.TokenBalance.Symbol}"
+                                 CurrencyDescription="{Binding TokenViewModel.Contract.Name}"
                                  CurrencyFormat="{Binding TokenFormat}"
                                  BaseCurrencyFormat="{Binding TokenViewModel.BaseCurrencyFormat}"
                                  CurrentQuote="{Binding TokenViewModel.CurrentQuote}"

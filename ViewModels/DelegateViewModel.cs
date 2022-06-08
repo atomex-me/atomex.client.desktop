@@ -321,6 +321,13 @@ namespace Atomex.Client.Desktop.ViewModels
         {
             _app = app ?? throw new ArgumentNullException(nameof(app));
             _tezosConfig = _app.Account.Currencies.Get<TezosConfig>(TezosConfig.Xtz);
+            FeeFormat = _tezosConfig.FeeFormat;
+            FeeCurrencyCode = _tezosConfig.FeeCode;
+            BaseCurrencyCode = "USD";
+            BaseCurrencyFormat = "$0.00";
+            UseDefaultFee = true;
+            Stage = SendStage.Edit;
+            CurrentSortDirection = SortDirection.Desc;
 
             this.WhenAnyValue(vm => vm.Fee)
                 .SubscribeInMainThread(f => { OnQuotesUpdatedEventHandler(_app.QuotesProvider, EventArgs.Empty); });
@@ -361,14 +368,6 @@ namespace Atomex.Client.Desktop.ViewModels
 
             SendCommand.IsExecuting.ToPropertyExInMainThread(this, vm => vm.IsSending);
             CheckDelegationCommand.IsExecuting.ToPropertyExInMainThread(this, vm => vm.IsChecking);
-
-            FeeFormat = _tezosConfig.FeeFormat;
-            FeeCurrencyCode = _tezosConfig.FeeCode;
-            BaseCurrencyCode = "USD";
-            BaseCurrencyFormat = "$0.00";
-            UseDefaultFee = true;
-            Stage = SendStage.Edit;
-            CurrentSortDirection = SortDirection.Desc;
 
             SubscribeToServices();
             _ = LoadBakerList();
@@ -598,7 +597,7 @@ namespace Atomex.Client.Desktop.ViewModels
 
         private void OnQuotesUpdatedEventHandler(object? sender, EventArgs args)
         {
-            if (sender is not ICurrencyQuotesProvider quotesProvider)
+            if (sender is not ICurrencyQuotesProvider quotesProvider )
                 return;
 
             var quote = quotesProvider.GetQuote(FeeCurrencyCode, BaseCurrencyCode);

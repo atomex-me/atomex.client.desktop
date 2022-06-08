@@ -159,7 +159,8 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 .GetReceivingAddressesAsync(
                     account: account,
                     currency: currency,
-                    tokenContract: tokenContract)
+                    tokenContract: tokenContract,
+                    tokenId: selectedTokenId)
                 .WaitForResult()
                 .Where(address => SelectAddressMode != SelectAddressMode.SendFrom || address.Balance != 0)
                 .OrderByDescending(address => address.Balance);

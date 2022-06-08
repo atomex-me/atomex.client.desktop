@@ -21,6 +21,7 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
         public TokenContract Contract { get; set; }
         public string Address { get; set; }
         public static string BaseCurrencyFormat => "$0.##"; // todo: use from settings
+        public static string BaseCurrencyCode => "USD"; // todo: use base currency from settings
         [Reactive] public decimal BalanceInBase { get; set; }
         [Reactive] public decimal CurrentQuote { get; set; }
         [Reactive] public bool IsPopupOpened { get; set; }

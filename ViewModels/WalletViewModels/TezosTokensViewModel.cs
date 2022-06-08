@@ -28,8 +28,8 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 {
     public class TezosTokensViewModel : ViewModelBase
     {
-        private const string FA2 = "FA2";
-        private const string FA12 = "FA12";
+        // private const string FA2 = "FA2";
+        // private const string FA12 = "FA12";
         private readonly IAtomexApp _app;
         private Action<TezosTokenViewModel> ShowTezosToken { get; }
         [Reactive] private ObservableCollection<TokenContract>? Contracts { get; set; }
@@ -117,11 +117,8 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         private ReactiveCommand<TezosTokenViewModel, Unit> _setTokenCommand;
 
         private ReactiveCommand<TezosTokenViewModel, Unit> SetTokenCommand => _setTokenCommand ??=
-            ReactiveCommand.Create<TezosTokenViewModel>(tezosTokenViewModel =>
-            {
-                var a = 5;
-                ShowTezosToken.Invoke(tezosTokenViewModel);
-            });
+            ReactiveCommand.Create<TezosTokenViewModel>(
+                tezosTokenViewModel => ShowTezosToken.Invoke(tezosTokenViewModel));
 
         private void OnAtomexClientChanged(object sender, AtomexClientChangedEventArgs e)
         {
@@ -153,7 +150,8 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             Tokens = new ObservableCollection<TezosTokenViewModel>(tokens
                 .Select(token =>
                 {
-                    var quote = quotesProvider.GetQuote(token.TokenBalance.Symbol.ToLower());
+                    var quote = quotesProvider.GetQuote(token.TokenBalance.Symbol,
+                        TezosTokenViewModel.BaseCurrencyCode);
                     if (quote == null) return token;
 
                     token.CurrentQuote = quote.Bid;
