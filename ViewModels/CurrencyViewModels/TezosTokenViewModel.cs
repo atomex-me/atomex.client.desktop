@@ -25,6 +25,8 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
     {
         private const int MaxBalanceDecimals = AddressesHelper.MaxTokenCurrencyFormatDecimals;
         private static readonly string[] ConvertibleTokens = { "tzbtc", "kusd" };
+        public const string Fa12 = "FA12";
+        public const string Fa2 = "FA2";
         public bool CanExchange => ConvertibleTokens.Contains(TokenBalance.Symbol.ToLower());
         public IAtomexApp AtomexApp { get; set; }
         public TezosConfig TezosConfig { get; set; }
@@ -33,6 +35,8 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
         public string Address { get; set; }
         public static string BaseCurrencyFormat => "$0.##"; // todo: use from settings
         public static string BaseCurrencyCode => "USD"; // todo: use base currency from settings
+        public bool IsFa12 => Contract.GetContractType() == Fa12;
+        public bool IsFa2 => Contract.GetContractType() == Fa2;
         public Action<CurrencyConfig> SetConversionTab { get; set; }
 
         public string TokenFormat => TokenBalance.Decimals != 0
@@ -96,7 +100,7 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
                 .SubscribeInMainThread(_ => IsPopupOpened = false);
         }
 
-        public ReceiveViewModel GetReceiveDialog()
+        private ReceiveViewModel GetReceiveDialog()
         {
             var tezosConfig = AtomexApp.Account
                 .Currencies
@@ -109,7 +113,7 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
                 tokenType: Contract.GetContractType());
         }
 
-        public TezosTokensSendViewModel GetSendDialog()
+        private TezosTokensSendViewModel GetSendDialog()
         {
             return new TezosTokensSendViewModel(
                 app: AtomexApp,
