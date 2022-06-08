@@ -2,8 +2,6 @@ using System;
 using System.Reactive.Linq;
 using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
-using Atomex.Client.Desktop.ViewModels.SendViewModels;
-using Atomex.ViewModels;
 using Avalonia.Controls;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
@@ -13,13 +11,6 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 {
     public class TezosTokenWalletViewModel : WalletViewModel
     {
-        private const int MaxBalanceDecimals = AddressesHelper.MaxTokenCurrencyFormatDecimals;
-
-        public string TokenFormat =>
-            TokenViewModel?.TokenBalance != null && TokenViewModel.TokenBalance.Decimals != 0
-                ? $"F{Math.Min(TokenViewModel.TokenBalance.Decimals, MaxBalanceDecimals)}"
-                : $"F{MaxBalanceDecimals}";
-
         [Reactive] public TezosTokenViewModel? TokenViewModel { get; set; }
 
         public TezosTokenWalletViewModel(
@@ -39,40 +30,23 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
         protected override void SubscribeToServices()
         {
-            Log.Fatal("SubscribeToServices in TezosTokenWalletViewModel");
         }
 
         protected override void OnReceiveClick()
         {
-            if (TokenViewModel?.Contract == null) return;
-
-            var tezosConfig = _app.Account
-                .Currencies
-                .GetByName(TezosConfig.Xtz);
-
-            var receiveViewModel = new ReceiveViewModel(
-                app: _app,
-                currency: tezosConfig,
-                tokenContract: TokenViewModel.Contract.Address,
-                tokenType: TokenViewModel.Contract.GetContractType());
-
-            App.DialogService.Show(receiveViewModel);
+            if (TokenViewModel != null)
+                App.DialogService.Show(TokenViewModel.GetReceiveDialog());
         }
 
         protected override void OnSendClick()
         {
-            if (TokenViewModel?.Contract.Address == null)
-                return;
+            if (TokenViewModel != null)
+                App.DialogService.Show(TokenViewModel.GetSendDialog().SelectFromViewModel);
+        }
 
-            var sendViewModel = new TezosTokensSendViewModel(
-                app: _app,
-                tokenContract: TokenViewModel.Contract.Address,
-                tokenId: TokenViewModel.TokenBalance.TokenId,
-                tokenType: TokenViewModel.Contract.GetContractType(),
-                tokenPreview: TokenViewModel.TokenPreview,
-                from: null);
-
-            App.DialogService.Show(sendViewModel.SelectFromViewModel);
+        protected override void OnConvertClick()
+        {
+            TokenViewModel?.ExchangeCommand.Execute().Subscribe();
         }
 
         public TezosTokenWalletViewModel()

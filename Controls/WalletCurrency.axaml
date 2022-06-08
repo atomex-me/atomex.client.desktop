@@ -44,17 +44,18 @@
                                  Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
                                  Path="{TemplateBinding IconPath}"
                                  Height="55" />
-                        
+
                         <Ellipse Grid.Column="0"
                                  Width="55"
                                  Height="55"
                                  IsVisible="{TemplateBinding IconPath,
                                  Converter={x:Static StringConverters.IsNullOrEmpty}}">
                             <Ellipse.Fill>
-                                <ImageBrush Source="{Binding TokenPreview,
+                                <ImageBrush
+                                    Source="{Binding TokenPreview,
                                             RelativeSource={RelativeSource TemplatedParent}}"
-                                            BitmapInterpolationMode="HighQuality"
-                                            Stretch="Fill" />
+                                    BitmapInterpolationMode="HighQuality"
+                                    Stretch="Fill" />
                             </Ellipse.Fill>
                         </Ellipse>
 
@@ -188,6 +189,7 @@
                                 </controls:RoundedButton>
                                 <controls:RoundedButton Height="46"
                                                         Padding="26 0"
+                                                        IsVisible="{TemplateBinding CanExchange}"
                                                         Command="{TemplateBinding ExchangeCommand}"
                                                         Margin="0 0 12 12"
                                                         Classes="AccentButton">

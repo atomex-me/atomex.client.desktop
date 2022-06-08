@@ -1,16 +1,12 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Diagnostics.Tracing;
 using System.Linq;
 using System.Reactive;
-using System.Reactive.Linq;
 using System.Threading.Tasks;
 using Atomex.Blockchain.Tezos;
 using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
-using Atomex.Common;
 using Atomex.Core;
 using Atomex.MarketData.Abstract;
 using Atomex.Services;
@@ -18,8 +14,6 @@ using Atomex.Wallet;
 using Atomex.Wallet.Tezos;
 using Avalonia.Threading;
 using DynamicData;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using Serilog;
@@ -32,14 +26,18 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         // private const string FA12 = "FA12";
         private readonly IAtomexApp _app;
         private Action<TezosTokenViewModel> ShowTezosToken { get; }
+        private Action<CurrencyConfig> SetConversionTab { get; }
         [Reactive] private ObservableCollection<TokenContract>? Contracts { get; set; }
         [Reactive] public ObservableCollection<TezosTokenViewModel> Tokens { get; set; }
 
 
-        public TezosTokensViewModel(IAtomexApp app, Action<TezosTokenViewModel> showTezosToken)
+        public TezosTokensViewModel(IAtomexApp app,
+            Action<TezosTokenViewModel> showTezosToken,
+            Action<CurrencyConfig> setConversionTab)
         {
             _app = app ?? throw new ArgumentNullException(nameof(app));
             ShowTezosToken = showTezosToken ?? throw new ArgumentNullException(nameof(showTezosToken));
+            SetConversionTab = setConversionTab ?? throw new ArgumentNullException(nameof(setConversionTab));
 
             _app.AtomexClientChanged += OnAtomexClientChanged;
             _app.Account.BalanceUpdated += OnBalanceUpdatedEventHandler;
@@ -150,16 +148,20 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             Tokens = new ObservableCollection<TezosTokenViewModel>(tokens
                 .Select(token =>
                 {
+                    token.AtomexApp = _app;
+                    token.SetConversionTab = SetConversionTab;
+
                     var quote = quotesProvider.GetQuote(token.TokenBalance.Symbol,
                         TezosTokenViewModel.BaseCurrencyCode);
+
                     if (quote == null) return token;
 
                     token.CurrentQuote = quote.Bid;
                     token.BalanceInBase = token.TokenBalance.GetTokenBalance().SafeMultiply(quote.Bid);
+
                     return token;
                 })
-                .OrderByDescending(token => token.Contract.Name?.ToLower() == "tzbtc")
-                .ThenByDescending(token => token.Contract.Name?.ToLower() == "kusd")
+                .OrderByDescending(token => token.CanExchange)
                 .ThenByDescending(token => token.BalanceInBase));
         }
 

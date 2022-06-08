@@ -23,14 +23,14 @@
                                  TotalAmountInBase="{Binding TokenViewModel.BalanceInBase}"
                                  CurrencyCode="{Binding TokenViewModel.TokenBalance.Symbol}"
                                  CurrencyDescription="{Binding TokenViewModel.Contract.Name}"
-                                 CurrencyFormat="{Binding TokenFormat}"
+                                 CurrencyFormat="{Binding TokenViewModel.TokenFormat}"
                                  BaseCurrencyFormat="{Binding TokenViewModel.BaseCurrencyFormat}"
                                  CurrentQuote="{Binding TokenViewModel.CurrentQuote}"
                                  IsBalanceUpdating="{Binding IsBalanceUpdating}"
                                  SendCommand="{Binding SendCommand}"
                                  ReceiveCommand="{Binding ReceiveCommand}"
                                  ExchangeCommand="{Binding ExchangeCommand}"
-                                 BuyCommand="{Binding BuyCommand}"
+                                 CanExchange="{Binding TokenViewModel.CanExchange}"
                                  UpdateCommand="{Binding UpdateCommand}" />
 
         <TabControl Grid.Row="1"

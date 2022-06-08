@@ -62,7 +62,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             _ = LoadDelegationInfoAsync();
 
             DelegateViewModel = new DelegateViewModel(_app);
-            TezosTokensViewModel = new TezosTokensViewModel(_app, showTezosToken);
+            TezosTokensViewModel = new TezosTokensViewModel(_app, showTezosToken, setConversionTab);
             CurrentDelegationSortField = DelegationSortField.ByBalance;
             CurrentDelegationSortDirection = SortDirection.Desc;
         }

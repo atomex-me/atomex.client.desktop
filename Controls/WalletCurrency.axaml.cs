@@ -20,7 +20,8 @@ namespace Atomex.Client.Desktop.Controls
                 CurrencyCodeProperty,
                 CurrencyDescriptionProperty,
                 BaseCurrencyFormatProperty,
-                IsBalanceUpdatingProperty
+                IsBalanceUpdatingProperty,
+                CanExchangeProperty
             );
 
             // var baseLight = (IStyle)AvaloniaXamlLoader.Load(
@@ -81,7 +82,6 @@ namespace Atomex.Client.Desktop.Controls
             set => SetAndRaise(ReceiveCommandProperty, ref _receiveCommand, value);
         }
 
-
         public static readonly DirectProperty<WalletCurrency, ICommand> ExchangeCommandProperty =
             AvaloniaProperty.RegisterDirect<WalletCurrency, ICommand>(nameof(ExchangeCommand),
                 control => control.ExchangeCommand, (control, command) => control.ExchangeCommand = command);
@@ -114,6 +114,20 @@ namespace Atomex.Client.Desktop.Controls
         {
             get => GetValue(IsBalanceUpdatingProperty);
             set => SetValue(IsBalanceUpdatingProperty, value);
+        }
+
+        public static readonly DirectProperty<WalletCurrency, bool?> CanExchangeProperty =
+            AvaloniaProperty.RegisterDirect<WalletCurrency, bool?>(
+                nameof(CanExchange),
+                control => control.CanExchange,
+                (control, value) => control.CanExchange = value);
+
+        private bool? _canExchangeCommand;
+
+        public bool? CanExchange
+        {
+            get => _canExchangeCommand;
+            set => SetAndRaise(CanExchangeProperty, ref _canExchangeCommand, value);
         }
 
         public static readonly DirectProperty<WalletCurrency, string?> IconPathProperty =
