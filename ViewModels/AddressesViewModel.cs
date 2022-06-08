@@ -5,6 +5,7 @@ using System.Linq;
 using System.Globalization;
 using System.Reactive;
 using System.Threading.Tasks;
+using Atomex.Blockchain.Tezos;
 using Serilog;
 using ReactiveUI;
 using Atomex.Blockchain.Tezos.Internal;
@@ -13,6 +14,7 @@ using Atomex.Client.Desktop.ViewModels.Abstract;
 using Atomex.Common;
 using Atomex.Core;
 using Atomex.Cryptography;
+using Atomex.ViewModels;
 using Atomex.Wallet;
 using Atomex.Wallet.Tezos;
 using Avalonia.Controls;
@@ -20,17 +22,12 @@ using ReactiveUI.Fody.Helpers;
 
 namespace Atomex.Client.Desktop.ViewModels
 {
-    public enum AddressesSortField
-    {
-        ByPath,
-        ByBalance,
-    }
-
     public class AddressViewModel : ViewModelBase
     {
-        public string Address { get; set; }
+        public WalletAddress WalletAddress { get; set; }
+        public string Address => WalletAddress.Address;
+        public string Type => KeyTypeToString(WalletAddress.KeyType);
         public string AddressExplorerUri { get; set; }
-        public string Type { get; set; }
         public string Path { get; set; }
         public bool HasTokens { get; set; }
         public Action<string> CopyToClipboard { get; set; }
@@ -38,9 +35,28 @@ namespace Atomex.Client.Desktop.ViewModels
         public Action<string> ExportKey { get; set; }
         public Func<string, Task>? UpdateAddress { get; set; }
 
-        [Reactive] public string Balance { get; set; }
-        [Reactive] public string TokenBalance { get; set; }
-        [Reactive] public bool IsUpdating { get; set; }
+        public string Balance { get; set; }
+        public TokenBalance? TokenBalance { get; set; }
+
+        public string TokenBalanceString =>
+            $"{TokenBalance?.GetTokenBalance() ?? 0} {TokenBalance?.Symbol ?? string.Empty}";
+
+        [ObservableAsProperty] public bool IsUpdating { get; }
+
+        public AddressViewModel()
+        {
+            UpdateAddressCommand
+                .IsExecuting
+                .ToPropertyExInMainThread(this, vm => vm.IsUpdating);
+        }
+
+        private string KeyTypeToString(int keyType) =>
+            keyType switch
+            {
+                CurrencyConfig.StandardKey => "Standard",
+                TezosConfig.Bip32Ed25519Key => "Atomex",
+                _ => throw new NotSupportedException($"Key type {keyType} not supported.")
+            };
 
         private ReactiveCommand<Unit, Unit> _updateAddressCommand;
 
@@ -48,9 +64,7 @@ namespace Atomex.Client.Desktop.ViewModels
             ReactiveCommand.CreateFromTask(async () =>
             {
                 if (UpdateAddress == null) return;
-                IsUpdating = true;
                 await UpdateAddress(Address);
-                IsUpdating = false;
             });
 
         private ReactiveCommand<Unit, Unit> _copyCommand;
@@ -71,10 +85,10 @@ namespace Atomex.Client.Desktop.ViewModels
 
     public class AddressesViewModel : ViewModelBase, IDisposable
     {
-        private const int DefaultTokenPrecision = 9;
         private readonly IAtomexApp _app;
         private CurrencyConfig _currency;
         private readonly string? _tokenContract;
+        private readonly decimal _tokenId;
 
         public bool HasTokens => _currency.Name == TezosConfig.Xtz && _tokenContract != null;
         [Reactive] public ObservableCollection<AddressViewModel> Addresses { get; set; }
@@ -92,18 +106,25 @@ namespace Atomex.Client.Desktop.ViewModels
         public AddressesViewModel(
             IAtomexApp app,
             CurrencyConfig currency,
-            string tokenContract = null)
+            string? tokenContract = null,
+            decimal tokenId = 0)
         {
             _app = app ?? throw new ArgumentNullException(nameof(app));
             _currency = currency ?? throw new ArgumentNullException(nameof(currency));
             _tokenContract = tokenContract;
+            _tokenId = tokenId;
 
             this.WhenAnyValue(vm => vm.CurrentSortField, vm => vm.CurrentSortDirection)
                 .WhereAllNotNull()
                 .SubscribeInMainThread(_ => { ReloadAddresses(); });
 
-            CurrentSortField = AddressesSortField.ByPath;
-            CurrentSortDirection = SortDirection.Asc;
+            CurrentSortField = _tokenContract != null
+                ? AddressesSortField.ByTokenBalance
+                : AddressesSortField.ByPath;
+
+            CurrentSortDirection = _tokenContract != null
+                ? SortDirection.Desc
+                : SortDirection.Asc;
 
             _app.Account.BalanceUpdated += OnBalanceUpdatedEventHandler;
         }
@@ -119,116 +140,119 @@ namespace Atomex.Client.Desktop.ViewModels
                         .GetAddressesAsync())
                     .ToList();
 
-                switch (CurrentSortField)
+                var addressesViewModels = addresses.Select(a =>
                 {
-                    case AddressesSortField.ByPath when CurrentSortDirection == SortDirection.Desc:
-                        addresses.Sort((a2, a1) =>
-                        {
-                            var typeResult = a1.KeyType.CompareTo(a2.KeyType);
+                    var path = a.KeyType == CurrencyConfig.StandardKey && Currencies.IsTezosBased(_currency.Name)
+                        ? $"m/44'/{_currency.Bip44Code}'/{a.KeyIndex.Account}'/{a.KeyIndex.Chain}'"
+                        : $"m/44'/{_currency.Bip44Code}'/{a.KeyIndex.Account}'/{a.KeyIndex.Chain}/{a.KeyIndex.Index}";
 
-                            if (typeResult != 0)
-                                return typeResult;
-
-                            var accountResult = a1.KeyIndex.Account.CompareTo(a2.KeyIndex.Account);
-
-                            if (accountResult != 0)
-                                return accountResult;
-
-                            var chainResult = a1.KeyIndex.Chain.CompareTo(a2.KeyIndex.Chain);
-
-                            return chainResult != 0
-                                ? chainResult
-                                : a1.KeyIndex.Index.CompareTo(a2.KeyIndex.Index);
-                        });
-                        break;
-                    case AddressesSortField.ByPath when CurrentSortDirection == SortDirection.Asc:
-                        addresses.Sort((a1, a2) =>
-                        {
-                            var typeResult = a1.KeyType.CompareTo(a2.KeyType);
-
-                            if (typeResult != 0)
-                                return typeResult;
-
-                            var accountResult = a1.KeyIndex.Account.CompareTo(a2.KeyIndex.Account);
-
-                            if (accountResult != 0)
-                                return accountResult;
-
-                            var chainResult = a1.KeyIndex.Chain.CompareTo(a2.KeyIndex.Chain);
-
-                            return chainResult != 0
-                                ? chainResult
-                                : a1.KeyIndex.Index.CompareTo(a2.KeyIndex.Index);
-                        });
-                        break;
-                    case AddressesSortField.ByBalance when CurrentSortDirection == SortDirection.Desc:
-                        addresses = addresses.OrderByDescending(a => a.AvailableBalance()).ToList();
-                        break;
-
-                    case AddressesSortField.ByBalance when CurrentSortDirection == SortDirection.Asc:
-                        addresses = addresses.OrderBy(a => a.AvailableBalance()).ToList();
-                        break;
-
-                    default:
-                        throw new ArgumentOutOfRangeException();
-                }
-
-                Addresses = new ObservableCollection<AddressViewModel>(
-                    addresses.Select(a =>
+                    return new AddressViewModel
                     {
-                        var path = a.KeyType == CurrencyConfig.StandardKey && Currencies.IsTezosBased(_currency.Name)
-                            ? $"m/44'/{_currency.Bip44Code}'/{a.KeyIndex.Account}'/{a.KeyIndex.Chain}'"
-                            : $"m/44'/{_currency.Bip44Code}'/{a.KeyIndex.Account}'/{a.KeyIndex.Chain}/{a.KeyIndex.Index}";
-
-                        return new AddressViewModel
-                        {
-                            Address = a.Address,
-                            AddressExplorerUri = $"{_currency.AddressExplorerUri}{a.Address}",
-                            Type = KeyTypeToString(a.KeyType),
-                            Path = path,
-                            HasTokens = HasTokens,
-                            Balance = $"{a.Balance.ToString(CultureInfo.InvariantCulture)} {_currency.Name}",
-                            CopyToClipboard = address => App.Clipboard.SetTextAsync(address),
-                            OpenInExplorer = OpenInExplorer,
-                            UpdateAddress = UpdateAddress,
-                            ExportKey = ExportKey
-                        };
-                    }));
+                        WalletAddress = a,
+                        Path = path,
+                        HasTokens = HasTokens,
+                        Balance = $"{a.Balance.ToString(CultureInfo.InvariantCulture)} {_currency.Name}",
+                        AddressExplorerUri = $"{_currency.AddressExplorerUri}{a.Address}",
+                        CopyToClipboard = address => App.Clipboard.SetTextAsync(address),
+                        OpenInExplorer = OpenInExplorer,
+                        UpdateAddress = UpdateAddress,
+                        ExportKey = ExportKey
+                    };
+                }).ToList();
 
                 // token balances
                 if (HasTokens)
                 {
                     var tezosAccount = account as TezosAccount;
 
-                    var addressesWithTokens = (await tezosAccount
+                    (await tezosAccount
                             .DataRepository
                             .GetTezosTokenAddressesByContractAsync(_tokenContract))
+                        .Where(w => w.TokenBalance.TokenId == _tokenId)
                         .Where(w => w.Balance != 0)
-                        .GroupBy(w => w.Address);
-
-                    foreach (var addressWithTokens in addressesWithTokens)
-                    {
-                        var addressInfo = Addresses.FirstOrDefault(a => a.Address == addressWithTokens.Key);
-
-                        if (addressInfo == null)
-                            continue;
-
-                        if (addressWithTokens.Count() == 1)
+                        .ToList()
+                        .ForEachDo(addressWithTokens =>
                         {
-                            var tokenAddress = addressWithTokens.First();
+                            var addressViewModel = addressesViewModels
+                                .FirstOrDefault(a => a.Address == addressWithTokens.Address);
+                            if (addressViewModel == null)
+                                return;
 
-                            addressInfo.TokenBalance = tokenAddress.Balance.FormatWithPrecision(DefaultTokenPrecision);
+                            addressViewModel.TokenBalance = addressWithTokens.TokenBalance;
+                        });
+                }
 
-                            var tokenCode = tokenAddress?.TokenBalance?.Symbol;
-
-                            if (tokenCode != null)
-                                addressInfo.TokenBalance += $" {tokenCode}";
-                        }
-                        else
+                switch (CurrentSortField)
+                {
+                    case AddressesSortField.ByPath when CurrentSortDirection == SortDirection.Desc:
+                        addressesViewModels.Sort((a2, a1) =>
                         {
-                            addressInfo.TokenBalance = $"{addressWithTokens.Count()} TOKENS";
-                        }
-                    }
+                            var typeResult = a1.WalletAddress.KeyType.CompareTo(a2.WalletAddress.KeyType);
+
+                            if (typeResult != 0)
+                                return typeResult;
+
+                            var accountResult =
+                                a1.WalletAddress.KeyIndex.Account.CompareTo(a2.WalletAddress.KeyIndex.Account);
+
+                            if (accountResult != 0)
+                                return accountResult;
+
+                            var chainResult =
+                                a1.WalletAddress.KeyIndex.Chain.CompareTo(a2.WalletAddress.KeyIndex.Chain);
+
+                            return chainResult != 0
+                                ? chainResult
+                                : a1.WalletAddress.KeyIndex.Index.CompareTo(a2.WalletAddress.KeyIndex.Index);
+                        });
+                        Addresses = new ObservableCollection<AddressViewModel>(addressesViewModels);
+                        break;
+                    case AddressesSortField.ByPath when CurrentSortDirection == SortDirection.Asc:
+                        addressesViewModels.Sort((a1, a2) =>
+                        {
+                            var typeResult = a1.WalletAddress.KeyType.CompareTo(a2.WalletAddress.KeyType);
+
+                            if (typeResult != 0)
+                                return typeResult;
+
+                            var accountResult =
+                                a1.WalletAddress.KeyIndex.Account.CompareTo(a2.WalletAddress.KeyIndex.Account);
+
+                            if (accountResult != 0)
+                                return accountResult;
+
+                            var chainResult =
+                                a1.WalletAddress.KeyIndex.Chain.CompareTo(a2.WalletAddress.KeyIndex.Chain);
+
+                            return chainResult != 0
+                                ? chainResult
+                                : a1.WalletAddress.KeyIndex.Index.CompareTo(a2.WalletAddress.KeyIndex.Index);
+                        });
+                        Addresses = new ObservableCollection<AddressViewModel>(addressesViewModels);
+                        break;
+                    case AddressesSortField.ByBalance when CurrentSortDirection == SortDirection.Desc:
+                        Addresses = new ObservableCollection<AddressViewModel>(
+                            addressesViewModels.OrderByDescending(a => a.WalletAddress.AvailableBalance()));
+                        break;
+
+                    case AddressesSortField.ByBalance when CurrentSortDirection == SortDirection.Asc:
+                        Addresses = new ObservableCollection<AddressViewModel>(
+                            addressesViewModels.OrderBy(a => a.WalletAddress.AvailableBalance()));
+                        break;
+
+                    case AddressesSortField.ByTokenBalance when CurrentSortDirection == SortDirection.Desc:
+                        if (_tokenContract == null) break;
+                        Addresses = new ObservableCollection<AddressViewModel>(
+                            addressesViewModels.OrderByDescending(a => a.TokenBalance?.GetTokenBalance()));
+                        break;
+
+                    case AddressesSortField.ByTokenBalance when CurrentSortDirection == SortDirection.Asc:
+                        if (_tokenContract == null) break;
+                        Addresses = new ObservableCollection<AddressViewModel>(
+                            addressesViewModels.OrderBy(a => a.TokenBalance?.GetTokenBalance()));
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
                 }
             }
             catch (Exception e)
@@ -256,14 +280,6 @@ namespace Atomex.Client.Desktop.ViewModels
 
             await ReloadAddresses();
         }
-
-        private string KeyTypeToString(int keyType) =>
-            keyType switch
-            {
-                CurrencyConfig.StandardKey => "Standard",
-                TezosConfig.Bip32Ed25519Key => "Atomex",
-                _ => throw new NotSupportedException($"Key type {keyType} not supported.")
-            };
 
         private void OpenInExplorer(string address)
         {
@@ -306,7 +322,7 @@ namespace Atomex.Client.Desktop.ViewModels
                                 .ReloadBalances();
                 }
 
-                ReloadAddresses();
+                _ = ReloadAddresses();
             }
             catch (OperationCanceledException)
             {
@@ -385,24 +401,27 @@ namespace Atomex.Client.Desktop.ViewModels
         {
             _currency = DesignTime.TestNetCurrencies.First();
 
+            var walletAddress = new WalletAddress();
+            walletAddress.Address = "mzztP8VVJYxV93EUiiYrJUbL55MLx7KLoM";
+
             Addresses = new ObservableCollection<AddressViewModel>(
                 new List<AddressViewModel>
                 {
                     new AddressViewModel
                     {
-                        Address = "mzztP8VVJYxV93EUiiYrJUbL55MLx7KLoM",
+                        WalletAddress = walletAddress,
                         Path = "m/44'/0'/0'/0/0",
                         Balance = 4.0000000.ToString(CultureInfo.InvariantCulture),
                     },
                     new AddressViewModel
                     {
-                        Address = "mzztP8VVJYxV93EUiiYrJUbL55MLx7KLoM",
+                        WalletAddress = walletAddress,
                         Path = "m/44'/0'/0'/0/0",
                         Balance = 100.ToString(CultureInfo.InvariantCulture),
                     },
                     new AddressViewModel
                     {
-                        Address = "mzztP8VVJYxV93EUiiYrJUbL55MLx7KLoM",
+                        WalletAddress = walletAddress,
                         Path = "m/44'/0'/0'/0/0",
                         Balance = 16.0000001.ToString(CultureInfo.InvariantCulture),
                     }

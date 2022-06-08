@@ -13,7 +13,7 @@
     <Design.DataContext>
         <vm:AddressesViewModel />
     </Design.DataContext>
-    
+
     <Grid RowDefinitions="Auto,*"
           Name="DesignGrid">
         <Border Grid.Row="0"
@@ -42,7 +42,7 @@
                 <controls:SortButton Grid.Column="1"
                                      Title="Path"
                                      Command="{Binding SetSortTypeCommand}"
-                                     CommandParameter="{x:Static vm:AddressesSortField.ByPath}">
+                                     CommandParameter="{x:Static abstract:AddressesSortField.ByPath}">
                     <controls:SortButton.SortIsAsc>
                         <MultiBinding Converter="{x:Static BoolConverters.And}">
                             <Binding Path="CurrentSortDirection"
@@ -50,7 +50,7 @@
                                      ConverterParameter="{x:Static abstract:SortDirection.Asc}" />
                             <Binding Path="CurrentSortField"
                                      Converter="{x:Static converters:EnumToStringEqualConverter.Instance}"
-                                     ConverterParameter="{x:Static vm:AddressesSortField.ByPath}" />
+                                     ConverterParameter="{x:Static abstract:AddressesSortField.ByPath}" />
                         </MultiBinding>
                     </controls:SortButton.SortIsAsc>
                     <controls:SortButton.SortIsDesc>
@@ -60,7 +60,7 @@
                                      ConverterParameter="{x:Static abstract:SortDirection.Desc}" />
                             <Binding Path="CurrentSortField"
                                      Converter="{x:Static converters:EnumToStringEqualConverter.Instance}"
-                                     ConverterParameter="{x:Static vm:AddressesSortField.ByPath}" />
+                                     ConverterParameter="{x:Static abstract:AddressesSortField.ByPath}" />
                         </MultiBinding>
                     </controls:SortButton.SortIsDesc>
                 </controls:SortButton>
@@ -81,7 +81,7 @@
                 <controls:SortButton Grid.Column="3"
                                      Title="Balance"
                                      Command="{Binding SetSortTypeCommand}"
-                                     CommandParameter="{x:Static vm:AddressesSortField.ByBalance}">
+                                     CommandParameter="{x:Static abstract:AddressesSortField.ByBalance}">
                     <controls:SortButton.SortIsAsc>
                         <MultiBinding Converter="{x:Static BoolConverters.And}">
                             <Binding Path="CurrentSortDirection"
@@ -89,7 +89,7 @@
                                      ConverterParameter="{x:Static abstract:SortDirection.Asc}" />
                             <Binding Path="CurrentSortField"
                                      Converter="{x:Static converters:EnumToStringEqualConverter.Instance}"
-                                     ConverterParameter="{x:Static vm:AddressesSortField.ByBalance}" />
+                                     ConverterParameter="{x:Static abstract:AddressesSortField.ByBalance}" />
                         </MultiBinding>
                     </controls:SortButton.SortIsAsc>
                     <controls:SortButton.SortIsDesc>
@@ -99,21 +99,36 @@
                                      ConverterParameter="{x:Static abstract:SortDirection.Desc}" />
                             <Binding Path="CurrentSortField"
                                      Converter="{x:Static converters:EnumToStringEqualConverter.Instance}"
-                                     ConverterParameter="{x:Static vm:AddressesSortField.ByBalance}" />
+                                     ConverterParameter="{x:Static abstract:AddressesSortField.ByBalance}" />
                         </MultiBinding>
                     </controls:SortButton.SortIsDesc>
                 </controls:SortButton>
 
-                <Button Grid.Column="4"
-                        Padding="0"
-                        VerticalAlignment="Stretch"
-                        VerticalContentAlignment="Center"
-                        IsEnabled="False"
-                        Classes="EmptyBtnWithContent">
-                    <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
-                               FontSize="13"
-                               Text="Token balance" />
-                </Button>
+                <controls:SortButton Grid.Column="4"
+                                     Title="Token balance"
+                                     Command="{Binding SetSortTypeCommand}"
+                                     CommandParameter="{x:Static abstract:AddressesSortField.ByTokenBalance}">
+                    <controls:SortButton.SortIsAsc>
+                        <MultiBinding Converter="{x:Static BoolConverters.And}">
+                            <Binding Path="CurrentSortDirection"
+                                     Converter="{x:Static converters:EnumToStringEqualConverter.Instance}"
+                                     ConverterParameter="{x:Static abstract:SortDirection.Asc}" />
+                            <Binding Path="CurrentSortField"
+                                     Converter="{x:Static converters:EnumToStringEqualConverter.Instance}"
+                                     ConverterParameter="{x:Static abstract:AddressesSortField.ByTokenBalance}" />
+                        </MultiBinding>
+                    </controls:SortButton.SortIsAsc>
+                    <controls:SortButton.SortIsDesc>
+                        <MultiBinding Converter="{x:Static BoolConverters.And}">
+                            <Binding Path="CurrentSortDirection"
+                                     Converter="{x:Static converters:EnumToStringEqualConverter.Instance}"
+                                     ConverterParameter="{x:Static abstract:SortDirection.Desc}" />
+                            <Binding Path="CurrentSortField"
+                                     Converter="{x:Static converters:EnumToStringEqualConverter.Instance}"
+                                     ConverterParameter="{x:Static abstract:AddressesSortField.ByTokenBalance}" />
+                        </MultiBinding>
+                    </controls:SortButton.SortIsDesc>
+                </controls:SortButton>
                 <Button Grid.Column="5"
                         Padding="0"
                         VerticalAlignment="Stretch"

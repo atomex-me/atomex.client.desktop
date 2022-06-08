@@ -61,7 +61,7 @@
                                FontSize="16"
                                Text="Addresses" />
                 </TabItem.Header>
-                <!-- <ContentControl Content="{Binding AddressesViewModel}" /> -->
+                <ContentControl Content="{Binding AddressesViewModel}" />
             </TabItem>
         </TabControl>
     </Grid>

@@ -2,6 +2,7 @@ using System;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive.Linq;
+using System.Threading.Tasks;
 using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
 using Atomex.Client.Desktop.ViewModels.TransactionViewModels;
@@ -34,10 +35,14 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
             this.WhenAnyValue(vm => vm.TokenViewModel)
                 .WhereNotNull()
-                .SubscribeInMainThread(LoadTransfers);
+                .SubscribeInMainThread(tokenViewModel =>
+                {
+                    LoadAddresses();
+                    _ = LoadTransfers(tokenViewModel);
+                });
         }
 
-        private async void LoadTransfers(TezosTokenViewModel tokenViewModel)
+        private async Task LoadTransfers(TezosTokenViewModel tokenViewModel)
         {
             var tezosConfig = _app.Account
                 .Currencies
@@ -96,6 +101,21 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         protected override void OnConvertClick()
         {
             TokenViewModel?.ExchangeCommand.Execute().Subscribe();
+        }
+
+        protected override void LoadAddresses()
+        {
+            if (TokenViewModel == null) return;
+
+            var tezosConfig = _app.Account
+                .Currencies
+                .Get<TezosConfig>(TezosConfig.Xtz);
+
+            AddressesViewModel = new AddressesViewModel(
+                app: _app,
+                currency: tezosConfig,
+                tokenContract: TokenViewModel.Contract.Address,
+                tokenId: TokenViewModel.TokenBalance.TokenId);
         }
 
         public TezosTokenWalletViewModel()

@@ -166,6 +166,9 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
                     var account = await tzktApi.GetAccountByAddressAsync(wa.Address);
 
+                    if (account.HasError)
+                        continue;
+
                     var txCycle = _app.Account.Network == Network.MainNet
                         ? Math.Floor((account.Value.DelegationLevel - 1) / 4096)
                         : Math.Floor((account.Value.DelegationLevel - 1) / 2048);
