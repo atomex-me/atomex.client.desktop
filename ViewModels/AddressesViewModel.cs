@@ -276,9 +276,14 @@ namespace Atomex.Client.Desktop.ViewModels
 
         private async void OnBalanceUpdatedEventHandler(object? sender, CurrencyEventArgs args)
         {
-            if (_currency.Name != args.Currency) return;
+            if (Currencies.IsTezosToken(args.Currency) && Currencies.IsTezosBased(_currency.Name))
+            {
+                await ReloadAddresses();
+                return;
+            }
 
-            await ReloadAddresses();
+            if (_currency.Name == args.Currency)
+                await ReloadAddresses();
         }
 
         private void OpenInExplorer(string address)
@@ -396,6 +401,8 @@ namespace Atomex.Client.Desktop.ViewModels
                 Log.Error(e, "Private key export error");
             }
         }
+        
+        public void Dispose() => _app.Account.BalanceUpdated -= OnBalanceUpdatedEventHandler;
 
         private void DesignerMode()
         {
@@ -426,12 +433,6 @@ namespace Atomex.Client.Desktop.ViewModels
                         Balance = 16.0000001.ToString(CultureInfo.InvariantCulture),
                     }
                 });
-        }
-
-
-        public void Dispose()
-        {
-            _app.Account.BalanceUpdated -= OnBalanceUpdatedEventHandler;
         }
     }
 }

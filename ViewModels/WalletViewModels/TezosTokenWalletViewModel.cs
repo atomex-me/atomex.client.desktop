@@ -2,15 +2,19 @@ using System;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
 using Atomex.Client.Desktop.ViewModels.TransactionViewModels;
 using Atomex.Common;
+using Atomex.Wallet;
 using Atomex.Wallet.Tezos;
 using Avalonia.Controls;
+using Avalonia.Threading;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
+using Serilog;
 
 
 namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
@@ -44,48 +48,89 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
         private async Task LoadTransfers(TezosTokenViewModel tokenViewModel)
         {
-            var tezosConfig = _app.Account
-                .Currencies
-                .Get<TezosConfig>(TezosConfig.Xtz);
+            await LoadTransactionsSemaphore.WaitAsync();
 
-            if (tokenViewModel.IsFa12)
+            try
             {
-                var tokenAccount = _app.Account.GetTezosTokenAccount<Fa12Account>(
-                    currency: TezosTokenViewModel.Fa12,
-                    tokenContract: tokenViewModel.Contract.Address,
-                    tokenId: 0);
+                var tezosConfig = _app.Account
+                    .Currencies
+                    .Get<TezosConfig>(TezosConfig.Xtz);
 
-                Transactions = SortTransactions(
-                    new ObservableCollection<TransactionViewModelBase>((await tokenAccount
-                            .DataRepository
-                            .GetTezosTokenTransfersAsync(tokenViewModel.Contract.Address,
-                                offset: 0,
-                                limit: int.MaxValue))
-                        .Where(token => token.Token.TokenId == tokenViewModel.TokenBalance.TokenId)
-                        .Select(t => new TezosTokenTransferViewModel(t, tezosConfig))
-                        .ToList()
-                        .ForEachDo(t => t.OnClose = () => ShowRightPopupContent?.Invoke(null))));
+                IsTransactionsLoading = true;
+
+                if (tokenViewModel.IsFa12)
+                {
+                    var tokenAccount = _app.Account.GetTezosTokenAccount<Fa12Account>(
+                        currency: TezosTokenViewModel.Fa12,
+                        tokenContract: tokenViewModel.Contract.Address,
+                        tokenId: 0);
+
+                    var selectedTransactionId = SelectedTransaction?.Id;
+
+                    Transactions = SortTransactions(
+                        new ObservableCollection<TransactionViewModelBase>((await tokenAccount
+                                .DataRepository
+                                .GetTezosTokenTransfersAsync(tokenViewModel.Contract.Address,
+                                    offset: 0,
+                                    limit: int.MaxValue))
+                            .Where(token => token.Token.TokenId == tokenViewModel.TokenBalance.TokenId)
+                            .Select(t => new TezosTokenTransferViewModel(t, tezosConfig))
+                            .ToList()
+                            .ForEachDo(t => t.OnClose = () => ShowRightPopupContent?.Invoke(null))));
+
+                    if (selectedTransactionId != null)
+                        SelectedTransaction = Transactions.FirstOrDefault(t => t.Id == selectedTransactionId);
+                }
+                else if (tokenViewModel.IsFa2)
+                {
+                    var tezosAccount = _app.Account
+                        .GetCurrencyAccount<TezosAccount>(TezosConfig.Xtz);
+
+                    var selectedTransactionId = SelectedTransaction?.Id;
+
+                    Transactions = SortTransactions(
+                        new ObservableCollection<TransactionViewModelBase>((await tezosAccount
+                                .DataRepository
+                                .GetTezosTokenTransfersAsync(tokenViewModel.Contract.Address,
+                                    offset: 0,
+                                    limit: int.MaxValue))
+                            .Where(token => token.Token.TokenId == tokenViewModel.TokenBalance.TokenId)
+                            .Select(t => new TezosTokenTransferViewModel(t, tezosConfig))
+                            .ToList()
+                            .ForEachDo(t => t.OnClose = () => ShowRightPopupContent?.Invoke(null))));
+
+                    if (selectedTransactionId != null)
+                        SelectedTransaction = Transactions.FirstOrDefault(t => t.Id == selectedTransactionId);
+                }
             }
-            else if (tokenViewModel.IsFa2)
+            catch (OperationCanceledException)
             {
-                var tezosAccount = _app.Account
-                    .GetCurrencyAccount<TezosAccount>(TezosConfig.Xtz);
-
-                Transactions = SortTransactions(
-                    new ObservableCollection<TransactionViewModelBase>((await tezosAccount
-                            .DataRepository
-                            .GetTezosTokenTransfersAsync(tokenViewModel.Contract.Address,
-                                offset: 0,
-                                limit: int.MaxValue))
-                        .Where(token => token.Token.TokenId == tokenViewModel.TokenBalance.TokenId)
-                        .Select(t => new TezosTokenTransferViewModel(t, tezosConfig))
-                        .ToList()
-                        .ForEachDo(t => t.OnClose = () => ShowRightPopupContent?.Invoke(null))));
+                Log.Debug("LoadTransfers for {Contract} canceled", tokenViewModel.Contract.Address);
+            }
+            catch (Exception e)
+            {
+                Log.Error(e, "LoadTransfers error for contract {Contract}", tokenViewModel.Contract.Address);
+            }
+            finally
+            {
+                LoadTransactionsSemaphore.Release();
+                Log.Debug("Token transfers loaded for contract {Contract}", tokenViewModel.Contract.Address);
             }
         }
 
-        protected override void SubscribeToServices()
+        protected override async void OnBalanceUpdatedEventHandler(object sender, CurrencyEventArgs args)
         {
+            try
+            {
+                if (!Currencies.IsTezosToken(args.Currency) || TokenViewModel == null) return;
+
+                await Dispatcher.UIThread.InvokeAsync(async () => { await LoadTransfers(TokenViewModel); },
+                    DispatcherPriority.Background);
+            }
+            catch (Exception e)
+            {
+                Log.Error(e, "Account balance updated event handler error");
+            }
         }
 
         protected override void OnReceiveClick()
@@ -111,11 +156,45 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                 .Currencies
                 .Get<TezosConfig>(TezosConfig.Xtz);
 
+            AddressesViewModel?.Dispose();
+
             AddressesViewModel = new AddressesViewModel(
                 app: _app,
                 currency: tezosConfig,
                 tokenContract: TokenViewModel.Contract.Address,
                 tokenId: TokenViewModel.TokenBalance.TokenId);
+        }
+
+        protected override async Task OnUpdateClick()
+        {
+            _cancellation = new CancellationTokenSource();
+
+            try
+            {
+                var tezosAccount = _app.Account
+                    .GetCurrencyAccount<TezosAccount>(TezosConfig.Xtz);
+
+                var tezosTokensScanner = new TezosTokensScanner(tezosAccount);
+
+                await tezosTokensScanner.ScanContractAsync(
+                    contractAddress: TokenViewModel!.Contract.Address,
+                    cancellationToken: _cancellation.Token);
+
+                // reload balances for all tezos tokens account
+                foreach (var currency in _app.Account.Currencies)
+                    if (Currencies.IsTezosToken(currency.Name))
+                        _app.Account
+                            .GetCurrencyAccount<TezosTokenAccount>(currency.Name)
+                            .ReloadBalances();
+            }
+            catch (OperationCanceledException)
+            {
+                Log.Debug("Tezos tokens Wallet update operation canceled");
+            }
+            catch (Exception e)
+            {
+                Log.Error(e, "Tezos tokens Wallet update exception");
+            }
         }
 
         public TezosTokenWalletViewModel()

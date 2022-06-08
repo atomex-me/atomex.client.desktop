@@ -67,8 +67,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                             transactions
                                 .Select(t => new TezosTokenTransferViewModel(t, Currency))
                                 .ToList()
-                                .ForEachDo(t => t.OnClose = () => ShowRightPopupContent?.Invoke(null)
-                                ));
+                                .ForEachDo(t => t.OnClose = () => ShowRightPopupContent?.Invoke(null)));
 
                         if (selectedTransactionId != null)
                             SelectedTransaction = Transactions.FirstOrDefault(t => t.Id == selectedTransactionId);
