@@ -308,7 +308,7 @@
                                          Width="50"
                                          Height="50">
                                     <Ellipse.Fill>
-                                        <ImageBrush Source="{Binding TokenPreview}"
+                                        <ImageBrush Source="{Binding BitmapIcon}"
                                                     BitmapInterpolationMode="HighQuality"
                                                     Stretch="Fill" />
                                     </Ellipse.Fill>

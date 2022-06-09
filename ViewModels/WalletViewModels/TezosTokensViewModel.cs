@@ -22,8 +22,6 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 {
     public class TezosTokensViewModel : ViewModelBase
     {
-        // private const string FA2 = "FA2";
-        // private const string FA12 = "FA12";
         private readonly IAtomexApp _app;
         private Action<TezosTokenViewModel> ShowTezosToken { get; }
         private Action<CurrencyConfig> SetConversionTab { get; }
@@ -157,12 +155,12 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                     if (quote == null) return token;
 
                     token.CurrentQuote = quote.Bid;
-                    token.BalanceInBase = token.TokenBalance.GetTokenBalance().SafeMultiply(quote.Bid);
+                    token.AvailableAmountInBase = token.TokenBalance.GetTokenBalance().SafeMultiply(quote.Bid);
 
                     return token;
                 })
                 .OrderByDescending(token => token.CanExchange)
-                .ThenByDescending(token => token.BalanceInBase));
+                .ThenByDescending(token => token.AvailableAmountInBase));
         }
 
         public TezosTokensViewModel()

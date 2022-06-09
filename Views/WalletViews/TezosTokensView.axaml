@@ -58,7 +58,7 @@
                                 <Ellipse Width="30"
                                          Height="30">
                                     <Ellipse.Fill>
-                                        <ImageBrush Source="{Binding TokenPreview}"
+                                        <ImageBrush Source="{Binding BitmapIcon}"
                                                     BitmapInterpolationMode="HighQuality"
                                                     Stretch="Fill" />
                                     </Ellipse.Fill>
@@ -96,7 +96,7 @@
                                            VerticalAlignment="Center">
                                     <TextBlock.Text>
                                         <MultiBinding Converter="{StaticResource AmountToStringConverter}">
-                                            <Binding Path="BalanceInBase" Mode="OneWay" />
+                                            <Binding Path="AvailableAmountInBase" Mode="OneWay" />
                                             <Binding Path="BaseCurrencyFormat" Mode="OneWay" />
                                         </MultiBinding>
                                     </TextBlock.Text>

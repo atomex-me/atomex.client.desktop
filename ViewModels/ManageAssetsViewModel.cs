@@ -12,13 +12,13 @@ using ReactiveUI.Fody.Helpers;
 
 namespace Atomex.Client.Desktop.ViewModels
 {
-    public class CurrencyWithSelection : ViewModelBase
+    public class AssetWithSelection : ViewModelBase
     {
-        public CurrencyViewModel Currency { get; set; }
+        public IAssetViewModel Asset { get; set; }
         [Reactive] public bool IsSelected { get; set; }
         public Action OnChanged { get; set; }
 
-        public CurrencyWithSelection()
+        public AssetWithSelection()
         {
             this.WhenAnyValue(vm => vm.IsSelected)
                 .SubscribeInMainThread(_ => OnChanged?.Invoke());
@@ -27,44 +27,42 @@ namespace Atomex.Client.Desktop.ViewModels
 
     public class ManageAssetsViewModel : ViewModelBase
     {
-        private ObservableCollection<CurrencyWithSelection> InitialCurrencies { get; set; }
-        private ObservableCollection<CurrencyWithSelection> BeforeSearchCurrencies { get; set; }
-        [Reactive] public ObservableCollection<CurrencyWithSelection> AvailableCurrencies { get; set; }
+        private ObservableCollection<AssetWithSelection> InitialAssets { get; set; }
+        private ObservableCollection<AssetWithSelection> BeforeSearchAssets { get; set; }
+        [Reactive] public ObservableCollection<AssetWithSelection> AvailableAssets { get; set; }
         [Reactive] public string SearchPattern { get; set; }
-        public Action<IEnumerable<CurrencyViewModel>> OnAssetsChanged { get; set; }
+        public Action<IEnumerable<string>> OnAssetsChanged { get; set; }
 
         public ManageAssetsViewModel()
         {
-            this.WhenAnyValue(vm => vm.AvailableCurrencies)
+            this.WhenAnyValue(vm => vm.AvailableAssets)
                 .WhereNotNull()
                 .Take(1)
                 .SubscribeInMainThread(_ =>
                 {
-                    AvailableCurrencies.ForEachDo(curr => curr.OnChanged = () =>
+                    AvailableAssets.ForEachDo(asset => asset.OnChanged = () =>
                     {
-                        OnAssetsChanged?.Invoke(InitialCurrencies
-                            .Where(currency => currency.IsSelected)
-                            .Select(currencyWithSelection => currencyWithSelection.Currency));
+                        OnAssetsChanged?.Invoke(InitialAssets
+                            .Where(a => a.IsSelected)
+                            .Select(assetWithSelection => assetWithSelection.Asset.CurrencyCode));
                     });
 
-                    InitialCurrencies = new ObservableCollection<CurrencyWithSelection>(AvailableCurrencies);
+                    InitialAssets = new ObservableCollection<AssetWithSelection>(AvailableAssets);
                 });
 
             this.WhenAnyValue(vm => vm.SearchPattern)
                 .WhereNotNull()
-                .Where(_ => AvailableCurrencies != null)
+                .Where(_ => AvailableAssets != null)
                 .SubscribeInMainThread(searchPattern =>
                 {
                     if (searchPattern == string.Empty)
-                        BeforeSearchCurrencies = new ObservableCollection<CurrencyWithSelection>(AvailableCurrencies);
+                        BeforeSearchAssets = new ObservableCollection<AssetWithSelection>(AvailableAssets);
 
-                    var filteredCurrencies = InitialCurrencies
-                        .Where(c => c.Currency.Currency.Name.ToLower()
-                                        .Contains(searchPattern?.ToLower() ?? string.Empty) ||
-                                    c.Currency.Currency.Description.ToLower()
-                                        .Contains(searchPattern?.ToLower() ?? string.Empty));
+                    var filteredAssets = InitialAssets
+                        .Where(c => c.Asset.CurrencyCode.ToLower().Contains(searchPattern.ToLower())
+                                    || c.Asset.CurrencyDescription.ToLower().Contains(searchPattern.ToLower()));
 
-                    AvailableCurrencies = new ObservableCollection<CurrencyWithSelection>(filteredCurrencies);
+                    AvailableAssets = new ObservableCollection<AssetWithSelection>(filteredAssets);
                 });
 
             SearchPattern = string.Empty;

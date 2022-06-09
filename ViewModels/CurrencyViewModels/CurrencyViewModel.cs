@@ -1,17 +1,14 @@
 using System;
 using System.Threading.Tasks;
 using System.Reactive.Linq;
-
 using Avalonia;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
 using Avalonia.Threading;
-
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using Serilog;
-
 using Atomex.Core;
 using Atomex.MarketData.Abstract;
 using Atomex.Wallet;
@@ -20,14 +17,13 @@ using Atomex.Client.Desktop.Common;
 
 namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
 {
-    public abstract class CurrencyViewModel : ViewModelBase
+    public abstract class CurrencyViewModel : ViewModelBase, IAssetViewModel
     {
         private const string PathToImages = "avares://Atomex.Client.Desktop/Resources/Images";
         protected const string PathToIcons = "/Resources/Icons";
 
         protected IAccount Account { get; set; }
         private ICurrencyQuotesProvider QuotesProvider { get; set; }
-
         public event EventHandler AmountUpdated;
 
         public CurrencyConfig Currency { get; set; }
@@ -39,6 +35,7 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
         public Color AccentColor { get; set; }
         public Color AmountColor { get; set; }
         public string IconPath { get; set; }
+        public IBitmap? BitmapIcon => null;
         public string DisabledIconPath { get; set; }
         [Reactive] public decimal CurrentQuote { get; set; }
         [Reactive] public decimal DailyChangePercent { get; set; }
@@ -50,6 +47,7 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
         [Reactive] public decimal UnconfirmedAmountInBase { get; set; }
 
         public string CurrencyCode => Currency.Name;
+        public string CurrencyDescription => Currency.Description;
         public string FeeCurrencyCode => Currency.FeeCode;
         public string BaseCurrencyCode => "USD"; // todo: use base currency from settings
         public string CurrencyFormat => Currency.Format;
@@ -82,7 +80,6 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
                 UnconfirmedAmount = balance.UnconfirmedIncome + balance.UnconfirmedOutcome;
 
                 UpdateQuotesInBaseCurrency(QuotesProvider);
-
             }, DispatcherPriority.Background);
         }
 

@@ -90,8 +90,9 @@ namespace Atomex.Client.Desktop.ViewModels
         public ReactiveCommand<Unit, Unit> BackCommand => _backCommand ??=
             (_backCommand = ReactiveCommand.Create(() =>
             {
-                if (Selected is TezosTokenWalletViewModel)
+                if (Selected is TezosTokenWalletViewModel tokenWalletViewModel)
                 {
+                    tokenWalletViewModel.TokenViewModel = null;
                     Selected = Wallets.First(wallet => wallet is TezosWalletViewModel);
                     return;
                 }

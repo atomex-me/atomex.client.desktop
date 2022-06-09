@@ -446,7 +446,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             return Tokens
                 .FirstOrDefault(tokenViewModel =>
                     tokenViewModel.Address == address && tokenViewModel.TokenBalance.TokenId == tokenId)
-                ?.TokenPreview ?? TokenContract.IconPreview;
+                ?.BitmapIcon ?? TokenContract.IconPreview;
         }
 
         protected override void OnReceiveClick()

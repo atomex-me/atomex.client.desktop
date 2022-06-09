@@ -254,14 +254,53 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             (_openDelegationPopupCommand = ReactiveCommand.Create<string>(
                 address => DelegationAddressPopupOpened = address));
 
+
         private ReactiveCommand<Unit, Unit> _manageTokensCommand;
 
-        public ReactiveCommand<Unit, Unit> ManageTokensCommand => _manageTokensCommand ??=
-            (_manageTokensCommand = ReactiveCommand.Create(() =>
+        public ReactiveCommand<Unit, Unit> ManageTokensCommand =>
+            _manageTokensCommand ??= _manageTokensCommand = ReactiveCommand.Create(() =>
             {
-                Log.Information("Manage assets!");
-            }));
-        
+                var vm = new ManageAssetsViewModel
+                {
+                    AvailableAssets = new ObservableCollection<AssetWithSelection>(
+                        TezosTokensViewModel
+                            .Tokens
+                            .Select(token => new AssetWithSelection
+                            {
+                                Asset = token,
+                                IsSelected = _app.Account.UserData.DisabledTokens?.Contains(token.TokenBalance.Symbol)
+                                             ?? true
+                            })
+                    ),
+                    OnAssetsChanged = selectedSymbols =>
+                    {
+                        var disabledTokens = TezosTokensViewModel
+                            .Tokens
+                            .Select(token => token.TokenBalance.Symbol)
+                            .Where(symbol => !selectedSymbols.Contains(symbol))
+                            .ToArray();
+
+                        var a = 5;
+
+                        // var currencies = AllCurrencies
+                        //     .Where(c => c.Header == TezosTokens || currencyCodes.Contains(c.CurrencyCode));
+                        //
+                        // ChoosenCurrencies =
+                        //     new List<CurrencyViewModel>(currencies);
+                        //
+                        // InitialChoosenCurrencies = new List<CurrencyViewModel>(ChoosenCurrencies);
+
+                        // _app.Account.UserData.InitializedCurrencies = ChoosenCurrencies
+                        //     .Select(currency => currency.Currency.Name)
+                        //     .ToArray();
+
+                        // App.Account.UserData.SaveToFile(App.Account.SettingsFilePath);
+                    }
+                };
+
+                Desktop.App.DialogService.Show(vm);
+            });
+
         private ReactiveCommand<Unit, Unit> _updateTokensCommand;
 
         public ReactiveCommand<Unit, Unit> UpdateTokensCommand => _updateTokensCommand ??=

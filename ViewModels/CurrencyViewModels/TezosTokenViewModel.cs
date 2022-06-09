@@ -18,7 +18,7 @@ using Serilog;
 
 namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
 {
-    public class TezosTokenViewModel : ViewModelBase
+    public class TezosTokenViewModel : ViewModelBase, IAssetViewModel
     {
         private const int MaxBalanceDecimals = AddressesHelper.MaxTokenCurrencyFormatDecimals;
         private static readonly string[] ConvertibleTokens = { "tzbtc", "kusd" };
@@ -36,13 +36,21 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
         public bool IsFa2 => Contract.GetContractType() == Fa2;
         public Action<CurrencyConfig> SetConversionTab { get; set; }
 
-        public string TokenFormat => TokenBalance.Decimals != 0
+        public string CurrencyFormat => TokenBalance.Decimals != 0
             ? $"F{Math.Min(TokenBalance.Decimals, MaxBalanceDecimals)}"
             : $"F{MaxBalanceDecimals}";
 
-        [Reactive] public decimal BalanceInBase { get; set; }
+        [Reactive] public decimal AvailableAmountInBase { get; set; }
         [Reactive] public decimal CurrentQuote { get; set; }
         [Reactive] public bool IsPopupOpened { get; set; }
+        
+        public string IconPath => string.Empty;
+        public string DisabledIconPath => string.Empty;
+        public string CurrencyCode => TokenBalance.Symbol;
+        public string CurrencyDescription => TokenBalance.Name;
+        string IAssetViewModel.BaseCurrencyFormat => BaseCurrencyFormat;
+        public decimal TotalAmount => TokenBalance.ParsedBalance ?? 0;
+        // public decimal AvailableAmountInBase { get; }
 
         private ThumbsApi ThumbsApi => new ThumbsApi(
             new ThumbsApiSettings
@@ -54,7 +62,7 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
 
         private bool _isPreviewDownloading;
 
-        public IBitmap? TokenPreview
+        public IBitmap? BitmapIcon
         {
             get
             {
@@ -74,7 +82,7 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
                         _ = App.ImageService.LoadImageFromUrl(url, async () =>
                         {
                             _isPreviewDownloading = false;
-                            await Dispatcher.UIThread.InvokeAsync(() => { OnPropertyChanged(nameof(TokenPreview)); });
+                            await Dispatcher.UIThread.InvokeAsync(() => { OnPropertyChanged(nameof(BitmapIcon)); });
                         });
                     });
 
@@ -88,7 +96,7 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
         public decimal DecimalBalance => TokenBalance.GetTokenBalance();
 
         public string Balance => TokenBalance.Balance != "1"
-            ? $"{DecimalBalance.ToString(TokenFormat, CultureInfo.CurrentCulture)}  {TokenBalance.Symbol}"
+            ? $"{DecimalBalance.ToString(CurrencyFormat, CultureInfo.CurrentCulture)}  {TokenBalance.Symbol}"
             : "";
 
         public TezosTokenViewModel()
@@ -117,7 +125,7 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
                 tokenContract: Contract.Address,
                 tokenId: TokenBalance.TokenId,
                 tokenType: Contract.GetContractType(),
-                tokenPreview: TokenPreview,
+                tokenPreview: BitmapIcon,
                 from: null);
         }
 
