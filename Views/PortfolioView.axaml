@@ -158,7 +158,7 @@
                                Text="Coins &amp; Tokens" />
 
                     <controls:IconButton Grid.Column="1"
-                                         Classes="Settings"
+                                         Classes="SetupAssets"
                                          Margin="0 0 12 0"
                                          Command="{Binding ManageAssetsCommand}" />
                 </Grid>
