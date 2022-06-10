@@ -43,7 +43,7 @@
         <StackPanel Grid.Row="1"
                     Height="72"
                     ZIndex="1"
-                    Margin="0 4 16 0"
+                    Margin="0 4 18 0"
                     Orientation="Horizontal"
                     HorizontalAlignment="Right"
                     VerticalAlignment="Top"
@@ -58,6 +58,10 @@
             <controls:IconButton Classes="SetupAssets"
                                  VerticalAlignment="Center"
                                  ToolText="Manage tokens"
+                                 Margin="12 0 12 0"
+                                 Command="{Binding ManageTokensCommand}" />
+            <controls:IconButton Classes="MenuDots"
+                                 VerticalAlignment="Center"
                                  Margin="12 0 0 0"
                                  Command="{Binding ManageTokensCommand}" />
         </StackPanel>
