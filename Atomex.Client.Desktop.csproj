@@ -6,8 +6,8 @@
         <UseAppHost>true</UseAppHost>
         <ApplicationIcon>Resources/Images/logo_dark_256x256.ico</ApplicationIcon>
 
-        <AssemblyVersion>1.2.12</AssemblyVersion>
-        <Version>1.2.12</Version>
+        <AssemblyVersion>1.2.13</AssemblyVersion>
+        <Version>1.2.13</Version>
     </PropertyGroup>
     <Choose>
         <When Condition=" '$(Configuration)' == 'Debug' ">

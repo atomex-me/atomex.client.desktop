@@ -24,7 +24,7 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
         private static readonly string[] ConvertibleTokens = { "tzbtc", "kusd" };
         public const string Fa12 = "FA12";
         public const string Fa2 = "FA2";
-        public bool CanExchange => ConvertibleTokens.Contains(TokenBalance.Symbol.ToLower());
+        public bool CanExchange => ConvertibleTokens.Contains(TokenBalance.Symbol?.ToLower());
         public IAtomexApp AtomexApp { get; set; }
         public TezosConfig TezosConfig { get; set; }
         public TokenBalance TokenBalance { get; set; }
