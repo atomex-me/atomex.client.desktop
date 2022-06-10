@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive;
+using System.Reactive.Linq;
 using System.Threading.Tasks;
 using Atomex.Blockchain.Tezos;
 using Atomex.Client.Desktop.Common;
@@ -25,8 +26,10 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         private readonly IAtomexApp _app;
         private Action<TezosTokenViewModel> ShowTezosToken { get; }
         private Action<CurrencyConfig> SetConversionTab { get; }
+        [Reactive] public string[] DisabledTokens { get; set; }
         [Reactive] private ObservableCollection<TokenContract>? Contracts { get; set; }
         [Reactive] public ObservableCollection<TezosTokenViewModel> Tokens { get; set; }
+        public ObservableCollection<TezosTokenViewModel> InitialTokens { get; set; }
 
 
         public TezosTokensViewModel(IAtomexApp app,
@@ -45,6 +48,18 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                 .WhereNotNull()
                 .SubscribeInMainThread(_ => OnQuotesUpdatedEventHandler(_app.QuotesProvider, EventArgs.Empty));
 
+            this.WhenAnyValue(vm => vm.DisabledTokens)
+                .WhereNotNull()
+                .Skip(1)
+                .SubscribeInMainThread(disabledTokens =>
+                {
+                    _app.Account.UserData.DisabledTokens = disabledTokens;
+                    _app.Account.UserData.SaveToFile(_app.Account.SettingsFilePath);
+                    OnQuotesUpdatedEventHandler(_app.QuotesProvider, EventArgs.Empty);
+                });
+
+
+            DisabledTokens = _app.Account.UserData.DisabledTokens ?? Array.Empty<string>();
             _ = ReloadTokenContractsAsync();
         }
 
@@ -143,7 +158,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
             var tokens = await LoadTokens();
 
-            Tokens = new ObservableCollection<TezosTokenViewModel>(tokens
+            var tokenViewModels = new ObservableCollection<TezosTokenViewModel>(tokens
                 .Select(token =>
                 {
                     token.AtomexApp = _app;
@@ -161,6 +176,10 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                 })
                 .OrderByDescending(token => token.CanExchange)
                 .ThenByDescending(token => token.AvailableAmountInBase));
+
+            InitialTokens = new ObservableCollection<TezosTokenViewModel>(tokenViewModels);
+            Tokens = new ObservableCollection<TezosTokenViewModel>(
+                tokenViewModels.Where(token => !DisabledTokens.Contains(token.TokenBalance.Symbol)));
         }
 
         public TezosTokensViewModel()

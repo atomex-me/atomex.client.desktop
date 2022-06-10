@@ -264,37 +264,26 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                 {
                     AvailableAssets = new ObservableCollection<AssetWithSelection>(
                         TezosTokensViewModel
-                            .Tokens
+                            .InitialTokens
                             .Select(token => new AssetWithSelection
                             {
                                 Asset = token,
-                                IsSelected = _app.Account.UserData.DisabledTokens?.Contains(token.TokenBalance.Symbol)
-                                             ?? true
+                                IsSelected = TezosTokensViewModel
+                                                 .Tokens
+                                                 .Select(t => t.TokenBalance.Symbol)
+                                                 .ToArray()
+                                                 .Contains(token.TokenBalance.Symbol)
                             })
                     ),
                     OnAssetsChanged = selectedSymbols =>
                     {
                         var disabledTokens = TezosTokensViewModel
-                            .Tokens
+                            .InitialTokens
                             .Select(token => token.TokenBalance.Symbol)
                             .Where(symbol => !selectedSymbols.Contains(symbol))
                             .ToArray();
 
-                        var a = 5;
-
-                        // var currencies = AllCurrencies
-                        //     .Where(c => c.Header == TezosTokens || currencyCodes.Contains(c.CurrencyCode));
-                        //
-                        // ChoosenCurrencies =
-                        //     new List<CurrencyViewModel>(currencies);
-                        //
-                        // InitialChoosenCurrencies = new List<CurrencyViewModel>(ChoosenCurrencies);
-
-                        // _app.Account.UserData.InitializedCurrencies = ChoosenCurrencies
-                        //     .Select(currency => currency.Currency.Name)
-                        //     .ToArray();
-
-                        // App.Account.UserData.SaveToFile(App.Account.SettingsFilePath);
+                        TezosTokensViewModel.DisabledTokens = disabledTokens;
                     }
                 };
 
