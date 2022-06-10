@@ -36,9 +36,10 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
         public Color AmountColor { get; set; }
         public string IconPath { get; set; }
         public IBitmap? BitmapIcon => null;
+        public bool CanExchange => true;
         public string DisabledIconPath { get; set; }
         [Reactive] public decimal CurrentQuote { get; set; }
-        [Reactive] public decimal DailyChangePercent { get; set; }
+        [Reactive] public decimal? DailyChangePercent { get; set; }
         [Reactive] public decimal TotalAmount { get; set; }
         [Reactive] public decimal TotalAmountInBase { get; set; }
         [Reactive] public decimal AvailableAmount { get; set; }

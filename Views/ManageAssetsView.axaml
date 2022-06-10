@@ -144,7 +144,7 @@
                                                Margin="0 2 0 0">
                                         <TextBlock.Text>
                                             <MultiBinding Converter="{StaticResource AmountToStringConverter}">
-                                                <Binding Path="Asset.AvailableAmountInBase" Mode="OneWay" />
+                                                <Binding Path="Asset.TotalAmountInBase" Mode="OneWay" />
                                                 <Binding Path="Asset.BaseCurrencyFormat" Mode="OneWay" />
                                             </MultiBinding>
                                         </TextBlock.Text>

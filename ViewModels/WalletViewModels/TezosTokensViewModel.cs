@@ -170,12 +170,12 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                     if (quote == null) return token;
 
                     token.CurrentQuote = quote.Bid;
-                    token.AvailableAmountInBase = token.TokenBalance.GetTokenBalance().SafeMultiply(quote.Bid);
+                    token.TotalAmountInBase = token.TokenBalance.GetTokenBalance().SafeMultiply(quote.Bid);
 
                     return token;
                 })
                 .OrderByDescending(token => token.CanExchange)
-                .ThenByDescending(token => token.AvailableAmountInBase));
+                .ThenByDescending(token => token.TotalAmountInBase));
 
             InitialTokens = new ObservableCollection<TezosTokenViewModel>(tokenViewModels);
             Tokens = new ObservableCollection<TezosTokenViewModel>(

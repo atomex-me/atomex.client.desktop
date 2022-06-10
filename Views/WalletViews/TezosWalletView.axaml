@@ -33,15 +33,7 @@
         <controls:WalletCurrency Grid.Row="0"
                                  Grid.Column="0"
                                  Margin="0 40 0 0"
-                                 IconPath="{Binding CurrencyViewModel.IconPath}"
-                                 TotalAmount="{Binding CurrencyViewModel.TotalAmount}"
-                                 TotalAmountInBase="{Binding CurrencyViewModel.TotalAmountInBase}"
-                                 DailyChangePercent="{Binding CurrencyViewModel.DailyChangePercent}"
-                                 CurrencyCode="{Binding CurrencyViewModel.CurrencyCode}"
-                                 CurrencyDescription="{Binding CurrencyViewModel.Currency.Description}"
-                                 CurrencyFormat="{Binding CurrencyViewModel.CurrencyFormat}"
-                                 BaseCurrencyFormat="{Binding CurrencyViewModel.BaseCurrencyFormat}"
-                                 CurrentQuote="{Binding CurrencyViewModel.CurrentQuote}"
+                                 AssetViewModel="{Binding CurrencyViewModel}"
                                  IsBalanceUpdating="{Binding IsBalanceUpdating}"
                                  SendCommand="{Binding SendCommand}"
                                  ReceiveCommand="{Binding ReceiveCommand}"
@@ -107,6 +99,16 @@
                                Text="Addresses" />
                 </TabItem.Header>
                 <ContentControl Content="{Binding AddressesViewModel}" />
+            </TabItem>
+            <TabItem Margin="16 0"
+                     Classes="WalletTabItem"
+                     Name="TokensTab">
+                <TabItem.Header>
+                    <TextBlock VerticalAlignment="Center"
+                               FontSize="16"
+                               Text="Tokens" />
+                </TabItem.Header>
+                <ContentControl Content="{Binding TezosTokensViewModel}" />
             </TabItem>
             <TabItem Margin="16 0"
                      Classes="WalletTabItem">
@@ -436,16 +438,6 @@
                         </ListBox.ItemTemplate>
                     </ListBox>
                 </Grid>
-            </TabItem>
-            <TabItem Margin="16 0"
-                     Classes="WalletTabItem"
-                     Name="TokensTab">
-                <TabItem.Header>
-                    <TextBlock VerticalAlignment="Center"
-                               FontSize="16"
-                               Text="Tokens" />
-                </TabItem.Header>
-                <ContentControl Content="{Binding TezosTokensViewModel}" />
             </TabItem>
         </TabControl>
     </Grid>

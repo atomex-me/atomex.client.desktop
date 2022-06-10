@@ -96,7 +96,7 @@
                                            VerticalAlignment="Center">
                                     <TextBlock.Text>
                                         <MultiBinding Converter="{StaticResource AmountToStringConverter}">
-                                            <Binding Path="AvailableAmountInBase" Mode="OneWay" />
+                                            <Binding Path="TotalAmountInBase" Mode="OneWay" />
                                             <Binding Path="BaseCurrencyFormat" Mode="OneWay" />
                                         </MultiBinding>
                                     </TextBlock.Text>

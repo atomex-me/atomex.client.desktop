@@ -12,6 +12,9 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
         string CurrencyFormat { get; }
         string BaseCurrencyFormat { get; }
         decimal TotalAmount { get; }
-        decimal AvailableAmountInBase { get; }
+        decimal TotalAmountInBase { get; }
+        decimal CurrentQuote { get; }
+        decimal? DailyChangePercent { get; }
+        bool CanExchange { get; }
     }
 }

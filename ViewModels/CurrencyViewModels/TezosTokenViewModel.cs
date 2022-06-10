@@ -40,17 +40,17 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
             ? $"F{Math.Min(TokenBalance.Decimals, MaxBalanceDecimals)}"
             : $"F{MaxBalanceDecimals}";
 
-        [Reactive] public decimal AvailableAmountInBase { get; set; }
+        [Reactive] public decimal TotalAmountInBase { get; set; }
         [Reactive] public decimal CurrentQuote { get; set; }
         [Reactive] public bool IsPopupOpened { get; set; }
-        
+
         public string IconPath => string.Empty;
         public string DisabledIconPath => string.Empty;
         public string CurrencyCode => TokenBalance.Symbol;
         public string CurrencyDescription => TokenBalance.Name;
         string IAssetViewModel.BaseCurrencyFormat => BaseCurrencyFormat;
         public decimal TotalAmount => TokenBalance.ParsedBalance ?? 0;
-        // public decimal AvailableAmountInBase { get; }
+        public decimal? DailyChangePercent => null;
 
         private ThumbsApi ThumbsApi => new ThumbsApi(
             new ThumbsApiSettings
