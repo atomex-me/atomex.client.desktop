@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Avalonia.Threading;
 using Serilog;
@@ -13,27 +14,28 @@ using Atomex.Blockchain.Tezos.Internal;
 using Atomex.Blockchain.Tezos.Tzkt;
 using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.ViewModels.Abstract;
+using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
 using Atomex.Core;
 using Atomex.Wallet;
+using Atomex.Wallet.Tezos;
 using ReactiveUI.Fody.Helpers;
-
-// ReSharper disable All
 
 
 namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 {
     public class TezosWalletViewModel : WalletViewModel
     {
-        private const int DelegationCheckIntervalInSec = 20;
         [Reactive] public ObservableCollection<Delegation> Delegations { get; set; }
         [Reactive] public SortDirection? CurrentDelegationSortDirection { get; set; }
         [Reactive] public DelegationSortField? CurrentDelegationSortField { get; set; }
         [Reactive] public string? DelegationAddressPopupOpened { get; set; }
+        [ObservableAsProperty] public bool IsTokensUpdating { get; }
 
         private bool CanDelegate { get; set; }
         private bool HasDelegations { get; set; }
-        private DelegateViewModel DelegateViewModel { get; set; }
-        private TezosConfig? Tezos { get; set; }
+        private DelegateViewModel DelegateViewModel { get; }
+        private TezosTokensViewModel TezosTokensViewModel { get; set; }
+        private TezosConfig? Tezos { get; }
 
         public TezosWalletViewModel()
             : base()
@@ -42,8 +44,9 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
         public TezosWalletViewModel(IAtomexApp app,
             Action<CurrencyConfig> setConversionTab,
-            Action<string> setWertCurrency,
+            Action<string>? setWertCurrency,
             Action<ViewModelBase?> showRightPopupContent,
+            Action<TezosTokenViewModel> showTezosToken,
             CurrencyConfig currency)
             : base(app, setConversionTab, setWertCurrency, showRightPopupContent, currency)
         {
@@ -59,9 +62,14 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             DelegateCommand.Merge(UndelegateCommand)
                 .SubscribeInMainThread(_ => DelegationAddressPopupOpened = null);
 
+            UpdateTokensCommand
+                .IsExecuting
+                .ToPropertyExInMainThread(this, vm => vm.IsTokensUpdating);
+
             _ = LoadDelegationInfoAsync();
 
             DelegateViewModel = new DelegateViewModel(_app);
+            TezosTokensViewModel = new TezosTokensViewModel(_app, showTezosToken, setConversionTab);
             CurrentDelegationSortField = DelegationSortField.ByBalance;
             CurrentDelegationSortDirection = SortDirection.Desc;
         }
@@ -165,6 +173,9 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
                     var account = await tzktApi.GetAccountByAddressAsync(wa.Address);
 
+                    if (account.HasError)
+                        continue;
+
                     var txCycle = _app.Account.Network == Network.MainNet
                         ? Math.Floor((account.Value.DelegationLevel - 1) / 4096)
                         : Math.Floor((account.Value.DelegationLevel - 1) / 2048);
@@ -243,6 +254,78 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             (_openDelegationPopupCommand = ReactiveCommand.Create<string>(
                 address => DelegationAddressPopupOpened = address));
 
+
+        private ReactiveCommand<Unit, Unit> _manageTokensCommand;
+
+        public ReactiveCommand<Unit, Unit> ManageTokensCommand =>
+            _manageTokensCommand ??= _manageTokensCommand = ReactiveCommand.Create(() =>
+            {
+                var vm = new ManageAssetsViewModel
+                {
+                    AvailableAssets = new ObservableCollection<AssetWithSelection>(
+                        TezosTokensViewModel
+                            .InitialTokens
+                            .Select(token => new AssetWithSelection
+                            {
+                                Asset = token,
+                                IsSelected = TezosTokensViewModel
+                                                 .Tokens
+                                                 .Select(t => t.TokenBalance.Symbol)
+                                                 .ToArray()
+                                                 .Contains(token.TokenBalance.Symbol)
+                            })
+                    ),
+                    OnAssetsChanged = selectedSymbols =>
+                    {
+                        var disabledTokens = TezosTokensViewModel
+                            .InitialTokens
+                            .Select(token => token.TokenBalance.Symbol)
+                            .Where(symbol => !selectedSymbols.Contains(symbol))
+                            .ToArray();
+
+                        TezosTokensViewModel.DisabledTokens = disabledTokens;
+                    }
+                };
+
+                Desktop.App.DialogService.Show(vm);
+            });
+
+        private ReactiveCommand<Unit, Unit> _updateTokensCommand;
+
+        public ReactiveCommand<Unit, Unit> UpdateTokensCommand => _updateTokensCommand ??=
+            (_updateTokensCommand = ReactiveCommand.CreateFromTask(UpdateTokens));
+
+        private async Task UpdateTokens()
+        {
+            _cancellation = new CancellationTokenSource();
+            try
+            {
+                var tezosAccount = _app.Account
+                    .GetCurrencyAccount<TezosAccount>(TezosConfig.Xtz);
+
+                var tezosTokensScanner = new TezosTokensScanner(tezosAccount);
+
+                await tezosTokensScanner.ScanAsync(
+                    skipUsed: false,
+                    cancellationToken: _cancellation.Token);
+
+                // reload balances for all tezos tokens account
+                foreach (var currency in _app.Account.Currencies)
+                    if (Currencies.IsTezosToken(currency.Name))
+                        _app.Account
+                            .GetCurrencyAccount<TezosTokenAccount>(currency.Name)
+                            .ReloadBalances();
+            }
+            catch (OperationCanceledException)
+            {
+                Log.Debug("Tezos tokens update canceled");
+            }
+            catch (Exception e)
+            {
+                Log.Error(e, "Tezos tokens update error");
+            }
+        }
+
         private void OnDelegateClick(string addressToDelegate)
         {
             var delegation = Delegations.First(delegation => delegation.Address == addressToDelegate);
@@ -254,6 +337,9 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         protected override void DesignerMode()
         {
             base.DesignerMode();
+            SelectedTabIndex = 3;
+
+            TezosTokensViewModel = new TezosTokensViewModel(_app, x => { }, x => { });
 
             Delegations = new ObservableCollection<Delegation>()
             {

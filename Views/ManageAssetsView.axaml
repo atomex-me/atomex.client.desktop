@@ -16,7 +16,8 @@
             Width="700">
         <Grid RowDefinitions="72,Auto,*">
             <!-- title -->
-            <TextBlock Name="Title"
+            <TextBlock Grid.Row="0"
+                       Name="Title"
                        FontSize="22"
                        HorizontalAlignment="Center"
                        VerticalAlignment="Center"
@@ -24,7 +25,8 @@
                        Grid.Column="0"
                        Text="Manage assets" />
 
-            <Border Height="1"
+            <Border Grid.Row="0"
+                    Height="1"
                     Background="{DynamicResource LightDefaultOpacity10}"
                     VerticalAlignment="Bottom" />
 
@@ -38,7 +40,8 @@
                      Classes="SearchTextBox">
                 <TextBox.InnerRightContent>
                     <StackPanel VerticalAlignment="Center"
-                                IsVisible="{Binding SearchPattern, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+                                IsVisible="{Binding SearchPattern,
+                                Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
                         <controls:IconButton Classes="Clear NoEffects"
                                              Command="{ReflectionBinding $parent[TextBox].Clear}"
                                              Margin="0 0 15 0" />
@@ -52,7 +55,7 @@
                      Grid.Row="2"
                      ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                      Background="{DynamicResource AlmostTransparentBrush}"
-                     Items="{Binding AvailableCurrencies}"
+                     Items="{Binding AvailableAssets}"
                      Classes="SelectCurrencyListBox ManageAssets">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
@@ -61,18 +64,43 @@
                                         Orientation="Horizontal"
                                         VerticalAlignment="Center"
                                         Grid.Column="0">
-                                <svg:Svg Path="{Binding Currency.IconPath}"
-                                         Width="28"
-                                         VerticalAlignment="Top"
-                                         Classes="BaseDisabledStyle"
-                                         IsVisible="{Binding IsSelected}" />
-                                <svg:Svg Path="{Binding Currency.DisabledIconPath}"
-                                         Width="28"
-                                         VerticalAlignment="Top"
-                                         Classes="BaseDisabledStyle"
-                                         IsVisible="{Binding !IsSelected}" />
+                                <Panel
+                                    IsVisible="{Binding Asset.IconPath,
+                                    Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+                                    <svg:Svg Path="{Binding Asset.IconPath}"
+                                             Width="28"
+                                             VerticalAlignment="Top"
+                                             Classes="BaseDisabledStyle"
+                                             IsVisible="{Binding IsSelected}" />
+                                    <svg:Svg Path="{Binding Asset.DisabledIconPath}"
+                                             Width="28"
+                                             VerticalAlignment="Top"
+                                             Classes="BaseDisabledStyle"
+                                             IsVisible="{Binding !IsSelected}" />
+                                </Panel>
+                                <Ellipse
+                                    IsVisible="{Binding Asset.BitmapIcon,
+                                    Converter={x:Static ObjectConverters.IsNotNull}}"
+                                    Classes.Enabled="{Binding IsSelected}"
+                                    Classes.Disabled="{Binding !IsSelected}"
+                                    Width="28"
+                                    Height="28">
+                                    <Ellipse.Styles>
+                                        <Style Selector="Ellipse.Disabled">
+                                            <Setter Property="Opacity" Value="0.5" />
+                                        </Style>
+                                        <Style Selector="Ellipse.Enabled">
+                                            <Setter Property="Opacity" Value="1" />
+                                        </Style>
+                                    </Ellipse.Styles>
+                                    <Ellipse.Fill>
+                                        <ImageBrush Source="{Binding Asset.BitmapIcon}"
+                                                    BitmapInterpolationMode="HighQuality"
+                                                    Stretch="Fill" />
+                                    </Ellipse.Fill>
+                                </Ellipse>
                                 <TextBlock Margin="17 0 0 0"
-                                           Text="{Binding Currency.Header}"
+                                           Text="{Binding Asset.CurrencyDescription}"
                                            FontFamily="{DynamicResource DefaultLightFontFamily}"
                                            FontSize="18"
                                            VerticalAlignment="Center"
@@ -96,15 +124,15 @@
                                                    Classes.NotSelected="{Binding !IsSelected}">
                                             <TextBlock.Text>
                                                 <MultiBinding Converter="{StaticResource AmountToStringConverter}">
-                                                    <Binding Path="Currency.TotalAmount" Mode="OneWay" />
-                                                    <Binding Path="Currency.CurrencyFormat" Mode="OneWay" />
+                                                    <Binding Path="Asset.TotalAmount" Mode="OneWay" />
+                                                    <Binding Path="Asset.CurrencyFormat" Mode="OneWay" />
                                                 </MultiBinding>
                                             </TextBlock.Text>
                                         </TextBlock>
                                         <TextBlock HorizontalAlignment="Right"
                                                    VerticalAlignment="Center"
                                                    FontSize="16"
-                                                   Text="{Binding Currency.CurrencyCode}"
+                                                   Text="{Binding Asset.CurrencyCode}"
                                                    Margin="3 0 0 0"
                                                    Classes.IsSelected="{Binding IsSelected}"
                                                    Classes.NotSelected="{Binding !IsSelected}" />
@@ -116,8 +144,8 @@
                                                Margin="0 2 0 0">
                                         <TextBlock.Text>
                                             <MultiBinding Converter="{StaticResource AmountToStringConverter}">
-                                                <Binding Path="Currency.AvailableAmountInBase" Mode="OneWay" />
-                                                <Binding Path="Currency.BaseCurrencyFormat" Mode="OneWay" />
+                                                <Binding Path="Asset.TotalAmountInBase" Mode="OneWay" />
+                                                <Binding Path="Asset.BaseCurrencyFormat" Mode="OneWay" />
                                             </MultiBinding>
                                         </TextBlock.Text>
                                     </TextBlock>

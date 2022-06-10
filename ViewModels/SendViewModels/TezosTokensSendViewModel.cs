@@ -39,7 +39,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         [ObservableAsProperty] public string TokenContractBeautified { get; }
         [Reactive] public decimal TokenId { get; set; }
         [Reactive] public string To { get; set; }
-        [Reactive] public IBitmap TokenPreview { get; set; }
+        [Reactive] public IBitmap? TokenPreview { get; set; }
         private readonly string _tokenType;
         public bool IsFa2 => _tokenType == "FA2";
 
@@ -59,10 +59,10 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         [Reactive] public MessageType WarningType { get; set; }
         [Reactive] public bool ConfirmStage { get; set; }
         [Reactive] public bool CanSend { get; set; }
+        [ObservableAsProperty] public bool IsSending { get; }
 
         public SelectAddressViewModel SelectFromViewModel { get; set; }
         public SelectAddressViewModel SelectToViewModel { get; set; }
-        private Func<string, decimal, IBitmap> GetTokenPreview { get; }
 
         public TezosTokensSendViewModel()
         {
@@ -77,7 +77,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             string tokenContract,
             decimal tokenId,
             string tokenType,
-            Func<string, decimal, IBitmap> getTokenPreview,
+            IBitmap? tokenPreview,
             string? balanceFormat = null,
             string? from = null)
         {
@@ -153,6 +153,10 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     }
                 });
 
+            NextCommand
+                .IsExecuting
+                .ToPropertyExInMainThread(this, vm => vm.IsSending);
+
             CurrencyCode = string.Empty;
             FeeCurrencyCode = TezosConfig.Xtz;
             BaseCurrencyCode = DefaultBaseCurrencyCode;
@@ -164,7 +168,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
             TokenId = tokenId;
             _tokenType = tokenType;
-            GetTokenPreview = getTokenPreview;
+            TokenPreview = tokenPreview;
 
             if (from != null)
             {
@@ -212,7 +216,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         }));
 
         private ReactiveCommand<Unit, Unit> _nextCommand;
-        public ReactiveCommand<Unit, Unit> NextCommand => _nextCommand ??= ReactiveCommand.Create(OnNextCommand);
+        public ReactiveCommand<Unit, Unit> NextCommand => _nextCommand ??= ReactiveCommand.CreateFromTask(OnNextCommand);
 
         private ReactiveCommand<Unit, Unit> _maxCommand;
         public ReactiveCommand<Unit, Unit> MaxCommand => _maxCommand ??= ReactiveCommand.Create(OnMaxClick);
@@ -248,7 +252,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             App.DialogService.Show(SelectToViewModel);
         }
 
-        private async void OnNextCommand()
+        private async Task OnNextCommand()
         {
             var tezosConfig = _app.Account
                 .Currencies
@@ -334,9 +338,6 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             {
                 try
                 {
-                    App.DialogService.Show(
-                        MessageViewModel.Message(title: "Sending, please wait", withProgressBar: true));
-
                     var error = await Send();
 
                     if (error != null)
@@ -599,7 +600,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
             if (tokenAddress?.TokenBalance?.Symbol != null)
             {
-                CurrencyCode = tokenAddress.TokenBalance.Symbol.ToUpper();
+                CurrencyCode = tokenAddress.TokenBalance.Symbol;
                 CurrencyFormat =
                     $"F{Math.Min(tokenAddress.TokenBalance.Decimals, AddressesHelper.MaxTokenCurrencyFormatDecimals)}";
             }
@@ -607,14 +608,14 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             {
                 CurrencyCode = _app.Account.Currencies
                     .FirstOrDefault(c => c is Fa12Config fa12 && fa12.TokenContractAddress == TokenContract)
-                    ?.Name.ToUpper() ?? "TOKENS";
+                    ?.Name ?? "TOKENS";
                 CurrencyFormat = DefaultCurrencyFormat;
             }
 
             SelectedFromBalance = tokenAddress?.AvailableBalance() ?? 0;
             this.RaisePropertyChanged(nameof(Amount));
 
-            TokenPreview = GetTokenPreview(From, TokenId);
+            // TokenPreview = GetTokenPreview(From, TokenId);
         }
 
         private async Task<Error> Send(CancellationToken cancellationToken = default)

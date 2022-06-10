@@ -2,13 +2,14 @@
         xmlns:x='http://schemas.microsoft.com/winfx/2006/xaml'
         xmlns:controls="clr-namespace:Atomex.Client.Desktop.Controls"
         xmlns:converters="clr-namespace:Atomex.Client.Desktop.Converters"
-        xmlns:common="clr-namespace:Atomex.Client.Desktop.Common"
-        xmlns:svg="clr-namespace:Avalonia.Svg.Skia;assembly=Avalonia.Svg.Skia">
+        xmlns:svg="clr-namespace:Avalonia.Svg.Skia;assembly=Avalonia.Svg.Skia"
+        xmlns:common="clr-namespace:Atomex.Client.Desktop.Common">
 
     <Design.PreviewWith>
         <Border Padding="40 10"
                 Width="600">
-            <controls:WalletCurrency CurrencyViewModel="{x:Static common:DesignTime.BtcCurrencyViewModel}" />
+            <controls:WalletCurrency IsBalanceUpdating="False"
+                                     AssetViewModel="{x:Static common:DesignTime.BtcCurrencyViewModel}" />
         </Border>
     </Design.PreviewWith>
 
@@ -33,9 +34,27 @@
                                 Height="150"
                                 CornerRadius="150" />
                         <svg:Svg Grid.Column="0"
-                                 Path="{Binding CurrencyViewModel.IconPath,
+                                 IsVisible="{Binding AssetViewModel.IconPath,
+                                 RelativeSource={RelativeSource TemplatedParent},
+                                 Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                                 Path="{Binding AssetViewModel.IconPath,
                                  RelativeSource={RelativeSource TemplatedParent}}"
                                  Height="55" />
+
+                        <Ellipse Grid.Column="0"
+                                 Width="55"
+                                 Height="55"
+                                 IsVisible="{Binding AssetViewModel.BitmapIcon,
+                                 RelativeSource={RelativeSource TemplatedParent},
+                                 Converter={x:Static ObjectConverters.IsNotNull}}">
+                            <Ellipse.Fill>
+                                <ImageBrush
+                                    Source="{Binding AssetViewModel.BitmapIcon,
+                                    RelativeSource={RelativeSource TemplatedParent}}"
+                                    BitmapInterpolationMode="HighQuality"
+                                    Stretch="Fill" />
+                            </Ellipse.Fill>
+                        </Ellipse>
 
                         <StackPanel Grid.Column="1"
                                     Margin="40 0 0 0">
@@ -46,10 +65,10 @@
                                     <TextBlock.Text>
                                         <MultiBinding Converter="{StaticResource AmountToStringConverter}">
                                             <Binding RelativeSource="{RelativeSource TemplatedParent}"
-                                                     Path="CurrencyViewModel.TotalAmount"
+                                                     Path="AssetViewModel.TotalAmount"
                                                      Mode="OneWay" />
                                             <Binding RelativeSource="{RelativeSource TemplatedParent}"
-                                                     Path="CurrencyViewModel.CurrencyFormat"
+                                                     Path="AssetViewModel.CurrencyFormat"
                                                      Mode="OneWay" />
                                         </MultiBinding>
                                     </TextBlock.Text>
@@ -59,7 +78,7 @@
                                            Foreground="{DynamicResource DefaultForegroundBrush}"
                                            FontSize="32"
                                            LineHeight="40"
-                                           Text="{Binding CurrencyViewModel.CurrencyCode,
+                                           Text="{Binding AssetViewModel.CurrencyCode,
                                            RelativeSource={RelativeSource TemplatedParent}}" />
                                 <controls:IconButton Classes="Update Big WithToolTipContent"
                                                      Classes.Updating="{TemplateBinding IsBalanceUpdating}"
@@ -70,8 +89,8 @@
                                     <StackPanel Orientation="Horizontal">
                                         <TextBlock Text="Update " />
                                         <TextBlock
-                                            Text="{Binding CurrencyViewModel.Currency.Description,
-                                            RelativeSource={RelativeSource TemplatedParent}}" />
+                                            Text="{Binding AssetViewModel.CurrencyDescription,
+                                                    RelativeSource={RelativeSource TemplatedParent}}" />
                                     </StackPanel>
                                 </controls:IconButton>
                             </StackPanel>
@@ -82,10 +101,10 @@
                                 <TextBlock.Text>
                                     <MultiBinding Converter="{StaticResource AmountToStringConverter}">
                                         <Binding RelativeSource="{RelativeSource TemplatedParent}"
-                                                 Path="CurrencyViewModel.TotalAmountInBase"
+                                                 Path="AssetViewModel.TotalAmountInBase"
                                                  Mode="OneWay" />
                                         <Binding RelativeSource="{RelativeSource TemplatedParent}"
-                                                 Path="CurrencyViewModel.BaseCurrencyFormat"
+                                                 Path="AssetViewModel.BaseCurrencyFormat"
                                                  Mode="OneWay" />
                                     </MultiBinding>
                                 </TextBlock.Text>
@@ -101,7 +120,7 @@
                                            FontSize="13"
                                            LineHeight="16"
                                            Margin="4 0"
-                                           Text="{Binding CurrencyViewModel.CurrencyCode,
+                                           Text="{Binding AssetViewModel.CurrencyCode,
                                            RelativeSource={RelativeSource TemplatedParent}}" />
                                 <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
                                            FontSize="13"
@@ -114,10 +133,10 @@
                                     <TextBlock.Text>
                                         <MultiBinding Converter="{StaticResource AmountToStringConverter}">
                                             <Binding RelativeSource="{RelativeSource TemplatedParent}"
-                                                     Path="CurrencyViewModel.CurrentQuote"
+                                                     Path="AssetViewModel.CurrentQuote"
                                                      Mode="OneWay" />
                                             <Binding RelativeSource="{RelativeSource TemplatedParent}"
-                                                     Path="CurrencyViewModel.BaseCurrencyFormat"
+                                                     Path="AssetViewModel.BaseCurrencyFormat"
                                                      Mode="OneWay" />
                                         </MultiBinding>
                                     </TextBlock.Text>
@@ -126,18 +145,20 @@
                                 <TextBlock FontSize="13"
                                            LineHeight="16"
                                            Margin="10 0 0 0"
-                                           Text="{Binding CurrencyViewModel.DailyChangePercent,
+                                           IsVisible="{Binding AssetViewModel.DailyChangePercent,
+                                           RelativeSource={RelativeSource TemplatedParent},
+                                           Converter={x:Static ObjectConverters.IsNotNull}}"
+                                           Text="{Binding AssetViewModel.DailyChangePercent,
                                            RelativeSource={RelativeSource TemplatedParent},
                                            Converter={StaticResource PercentConverter}}"
                                            Classes="Success"
-                                           Classes.UnSuccess="{Binding CurrencyViewModel.DailyChangePercent,
+                                           Classes.UnSuccess="{Binding AssetViewModel.DailyChangePercent,
                                            RelativeSource={RelativeSource TemplatedParent},
                                            Converter={x:Static converters:NumericConverters.LowerThanZero}}" />
                             </StackPanel>
 
                             <WrapPanel Margin="0 16 0 0"
                                        Orientation="Horizontal"
-
                                        VerticalAlignment="Top">
 
                                 <controls:RoundedButton Height="46"
@@ -172,6 +193,8 @@
                                 </controls:RoundedButton>
                                 <controls:RoundedButton Height="46"
                                                         Padding="26 0"
+                                                        IsVisible="{Binding AssetViewModel.CanExchange,
+                                                        RelativeSource={RelativeSource TemplatedParent}}"
                                                         Command="{TemplateBinding ExchangeCommand}"
                                                         Margin="0 0 12 12"
                                                         Classes="AccentButton">
@@ -190,7 +213,7 @@
                                                         Padding="26 0"
                                                         Command="{TemplateBinding BuyCommand}"
                                                         Margin="0 0 12 12"
-                                                        IsVisible="{Binding CurrencyViewModel.CurrencyCode,
+                                                        IsVisible="{Binding AssetViewModel.CurrencyCode,
                                                         RelativeSource={RelativeSource TemplatedParent},
                                                         Converter={StaticResource ShowBuyButton}}"
                                                         Classes="GrayButton">

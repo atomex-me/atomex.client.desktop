@@ -1,5 +1,5 @@
 ﻿using System;
-
+using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
 using Atomex.Core;
 using Atomex.EthereumTokens;
 using Atomex.TezosTokens;
@@ -11,8 +11,9 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         public static IWalletViewModel CreateViewModel(
             IAtomexApp app,
             Action<CurrencyConfig> setConversionTab,
-            Action<string> setWertCurrency,
+            Action<string>? setWertCurrency,
             Action<ViewModelBase?> showRightPopupContent,
+            Action<TezosTokenViewModel> showTezosToken,
             CurrencyConfig currency)
         {
             return currency switch
@@ -38,6 +39,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                     setConversionTab: setConversionTab,
                     setWertCurrency: setWertCurrency,
                     showRightPopupContent: showRightPopupContent,
+                    showTezosToken: showTezosToken,
                     currency: currency),
 
                 _ => throw new NotSupportedException($"Can't create wallet view model for {currency.Name}. This currency is not supported."),

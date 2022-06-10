@@ -104,7 +104,7 @@ namespace Atomex.Client.Desktop.ViewModels
 
             SubscribeToServices();
         }
-        
+
         // todo: remove
         public static string TezosTokens => "Tezos tokens";
 
@@ -125,7 +125,7 @@ namespace Atomex.Client.Desktop.ViewModels
                     return vm;
                 })
                 .ToList() ?? new List<CurrencyViewModel>();
-            
+
             // todo: remove
             var tezosConfig = App.Account.Currencies.Get<TezosConfig>(TezosConfig.Xtz);
             TezosTokensCurrencyViewModel = new TezosCurrencyViewModel(tezosConfig);
@@ -285,7 +285,7 @@ namespace Atomex.Client.Desktop.ViewModels
                             SelectedCurrency = currencyViewModel;
                         }
                     };
-                
+
                 SelectedCurrency = null;
                 Desktop.App.DialogService.Show(selectReceiveCurrencyViewModel);
             });
@@ -309,22 +309,26 @@ namespace Atomex.Client.Desktop.ViewModels
             {
                 var vm = new ManageAssetsViewModel
                 {
-                    AvailableCurrencies = new ObservableCollection<CurrencyWithSelection>(
+                    AvailableAssets = new ObservableCollection<AssetWithSelection>(
                         AllCurrencies
                             .Where(c => c.Header != TezosTokens)
-                            .Select(currency => new CurrencyWithSelection
-                        {
-                            Currency = currency,
-                            IsSelected = InitialChoosenCurrencies.Contains(currency)
-                        })
+                            .Select(currency => new AssetWithSelection
+                            {
+                                Asset = currency,
+                                IsSelected = InitialChoosenCurrencies.Contains(currency)
+                            })
                     ),
-                    OnAssetsChanged = currencies =>
+                    OnAssetsChanged = currencyCodes =>
                     {
-                        // todo: remove
-                        ChoosenCurrencies = new List<CurrencyViewModel>(currencies.Append(TezosTokensCurrencyViewModel));
+                        // todo: remove tezos tokens
+                        var currencies = AllCurrencies
+                            .Where(c => c.Header == TezosTokens || currencyCodes.Contains(c.CurrencyCode));
+
+                        ChoosenCurrencies =
+                            new List<CurrencyViewModel>(currencies);
 
                         InitialChoosenCurrencies = new List<CurrencyViewModel>(ChoosenCurrencies);
-                        
+
                         App.Account.UserData.InitializedCurrencies = ChoosenCurrencies
                             .Select(currency => currency.Currency.Name)
                             .ToArray();

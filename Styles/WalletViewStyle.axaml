@@ -49,7 +49,6 @@
         <DataTemplate x:Key="UnconfirmedStateTemplate" DataType="viewModels:TransactionViewModel">
             <StackPanel Orientation="Horizontal">
                 <svg:Svg Width="18"
-                         Classes="InProgress"
                          VerticalAlignment="Center"
                          Path="/Resources/Icons/exclamation-mark.svg" />
                 <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"

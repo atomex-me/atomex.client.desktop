@@ -6,8 +6,8 @@
         <UseAppHost>true</UseAppHost>
         <ApplicationIcon>Resources/Images/logo_dark_256x256.ico</ApplicationIcon>
 
-        <AssemblyVersion>1.2.11</AssemblyVersion>
-        <Version>1.2.11</Version>
+        <AssemblyVersion>1.2.12</AssemblyVersion>
+        <Version>1.2.12</Version>
     </PropertyGroup>
     <Choose>
         <When Condition=" '$(Configuration)' == 'Debug' ">
@@ -30,11 +30,11 @@
         <AvaloniaResource Include="Resources\Images\*" />
     </ItemGroup>
     <ItemGroup>
-        <PackageReference Include="Avalonia" Version="0.10.14" />
-        <PackageReference Include="Avalonia.Controls.DataGrid" Version="0.10.14" />
-        <PackageReference Include="Avalonia.Desktop" Version="0.10.14" />
-        <PackageReference Include="Avalonia.Diagnostics" Version="0.10.14" />
-        <PackageReference Include="Avalonia.ReactiveUI" Version="0.10.14" />
+        <PackageReference Include="Avalonia" Version="0.10.15" />
+        <PackageReference Include="Avalonia.Controls.DataGrid" Version="0.10.15" />
+        <PackageReference Include="Avalonia.Desktop" Version="0.10.15" />
+        <PackageReference Include="Avalonia.Diagnostics" Version="0.10.15" />
+        <PackageReference Include="Avalonia.ReactiveUI" Version="0.10.15" />
         <PackageReference Include="Avalonia.Xaml.Behaviors" Version="0.10.13.3" />
         <PackageReference Include="Avalonia.Svg.Skia" Version="0.10.13" />
         <PackageReference Include="DialogHost.Avalonia" Version="0.4.0" />
