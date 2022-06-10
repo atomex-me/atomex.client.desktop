@@ -501,6 +501,7 @@
                         Margin="0 32 0 60">
                 <controls:RoundedButton Width="440"
                                         Command="{Binding NextCommand}"
+                                        Classes.Loading="{Binding IsSending}"
                                         IsEnabled="{Binding CanSend}">
                     <i:Interaction.Behaviors>
                         <ia:DataTriggerBehavior Binding="{Binding Stage}"

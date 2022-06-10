@@ -53,6 +53,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         [Reactive] public bool UseRecommendedAmount { get; set; }
         [Reactive] public bool UseEnteredAmount { get; set; }
         [Reactive] public bool CanSend { get; set; }
+        [ObservableAsProperty] public bool IsSending { get; }
         public decimal AmountToSend => UseRecommendedAmount && (RecommendedMaxAmount < Amount)
             ? RecommendedMaxAmount
             : Amount;
@@ -135,18 +136,15 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             {
                 try
                 {
-                    App.DialogService.Show(
-                        MessageViewModel.Message(title: "Sending, please wait", withProgressBar: true));
-
                     var error = await Send();
 
                     if (error != null)
-                    {
+                    { 
                         App.DialogService.Show(MessageViewModel.Error(
                             text: error.Description,
                             backAction: () => App.DialogService.Show(this)));
-
-                        return;
+                        
+                        return;   
                     }
 
                     App.DialogService.Show(MessageViewModel.Success(
@@ -307,6 +305,10 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                         Amount,
                         Currency.Name);
                 });
+
+            NextCommand
+                .IsExecuting
+                .ToPropertyExInMainThread(this, vm => vm.IsSending);
 
             SubscribeToServices();
         }

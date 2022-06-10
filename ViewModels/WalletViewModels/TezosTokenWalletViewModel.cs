@@ -117,6 +117,11 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                 Log.Debug("Token transfers loaded for contract {Contract}", tokenViewModel.Contract.Address);
             }
         }
+        
+        protected override void SubscribeToServices()
+        {
+            _app.Account.BalanceUpdated += OnBalanceUpdatedEventHandler;
+        }
 
         protected override async void OnBalanceUpdatedEventHandler(object sender, CurrencyEventArgs args)
         {
