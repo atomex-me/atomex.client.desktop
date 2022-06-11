@@ -63,7 +63,7 @@
             <controls:IconButton Classes="MenuDots"
                                  VerticalAlignment="Center"
                                  Margin="12 0 0 0"
-                                 Command="{Binding ManageTokensCommand}" />
+                                 Command="{Binding HideLowBalancesCommand}" />
         </StackPanel>
 
 

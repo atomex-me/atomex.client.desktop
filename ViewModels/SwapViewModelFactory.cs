@@ -22,11 +22,11 @@ namespace Atomex.Client.Desktop.ViewModels
                 var soldCurrency = currencies.GetByName(swap.SoldCurrency);
                 var purchasedCurrency = currencies.GetByName(swap.PurchasedCurrency);
 
-                var fromCurrencyViewModel = CurrencyViewModelCreator.CreateViewModel(
+                var fromCurrencyViewModel = CurrencyViewModelCreator.CreateOrGet(
                     currencyConfig: soldCurrency,
                     subscribeToUpdates: false);
 
-                var toCurrencyViewModel = CurrencyViewModelCreator.CreateViewModel(
+                var toCurrencyViewModel = CurrencyViewModelCreator.CreateOrGet(
                     currencyConfig: purchasedCurrency,
                     subscribeToUpdates: false);
 

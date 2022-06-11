@@ -289,6 +289,12 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
                 Desktop.App.DialogService.Show(vm);
             });
+        
+        
+        private ReactiveCommand<Unit, Unit> _hideLowBalancesCommand;
+
+        public ReactiveCommand<Unit, Unit> HideLowBalancesCommand => _hideLowBalancesCommand ??=
+            (_hideLowBalancesCommand = ReactiveCommand.CreateFromTask(UpdateTokens));
 
         private ReactiveCommand<Unit, Unit> _updateTokensCommand;
 

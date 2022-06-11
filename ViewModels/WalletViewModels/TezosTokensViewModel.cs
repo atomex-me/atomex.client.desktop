@@ -26,6 +26,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         private readonly IAtomexApp _app;
         private Action<TezosTokenViewModel> ShowTezosToken { get; }
         private Action<CurrencyConfig> SetConversionTab { get; }
+        [Reactive] public bool HideLowBalances { get; set; }
         [Reactive] public string[] DisabledTokens { get; set; }
         [Reactive] private ObservableCollection<TokenContract>? Contracts { get; set; }
         [Reactive] public ObservableCollection<TezosTokenViewModel> Tokens { get; set; }
@@ -92,12 +93,8 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                     .GetTezosTokenAddressesByContractAsync(contract.Address);
 
                 var tokenGroups = tokenWalletAddresses
-                    .Where(walletAddress => walletAddress.Balance != 0)
-                    .GroupBy(walletAddress => new
-                    {
-                        walletAddress.TokenBalance.TokenId,
-                        walletAddress.TokenBalance.Contract
-                    });
+                    // .Where(walletAddress => walletAddress.Balance != 0)
+                    .GroupBy(walletAddress => walletAddress.TokenBalance.TokenId);
 
                 var tokensViewModels = tokenGroups
                     .Select(walletAddressGroup =>
@@ -163,6 +160,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                 {
                     token.AtomexApp = _app;
                     token.SetConversionTab = SetConversionTab;
+                    token.TotalAmount = token.TokenBalance.GetTokenBalance();
 
                     var quote = quotesProvider.GetQuote(token.TokenBalance.Symbol,
                         TezosTokenViewModel.BaseCurrencyCode);

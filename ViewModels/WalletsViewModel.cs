@@ -73,6 +73,10 @@ namespace Atomex.Client.Desktop.ViewModels
                 walletsViewModels.AddRange(wallets);
                 walletsViewModels.Add(new TezosTokenWalletViewModel(App, ShowRightPopupContent));
             }
+            else
+            {
+                CurrencyViewModelCreator.Reset();
+            }
 
             Wallets = new ObservableCollection<IWalletViewModel>(walletsViewModels);
         }
@@ -109,12 +113,12 @@ namespace Atomex.Client.Desktop.ViewModels
                 new WalletViewModel
                 {
                     CurrencyViewModel =
-                        CurrencyViewModelCreator.CreateViewModel(currencies[0], subscribeToUpdates: false)
+                        CurrencyViewModelCreator.CreateOrGet(currencies[0], subscribeToUpdates: false)
                 },
                 new WalletViewModel
                 {
                     CurrencyViewModel =
-                        CurrencyViewModelCreator.CreateViewModel(currencies[1], subscribeToUpdates: false)
+                        CurrencyViewModelCreator.CreateOrGet(currencies[1], subscribeToUpdates: false)
                 }
             };
 

@@ -164,8 +164,8 @@ namespace Atomex.Client.Desktop.ViewModels
             var btc = DesignTime.TestNetCurrencies.Get<BitcoinConfig>("BTC");
             var ltc = DesignTime.TestNetCurrencies.Get<LitecoinConfig>("LTC");
 
-            FromCurrencyViewModel = CurrencyViewModelCreator.CreateViewModel(btc, subscribeToUpdates: false);
-            ToCurrencyViewModel = CurrencyViewModelCreator.CreateViewModel(ltc, subscribeToUpdates: false);
+            FromCurrencyViewModel = CurrencyViewModelCreator.CreateOrGet(btc, subscribeToUpdates: false);
+            ToCurrencyViewModel = CurrencyViewModelCreator.CreateOrGet(ltc, subscribeToUpdates: false);
 
             CompactState = SwapCompactState.InProgress;
         }

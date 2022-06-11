@@ -72,7 +72,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
             if (currency != null)
             {
-                CurrencyViewModel = CurrencyViewModelCreator.CreateViewModel(currency);
+                CurrencyViewModel = CurrencyViewModelCreator.CreateOrGet(currency);
                 Header = CurrencyViewModel.Header;
                 
                 LoadAddresses();
@@ -362,7 +362,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         {
             var currencies = DesignTime.TestNetCurrencies.ToList();
 
-            CurrencyViewModel = CurrencyViewModelCreator.CreateViewModel(currencies[3], subscribeToUpdates: false);
+            CurrencyViewModel = CurrencyViewModelCreator.CreateOrGet(currencies[3], subscribeToUpdates: false);
             CurrencyViewModel.TotalAmount = 0.01012345m;
             CurrencyViewModel.TotalAmountInBase = 16.51m;
             CurrencyViewModel.AvailableAmount = 0.01010005m;

@@ -117,7 +117,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                 Log.Debug("Token transfers loaded for contract {Contract}", tokenViewModel.Contract.Address);
             }
         }
-        
+
         protected override void SubscribeToServices()
         {
             _app.Account.BalanceUpdated += OnBalanceUpdatedEventHandler;
@@ -127,9 +127,28 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         {
             try
             {
-                if (!Currencies.IsTezosToken(args.Currency) || TokenViewModel == null) return;
+                if (!Currencies.IsTezosBased(args.Currency) || TokenViewModel == null) return;
 
-                await Dispatcher.UIThread.InvokeAsync(async () => { await LoadTransfers(TokenViewModel); },
+                await Dispatcher.UIThread.InvokeAsync(async () =>
+                    {
+                        await LoadTransfers(TokenViewModel);
+                        var tezosAccount = _app.Account
+                            .GetCurrencyAccount<TezosAccount>(TezosConfig.Xtz);
+
+                        var tokenWalletAddresses = (await tezosAccount
+                                .DataRepository
+                                .GetTezosTokenAddressesByContractAsync(TokenViewModel.Contract.Address))
+                            .Where(address => address.TokenBalance.TokenId == TokenViewModel.TokenBalance.TokenId);
+
+                        var tokenBalance = tokenWalletAddresses.Sum(address => address.TokenBalance.GetTokenBalance());
+
+                        TokenViewModel.TotalAmount = tokenBalance;
+
+                        // todo: quotes update event
+                        var quote = _app.QuotesProvider.GetQuote(TokenViewModel.TokenBalance.Symbol);
+                        if (quote != null)
+                            TokenViewModel.TotalAmountInBase = TokenViewModel.TotalAmount.SafeMultiply(quote.Bid);
+                    },
                     DispatcherPriority.Background);
             }
             catch (Exception e)

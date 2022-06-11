@@ -43,13 +43,14 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
         [Reactive] public decimal TotalAmountInBase { get; set; }
         [Reactive] public decimal CurrentQuote { get; set; }
         [Reactive] public bool IsPopupOpened { get; set; }
+        [Reactive] public decimal TotalAmount { get; set; }
 
         public string IconPath => string.Empty;
         public string DisabledIconPath => string.Empty;
         public string CurrencyCode => TokenBalance.Symbol;
         public string CurrencyDescription => TokenBalance.Name;
         string IAssetViewModel.BaseCurrencyFormat => BaseCurrencyFormat;
-        public decimal TotalAmount => TokenBalance.ParsedBalance ?? 0;
+        
         public decimal? DailyChangePercent => null;
 
         private ThumbsApi ThumbsApi => new ThumbsApi(
@@ -96,7 +97,7 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
         public decimal DecimalBalance => TokenBalance.GetTokenBalance();
 
         public string Balance => TokenBalance.Balance != "1"
-            ? $"{DecimalBalance.ToString(CurrencyFormat, CultureInfo.CurrentCulture)}  {TokenBalance.Symbol}"
+            ? $"{DecimalBalance.ToString(CurrencyFormat, CultureInfo.CurrentCulture)}  {CurrencyCode}"
             : "";
 
         public TezosTokenViewModel()

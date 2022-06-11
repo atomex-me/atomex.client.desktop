@@ -120,7 +120,7 @@ namespace Atomex.Client.Desktop.ViewModels
             AllCurrencies = e.AtomexClient?.Account?.Currencies
                 .Select(c =>
                 {
-                    var vm = CurrencyViewModelCreator.CreateViewModel(c);
+                    var vm = CurrencyViewModelCreator.CreateOrGet(c);
                     vm.AmountUpdated += OnAmountUpdatedEventHandler;
                     return vm;
                 })
@@ -363,7 +363,7 @@ namespace Atomex.Client.Desktop.ViewModels
             ChoosenCurrencies = DesignTime.TestNetCurrencies
                 .Select(c =>
                 {
-                    var vm = CurrencyViewModelCreator.CreateViewModel(c, subscribeToUpdates: false);
+                    var vm = CurrencyViewModelCreator.CreateOrGet(c, subscribeToUpdates: false);
                     vm.TotalAmountInBase = random.Next(1000000, 10000000);
                     vm.TotalAmount = random.Next(1000000, 10000000);
                     vm.AvailableAmount = random.Next(1000000, 10000000);
