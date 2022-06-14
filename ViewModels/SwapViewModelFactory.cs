@@ -62,13 +62,11 @@ namespace Atomex.Client.Desktop.ViewModels
                     Time                  = swap.TimeStamp,
 
                     FromCurrencyViewModel = fromCurrencyViewModel,
-                    FromBrush             = new SolidColorBrush(fromCurrencyViewModel.AmountColor),
                     FromAmount            = fromAmount,
                     FromAmountFormat      = fromCurrencyViewModel.CurrencyFormat,
                     FromCurrencyCode      = fromCurrencyViewModel.CurrencyCode,
 
                     ToCurrencyViewModel   = toCurrencyViewModel,
-                    ToBrush               = new SolidColorBrush(toCurrencyViewModel.AmountColor),
                     ToAmount              = toAmount,
                     ToAmountFormat        = toCurrencyViewModel.CurrencyFormat,
                     ToCurrencyCode        = toCurrencyViewModel.CurrencyCode,

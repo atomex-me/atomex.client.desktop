@@ -1,14 +1,14 @@
 using System;
 using System.Threading.Tasks;
 using System.Reactive.Linq;
-using Avalonia;
+
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
-using Avalonia.Platform;
 using Avalonia.Threading;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using Serilog;
+
 using Atomex.Core;
 using Atomex.MarketData.Abstract;
 using Atomex.Wallet;
@@ -29,11 +29,7 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
         public CurrencyConfig Currency { get; set; }
         public CurrencyConfig ChainCurrency { get; set; }
         public string Header { get; set; }
-        public Brush IconBrush { get; set; }
-        public IBrush UnselectedIconBrush { get; set; }
-        public Brush IconMaskBrush { get; set; }
         public Color AccentColor { get; set; }
-        public Color AmountColor { get; set; }
         public string IconPath { get; set; }
         public IBitmap? BitmapIcon => null;
         public bool CanExchange => true;
@@ -134,17 +130,6 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
             DailyChangePercent = quote?.DailyChangePercent ?? 0;
 
             AmountUpdated?.Invoke(this, EventArgs.Empty);
-        }
-
-        protected static string PathToImage(string imageName)
-        {
-            return $"{PathToImages}/{imageName}";
-        }
-
-        protected static IBitmap GetBitmap(string uri)
-        {
-            var assets = AvaloniaLocator.Current.GetService<IAssetLoader>();
-            return new Bitmap(assets.Open(new Uri(uri)));
         }
 
         #region IDisposable Support
