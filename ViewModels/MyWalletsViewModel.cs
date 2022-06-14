@@ -102,7 +102,7 @@ namespace Atomex.Client.Desktop.ViewModels
 
         private void TezosTransactionsDeleted()
         {
-            var xtzCurrencies = new[] { "XTZ", "TZBTC", "KUSD" };
+            var xtzCurrencies = new[] { "XTZ", "TZBTC", "KUSD", "USDT_XTZ" };
             var restoreDialogViewModel = new RestoreDialogViewModel(AtomexApp);
             restoreDialogViewModel.ScanCurrenciesAsync(xtzCurrencies);
         }

@@ -17,17 +17,18 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
         {
             var result = currencyConfig.Name switch
             {
-                "BTC"   => (CurrencyViewModel)new BitcoinCurrencyViewModel(currencyConfig),
-                "LTC"   => new LitecoinCurrencyViewModel(currencyConfig),
-                "USDT"  => new TetherCurrencyViewModel(currencyConfig),
-                "TBTC"  => new TbtcCurrencyViewModel(currencyConfig),
-                "WBTC"  => new WbtcCurrencyViewModel(currencyConfig),
-                "ETH"   => new EthereumCurrencyViewModel(currencyConfig),
-                "TZBTC" => new TzbtcCurrencyViewModel(currencyConfig),
-                "KUSD"  => new KusdCurrencyViewModel(currencyConfig),
-                "XTZ"   => new TezosCurrencyViewModel(currencyConfig),
+                "BTC"      => (CurrencyViewModel)new BitcoinCurrencyViewModel(currencyConfig),
+                "LTC"      => new LitecoinCurrencyViewModel(currencyConfig),
+                "USDT"     => new TetherCurrencyViewModel(currencyConfig),
+                "TBTC"     => new TbtcCurrencyViewModel(currencyConfig),
+                "WBTC"     => new WbtcCurrencyViewModel(currencyConfig),
+                "ETH"      => new EthereumCurrencyViewModel(currencyConfig),
+                "TZBTC"    => new TzbtcCurrencyViewModel(currencyConfig),
+                "KUSD"     => new KusdCurrencyViewModel(currencyConfig),
+                "USDT_XTZ" => new UsdtXtzCurrencyViewModel(currencyConfig),
+                "XTZ"      => new TezosCurrencyViewModel(currencyConfig),
                 _ => throw new NotSupportedException(
-                    $"Can't create currency view model for {currencyConfig.Name}. This currency is not supported.")
+                    $"Can't create currency view model for {currencyConfig.Name}. This currency is not supported")
             };
 
             if (!subscribeToUpdates)

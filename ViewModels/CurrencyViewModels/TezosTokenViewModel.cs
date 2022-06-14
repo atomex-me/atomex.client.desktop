@@ -21,7 +21,7 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
     public class TezosTokenViewModel : ViewModelBase, IAssetViewModel
     {
         private const int MaxBalanceDecimals = AddressesHelper.MaxTokenCurrencyFormatDecimals;
-        private static readonly string[] ConvertibleTokens = { "tzbtc", "kusd" };
+        private static readonly string[] ConvertibleTokens = { "tzbtc", "kusd", "usdt_xtz" };
         public const string Fa12 = "FA12";
         public const string Fa2 = "FA2";
         public bool CanExchange => ConvertibleTokens.Contains(TokenBalance.Symbol?.ToLower());
