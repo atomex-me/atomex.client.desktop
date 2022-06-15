@@ -129,26 +129,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             {
                 if (!Currencies.IsTezosBased(args.Currency) || TokenViewModel == null) return;
 
-                await Dispatcher.UIThread.InvokeAsync(async () =>
-                    {
-                        await LoadTransfers(TokenViewModel);
-                        var tezosAccount = _app.Account
-                            .GetCurrencyAccount<TezosAccount>(TezosConfig.Xtz);
-
-                        var tokenWalletAddresses = (await tezosAccount
-                                .DataRepository
-                                .GetTezosTokenAddressesByContractAsync(TokenViewModel.Contract.Address))
-                            .Where(address => address.TokenBalance.TokenId == TokenViewModel.TokenBalance.TokenId);
-
-                        var tokenBalance = tokenWalletAddresses.Sum(address => address.TokenBalance.GetTokenBalance());
-
-                        TokenViewModel.TotalAmount = tokenBalance;
-
-                        // todo: quotes update event
-                        var quote = _app.QuotesProvider.GetQuote(TokenViewModel.TokenBalance.Symbol);
-                        if (quote != null)
-                            TokenViewModel.TotalAmountInBase = TokenViewModel.TotalAmount.SafeMultiply(quote.Bid);
-                    },
+                await Dispatcher.UIThread.InvokeAsync(async () => await LoadTransfers(TokenViewModel),
                     DispatcherPriority.Background);
             }
             catch (Exception e)
