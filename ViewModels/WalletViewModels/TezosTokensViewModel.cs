@@ -4,9 +4,11 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
+using System.Reflection.Metadata;
 using System.Threading.Tasks;
 using Atomex.Blockchain.Tezos;
 using Atomex.Client.Desktop.Common;
+using Atomex.Client.Desktop.ViewModels.Abstract;
 using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
 using Atomex.Core;
 using Atomex.MarketData.Abstract;
@@ -26,6 +28,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         private readonly IAtomexApp _app;
         private Action<TezosTokenViewModel> ShowTezosToken { get; }
         private Action<CurrencyConfig> SetConversionTab { get; }
+        [Reactive] public bool HideLowBalances { get; set; }
         [Reactive] public string[] DisabledTokens { get; set; }
         [Reactive] private ObservableCollection<TokenContract>? Contracts { get; set; }
         [Reactive] public ObservableCollection<TezosTokenViewModel> Tokens { get; set; }
@@ -58,8 +61,20 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                     OnQuotesUpdatedEventHandler(_app.QuotesProvider, EventArgs.Empty);
                 });
 
+            this.WhenAnyValue(vm => vm.HideLowBalances)
+                .WhereNotNull()
+                .Skip(1)
+                .SubscribeInMainThread(hideLowBalances =>
+                {
+                    _app.Account.UserData.HideTokensWithLowBalance = hideLowBalances;
+                    _app.Account.UserData.SaveToFile(_app.Account.SettingsFilePath);
+                    OnQuotesUpdatedEventHandler(_app.QuotesProvider, EventArgs.Empty);
+                });
+
 
             DisabledTokens = _app.Account.UserData.DisabledTokens ?? Array.Empty<string>();
+            HideLowBalances = _app.Account.UserData.HideTokensWithLowBalance ?? false;
+
             _ = ReloadTokenContractsAsync();
         }
 
@@ -76,52 +91,13 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
         private async Task<IEnumerable<TezosTokenViewModel>> LoadTokens()
         {
-            var tezosConfig = _app.Account
-                .Currencies
-                .Get<TezosConfig>(TezosConfig.Xtz);
-
             var tokens = new ObservableCollection<TezosTokenViewModel>();
 
             foreach (var contract in Contracts!)
-            {
-                var tezosAccount = _app.Account
-                    .GetCurrencyAccount<TezosAccount>(TezosConfig.Xtz);
+                tokens.AddRange(await TezosTokenViewModelCreator.CreateOrGet(_app, contract, SetConversionTab));
 
-                var tokenWalletAddresses = await tezosAccount
-                    .DataRepository
-                    .GetTezosTokenAddressesByContractAsync(contract.Address);
-
-                var tokenGroups = tokenWalletAddresses
-                    .Where(walletAddress => walletAddress.Balance != 0)
-                    .GroupBy(walletAddress => new
-                    {
-                        walletAddress.TokenBalance.TokenId,
-                        walletAddress.TokenBalance.Contract
-                    });
-
-                var tokensViewModels = tokenGroups
-                    .Select(walletAddressGroup =>
-                        walletAddressGroup.Skip(1).Aggregate(walletAddressGroup.First(), (result, walletAddress) =>
-                        {
-                            result.Balance += walletAddress.Balance;
-                            result.TokenBalance.ParsedBalance = result.TokenBalance.GetTokenBalance() +
-                                                                walletAddress.TokenBalance.GetTokenBalance();
-
-                            return result;
-                        }))
-                    .Select(walletAddress => new TezosTokenViewModel
-                    {
-                        TezosConfig = tezosConfig,
-                        TokenBalance = walletAddress.TokenBalance,
-                        Address = walletAddress.Address,
-                        Contract = contract,
-                    });
-
-                tokens.AddRange(tokensViewModels);
-            }
-
-            return tokens
-                .Where(token => !token.TokenBalance.IsNft);
+            return tokens.OrderByDescending(token => token.CanExchange)
+                .ThenByDescending(token => token.TotalAmountInBase);
         }
 
 
@@ -153,33 +129,18 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
         private async void OnQuotesUpdatedEventHandler(object sender, EventArgs args)
         {
-            if (sender is not ICurrencyQuotesProvider quotesProvider)
-                return;
+            if (sender is not ICurrencyQuotesProvider) return;
 
-            var tokens = await LoadTokens();
+            await Dispatcher.UIThread.InvokeAsync(async () =>
+            {
+                var tezosTokenViewModels = (await LoadTokens()).ToList();
 
-            var tokenViewModels = new ObservableCollection<TezosTokenViewModel>(tokens
-                .Select(token =>
-                {
-                    token.AtomexApp = _app;
-                    token.SetConversionTab = SetConversionTab;
-
-                    var quote = quotesProvider.GetQuote(token.TokenBalance.Symbol,
-                        TezosTokenViewModel.BaseCurrencyCode);
-
-                    if (quote == null) return token;
-
-                    token.CurrentQuote = quote.Bid;
-                    token.TotalAmountInBase = token.TokenBalance.GetTokenBalance().SafeMultiply(quote.Bid);
-
-                    return token;
-                })
-                .OrderByDescending(token => token.CanExchange)
-                .ThenByDescending(token => token.TotalAmountInBase));
-
-            InitialTokens = new ObservableCollection<TezosTokenViewModel>(tokenViewModels);
-            Tokens = new ObservableCollection<TezosTokenViewModel>(
-                tokenViewModels.Where(token => !DisabledTokens.Contains(token.TokenBalance.Symbol)));
+                InitialTokens = new ObservableCollection<TezosTokenViewModel>(tezosTokenViewModels);
+                Tokens = new ObservableCollection<TezosTokenViewModel>(tezosTokenViewModels
+                    .Where(token => !DisabledTokens.Contains(token.TokenBalance.Symbol))
+                    .Where(token => !HideLowBalances || token.TotalAmountInBase > Constants.MinBalanceForTokensUsd)
+                );
+            }, DispatcherPriority.Background);
         }
 
         public TezosTokensViewModel()

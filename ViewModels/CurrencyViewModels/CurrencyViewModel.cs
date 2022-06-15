@@ -17,7 +17,7 @@ using Atomex.Client.Desktop.Common;
 
 namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
 {
-    public abstract class CurrencyViewModel : ViewModelBase, IAssetViewModel
+    public abstract class CurrencyViewModel : ViewModelBase, IAssetViewModel, IDisposable
     {
         private const string PathToImages = "avares://Atomex.Client.Desktop/Resources/Images";
         protected const string PathToIcons = "/Resources/Icons";

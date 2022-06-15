@@ -44,7 +44,7 @@ namespace Atomex.Client.Desktop.ViewModels
             var currencies = DesignTime.TestNetCurrencies
                 .Select(c =>
                 {
-                    var vm = CurrencyViewModelCreator.CreateViewModel(c, subscribeToUpdates: false);
+                    var vm = CurrencyViewModelCreator.CreateOrGet(c, subscribeToUpdates: false);
                     vm.AvailableAmount = random.Next(10, 1000);
                     return vm;
                 })

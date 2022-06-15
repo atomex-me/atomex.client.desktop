@@ -117,7 +117,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                 Log.Debug("Token transfers loaded for contract {Contract}", tokenViewModel.Contract.Address);
             }
         }
-        
+
         protected override void SubscribeToServices()
         {
             _app.Account.BalanceUpdated += OnBalanceUpdatedEventHandler;
@@ -127,9 +127,9 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         {
             try
             {
-                if (!Currencies.IsTezosToken(args.Currency) || TokenViewModel == null) return;
+                if (!Currencies.IsTezosBased(args.Currency) || TokenViewModel == null) return;
 
-                await Dispatcher.UIThread.InvokeAsync(async () => { await LoadTransfers(TokenViewModel); },
+                await Dispatcher.UIThread.InvokeAsync(async () => await LoadTransfers(TokenViewModel),
                     DispatcherPriority.Background);
             }
             catch (Exception e)
