@@ -77,48 +77,12 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
         private async Task<IEnumerable<TezosTokenViewModel>> LoadTokens()
         {
-            var tezosConfig = _app.Account
-                .Currencies
-                .Get<TezosConfig>(TezosConfig.Xtz);
-
             var tokens = new ObservableCollection<TezosTokenViewModel>();
 
             foreach (var contract in Contracts!)
-            {
-                var tezosAccount = _app.Account
-                    .GetCurrencyAccount<TezosAccount>(TezosConfig.Xtz);
+                tokens.AddRange(await TezosTokenViewModelCreator.CreateOrGet(_app, contract));
 
-                var tokenWalletAddresses = await tezosAccount
-                    .DataRepository
-                    .GetTezosTokenAddressesByContractAsync(contract.Address);
-
-                var tokenGroups = tokenWalletAddresses
-                    // .Where(walletAddress => walletAddress.Balance != 0)
-                    .GroupBy(walletAddress => walletAddress.TokenBalance.TokenId);
-
-                var tokensViewModels = tokenGroups
-                    .Select(walletAddressGroup =>
-                        walletAddressGroup.Skip(1).Aggregate(walletAddressGroup.First(), (result, walletAddress) =>
-                        {
-                            result.Balance += walletAddress.Balance;
-                            result.TokenBalance.ParsedBalance = result.TokenBalance.GetTokenBalance() +
-                                                                walletAddress.TokenBalance.GetTokenBalance();
-
-                            return result;
-                        }))
-                    .Select(walletAddress => new TezosTokenViewModel
-                    {
-                        TezosConfig = tezosConfig,
-                        TokenBalance = walletAddress.TokenBalance,
-                        Address = walletAddress.Address,
-                        Contract = contract,
-                    });
-
-                tokens.AddRange(tokensViewModels);
-            }
-
-            return tokens
-                .Where(token => !token.TokenBalance.IsNft);
+            return tokens;
         }
 
 
@@ -160,15 +124,15 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                 {
                     token.AtomexApp = _app;
                     token.SetConversionTab = SetConversionTab;
-                    token.TotalAmount = token.TokenBalance.GetTokenBalance();
+                    // token.TotalAmount = token.TokenBalance.GetTokenBalance();
 
-                    var quote = quotesProvider.GetQuote(token.TokenBalance.Symbol,
-                        TezosTokenViewModel.BaseCurrencyCode);
-
-                    if (quote == null) return token;
-
-                    token.CurrentQuote = quote.Bid;
-                    token.TotalAmountInBase = token.TokenBalance.GetTokenBalance().SafeMultiply(quote.Bid);
+                    // var quote = quotesProvider.GetQuote(token.TokenBalance.Symbol,
+                    //     TezosTokenViewModel.BaseCurrencyCode);
+                    //
+                    // if (quote == null) return token;
+                    //
+                    // token.CurrentQuote = quote.Bid;
+                    // token.TotalAmountInBase = token.TokenBalance.GetTokenBalance().SafeMultiply(quote.Bid);
 
                     return token;
                 })

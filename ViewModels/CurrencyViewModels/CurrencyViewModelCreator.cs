@@ -62,6 +62,11 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
 
         public static void Reset()
         {
+            foreach (var currencyViewModel in Instances.Values)
+            {
+                currencyViewModel.Dispose();
+            }
+
             Instances.Clear();
         }
 

@@ -8,17 +8,21 @@ using Atomex.Blockchain.Tezos;
 using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.ViewModels.SendViewModels;
 using Atomex.Core;
+using Atomex.MarketData.Abstract;
 using Atomex.TezosTokens;
 using Atomex.ViewModels;
+using Atomex.Wallet;
+using Atomex.Wallet.Tezos;
 using Avalonia.Media.Imaging;
 using Avalonia.Threading;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using Serilog;
 
 namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
 {
-    public class TezosTokenViewModel : ViewModelBase, IAssetViewModel
+    public class TezosTokenViewModel : ViewModelBase, IAssetViewModel, IDisposable
     {
         private const int MaxBalanceDecimals = AddressesHelper.MaxTokenCurrencyFormatDecimals;
         private static readonly string[] ConvertibleTokens = { "tzbtc", "kusd" };
@@ -40,17 +44,18 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
             ? $"F{Math.Min(TokenBalance.Decimals, MaxBalanceDecimals)}"
             : $"F{MaxBalanceDecimals}";
 
-        [Reactive] public decimal TotalAmountInBase { get; set; }
         [Reactive] public decimal CurrentQuote { get; set; }
         [Reactive] public bool IsPopupOpened { get; set; }
         [Reactive] public decimal TotalAmount { get; set; }
+        [Reactive] public decimal TotalAmountInBase { get; set; }
+        [ObservableAsProperty] public string Balance { get; }
 
         public string IconPath => string.Empty;
         public string DisabledIconPath => string.Empty;
         public string CurrencyCode => TokenBalance.Symbol;
         public string CurrencyDescription => TokenBalance.Name;
         string IAssetViewModel.BaseCurrencyFormat => BaseCurrencyFormat;
-        
+
         public decimal? DailyChangePercent => null;
 
         private ThumbsApi ThumbsApi => new ThumbsApi(
@@ -94,16 +99,80 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
             }
         }
 
-        public decimal DecimalBalance => TokenBalance.GetTokenBalance();
-
-        public string Balance => TokenBalance.Balance != "1"
-            ? $"{DecimalBalance.ToString(CurrencyFormat, CultureInfo.CurrentCulture)}  {CurrencyCode}"
-            : "";
+        // public decimal DecimalBalance => TokenBalance.GetTokenBalance();
 
         public TezosTokenViewModel()
         {
+            this.WhenAnyValue(vm => vm.TotalAmount)
+                .WhereNotNull()
+                .Select(totalAmount => $"{totalAmount.ToString(CurrencyFormat, CultureInfo.CurrentCulture)} {CurrencyCode}")
+                .ToPropertyExInMainThread(this, vm => vm.Balance);
+
             SendCommand.Merge(ReceiveCommand)
                 .SubscribeInMainThread(_ => IsPopupOpened = false);
+        }
+
+        public void SubscribeToUpdates()
+        {
+            AtomexApp.Account.BalanceUpdated += OnBalanceChangedEventHandler;
+            AtomexApp.QuotesProvider.QuotesUpdated += OnQuotesUpdatedEventHandler;
+        }
+
+        private async void OnBalanceChangedEventHandler(object? sender, CurrencyEventArgs args)
+        {
+            try
+            {
+                //if (Currency.Name.Equals(args.Currency))
+                await UpdateAsync();
+
+                Log.Fatal($"UPDATING BALANCE FOR {TokenBalance.Symbol}");
+            }
+            catch (Exception e)
+            {
+                Log.Error(e, $"Error for currency {args.Currency}");
+            }
+        }
+
+        private void OnQuotesUpdatedEventHandler(object? sender, EventArgs args)
+        {
+            if (sender is not ICurrencyQuotesProvider quotesProvider)
+                return;
+
+            UpdateQuotesInBaseCurrency(quotesProvider);
+        }
+
+        public void UpdateQuotesInBaseCurrency(ICurrencyQuotesProvider quotesProvider)
+        {
+            var quote = quotesProvider.GetQuote(TokenBalance.Symbol, BaseCurrencyCode);
+            if (quote == null) return;
+
+            CurrentQuote = quote.Bid;
+            TotalAmountInBase = TokenBalance.GetTokenBalance().SafeMultiply(quote.Bid);
+
+            Log.Fatal($"UPDATING QUOTES FOR {TokenBalance.Symbol}");
+        }
+
+        public async Task UpdateAsync()
+        {
+            await Dispatcher.UIThread.InvokeAsync(async () =>
+            {
+                var tezosAccount = AtomexApp.Account.GetCurrencyAccount<TezosAccount>(TezosConfig.Xtz);
+
+                var tokenWalletAddresses = await tezosAccount
+                    .DataRepository
+                    .GetTezosTokenAddressesByContractAsync(Contract.Address);
+
+                var addresses = tokenWalletAddresses
+                    .Where(walletAddress => walletAddress.TokenBalance.TokenId == TokenBalance.TokenId)
+                    .ToList();
+
+                var tokenBalance = 0m;
+                addresses.ForEach(a => { tokenBalance += a.TokenBalance.GetTokenBalance(); });
+                
+                TotalAmount = tokenBalance;
+
+                UpdateQuotesInBaseCurrency(AtomexApp.QuotesProvider);
+            }, DispatcherPriority.Background);
         }
 
         private ReceiveViewModel GetReceiveDialog()
@@ -213,5 +282,11 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
                     Log.Error(e, "Copy to clipboard error");
                 }
             });
+
+        public void Dispose()
+        {
+            AtomexApp.Account.BalanceUpdated -= OnBalanceChangedEventHandler;
+            AtomexApp.QuotesProvider.QuotesUpdated -= OnQuotesUpdatedEventHandler;
+        }
     }
 }

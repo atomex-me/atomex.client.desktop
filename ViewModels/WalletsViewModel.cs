@@ -76,6 +76,7 @@ namespace Atomex.Client.Desktop.ViewModels
             else
             {
                 CurrencyViewModelCreator.Reset();
+                TezosTokenViewModelCreator.Reset();
             }
 
             Wallets = new ObservableCollection<IWalletViewModel>(walletsViewModels);
