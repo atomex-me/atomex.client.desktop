@@ -61,7 +61,6 @@ namespace Atomex.Client.Desktop.ViewModels
 
                 await Task.Run(() =>
                         Task.WhenAll(primaryCurrencies
-                            .Where(currency => currency.Name != TezosConfig.Xtz)
                             .Select(currency =>
                                 hdWalletScanner.ScanAsync(currency.Name, cancellationToken: cancellation.Token))),
                     cancellation.Token);
@@ -93,7 +92,7 @@ namespace Atomex.Client.Desktop.ViewModels
                             .Select(currency =>
                                 hdWalletScanner.ScanAsync(currency.Name, cancellationToken: cancellation.Token))),
                     cancellation.Token);
-                
+
                 Log.Information($"Scan {_restoringEntityTitle} done");
             }
             catch (OperationCanceledException)
@@ -109,7 +108,7 @@ namespace Atomex.Client.Desktop.ViewModels
             {
                 if (App.DialogService.IsCurrentlyShowing(restoreModalVm))
                     App.DialogService.Close();
-                
+
                 OnRestored?.Invoke();
             }
         }

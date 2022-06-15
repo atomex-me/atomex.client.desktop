@@ -4,9 +4,11 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
+using System.Reflection.Metadata;
 using System.Threading.Tasks;
 using Atomex.Blockchain.Tezos;
 using Atomex.Client.Desktop.Common;
+using Atomex.Client.Desktop.ViewModels.Abstract;
 using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
 using Atomex.Core;
 using Atomex.MarketData.Abstract;
@@ -59,8 +61,20 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                     OnQuotesUpdatedEventHandler(_app.QuotesProvider, EventArgs.Empty);
                 });
 
+            this.WhenAnyValue(vm => vm.HideLowBalances)
+                .WhereNotNull()
+                .Skip(1)
+                .SubscribeInMainThread(hideLowBalances =>
+                {
+                    _app.Account.UserData.HideTokensWithLowBalance = hideLowBalances;
+                    _app.Account.UserData.SaveToFile(_app.Account.SettingsFilePath);
+                    OnQuotesUpdatedEventHandler(_app.QuotesProvider, EventArgs.Empty);
+                });
+
 
             DisabledTokens = _app.Account.UserData.DisabledTokens ?? Array.Empty<string>();
+            HideLowBalances = _app.Account.UserData.HideTokensWithLowBalance ?? false;
+
             _ = ReloadTokenContractsAsync();
         }
 
@@ -123,7 +137,9 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
                 InitialTokens = new ObservableCollection<TezosTokenViewModel>(tezosTokenViewModels);
                 Tokens = new ObservableCollection<TezosTokenViewModel>(tezosTokenViewModels
-                    .Where(token => !DisabledTokens.Contains(token.TokenBalance.Symbol)));
+                    .Where(token => !DisabledTokens.Contains(token.TokenBalance.Symbol))
+                    .Where(token => !HideLowBalances || token.TotalAmountInBase > Constants.MinBalanceForTokensUsd)
+                );
             }, DispatcherPriority.Background);
         }
 
