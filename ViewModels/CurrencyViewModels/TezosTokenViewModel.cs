@@ -105,8 +105,15 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
         {
             this.WhenAnyValue(vm => vm.TotalAmount)
                 .WhereNotNull()
-                .Select(totalAmount => $"{totalAmount.ToString(CurrencyFormat, CultureInfo.CurrentCulture)} {CurrencyCode}")
+                .Where(_ => TokenBalance != null)
+                .Select(totalAmount =>
+                    $"{totalAmount.ToString(CurrencyFormat, CultureInfo.CurrentCulture)} {CurrencyCode}")
                 .ToPropertyExInMainThread(this, vm => vm.Balance);
+
+            this.WhenAnyValue(vm => vm.TotalAmount)
+                .WhereNotNull()
+                .Where(_ => AtomexApp != null)
+                .SubscribeInMainThread(_ => UpdateQuotesInBaseCurrency(AtomexApp!.QuotesProvider));
 
             SendCommand.Merge(ReceiveCommand)
                 .SubscribeInMainThread(_ => IsPopupOpened = false);
@@ -122,14 +129,14 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
         {
             try
             {
-                //if (Currency.Name.Equals(args.Currency))
-                await UpdateAsync();
+                if (!Atomex.Currencies.IsTezosBased(args.Currency)) return;
 
-                Log.Fatal($"UPDATING BALANCE FOR {TokenBalance.Symbol}");
+                await UpdateAsync();
+                Log.Debug("Balance updated for tezos token {Symbol}", TokenBalance.Symbol);
             }
             catch (Exception e)
             {
-                Log.Error(e, $"Error for currency {args.Currency}");
+                Log.Error(e, "Error updating tezos token {Symbol}", TokenBalance.Symbol);
             }
         }
 
@@ -141,18 +148,18 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
             UpdateQuotesInBaseCurrency(quotesProvider);
         }
 
-        public void UpdateQuotesInBaseCurrency(ICurrencyQuotesProvider quotesProvider)
+        private void UpdateQuotesInBaseCurrency(ICurrencyQuotesProvider quotesProvider)
         {
             var quote = quotesProvider.GetQuote(TokenBalance.Symbol, BaseCurrencyCode);
             if (quote == null) return;
 
             CurrentQuote = quote.Bid;
-            TotalAmountInBase = TokenBalance.GetTokenBalance().SafeMultiply(quote.Bid);
+            TotalAmountInBase = TotalAmount.SafeMultiply(quote.Bid);
 
-            Log.Fatal($"UPDATING QUOTES FOR {TokenBalance.Symbol}");
+            Log.Debug("Quotes updated for tezos token {Symbol}", TokenBalance.Symbol);
         }
 
-        public async Task UpdateAsync()
+        private async Task UpdateAsync()
         {
             await Dispatcher.UIThread.InvokeAsync(async () =>
             {
@@ -168,10 +175,8 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
 
                 var tokenBalance = 0m;
                 addresses.ForEach(a => { tokenBalance += a.TokenBalance.GetTokenBalance(); });
-                
-                TotalAmount = tokenBalance;
 
-                UpdateQuotesInBaseCurrency(AtomexApp.QuotesProvider);
+                TotalAmount = tokenBalance;
             }, DispatcherPriority.Background);
         }
 
@@ -285,8 +290,11 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
 
         public void Dispose()
         {
-            AtomexApp.Account.BalanceUpdated -= OnBalanceChangedEventHandler;
-            AtomexApp.QuotesProvider.QuotesUpdated -= OnQuotesUpdatedEventHandler;
+            if (AtomexApp.Account != null)
+                AtomexApp.Account.BalanceUpdated -= OnBalanceChangedEventHandler;
+            
+            if (AtomexApp.QuotesProvider != null)
+                AtomexApp.QuotesProvider.QuotesUpdated -= OnQuotesUpdatedEventHandler;
         }
     }
 }

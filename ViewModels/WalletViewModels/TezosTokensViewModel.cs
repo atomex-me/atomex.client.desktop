@@ -80,9 +80,10 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             var tokens = new ObservableCollection<TezosTokenViewModel>();
 
             foreach (var contract in Contracts!)
-                tokens.AddRange(await TezosTokenViewModelCreator.CreateOrGet(_app, contract));
+                tokens.AddRange(await TezosTokenViewModelCreator.CreateOrGet(_app, contract, SetConversionTab));
 
-            return tokens;
+            return tokens.OrderByDescending(token => token.CanExchange)
+                .ThenByDescending(token => token.TotalAmountInBase);
         }
 
 
@@ -114,34 +115,16 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
         private async void OnQuotesUpdatedEventHandler(object sender, EventArgs args)
         {
-            if (sender is not ICurrencyQuotesProvider quotesProvider)
-                return;
+            if (sender is not ICurrencyQuotesProvider) return;
 
-            var tokens = await LoadTokens();
+            await Dispatcher.UIThread.InvokeAsync(async () =>
+            {
+                var tezosTokenViewModels = (await LoadTokens()).ToList();
 
-            var tokenViewModels = new ObservableCollection<TezosTokenViewModel>(tokens
-                .Select(token =>
-                {
-                    token.AtomexApp = _app;
-                    token.SetConversionTab = SetConversionTab;
-                    // token.TotalAmount = token.TokenBalance.GetTokenBalance();
-
-                    // var quote = quotesProvider.GetQuote(token.TokenBalance.Symbol,
-                    //     TezosTokenViewModel.BaseCurrencyCode);
-                    //
-                    // if (quote == null) return token;
-                    //
-                    // token.CurrentQuote = quote.Bid;
-                    // token.TotalAmountInBase = token.TokenBalance.GetTokenBalance().SafeMultiply(quote.Bid);
-
-                    return token;
-                })
-                .OrderByDescending(token => token.CanExchange)
-                .ThenByDescending(token => token.TotalAmountInBase));
-
-            InitialTokens = new ObservableCollection<TezosTokenViewModel>(tokenViewModels);
-            Tokens = new ObservableCollection<TezosTokenViewModel>(
-                tokenViewModels.Where(token => !DisabledTokens.Contains(token.TokenBalance.Symbol)));
+                InitialTokens = new ObservableCollection<TezosTokenViewModel>(tezosTokenViewModels);
+                Tokens = new ObservableCollection<TezosTokenViewModel>(tezosTokenViewModels
+                    .Where(token => !DisabledTokens.Contains(token.TokenBalance.Symbol)));
+            }, DispatcherPriority.Background);
         }
 
         public TezosTokensViewModel()
