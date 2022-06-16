@@ -74,8 +74,8 @@ namespace Atomex.Client.Desktop
             AtomexApp = new AtomexApp()
                 .UseCurrenciesProvider(currenciesProvider)
                 .UseSymbolsProvider(symbolsProvider)
-                .UseCurrenciesUpdater(new CurrenciesUpdater(currenciesProvider))
-                .UseSymbolsUpdater(new SymbolsUpdater(symbolsProvider))
+                //.UseCurrenciesUpdater(new CurrenciesUpdater(currenciesProvider))
+                //.UseSymbolsUpdater(new SymbolsUpdater(symbolsProvider))
                 .UseQuotesProvider(new BitfinexQuotesProvider(
                     currencies: currenciesProvider.GetCurrencies(Network.MainNet),
                     baseCurrency: BitfinexQuotesProvider.Usd));
