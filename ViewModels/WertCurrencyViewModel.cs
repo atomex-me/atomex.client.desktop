@@ -61,8 +61,13 @@ namespace Atomex.Client.Desktop.ViewModels
             {
                 _isSelected = value;
                 OnPropertyChanged(nameof(IsSelected));
+                OnPropertyChanged(nameof(IconPath));
             }
         }
+
+        public string IconPath => _isSelected
+            ? CurrencyViewModel.IconPath
+            : CurrencyViewModel.DisabledIconPath;
 
         private string GetUserId()
         {

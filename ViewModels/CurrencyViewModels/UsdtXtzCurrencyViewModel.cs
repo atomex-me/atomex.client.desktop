@@ -12,8 +12,8 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
         {
             Header              = Currency.Description;
             AccentColor         = Color.FromRgb(r: 7, g: 82, b: 192);
-            IconPath            = $"{PathToIcons}/kusd.svg";
-            DisabledIconPath    = $"{PathToIcons}/kusd-disabled.svg";
+            IconPath            = $"{PathToIcons}/tether-tezos.svg";
+            DisabledIconPath    = $"{PathToIcons}/tether-tezos-disabled.svg";
             FeeName             = Resources.SvMiningFee;
         }
     }
