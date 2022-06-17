@@ -632,7 +632,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                                      tokenConfig.TokenId == TokenId)
                 ?.Name ?? _tokenType;
 
-            var tokenAccount = App.AtomexApp.Account.GetTezosTokenAccount<Fa12Account>(
+            var tokenAccount = App.AtomexApp.Account.GetTezosTokenAccount<TezosTokenAccount>(
                 currency: currencyName,
                 tokenContract: TokenContract,
                 tokenId: TokenId);

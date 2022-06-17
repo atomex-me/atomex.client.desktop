@@ -8,7 +8,6 @@ using Avalonia.Threading;
 using Serilog;
 
 using Atomex.Blockchain.Abstract;
-using Atomex.Blockchain.Tezos;
 using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.Properties;
 using Atomex.Client.Desktop.ViewModels.Abstract;
@@ -256,7 +255,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     from: tokenAddress.Address,
                     to: To,
                     amount: AmountToSend,
-                    fee: (int)Fee.ToMicroTez(),
+                    fee: Fee,
                     useDefaultFee: UseDefaultFee,
                     cancellationToken: cancellationToken)
                 .ConfigureAwait(false);
