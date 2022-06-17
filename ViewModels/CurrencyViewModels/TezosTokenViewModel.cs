@@ -4,17 +4,19 @@ using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
+
+using Avalonia.Media.Imaging;
+using Avalonia.Threading;
+using ReactiveUI;
+using ReactiveUI.Fody.Helpers;
+using Serilog;
+
 using Atomex.Blockchain.Tezos;
 using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.ViewModels.SendViewModels;
 using Atomex.Core;
 using Atomex.TezosTokens;
 using Atomex.ViewModels;
-using Avalonia.Media.Imaging;
-using Avalonia.Threading;
-using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
-using Serilog;
 
 namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
 {
@@ -52,7 +54,7 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
         public decimal TotalAmount => TokenBalance.ParsedBalance ?? 0;
         public decimal? DailyChangePercent => null;
 
-        private ThumbsApi ThumbsApi => new ThumbsApi(
+        private ThumbsApi ThumbsApi => new(
             new ThumbsApiSettings
             {
                 ThumbsApiUri = TezosConfig.ThumbsApiUri,
@@ -123,7 +125,7 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
             return new TezosTokensSendViewModel(
                 app: AtomexApp,
                 tokenContract: Contract.Address,
-                tokenId: TokenBalance.TokenId,
+                tokenId: (int)TokenBalance.TokenId,
                 tokenType: Contract.GetContractType(),
                 tokenPreview: BitmapIcon,
                 from: null);

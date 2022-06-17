@@ -5,13 +5,13 @@ using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
+using Avalonia.Controls;
 using Avalonia.Media.Imaging;
 using Avalonia.Threading;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using Serilog;
 
-using Atomex.Blockchain.Tezos;
 using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.Properties;
 using Atomex.Client.Desktop.ViewModels.Abstract;
@@ -21,7 +21,6 @@ using Atomex.TezosTokens;
 using Atomex.ViewModels;
 using Atomex.Wallet.Abstract;
 using Atomex.Wallet.Tezos;
-using Avalonia.Controls;
 
 namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 {
@@ -37,7 +36,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         [ObservableAsProperty] public string FromBeautified { get; }
         [Reactive] private string TokenContract { get; set; }
         [ObservableAsProperty] public string TokenContractBeautified { get; }
-        [Reactive] public decimal TokenId { get; set; }
+        [Reactive] public int TokenId { get; set; }
         [Reactive] public string To { get; set; }
         [Reactive] public IBitmap? TokenPreview { get; set; }
         private readonly string _tokenType;
@@ -75,7 +74,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         public TezosTokensSendViewModel(
             IAtomexApp app,
             string tokenContract,
-            decimal tokenId,
+            int tokenId,
             string tokenType,
             IBitmap? tokenPreview,
             string? balanceFormat = null,
@@ -554,7 +553,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             }
         }
 
-        protected void OnQuotesUpdatedEventHandler(object sender, EventArgs args)
+        protected void OnQuotesUpdatedEventHandler(object? sender, EventArgs args)
         {
             if (sender is not ICurrencyQuotesProvider quotesProvider)
                 return;
@@ -627,50 +626,26 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 tokenId: TokenId,
                 tokenType: _tokenType);
 
-            if (tokenAddress.Currency == "FA12")
-            {
-                var currencyName = App.AtomexApp.Account.Currencies
-                    .FirstOrDefault(c => c is Fa12Config fa12 && fa12.TokenContractAddress == TokenContract)
-                    ?.Name ?? "FA12";
+            var currencyName = App.AtomexApp.Account.Currencies
+                .FirstOrDefault(c => c is TezosTokenConfig tokenConfig &&
+                                     tokenConfig.TokenContractAddress == TokenContract &&
+                                     tokenConfig.TokenId == TokenId)
+                ?.Name ?? _tokenType;
 
-                var tokenAccount = App.AtomexApp.Account.GetTezosTokenAccount<Fa12Account>(
-                    currency: currencyName,
-                    tokenContract: TokenContract,
-                    tokenId: TokenId);
+            var tokenAccount = App.AtomexApp.Account.GetTezosTokenAccount<Fa12Account>(
+                currency: currencyName,
+                tokenContract: TokenContract,
+                tokenId: TokenId);
 
-                var (_, error) = await tokenAccount.SendAsync(
-                    from: tokenAddress.Address,
-                    to: To,
-                    amount: Amount,
-                    fee: Fee,
-                    useDefaultFee: UseDefaultFee,
-                    cancellationToken: cancellationToken);
+            var (_, error) = await tokenAccount.SendAsync(
+                from: tokenAddress.Address,
+                to: To,
+                amount: Amount,
+                fee: Fee,
+                useDefaultFee: UseDefaultFee,
+                cancellationToken: cancellationToken);
 
-                return error;
-            }
-            else
-            {
-                var tokenAccount = App.AtomexApp.Account.GetTezosTokenAccount<Fa2Account>(
-                    currency: "FA2",
-                    tokenContract: TokenContract,
-                    tokenId: TokenId);
-
-                var decimals = tokenAddress.TokenBalance.Decimals;
-                var amount = Amount * (decimal)Math.Pow(10, decimals);
-                var fee = (int)Fee.ToMicroTez();
-
-                var (_, error) = await tokenAccount.SendAsync(
-                    from: From,
-                    to: To,
-                    amount: amount,
-                    tokenContract: TokenContract,
-                    tokenId: (int)TokenId,
-                    fee: fee,
-                    useDefaultFee: UseDefaultFee,
-                    cancellationToken: cancellationToken);
-
-                return error;
-            }
+            return error;
         }
 
 #if DEBUG

@@ -256,8 +256,6 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     from: tokenAddress.Address,
                     to: To,
                     amount: AmountToSend,
-                    tokenContract: tokenContract,
-                    tokenId: tokenId,
                     fee: (int)Fee.ToMicroTez(),
                     useDefaultFee: UseDefaultFee,
                     cancellationToken: cancellationToken)
