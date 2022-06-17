@@ -4,9 +4,11 @@ using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Windows.Input;
+
 using Avalonia.Controls;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
+
 using Atomex.Common;
 using Atomex.Core;
 using Atomex.ViewModels;
@@ -48,7 +50,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             CurrencyConfig currency,
             SelectAddressMode mode = SelectAddressMode.ReceiveTo,
             string? selectedAddress = null,
-            decimal? selectedTokenId = null,
+            int selectedTokenId = 0,
             string? tokenContract = null)
         {
             this.WhenAnyValue(

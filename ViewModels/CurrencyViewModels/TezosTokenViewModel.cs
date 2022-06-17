@@ -23,10 +23,15 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
     public class TezosTokenViewModel : ViewModelBase, IAssetViewModel
     {
         private const int MaxBalanceDecimals = AddressesHelper.MaxTokenCurrencyFormatDecimals;
-        private static readonly string[] ConvertibleTokens = { "tzbtc", "kusd", "usdt_xtz" };
         public const string Fa12 = "FA12";
         public const string Fa2 = "FA2";
-        public bool CanExchange => ConvertibleTokens.Contains(TokenBalance.Symbol?.ToLower());
+        public bool CanExchange => AtomexApp
+            ?.Account
+            ?.Currencies
+            .Any(c => c is TezosTokenConfig tezosTokenConfig &&
+                      tezosTokenConfig.TokenContractAddress == Contract?.Address &&
+                      tezosTokenConfig.TokenId == TokenBalance?.TokenId) ?? false;
+
         public IAtomexApp AtomexApp { get; set; }
         public TezosConfig TezosConfig { get; set; }
         public TokenBalance TokenBalance { get; set; }
@@ -131,7 +136,6 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
                 from: null);
         }
 
-
         public bool IsIpfsAsset =>
             TokenBalance.ArtifactUri != null && ThumbsApi.HasIpfsPrefix(TokenBalance.ArtifactUri);
 
@@ -156,7 +160,9 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
             {
                 var currency = AtomexApp.Account
                     .Currencies
-                    .FirstOrDefault(c => c is Fa12Config fa12 && fa12.TokenContractAddress == Contract.Address);
+                    .FirstOrDefault(c => c is TezosTokenConfig tokenConfig &&
+                                         tokenConfig.TokenContractAddress == Contract.Address &&
+                                         tokenConfig.TokenId == TokenBalance.TokenId);
 
                 if (currency != null)
                     SetConversionTab?.Invoke(currency);
