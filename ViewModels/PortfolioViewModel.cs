@@ -209,6 +209,12 @@ namespace Atomex.Client.Desktop.ViewModels
                     tokenContract: fa12Config.TokenContractAddress,
                     tokenType: "FA12"),
 
+                Fa2Config fa2Config => new ReceiveViewModel(
+                    app: App,
+                    currency: App.Account.Currencies.GetByName(TezosConfig.Xtz),
+                    tokenContract: fa2Config.TokenContractAddress,
+                    tokenType: "FA2"),
+
                 _ => new ReceiveViewModel(App, currencyConfig)
             };
             receiveViewModel.OnBack = () => ReceiveCommand.Execute().Subscribe();
