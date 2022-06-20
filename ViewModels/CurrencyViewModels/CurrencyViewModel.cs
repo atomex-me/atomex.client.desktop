@@ -106,8 +106,7 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
             try
             {
                 if (Currency.Name.Equals(args.Currency))
-                    await UpdateAsync()
-                        .ConfigureAwait(false);
+                    await UpdateAsync();
             }
             catch (Exception e)
             {

@@ -65,6 +65,7 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
                     Contract = contract,
                 };
 
+                tokenViewModel.UpdateQuotesInBaseCurrency(atomexApp.QuotesProvider);
                 tokenViewModel.SubscribeToUpdates();
                 Instances.TryAdd(kv, tokenViewModel);
                 tokens.Add(tokenViewModel);
