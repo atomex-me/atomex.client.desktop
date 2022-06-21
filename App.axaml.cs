@@ -6,7 +6,6 @@ using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
-
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Input.Platform;
@@ -18,13 +17,15 @@ using Serilog.Events;
 using Serilog.Formatting;
 using Serilog.Formatting.Display;
 using Sentry;
-
 using Atomex.Client.Desktop.Services;
 using Atomex.Client.Desktop.ViewModels;
 using Atomex.Client.Desktop.Views;
 using Atomex.Common.Configuration;
 using Atomex.Core;
+using Atomex.MarketData;
+using Atomex.MarketData.Abstract;
 using Atomex.MarketData.Bitfinex;
+using Atomex.MarketData.TezTools;
 using Atomex.Services;
 
 namespace Atomex.Client.Desktop
@@ -70,15 +71,20 @@ namespace Atomex.Client.Desktop
             var currenciesProvider = new CurrenciesProvider(CurrenciesConfigurationString);
             var symbolsProvider = new SymbolsProvider(SymbolsConfiguration);
 
+            var bitfinexQuotesProvider = new BitfinexQuotesProvider(
+                currencies: currenciesProvider.GetCurrencies(Network.MainNet),
+                baseCurrency: BitfinexQuotesProvider.Usd);
+            var tezToolsQuotesProvider = new TezToolsQuotesProvider();
+            
+            var quotesProvider = new MultiSourceQuotesProvider(bitfinexQuotesProvider, tezToolsQuotesProvider);
+
             // init Atomex client app
             AtomexApp = new AtomexApp()
                 .UseCurrenciesProvider(currenciesProvider)
                 .UseSymbolsProvider(symbolsProvider)
                 .UseCurrenciesUpdater(new CurrenciesUpdater(currenciesProvider))
                 .UseSymbolsUpdater(new SymbolsUpdater(symbolsProvider))
-                .UseQuotesProvider(new BitfinexQuotesProvider(
-                    currencies: currenciesProvider.GetCurrencies(Network.MainNet),
-                    baseCurrency: BitfinexQuotesProvider.Usd));
+                .UseQuotesProvider(quotesProvider);
 
             if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
             {
@@ -137,10 +143,10 @@ namespace Atomex.Client.Desktop
         {
             get
             {
-                var resourceName  = "currencies.json";
+                var resourceName = "currencies.json";
                 var resourceNames = CoreAssembly.GetManifestResourceNames();
-                var fullFileName  = resourceNames.FirstOrDefault(n => n.EndsWith(resourceName));
-                var stream        = CoreAssembly.GetManifestResourceStream(fullFileName!);
+                var fullFileName = resourceNames.FirstOrDefault(n => n.EndsWith(resourceName));
+                var stream = CoreAssembly.GetManifestResourceStream(fullFileName!);
                 using StreamReader reader = new(stream!);
                 return reader.ReadToEnd();
             }
@@ -163,9 +169,9 @@ namespace Atomex.Client.Desktop
             {
                 using Process process = Process.Start(new ProcessStartInfo
                 {
-                    FileName        = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? url : "open",
-                    Arguments       = RuntimeInformation.IsOSPlatform(OSPlatform.OSX) ? $"{url}" : "",
-                    CreateNoWindow  = true,
+                    FileName = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? url : "open",
+                    Arguments = RuntimeInformation.IsOSPlatform(OSPlatform.OSX) ? $"{url}" : "",
+                    CreateNoWindow = true,
                     UseShellExecute = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
                 });
             }
@@ -178,12 +184,12 @@ namespace Atomex.Client.Desktop
             using var process = Process.Start(
                 new ProcessStartInfo
                 {
-                    FileName               = "/bin/bash",
-                    Arguments              = $"-c \"{escapedArgs}\"",
+                    FileName = "/bin/bash",
+                    Arguments = $"-c \"{escapedArgs}\"",
                     RedirectStandardOutput = true,
-                    UseShellExecute        = false,
-                    CreateNoWindow         = true,
-                    WindowStyle            = ProcessWindowStyle.Hidden
+                    UseShellExecute = false,
+                    CreateNoWindow = true,
+                    WindowStyle = ProcessWindowStyle.Hidden
                 }
             );
 
