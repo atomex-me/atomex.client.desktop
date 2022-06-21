@@ -6,6 +6,7 @@
              x:Class="Atomex.Client.Desktop.Views.StartView"
              xmlns:vm="clr-namespace:Atomex.Client.Desktop.ViewModels"
              xmlns:controls="clr-namespace:Atomex.Client.Desktop.Controls"
+             xmlns:svg="clr-namespace:Avalonia.Svg.Skia;assembly=Avalonia.Svg.Skia"
              Padding="12">
 
     <Design.DataContext>
@@ -31,21 +32,11 @@
                                 Margin="0 30 0 0"
                                 VerticalAlignment="Top"
                                 HorizontalAlignment="Center">
-
-                        <Image
-                            Source="avares://Atomex.Client.Desktop/Resources/Images/logo_white.png"
-                            Width="50"
-                            Height="52"
-                            VerticalAlignment="Center"
-                            HorizontalAlignment="Center" />
-
-                        <TextBlock Text="atomex"
-                                   FontSize="40"
-                                   FontFamily="{DynamicResource MainTitleFontFamily}"
-                                   HorizontalAlignment="Center"
-                                   VerticalAlignment="Center"
-                                   Foreground="White"
-                                   Margin="10 0 0 0" />
+                        
+                        <svg:Svg Path="/Resources/Icons/logo-with-title-light.svg"
+                                 HorizontalAlignment="Left"
+                                 VerticalAlignment="Center"
+                                 Height="50" />
                     </StackPanel>
                 </Grid>
             </Border>
