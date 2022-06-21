@@ -15,7 +15,6 @@ using Atomex.Wallet;
 using Atomex.Wallet.Tezos;
 using Avalonia.Media.Imaging;
 using Avalonia.Threading;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using Serilog;
@@ -31,7 +30,7 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
         public bool CanExchange => ConvertibleTokens.Contains(TokenBalance.Symbol?.ToLower());
         public IAtomexApp AtomexApp { get; set; }
         public TezosConfig TezosConfig { get; set; }
-        public TokenBalance TokenBalance { get; set; }
+        [Reactive] public TokenBalance TokenBalance { get; set; }
         public TokenContract Contract { get; set; }
         public string Address { get; set; }
         public static string BaseCurrencyFormat => "$0.##"; // todo: use from settings
@@ -48,7 +47,7 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
         [Reactive] public bool IsPopupOpened { get; set; }
         [Reactive] public decimal TotalAmount { get; set; }
         [Reactive] public decimal TotalAmountInBase { get; set; }
-        [ObservableAsProperty] public string Balance { get; }
+        [Reactive] public string Balance { get; set; }
 
         public string IconPath => string.Empty;
         public string DisabledIconPath => string.Empty;
@@ -99,22 +98,22 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
             }
         }
 
-        // public decimal DecimalBalance => TokenBalance.GetTokenBalance();
-
         public TezosTokenViewModel()
         {
-            this.WhenAnyValue(vm => vm.TotalAmount)
-                .WhereNotNull()
-                .Where(_ => TokenBalance != null)
-                .Select(totalAmount =>
-                    $"{totalAmount.ToString(CurrencyFormat, CultureInfo.CurrentCulture)} {CurrencyCode}")
-                .ToPropertyExInMainThread(this, vm => vm.Balance);
+            this.WhenAnyValue(vm => vm.TotalAmount, vm => vm.TokenBalance)
+                .Where(values => values.Item2 != null)
+                .Select(values =>
+                    values.Item1 == 0
+                        ? $"0 {CurrencyCode}"
+                        : $"{values.Item1.ToString(CurrencyFormat, CultureInfo.CurrentCulture)} {CurrencyCode}")
+                .Subscribe(formattedAmount => Balance = formattedAmount);
 
             this.WhenAnyValue(vm => vm.TotalAmount)
                 .WhereNotNull()
                 .Where(_ => AtomexApp != null)
+                .Skip(1)
                 .SubscribeInMainThread(_ => UpdateQuotesInBaseCurrency(AtomexApp!.QuotesProvider));
-
+            
             SendCommand.Merge(ReceiveCommand)
                 .SubscribeInMainThread(_ => IsPopupOpened = false);
         }
@@ -148,7 +147,7 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
             UpdateQuotesInBaseCurrency(quotesProvider);
         }
 
-        private void UpdateQuotesInBaseCurrency(ICurrencyQuotesProvider quotesProvider)
+        public void UpdateQuotesInBaseCurrency(ICurrencyQuotesProvider quotesProvider)
         {
             var quote = quotesProvider.GetQuote(TokenBalance.Symbol, BaseCurrencyCode);
             if (quote == null) return;
@@ -161,23 +160,21 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
 
         private async Task UpdateAsync()
         {
-            await Dispatcher.UIThread.InvokeAsync(async () =>
-            {
-                var tezosAccount = AtomexApp.Account.GetCurrencyAccount<TezosAccount>(TezosConfig.Xtz);
+            var tezosAccount = AtomexApp.Account.GetCurrencyAccount<TezosAccount>(TezosConfig.Xtz);
 
-                var tokenWalletAddresses = await tezosAccount
-                    .DataRepository
-                    .GetTezosTokenAddressesByContractAsync(Contract.Address);
+            var tokenWalletAddresses = await tezosAccount
+                .DataRepository
+                .GetTezosTokenAddressesByContractAsync(Contract.Address);
 
-                var addresses = tokenWalletAddresses
-                    .Where(walletAddress => walletAddress.TokenBalance.TokenId == TokenBalance.TokenId)
-                    .ToList();
+            var addresses = tokenWalletAddresses
+                .Where(walletAddress => walletAddress.TokenBalance.TokenId == TokenBalance.TokenId)
+                .ToList();
 
-                var tokenBalance = 0m;
-                addresses.ForEach(a => { tokenBalance += a.TokenBalance.GetTokenBalance(); });
+            var tokenBalance = 0m;
+            addresses.ForEach(a => { tokenBalance += a.TokenBalance.GetTokenBalance(); });
 
-                TotalAmount = tokenBalance;
-            }, DispatcherPriority.Background);
+            await Dispatcher.UIThread.InvokeAsync(() => { TotalAmount = tokenBalance; },
+                DispatcherPriority.Background);
         }
 
         private ReceiveViewModel GetReceiveDialog()
@@ -292,7 +289,7 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
         {
             if (AtomexApp.Account != null)
                 AtomexApp.Account.BalanceUpdated -= OnBalanceChangedEventHandler;
-            
+
             if (AtomexApp.QuotesProvider != null)
                 AtomexApp.QuotesProvider.QuotesUpdated -= OnQuotesUpdatedEventHandler;
         }
