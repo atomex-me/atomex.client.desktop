@@ -91,7 +91,7 @@ namespace Atomex.Client.Desktop.ViewModels
                 },
                 onUnlock: () =>
                 {
-                    var atomexClient = new WebSocketAtomexClient(
+                    var atomexClient = new WebSocketAtomexClientLegacy(
                         configuration: App.Configuration,
                         account: account,
                         symbolsProvider: AtomexApp.SymbolsProvider);

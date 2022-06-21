@@ -82,7 +82,7 @@ namespace Atomex.Client.Desktop.Api
             CancellationToken cancellationToken = default)
         {
             await RequestLimitControl
-                .Wait(cancellationToken)
+                .WaitAsync(cancellationToken)
                 .ConfigureAwait(false);
 
             var requestContent = JsonConvert.SerializeObject(new WertRequestData

@@ -106,7 +106,7 @@ namespace Atomex.Client.Desktop.ViewModels
 
         private void OnAccountCreated(IAccount account)
         {
-            var atomexClient = new WebSocketAtomexClient(
+            var atomexClient = new WebSocketAtomexClientLegacy(
                 configuration: App.Configuration,
                 account: account,
                 symbolsProvider: AtomexApp.SymbolsProvider);
@@ -116,7 +116,7 @@ namespace Atomex.Client.Desktop.ViewModels
         
         private void OnAccountRestored(IAccount account)
         {
-            var atomexClient = new WebSocketAtomexClient(
+            var atomexClient = new WebSocketAtomexClientLegacy(
                 configuration: App.Configuration,
                 account: account,
                 symbolsProvider: AtomexApp.SymbolsProvider);
