@@ -29,6 +29,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         [Reactive] public SortDirection? CurrentDelegationSortDirection { get; set; }
         [Reactive] public DelegationSortField? CurrentDelegationSortField { get; set; }
         [Reactive] public string? DelegationAddressPopupOpened { get; set; }
+        [Reactive] public bool HideLowTokensPopupOpened { get; set; }
         [ObservableAsProperty] public bool IsTokensUpdating { get; }
 
         private bool CanDelegate { get; set; }
@@ -269,10 +270,10 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                             {
                                 Asset = token,
                                 IsSelected = TezosTokensViewModel
-                                                 .Tokens
-                                                 .Select(t => t.TokenBalance.Symbol)
-                                                 .ToArray()
-                                                 .Contains(token.TokenBalance.Symbol)
+                                    .Tokens
+                                    .Select(t => t.TokenBalance.Symbol)
+                                    .ToArray()
+                                    .Contains(token.TokenBalance.Symbol)
                             })
                     ),
                     OnAssetsChanged = selectedSymbols =>
@@ -289,6 +290,18 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
                 Desktop.App.DialogService.Show(vm);
             });
+
+
+        private ReactiveCommand<Unit, Unit> _hideLowBalancesCommand;
+
+        public ReactiveCommand<Unit, Unit> HideLowBalancesCommand => _hideLowBalancesCommand ??=
+            (_hideLowBalancesCommand = ReactiveCommand.Create(
+                () => { TezosTokensViewModel.HideLowBalances = !TezosTokensViewModel.HideLowBalances; }));
+
+        private ReactiveCommand<Unit, Unit> _showHideLowBalancesCommand;
+
+        public ReactiveCommand<Unit, Unit> ShowHideLowBalancesCommand => _showHideLowBalancesCommand ??=
+            (_showHideLowBalancesCommand = ReactiveCommand.Create(() => { HideLowTokensPopupOpened = true; }));
 
         private ReactiveCommand<Unit, Unit> _updateTokensCommand;
 

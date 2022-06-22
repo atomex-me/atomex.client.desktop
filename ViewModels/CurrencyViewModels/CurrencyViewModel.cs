@@ -17,7 +17,7 @@ using Atomex.Client.Desktop.Common;
 
 namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
 {
-    public abstract class CurrencyViewModel : ViewModelBase, IAssetViewModel
+    public abstract class CurrencyViewModel : ViewModelBase, IAssetViewModel, IDisposable
     {
         protected const string PathToIcons = "/Resources/Icons";
 
@@ -102,8 +102,7 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
             try
             {
                 if (Currency.Name.Equals(args.Currency))
-                    await UpdateAsync()
-                        .ConfigureAwait(false);
+                    await UpdateAsync();
             }
             catch (Exception e)
             {

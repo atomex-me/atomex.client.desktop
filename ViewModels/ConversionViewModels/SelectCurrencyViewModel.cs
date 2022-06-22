@@ -298,7 +298,7 @@ namespace Atomex.Client.Desktop.ViewModels.ConversionViewModels
                         };
 
                         return new SelectCurrencyWithOutputsViewModelItem(
-                            currencyViewModel: CurrencyViewModelCreator.CreateViewModel(c, subscribeToUpdates: false),
+                            currencyViewModel: CurrencyViewModelCreator.CreateOrGet(c, subscribeToUpdates: false),
                             availableOutputs: outputs,
                             selectedOutputs: outputs);
                     }
@@ -311,7 +311,7 @@ namespace Atomex.Client.Desktop.ViewModels.ConversionViewModels
                         };
 
                         return new SelectCurrencyWithAddressViewModelItem(
-                            currencyViewModel: CurrencyViewModelCreator.CreateViewModel(c, subscribeToUpdates: false),
+                            currencyViewModel: CurrencyViewModelCreator.CreateOrGet(c, subscribeToUpdates: false),
                             type: SelectCurrencyType.From,
                             availableAddresses: new WalletAddress[] { address },
                             selectedAddress: address);

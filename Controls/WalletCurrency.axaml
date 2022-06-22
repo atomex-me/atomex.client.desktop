@@ -212,7 +212,7 @@
                                 <controls:RoundedButton Height="46"
                                                         Padding="26 0"
                                                         Command="{TemplateBinding BuyCommand}"
-                                                        Margin="0 0 12 12"
+                                                        Margin="0 0 0 12"
                                                         IsVisible="{Binding AssetViewModel.CurrencyCode,
                                                         RelativeSource={RelativeSource TemplatedParent},
                                                         Converter={StaticResource ShowBuyButton}}"

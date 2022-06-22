@@ -15,12 +15,15 @@ using Atomex.Blockchain.Tezos;
 using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.ViewModels.SendViewModels;
 using Atomex.Core;
+using Atomex.MarketData.Abstract;
 using Atomex.TezosTokens;
 using Atomex.ViewModels;
+using Atomex.Wallet;
+using Atomex.Wallet.Tezos;
 
 namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
 {
-    public class TezosTokenViewModel : ViewModelBase, IAssetViewModel
+    public class TezosTokenViewModel : ViewModelBase, IAssetViewModel, IDisposable
     {
         private const int MaxBalanceDecimals = AddressesHelper.MaxTokenCurrencyFormatDecimals;
         public const string Fa12 = "FA12";
@@ -34,7 +37,7 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
 
         public IAtomexApp AtomexApp { get; set; }
         public TezosConfig TezosConfig { get; set; }
-        public TokenBalance TokenBalance { get; set; }
+        [Reactive] public TokenBalance TokenBalance { get; set; }
         public TokenContract Contract { get; set; }
         public string Address { get; set; }
         public static string BaseCurrencyFormat => "$0.##"; // todo: use from settings
@@ -47,9 +50,11 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
             ? $"F{Math.Min(TokenBalance.Decimals, MaxBalanceDecimals)}"
             : $"F{MaxBalanceDecimals}";
 
-        [Reactive] public decimal TotalAmountInBase { get; set; }
         [Reactive] public decimal CurrentQuote { get; set; }
         [Reactive] public bool IsPopupOpened { get; set; }
+        [Reactive] public decimal TotalAmount { get; set; }
+        [Reactive] public decimal TotalAmountInBase { get; set; }
+        [Reactive] public string Balance { get; set; }
 
         public string IconPath => string.Empty;
         public string DisabledIconPath => string.Empty;
@@ -58,7 +63,7 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
         public string CurrencyCode => TokenBalance.Symbol;
         public string CurrencyDescription => TokenBalance.Name;
         string IAssetViewModel.BaseCurrencyFormat => BaseCurrencyFormat;
-        public decimal TotalAmount => TokenBalance.ParsedBalance ?? 0;
+
         public decimal? DailyChangePercent => null;
 
         private ThumbsApi ThumbsApi => new(
@@ -102,16 +107,83 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
             }
         }
 
-        public decimal DecimalBalance => TokenBalance.GetTokenBalance();
-
-        public string Balance => TokenBalance.Balance != "1"
-            ? $"{DecimalBalance.ToString(CurrencyFormat, CultureInfo.CurrentCulture)}  {TokenBalance.Symbol}"
-            : "";
-
         public TezosTokenViewModel()
         {
+            this.WhenAnyValue(vm => vm.TotalAmount, vm => vm.TokenBalance)
+                .Where(values => values.Item2 != null)
+                .Select(values =>
+                    values.Item1 == 0
+                        ? $"0 {CurrencyCode}"
+                        : $"{values.Item1.ToString(CurrencyFormat, CultureInfo.CurrentCulture)} {CurrencyCode}")
+                .Subscribe(formattedAmount => Balance = formattedAmount);
+
+            this.WhenAnyValue(vm => vm.TotalAmount)
+                .WhereNotNull()
+                .Where(_ => AtomexApp != null)
+                .Skip(1)
+                .SubscribeInMainThread(_ => UpdateQuotesInBaseCurrency(AtomexApp!.QuotesProvider));
+            
             SendCommand.Merge(ReceiveCommand)
                 .SubscribeInMainThread(_ => IsPopupOpened = false);
+        }
+
+        public void SubscribeToUpdates()
+        {
+            AtomexApp.Account.BalanceUpdated += OnBalanceChangedEventHandler;
+            AtomexApp.QuotesProvider.QuotesUpdated += OnQuotesUpdatedEventHandler;
+        }
+
+        private async void OnBalanceChangedEventHandler(object? sender, CurrencyEventArgs args)
+        {
+            try
+            {
+                if (!Atomex.Currencies.IsTezosBased(args.Currency)) return;
+
+                await UpdateAsync();
+                Log.Debug("Balance updated for tezos token {Symbol}", TokenBalance.Symbol);
+            }
+            catch (Exception e)
+            {
+                Log.Error(e, "Error updating tezos token {Symbol}", TokenBalance.Symbol);
+            }
+        }
+
+        private void OnQuotesUpdatedEventHandler(object? sender, EventArgs args)
+        {
+            if (sender is not ICurrencyQuotesProvider quotesProvider)
+                return;
+
+            UpdateQuotesInBaseCurrency(quotesProvider);
+        }
+
+        public void UpdateQuotesInBaseCurrency(ICurrencyQuotesProvider quotesProvider)
+        {
+            var quote = quotesProvider.GetQuote(TokenBalance.Symbol, BaseCurrencyCode);
+            if (quote == null) return;
+
+            CurrentQuote = quote.Bid;
+            TotalAmountInBase = TotalAmount.SafeMultiply(quote.Bid);
+
+            Log.Debug("Quotes updated for tezos token {Symbol}", TokenBalance.Symbol);
+        }
+
+        private async Task UpdateAsync()
+        {
+            var tezosAccount = AtomexApp.Account.GetCurrencyAccount<TezosAccount>(TezosConfig.Xtz);
+
+            var tokenWalletAddresses = await tezosAccount
+                .DataRepository
+                .GetTezosTokenAddressesByContractAsync(Contract.Address);
+
+            var addresses = tokenWalletAddresses
+                .Where(walletAddress => walletAddress.TokenBalance.TokenId == TokenBalance.TokenId)
+                .ToList();
+
+            var tokenBalance = 0m;
+            addresses.ForEach(a => { tokenBalance += a.TokenBalance.GetTokenBalance(); });
+
+            await Dispatcher.UIThread.InvokeAsync(() => { TotalAmount = tokenBalance; },
+                DispatcherPriority.Background);
         }
 
         private ReceiveViewModel GetReceiveDialog()
@@ -222,5 +294,14 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
                     Log.Error(e, "Copy to clipboard error");
                 }
             });
+
+        public void Dispose()
+        {
+            if (AtomexApp.Account != null)
+                AtomexApp.Account.BalanceUpdated -= OnBalanceChangedEventHandler;
+
+            if (AtomexApp.QuotesProvider != null)
+                AtomexApp.QuotesProvider.QuotesUpdated -= OnQuotesUpdatedEventHandler;
+        }
     }
 }

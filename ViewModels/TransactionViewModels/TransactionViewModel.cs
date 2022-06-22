@@ -116,7 +116,7 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
 
             var netAmount = amount + fee;
 
-            var currencyViewModel = CurrencyViewModelCreator.CreateViewModel(currencyConfig, false);
+            var currencyViewModel = CurrencyViewModelCreator.CreateOrGet(currencyConfig, false);
 
             AmountFormat = currencyViewModel.CurrencyFormat;
             CurrencyCode = currencyViewModel.CurrencyCode;

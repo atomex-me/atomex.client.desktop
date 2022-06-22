@@ -190,7 +190,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             _app = app ?? throw new ArgumentNullException(nameof(app));
             Currency = currency ?? throw new ArgumentNullException(nameof(currency));
 
-            CurrencyViewModel = CurrencyViewModelCreator.CreateViewModel(currency);
+            CurrencyViewModel = CurrencyViewModelCreator.CreateOrGet(currency);
             UseDefaultFee = true;
 
             var updateAmountCommand = ReactiveCommand.CreateFromTask(UpdateAmount);
@@ -357,7 +357,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         protected void DesignerMode()
         {
             var fromCurrencies = DesignTime.TestNetCurrencies
-                .Select(c => CurrencyViewModelCreator.CreateViewModel(c, subscribeToUpdates: false))
+                .Select(c => CurrencyViewModelCreator.CreateOrGet(c, subscribeToUpdates: false))
                 .ToList();
 
             Currency          = fromCurrencies[0].Currency;

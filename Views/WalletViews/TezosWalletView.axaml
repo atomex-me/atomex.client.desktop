@@ -43,7 +43,7 @@
         <StackPanel Grid.Row="1"
                     Height="72"
                     ZIndex="1"
-                    Margin="0 4 16 0"
+                    Margin="0 4 18 0"
                     Orientation="Horizontal"
                     HorizontalAlignment="Right"
                     VerticalAlignment="Top"
@@ -58,8 +58,55 @@
             <controls:IconButton Classes="SetupAssets"
                                  VerticalAlignment="Center"
                                  ToolText="Manage tokens"
-                                 Margin="12 0 0 0"
+                                 Margin="12 0 12 0"
                                  Command="{Binding ManageTokensCommand}" />
+
+
+            <WrapPanel VerticalAlignment="Center">
+                <controls:IconButton Classes="MenuDots"
+                                     VerticalAlignment="Center"
+                                     Margin="12 0 0 0"
+                                     Command="{Binding ShowHideLowBalancesCommand}" />
+                <Popup PlacementMode="Left"
+                       VerticalAlignment="Center"
+                       WindowManagerAddShadowHint="False"
+                       IsLightDismissEnabled="True"
+                       IsOpen="{Binding HideLowTokensPopupOpened, Mode=TwoWay}">
+                    <Border Background="{DynamicResource DeepBlue}"
+                            CornerRadius="{DynamicResource AtomexCornerRadius}"
+                            Padding="12 16">
+                        <StackPanel Classes="Popup">
+                            <Button CornerRadius="{DynamicResource AtomexCornerRadius}"
+                                    VerticalContentAlignment="Center"
+                                    Command="{Binding HideLowBalancesCommand}">
+                                <StackPanel Orientation="Horizontal"
+                                            VerticalAlignment="Stretch">
+                                    <TextBlock Foreground="{DynamicResource DefaultForegroundBrush}"
+                                               VerticalAlignment="Center"
+                                               FontSize="16">
+                                        <i:Interaction.Behaviors>
+                                            <ia:DataTriggerBehavior
+                                                Binding="{Binding TezosTokensViewModel.HideLowBalances}"
+                                                ComparisonCondition="Equal"
+                                                Value="True">
+                                                <ia:ChangePropertyAction PropertyName="Text"
+                                                                         Value="Show low balances" />
+                                            </ia:DataTriggerBehavior>
+                                            <ia:DataTriggerBehavior
+                                                Binding="{Binding TezosTokensViewModel.HideLowBalances}"
+                                                ComparisonCondition="Equal"
+                                                Value="False">
+                                                <ia:ChangePropertyAction PropertyName="Text"
+                                                                         Value="Hide low balances" />
+                                            </ia:DataTriggerBehavior>
+                                        </i:Interaction.Behaviors>
+                                    </TextBlock>
+                                </StackPanel>
+                            </Button>
+                        </StackPanel>
+                    </Border>
+                </Popup>
+            </WrapPanel>
         </StackPanel>
 
 

@@ -804,7 +804,7 @@ namespace Atomex.Client.Desktop.ViewModels
 
             FromCurrencies = atomexClient.Account.Currencies
                 .Where(c => c.IsSwapAvailable)
-                .Select(CurrencyViewModelCreator.CreateViewModel)
+                .Select(CurrencyViewModelCreator.CreateOrGet)
                 .ToList();
 
             ToCurrencies = FromCurrencies;
@@ -1127,8 +1127,8 @@ namespace Atomex.Client.Desktop.ViewModels
             var btc = DesignTime.TestNetCurrencies.Get<BitcoinConfig>("BTC");
             var ltc = DesignTime.TestNetCurrencies.Get<LitecoinConfig>("LTC");
 
-            var btcViewModel = CurrencyViewModelCreator.CreateViewModel(btc, subscribeToUpdates: false);
-            var ltcViewModel = CurrencyViewModelCreator.CreateViewModel(ltc, subscribeToUpdates: false);
+            var btcViewModel = CurrencyViewModelCreator.CreateOrGet(btc, subscribeToUpdates: false);
+            var ltcViewModel = CurrencyViewModelCreator.CreateOrGet(ltc, subscribeToUpdates: false);
 
             var currencyViewModels = new List<CurrencyViewModel>
             {

@@ -86,7 +86,7 @@ namespace Atomex.Client.Desktop.ViewModels
         {
             _app = app ?? throw new ArgumentNullException(nameof(app));
             _api = wertApi ?? throw new ArgumentNullException(nameof(wertApi));
-            CurrencyViewModel = CurrencyViewModelCreator.CreateViewModel(currency);
+            CurrencyViewModel = CurrencyViewModelCreator.CreateOrGet(currency);
             _cancellationTokenSource = new CancellationTokenSource();
 
             // get all addresses with tokens (if exists)

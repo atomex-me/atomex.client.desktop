@@ -20,8 +20,8 @@ namespace Atomex.Client.Desktop.ViewModels
     public class MyWalletsViewModel : ViewModelBase
     {
         private IAtomexApp AtomexApp { get; }
-        private readonly Action<ViewModelBase> ShowContent;
-        private Action DoAfterAtomexClientChanged;
+        private readonly Action<ViewModelBase> _showContent;
+        private Action _doAfterAtomexClientChanged;
 
         public IEnumerable<WalletInfo> Wallets { get; set; }
         [Reactive] public WalletInfo? SelectedWallet { get; set; }
@@ -47,7 +47,7 @@ namespace Atomex.Client.Desktop.ViewModels
 
             AtomexApp.AtomexClientChanged += OnAtomexClientChangedEventHandler;
 
-            ShowContent += showContent;
+            _showContent += showContent;
         }
 
         private ReactiveCommand<WalletInfo, Unit> _selectWalletCommand;
@@ -77,17 +77,19 @@ namespace Atomex.Client.Desktop.ViewModels
                         password: password,
                         currenciesProvider: AtomexApp.CurrenciesProvider,
                         clientType: clientType,
-                        migrationCompleteCallback: (MigrationActionType actionType) =>
+                        migrationCompleteCallback: actionType =>
                         {
-                            if (actionType == MigrationActionType.XtzTransactionsDeleted)
+                            _doAfterAtomexClientChanged = actionType switch
                             {
-                                DoAfterAtomexClientChanged = TezosTransactionsDeleted;
-                            }
+                                MigrationActionType.XtzTransactionsDeleted => TezosTransactionsDeleted,
+                                MigrationActionType.XtzTokensDataDeleted => OnTezosTokensDataDeleted,
+                                _ => _doAfterAtomexClientChanged
+                            };
                         });
                 },
                 goBack: () =>
                 {
-                    ShowContent(this);
+                    _showContent(this);
                     SelectedWallet = null;
                 },
                 onUnlock: () =>
@@ -101,7 +103,7 @@ namespace Atomex.Client.Desktop.ViewModels
                     AtomexApp.UseAtomexClient(atomexClient, restart: true);
                 });
 
-            ShowContent?.Invoke(unlockViewModel);
+            _showContent?.Invoke(unlockViewModel);
         }
 
         private void TezosTransactionsDeleted()
@@ -109,6 +111,12 @@ namespace Atomex.Client.Desktop.ViewModels
             var xtzCurrencies = new[] { "XTZ", "TZBTC", "KUSD", "USDT_XTZ" };
             var restoreDialogViewModel = new RestoreDialogViewModel(AtomexApp);
             restoreDialogViewModel.ScanCurrenciesAsync(xtzCurrencies);
+        }
+
+        private void OnTezosTokensDataDeleted()
+        {
+            var restoreDialogViewModel = new RestoreDialogViewModel(AtomexApp);
+            restoreDialogViewModel.ScanTezosTokens();
         }
 
         private void OnAtomexClientChangedEventHandler(object? sender, AtomexClientChangedEventArgs args)
@@ -121,7 +129,7 @@ namespace Atomex.Client.Desktop.ViewModels
                 return;
             }
 
-            DoAfterAtomexClientChanged?.Invoke();
+            _doAfterAtomexClientChanged?.Invoke();
         }
 
         private void DesignerMode()

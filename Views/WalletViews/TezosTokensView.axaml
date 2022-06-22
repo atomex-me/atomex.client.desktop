@@ -82,18 +82,21 @@
                                 </TextBlock>
                             </StackPanel>
                             <StackPanel Grid.Column="1"
+                                        VerticalAlignment="Center"
                                         Orientation="Vertical">
                                 <TextBlock Foreground="{DynamicResource DefaultForegroundBrush}"
                                            FontSize="16"
                                            Margin="0 0 0 2"
-                                           VerticalAlignment="Center"
+                                           VerticalAlignment="Stretch"
                                            HorizontalAlignment="Right"
                                            Text="{Binding Balance}" />
                                 <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
                                            FontSize="13"
                                            Margin="0 2 0 0"
                                            HorizontalAlignment="Right"
-                                           VerticalAlignment="Center">
+                                           VerticalAlignment="Stretch"
+                                           IsVisible="{Binding TotalAmount,
+                                           Converter={x:Static converters:NumericConverters.NotZero}}">
                                     <TextBlock.Text>
                                         <MultiBinding Converter="{StaticResource AmountToStringConverter}">
                                             <Binding Path="TotalAmountInBase" Mode="OneWay" />

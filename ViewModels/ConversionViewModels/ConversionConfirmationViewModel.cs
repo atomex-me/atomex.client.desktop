@@ -308,8 +308,8 @@ namespace Atomex.Client.Desktop.ViewModels
             var btc = DesignTime.TestNetCurrencies.Get<BitcoinConfig>("BTC");
             var ltc = DesignTime.TestNetCurrencies.Get<LitecoinConfig>("LTC");
 
-            FromCurrencyViewModel     = CurrencyViewModelCreator.CreateViewModel(btc, subscribeToUpdates: false);
-            ToCurrencyViewModel       = CurrencyViewModelCreator.CreateViewModel(ltc, subscribeToUpdates: false);
+            FromCurrencyViewModel     = CurrencyViewModelCreator.CreateOrGet(btc, subscribeToUpdates: false);
+            ToCurrencyViewModel       = CurrencyViewModelCreator.CreateOrGet(ltc, subscribeToUpdates: false);
 
             FromSource                = new FromAddress("13V2gzjUL9DiHZLy1WFk9q6pZ3yBsb4TzP");
             ToAddress                 = "13V2gzjUL9DiHZLy1WFk9q6pZ3yBsb4TzP";
