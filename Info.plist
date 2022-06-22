@@ -2,7 +2,7 @@
 <plist version="1.0">
   <dict>
     <key>CFBundleIconFile</key>
-    <string>logo.icns</string>
+    <string>atomex_logo_256x256.icns</string>
     <key>CFBundleIdentifier</key>
     <string>com.atomex.osx</string>
     <key>CFBundleName</key>
