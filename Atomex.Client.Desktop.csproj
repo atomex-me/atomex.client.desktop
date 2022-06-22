@@ -4,7 +4,7 @@
         <Nullable>enable</Nullable>
         <DefaultItemExcludes>$(DefaultItemExcludes);atomex.client.core\**</DefaultItemExcludes>
         <UseAppHost>true</UseAppHost>
-        <ApplicationIcon>Resources/Images/logo_dark_256x256.ico</ApplicationIcon>
+        <ApplicationIcon>Resources/Images/atomex_logo_256x256_ico.ico</ApplicationIcon>
 
         <AssemblyVersion>1.2.15</AssemblyVersion>
         <Version>1.2.15</Version>
