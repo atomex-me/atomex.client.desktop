@@ -7,6 +7,7 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
         string? IconPath { get; }
         IBitmap? BitmapIcon { get; }
         string DisabledIconPath { get; }
+        public string CurrencyName { get; }
         string CurrencyCode { get; }
         string CurrencyDescription { get; }
         string CurrencyFormat { get; }

@@ -6,11 +6,13 @@ using System.Linq;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
+
 using Avalonia.Controls;
 using Avalonia.Threading;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using Serilog;
+
 using Atomex.Abstract;
 using Atomex.Blockchain.BitcoinBased;
 using Atomex.Client.Desktop.Common;
@@ -316,9 +318,12 @@ namespace Atomex.Client.Desktop.ViewModels
                 {
                     var symbol = Symbols.SymbolByCurrencies(t.Item1.Currency, t.Item2.Currency);
 
-                    PriceFormat = symbol != null ? Currencies.GetByName(symbol.Quote).Format : null;
-                    BaseCurrencyCode = symbol?.Base;
-                    QuoteCurrencyCode = symbol?.Quote;
+                    var quoteCurrency = symbol != null ? Currencies.GetByName(symbol.Quote) : null;
+                    var baseCurrency = symbol != null ? Currencies.GetByName(symbol.Base) : null;
+
+                    PriceFormat = quoteCurrency?.Format;
+                    BaseCurrencyCode = baseCurrency?.DisplayedName;
+                    QuoteCurrencyCode = quoteCurrency?.DisplayedName;
                 });
 
             // AmountStrings, FromCurrencyViewModel or ToCurrencyViewModel changed => estimate swap price and target amount

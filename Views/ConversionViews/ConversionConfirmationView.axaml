@@ -91,7 +91,7 @@
             </TextBlock>
 
             <TextBlock Margin="6 0 0 0"
-                       Text="{Binding FromCurrencyViewModel.CurrencyCode}"
+                       Text="{Binding FromCurrencyViewModel.CurrencyName}"
                        FontSize="18"
                        FontFamily="{DynamicResource DefaultLightFontFamily}"
                        Foreground="{DynamicResource DefaultForegroundBrush}">         
@@ -187,7 +187,7 @@
             </TextBlock>
 
             <TextBlock Margin="6 0 0 0"
-                       Text="{Binding ToCurrencyViewModel.CurrencyCode}"
+                       Text="{Binding ToCurrencyViewModel.CurrencyName}"
                        FontSize="18"
                        FontFamily="{DynamicResource DefaultLightFontFamily}"
                        Foreground="{DynamicResource DefaultForegroundBrush}">         

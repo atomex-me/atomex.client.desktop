@@ -19,7 +19,6 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
 {
     public abstract class CurrencyViewModel : ViewModelBase, IAssetViewModel
     {
-        private const string PathToImages = "avares://Atomex.Client.Desktop/Resources/Images";
         protected const string PathToIcons = "/Resources/Icons";
 
         protected IAccount Account { get; set; }
@@ -43,6 +42,7 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
         [Reactive] public decimal UnconfirmedAmount { get; set; }
         [Reactive] public decimal UnconfirmedAmountInBase { get; set; }
 
+        public string CurrencyName => Currency.DisplayedName;
         public string CurrencyCode => Currency.Name;
         public string CurrencyDescription => Currency.Description;
         public string FeeCurrencyCode => Currency.FeeCode;

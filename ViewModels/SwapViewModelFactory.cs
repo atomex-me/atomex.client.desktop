@@ -64,12 +64,10 @@ namespace Atomex.Client.Desktop.ViewModels
                     FromCurrencyViewModel = fromCurrencyViewModel,
                     FromAmount            = fromAmount,
                     FromAmountFormat      = fromCurrencyViewModel.CurrencyFormat,
-                    FromCurrencyCode      = fromCurrencyViewModel.CurrencyCode,
 
                     ToCurrencyViewModel   = toCurrencyViewModel,
                     ToAmount              = toAmount,
                     ToAmountFormat        = toCurrencyViewModel.CurrencyFormat,
-                    ToCurrencyCode        = toCurrencyViewModel.CurrencyCode,
 
                     Price                 = swap.Price,
                     PriceFormat           = $"F{quoteCurrency.Digits}",

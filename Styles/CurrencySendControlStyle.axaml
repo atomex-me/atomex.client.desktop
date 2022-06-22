@@ -128,7 +128,7 @@
                   </TextBlock.Text>
                 </TextBlock>
 
-                <TextBlock Text="{Binding CurrencyCode}"
+                <TextBlock Text="{Binding CurrencyName}"
                            FontSize="13"
                            LineHeight="16"
                            Foreground="{DynamicResource SecondaryForegroundBrush}"

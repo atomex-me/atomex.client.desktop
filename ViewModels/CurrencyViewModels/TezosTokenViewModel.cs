@@ -53,6 +53,8 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
 
         public string IconPath => string.Empty;
         public string DisabledIconPath => string.Empty;
+
+        public string CurrencyName => TokenBalance.Symbol;
         public string CurrencyCode => TokenBalance.Symbol;
         public string CurrencyDescription => TokenBalance.Name;
         string IAssetViewModel.BaseCurrencyFormat => BaseCurrencyFormat;
