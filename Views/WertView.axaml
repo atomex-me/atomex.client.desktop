@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              xmlns:vm="clr-namespace:Atomex.Client.Desktop.ViewModels"
+             xmlns:svg="clr-namespace:Avalonia.Svg.Skia;assembly=Avalonia.Svg.Skia"
              x:Class="Atomex.Client.Desktop.Views.WertView">
     
     <Design.DataContext>
@@ -27,10 +28,9 @@
                                         Height="64"
                                         Opacity="0.8"
                                         Margin="3 0 3 0">
-                            <Canvas Width="48"
-                                    Height="48"
-                                    Background="{Binding Background}"
-                                    OpacityMask="{Binding OpacityMask}" />
+                          <svg:Svg Path="{Binding IconPath}"
+                                   Height="48"
+                                   Width="48"/>
                         </ContentControl>
 
                         <TextBlock x:Name="HeaderTextBlock" Text="{Binding Header}"

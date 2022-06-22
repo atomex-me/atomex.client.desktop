@@ -82,7 +82,7 @@
                                     </TextBlock.Text>
                                 </TextBlock>
                                 <TextBlock Margin="6 0 0 -2"
-                                           Text="{Binding CurrencyCode}"
+                                           Text="{Binding CurrencyName}"
                                            FontFamily="{DynamicResource DefaultLightFontFamily}"
                                            FontSize="16"
                                            Foreground="{DynamicResource LightDefaultOpacity50}"

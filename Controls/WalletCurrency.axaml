@@ -78,7 +78,7 @@
                                            Foreground="{DynamicResource DefaultForegroundBrush}"
                                            FontSize="32"
                                            LineHeight="40"
-                                           Text="{Binding AssetViewModel.CurrencyCode,
+                                           Text="{Binding AssetViewModel.CurrencyName,
                                            RelativeSource={RelativeSource TemplatedParent}}" />
                                 <controls:IconButton Classes="Update Big WithToolTipContent"
                                                      Classes.Updating="{TemplateBinding IsBalanceUpdating}"
@@ -120,7 +120,7 @@
                                            FontSize="13"
                                            LineHeight="16"
                                            Margin="4 0"
-                                           Text="{Binding AssetViewModel.CurrencyCode,
+                                           Text="{Binding AssetViewModel.CurrencyName,
                                            RelativeSource={RelativeSource TemplatedParent}}" />
                                 <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
                                            FontSize="13"

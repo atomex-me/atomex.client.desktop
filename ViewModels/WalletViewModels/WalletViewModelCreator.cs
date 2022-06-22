@@ -34,6 +34,13 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                     showRightPopupContent: showRightPopupContent,
                     currency: currency),
 
+                Fa2Config _ => new Fa2WalletViewModel(
+                    app: app,
+                    setConversionTab: setConversionTab,
+                    setWertCurrency: setWertCurrency,
+                    showRightPopupContent: showRightPopupContent,
+                    currency: currency),
+
                 TezosConfig _ => new TezosWalletViewModel(
                     app: app,
                     setConversionTab: setConversionTab,

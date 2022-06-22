@@ -274,7 +274,7 @@
                                                     <TextBlock HorizontalAlignment="Right"
                                                                Foreground="{DynamicResource DefaultForegroundBrush}"
                                                                FontSize="16"
-                                                               Text="{Binding CurrencyCode}"
+                                                               Text="{Binding CurrencyName}"
                                                                Margin="3 0 0 0" />
                                                 </StackPanel>
                                                 <TextBlock HorizontalAlignment="Right"
@@ -312,7 +312,7 @@
                                                            FontSize="16"
                                                            VerticalAlignment="Center"
                                                            Margin="3 0 0 0"
-                                                           Text="{Binding CurrencyCode}" />
+                                                           Text="{Binding CurrencyName}" />
 
                                                 <WrapPanel VerticalAlignment="Center">
                                                     <controls:IconButton Classes="MenuDots"
@@ -346,7 +346,7 @@
                                                                             Foreground="{DynamicResource DefaultForegroundBrush}"
                                                                             VerticalAlignment="Center"
                                                                             FontSize="16" />
-                                                                        <TextBlock Text="{Binding CurrencyCode}"
+                                                                        <TextBlock Text="{Binding CurrencyName}"
                                                                             Foreground="{DynamicResource DefaultForegroundBrush}"
                                                                             VerticalAlignment="Center"
                                                                             FontSize="16"
@@ -363,7 +363,7 @@
                                                                             Foreground="{DynamicResource DefaultForegroundBrush}"
                                                                             VerticalAlignment="Center"
                                                                             FontSize="16" />
-                                                                        <TextBlock Text="{Binding CurrencyCode}"
+                                                                        <TextBlock Text="{Binding CurrencyName}"
                                                                             Foreground="{DynamicResource DefaultForegroundBrush}"
                                                                             VerticalAlignment="Center"
                                                                             FontSize="16"
@@ -380,7 +380,7 @@
                                                                             Foreground="{DynamicResource DefaultForegroundBrush}"
                                                                             VerticalAlignment="Center"
                                                                             FontSize="16" />
-                                                                        <TextBlock Text="{Binding CurrencyCode}"
+                                                                        <TextBlock Text="{Binding CurrencyName}"
                                                                             Foreground="{DynamicResource DefaultForegroundBrush}"
                                                                             VerticalAlignment="Center"
                                                                             FontSize="16"
@@ -398,7 +398,7 @@
                                                                             Foreground="{DynamicResource DefaultForegroundBrush}"
                                                                             VerticalAlignment="Center"
                                                                             FontSize="16" />
-                                                                        <TextBlock Text="{Binding CurrencyCode}"
+                                                                        <TextBlock Text="{Binding CurrencyName}"
                                                                             Foreground="{DynamicResource DefaultForegroundBrush}"
                                                                             VerticalAlignment="Center"
                                                                             FontSize="16"

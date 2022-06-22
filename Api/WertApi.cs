@@ -4,8 +4,10 @@ using System.Net.Http;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Atomex.Common;
+
 using Newtonsoft.Json;
+
+using Atomex.Common;
 
 namespace Atomex.Client.Desktop.Api
 {
@@ -40,14 +42,17 @@ namespace Atomex.Client.Desktop.Api
             [JsonProperty(PropertyName = "status")]
             public string Status { get; set; }
 
-            [JsonProperty(PropertyName = "body")] public Body Body { get; set; }
+            [JsonProperty(PropertyName = "body")]
+            public Body Body { get; set; }
         }
 
         internal class WertRequestData
         {
-            [JsonProperty(PropertyName = "from")] public string From { get; set; }
+            [JsonProperty(PropertyName = "from")]
+            public string From { get; set; }
 
-            [JsonProperty(PropertyName = "to")] public string To { get; set; }
+            [JsonProperty(PropertyName = "to")]
+            public string To { get; set; }
 
             [JsonProperty(PropertyName = "amount")]
             public decimal Amount { get; set; }
@@ -59,7 +64,7 @@ namespace Atomex.Client.Desktop.Api
 
         private string ConvertUrl => "api/v3/convert";
 
-        private string _partnerIdHeader => App.Account.Network == Core.Network.MainNet
+        private string PartnerIdHeader => App.Account.Network == Core.Network.MainNet
             ? "atomex"
             : "01F298K3HP4DY326AH1NS3MM3M";
         
@@ -94,7 +99,7 @@ namespace Atomex.Client.Desktop.Api
             
             var headers = new HttpRequestHeaders
             {
-                new KeyValuePair<string, IEnumerable<string>>("x-partner-id", new[] {_partnerIdHeader})
+                new KeyValuePair<string, IEnumerable<string>>("x-partner-id", new[] {PartnerIdHeader})
             };
 
             return await HttpHelper.PostAsyncResult<WertConvertResponse>(

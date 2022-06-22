@@ -432,7 +432,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             var sendViewModel = new TezosTokensSendViewModel(
                 app: _app,
                 tokenContract: tokenViewModel.TokenBalance.Contract,
-                tokenId: tokenViewModel.TokenBalance.TokenId,
+                tokenId: (int)tokenViewModel.TokenBalance.TokenId,
                 tokenType: TokenContract.Contract.GetContractType(),
                 // getTokenPreview: GetTokenPreview,
                 tokenPreview: null,

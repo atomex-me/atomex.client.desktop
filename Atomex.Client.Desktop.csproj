@@ -6,8 +6,8 @@
         <UseAppHost>true</UseAppHost>
         <ApplicationIcon>Resources/Images/logo_dark_256x256.ico</ApplicationIcon>
 
-        <AssemblyVersion>1.2.14</AssemblyVersion>
-        <Version>1.2.14</Version>
+        <AssemblyVersion>1.2.15</AssemblyVersion>
+        <Version>1.2.15</Version>
     </PropertyGroup>
     <Choose>
         <When Condition=" '$(Configuration)' == 'Debug' ">
@@ -124,6 +124,9 @@
         </Compile>
         <Compile Update="Views\ConversionViews\ConversionView.axaml.cs">
             <DependentUpon>ConversionView.axaml</DependentUpon>
+        </Compile>
+        <Compile Update="Views\WalletViews\Fa2WalletView.axaml.cs">
+          <DependentUpon>Fa2WalletView.axaml</DependentUpon>
         </Compile>
         <Compile Update="Views\WalletViews\WalletView.axaml.cs">
             <DependentUpon>WalletView.axaml</DependentUpon>

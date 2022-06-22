@@ -61,6 +61,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         [Reactive] public string SendRecommendedAmountMenu { get; set; }
         [Reactive] public string SendEnteredAmountMenu { get; set; }
 
+        public string CurrencyName => CurrencyViewModel.CurrencyName;
         public string CurrencyCode => CurrencyViewModel.CurrencyCode;
         public string FeeCurrencyCode => CurrencyViewModel.FeeCurrencyCode;
         public string BaseCurrencyCode => CurrencyViewModel.BaseCurrencyCode;

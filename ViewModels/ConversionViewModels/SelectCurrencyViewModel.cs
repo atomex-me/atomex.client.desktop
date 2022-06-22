@@ -61,7 +61,7 @@ namespace Atomex.Client.Desktop.ViewModels.ConversionViewModels
                     var totalAmount          = currency.SatoshiToCoin(totalAmountInSatoshi);
                     var totalAmountString    = totalAmount.ToString(CurrencyViewModel.CurrencyFormat);
 
-                    return $"from {outputs.Count()} outputs ({totalAmountString} {currency.Name})";
+                    return $"from {outputs.Count()} outputs ({totalAmountString} {currency.DisplayedName})";
                 })
                 .ToPropertyExInMainThread(this, vm => vm.SelectedAddressDescription);
 
@@ -125,7 +125,7 @@ namespace Atomex.Client.Desktop.ViewModels.ConversionViewModels
                     var prefix = _type == SelectCurrencyType.From ? "from" : "to";
                     var balanceString = address.Balance.ToString(CurrencyViewModel.CurrencyFormat);
 
-                    return $"{prefix} {address.Address.TruncateAddress()} ({balanceString} {CurrencyViewModel.Currency.Name})";
+                    return $"{prefix} {address.Address.TruncateAddress()} ({balanceString} {CurrencyViewModel.Currency.DisplayedName})";
                 })
                 .ToPropertyExInMainThread(this, vm => vm.SelectedAddressDescription);
 

@@ -1,10 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Reactive;
-using System.Reactive.Linq;
 using System.Runtime.InteropServices;
-using System.Windows.Input;
+
+using Avalonia.Controls;
 using ReactiveUI;
+using ReactiveUI.Fody.Helpers;
+
 using Atomex.Client.Desktop.Common;
 using Atomex.Common;
 using Atomex.Core;
@@ -12,8 +14,6 @@ using Atomex.LiteDb;
 using Atomex.Services;
 using Atomex.Wallet;
 using Atomex.Wallet.Abstract;
-using Avalonia.Controls;
-using ReactiveUI.Fody.Helpers;
 
 namespace Atomex.Client.Desktop.ViewModels
 {
@@ -64,10 +64,13 @@ namespace Atomex.Client.Desktop.ViewModels
                 unlockAction: password =>
                 {
                     var clientType = ClientType.Unknown;
+
                     if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                         clientType = ClientType.AvaloniaWindows;
-                    if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX)) clientType = ClientType.AvaloniaMac;
-                    if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux)) clientType = ClientType.AvaloniaLinux;
+                    if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+                        clientType = ClientType.AvaloniaMac;
+                    if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+                        clientType = ClientType.AvaloniaLinux;
 
                     account = Account.LoadFromFile(
                         pathToAccount: info.Path,
@@ -92,7 +95,8 @@ namespace Atomex.Client.Desktop.ViewModels
                 onUnlock: () =>
                 {
                     var atomexClient = new WebSocketAtomexClientLegacy(
-                        configuration: App.Configuration,
+                        exchangeUrl: App.Configuration[$"Services:{account!.Network}:Exchange:Url"],
+                        marketDataUrl: App.Configuration[$"Services:{account!.Network}:MarketData:Url"],
                         account: account,
                         symbolsProvider: AtomexApp.SymbolsProvider);
 
@@ -104,7 +108,7 @@ namespace Atomex.Client.Desktop.ViewModels
 
         private void TezosTransactionsDeleted()
         {
-            var xtzCurrencies = new[] { "XTZ", "TZBTC", "KUSD" };
+            var xtzCurrencies = new[] { "XTZ", "TZBTC", "KUSD", "USDT_XTZ" };
             var restoreDialogViewModel = new RestoreDialogViewModel(AtomexApp);
             restoreDialogViewModel.ScanCurrenciesAsync(xtzCurrencies);
         }

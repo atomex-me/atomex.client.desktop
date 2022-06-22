@@ -40,7 +40,7 @@
                             </MultiBinding>
                         </TextBlock.Text>
                     </TextBlock>
-                    <TextBlock Text="{Binding CurrencyCode}"
+                    <TextBlock Text="{Binding CurrencyName}"
                                FontSize="9"
                                Foreground="{DynamicResource DefaultForegroundBrush}"
                                Margin="4 3 0 0" />

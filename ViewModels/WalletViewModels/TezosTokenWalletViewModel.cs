@@ -4,18 +4,19 @@ using System.Linq;
 using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Atomex.Client.Desktop.Common;
-using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
-using Atomex.Client.Desktop.ViewModels.TransactionViewModels;
-using Atomex.Common;
-using Atomex.Wallet;
-using Atomex.Wallet.Tezos;
+
 using Avalonia.Controls;
 using Avalonia.Threading;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using Serilog;
 
+using Atomex.Client.Desktop.Common;
+using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
+using Atomex.Client.Desktop.ViewModels.TransactionViewModels;
+using Atomex.Common;
+using Atomex.Wallet;
+using Atomex.Wallet.Tezos;
 
 namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 {
