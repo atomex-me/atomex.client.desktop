@@ -263,7 +263,7 @@
                                FontSize="13"
                                VerticalAlignment="Center"
                                Foreground="{DynamicResource Orange}"
-                               Text="{Binding Currency.Name}" />
+                               Text="{Binding Currency.DisplayedName}" />
                     <TextBlock HorizontalAlignment="Right"
                                LineHeight="16"
                                FontSize="13"

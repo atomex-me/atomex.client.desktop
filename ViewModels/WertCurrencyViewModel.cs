@@ -123,12 +123,12 @@ namespace Atomex.Client.Desktop.ViewModels
 
                     return new WalletAddressViewModel
                     {
-                        Address = g.Key,
-                        HasActivity = address?.HasActivity ?? hasTokens,
+                        Address          = g.Key,
+                        HasActivity      = address?.HasActivity ?? hasTokens,
                         AvailableBalance = address?.AvailableBalance() ?? 0m,
-                        CurrencyFormat = Currency.Format,
-                        CurrencyCode = Currency.Name,
-                        IsFreeAddress = isFreeAddress,
+                        CurrencyFormat   = Currency.Format,
+                        CurrencyCode     = Currency.DisplayedName,
+                        IsFreeAddress    = isFreeAddress,
                     };
                 })
                 .ToList();

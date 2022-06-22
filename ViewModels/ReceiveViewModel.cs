@@ -143,7 +143,7 @@ namespace Atomex.Client.Desktop.ViewModels
                 HasActivity = true,
                 AvailableBalance = 123.456789m,
                 CurrencyFormat = Currency.Format,
-                CurrencyCode = Currency.Name,
+                CurrencyCode = Currency.DisplayedName,
                 IsFreeAddress = false,
                 ShowTokenBalance = true,
                 TokenBalance = 100.00000000m,
