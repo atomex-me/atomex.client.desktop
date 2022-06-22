@@ -13,7 +13,6 @@
         <vm:SelectCurrencyViewModel />
     </Design.DataContext>
 
-
     <Border Classes="ChildViewBorder"
             Width="700">
         <Grid RowDefinitions="72,*">
@@ -87,7 +86,7 @@
                                     </TextBlock.Text>
                                 </TextBlock>
                                 <TextBlock Margin="6 0 0 -2"
-                                           Text="{Binding CurrencyViewModel.CurrencyCode}"
+                                           Text="{Binding CurrencyViewModel.CurrencyName}"
                                            FontFamily="{DynamicResource DefaultLightFontFamily}"
                                            FontSize="16"
                                            Foreground="{DynamicResource LightDefaultOpacity50}"

@@ -4,6 +4,13 @@ using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
+
+using Avalonia.Media.Imaging;
+using Avalonia.Threading;
+using ReactiveUI;
+using ReactiveUI.Fody.Helpers;
+using Serilog;
+
 using Atomex.Blockchain.Tezos;
 using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.ViewModels.SendViewModels;
@@ -13,21 +20,21 @@ using Atomex.TezosTokens;
 using Atomex.ViewModels;
 using Atomex.Wallet;
 using Atomex.Wallet.Tezos;
-using Avalonia.Media.Imaging;
-using Avalonia.Threading;
-using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
-using Serilog;
 
 namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
 {
     public class TezosTokenViewModel : ViewModelBase, IAssetViewModel, IDisposable
     {
         private const int MaxBalanceDecimals = AddressesHelper.MaxTokenCurrencyFormatDecimals;
-        private static readonly string[] ConvertibleTokens = { "tzbtc", "kusd" };
         public const string Fa12 = "FA12";
         public const string Fa2 = "FA2";
-        public bool CanExchange => ConvertibleTokens.Contains(TokenBalance.Symbol?.ToLower());
+        public bool CanExchange => AtomexApp
+            ?.Account
+            ?.Currencies
+            .Any(c => c is TezosTokenConfig tezosTokenConfig &&
+                      tezosTokenConfig.TokenContractAddress == Contract?.Address &&
+                      tezosTokenConfig.TokenId == TokenBalance?.TokenId) ?? false;
+
         public IAtomexApp AtomexApp { get; set; }
         public TezosConfig TezosConfig { get; set; }
         [Reactive] public TokenBalance TokenBalance { get; set; }
@@ -51,13 +58,15 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
 
         public string IconPath => string.Empty;
         public string DisabledIconPath => string.Empty;
+
+        public string CurrencyName => TokenBalance.Symbol;
         public string CurrencyCode => TokenBalance.Symbol;
         public string CurrencyDescription => TokenBalance.Name;
         string IAssetViewModel.BaseCurrencyFormat => BaseCurrencyFormat;
 
         public decimal? DailyChangePercent => null;
 
-        private ThumbsApi ThumbsApi => new ThumbsApi(
+        private ThumbsApi ThumbsApi => new(
             new ThumbsApiSettings
             {
                 ThumbsApiUri = TezosConfig.ThumbsApiUri,
@@ -195,12 +204,11 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
             return new TezosTokensSendViewModel(
                 app: AtomexApp,
                 tokenContract: Contract.Address,
-                tokenId: TokenBalance.TokenId,
+                tokenId: (int)TokenBalance.TokenId,
                 tokenType: Contract.GetContractType(),
                 tokenPreview: BitmapIcon,
                 from: null);
         }
-
 
         public bool IsIpfsAsset =>
             TokenBalance.ArtifactUri != null && ThumbsApi.HasIpfsPrefix(TokenBalance.ArtifactUri);
@@ -226,7 +234,9 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
             {
                 var currency = AtomexApp.Account
                     .Currencies
-                    .FirstOrDefault(c => c is Fa12Config fa12 && fa12.TokenContractAddress == Contract.Address);
+                    .FirstOrDefault(c => c is TezosTokenConfig tokenConfig &&
+                                         tokenConfig.TokenContractAddress == Contract.Address &&
+                                         tokenConfig.TokenId == TokenBalance.TokenId);
 
                 if (currency != null)
                     SetConversionTab?.Invoke(currency);

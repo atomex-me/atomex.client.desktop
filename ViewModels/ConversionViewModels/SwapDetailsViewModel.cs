@@ -32,8 +32,8 @@ namespace Atomex.Client.Desktop.ViewModels
         public decimal ToAmount { get; set; }
         public string FromAmountFormat => FromCurrencyViewModel.CurrencyFormat;
         public string ToAmountFormat => ToCurrencyViewModel.CurrencyFormat;
-        public string FromCurrencyCode => FromCurrencyViewModel.CurrencyCode;
-        public string ToCurrencyCode => ToCurrencyViewModel.CurrencyCode;
+        public string FromCurrencyCode => FromCurrencyViewModel.CurrencyName;
+        public string ToCurrencyCode => ToCurrencyViewModel.CurrencyName;
         public IEnumerable<Atomex.ViewModels.Helpers.SwapDetailingInfo> DetailingInfo { get; set; }
 
 #if DEBUG

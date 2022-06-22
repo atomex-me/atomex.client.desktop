@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Concurrent;
+
 using Atomex.Core;
 
 // ReSharper disable InconsistentNaming
@@ -16,6 +17,7 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
         ETH,
         TZBTC,
         KUSD,
+        USDT_XTZ,
         XTZ,
     }
 
@@ -38,15 +40,16 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
 
             var currencyViewModel = currency switch
             {
-                Currencies.BTC => (CurrencyViewModel)new BitcoinCurrencyViewModel(currencyConfig),
-                Currencies.LTC => new LitecoinCurrencyViewModel(currencyConfig),
-                Currencies.USDT => new TetherCurrencyViewModel(currencyConfig),
-                Currencies.TBTC => new TbtcCurrencyViewModel(currencyConfig),
-                Currencies.WBTC => new WbtcCurrencyViewModel(currencyConfig),
-                Currencies.ETH => new EthereumCurrencyViewModel(currencyConfig),
-                Currencies.TZBTC => new TzbtcCurrencyViewModel(currencyConfig),
-                Currencies.KUSD => new KusdCurrencyViewModel(currencyConfig),
-                Currencies.XTZ => new TezosCurrencyViewModel(currencyConfig),
+                Currencies.BTC      => (CurrencyViewModel)new BitcoinCurrencyViewModel(currencyConfig),
+                Currencies.LTC      => new LitecoinCurrencyViewModel(currencyConfig),
+                Currencies.USDT     => new TetherCurrencyViewModel(currencyConfig),
+                Currencies.TBTC     => new TbtcCurrencyViewModel(currencyConfig),
+                Currencies.WBTC     => new WbtcCurrencyViewModel(currencyConfig),
+                Currencies.ETH      => new EthereumCurrencyViewModel(currencyConfig),
+                Currencies.TZBTC    => new TzbtcCurrencyViewModel(currencyConfig),
+                Currencies.KUSD     => new KusdCurrencyViewModel(currencyConfig),
+                Currencies.USDT_XTZ => new UsdtXtzCurrencyViewModel(currencyConfig),
+                Currencies.XTZ      => new TezosCurrencyViewModel(currencyConfig),
                 _ => throw NotSupported(currencyConfig.Name)
             };
 
