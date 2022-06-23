@@ -7,8 +7,7 @@
              xmlns:vm="clr-namespace:Atomex.Client.Desktop.ViewModels"
              xmlns:controls="clr-namespace:Atomex.Client.Desktop.Controls"
              xmlns:converters="clr-namespace:Atomex.Client.Desktop.Converters"
-             xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
-             xmlns:ia="clr-namespace:Avalonia.Xaml.Interactions.Core;assembly=Avalonia.Xaml.Interactions">
+             xmlns:svg="clr-namespace:Avalonia.Svg.Skia;assembly=Avalonia.Svg.Skia">
 
     <Design.DataContext>
         <vm:WalletMainViewModel />
@@ -16,7 +15,6 @@
 
     <UserControl.Resources>
         <converters:CalcChildHeightConverter x:Key="CalcChildHeightConverter" />
-        <converters:ToolTipOffsetConverter x:Key="ToolTipOffsetConverter" />
     </UserControl.Resources>
 
     <UserControl.Styles>
@@ -97,11 +95,11 @@
         <!-- left menu -->
         <DockPanel DockPanel.Dock="Left">
             <StackPanel Width="220">
-                <Image Source="/Resources/Images/menu_logo.png"
-                       Stretch="None"
-                       HorizontalAlignment="Left"
-                       Margin="32 33 0 55" />
-
+                <svg:Svg Path="/Resources/Icons/logo-with-title.svg"
+                         Margin="32 36 0 78"
+                         HorizontalAlignment="Left"
+                         Height="28" />
+                
                 <controls:MenuButton
                     Background="Transparent"
                     Foreground="{DynamicResource LightDefault}"

@@ -24,7 +24,7 @@
 		<MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
 		<MediaTemplate EmbedCab="yes" />
 
-		<Icon Id="AppIcon.exe" SourceFile="$(var.Atomex.Client.Desktop.ProjectDir)\Resources\Images\logo_dark_256x256.ico" />
+		<Icon Id="AppIcon.exe" SourceFile="$(var.Atomex.Client.Desktop.ProjectDir)\Resources\Images\atomex_logo_256x256_ico.ico" />
 
 		<Property Id="ARPPRODUCTICON" Value="AppIcon.exe" />
 		<Property Id="ARPHELPLINK" Value="https://atomex.me/" />
