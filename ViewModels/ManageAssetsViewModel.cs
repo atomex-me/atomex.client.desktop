@@ -31,6 +31,7 @@ namespace Atomex.Client.Desktop.ViewModels
         private ObservableCollection<AssetWithSelection> BeforeSearchAssets { get; set; }
         [Reactive] public ObservableCollection<AssetWithSelection> AvailableAssets { get; set; }
         [Reactive] public string SearchPattern { get; set; }
+        [Reactive] public bool HideZeroBalances { get; set; }
         public Action<IEnumerable<string>> OnAssetsChanged { get; set; }
 
         public ManageAssetsViewModel()
