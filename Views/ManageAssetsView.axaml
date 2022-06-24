@@ -83,7 +83,8 @@
                      Classes="SelectCurrencyListBox ManageAssets">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
-                        <Grid ColumnDefinitions="*,Auto">
+                        <Grid ColumnDefinitions="*,Auto"
+                              IsEnabled="{Binding ShouldHide}">
                             <StackPanel Margin="16 14"
                                         Orientation="Horizontal"
                                         VerticalAlignment="Center"

@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive.Linq;
 using Atomex.Client.Desktop.Common;
+using Atomex.Client.Desktop.ViewModels.Abstract;
 using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
 using Atomex.Common;
 using ReactiveUI;
@@ -16,6 +17,7 @@ namespace Atomex.Client.Desktop.ViewModels
     {
         public IAssetViewModel Asset { get; set; }
         [Reactive] public bool IsSelected { get; set; }
+        [Reactive] public bool ShouldHide { get; set; }
         public Action OnChanged { get; set; }
 
         public AssetWithSelection()
@@ -28,11 +30,11 @@ namespace Atomex.Client.Desktop.ViewModels
     public class ManageAssetsViewModel : ViewModelBase
     {
         private ObservableCollection<AssetWithSelection> InitialAssets { get; set; }
-        private ObservableCollection<AssetWithSelection> BeforeSearchAssets { get; set; }
         [Reactive] public ObservableCollection<AssetWithSelection> AvailableAssets { get; set; }
         [Reactive] public string SearchPattern { get; set; }
         [Reactive] public bool HideZeroBalances { get; set; }
         public Action<IEnumerable<string>> OnAssetsChanged { get; set; }
+        public Action<bool>? OnHideZeroBalancesChanges { get; set; }
 
         public ManageAssetsViewModel()
         {
@@ -56,14 +58,32 @@ namespace Atomex.Client.Desktop.ViewModels
                 .Where(_ => AvailableAssets != null)
                 .SubscribeInMainThread(searchPattern =>
                 {
-                    if (searchPattern == string.Empty)
-                        BeforeSearchAssets = new ObservableCollection<AssetWithSelection>(AvailableAssets);
-
                     var filteredAssets = InitialAssets
-                        .Where(c => c.Asset.CurrencyCode.ToLower().Contains(searchPattern.ToLower())
-                                    || c.Asset.CurrencyDescription.ToLower().Contains(searchPattern.ToLower()));
+                        .Where(c => c.Asset.CurrencyCode?.ToLower().Contains(searchPattern.ToLower())
+                                    || c.Asset.CurrencyDescription?.ToLower().Contains(searchPattern.ToLower()));
 
                     AvailableAssets = new ObservableCollection<AssetWithSelection>(filteredAssets);
+                });
+
+            this.WhenAnyValue(vm => vm.HideZeroBalances)
+                .Where(_ => OnHideZeroBalancesChanges != null)
+                .SubscribeInMainThread(hideZeroBalances =>
+                {
+                    AvailableAssets.ForEachDo(asset =>
+                    {
+                        if (!hideZeroBalances)
+                        {
+                            asset.ShouldHide = false;
+                            return;
+                        }
+
+                        asset.ShouldHide = asset.Asset.TotalAmountInBase <= Constants.MinBalanceForTokensUsd;
+                    });
+                    
+                    OnAssetsChanged!.Invoke(InitialAssets
+                            .Where(a => a.IsSelected && !a.ShouldHide)
+                            .Select(assetWithSelection => assetWithSelection.Asset.CurrencyCode)
+                    );
                 });
 
             SearchPattern = string.Empty;
