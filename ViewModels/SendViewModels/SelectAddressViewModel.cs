@@ -172,7 +172,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
             SelectedAddress = selectedAddress != null
                 ? MyAddresses.FirstOrDefault(vm =>
-                    vm.Address == selectedAddress && (selectedTokenId == null || vm.TokenId == selectedTokenId))
+                    vm.Address == selectedAddress && vm.TokenId == selectedTokenId)
                 : SelectAddressMode == SelectAddressMode.SendFrom
                     ? SelectDefaultAddress()
                     : null;

@@ -256,8 +256,22 @@
                                LineHeight="16"
                                FontSize="13"
                                Foreground="{DynamicResource Orange}"
-                               VerticalAlignment="Center"
-                               Text="You will receive " />
+                               VerticalAlignment="Center">
+                        <i:Interaction.Behaviors>
+                            <ia:DataTriggerBehavior Binding="{Binding SelectAddressMode}"
+                                                    ComparisonCondition="Equal"
+                                                    Value="{x:Static abstract:SelectAddressMode.ChangeRedeemAddress}">
+                                <ia:ChangePropertyAction PropertyName="Text"
+                                                         Value="You will receive " />
+                            </ia:DataTriggerBehavior>
+                            <ia:DataTriggerBehavior Binding="{Binding SelectAddressMode}"
+                                                    ComparisonCondition="NotEqual"
+                                                    Value="{x:Static abstract:SelectAddressMode.ChangeRedeemAddress}">
+                                <ia:ChangePropertyAction PropertyName="Text"
+                                                         Value="You will send " />
+                            </ia:DataTriggerBehavior>
+                        </i:Interaction.Behaviors>
+                    </TextBlock>
                     <TextBlock HorizontalAlignment="Right"
                                LineHeight="16"
                                FontSize="13"
