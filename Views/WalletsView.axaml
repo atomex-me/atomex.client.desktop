@@ -12,10 +12,6 @@
     <Design.DataContext>
         <vm:WalletsViewModel />
     </Design.DataContext>
-
-    <UserControl.Resources>
-        <converters:WalletsViewMarginConverter x:Key="WalletsViewMarginConverter" />
-    </UserControl.Resources>
     
     <UserControl.Styles>
         <Style Selector="Border.WithTezosTokens">
@@ -30,8 +26,6 @@
     <!-- todo: remove -->
     <Border Classes.WithTezosTokens="{Binding IsTezosTokensSelected}"
             Classes.WithoutTezosTokens="{Binding !IsTezosTokensSelected}"
-            Margin="{Binding $parent[Window].DataContext.IsLinux,
-            Converter={StaticResource WalletsViewMarginConverter}}"
             Name="MainControl">
         <Grid RowDefinitions="Auto,Auto,*">
             <Grid Grid.Row="0"
