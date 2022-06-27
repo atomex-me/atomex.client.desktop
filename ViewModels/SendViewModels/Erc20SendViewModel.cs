@@ -13,6 +13,7 @@ using Atomex.Client.Desktop.ViewModels.Abstract;
 using Atomex.Core;
 using Atomex.MarketData.Abstract;
 using Atomex.Wallet.Ethereum;
+using Atomex.Common;
 
 namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 {

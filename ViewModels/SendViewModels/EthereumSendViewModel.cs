@@ -21,6 +21,7 @@ using Atomex.EthereumTokens;
 using Atomex.MarketData.Abstract;
 using Atomex.Wallet.Abstract;
 using Atomex.Wallet.Ethereum;
+using Atomex.Common;
 
 namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 {

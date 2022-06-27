@@ -21,6 +21,7 @@ using Atomex.TezosTokens;
 using Atomex.ViewModels;
 using Atomex.Wallet.Abstract;
 using Atomex.Wallet.Tezos;
+using Atomex.Common;
 
 namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 {
