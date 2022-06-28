@@ -1,6 +1,6 @@
 <Styles xmlns='https://github.com/avaloniaui'
         xmlns:x='http://schemas.microsoft.com/winfx/2006/xaml'>
-    <Style Selector=".SelectCurrencyListBox ListBoxItem">
+    <Style Selector="ListBox.SelectCurrencyListBox ListBoxItem">
         <Setter Property="Padding" Value="0" />
         <Setter Property="CornerRadius" Value="8" />
         <Setter Property="HorizontalContentAlignment" Value="Stretch" />
@@ -27,7 +27,6 @@
     <Style Selector="ListBox.ManageAssets ListBoxItem">
         <Setter Property="Cursor" Value="Arrow" />
     </Style>
-    
     <Style Selector="ListBox.ManageAssets Grid[IsEnabled=False]">
         <Setter Property="Opacity" Value="0.5" />
     </Style>
@@ -42,6 +41,9 @@
     </Style>
     <Style Selector="ListBox.ManageAssets ListBoxItem:selected Border#BottomLine">
         <Setter Property="IsVisible" Value="True" />
+    </Style>
+    <Style Selector="ListBox.ManageAssets TextBlock.IsHidden">
+        <Setter Property="Opacity" Value="0.5" />
     </Style>
     <Style Selector="ListBox.ManageAssets TextBlock.IsSelected">
         <Setter Property="Foreground" Value="{DynamicResource DefaultForegroundBrush}" />

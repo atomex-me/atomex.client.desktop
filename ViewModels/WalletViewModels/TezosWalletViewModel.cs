@@ -208,33 +208,33 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             }
             catch (OperationCanceledException)
             {
-                Log.Debug("LoadDelegationInfoAsync canceled.");
+                Log.Debug("LoadDelegationInfoAsync canceled");
             }
             catch (Exception e)
             {
-                Log.Error(e, "LoadDelegationInfoAsync error.");
+                Log.Error(e, "LoadDelegationInfoAsync error");
             }
         }
 
-        private ReactiveCommand<string, Unit> _delegateCommand;
+        private ReactiveCommand<string, Unit>? _delegateCommand;
 
         public ReactiveCommand<string, Unit> DelegateCommand =>
-            _delegateCommand ??= (_delegateCommand = ReactiveCommand.Create<string>(OnDelegateClick));
+            _delegateCommand ??= _delegateCommand = ReactiveCommand.Create<string>(OnDelegateClick);
 
-        private ReactiveCommand<string, Unit> _undelegateCommand;
+        private ReactiveCommand<string, Unit>? _undelegateCommand;
 
         public ReactiveCommand<string, Unit> UndelegateCommand =>
-            _undelegateCommand ??= (_undelegateCommand = ReactiveCommand.Create<string>(
-                undelegateAddress => _ = DelegateViewModel.Undelegate(undelegateAddress)));
+            _undelegateCommand ??= _undelegateCommand = ReactiveCommand.Create<string>(
+                undelegateAddress => _ = DelegateViewModel.Undelegate(undelegateAddress));
 
-        private ReactiveCommand<string, Unit> _openAddressInExplorerCommand;
+        private ReactiveCommand<string, Unit>? _openAddressInExplorerCommand;
 
         public ReactiveCommand<string, Unit> OpenAddressInExplorerCommand => _openAddressInExplorerCommand ??=
-            (_openAddressInExplorerCommand = ReactiveCommand.Create<string>(
-                address => App.OpenBrowser($"{Tezos?.BbUri}{address}")));
+            _openAddressInExplorerCommand = ReactiveCommand.Create<string>(
+                address => App.OpenBrowser($"{Tezos?.BbUri}{address}"));
 
 
-        private ReactiveCommand<DelegationSortField, Unit> _setDelegationSortTypeCommand;
+        private ReactiveCommand<DelegationSortField, Unit>? _setDelegationSortTypeCommand;
 
         public ReactiveCommand<DelegationSortField, Unit> SetDelegationSortTypeCommand =>
             _setDelegationSortTypeCommand ??= ReactiveCommand.Create<DelegationSortField>(sortField =>
@@ -248,19 +248,19 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             });
 
 
-        private ReactiveCommand<string, Unit> _openDelegationPopupCommand;
+        private ReactiveCommand<string, Unit>? _openDelegationPopupCommand;
 
         public ReactiveCommand<string, Unit> OpenDelegationPopupCommand => _openDelegationPopupCommand ??=
             (_openDelegationPopupCommand = ReactiveCommand.Create<string>(
                 address => DelegationAddressPopupOpened = address));
 
 
-        private ReactiveCommand<Unit, Unit> _manageTokensCommand;
+        private ReactiveCommand<Unit, Unit>? _manageTokensCommand;
 
         public ReactiveCommand<Unit, Unit> ManageTokensCommand =>
             _manageTokensCommand ??= _manageTokensCommand = ReactiveCommand.Create(() =>
             {
-                var vm = new ManageAssetsViewModel
+                var manageAssetsViewModel = new ManageAssetsViewModel
                 {
                     AvailableAssets = new ObservableCollection<AssetWithSelection>(
                         TezosTokensViewModel
@@ -268,11 +268,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                             .Select(token => new AssetWithSelection
                             {
                                 Asset = token,
-                                IsSelected = TezosTokensViewModel
-                                    .Tokens
-                                    .Select(t => t.TokenBalance.Symbol)
-                                    .ToArray()
-                                    .Contains(token.TokenBalance.Symbol)
+                                IsSelected = !_app.Account.UserData.DisabledTokens?.Contains(token.TokenBalance.Symbol) ?? true
                             })
                     ),
                     OnAssetsChanged = selectedSymbols =>
@@ -284,20 +280,18 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                             .ToArray();
 
                         TezosTokensViewModel.DisabledTokens = disabledTokens;
-                    }
+                    },
+                    OnHideZeroBalancesChanges =
+                        hideLowBalances => TezosTokensViewModel.HideLowBalances = hideLowBalances,
+                    
+                    HideZeroBalances = _app.Account.UserData.HideTokensWithLowBalance ?? false
                 };
 
-                Desktop.App.DialogService.Show(vm);
+                App.DialogService.Show(manageAssetsViewModel);
             });
-
-
-        private ReactiveCommand<Unit, Unit> _hideLowBalancesCommand;
-
-        public ReactiveCommand<Unit, Unit> HideLowBalancesCommand => _hideLowBalancesCommand ??=
-            (_hideLowBalancesCommand = ReactiveCommand.Create(
-                () => { TezosTokensViewModel.HideLowBalances = !TezosTokensViewModel.HideLowBalances; }));
         
-        private ReactiveCommand<Unit, Unit> _updateTokensCommand;
+
+        private ReactiveCommand<Unit, Unit>? _updateTokensCommand;
 
         public ReactiveCommand<Unit, Unit> UpdateTokensCommand => _updateTokensCommand ??=
             (_updateTokensCommand = ReactiveCommand.CreateFromTask(UpdateTokens));

@@ -50,6 +50,8 @@
 
             <Grid Grid.Row="2"
                   Margin="16 24 16 0"
+                  IsVisible="{Binding OnHideZeroBalancesChanges,
+                  Converter={x:Static ObjectConverters.IsNotNull}}"
                   ColumnDefinitions="*,Auto">
                 <TextBlock Grid.Column="0"
                            VerticalAlignment="Center"
@@ -68,13 +70,15 @@
 
             <Border Grid.Row="3"
                     Grid.ColumnSpan="2"
-                    Margin="16 8 16 16"
+                    Margin="16 8 16 0"
+                    IsVisible="{Binding OnHideZeroBalancesChanges,
+                    Converter={x:Static ObjectConverters.IsNotNull}}"
                     Height="1"
                     Background="{DynamicResource LightDefaultOpacity10}"
                     VerticalAlignment="Bottom" />
 
             <ListBox Grid.Row="4"
-                     Margin="16 0 16 16"
+                     Margin="16 8 16 16"
                      MaxHeight="460"
                      MinHeight="300"
                      ScrollViewer.HorizontalScrollBarVisibility="Disabled"
@@ -84,7 +88,7 @@
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <Grid ColumnDefinitions="*,Auto"
-                              IsEnabled="{Binding ShouldHide}">
+                              IsEnabled="{Binding !IsHidden}">
                             <StackPanel Margin="16 14"
                                         Orientation="Horizontal"
                                         VerticalAlignment="Center"
@@ -129,6 +133,7 @@
                                            FontFamily="{DynamicResource DefaultLightFontFamily}"
                                            FontSize="18"
                                            VerticalAlignment="Center"
+                                           Classes.IsHidden="{Binding IsHidden}"
                                            Classes.IsSelected="{Binding IsSelected}"
                                            Classes.NotSelected="{Binding !IsSelected}" />
                             </StackPanel>
@@ -145,6 +150,7 @@
                                                    FontSize="16"
                                                    HorizontalAlignment="Right"
                                                    VerticalAlignment="Center"
+                                                   Classes.IsHidden="{Binding IsHidden}"
                                                    Classes.IsSelected="{Binding IsSelected}"
                                                    Classes.NotSelected="{Binding !IsSelected}">
                                             <TextBlock.Text>
@@ -159,6 +165,7 @@
                                                    FontSize="16"
                                                    Text="{Binding Asset.CurrencyCode}"
                                                    Margin="3 0 0 0"
+                                                   Classes.IsHidden="{Binding IsHidden}"
                                                    Classes.IsSelected="{Binding IsSelected}"
                                                    Classes.NotSelected="{Binding !IsSelected}" />
                                     </StackPanel>

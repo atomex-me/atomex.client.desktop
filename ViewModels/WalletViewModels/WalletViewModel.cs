@@ -29,7 +29,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 {
     public class WalletViewModel : ViewModelBase, IWalletViewModel
     {
-        protected IAtomexApp _app;
+        protected readonly IAtomexApp _app;
         [Reactive] public ObservableCollection<TransactionViewModelBase> Transactions { get; set; }
         [Reactive] public TransactionViewModelBase? SelectedTransaction { get; set; }
         private TransactionViewModelBase? PreviousSelectedTransaction { get; set; }

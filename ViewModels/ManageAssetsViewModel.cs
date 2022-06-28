@@ -17,7 +17,7 @@ namespace Atomex.Client.Desktop.ViewModels
     {
         public IAssetViewModel Asset { get; set; }
         [Reactive] public bool IsSelected { get; set; }
-        [Reactive] public bool ShouldHide { get; set; }
+        [Reactive] public bool IsHidden { get; set; }
         public Action OnChanged { get; set; }
 
         public AssetWithSelection()
@@ -59,31 +59,40 @@ namespace Atomex.Client.Desktop.ViewModels
                 .SubscribeInMainThread(searchPattern =>
                 {
                     var filteredAssets = InitialAssets
-                        .Where(c => c.Asset.CurrencyCode?.ToLower().Contains(searchPattern.ToLower())
-                                    || c.Asset.CurrencyDescription?.ToLower().Contains(searchPattern.ToLower()));
+                        .Where(a => a.Asset is { CurrencyCode: { }, CurrencyDescription: { } })
+                        .Where(c => c.Asset.CurrencyCode.ToLower().Contains(searchPattern.ToLower())
+                                    || c.Asset.CurrencyDescription.ToLower().Contains(searchPattern.ToLower()));
 
                     AvailableAssets = new ObservableCollection<AssetWithSelection>(filteredAssets);
                 });
 
             this.WhenAnyValue(vm => vm.HideZeroBalances)
-                .Where(_ => OnHideZeroBalancesChanges != null)
+                .Where(_ => AvailableAssets != null && InitialAssets != null)
                 .SubscribeInMainThread(hideZeroBalances =>
                 {
                     AvailableAssets.ForEachDo(asset =>
                     {
                         if (!hideZeroBalances)
                         {
-                            asset.ShouldHide = false;
+                            asset.IsHidden = false;
                             return;
                         }
 
-                        asset.ShouldHide = asset.Asset.TotalAmountInBase <= Constants.MinBalanceForTokensUsd;
+                        asset.IsHidden = asset.Asset.TotalAmountInBase <= Constants.MinBalanceForTokensUsd;
                     });
                     
-                    OnAssetsChanged!.Invoke(InitialAssets
-                            .Where(a => a.IsSelected && !a.ShouldHide)
-                            .Select(assetWithSelection => assetWithSelection.Asset.CurrencyCode)
-                    );
+                    InitialAssets.ForEachDo(asset =>
+                    {
+                        if (!hideZeroBalances)
+                        {
+                            asset.IsHidden = false;
+                            return;
+                        }
+
+                        asset.IsHidden = asset.Asset.TotalAmountInBase <= Constants.MinBalanceForTokensUsd;
+                    });
+                    
+                    OnHideZeroBalancesChanges?.Invoke(hideZeroBalances);
                 });
 
             SearchPattern = string.Empty;
