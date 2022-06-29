@@ -5,24 +5,24 @@ using System.Globalization;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
-using Atomex.Common;
-using Atomex.Services;
-using Atomex.Client.Desktop.Common;
-using Atomex.Client.Desktop.ViewModels.Abstract;
-using Atomex.Client.Desktop.ViewModels.ConversionViewModels;
-using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
-using Atomex.Client.Desktop.ViewModels.SendViewModels;
-using Atomex.Core;
-using Atomex.TezosTokens;
+
 using Avalonia.Controls;
 using Avalonia.Media;
-using ReactiveUI;
 using OxyPlot;
 using OxyPlot.Avalonia;
 using OxyPlot.Series;
+using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using PieSeries = OxyPlot.Series.PieSeries;
 
+using Atomex.Client.Common;
+using Atomex.Client.Desktop.Common;
+using Atomex.Client.Desktop.ViewModels.Abstract;
+using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
+using Atomex.Client.Desktop.ViewModels.SendViewModels;
+using Atomex.Common;
+using Atomex.Core;
+using Atomex.TezosTokens;
 
 namespace Atomex.Client.Desktop.ViewModels
 {
@@ -115,9 +115,10 @@ namespace Atomex.Client.Desktop.ViewModels
 
         private void OnAtomexClientChangedEventHandler(object sender, AtomexClientChangedEventArgs e)
         {
-            if (e.AtomexClient is null) return;
+            if (e.AtomexClient is null || App.Account == null)
+                return;
 
-            AllCurrencies = e.AtomexClient?.Account?.Currencies
+            AllCurrencies = App.Account?.Currencies
                 .Select(c =>
                 {
                     var vm = CurrencyViewModelCreator.CreateOrGet(c);
@@ -133,7 +134,7 @@ namespace Atomex.Client.Desktop.ViewModels
             AllCurrencies.Add(TezosTokensCurrencyViewModel);
 
             var savedCurrenciesArr =
-                e.AtomexClient?.Account?.UserData?.InitializedCurrencies ??
+                App?.Account?.UserData?.InitializedCurrencies ??
                 AllCurrencies.Select(c => c.Currency.Name).ToArray();
 
             ChoosenCurrencies = new List<CurrencyViewModel>(AllCurrencies)

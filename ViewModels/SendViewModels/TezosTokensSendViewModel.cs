@@ -556,7 +556,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
         protected void OnQuotesUpdatedEventHandler(object? sender, EventArgs args)
         {
-            if (sender is not ICurrencyQuotesProvider quotesProvider)
+            if (sender is not IQuotesProvider quotesProvider)
                 return;
 
             Dispatcher.UIThread.InvokeAsync(() =>

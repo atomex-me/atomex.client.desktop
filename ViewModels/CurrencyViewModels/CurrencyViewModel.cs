@@ -22,7 +22,7 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
         protected const string PathToIcons = "/Resources/Icons";
 
         protected IAccount Account { get; set; }
-        private ICurrencyQuotesProvider QuotesProvider { get; set; }
+        private IQuotesProvider QuotesProvider { get; set; }
         public event EventHandler AmountUpdated;
 
         public CurrencyConfig Currency { get; set; }
@@ -77,6 +77,7 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
                 UnconfirmedAmount = balance.UnconfirmedIncome + balance.UnconfirmedOutcome;
 
                 UpdateQuotesInBaseCurrency(QuotesProvider);
+
             }, DispatcherPriority.Background);
         }
 
@@ -91,7 +92,7 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
             Account.BalanceUpdated += OnBalanceChangedEventHandler;
         }
 
-        public void SubscribeToRatesProvider(ICurrencyQuotesProvider quotesProvider)
+        public void SubscribeToRatesProvider(IQuotesProvider quotesProvider)
         {
             QuotesProvider = quotesProvider;
             QuotesProvider.QuotesUpdated += OnQuotesUpdatedEventHandler;
@@ -112,13 +113,13 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
 
         private void OnQuotesUpdatedEventHandler(object? sender, EventArgs args)
         {
-            if (sender is not ICurrencyQuotesProvider quotesProvider)
+            if (sender is not IQuotesProvider quotesProvider)
                 return;
 
             UpdateQuotesInBaseCurrency(quotesProvider);
         }
 
-        private void UpdateQuotesInBaseCurrency(ICurrencyQuotesProvider quotesProvider)
+        private void UpdateQuotesInBaseCurrency(IQuotesProvider quotesProvider)
         {
             var quote = quotesProvider.GetQuote(CurrencyCode, BaseCurrencyCode);
 

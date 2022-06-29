@@ -12,6 +12,7 @@ using Serilog;
 using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.Properties;
 using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
+using Atomex.Client.Entities;
 using Atomex.Common;
 using Atomex.Core;
 using Atomex.ViewModels;
@@ -196,6 +197,8 @@ namespace Atomex.Client.Desktop.ViewModels
 
                 var order = new Order
                 {
+                    ClientOrderId     = Guid.NewGuid().ToByteArray().ToHexString(0, 16),
+                    Status            = OrderStatus.Pending,
                     Symbol            = symbol.Name,
                     TimeStamp         = DateTime.UtcNow,
                     Price             = orderPrice,
@@ -219,7 +222,29 @@ namespace Atomex.Client.Desktop.ViewModels
 
                 await order.CreateProofOfPossessionAsync(account);
 
-                atomexClient.OrderSendAsync(order);
+                await _app.Account
+                    .UpsertOrderAsync(order);
+
+                atomexClient.OrderSendAsync(new V1.Entities.Order
+                {
+                    ClientOrderId = order.ClientOrderId,
+                    Symbol        = order.Symbol,
+                    TimeStamp     = order.TimeStamp,
+                    Price         = order.Price,
+                    Qty           = order.Qty,
+                    Side          = order.Side,
+                    Type          = order.Type,
+                    FromWallets = order.FromWallets
+                        .Select(w => new V1.Entities.WalletAddress
+                        {
+                            Address           = w.Address,
+                            Currency          = w.Currency,
+                            Nonce             = w.Nonce,
+                            ProofOfPossession = w.ProofOfPossession,
+                            PublicKey         = w.PublicKey,
+                        })
+                        .ToList(),
+                });
 
                 // wait for swap confirmation
                 var timeStamp = DateTime.UtcNow;
@@ -228,7 +253,7 @@ namespace Atomex.Client.Desktop.ViewModels
                 {
                     await Task.Delay(SwapCheckInterval);
 
-                    var currentOrder = atomexClient.Account.GetOrderById(order.ClientOrderId);
+                    var currentOrder = _app.Account.GetOrderById(order.ClientOrderId);
 
                     if (currentOrder == null)
                         continue;
@@ -238,7 +263,7 @@ namespace Atomex.Client.Desktop.ViewModels
 
                     if (currentOrder.Status == OrderStatus.PartiallyFilled || currentOrder.Status == OrderStatus.Filled)
                     {
-                        var swap = (await atomexClient.Account
+                        var swap = (await _app.Account
                             .GetSwapsAsync())
                             .FirstOrDefault(s => s.OrderId == currentOrder.Id);
 
