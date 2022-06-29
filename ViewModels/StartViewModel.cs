@@ -5,8 +5,8 @@ using System.Linq;
 using Avalonia.Controls;
 using ReactiveUI;
 
-using Atomex.Client.Common;
 using Atomex.Client.Desktop.Common;
+using Atomex.Common;
 using Atomex.Services;
 using Atomex.Wallet.Abstract;
 
@@ -111,19 +111,7 @@ namespace Atomex.Client.Desktop.ViewModels
                 exchangeUrl: App.Configuration[$"Services:{account!.Network}:Exchange:Url"],
                 marketDataUrl: App.Configuration[$"Services:{account!.Network}:MarketData:Url"],
                 clientType: PlatformHelper.GetClientType(),
-                authMessageSigner: new AuthMessageSigner(async (data, algorithm) =>
-                {
-                    const int keyIndex = 0;
-
-                    var securePublicKey = account.Wallet.GetServicePublicKey(keyIndex);
-                    var publicKey = securePublicKey.ToUnsecuredBytes();
-
-                    var signature = await account.Wallet
-                        .SignByServiceKeyAsync(data, keyIndex)
-                        .ConfigureAwait(false);
-
-                    return (publicKey, signature);
-                }));
+                authMessageSigner: account.DefaultAuthMessageSigner());
 
             AtomexApp.ChangeAtomexClient(atomexClient, account, restart: true);
         }
@@ -134,19 +122,7 @@ namespace Atomex.Client.Desktop.ViewModels
                 exchangeUrl: App.Configuration[$"Services:{account!.Network}:Exchange:Url"],
                 marketDataUrl: App.Configuration[$"Services:{account!.Network}:MarketData:Url"],
                 clientType: PlatformHelper.GetClientType(),
-                authMessageSigner: new AuthMessageSigner(async (data, algorithm) =>
-                {
-                    const int keyIndex = 0;
-
-                    var securePublicKey = account.Wallet.GetServicePublicKey(keyIndex);
-                    var publicKey = securePublicKey.ToUnsecuredBytes();
-
-                    var signature = await account.Wallet
-                        .SignByServiceKeyAsync(data, keyIndex)
-                        .ConfigureAwait(false);
-
-                    return (publicKey, signature);
-                }));
+                authMessageSigner: account.DefaultAuthMessageSigner());
 
             MainWindowVM.AccountRestored = true;
 

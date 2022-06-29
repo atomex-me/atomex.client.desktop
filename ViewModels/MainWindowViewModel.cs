@@ -277,11 +277,6 @@ namespace Atomex.Client.Desktop.ViewModels
                 walletName: accountName,
                 unlockAction: password =>
                 {
-                    //var clientType = ClientType.Unknown;
-                    //if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) clientType = ClientType.AvaloniaWindows;
-                    //if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX)) clientType = ClientType.AvaloniaMac;
-                    //if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux)) clientType = ClientType.AvaloniaLinux;
-
                     var _ = Account.LoadFromFile(
                         pathToAccount: pathToAccount,
                         password: password,
