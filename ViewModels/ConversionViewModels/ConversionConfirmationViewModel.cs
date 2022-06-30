@@ -203,6 +203,7 @@ namespace Atomex.Client.Desktop.ViewModels
                     TimeStamp         = DateTime.UtcNow,
                     Price             = orderPrice,
                     Qty               = qty,
+                    LeaveQty          = qty,
                     Side              = side,
                     Type              = OrderType.FillOrKill,
                     FromWallets       = fromWallets.ToList(),
@@ -220,7 +221,8 @@ namespace Atomex.Client.Desktop.ViewModels
                         : RedeemFromAddress
                 };
 
-                await order.CreateProofOfPossessionAsync(account);
+                await order
+                    .CreateProofOfPossessionAsync(account);
 
                 await _app.Account
                     .UpsertOrderAsync(order);
@@ -234,7 +236,7 @@ namespace Atomex.Client.Desktop.ViewModels
                     Qty           = order.Qty,
                     Side          = order.Side,
                     Type          = order.Type,
-                    FromWallets = order.FromWallets
+                    FromWallets   = order.FromWallets
                         .Select(w => new V1.Entities.WalletAddress
                         {
                             Address           = w.Address,
@@ -244,6 +246,8 @@ namespace Atomex.Client.Desktop.ViewModels
                             PublicKey         = w.PublicKey,
                         })
                         .ToList(),
+                    BaseCurrencyContract = GetSwapContract(order.Symbol.BaseCurrency()),
+                    QuoteCurrencyContract = GetSwapContract(order.Symbol.QuoteCurrency())
                 });
 
                 // wait for swap confirmation
@@ -289,7 +293,18 @@ namespace Atomex.Client.Desktop.ViewModels
                 return new Error(Errors.SwapError, Resources.CvConversionError);
             }
         }
-        
+
+        private string GetSwapContract(string currency)
+        {
+            if (currency == "ETH" || Currencies.IsEthereumToken(currency))
+                return _app.Account.Currencies.Get<EthereumConfig>(currency).SwapContractAddress;
+
+            if (currency == "XTZ" || Currencies.IsTezosToken(currency))
+                return _app.Account.Currencies.Get<TezosConfig>(currency).SwapContractAddress;
+
+            return null;
+        }
+
         private async Task<IEnumerable<WalletAddress>> GetFromAddressesAsync()
         {
             if (FromSource is FromAddress fromAddress)
