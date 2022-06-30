@@ -37,5 +37,27 @@ namespace Atomex.Client.Desktop.Converters
                     _ => false
                 };
             });
+        
+        public static readonly IValueConverter GreaterThanOne =
+            new FuncValueConverter<object, bool>(val =>
+            {
+                return val switch
+                {
+                    decimal decimalValue => decimalValue > 1,
+                    int intValue => intValue > 1,
+                    _ => false
+                };
+            });
+        
+        public static readonly IValueConverter IsOne =
+            new FuncValueConverter<object, bool>(val =>
+            {
+                return val switch
+                {
+                    decimal decimalValue => decimalValue == 1,
+                    int intValue => intValue == 1,
+                    _ => false
+                };
+            });
     }
 }

@@ -15,6 +15,7 @@ using Atomex.MarketData.Abstract;
 using Atomex.Services;
 using Atomex.Wallet;
 using Atomex.Wallet.Tezos;
+using Avalonia.Controls;
 using Avalonia.Threading;
 using DynamicData;
 using ReactiveUI;
@@ -100,7 +101,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         }
 
 
-        private ReactiveCommand<TezosTokenViewModel, Unit> _setTokenCommand;
+        private ReactiveCommand<TezosTokenViewModel, Unit>? _setTokenCommand;
 
         private ReactiveCommand<TezosTokenViewModel, Unit> SetTokenCommand => _setTokenCommand ??=
             ReactiveCommand.Create<TezosTokenViewModel>(
@@ -145,7 +146,8 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         public TezosTokensViewModel()
         {
 #if DEBUG
-            DesignerMode();
+            if (Design.IsDesignMode)
+                DesignerMode();
 #endif
         }
 #if DEBUG

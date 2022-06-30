@@ -65,7 +65,7 @@
                           FontSize="13"
                           FontFamily="{DynamicResource DefaultLightFontFamily}"
                           Foreground="{DynamicResource SecondaryForegroundBrush}"
-                          Content="Hide zero balances" />
+                          Content="Hide low balances" />
             </Grid>
 
             <Border Grid.Row="3"

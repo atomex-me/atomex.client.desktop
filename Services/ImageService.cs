@@ -62,9 +62,24 @@ namespace Atomex.Client.Desktop.Services
             return url != null && Images.TryGetValue(url, out _);
         }
 
-        public IBitmap GetImage(string url)
+        public IBitmap GetImage(string? imageSource)
         {
-            return url != null && Images.TryGetValue(url, out var image)
+            if (imageSource == null) return Images["default"];
+            
+            if (!imageSource.StartsWith("http"))
+            {
+                try
+                {
+                    var assets = AvaloniaLocator.Current.GetService<IAssetLoader>();
+                    return new Bitmap(assets!.Open(new Uri($"avares://Atomex.Client.Desktop/Resources/Images/{imageSource}")));
+                }
+                catch (Exception e)
+                {
+                    Log.Error(e, "Can't find image {Source} in resources", imageSource);
+                }
+            }
+
+            return Images.TryGetValue(imageSource, out var image)
                 ? image
                 : Images["default"];
         }
