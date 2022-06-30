@@ -1,48 +1,54 @@
 <Styles xmlns='https://github.com/avaloniaui'
         xmlns:x='http://schemas.microsoft.com/winfx/2006/xaml'>
-    <Style Selector=".SelectCurrencyListBox ListBoxItem">
+    <Style Selector="ListBox.SelectCurrencyListBox ListBoxItem">
         <Setter Property="Padding" Value="0" />
         <Setter Property="CornerRadius" Value="8" />
         <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-        <Setter Property="Cursor" Value="Hand"></Setter>
+        <Setter Property="Cursor" Value="Hand" />
     </Style>
 
-    <Style Selector=".SelectCurrencyListBox ListBoxItem:pointerover Border#BottomLine">
+    <Style Selector="ListBox.SelectCurrencyListBox ListBoxItem:pointerover Border#BottomLine">
         <Setter Property="IsVisible" Value="False" />
     </Style>
-    <Style Selector=".SelectCurrencyListBox ListBoxItem:pointerover /template/ ContentPresenter">
+    <Style Selector="ListBox.SelectCurrencyListBox ListBoxItem:pointerover /template/ ContentPresenter">
         <Setter Property="Background" Value="{DynamicResource ListBoxItemPointeroverBrush}" />
     </Style>
-    <Style Selector=".SelectCurrencyListBox ListBoxItem:pressed /template/ ContentPresenter">
+    <Style Selector="ListBox.SelectCurrencyListBox ListBoxItem:pressed /template/ ContentPresenter">
         <Setter Property="Background" Value="{DynamicResource LightDefaultOpacity4}" />
     </Style>
-    <Style Selector=".SelectCurrencyListBox ListBoxItem:selected /template/ ContentPresenter">
+    <Style Selector="ListBox.SelectCurrencyListBox ListBoxItem:selected /template/ ContentPresenter">
         <Setter Property="Background" Value="{DynamicResource ListBoxItemSelectedBrush}" />
     </Style>
-    <Style Selector=".SelectCurrencyListBox ListBoxItem:selected Border#BottomLine">
+    <Style Selector="ListBox.SelectCurrencyListBox ListBoxItem:selected Border#BottomLine">
         <Setter Property="IsVisible" Value="False" />
     </Style>
     
     
-    <Style Selector=".ManageAssets ListBoxItem">
+    <Style Selector="ListBox.ManageAssets ListBoxItem">
         <Setter Property="Cursor" Value="Arrow" />
     </Style>
-    <Style Selector=".ManageAssets ListBoxItem:selected /template/ ContentPresenter">
+    <Style Selector="ListBox.ManageAssets Grid[IsEnabled=False]">
+        <Setter Property="Opacity" Value="0.5" />
+    </Style>
+    <Style Selector="ListBox.ManageAssets ListBoxItem:selected /template/ ContentPresenter">
         <Setter Property="Background" Value="{DynamicResource AlmostTransparentBrush}" />
     </Style>
-    <Style Selector=".ManageAssets ListBoxItem:pointerover:selected /template/ ContentPresenter">
+    <Style Selector="ListBox.ManageAssets ListBoxItem:pointerover:selected /template/ ContentPresenter">
         <Setter Property="Background" Value="{DynamicResource ListBoxItemPointeroverBrush}" />
     </Style>
-    <Style Selector=".ManageAssets ListBoxItem Border#BottomLine">
+    <Style Selector="ListBox.ManageAssets ListBoxItem Border#BottomLine">
         <Setter Property="IsVisible" Value="True" />
     </Style>
-    <Style Selector=".ManageAssets ListBoxItem:selected Border#BottomLine">
+    <Style Selector="ListBox.ManageAssets ListBoxItem:selected Border#BottomLine">
         <Setter Property="IsVisible" Value="True" />
     </Style>
-    <Style Selector=".ManageAssets TextBlock.IsSelected">
+    <Style Selector="ListBox.ManageAssets TextBlock.IsHidden">
+        <Setter Property="Opacity" Value="0.5" />
+    </Style>
+    <Style Selector="ListBox.ManageAssets TextBlock.IsSelected">
         <Setter Property="Foreground" Value="{DynamicResource DefaultForegroundBrush}" />
     </Style>
-    <Style Selector=".ManageAssets TextBlock.NotSelected">
+    <Style Selector="ListBox.ManageAssets TextBlock.NotSelected">
         <Setter Property="Foreground" Value="{DynamicResource SecondaryForegroundBrush}" />
     </Style>
 </Styles>

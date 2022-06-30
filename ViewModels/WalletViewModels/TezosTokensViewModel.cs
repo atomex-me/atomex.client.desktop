@@ -72,7 +72,6 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                     OnQuotesUpdatedEventHandler(_app.QuotesProvider, EventArgs.Empty);
                 });
 
-
             DisabledTokens = _app.Account.UserData.DisabledTokens ?? Array.Empty<string>();
             HideLowBalances = _app.Account.UserData.HideTokensWithLowBalance ?? false;
 
