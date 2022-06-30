@@ -21,6 +21,7 @@ using Atomex.TezosTokens;
 using Atomex.ViewModels;
 using Atomex.Wallet.Abstract;
 using Atomex.Wallet.Tezos;
+using Atomex.Common;
 
 namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 {
@@ -555,7 +556,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
         protected void OnQuotesUpdatedEventHandler(object? sender, EventArgs args)
         {
-            if (sender is not ICurrencyQuotesProvider quotesProvider)
+            if (sender is not IQuotesProvider quotesProvider)
                 return;
 
             Dispatcher.UIThread.InvokeAsync(() =>

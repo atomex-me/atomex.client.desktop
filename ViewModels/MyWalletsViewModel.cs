@@ -7,6 +7,7 @@ using Avalonia.Controls;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
+using Atomex.Client.Common;
 using Atomex.Client.Desktop.Common;
 using Atomex.Common;
 using Atomex.Core;
@@ -19,7 +20,7 @@ namespace Atomex.Client.Desktop.ViewModels
 {
     public class MyWalletsViewModel : ViewModelBase
     {
-        private IAtomexApp AtomexApp { get; }
+        private readonly IAtomexApp _app;
         private readonly Action<ViewModelBase> _showContent;
         private Action _doAfterAtomexClientChanged;
 
@@ -38,14 +39,14 @@ namespace Atomex.Client.Desktop.ViewModels
             IAtomexApp app,
             Action<ViewModelBase> showContent)
         {
-            AtomexApp = app ?? throw new ArgumentNullException(nameof(app));
+            _app = app ?? throw new ArgumentNullException(nameof(app));
             Wallets = WalletInfo.AvailableWallets();
 
             this.WhenAnyValue(vm => vm.SelectedWallet)
                 .WhereNotNull()
                 .InvokeCommandInMainThread(SelectWalletCommand);
 
-            AtomexApp.AtomexClientChanged += OnAtomexClientChangedEventHandler;
+            _app.AtomexClientChanged += OnAtomexClientChangedEventHandler;
 
             _showContent += showContent;
         }
@@ -63,20 +64,10 @@ namespace Atomex.Client.Desktop.ViewModels
                 walletName: info.Name,
                 unlockAction: password =>
                 {
-                    var clientType = ClientType.Unknown;
-
-                    if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-                        clientType = ClientType.AvaloniaWindows;
-                    if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-                        clientType = ClientType.AvaloniaMac;
-                    if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-                        clientType = ClientType.AvaloniaLinux;
-
                     account = Account.LoadFromFile(
                         pathToAccount: info.Path,
                         password: password,
-                        currenciesProvider: AtomexApp.CurrenciesProvider,
-                        clientType: clientType,
+                        currenciesProvider: _app.CurrenciesProvider,
                         migrationCompleteCallback: actionType =>
                         {
                             _doAfterAtomexClientChanged = actionType switch
@@ -97,10 +88,10 @@ namespace Atomex.Client.Desktop.ViewModels
                     var atomexClient = new WebSocketAtomexClientLegacy(
                         exchangeUrl: App.Configuration[$"Services:{account!.Network}:Exchange:Url"],
                         marketDataUrl: App.Configuration[$"Services:{account!.Network}:MarketData:Url"],
-                        account: account,
-                        symbolsProvider: AtomexApp.SymbolsProvider);
+                        clientType: PlatformHelper.GetClientType(),
+                        authMessageSigner: account.DefaultAuthMessageSigner());
 
-                    AtomexApp.UseAtomexClient(atomexClient, restart: true);
+                    _app.ChangeAtomexClient(atomexClient, account, restart: true);
                 });
 
             _showContent?.Invoke(unlockViewModel);
@@ -109,23 +100,21 @@ namespace Atomex.Client.Desktop.ViewModels
         private void TezosTransactionsDeleted()
         {
             var xtzCurrencies = new[] { "XTZ", "TZBTC", "KUSD", "USDT_XTZ" };
-            var restoreDialogViewModel = new RestoreDialogViewModel(AtomexApp);
+            var restoreDialogViewModel = new RestoreDialogViewModel(_app);
             restoreDialogViewModel.ScanCurrenciesAsync(xtzCurrencies);
         }
 
         private void OnTezosTokensDataDeleted()
         {
-            var restoreDialogViewModel = new RestoreDialogViewModel(AtomexApp);
+            var restoreDialogViewModel = new RestoreDialogViewModel(_app);
             restoreDialogViewModel.ScanTezosTokens();
         }
 
         private void OnAtomexClientChangedEventHandler(object? sender, AtomexClientChangedEventArgs args)
         {
-            var atomexClient = args.AtomexClient;
-
-            if (atomexClient?.Account == null)
+            if (_app?.AtomexClient == null)
             {
-                AtomexApp.AtomexClientChanged -= OnAtomexClientChangedEventHandler;
+                _app.AtomexClientChanged -= OnAtomexClientChangedEventHandler;
                 return;
             }
 

@@ -150,13 +150,13 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
 
         private void OnQuotesUpdatedEventHandler(object? sender, EventArgs args)
         {
-            if (sender is not ICurrencyQuotesProvider quotesProvider)
+            if (sender is not IQuotesProvider quotesProvider)
                 return;
 
             UpdateQuotesInBaseCurrency(quotesProvider);
         }
 
-        public void UpdateQuotesInBaseCurrency(ICurrencyQuotesProvider quotesProvider)
+        public void UpdateQuotesInBaseCurrency(IQuotesProvider quotesProvider)
         {
             var quote = quotesProvider.GetQuote(TokenBalance.Symbol, BaseCurrencyCode);
             if (quote == null) return;

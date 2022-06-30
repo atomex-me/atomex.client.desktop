@@ -4,14 +4,16 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
-using Atomex.Services;
+
+using Avalonia.Controls;
+using ReactiveUI;
+using ReactiveUI.Fody.Helpers;
+
+using Atomex.Client.Common;
 using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
 using Atomex.Client.Desktop.ViewModels.WalletViewModels;
 using Atomex.Core;
-using Avalonia.Controls;
-using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
 
 namespace Atomex.Client.Desktop.ViewModels
 {
@@ -58,9 +60,9 @@ namespace Atomex.Client.Desktop.ViewModels
         {
             var walletsViewModels = new List<IWalletViewModel>();
 
-            if (e.AtomexClient?.Account != null)
+            if (e.AtomexClient != null && App?.Account != null)
             {
-                var wallets = e.AtomexClient.Account.Currencies
+                var wallets = App.Account.Currencies
                     .Select(currency => WalletViewModelCreator.CreateViewModel(
                         app: App,
                         setConversionTab: SetConversionTab,

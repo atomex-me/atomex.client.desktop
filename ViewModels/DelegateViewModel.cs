@@ -7,22 +7,23 @@ using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+
+using Avalonia.Controls;
 using Avalonia.Threading;
 using Newtonsoft.Json.Linq;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using Serilog;
+
 using Atomex.Blockchain.Tezos;
 using Atomex.Blockchain.Tezos.Internal;
 using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.Properties;
 using Atomex.Client.Desktop.ViewModels.Abstract;
 using Atomex.Common;
-using Atomex.Core;
 using Atomex.MarketData.Abstract;
 using Atomex.Wallet;
 using Atomex.Wallet.Tezos;
-using Avalonia.Controls;
 
 namespace Atomex.Client.Desktop.ViewModels
 {
@@ -597,7 +598,7 @@ namespace Atomex.Client.Desktop.ViewModels
 
         private void OnQuotesUpdatedEventHandler(object? sender, EventArgs args)
         {
-            if (sender is not ICurrencyQuotesProvider quotesProvider )
+            if (sender is not IQuotesProvider quotesProvider )
                 return;
 
             var quote = quotesProvider.GetQuote(FeeCurrencyCode, BaseCurrencyCode);
@@ -608,7 +609,7 @@ namespace Atomex.Client.Desktop.ViewModels
 
         private void OnQuotesProviderAvailabilityChangedEventHandler(object? sender, EventArgs args)
         {
-            if (sender is not ICurrencyQuotesProvider provider)
+            if (sender is not IQuotesProvider provider)
                 return;
 
             if (provider.IsAvailable)
