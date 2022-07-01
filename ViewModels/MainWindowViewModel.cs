@@ -4,16 +4,17 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using System.Windows.Input;
+
+using Avalonia.Controls;
 using Avalonia.Threading;
 using ReactiveUI;
 using Serilog;
-using Atomex.Client.Desktop.Common;
+
+using Atomex.Client.Common;
 using Atomex.Client.Desktop.Controls;
 using Atomex.Client.Desktop.Properties;
 using Atomex.Common;
-using Atomex.Services;
 using Atomex.Wallet;
-using Avalonia.Controls;
 
 namespace Atomex.Client.Desktop.ViewModels
 {
@@ -29,7 +30,7 @@ namespace Atomex.Client.Desktop.ViewModels
 
         private void ShowStart()
         {
-            ShowContent(new StartViewModel(ShowContent, ShowStart, AtomexApp, this));
+            ShowContent(new StartViewModel(ShowContent, ShowStart, _app, this));
         }
 
         private ViewModelBase _content;
@@ -54,8 +55,8 @@ namespace Atomex.Client.Desktop.ViewModels
 
         public MainWindowViewModel(IAtomexApp app, IMainView mainView = null)
         {
-            AtomexApp = app ?? throw new ArgumentNullException(nameof(app));
-            WalletMainViewModel = new WalletMainViewModel(AtomexApp);
+            _app = app ?? throw new ArgumentNullException(nameof(app));
+            WalletMainViewModel = new WalletMainViewModel(_app);
 
             SubscribeToServices();
 
@@ -68,7 +69,7 @@ namespace Atomex.Client.Desktop.ViewModels
             ShowStart();
         }
 
-        private static IAtomexApp AtomexApp { get; set; }
+        private IAtomexApp _app;
         private IMainView MainView { get; set; }
 
 
@@ -86,7 +87,7 @@ namespace Atomex.Client.Desktop.ViewModels
 
                     if (AccountRestored)
                     {
-                        var restoreViewModel = new RestoreDialogViewModel(AtomexApp)
+                        var restoreViewModel = new RestoreDialogViewModel(_app)
                         {
                             OnRestored = () => AccountRestored = false
                         };
@@ -104,7 +105,6 @@ namespace Atomex.Client.Desktop.ViewModels
         public bool IsDownloadingUpdate => HasUpdates && UpdateDownloadProgress > 0 && UpdateDownloadProgress < 100;
 
         private bool _hasUpdates;
-
         public bool HasUpdates
         {
             get => _hasUpdates;
@@ -116,7 +116,6 @@ namespace Atomex.Client.Desktop.ViewModels
         }
 
         private string _updateVersion;
-
         public string UpdateVersion
         {
             get => _updateVersion;
@@ -128,7 +127,6 @@ namespace Atomex.Client.Desktop.ViewModels
         }
 
         private bool _updateStarted;
-
         public bool UpdateStarted
         {
             get => _updateStarted;
@@ -140,7 +138,6 @@ namespace Atomex.Client.Desktop.ViewModels
         }
 
         private int _updateDownloadProgress;
-
         public int UpdateDownloadProgress
         {
             get => _updateDownloadProgress;
@@ -158,14 +155,12 @@ namespace Atomex.Client.Desktop.ViewModels
 
         private void SubscribeToServices()
         {
-            AtomexApp.AtomexClientChanged += OnAtomexClientChangedEventHandler;
+            _app.AtomexClientChanged += OnAtomexClientChangedEventHandler;
         }
 
         private void OnAtomexClientChangedEventHandler(object sender, AtomexClientChangedEventArgs args)
         {
-            var atomexClient = args.AtomexClient;
-
-            if (atomexClient?.Account == null)
+            if (_app?.Account == null)
             {
                 HasAccount = false;
                 MainView?.StopInactivityControl();
@@ -173,13 +168,11 @@ namespace Atomex.Client.Desktop.ViewModels
                 return;
             }
 
-            var account = atomexClient.Account;
-
             HasAccount = true;
 
             // auto sign out after timeout
-            if (MainView != null && account.UserData.AutoSignOut)
-                MainView.StartInactivityControl(TimeSpan.FromMinutes(account.UserData.PeriodOfInactivityInMin));
+            if (MainView != null && _app.Account.UserData.AutoSignOut)
+                MainView.StartInactivityControl(TimeSpan.FromMinutes(_app.Account.UserData.PeriodOfInactivityInMin));
 
             StartLookingForUserMessages(TimeSpan.FromSeconds(90));
         }
@@ -191,7 +184,7 @@ namespace Atomex.Client.Desktop.ViewModels
         private async void OnUpdateClick()
         {
             await SignOut(withAppUpdate: true);
-            if (AtomexApp.AtomexClient != null) return;
+            if (_app.AtomexClient != null) return;
 
             OnUpdateAction?.Invoke();
             UpdateStarted = true;
@@ -234,7 +227,7 @@ namespace Atomex.Client.Desktop.ViewModels
 
                 _ = Dispatcher.UIThread.InvokeAsync(() => { App.DialogService.Close(); });
 
-                AtomexApp.UseAtomexClient(null);
+                _app.ChangeAtomexClient(atomexClient: null, account: null);
                 _userIgnoreActiveSwaps = false;
 
                 ShowStart();
@@ -247,7 +240,7 @@ namespace Atomex.Client.Desktop.ViewModels
 
         private async Task<bool> HasActiveSwapsAsync()
         {
-            var swaps = await AtomexApp.Account
+            var swaps = await _app.Account
                 .GetSwapsAsync();
 
             return swaps.Any(swap => swap.IsActive);
@@ -255,8 +248,8 @@ namespace Atomex.Client.Desktop.ViewModels
 
         private async Task<bool> WhetherToCancelClosingAsync()
         {
-            if (AtomexApp.Account == null) return false;
-            if (!AtomexApp.Account.UserData.ShowActiveSwapWarning)
+            if (_app.Account == null) return false;
+            if (!_app.Account.UserData.ShowActiveSwapWarning)
                 return false;
 
             var hasActiveSwaps = await HasActiveSwapsAsync();
@@ -266,10 +259,10 @@ namespace Atomex.Client.Desktop.ViewModels
 
         private void InactivityHandler(object sender, EventArgs args)
         {
-            if (AtomexApp?.Account == null)
+            if (_app?.Account == null)
                 return;
 
-            var pathToAccount = AtomexApp.Account.Wallet.PathToWallet;
+            var pathToAccount = _app.Account.Wallet.PathToWallet;
             var accountDirectory = Path.GetDirectoryName(pathToAccount);
 
             if (accountDirectory == null)
@@ -284,23 +277,17 @@ namespace Atomex.Client.Desktop.ViewModels
                 walletName: accountName,
                 unlockAction: password =>
                 {
-                    var clientType = ClientType.Unknown;
-                    if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) clientType = ClientType.AvaloniaWindows;
-                    if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX)) clientType = ClientType.AvaloniaMac;
-                    if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux)) clientType = ClientType.AvaloniaLinux;
-
                     var _ = Account.LoadFromFile(
                         pathToAccount: pathToAccount,
                         password: password,
-                        currenciesProvider: AtomexApp.CurrenciesProvider,
-                        clientType: clientType);
+                        currenciesProvider: _app.CurrenciesProvider);
                 },
                 goBack: async () => await SignOut(),
                 onUnlock: async () =>
                 {
                     ShowContent(WalletMainViewModel);
 
-                    var userId = Atomex.ViewModels.Helpers.GetUserId(AtomexApp.Account);
+                    var userId = Atomex.ViewModels.Helpers.GetUserId(_app.Account);
                     var messages = await Atomex.ViewModels.Helpers.GetUserMessages(userId);
                     if (messages != null)
                     {
@@ -343,7 +330,7 @@ namespace Atomex.Client.Desktop.ViewModels
 
         private void StartLookingForUserMessages(TimeSpan delayInterval)
         {
-            var userId = Atomex.ViewModels.Helpers.GetUserId(AtomexApp.Account);
+            var userId = Atomex.ViewModels.Helpers.GetUserId(_app.Account);
             var firstRun = true;
 
             _ = Task.Run(async () =>

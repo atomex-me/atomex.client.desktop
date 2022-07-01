@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using Atomex.Client.Common;
 using Atomex.Client.Desktop.Api;
 using Atomex.Client.Desktop.Common;
 using Atomex.Services;
@@ -69,9 +70,9 @@ namespace Atomex.Client.Desktop.ViewModels
         {
             var wertApi = new WertApi(App);
 
-            Wallets = e.AtomexClient?.Account != null
+            Wallets = App?.Account != null
                 ? new ObservableCollection<WertCurrencyViewModel>(
-                    e.AtomexClient.Account.Currencies
+                    App.Account.Currencies
                         .Where(currency => CurrenciesToBuy.Contains(currency.Name))
                         .Select(currency => new WertCurrencyViewModel(currency, App, wertApi)))
                 : new ObservableCollection<WertCurrencyViewModel>();

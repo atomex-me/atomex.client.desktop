@@ -9,7 +9,6 @@ using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using Serilog;
 
-using Atomex.Client.Desktop.Common;
 using Avalonia.Controls;
 
 namespace Atomex.Client.Desktop.ViewModels

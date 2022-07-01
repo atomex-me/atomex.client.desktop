@@ -4,23 +4,23 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
-using System.Reflection.Metadata;
 using System.Threading.Tasks;
-using Atomex.Blockchain.Tezos;
-using Atomex.Client.Desktop.Common;
-using Atomex.Client.Desktop.ViewModels.Abstract;
-using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
-using Atomex.Core;
-using Atomex.MarketData.Abstract;
-using Atomex.Services;
-using Atomex.Wallet;
-using Atomex.Wallet.Tezos;
-using Avalonia.Controls;
 using Avalonia.Threading;
 using DynamicData;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using Serilog;
+using Atomex.Blockchain.Tezos;
+using Atomex.Client.Common;
+using Atomex.Client.Desktop.Common;
+using Atomex.Client.Desktop.ViewModels.Abstract;
+using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
+using Atomex.Core;
+using Atomex.MarketData.Abstract;
+using Atomex.Wallet;
+using Atomex.Wallet.Tezos;
+using Avalonia.Controls;
+
 
 namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 {
@@ -129,7 +129,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
         private async void OnQuotesUpdatedEventHandler(object sender, EventArgs args)
         {
-            if (sender is not ICurrencyQuotesProvider) return;
+            if (sender is not IQuotesProvider) return;
 
             await Dispatcher.UIThread.InvokeAsync(async () =>
             {

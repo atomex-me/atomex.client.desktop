@@ -6,8 +6,8 @@
         <UseAppHost>true</UseAppHost>
         <ApplicationIcon>Resources/Images/atomex_logo_256x256_ico.ico</ApplicationIcon>
 
-        <AssemblyVersion>1.2.18</AssemblyVersion>
-        <Version>1.2.18</Version>
+        <AssemblyVersion>1.2.19</AssemblyVersion>
+        <Version>1.2.19</Version>
     </PropertyGroup>
     <Choose>
         <When Condition=" '$(Configuration)' == 'Debug' ">
@@ -45,6 +45,7 @@
         <PackageReference Include="QRCoder" Version="1.4.1" />
         <PackageReference Include="runtime.osx.10.10-x64.CoreCompat.System.Drawing" Version="5.8.64" />
         <PackageReference Include="Sentry.Serilog" Version="3.15.0" />
+        <PackageReference Include="Serilog.Extensions.Logging" Version="3.1.0" />
         <PackageReference Include="Serilog.Settings.Configuration" Version="3.1.0" />
         <PackageReference Include="Serilog.Sinks.Console" Version="3.1.1" />
         <PackageReference Include="ReactiveUI.Fody" Version="16.4.1" />

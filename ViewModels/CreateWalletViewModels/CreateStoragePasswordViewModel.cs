@@ -1,13 +1,12 @@
 using System;
-using System.Runtime.InteropServices;
-using System.Security;
 using System.Threading.Tasks;
-using System.Windows.Input;
+
+using ReactiveUI;
 using Serilog;
+
+using Atomex.Client.Desktop.Properties;
 using Atomex.Common;
 using Atomex.Wallet;
-using Atomex.Client.Desktop.Properties;
-using ReactiveUI;
 
 namespace Atomex.Client.Desktop.ViewModels.CreateWalletViewModels
 {
@@ -17,7 +16,6 @@ namespace Atomex.Client.Desktop.ViewModels.CreateWalletViewModels
         private HdWallet Wallet { get; set; }
 
         private string _warning;
-
         public string Warning
         {
             get => _warning;
@@ -29,7 +27,6 @@ namespace Atomex.Client.Desktop.ViewModels.CreateWalletViewModels
         }
 
         private int _passwordScore;
-
         public int PasswordScore
         {
             get => _passwordScore;
@@ -41,7 +38,6 @@ namespace Atomex.Client.Desktop.ViewModels.CreateWalletViewModels
         }
 
         private PasswordControlViewModel _passwordVM;
-
         public PasswordControlViewModel PasswordVM
         {
             get => _passwordVM;
@@ -53,7 +49,6 @@ namespace Atomex.Client.Desktop.ViewModels.CreateWalletViewModels
         }
 
         private PasswordControlViewModel _passwordConfirmationVM;
-
         public PasswordControlViewModel PasswordConfirmationVM
         {
             get => _passwordConfirmationVM;
@@ -125,16 +120,10 @@ namespace Atomex.Client.Desktop.ViewModels.CreateWalletViewModels
 
                     Wallet.SaveToFile(Wallet.PathToWallet, PasswordVM.SecurePass);
 
-                    var clientType = ClientType.Unknown;
-                    if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) clientType = ClientType.AvaloniaWindows;
-                    if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX)) clientType = ClientType.AvaloniaMac;
-                    if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux)) clientType = ClientType.AvaloniaLinux;
-
                     var acc = new Account(
                         Wallet,
                         PasswordVM.SecurePass,
-                        App.CurrenciesProvider,
-                        clientType);
+                        App.CurrenciesProvider);
 
                     PasswordVM.StringPass = string.Empty;
                     PasswordConfirmationVM.StringPass = string.Empty;

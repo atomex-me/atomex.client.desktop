@@ -15,6 +15,7 @@ using Serilog;
 
 using Atomex.Abstract;
 using Atomex.Blockchain.BitcoinBased;
+using Atomex.Client.Common;
 using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.Properties;
 using Atomex.Client.Desktop.ViewModels.Abstract;
@@ -23,9 +24,8 @@ using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
 using Atomex.Client.Desktop.ViewModels.SendViewModels;
 using Atomex.Common;
 using Atomex.Core;
-using Atomex.MarketData;
 using Atomex.MarketData.Abstract;
-using Atomex.Services;
+using Atomex.MarketData.Common;
 using Atomex.Swaps;
 using Atomex.ViewModels;
 using Atomex.Wallet.BitcoinBased;
@@ -477,7 +477,7 @@ namespace Atomex.Client.Desktop.ViewModels
                         fromCurrency: FromViewModel.CurrencyViewModel?.Currency,
                         toCurrency: ToViewModel.CurrencyViewModel?.Currency,
                         account: _app.Account,
-                        atomexClient: _app.AtomexClient,
+                        marketDataRepository: _app.MarketDataRepository,
                         symbolsProvider: _app.SymbolsProvider,
                         quotesProvider: _app.QuotesProvider);
 
@@ -689,7 +689,7 @@ namespace Atomex.Client.Desktop.ViewModels
                         fromCurrency: FromViewModel.CurrencyViewModel?.Currency,
                         toCurrency: ToViewModel.CurrencyViewModel?.Currency,
                         account: _app.Account,
-                        atomexClient: _app.AtomexClient,
+                        marketDataRepository: _app.MarketDataRepository,
                         symbolsProvider: _app.SymbolsProvider,
                         quotesProvider: _app.QuotesProvider);
 
@@ -721,6 +721,7 @@ namespace Atomex.Client.Desktop.ViewModels
                     RewardForRedeem = swapParams.RewardForRedeem;
                     EstimatedMakerNetworkFee = swapParams.MakerNetworkFee;
                     IsInsufficientFunds = swapParams.Error?.Code == Errors.InsufficientFunds;
+
                 }, DispatcherPriority.Background);
             }
             catch (Exception e)
@@ -733,7 +734,7 @@ namespace Atomex.Client.Desktop.ViewModels
             decimal amount,
             string? currency,
             string? baseCurrency,
-            ICurrencyQuotesProvider provider,
+            IQuotesProvider provider,
             decimal defaultAmountInBase = 0)
         {
             if (currency == null || baseCurrency == null || provider == null)
@@ -794,15 +795,13 @@ namespace Atomex.Client.Desktop.ViewModels
 
         private void OnAtomexClientChangedEventHandler(object? sender, AtomexClientChangedEventArgs args)
         {
-            var atomexClient = args.AtomexClient;
-
-            if (atomexClient?.Account == null)
+            if (_app?.Account == null)
                 return;
 
-            atomexClient.QuotesUpdated += OnQuotesUpdatedEventHandler;
+            _app.MarketDataRepository.QuotesUpdated += OnQuotesUpdatedEventHandler;
             _app.SwapManager.SwapUpdated += OnSwapEventHandler;
 
-            FromCurrencies = atomexClient.Account.Currencies
+            FromCurrencies = _app.Account.Currencies
                 .Where(c => c.IsSwapAvailable)
                 .Select(CurrencyViewModelCreator.CreateOrGet)
                 .ToList();
@@ -868,7 +867,7 @@ namespace Atomex.Client.Desktop.ViewModels
             }, DispatcherPriority.Background);
         }
 
-        protected async void OnQuotesUpdatedEventHandler(object? sender, MarketDataEventArgs? args)
+        protected async void OnQuotesUpdatedEventHandler(object? sender, QuotesEventArgs? args)
         {
             try
             {
@@ -881,7 +880,7 @@ namespace Atomex.Client.Desktop.ViewModels
                         fromCurrency: FromViewModel.CurrencyViewModel?.Currency,
                         toCurrency: ToViewModel.CurrencyViewModel?.Currency,
                         account: _app.Account,
-                        atomexClient: _app.AtomexClient,
+                        marketDataRepository: _app.MarketDataRepository,
                         symbolsProvider: _app.SymbolsProvider);
 
                 await Dispatcher.UIThread.InvokeAsync(() =>
@@ -919,6 +918,7 @@ namespace Atomex.Client.Desktop.ViewModels
                     EstimatedMaxFromAmount = swapPriceEstimation.MaxFromAmount;
                     EstimatedMaxToAmount = swapPriceEstimation.MaxToAmount;
                     IsNoLiquidity = swapPriceEstimation.IsNoLiquidity;
+
                 }, DispatcherPriority.Background);
             }
             catch (Exception e)
@@ -1001,7 +1001,8 @@ namespace Atomex.Client.Desktop.ViewModels
                 return;
             }
 
-            if (!_app.AtomexClient.IsServiceConnected(AtomexClientService.All))
+            if (!_app.AtomexClient.IsServiceConnected(Service.Exchange) ||
+                !_app.AtomexClient.IsServiceConnected(Service.MarketData))
             {
                 App.DialogService.Show(
                     MessageViewModel.Message(
