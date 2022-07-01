@@ -18,7 +18,8 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
         public static async Task<IEnumerable<TezosTokenViewModel>> CreateOrGet(
             IAtomexApp atomexApp,
             TokenContract contract,
-            Action<CurrencyConfig> setConversionTab)
+            bool isNft,
+            Action<CurrencyConfig>? setConversionTab = null)
         {
             var tezosAccount = atomexApp.Account.GetCurrencyAccount<TezosAccount>(TezosConfig.Xtz);
 
@@ -27,8 +28,12 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
                 .GetTezosTokenAddressesByContractAsync(contract.Address);
 
             var tokenGroups = tokenWalletAddresses
-                .Where(walletAddress => !walletAddress.TokenBalance.IsNft)
-                .GroupBy(walletAddress => walletAddress.TokenBalance.TokenId);
+                .Where(walletAddress => isNft ? walletAddress.TokenBalance.IsNft : !walletAddress.TokenBalance.IsNft)
+                .GroupBy(walletAddress => walletAddress.TokenBalance.TokenId)
+                .ToList();
+
+            if (!tokenGroups.Any())
+                return Array.Empty<TezosTokenViewModel>();
 
             var walletAddresses = tokenGroups
                 .Select(walletAddressGroup =>
@@ -64,14 +69,15 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
                     Address = walletAddress.Address,
                     Contract = contract,
                 };
-
-                tokenViewModel.UpdateQuotesInBaseCurrency(atomexApp.QuotesProvider);
+                if (!isNft)
+                    tokenViewModel.UpdateQuotesInBaseCurrency(atomexApp.QuotesProvider);
                 tokenViewModel.SubscribeToUpdates();
+
                 Instances.TryAdd(kv, tokenViewModel);
                 tokens.Add(tokenViewModel);
             }
 
-            return tokens.Where(token => !token.TokenBalance.IsNft);
+            return tokens;
         }
 
         public static void Reset()

@@ -47,16 +47,16 @@
             <DataTemplate>
                 <Grid ColumnDefinitions="156"
                       RowDefinitions="156,50">
-                    
+
                     <Border Grid.Column="0"
                             Grid.Row="0"
                             VerticalAlignment="Stretch"
                             HorizontalAlignment="Stretch"
                             ClipToBounds="True"
                             CornerRadius="8">
-                        <Image asyncImageLoader:ImageLoader.Source="{Binding Image}"
+                        <Image asyncImageLoader:ImageLoader.Source="{Binding NftPreviewUrl}"
                                StretchDirection="Both"
-                               Stretch="UniformToFill"/>
+                               Stretch="UniformToFill" />
                     </Border>
                     <StackPanel Grid.Column="0"
                                 Grid.Row="1"
@@ -64,21 +64,22 @@
 
                         <TextBlock Foreground="{DynamicResource DefaultForegroundBrush}"
                                    FontSize="16"
-                                   Text="{Binding Name}" />
+                                   TextTrimming="CharacterEllipsis"
+                                   Text="{Binding CurrencyDescription}" />
 
                         <StackPanel Orientation="Horizontal"
                                     Margin="0 4 0 0">
                             <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
                                        FontSize="13"
-                                       Text="{Binding Amount}" />
+                                       Text="{Binding TotalAmount}" />
                             <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
                                        FontSize="13"
-                                       IsVisible="{Binding Amount,
+                                       IsVisible="{Binding TotalAmount,
                                        Converter={x:Static converters:NumericConverters.IsOne}}"
                                        Text=" collectible" />
                             <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
                                        FontSize="13"
-                                       IsVisible="{Binding Amount,
+                                       IsVisible="{Binding TotalAmount,
                                        Converter={x:Static converters:NumericConverters.GreaterThanOne}}"
                                        Text=" collectibles" />
                         </StackPanel>

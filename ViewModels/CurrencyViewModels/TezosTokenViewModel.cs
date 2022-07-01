@@ -4,13 +4,11 @@ using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
-
 using Avalonia.Media.Imaging;
 using Avalonia.Threading;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using Serilog;
-
 using Atomex.Blockchain.Tezos;
 using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.ViewModels.SendViewModels;
@@ -28,6 +26,7 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
         private const int MaxBalanceDecimals = AddressesHelper.MaxTokenCurrencyFormatDecimals;
         public const string Fa12 = "FA12";
         public const string Fa2 = "FA2";
+
         public bool CanExchange => AtomexApp
             ?.Account
             ?.Currencies
@@ -44,7 +43,7 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
         public static string BaseCurrencyCode => "USD"; // todo: use base currency from settings
         public bool IsFa12 => Contract.GetContractType() == Fa12;
         public bool IsFa2 => Contract.GetContractType() == Fa2;
-        public Action<CurrencyConfig> SetConversionTab { get; set; }
+        public Action<CurrencyConfig>? SetConversionTab { get; set; }
 
         public string CurrencyFormat => TokenBalance.Decimals != 0
             ? $"F{Math.Min(TokenBalance.Decimals, MaxBalanceDecimals)}"
@@ -107,6 +106,9 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
             }
         }
 
+        public string NftPreviewUrl =>
+            $"https://assets.objkt.media/file/assets-003/{Contract.Address}/{TokenBalance.TokenId}/thumb288";
+
         public TezosTokenViewModel()
         {
             this.WhenAnyValue(vm => vm.TotalAmount, vm => vm.TokenBalance)
@@ -122,7 +124,7 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
                 .Where(_ => AtomexApp != null)
                 .Skip(1)
                 .SubscribeInMainThread(_ => UpdateQuotesInBaseCurrency(AtomexApp!.QuotesProvider));
-            
+
             SendCommand.Merge(ReceiveCommand)
                 .SubscribeInMainThread(_ => IsPopupOpened = false);
         }
@@ -217,17 +219,17 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
             ? $"http://ipfs.io/ipfs/{ThumbsApi.RemoveIpfsPrefix(TokenBalance.ArtifactUri)}"
             : null;
 
-        private ReactiveCommand<Unit, Unit> _sendCommand;
+        private ReactiveCommand<Unit, Unit>? _sendCommand;
 
         public ReactiveCommand<Unit, Unit> SendCommand => _sendCommand ??= ReactiveCommand.Create(
             () => App.DialogService.Show(GetSendDialog().SelectFromViewModel));
 
-        private ReactiveCommand<Unit, Unit> _receiveCommand;
+        private ReactiveCommand<Unit, Unit>? _receiveCommand;
 
         public ReactiveCommand<Unit, Unit> ReceiveCommand => _receiveCommand ??= ReactiveCommand.Create(
             () => App.DialogService.Show(GetReceiveDialog()));
 
-        private ReactiveCommand<Unit, Unit> _exchangeCommand;
+        private ReactiveCommand<Unit, Unit>? _exchangeCommand;
 
         public ReactiveCommand<Unit, Unit> ExchangeCommand => _exchangeCommand ??= ReactiveCommand.Create(
             () =>

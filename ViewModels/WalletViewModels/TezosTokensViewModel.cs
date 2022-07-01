@@ -94,7 +94,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             var tokens = new ObservableCollection<TezosTokenViewModel>();
 
             foreach (var contract in Contracts!)
-                tokens.AddRange(await TezosTokenViewModelCreator.CreateOrGet(_app, contract, SetConversionTab));
+                tokens.AddRange(await TezosTokenViewModelCreator.CreateOrGet(_app, contract, false, SetConversionTab));
 
             return tokens.OrderByDescending(token => token.CanExchange)
                 .ThenByDescending(token => token.TotalAmountInBase);
