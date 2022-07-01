@@ -132,13 +132,11 @@ namespace Atomex.Client.Desktop.ViewModels
             TezosTokensCurrencyViewModel = new TezosCurrencyViewModel(tezosConfig);
             TezosTokensCurrencyViewModel.Header = TezosTokens;
             AllCurrencies.Add(TezosTokensCurrencyViewModel);
-
-            var savedCurrenciesArr =
-                App?.Account?.UserData?.InitializedCurrencies ??
-                AllCurrencies.Select(c => c.Currency.Name).ToArray();
+            
+            var disabledCurrencies = App.Account.UserData?.DisabledCurrencies ?? Array.Empty<string>();
 
             ChoosenCurrencies = new List<CurrencyViewModel>(AllCurrencies)
-                .Where(c => savedCurrenciesArr.Contains(c.Currency.Name))
+                .Where(c => !disabledCurrencies.Contains(c.Currency.Name))
                 .ToList();
 
             InitialChoosenCurrencies = new List<CurrencyViewModel>(ChoosenCurrencies);
@@ -223,7 +221,7 @@ namespace Atomex.Client.Desktop.ViewModels
             Desktop.App.DialogService.Show(receiveViewModel);
         }
 
-        private ReactiveCommand<CurrencyViewModel, Unit> _setWalletCurrencyCommand;
+        private ReactiveCommand<CurrencyViewModel, Unit>? _setWalletCurrencyCommand;
 
         public ReactiveCommand<CurrencyViewModel, Unit> SetWalletCurrencyCommand => _setWalletCurrencyCommand ??=
             (_setWalletCurrencyCommand = ReactiveCommand.Create<CurrencyViewModel>(currencyViewModel =>
@@ -238,19 +236,19 @@ namespace Atomex.Client.Desktop.ViewModels
                 SetWalletCurrency?.Invoke(currencyViewModel.Currency.Description);
             }));
 
-        private ReactiveCommand<CurrencyViewModel, Unit> _setWertCurrencyCommand;
+        private ReactiveCommand<CurrencyViewModel, Unit>? _setWertCurrencyCommand;
 
         public ReactiveCommand<CurrencyViewModel, Unit> SetWertCurrencyCommand => _setWertCurrencyCommand ??=
             (_setWertCurrencyCommand = ReactiveCommand.Create<CurrencyViewModel>(
                 currencyViewModel => SetWertCurrency?.Invoke(currencyViewModel.Currency.Description)));
 
-        private ReactiveCommand<CurrencyViewModel, Unit> _openCurrencyPopupCommand;
+        private ReactiveCommand<CurrencyViewModel, Unit>? _openCurrencyPopupCommand;
 
         public ReactiveCommand<CurrencyViewModel, Unit> OpenCurrencyPopupCommand => _openCurrencyPopupCommand ??=
             (_openCurrencyPopupCommand = ReactiveCommand.Create<CurrencyViewModel>(
                 currencyViewModel => PopupOpenedCurrency = currencyViewModel.Header));
 
-        private ReactiveCommand<Unit, Unit> _sendCommand;
+        private ReactiveCommand<Unit, Unit>? _sendCommand;
 
         public ReactiveCommand<Unit, Unit> SendCommand => _sendCommand ??= (_sendCommand = ReactiveCommand.Create(() =>
         {
@@ -268,7 +266,7 @@ namespace Atomex.Client.Desktop.ViewModels
             Desktop.App.DialogService.Show(selectFromCurrencyViewModel);
         }));
 
-        private ReactiveCommand<CurrencyViewModel, Unit> _sendFromPopupCommand;
+        private ReactiveCommand<CurrencyViewModel, Unit>? _sendFromPopupCommand;
 
         public ReactiveCommand<CurrencyViewModel, Unit> SendFromPopupCommand => _sendFromPopupCommand ??=
             (_sendFromPopupCommand = ReactiveCommand.Create<CurrencyViewModel>(currencyViewModel =>
@@ -278,7 +276,7 @@ namespace Atomex.Client.Desktop.ViewModels
             }));
 
 
-        private ReactiveCommand<Unit, Unit> _receiveCommand;
+        private ReactiveCommand<Unit, Unit>? _receiveCommand;
 
         public ReactiveCommand<Unit, Unit> ReceiveCommand => _receiveCommand ??= _receiveCommand =
             ReactiveCommand.Create(() =>
@@ -297,19 +295,19 @@ namespace Atomex.Client.Desktop.ViewModels
                 Desktop.App.DialogService.Show(selectReceiveCurrencyViewModel);
             });
 
-        private ReactiveCommand<CurrencyViewModel, Unit> _receiveFromPopupCommand;
+        private ReactiveCommand<CurrencyViewModel, Unit>? _receiveFromPopupCommand;
 
         public ReactiveCommand<CurrencyViewModel, Unit> ReceiveFromPopupCommand => _receiveFromPopupCommand ??=
             _receiveFromPopupCommand = ReactiveCommand.Create<CurrencyViewModel>(
                 currencyViewModel => ShowReceiveWindow(currencyViewModel.Currency));
 
-        private ReactiveCommand<CurrencyViewModel, Unit> _exchangeCommand;
+        private ReactiveCommand<CurrencyViewModel, Unit>? _exchangeCommand;
 
         public ReactiveCommand<CurrencyViewModel, Unit> ExchangeCommand => _exchangeCommand ??= _exchangeCommand =
             ReactiveCommand.Create<CurrencyViewModel>(
                 currencyViewModel => SetDexTab?.Invoke(currencyViewModel?.Currency));
 
-        private ReactiveCommand<Unit, Unit> _manageAssetsCommand;
+        private ReactiveCommand<Unit, Unit>? _manageAssetsCommand;
 
         public ReactiveCommand<Unit, Unit> ManageAssetsCommand => _manageAssetsCommand ??= _manageAssetsCommand =
             ReactiveCommand.Create(() =>
@@ -325,21 +323,21 @@ namespace Atomex.Client.Desktop.ViewModels
                                 IsSelected = InitialChoosenCurrencies.Contains(currency)
                             })
                     ),
-                    OnAssetsChanged = currencyCodes =>
+                    OnAssetsChanged = selectedSymbols =>
                     {
+                        var disabledCurrencies = AllCurrencies
+                            .Select(currency => currency.CurrencyCode)
+                            .Where(currencyCode => !selectedSymbols.Contains(currencyCode))
+                            .ToArray();
+                        
                         // todo: remove tezos tokens
                         var currencies = AllCurrencies
-                            .Where(c => c.Header == TezosTokens || currencyCodes.Contains(c.CurrencyCode));
+                            .Where(c => c.Header == TezosTokens || !disabledCurrencies.Contains(c.CurrencyCode));
 
-                        ChoosenCurrencies =
-                            new List<CurrencyViewModel>(currencies);
-
+                        ChoosenCurrencies = new List<CurrencyViewModel>(currencies);
                         InitialChoosenCurrencies = new List<CurrencyViewModel>(ChoosenCurrencies);
 
-                        App.Account.UserData.InitializedCurrencies = ChoosenCurrencies
-                            .Select(currency => currency.Currency.Name)
-                            .ToArray();
-
+                        App.Account.UserData.DisabledCurrencies = disabledCurrencies;
                         App.Account.UserData.SaveToFile(App.Account.SettingsFilePath);
                     }
                 };

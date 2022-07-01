@@ -37,5 +37,16 @@ namespace Atomex.Client.Desktop.Converters
                     _ => false
                 };
             });
+        
+        public static readonly IValueConverter IsZero =
+            new FuncValueConverter<object, bool>(val =>
+            {
+                return val switch
+                {
+                    decimal decimalValue => decimalValue == 0,
+                    int intValue => intValue == 0,
+                    _ => false
+                };
+            });
     }
 }
