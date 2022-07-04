@@ -253,7 +253,8 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         {
             try
             {
-                if (!Currencies.IsTezosToken(args.Currency)) return;
+                if (!args.IsTokenUpdate)
+                    return;
 
                 await Dispatcher.UIThread.InvokeAsync(async () => { await ReloadTokenContractsAsync(); },
                     DispatcherPriority.Background);
@@ -495,16 +496,8 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
                 var tezosTokensScanner = new TezosTokensScanner(tezosAccount);
 
-                await tezosTokensScanner.ScanAsync(
-                    skipUsed: false,
+                await tezosTokensScanner.UpdateBalanceAsync(
                     cancellationToken: _cancellation.Token);
-
-                // reload balances for all tezos tokens account
-                foreach (var currency in _app.Account.Currencies)
-                    if (Currencies.IsTezosToken(currency.Name))
-                        _app.Account
-                            .GetCurrencyAccount<TezosTokenAccount>(currency.Name)
-                            .ReloadBalances();
             }
             catch (OperationCanceledException)
             {
@@ -639,7 +632,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             var address = "tz1YS2CmS5o24bDz9XNr84DSczBXuq4oGHxr";
 
             var tokensBalances = tzktApi
-                .GetTokenBalancesAsync(address)
+                .GetTokenBalanceAsync(addresses: new [] { address })
                 .WaitForResult();
 
             Tokens = new ObservableCollection<TezosTokenViewModel>(
@@ -651,8 +644,8 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
             var transfers = tzktApi
                 .GetTokenTransfersAsync(
-                    address: address,
-                    contractAddress: "KT1RJ6PbjHpwc3M5rw5s2Nbmefwbuwbdxton")
+                    addresses: new[] { address },
+                    tokenContracts: new[] { "KT1RJ6PbjHpwc3M5rw5s2Nbmefwbuwbdxton" })
                 .WaitForResult()
                 .Value;
 

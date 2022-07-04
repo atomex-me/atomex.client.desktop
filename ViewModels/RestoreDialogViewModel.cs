@@ -72,18 +72,8 @@ namespace Atomex.Client.Desktop.ViewModels
 
                     var tezosTokensScanner = new TezosTokensScanner(tezosAccount);
 
-                    await tezosTokensScanner.ScanAsync(
-                        skipUsed: false,
+                    await tezosTokensScanner.UpdateBalanceAsync(
                         cancellationToken: default);
-
-                    // reload balances for all tezos tokens account
-                    foreach (var currency in _app.Account.Currencies)
-                    {
-                        if (Currencies.IsTezosToken(currency.Name))
-                            _app.Account
-                                .GetCurrencyAccount<TezosTokenAccount>(currency.Name)
-                                .ReloadBalances();
-                    }
                 }
 
                 await Task.Run(() =>
@@ -138,16 +128,8 @@ namespace Atomex.Client.Desktop.ViewModels
 
                 var tezosTokensScanner = new TezosTokensScanner(tezosAccount);
 
-                await tezosTokensScanner.ScanAsync(
-                    skipUsed: false,
+                await tezosTokensScanner.UpdateBalanceAsync(
                     cancellationToken: cancellation.Token);
-
-                // reload balances for all tezos tokens account
-                foreach (var currency in _app.Account.Currencies)
-                    if (Currencies.IsTezosToken(currency.Name))
-                        _app.Account
-                            .GetCurrencyAccount<TezosTokenAccount>(currency.Name)
-                            .ReloadBalances();
             }
             catch (Exception e)
             {

@@ -23,7 +23,7 @@ using Atomex.Wallet;
 using Avalonia.Controls;
 using ReactiveUI.Fody.Helpers;
 using Network = NBitcoin.Network;
-
+using Atomex.TezosTokens;
 
 namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 {
@@ -133,7 +133,8 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         {
             try
             {
-                if (Currency.Name != args.Currency) return;
+                if (args.Currency != Currency.Name)
+                    return;
 
                 // update transactions list
                 await LoadTransactionsAsync();
