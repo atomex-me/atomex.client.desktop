@@ -1,8 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Reactive;
 using System.Runtime.InteropServices;
-
+using System.Threading.Tasks;
 using Avalonia.Controls;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
@@ -14,6 +15,7 @@ using Atomex.LiteDb;
 using Atomex.Services;
 using Atomex.Wallet;
 using Atomex.Wallet.Abstract;
+using Serilog;
 
 namespace Atomex.Client.Desktop.ViewModels
 {
@@ -86,6 +88,19 @@ namespace Atomex.Client.Desktop.ViewModels
                                 _ => _doAfterAtomexClientChanged
                             };
                         });
+                    
+
+                    Task.Run(async () =>
+                    {
+                        try
+                        {
+                            await new HdWalletScanner(account).ScanAsync(skipUsed: true);
+                        }
+                        catch (Exception e)
+                        {
+                            Log.Error(e, "Error on updating balances on auth");
+                        }
+                    });
                 },
                 goBack: () =>
                 {
