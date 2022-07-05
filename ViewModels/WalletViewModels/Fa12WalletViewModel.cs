@@ -10,7 +10,7 @@ using Atomex.TezosTokens;
 using Atomex.Core;
 using Atomex.Wallet.Tezos;
 using Avalonia.Controls;
-
+using Atomex.Wallet;
 
 namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 {
@@ -38,6 +38,27 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         protected override void SubscribeToServices()
         {
             _app.Account.BalanceUpdated += OnBalanceUpdatedEventHandler;
+        }
+
+        protected virtual async void OnBalanceUpdatedEventHandler(object sender, CurrencyEventArgs args)
+        {
+            try
+            {
+                var tezosTokenConfig = (TezosTokenConfig)Currency;
+
+                if (!args.IsTokenUpdate ||
+                   args.TokenContract != null && (args.TokenContract != tezosTokenConfig.TokenContractAddress || args.TokenId != tezosTokenConfig.TokenId))
+                {
+                    return;
+                }
+
+                // update transactions list
+                await LoadTransactionsAsync();
+            }
+            catch (Exception e)
+            {
+                Log.Error(e, "Account balance updated event handler error");
+            }
         }
 
         protected sealed override async Task LoadTransactionsAsync()

@@ -137,9 +137,14 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
         {
             try
             {
-                if (!Atomex.Currencies.IsTezosBased(args.Currency)) return;
+                if (!args.IsTokenUpdate ||
+                    args.TokenContract != null && (args.TokenContract != TokenBalance.Contract || args.TokenId != TokenBalance.TokenId))
+                {
+                    return;
+                }
 
                 await UpdateAsync();
+
                 Log.Debug("Balance updated for tezos token {Symbol}", TokenBalance.Symbol);
             }
             catch (Exception e)

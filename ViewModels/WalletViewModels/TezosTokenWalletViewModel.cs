@@ -128,7 +128,13 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         {
             try
             {
-                if (!Currencies.IsTezosBased(args.Currency) || TokenViewModel == null) return;
+                //if (!Currencies.IsTezosBased(args.Currency) || TokenViewModel == null) return;
+                if (!args.IsTokenUpdate ||
+                    TokenViewModel == null ||
+                    args.TokenContract != null && (args.TokenContract != TokenViewModel.Contract.Address || args.TokenId != TokenViewModel.TokenBalance.TokenId))
+                {
+                    return;
+                }
 
                 await Dispatcher.UIThread.InvokeAsync(async () => await LoadTransfers(TokenViewModel),
                     DispatcherPriority.Background);
@@ -182,16 +188,10 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
                 var tezosTokensScanner = new TezosTokensScanner(tezosAccount);
 
-                await tezosTokensScanner.ScanContractAsync(
-                    contractAddress: TokenViewModel!.Contract.Address,
+                await tezosTokensScanner.UpdateBalanceAsync(
+                    tokenContract: TokenViewModel!.Contract.Address,
+                    tokenId: (int)TokenViewModel!.TokenBalance.TokenId,
                     cancellationToken: _cancellation.Token);
-
-                // reload balances for all tezos tokens account
-                foreach (var currency in _app.Account.Currencies)
-                    if (Currencies.IsTezosToken(currency.Name))
-                        _app.Account
-                            .GetCurrencyAccount<TezosTokenAccount>(currency.Name)
-                            .ReloadBalances();
             }
             catch (OperationCanceledException)
             {
