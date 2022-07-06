@@ -39,7 +39,6 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
         public TezosConfig TezosConfig { get; set; }
         [Reactive] public TokenBalance TokenBalance { get; set; }
         public TokenContract Contract { get; set; }
-        public string Address { get; set; }
         public static string BaseCurrencyFormat => "$0.##"; // todo: use from settings
         public static string BaseCurrencyCode => "USD"; // todo: use base currency from settings
         public bool IsFa12 => Contract.GetContractType() == Fa12;

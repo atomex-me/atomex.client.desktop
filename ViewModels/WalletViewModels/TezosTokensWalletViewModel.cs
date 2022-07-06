@@ -202,18 +202,9 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         public bool IsConvertable => _app.Account.Currencies
             .Any(c => c is Fa12Config fa12 && fa12.TokenContractAddress == TokenContractAddress);
 
-        // public string Header => "Tezos Tokens";
         public decimal Balance { get; set; }
         public string BalanceFormat { get; set; }
         public string BalanceCurrencyCode { get; set; }
-
-        // public IBrush Background => IsSelected
-        //     ? TezosCurrencyViewModel.DefaultIconBrush
-        //     : TezosCurrencyViewModel.DefaultUnselectedIconBrush;
-        //
-        // public IBrush OpacityMask => IsSelected
-        //     ? null
-        //     : TezosCurrencyViewModel.DefaultIconMaskBrush;
 
         public int SelectedTabIndex { get; set; }
 
@@ -394,7 +385,6 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                     {
                         TezosConfig = tezosConfig,
                         TokenBalance = a.TokenBalance,
-                        Address = a.Address,
                         SendCallback = SendCallback
                     }));
             }
@@ -418,7 +408,6 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                 tokenContract: TokenContract.Contract.Address,
                 tokenId: 0,
                 tokenType: TokenContract.Contract.GetContractType(),
-                // getTokenPreview: GetTokenPreview,
                 tokenPreview: null,
                 balanceFormat: BalanceFormat,
                 from: null);
@@ -436,19 +425,10 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                 tokenContract: tokenViewModel.TokenBalance.Contract,
                 tokenId: (int)tokenViewModel.TokenBalance.TokenId,
                 tokenType: TokenContract.Contract.GetContractType(),
-                // getTokenPreview: GetTokenPreview,
                 tokenPreview: null,
-                from: tokenViewModel.Address);
+                from: null);
 
             App.DialogService.Show(sendViewModel.SelectToViewModel);
-        }
-
-        private IBitmap GetTokenPreview(string address, decimal tokenId)
-        {
-            return Tokens
-                .FirstOrDefault(tokenViewModel =>
-                    tokenViewModel.Address == address && tokenViewModel.TokenBalance.TokenId == tokenId)
-                ?.BitmapIcon ?? TokenContract.IconPreview;
         }
 
         protected override void OnReceiveClick()
@@ -639,7 +619,6 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                 tokensBalances.Value.Select(tb => new TezosTokenViewModel
                 {
                     TokenBalance = tb,
-                    Address = address
                 }));
 
             var transfers = tzktApi
