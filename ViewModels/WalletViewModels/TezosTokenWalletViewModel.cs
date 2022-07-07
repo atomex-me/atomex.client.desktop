@@ -59,50 +59,24 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
                 IsTransactionsLoading = true;
 
-                if (tokenViewModel.IsFa12)
-                {
-                    var tokenAccount = _app.Account.GetTezosTokenAccount<Fa12Account>(
-                        currency: TezosTokenViewModel.Fa12,
-                        tokenContract: tokenViewModel.Contract.Address,
-                        tokenId: 0);
+                var tezosAccount = _app.Account
+                    .GetCurrencyAccount<TezosAccount>(TezosConfig.Xtz);
 
-                    var selectedTransactionId = SelectedTransaction?.Id;
+                var selectedTransactionId = SelectedTransaction?.Id;
 
-                    Transactions = SortTransactions(
-                        new ObservableCollection<TransactionViewModelBase>((await tokenAccount
-                                .DataRepository
-                                .GetTezosTokenTransfersAsync(tokenViewModel.Contract.Address,
-                                    offset: 0,
-                                    limit: int.MaxValue))
-                            .Where(token => token.Token.TokenId == tokenViewModel.TokenBalance.TokenId)
-                            .Select(t => new TezosTokenTransferViewModel(t, tezosConfig))
-                            .ToList()
-                            .ForEachDo(t => t.OnClose = () => ShowRightPopupContent?.Invoke(null))));
+                Transactions = SortTransactions(
+                    new ObservableCollection<TransactionViewModelBase>((await tezosAccount
+                            .DataRepository
+                            .GetTezosTokenTransfersAsync(tokenViewModel.Contract.Address,
+                                offset: 0,
+                                limit: int.MaxValue))
+                        .Where(token => token.Token.TokenId == tokenViewModel.TokenBalance.TokenId)
+                        .Select(t => new TezosTokenTransferViewModel(t, tezosConfig))
+                        .ToList()
+                        .ForEachDo(t => t.OnClose = () => ShowRightPopupContent?.Invoke(null))));
 
-                    if (selectedTransactionId != null)
-                        SelectedTransaction = Transactions.FirstOrDefault(t => t.Id == selectedTransactionId);
-                }
-                else if (tokenViewModel.IsFa2)
-                {
-                    var tezosAccount = _app.Account
-                        .GetCurrencyAccount<TezosAccount>(TezosConfig.Xtz);
-
-                    var selectedTransactionId = SelectedTransaction?.Id;
-
-                    Transactions = SortTransactions(
-                        new ObservableCollection<TransactionViewModelBase>((await tezosAccount
-                                .DataRepository
-                                .GetTezosTokenTransfersAsync(tokenViewModel.Contract.Address,
-                                    offset: 0,
-                                    limit: int.MaxValue))
-                            .Where(token => token.Token.TokenId == tokenViewModel.TokenBalance.TokenId)
-                            .Select(t => new TezosTokenTransferViewModel(t, tezosConfig))
-                            .ToList()
-                            .ForEachDo(t => t.OnClose = () => ShowRightPopupContent?.Invoke(null))));
-
-                    if (selectedTransactionId != null)
-                        SelectedTransaction = Transactions.FirstOrDefault(t => t.Id == selectedTransactionId);
-                }
+                if (selectedTransactionId != null)
+                    SelectedTransaction = Transactions.FirstOrDefault(t => t.Id == selectedTransactionId);
             }
             catch (OperationCanceledException)
             {
