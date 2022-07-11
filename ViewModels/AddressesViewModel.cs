@@ -276,14 +276,11 @@ namespace Atomex.Client.Desktop.ViewModels
 
         private async void OnBalanceUpdatedEventHandler(object? sender, CurrencyEventArgs args)
         {
-            if (Currencies.IsTezosToken(args.Currency) && Currencies.IsTezosBased(_currency.Name))
+            if ((args.Currency != null && _currency.Name == args.Currency) ||
+                (args.IsTokenUpdate && (args.TokenContract == null || (args.TokenContract == _tokenContract && args.TokenId == _tokenId))))
             {
                 await ReloadAddresses();
-                return;
             }
-
-            if (_currency.Name == args.Currency)
-                await ReloadAddresses();
         }
 
         private void OpenInExplorer(string address)
@@ -317,15 +314,8 @@ namespace Atomex.Client.Desktop.ViewModels
                         .GetCurrencyAccount<TezosAccount>(TezosConfig.Xtz);
 
                     await new TezosTokensScanner(tezosAccount)
-                        .ScanContractAsync(address, _tokenContract);
-
-                    // reload balances for all tezos tokens account
-                    foreach (var currency in _app.Account.Currencies)
-                        if (Currencies.IsTezosToken(currency.Name))
-                            _app.Account
-                                .GetCurrencyAccount<TezosTokenAccount>(currency.Name)
-                                .ReloadBalances();
-                }
+                        .UpdateBalanceAsync(address, _tokenContract, (int)_tokenId);
+                 }
 
                 _ = ReloadAddresses();
             }

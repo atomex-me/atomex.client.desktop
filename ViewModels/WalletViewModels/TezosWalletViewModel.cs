@@ -308,16 +308,8 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
                 var tezosTokensScanner = new TezosTokensScanner(tezosAccount);
 
-                await tezosTokensScanner.ScanAsync(
-                    skipUsed: false,
-                    cancellationToken: _cancellation.Token);
-
-                // reload balances for all tezos tokens account
-                foreach (var currency in _app.Account.Currencies)
-                    if (Currencies.IsTezosToken(currency.Name))
-                        _app.Account
-                            .GetCurrencyAccount<TezosTokenAccount>(currency.Name)
-                            .ReloadBalances();
+                await tezosTokensScanner
+                    .UpdateBalanceAsync(cancellationToken: _cancellation.Token);
             }
             catch (OperationCanceledException)
             {

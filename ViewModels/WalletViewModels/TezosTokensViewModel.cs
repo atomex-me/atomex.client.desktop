@@ -116,7 +116,8 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         {
             try
             {
-                if (!Currencies.IsTezosToken(args.Currency)) return;
+                if (!args.IsTokenUpdate)
+                    return;
 
                 await Dispatcher.UIThread.InvokeAsync(async () => { await ReloadTokenContractsAsync(); },
                     DispatcherPriority.Background);

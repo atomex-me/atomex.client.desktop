@@ -14,6 +14,8 @@ using Atomex.MarketData.Abstract;
 using Atomex.Wallet;
 using Atomex.Wallet.Abstract;
 using Atomex.Client.Desktop.Common;
+using System.Linq;
+using Atomex.TezosTokens;
 
 namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
 {
@@ -102,8 +104,14 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
         {
             try
             {
-                if (Currency.Name.Equals(args.Currency))
+                if ((args.Currency != null && args.Currency == Currency.Name) ||
+                    (args.IsTokenUpdate && (args.TokenContract == null || Account.Currencies.FirstOrDefault(c =>
+                        c is TezosTokenConfig tc &&
+                        tc.TokenContractAddress == args.TokenContract &&
+                        tc.TokenId == args.TokenId) != null)))
+                {
                     await UpdateAsync();
+                }
             }
             catch (Exception e)
             {

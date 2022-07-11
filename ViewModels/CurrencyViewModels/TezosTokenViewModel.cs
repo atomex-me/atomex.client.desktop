@@ -38,7 +38,6 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
         public TezosConfig TezosConfig { get; set; }
         [Reactive] public TokenBalance TokenBalance { get; set; }
         public TokenContract Contract { get; set; }
-        public string Address { get; set; }
         public static string BaseCurrencyFormat => "$0.##"; // todo: use from settings
         public static string BaseCurrencyCode => "USD"; // todo: use base currency from settings
         public bool IsFa12 => Contract.GetContractType() == Fa12;
@@ -139,9 +138,14 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
         {
             try
             {
-                if (!Atomex.Currencies.IsTezosBased(args.Currency)) return;
+                if (!args.IsTokenUpdate ||
+                    args.TokenContract != null && (args.TokenContract != TokenBalance.Contract || args.TokenId != TokenBalance.TokenId))
+                {
+                    return;
+                }
 
                 await UpdateAsync();
+
                 Log.Debug("Balance updated for tezos token {Symbol}", TokenBalance.Symbol);
             }
             catch (Exception e)

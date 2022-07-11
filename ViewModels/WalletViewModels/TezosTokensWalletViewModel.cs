@@ -202,18 +202,9 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         public bool IsConvertable => _app.Account.Currencies
             .Any(c => c is Fa12Config fa12 && fa12.TokenContractAddress == TokenContractAddress);
 
-        // public string Header => "Tezos Tokens";
         public decimal Balance { get; set; }
         public string BalanceFormat { get; set; }
         public string BalanceCurrencyCode { get; set; }
-
-        // public IBrush Background => IsSelected
-        //     ? TezosCurrencyViewModel.DefaultIconBrush
-        //     : TezosCurrencyViewModel.DefaultUnselectedIconBrush;
-        //
-        // public IBrush OpacityMask => IsSelected
-        //     ? null
-        //     : TezosCurrencyViewModel.DefaultIconMaskBrush;
 
         public int SelectedTabIndex { get; set; }
 
@@ -253,7 +244,8 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         {
             try
             {
-                if (!Currencies.IsTezosToken(args.Currency)) return;
+                if (!args.IsTokenUpdate)
+                    return;
 
                 await Dispatcher.UIThread.InvokeAsync(async () => { await ReloadTokenContractsAsync(); },
                     DispatcherPriority.Background);
@@ -393,7 +385,6 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                     {
                         TezosConfig = tezosConfig,
                         TokenBalance = a.TokenBalance,
-                        Address = a.Address,
                         SendCallback = SendCallback
                     }));
             }
@@ -417,7 +408,6 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                 tokenContract: TokenContract.Contract.Address,
                 tokenId: 0,
                 tokenType: TokenContract.Contract.GetContractType(),
-                // getTokenPreview: GetTokenPreview,
                 tokenPreview: null,
                 balanceFormat: BalanceFormat,
                 from: null);
@@ -435,19 +425,10 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                 tokenContract: tokenViewModel.TokenBalance.Contract,
                 tokenId: (int)tokenViewModel.TokenBalance.TokenId,
                 tokenType: TokenContract.Contract.GetContractType(),
-                // getTokenPreview: GetTokenPreview,
                 tokenPreview: null,
-                from: tokenViewModel.Address);
+                from: null);
 
             App.DialogService.Show(sendViewModel.SelectToViewModel);
-        }
-
-        private IBitmap GetTokenPreview(string address, decimal tokenId)
-        {
-            return Tokens
-                .FirstOrDefault(tokenViewModel =>
-                    tokenViewModel.Address == address && tokenViewModel.TokenBalance.TokenId == tokenId)
-                ?.BitmapIcon ?? TokenContract.IconPreview;
         }
 
         protected override void OnReceiveClick()
@@ -495,16 +476,8 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
                 var tezosTokensScanner = new TezosTokensScanner(tezosAccount);
 
-                await tezosTokensScanner.ScanAsync(
-                    skipUsed: false,
+                await tezosTokensScanner.UpdateBalanceAsync(
                     cancellationToken: _cancellation.Token);
-
-                // reload balances for all tezos tokens account
-                foreach (var currency in _app.Account.Currencies)
-                    if (Currencies.IsTezosToken(currency.Name))
-                        _app.Account
-                            .GetCurrencyAccount<TezosTokenAccount>(currency.Name)
-                            .ReloadBalances();
             }
             catch (OperationCanceledException)
             {
@@ -639,20 +612,19 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             var address = "tz1YS2CmS5o24bDz9XNr84DSczBXuq4oGHxr";
 
             var tokensBalances = tzktApi
-                .GetTokenBalancesAsync(address)
+                .GetTokenBalanceAsync(addresses: new [] { address })
                 .WaitForResult();
 
             Tokens = new ObservableCollection<TezosTokenViewModel>(
                 tokensBalances.Value.Select(tb => new TezosTokenViewModel
                 {
                     TokenBalance = tb,
-                    Address = address
                 }));
 
             var transfers = tzktApi
                 .GetTokenTransfersAsync(
-                    address: address,
-                    contractAddress: "KT1RJ6PbjHpwc3M5rw5s2Nbmefwbuwbdxton")
+                    addresses: new[] { address },
+                    tokenContracts: new[] { "KT1RJ6PbjHpwc3M5rw5s2Nbmefwbuwbdxton" })
                 .WaitForResult()
                 .Value;
 
