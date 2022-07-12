@@ -71,7 +71,9 @@ namespace Atomex.Client.Desktop
             var tezToolsQuotesProvider = new TezToolsQuotesProvider(
                 log: LoggerFactory.CreateLogger<TezToolsQuotesProvider>());
             
-            var quotesProvider = new MultiSourceQuotesProvider(bitfinexQuotesProvider, tezToolsQuotesProvider);
+            var quotesProvider = new MultiSourceQuotesProvider(
+                log: LoggerFactory.CreateLogger<MultiSourceQuotesProvider>(),
+                bitfinexQuotesProvider, tezToolsQuotesProvider);
 
             // init Atomex client app
             AtomexApp = new AtomexApp()
