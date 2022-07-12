@@ -92,11 +92,12 @@
         </StackPanel>
 
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-            
+
             <!-- todo: resolve Azian symbols -->
-            <TextBox Classes="CustomTextBox CreateMnemonic"
+            <TextBox Name="MnemonicText"
+                     Classes="CustomTextBox CreateMnemonic"
                      Width="430"
-                     MinHeight="40"
+                     MinHeight="52"
                      IsReadOnly="True"
                      Margin="0 5 0 5"
                      Padding="10"
@@ -109,6 +110,7 @@
 
             <controls:RoundedButton Width="80"
                                     Margin="0 5 0 5"
+                                    Height="{Binding #MnemonicText.Bounds.Height}"
                                     CornerRadius="0 20 20 0"
                                     Content="Generate"
                                     FontSize="13"

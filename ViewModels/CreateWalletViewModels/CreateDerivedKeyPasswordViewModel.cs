@@ -1,6 +1,3 @@
-using System;
-using System.Security;
-using Atomex.Client.Desktop.Helpers;
 using ReactiveUI;
 using Atomex.Common;
 using Atomex.Wallet;

@@ -57,14 +57,7 @@ namespace Atomex.Client.Desktop.Controls
 
         public static readonly StyledProperty<double> CompletedStepLineWidthProperty =
             AvaloniaProperty.Register<StepIndicatorPanel, double>("CompletedStepLineWidth", 4.0);
-
-        // public static DependencyProperty FontFamilyProperty = DependencyProperty.Register("FontFamily",
-        //     typeof(FontFamily),
-        //     typeof(StepIndicatorPanel),
-        //     new FrameworkPropertyMetadata(
-        //         new FontFamily(new Uri("pack://application:,,,/resources/"), "./#Roboto Medium"),
-        //         FrameworkPropertyMetadataOptions.AffectsRender));
-
+        
         public static readonly StyledProperty<double> FontSizeProperty =
             AvaloniaProperty.Register<StepIndicatorPanel, double>("FontSize", 23.0);
 

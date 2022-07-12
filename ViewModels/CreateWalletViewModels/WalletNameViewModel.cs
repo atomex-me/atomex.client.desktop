@@ -1,39 +1,26 @@
 using ReactiveUI;
-using System.Windows.Input;
 using System.IO;
 using System;
 using Atomex.Client.Desktop.Common;
+using ReactiveUI.Fody.Helpers;
 
 namespace Atomex.Client.Desktop.ViewModels.CreateWalletViewModels
 {
     public class WalletNameViewModel : StepViewModel
     {
         private StepData StepData { get; set; }
+        [Reactive] public string WalletName { get; set; }
+        [Reactive] public string Warning { get; set; }
 
-        private string _walletName;
-
-        public string WalletName
+        public WalletNameViewModel()
         {
-            get => _walletName;
-            set
-            {
-                Warning = string.Empty;
-                this.RaiseAndSetIfChanged(ref _walletName, value);
-            }
+            this.WhenAnyValue(vm => vm.WalletName)
+                .SubscribeInMainThread(_ => Warning = string.Empty);
         }
 
-
-        private string _warning;
-        public string Warning
+        public override void Initialize(object arg)
         {
-            get => _warning;
-            set { this.RaiseAndSetIfChanged(ref _warning, value); }
-        }
-
-        public override void Initialize(
-            object arg)
-        {
-            StepData = (StepData) arg;
+            StepData = (StepData)arg;
         }
 
         public override void Next()
@@ -44,8 +31,8 @@ namespace Atomex.Client.Desktop.ViewModels.CreateWalletViewModels
                 return;
             }
 
-            if (WalletName.IndexOfAny(Path.GetInvalidFileNameChars()) != -1 ||
-                WalletName.IndexOf('.') != -1)
+            if (WalletName.IndexOfAny(Path.GetInvalidFileNameChars()) != -1 || WalletName.IndexOf('.') != -1 ||
+                WalletName.IndexOf(' ') != -1)
             {
                 Warning = Properties.Resources.CwvInvalidWalletName;
                 return;
@@ -70,7 +57,6 @@ namespace Atomex.Client.Desktop.ViewModels.CreateWalletViewModels
             }
 
             StepData.PathToWallet = pathToWallet;
-
             RaiseOnNext(StepData);
         }
     }

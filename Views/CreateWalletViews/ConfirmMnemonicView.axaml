@@ -1,0 +1,118 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:createWalletViewModels="clr-namespace:Atomex.Client.Desktop.ViewModels.CreateWalletViewModels"
+             xmlns:controls="clr-namespace:Atomex.Client.Desktop.Controls"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="Atomex.Client.Desktop.Views.CreateWalletViews.ConfirmMnemonicView">
+
+    <Design.DataContext>
+        <createWalletViewModels:ConfirmMnemonicViewModel />
+    </Design.DataContext>
+
+    <StackPanel Orientation="Vertical">
+        <StackPanel Orientation="Horizontal"
+                    Margin="10 30 10 20"
+                    HorizontalAlignment="Center">
+            <TextBlock Text="Step "
+                       Foreground="{DynamicResource DefaultForegroundBrush}"
+                       FontFamily="{DynamicResource DefaultLightFontFamily}"
+                       FontSize="25" />
+            <TextBlock Text="{Binding Step}"
+                       Foreground="{DynamicResource DefaultForegroundBrush}"
+                       FontFamily="{DynamicResource DefaultLightFontFamily}"
+                       FontSize="25" />
+            <TextBlock Text=": Confirm mnemonic phrase"
+                       Foreground="{DynamicResource DefaultForegroundBrush}"
+                       FontFamily="{DynamicResource DefaultLightFontFamily}"
+                       FontSize="25" />
+        </StackPanel>
+        
+        <TextBlock
+            Text="This is your mnemonic phrase words in random order. Please re-arrange words to their original order by clicking on them."
+            Foreground="{DynamicResource DefaultForegroundBrush}"
+            FontFamily="{DynamicResource DefaultLightFontFamily}"
+            FontSize="15"
+            Margin="40 0 40 20"
+            TextWrapping="Wrap"
+            HorizontalAlignment="Center" />
+
+        <ListBox Background="{DynamicResource AlmostTransparentBrush}"
+                 Items="{Binding RandomizedMnemonicWords}"
+                 Margin="40 0 40 0"
+                 HorizontalAlignment="Stretch">
+            <ListBox.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <WrapPanel />
+                </ItemsPanelTemplate>
+            </ListBox.ItemsPanel>
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <controls:RoundedButton Padding="8 0"
+                                            Height="28"
+                                            CornerRadius="{DynamicResource AtomexCornerRadius}"
+                                            Content="{Binding }"
+                                            Command="{Binding $parent[ListBox].DataContext.AddWordCommand}"
+                                            CommandParameter="{Binding }"
+                                            FontSize="13" />
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+            <ListBox.Styles>
+                <Style Selector="ListBoxItem">
+                    <Setter Property="Padding" Value="0 6 6 0" />
+                </Style>
+                <Style Selector="ListBoxItem:selected /template/ ContentPresenter">
+                    <Setter Property="Background" Value="{DynamicResource AlmostTransparentBrush}" />
+                </Style>
+                <Style Selector="ListBoxItem:not(:selected) /template/ ContentPresenter">
+                    <Setter Property="Background" Value="{DynamicResource AlmostTransparentBrush}" />
+                </Style>
+            </ListBox.Styles>
+        </ListBox>
+
+        <Border Margin="40 16 40 10"
+                Height="1"
+                Background="{DynamicResource LightDefaultOpacity10}" />
+
+        <ListBox Background="{DynamicResource AlmostTransparentBrush}"
+                 Items="{Binding ConfirmedMnemonicWords}"
+                 Margin="40 0 40 0"
+                 HorizontalAlignment="Stretch">
+            <ListBox.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <WrapPanel />
+                </ItemsPanelTemplate>
+            </ListBox.ItemsPanel>
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <controls:RoundedButton Padding="8 0"
+                                            Height="28"
+                                            CornerRadius="{DynamicResource AtomexCornerRadius}"
+                                            Content="{Binding }"
+                                            Command="{Binding $parent[ListBox].DataContext.RemoveWordCommand}"
+                                            CommandParameter="{Binding }"
+                                            FontSize="13" />
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+            <ListBox.Styles>
+                <Style Selector="ListBoxItem">
+                    <Setter Property="Padding" Value="0 6 6 0" />
+                </Style>
+                <Style Selector="ListBoxItem:selected /template/ ContentPresenter">
+                    <Setter Property="Background" Value="{DynamicResource AlmostTransparentBrush}" />
+                </Style>
+                <Style Selector="ListBoxItem:not(:selected) /template/ ContentPresenter">
+                    <Setter Property="Background" Value="{DynamicResource AlmostTransparentBrush}" />
+                </Style>
+            </ListBox.Styles>
+        </ListBox>
+        <TextBlock Text="{Binding Warning}"
+                   Foreground="{DynamicResource WarningForegroundBrush}"
+                   FontFamily="{DynamicResource DefaultLightFontFamily}"
+                   FontSize="13"
+                   Margin="20 12 20 0"
+                   TextWrapping="Wrap"
+                   HorizontalAlignment="Center"/>
+    </StackPanel>
+</UserControl>
