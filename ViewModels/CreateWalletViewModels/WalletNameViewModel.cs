@@ -11,6 +11,7 @@ namespace Atomex.Client.Desktop.ViewModels.CreateWalletViewModels
         private StepData StepData { get; set; }
         [Reactive] public string WalletName { get; set; }
         [Reactive] public string Warning { get; set; }
+        private string WalletNameTrimmed => WalletName?.Trim() ?? string.Empty;
 
         public WalletNameViewModel()
         {
@@ -25,20 +26,19 @@ namespace Atomex.Client.Desktop.ViewModels.CreateWalletViewModels
 
         public override void Next()
         {
-            if (string.IsNullOrEmpty(WalletName))
+            if (string.IsNullOrEmpty(WalletNameTrimmed))
             {
                 Warning = Properties.Resources.CwvEmptyWalletName;
                 return;
             }
 
-            if (WalletName.IndexOfAny(Path.GetInvalidFileNameChars()) != -1 || WalletName.IndexOf('.') != -1 ||
-                WalletName.IndexOf(' ') != -1)
+            if (WalletNameTrimmed.IndexOfAny(Path.GetInvalidFileNameChars()) != -1 || WalletNameTrimmed.IndexOf('.') != -1)
             {
                 Warning = Properties.Resources.CwvInvalidWalletName;
                 return;
             }
 
-            var pathToWallet = $"{WalletInfo.CurrentWalletDirectory}/{WalletName}/{WalletInfo.DefaultWalletFileName}";
+            var pathToWallet = $"{WalletInfo.CurrentWalletDirectory}/{WalletNameTrimmed}/{WalletInfo.DefaultWalletFileName}";
 
             try
             {
