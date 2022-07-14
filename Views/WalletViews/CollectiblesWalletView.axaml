@@ -10,7 +10,7 @@
     <Design.DataContext>
         <walletViewModels:CollectiblesWalletViewModel />
     </Design.DataContext>
-
+    
     <ListBox Items="{Binding Tokens}">
         <ListBox.Styles>
             <Style Selector="ListBox">
@@ -52,7 +52,7 @@
                                 HorizontalAlignment="Stretch"
                                 ClipToBounds="True"
                                 CornerRadius="8">
-                            <Image asyncImageLoader:ImageLoader.Source="{Binding NftPreview}"
+                            <Image asyncImageLoader:ImageLoader.Source="{Binding NftPreview, TargetNullValue=''}"
                                    StretchDirection="Both"
                                    Stretch="UniformToFill" />
                         </Border>

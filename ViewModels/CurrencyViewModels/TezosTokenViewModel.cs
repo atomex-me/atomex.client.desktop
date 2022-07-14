@@ -32,13 +32,13 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
                       tezosTokenConfig.TokenContractAddress == Contract?.Address &&
                       tezosTokenConfig.TokenId == TokenBalance?.TokenId) ?? false;
 
-        public IAtomexApp AtomexApp { get; set; }
-        public TezosConfig TezosConfig { get; set; }
-        [Reactive] public TokenBalance TokenBalance { get; set; }
-        public TokenContract Contract { get; set; }
+        public IAtomexApp AtomexApp { get; init; }
+        public TezosConfig TezosConfig { get; init; }
+        [Reactive] public TokenBalance TokenBalance { get; init; }
+        public TokenContract Contract { get; init; }
         public static string BaseCurrencyFormat => "$0.##"; // todo: use from settings
         public static string BaseCurrencyCode => "USD"; // todo: use base currency from settings
-        public Action<CurrencyConfig>? SetConversionTab { get; set; }
+        public Action<CurrencyConfig>? SetConversionTab { get; init; }
 
         public string CurrencyFormat => TokenBalance.Decimals != 0
             ? $"F{Math.Min(TokenBalance.Decimals, MaxBalanceDecimals)}"
@@ -101,8 +101,7 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
             }
         }
 
-        public string NftPreview =>
-            $"https://assets.objkt.media/file/assets-003/{Contract.Address}/{TokenBalance.TokenId}/thumb288";
+        public string NftPreview =>$"https://thumbs.dipdup.net/QmbJ2ZNCgpUZfQHAtCHZ3CcXxpoqhkvxrK7PEN8dpy2LcW";
 
         public TezosTokenViewModel()
         {
@@ -130,6 +129,7 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
             if (TokenBalance.IsNft) return;
             AtomexApp.QuotesProvider.QuotesUpdated += OnQuotesUpdatedEventHandler;
         }
+
         private async void OnBalanceChangedEventHandler(object? sender, CurrencyEventArgs args)
 
         {

@@ -23,7 +23,8 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
     {
         public IEnumerable<TezosTokenViewModel> Tokens { get; set; }
         public string Name => Tokens.First().Contract?.Name ?? Tokens.First().Contract.Address.TruncateAddress();
-        public string PreviewUrl => Tokens.First().NftPreview;
+        // public string PreviewUrl => Tokens.First().NftPreview;
+        public string PreviewUrl => "https://thumbs.dipdup.net/QmbJ2ZNCgpUZfQHAtCHZ3CcXxpoqhkvxrK7PEN8dpy2LcW";
         public int Amount => Tokens
             .Aggregate(0, (result, tokenViewModel) => result + decimal.ToInt32(tokenViewModel.TotalAmount));
 

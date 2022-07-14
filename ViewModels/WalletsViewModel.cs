@@ -74,6 +74,7 @@ namespace Atomex.Client.Desktop.ViewModels
                 walletsViewModels.AddRange(wallets);
                 walletsViewModels.Add(new TezosTokenWalletViewModel(App, ShowRightPopupContent));
                 walletsViewModels.Add(new CollectiblesWalletViewModel(ShowTezosCollectible));
+                walletsViewModels.Add(new CollectibleWalletViewModel());
             }
             else
             {
@@ -104,6 +105,11 @@ namespace Atomex.Client.Desktop.ViewModels
 
         private void ShowTezosCollectible(TezosTokenViewModel tokenViewModel)
         {
+            var walletViewModel = Wallets.FirstOrDefault(w => w is CollectibleWalletViewModel);
+            if (walletViewModel is not CollectibleWalletViewModel collectibleWalletViewModel) return;
+
+            collectibleWalletViewModel.Collectible = tokenViewModel;
+            Selected = collectibleWalletViewModel;
         }
 
         private ReactiveCommand<Unit, Unit>? _backCommand;
@@ -119,6 +125,10 @@ namespace Atomex.Client.Desktop.ViewModels
 
                 case CollectiblesWalletViewModel:
                     Selected = Wallets.First(wallet => wallet is TezosWalletViewModel);
+                    return;
+                
+                case CollectibleWalletViewModel:
+                    Selected = Wallets.First(wallet => wallet is CollectiblesWalletViewModel);
                     return;
 
                 default:

@@ -58,7 +58,7 @@
                                 HorizontalAlignment="Stretch"
                                 ClipToBounds="True"
                                 CornerRadius="8">
-                            <Image asyncImageLoader:ImageLoader.Source="{Binding PreviewUrl}"
+                            <Image asyncImageLoader:ImageLoader.Source="{Binding PreviewUrl, TargetNullValue=''}"
                                    StretchDirection="Both"
                                    Stretch="UniformToFill" />
                         </Border>
