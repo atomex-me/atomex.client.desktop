@@ -51,12 +51,34 @@
                                  Classes.Updating="{Binding IsTokensUpdating}"
                                  Classes.NotUpdating="{Binding !IsTokensUpdating}"
                                  VerticalAlignment="Center"
-                                 ToolText="Update all tokens"
+                                 ToolText="Update Tokens"
                                  Margin="0 0 12 0"
                                  Command="{Binding UpdateTokensCommand}" />
             <controls:IconButton Classes="SetupAssets"
                                  VerticalAlignment="Center"
                                  ToolText="Manage tokens"
+                                 Margin="12 0 0 0"
+                                 Command="{Binding ManageTokensCommand}" />
+        </StackPanel>
+
+        <StackPanel Grid.Row="1"
+                    Height="72"
+                    ZIndex="1"
+                    Margin="0 4 18 0"
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Top"
+                    IsVisible="{Binding #CollectiblesTab.IsSelected}">
+            <controls:IconButton Classes="Update Big"
+                                 Classes.Updating="{Binding IsTokensUpdating}"
+                                 Classes.NotUpdating="{Binding !IsTokensUpdating}"
+                                 VerticalAlignment="Center"
+                                 ToolText="Update Collectibles"
+                                 Margin="0 0 12 0"
+                                 Command="{Binding UpdateTokensCommand}" />
+            <controls:IconButton Classes="SetupAssets"
+                                 VerticalAlignment="Center"
+                                 ToolText="Manage Collectibles"
                                  Margin="12 0 0 0"
                                  Command="{Binding ManageTokensCommand}" />
         </StackPanel>
@@ -100,7 +122,8 @@
                 <ContentControl Content="{Binding TezosTokensViewModel}" />
             </TabItem>
             <TabItem Margin="16 0"
-                     Classes="WalletTabItem">
+                     Classes="WalletTabItem"
+                     Name="CollectiblesTab">
                 <TabItem.Header>
                     <TextBlock VerticalAlignment="Center"
                                FontSize="16"

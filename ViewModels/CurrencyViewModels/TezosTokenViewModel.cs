@@ -24,8 +24,6 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
     public class TezosTokenViewModel : ViewModelBase, IAssetViewModel, IDisposable
     {
         private const int MaxBalanceDecimals = AddressesHelper.MaxTokenCurrencyFormatDecimals;
-        public const string Fa12 = "FA12";
-        public const string Fa2 = "FA2";
 
         public bool CanExchange => AtomexApp
             ?.Account
@@ -40,8 +38,6 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
         public TokenContract Contract { get; set; }
         public static string BaseCurrencyFormat => "$0.##"; // todo: use from settings
         public static string BaseCurrencyCode => "USD"; // todo: use base currency from settings
-        public bool IsFa12 => Contract.GetContractType() == Fa12;
-        public bool IsFa2 => Contract.GetContractType() == Fa2;
         public Action<CurrencyConfig>? SetConversionTab { get; set; }
 
         public string CurrencyFormat => TokenBalance.Decimals != 0
@@ -105,7 +101,7 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
             }
         }
 
-        public string NftPreviewUrl =>
+        public string NftPreview =>
             $"https://assets.objkt.media/file/assets-003/{Contract.Address}/{TokenBalance.TokenId}/thumb288";
 
         public TezosTokenViewModel()
@@ -131,15 +127,17 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
         public void SubscribeToUpdates()
         {
             AtomexApp.Account.BalanceUpdated += OnBalanceChangedEventHandler;
+            if (TokenBalance.IsNft) return;
             AtomexApp.QuotesProvider.QuotesUpdated += OnQuotesUpdatedEventHandler;
         }
-
         private async void OnBalanceChangedEventHandler(object? sender, CurrencyEventArgs args)
+
         {
             try
             {
                 if (!args.IsTokenUpdate ||
-                    args.TokenContract != null && (args.TokenContract != TokenBalance.Contract || args.TokenId != TokenBalance.TokenId))
+                    args.TokenContract != null && (args.TokenContract != TokenBalance.Contract ||
+                                                   args.TokenId != TokenBalance.TokenId))
                 {
                     return;
                 }

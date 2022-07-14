@@ -7,14 +7,13 @@ using System.Threading.Tasks;
 using Atomex.Blockchain.Tezos;
 using Atomex.Core;
 using Atomex.Wallet.Tezos;
-using Serilog;
+
 
 namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
 {
     public static class TezosTokenViewModelCreator
     {
-        private static readonly ConcurrentDictionary<(string, decimal), TezosTokenViewModel> Instances =
-            new();
+        private static readonly ConcurrentDictionary<(string, decimal), TezosTokenViewModel> Instances = new();
 
         public static async Task<IEnumerable<TezosTokenViewModel>> CreateOrGet(
             IAtomexApp atomexApp,
@@ -33,10 +32,10 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
                 .GroupBy(walletAddress => walletAddress.TokenBalance.TokenId)
                 .ToList();
 
-            if (!tokenGroups.Any())
-                return Array.Empty<TezosTokenViewModel>();
-
             var resultTokens = new List<TezosTokenViewModel>();
+            
+            if (!tokenGroups.Any())
+                return resultTokens;
 
             foreach (var tokenGroup in tokenGroups)
             {
@@ -81,7 +80,6 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
                 tokenViewModel.SubscribeToUpdates();
 
                 Instances.TryAdd((contract.Address, tokenGroup.Key), tokenViewModel);
-
                 resultTokens.Add(tokenViewModel);
             }
 
