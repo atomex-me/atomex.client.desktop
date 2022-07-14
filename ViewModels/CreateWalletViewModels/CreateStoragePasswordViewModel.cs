@@ -1,9 +1,8 @@
 using System;
+using System.IO;
 using System.Threading.Tasks;
-
 using ReactiveUI;
 using Serilog;
-
 using Atomex.Client.Desktop.Properties;
 using Atomex.Common;
 using Atomex.Wallet;
@@ -16,6 +15,7 @@ namespace Atomex.Client.Desktop.ViewModels.CreateWalletViewModels
         private HdWallet Wallet { get; set; }
 
         private string _warning;
+
         public string Warning
         {
             get => _warning;
@@ -27,6 +27,7 @@ namespace Atomex.Client.Desktop.ViewModels.CreateWalletViewModels
         }
 
         private int _passwordScore;
+
         public int PasswordScore
         {
             get => _passwordScore;
@@ -38,6 +39,7 @@ namespace Atomex.Client.Desktop.ViewModels.CreateWalletViewModels
         }
 
         private PasswordControlViewModel _passwordVM;
+
         public PasswordControlViewModel PasswordVM
         {
             get => _passwordVM;
@@ -49,6 +51,7 @@ namespace Atomex.Client.Desktop.ViewModels.CreateWalletViewModels
         }
 
         private PasswordControlViewModel _passwordConfirmationVM;
+
         public PasswordControlViewModel PasswordConfirmationVM
         {
             get => _passwordConfirmationVM;
@@ -74,12 +77,12 @@ namespace Atomex.Client.Desktop.ViewModels.CreateWalletViewModels
         private void PasswordChanged()
         {
             Warning = string.Empty;
-            PasswordScore = (int) PasswordAdvisor.CheckStrength(PasswordVM.SecurePass);
+            PasswordScore = (int)PasswordAdvisor.CheckStrength(PasswordVM.SecurePass);
         }
 
         public override void Initialize(object o)
         {
-            Wallet = (HdWallet) o;
+            Wallet = (HdWallet)o;
         }
 
         public override void Back()
@@ -94,7 +97,7 @@ namespace Atomex.Client.Desktop.ViewModels.CreateWalletViewModels
 
         public override async void Next()
         {
-            // todo: rollback password strength cheking;
+            // todo: rollback password strength checking;
             // if (PasswordScore < (int) PasswordAdvisor.PasswordScore.Medium)
             // {
             //     Warning = Resources.CwvPasswordInsufficientComplexity;
@@ -118,7 +121,13 @@ namespace Atomex.Client.Desktop.ViewModels.CreateWalletViewModels
                 {
                     await Wallet.EncryptAsync(PasswordVM.SecurePass);
 
-                    Wallet.SaveToFile(Wallet.PathToWallet, PasswordVM.SecurePass);
+                    var saved = Wallet.SaveToFile(Wallet.PathToWallet, PasswordVM.SecurePass);
+
+                    if (!saved)
+                    {
+                        Warning = "Can't save wallet file to file system. Try to use different wallet name.";
+                        throw new IOException(Warning);
+                    }
 
                     var acc = new Account(
                         Wallet,

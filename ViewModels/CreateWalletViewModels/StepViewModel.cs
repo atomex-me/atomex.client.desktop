@@ -1,6 +1,6 @@
 using System;
 using NBitcoin;
-using ReactiveUI;
+using ReactiveUI.Fody.Helpers;
 using Network = Atomex.Core.Network;
 
 namespace Atomex.Client.Desktop.ViewModels.CreateWalletViewModels
@@ -19,32 +19,20 @@ namespace Atomex.Client.Desktop.ViewModels.CreateWalletViewModels
         public event Action<object> OnNext;
         public event Action ProgressBarShow;
         public event Action ProgressBarHide;
-
-        private int _step;
-
-        public int Step
-        {
-            get => _step;
-            set => this.RaiseAndSetIfChanged(ref _step, value);
-        }
-
-        public virtual void Initialize(
-            object o)
+        [Reactive] public int Step { get; set; }
+        
+        public virtual void Initialize(object o)
         {
         }
 
         public virtual void Back() => OnBack?.Invoke(null);
-
         public virtual void Next() => OnNext?.Invoke(null);
-
-        protected void RaiseOnBack(
-            object arg)
+        protected void RaiseOnBack(object arg)
         {
             OnBack?.Invoke(arg);
         }
 
-        protected void RaiseOnNext(
-            object arg)
+        protected void RaiseOnNext(object arg)
         {
             OnNext?.Invoke(arg);
         }

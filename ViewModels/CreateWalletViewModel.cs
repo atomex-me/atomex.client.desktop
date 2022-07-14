@@ -1,11 +1,11 @@
 using System;
 using System.Windows.Input;
 using Atomex.Wallet.Abstract;
-using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.ViewModels.CreateWalletViewModels;
 using System.Collections.Generic;
 using Avalonia.Controls;
 using ReactiveUI;
+using ReactiveUI.Fody.Helpers;
 
 namespace Atomex.Client.Desktop.ViewModels
 {
@@ -19,90 +19,45 @@ namespace Atomex.Client.Desktop.ViewModels
     {
         private const int WalletTypeViewIndex = 0;
         private const int WalletNameViewIndex = 1;
-        private const int CreateMnemonicViewIIndex = 2;
-        private const int WriteMnemonicViewIIndex = 3;
-        private const int CreateDerivedKeyPasswordViewIIndex = 4;
-        private const int WriteDerivedKeyPasswordViewIIndex = 5;
-        private const int CreateStoragePasswordViewIIndex = 6;
-
+        private const int CreateMnemonicViewIndex = 2;
+        private const int WriteMnemonicViewIndex = 3;
+        private const int ConfirmMnemonicViewIndex = 4;
+        private const int CreateDerivedKeyPasswordViewIndex = 5;
+        private const int WriteDerivedKeyPasswordViewIndex = 6;
+        private const int CreateStoragePasswordViewIndex = 7;
+        
         public event Action<IAccount> OnAccountCreated;
         public event Action OnCanceled;
-
         private IAtomexApp App { get; }
-
-        public List<StepViewModel> ViewModels { get; }
+        private List<StepViewModel> ViewModels { get; }
 
         private int[] CreateNewWalletViewIndexes { get; } =
         {
             WalletTypeViewIndex,
             WalletNameViewIndex,
-            CreateMnemonicViewIIndex,
-            CreateDerivedKeyPasswordViewIIndex,
-            CreateStoragePasswordViewIIndex
+            CreateMnemonicViewIndex,
+            ConfirmMnemonicViewIndex,
+            CreateDerivedKeyPasswordViewIndex,
+            CreateStoragePasswordViewIndex
         };
 
         private int[] RestoreWalletViewIndexes { get; } =
         {
             WalletTypeViewIndex,
             WalletNameViewIndex,
-            WriteMnemonicViewIIndex,
-            WriteDerivedKeyPasswordViewIIndex,
-            CreateStoragePasswordViewIIndex
+            WriteMnemonicViewIndex,
+            WriteDerivedKeyPasswordViewIndex,
+            CreateStoragePasswordViewIndex
         };
 
         private int[] ViewIndexes { get; }
-
-        private int _currentViewIndex;
-
-        public int CurrentViewIndex
-        {
-            get => _currentViewIndex;
-            set
-            {
-                _currentViewIndex = value;
-                Content = ViewModels[_currentViewIndex];
-            }
-        }
-
-        private ViewModelBase _content;
-
-        public ViewModelBase Content
-        {
-            get => _content;
-            set => this.RaiseAndSetIfChanged(ref _content, value);
-        }
-
-        private bool _canBack;
-
-        public bool CanBack
-        {
-            get => _canBack;
-            set => this.RaiseAndSetIfChanged(ref _canBack, value);
-        }
-
-        private bool _canNext;
-
-        public bool CanNext
-        {
-            get => _canNext;
-            set => this.RaiseAndSetIfChanged(ref _canNext, value);
-        }
-
-        private string _backText = Properties.Resources.CwvBack;
-
-        public string BackText
-        {
-            get => _backText;
-            set => this.RaiseAndSetIfChanged(ref _backText, value);
-        }
-
-        private string _nextText = Properties.Resources.CwvNext;
-
-        public string NextText
-        {
-            get => _nextText;
-            set => this.RaiseAndSetIfChanged(ref _nextText, value);
-        }
+        [Reactive] public ViewModelBase Content { get; set; }
+        [Reactive] public bool CanBack { get; set; }
+        [Reactive] public bool CanNext { get; set; }
+        [Reactive] public string BackText { get; set; }
+        [Reactive] public string NextText { get; set; }
+        [Reactive] public int StepsCount { get; set; }
+        [Reactive] public bool InProgress { get; set; }
 
         private int _step;
 
@@ -125,20 +80,16 @@ namespace Atomex.Client.Desktop.ViewModels
             }
         }
 
-        private int _stepsCount;
+        private int _currentViewIndex;
 
-        public int StepsCount
+        private int CurrentViewIndex
         {
-            get => _stepsCount;
-            set => this.RaiseAndSetIfChanged(ref _stepsCount, value);
-        }
-
-        private bool _inProgress;
-
-        public bool InProgress
-        {
-            get => _inProgress;
-            set => this.RaiseAndSetIfChanged(ref _inProgress, value);
+            get => _currentViewIndex;
+            set
+            {
+                _currentViewIndex = value;
+                Content = ViewModels[_currentViewIndex];
+            }
         }
 
         public CreateWalletViewModel()
@@ -152,8 +103,8 @@ namespace Atomex.Client.Desktop.ViewModels
         public CreateWalletViewModel(
             IAtomexApp app,
             CreateWalletScenario scenario,
-            Action<IAccount> onAccountCreated = null,
-            Action onCanceled = null)
+            Action<IAccount>? onAccountCreated = null,
+            Action? onCanceled = null)
         {
             App = app ?? throw new ArgumentNullException(nameof(app));
 
@@ -163,6 +114,7 @@ namespace Atomex.Client.Desktop.ViewModels
                 new WalletNameViewModel(),
                 new CreateMnemonicViewModel(),
                 new WriteMnemonicViewModel(),
+                new ConfirmMnemonicViewModel(),
                 new CreateDerivedKeyPasswordViewModel(),
                 new WriteDerivedKeyPasswordViewModel(),
                 new CreateStoragePasswordViewModel(App)
@@ -196,7 +148,7 @@ namespace Atomex.Client.Desktop.ViewModels
                 {
                     if (Step == ViewIndexes.Length - 1)
                     {
-                        OnAccountCreated?.Invoke((IAccount) arg);
+                        OnAccountCreated?.Invoke((IAccount)arg);
                         return;
                     }
 
@@ -209,31 +161,31 @@ namespace Atomex.Client.Desktop.ViewModels
 
             Step = 0;
             StepsCount = ViewIndexes.Length;
+            BackText = Properties.Resources.CwvBack;
+            NextText = Properties.Resources.CwvNext;
             CanBack = true;
             CanNext = true;
         }
 
-        private ICommand _backCommand;
+        private ICommand? _backCommand;
 
         public ICommand BackCommand =>
             _backCommand ??= ReactiveCommand.Create(() => { ViewModels[CurrentViewIndex].Back(); });
 
 
-        private ICommand _nextCommand;
+        private ICommand? _nextCommand;
 
         public ICommand NextCommand =>
             _nextCommand ??= ReactiveCommand.Create(() => { ViewModels[CurrentViewIndex].Next(); });
 
-        private int[] ResolveViewIndexes(
-            CreateWalletScenario scenario)
+        private int[] ResolveViewIndexes(CreateWalletScenario scenario)
         {
-            if (scenario == CreateWalletScenario.CreateNew)
-                return CreateNewWalletViewIndexes;
-
-            if (scenario == CreateWalletScenario.Restore)
-                return RestoreWalletViewIndexes;
-
-            throw new ArgumentOutOfRangeException(nameof(scenario), scenario, null);
+            return scenario switch
+            {
+                CreateWalletScenario.CreateNew => CreateNewWalletViewIndexes,
+                CreateWalletScenario.Restore => RestoreWalletViewIndexes,
+                _ => throw new ArgumentOutOfRangeException(nameof(scenario), scenario, null)
+            };
         }
 
         private void DesignerMode()
