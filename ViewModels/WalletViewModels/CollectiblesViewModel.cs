@@ -8,6 +8,7 @@ using Atomex.Blockchain.Tezos;
 using Atomex.Client.Common;
 using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
+using Atomex.ViewModels;
 using Atomex.Wallet;
 using Atomex.Wallet.Tezos;
 using Avalonia.Controls;
@@ -21,9 +22,8 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
     public class Collectible : ViewModelBase
     {
         public IEnumerable<TezosTokenViewModel> Tokens { get; set; }
-        public string Name => Tokens.First().Contract?.Name ?? Tokens.First().Contract.Address;
+        public string Name => Tokens.First().Contract?.Name ?? Tokens.First().Contract.Address.TruncateAddress();
         public string PreviewUrl => Tokens.First().NftPreview;
-
         public int Amount => Tokens
             .Aggregate(0, (result, tokenViewModel) => result + decimal.ToInt32(tokenViewModel.TotalAmount));
 
@@ -40,10 +40,13 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         private readonly IAtomexApp _app;
         [Reactive] private ObservableCollection<TokenContract>? Contracts { get; set; }
         [Reactive] public ObservableCollection<Collectible> Collectibles { get; set; }
+        private Action<IEnumerable<TezosTokenViewModel>> ShowTezosCollection { get; }
 
-        public CollectiblesViewModel(IAtomexApp app)
+        public CollectiblesViewModel(IAtomexApp app, Action<IEnumerable<TezosTokenViewModel>> showTezosCollection)
         {
             _app = app ?? throw new ArgumentNullException(nameof(app));
+            ShowTezosCollection = showTezosCollection ?? throw new ArgumentNullException(nameof(showTezosCollection));
+
             _app.AtomexClientChanged += OnAtomexClientChanged;
             _app.Account.BalanceUpdated += OnBalanceUpdatedEventHandler;
 
@@ -101,14 +104,9 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                 .Select(nftGroup => new Collectible
                 {
                     Tokens = nftGroup.Select(g => g),
-                    OnCollectionClick = ShowCollection
+                    OnCollectionClick = tokens => ShowTezosCollection.Invoke(tokens)
                 })
                 .OrderByDescending(collectible => collectible.Amount));
-        }
-
-        private void ShowCollection(IEnumerable<TezosTokenViewModel> tokens)
-        {
-            var a = 5;
         }
 
         public CollectiblesViewModel()

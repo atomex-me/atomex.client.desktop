@@ -1,24 +1,17 @@
-<UserControl xmlns="https://github.com/avaloniaui"
+﻿<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:walletViewModels="clr-namespace:Atomex.Client.Desktop.ViewModels.WalletViewModels"
-             xmlns:converters="clr-namespace:Atomex.Client.Desktop.Converters"
              xmlns:asyncImageLoader="clr-namespace:AsyncImageLoader;assembly=AsyncImageLoader.Avalonia"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             x:Class="Atomex.Client.Desktop.Views.WalletViews.CollectiblesView">
+             x:Class="Atomex.Client.Desktop.Views.WalletViews.CollectiblesWalletView">
+
     <Design.DataContext>
-        <walletViewModels:CollectiblesViewModel />
+        <walletViewModels:CollectiblesWalletViewModel />
     </Design.DataContext>
 
-    <Design.DesignStyle>
-        <Style Selector="ListBox.Designer">
-            <Setter Property="Background" Value="#122B50" />
-        </Style>
-    </Design.DesignStyle>
-
-    <ListBox Items="{Binding Collectibles}"
-             Classes="Designer">
+    <ListBox Items="{Binding Tokens}">
         <ListBox.Styles>
             <Style Selector="ListBox">
                 <Setter Property="Background" Value="Transparent" />
@@ -45,7 +38,8 @@
         </ListBox.Styles>
         <ListBox.ItemTemplate>
             <DataTemplate>
-                <Button Command="{Binding OnCollectionClickCommand}"
+                <Button Command="{Binding $parent[ListBox].DataContext.OnCollectibleClickCommand}"
+                        CommandParameter="{Binding}"
                         HorizontalAlignment="Stretch"
                         VerticalAlignment="Stretch"
                         Padding="0"
@@ -58,35 +52,23 @@
                                 HorizontalAlignment="Stretch"
                                 ClipToBounds="True"
                                 CornerRadius="8">
-                            <Image asyncImageLoader:ImageLoader.Source="{Binding PreviewUrl}"
+                            <Image asyncImageLoader:ImageLoader.Source="{Binding NftPreview}"
                                    StretchDirection="Both"
                                    Stretch="UniformToFill" />
                         </Border>
                         <StackPanel Grid.Column="0"
                                     Grid.Row="1"
                                     Margin="0 10 0 0">
-
                             <TextBlock Foreground="{DynamicResource DefaultForegroundBrush}"
                                        FontSize="16"
                                        TextTrimming="CharacterEllipsis"
-                                       Text="{Binding Name}" />
-
-                            <StackPanel Orientation="Horizontal"
-                                        Margin="0 4 0 0">
-                                <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
-                                           FontSize="13"
-                                           Text="{Binding Amount}" />
-                                <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
-                                           FontSize="13"
-                                           IsVisible="{Binding Amount,
-                                       Converter={x:Static converters:NumericConverters.IsOne}}"
-                                           Text=" collectible" />
-                                <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
-                                           FontSize="13"
-                                           IsVisible="{Binding Amount,
-                                       Converter={x:Static converters:NumericConverters.GreaterThanOne}}"
-                                           Text=" collectibles" />
-                            </StackPanel>
+                                       Text="{Binding TokenBalance.Name}" />
+                            
+                            <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
+                                       Margin="0 4 0 0"
+                                       FontSize="13"
+                                       TextTrimming="CharacterEllipsis"
+                                       Text="{Binding TokenBalance.Description}" />
                         </StackPanel>
                     </Grid>
                 </Button>

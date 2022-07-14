@@ -48,6 +48,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             Action<string>? setWertCurrency,
             Action<ViewModelBase?> showRightPopupContent,
             Action<TezosTokenViewModel> showTezosToken,
+            Action<IEnumerable<TezosTokenViewModel>> showTezosCollection,
             CurrencyConfig currency)
             : base(app, setConversionTab, setWertCurrency, showRightPopupContent, currency)
         {
@@ -71,7 +72,8 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
             DelegateViewModel = new DelegateViewModel(_app);
             TezosTokensViewModel = new TezosTokensViewModel(_app, showTezosToken, setConversionTab);
-            CollectiblesViewModel = new CollectiblesViewModel(_app);
+            CollectiblesViewModel = new CollectiblesViewModel(_app, showTezosCollection);
+            
             CurrentDelegationSortField = DelegationSortField.ByBalance;
             CurrentDelegationSortDirection = SortDirection.Desc;
         }
