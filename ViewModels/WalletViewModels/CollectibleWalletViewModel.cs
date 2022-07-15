@@ -6,6 +6,5 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
     public class CollectibleWalletViewModel : WalletViewModel
     {
         [Reactive] public TezosTokenViewModel Collectible { get; set; }
-        public string NftPreview => "https://thumbs.dipdup.net/QmbJ2ZNCgpUZfQHAtCHZ3CcXxpoqhkvxrK7PEN8dpy2LcW";
     }
 }

@@ -12,6 +12,7 @@ using Atomex.ViewModels;
 using Atomex.Wallet;
 using Atomex.Wallet.Tezos;
 using Avalonia.Controls;
+using Avalonia.Media.Imaging;
 using Avalonia.Threading;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
@@ -22,9 +23,49 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
     public class Collectible : ViewModelBase
     {
         public IEnumerable<TezosTokenViewModel> Tokens { get; set; }
-        public string Name => Tokens.First().Contract?.Name ?? Tokens.First().Contract.Address.TruncateAddress();
-        // public string PreviewUrl => Tokens.First().NftPreview;
-        public string PreviewUrl => "https://thumbs.dipdup.net/QmbJ2ZNCgpUZfQHAtCHZ3CcXxpoqhkvxrK7PEN8dpy2LcW";
+        public string Name => Tokens.First().Contract.Name ?? Tokens.First().Contract.Address.TruncateAddress();
+
+        private bool _isPreviewDownloading;
+
+        public IBitmap? BitmapIcon
+        {
+            get
+            {
+                if (_isPreviewDownloading)
+                    return null;
+
+                var previewUrl = ThumbsApi.GetCollectiblePreviewUrl(Tokens.First().Contract.Address,
+                    Tokens.First().TokenBalance.TokenId);
+
+                try
+                {
+                    if (App.ImageService.TryGetImage(previewUrl, out var image)) return image;
+
+                    _isPreviewDownloading = true;
+                    _ = Task.Run(() =>
+                    {
+                        _ = App.ImageService.LoadImageFromUrl(previewUrl, () =>
+                        {
+                            _isPreviewDownloading = false;
+                            _ = Dispatcher.UIThread.InvokeAsync(() => OnPropertyChanged(nameof(BitmapIcon)));
+                        });
+                    });
+
+                    return null;
+                }
+                catch (Exception)
+                {
+                    Log.Error("Error during loading preview for Tezos token {Contract} {TokenId}",
+                        Tokens.First().Contract.Address, Tokens.First().TokenBalance.TokenId);
+                    return null;
+                }
+                finally
+                {
+                    _isPreviewDownloading = false;
+                }
+            }
+        }
+
         public int Amount => Tokens
             .Aggregate(0, (result, tokenViewModel) => result + decimal.ToInt32(tokenViewModel.TotalAmount));
 

@@ -43,7 +43,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                 if (_isPreviewDownloading)
                     return null;
 
-                if (App.ImageService.GetImageLoaded(IconUrl)) return App.ImageService.GetImage(IconUrl);
+                if (App.ImageService.TryGetImage(IconUrl, out var img)) return img;
 
                 // start async download
                 _ = Task.Run(async () =>
@@ -175,8 +175,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                 if (TokenContractIconUrl == null)
                     return null;
 
-                if (App.ImageService.GetImageLoaded(TokenContractIconUrl))
-                    return App.ImageService.GetImage(TokenContractIconUrl);
+                if (App.ImageService.TryGetImage(TokenContractIconUrl, out var img)) return img;
 
                 // start async download
                 _ = Task.Run(async () =>

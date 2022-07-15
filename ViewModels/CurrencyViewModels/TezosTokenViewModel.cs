@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Reactive;
@@ -77,31 +78,45 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
                 if (_isPreviewDownloading)
                     return null;
 
-                foreach (var url in ThumbsApi.GetTokenPreviewUrls(TokenBalance.Contract, TokenBalance.ThumbnailUri,
-                             TokenBalance.DisplayUri ?? TokenBalance.ArtifactUri))
+                var previewUrlSources = TokenBalance.IsNft
+                    ? new List<string>
+                        { ThumbsApi.GetCollectiblePreviewUrl(TokenBalance.Contract, TokenBalance.TokenId) }
+                    : new List<string>(ThumbsApi.GetTokenPreviewUrls(TokenBalance.Contract, TokenBalance.ThumbnailUri,
+                        TokenBalance.DisplayUri ?? TokenBalance.ArtifactUri));
+
+                try
                 {
-                    if (App.ImageService.GetImageLoaded(url)) return App.ImageService.GetImage(url);
-
-                    // start async download
-                    _ = Task.Run(async () =>
+                    foreach (var url in previewUrlSources)
                     {
-                        _isPreviewDownloading = true;
+                        if (App.ImageService.TryGetImage(url, out var image)) return image;
 
-                        _ = App.ImageService.LoadImageFromUrl(url, async () =>
+                        _isPreviewDownloading = true;
+                        _ = Task.Run(() =>
                         {
-                            _isPreviewDownloading = false;
-                            await Dispatcher.UIThread.InvokeAsync(() => { OnPropertyChanged(nameof(BitmapIcon)); });
+                            _ = App.ImageService.LoadImageFromUrl(url, () =>
+                            {
+                                _isPreviewDownloading = false;
+                                _ = Dispatcher.UIThread.InvokeAsync(() => OnPropertyChanged(nameof(BitmapIcon)));
+                            });
                         });
-                    });
+
+                        return null;
+                    }
 
                     return null;
                 }
-
-                return null;
+                catch (Exception)
+                {
+                    Log.Error("Error during loading preview for Tezos token {Contract} {TokenId}",
+                        TokenBalance.Contract, TokenBalance.TokenId);
+                    return null;
+                }
+                finally
+                {
+                    _isPreviewDownloading = false;
+                }
             }
         }
-
-        public string NftPreview =>$"https://thumbs.dipdup.net/QmbJ2ZNCgpUZfQHAtCHZ3CcXxpoqhkvxrK7PEN8dpy2LcW";
 
         public TezosTokenViewModel()
         {
@@ -233,27 +248,26 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
 
         private ReactiveCommand<Unit, Unit>? _exchangeCommand;
 
-        public ReactiveCommand<Unit, Unit> ExchangeCommand => _exchangeCommand ??= ReactiveCommand.Create(
-            () =>
-            {
-                var currency = AtomexApp.Account
-                    .Currencies
-                    .FirstOrDefault(c => c is TezosTokenConfig tokenConfig &&
-                                         tokenConfig.TokenContractAddress == Contract.Address &&
-                                         tokenConfig.TokenId == TokenBalance.TokenId);
+        public ReactiveCommand<Unit, Unit> ExchangeCommand => _exchangeCommand ??= ReactiveCommand.Create(() =>
+        {
+            var currency = AtomexApp.Account
+                .Currencies
+                .FirstOrDefault(c => c is TezosTokenConfig tokenConfig &&
+                                     tokenConfig.TokenContractAddress == Contract.Address &&
+                                     tokenConfig.TokenId == TokenBalance.TokenId);
 
-                if (currency != null)
-                    SetConversionTab?.Invoke(currency);
-            });
+            if (currency != null)
+                SetConversionTab?.Invoke(currency);
+        });
 
         public Action<TezosTokenViewModel> SendCallback;
 
-        private ReactiveCommand<Unit, Unit> _send;
+        private ReactiveCommand<Unit, Unit>? _send;
 
         public ReactiveCommand<Unit, Unit> Send =>
             _send ??= ReactiveCommand.Create(() => { SendCallback?.Invoke(this); });
 
-        private ReactiveCommand<Unit, Unit> _openInBrowser;
+        private ReactiveCommand<Unit, Unit>? _openInBrowser;
 
         public ReactiveCommand<Unit, Unit> OpenInBrowser => _openInBrowser ??= ReactiveCommand.Create(() =>
         {
@@ -265,12 +279,12 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
                 Log.Error("Invalid uri for ipfs asset");
         });
 
-        private ReactiveCommand<Unit, Unit> _openPopupCommand;
+        private ReactiveCommand<Unit, Unit>? _openPopupCommand;
 
         private ReactiveCommand<Unit, Unit> OpenPopupCommand => _openPopupCommand ??=
             ReactiveCommand.Create(() => { IsPopupOpened = !IsPopupOpened; });
 
-        private ReactiveCommand<string, Unit> _openAddressInExplorerCommand;
+        private ReactiveCommand<string, Unit>? _openAddressInExplorerCommand;
 
         public ReactiveCommand<string, Unit> OpenAddressInExplorerCommand => _openAddressInExplorerCommand ??=
             ReactiveCommand.Create<string>((address) =>
@@ -284,7 +298,7 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
                     Log.Error("Invalid uri for address explorer");
             });
 
-        private ReactiveCommand<string, Unit> _copyAddressCommand;
+        private ReactiveCommand<string, Unit>? _copyAddressCommand;
 
         public ReactiveCommand<string, Unit> CopyAddressCommand => _copyAddressCommand ??=
             ReactiveCommand.Create<string>((s) =>
