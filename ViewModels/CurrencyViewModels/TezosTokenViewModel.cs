@@ -117,6 +117,8 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
                 }
             }
         }
+        
+        public string CollectiblePreviewUrl => ThumbsApi.GetCollectiblePreviewUrl(Contract.Address, TokenBalance.TokenId);
 
         public TezosTokenViewModel()
         {

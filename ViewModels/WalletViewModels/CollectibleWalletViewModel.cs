@@ -9,28 +9,25 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 {
     public class CollectibleWalletViewModel : WalletViewModel
     {
-        // private readonly IAtomexApp _app;
-        private readonly TezosConfig TezosConfig;
+        private readonly TezosConfig _tezosConfig;
         [Reactive] public TezosTokenViewModel Collectible { get; set; }
-        public string ContractExplorerUri => $"{TezosConfig.AddressExplorerUri}{Collectible.Contract.Address}";
+        public string ContractExplorerUri => $"{_tezosConfig.AddressExplorerUri}{Collectible.Contract.Address}";
 
         public CollectibleWalletViewModel(IAtomexApp app, Action<ViewModelBase?> showRightPopupContent)
             : base(app: app, showRightPopupContent)
         {
-            // _app = app ?? throw new ArgumentNullException(nameof(app));
-
-            TezosConfig = app.Account
+            _tezosConfig = app.Account
                 .Currencies
                 .Get<TezosConfig>(TezosConfig.Xtz);
         }
 
 
-        private ReactiveCommand<Unit, Unit>? _openInExplorerCommand;
+        private ReactiveCommand<string, Unit>? _openInExplorerCommand;
 
-        public ReactiveCommand<Unit, Unit> OpenInExplorerCommand => _openInExplorerCommand ??= ReactiveCommand.Create(
-            () =>
+        public ReactiveCommand<string, Unit> OpenInExplorerCommand => _openInExplorerCommand ??= 
+            ReactiveCommand.Create<string>(address =>
             {
-                if (Uri.TryCreate(ContractExplorerUri, UriKind.Absolute, out var uri))
+                if (Uri.TryCreate(address, UriKind.Absolute, out var uri))
                     App.OpenBrowser(uri.ToString());
             });
     }

@@ -6,6 +6,7 @@
              xmlns:walletViewModels="clr-namespace:Atomex.Client.Desktop.ViewModels.WalletViewModels"
              xmlns:controls="clr-namespace:Atomex.Client.Desktop.Controls"
              xmlns:converters="clr-namespace:Atomex.Client.Desktop.Converters"
+             xmlns:asyncImageLoader="clr-namespace:AsyncImageLoader;assembly=AsyncImageLoader.Avalonia"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="Atomex.Client.Desktop.Views.WalletViews.CollectibleWalletView">
     <Design.DataContext>
@@ -25,7 +26,7 @@
                     HorizontalAlignment="Stretch"
                     ClipToBounds="True"
                     CornerRadius="8">
-                <Image Source="{Binding Collectible.BitmapIcon}"
+                <Image asyncImageLoader:ImageLoader.Source="{Binding Collectible.CollectiblePreviewUrl}"
                        StretchDirection="Both"
                        Stretch="UniformToFill" />
             </Border>
@@ -72,7 +73,8 @@
                                              Content="{Binding Collectible.Contract.Address,
                                              Converter={x:Static converters:StringConverters.ToShortenedAddress}}"
                                              ToolText="{Binding ContractExplorerUri}"
-                                             Command="{Binding OpenInExplorerCommand}" />
+                                             Command="{Binding OpenInExplorerCommand}"
+                                             CommandParameter="{Binding ContractExplorerUri}" />
                     </StackPanel>
 
                     <StackPanel Orientation="Horizontal">
@@ -113,7 +115,8 @@
 
                     <controls:RoundedButton Height="46"
                                             Width="190"
-                                            Command="{Binding SendCommand}"
+                                            Command="{Binding OpenInExplorerCommand}"
+                                            CommandParameter="{Binding Collectible.AssetUrl}"
                                             Classes="GrayButton">
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Margin="0 0 12 0"
