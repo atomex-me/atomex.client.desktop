@@ -27,11 +27,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         public TezosTokenWalletViewModel(
             IAtomexApp app,
             Action<ViewModelBase?> showRightPopupContent) :
-            base(app: app,
-                showRightPopupContent: showRightPopupContent,
-                setConversionTab: null,
-                setWertCurrency: null,
-                currency: null)
+            base(app: app, showRightPopupContent: showRightPopupContent)
         {
             this.WhenAnyValue(vm => vm.TokenViewModel)
                 .WhereNotNull()

@@ -207,13 +207,9 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
 
         private ReceiveViewModel GetReceiveDialog()
         {
-            var tezosConfig = AtomexApp.Account
-                .Currencies
-                .GetByName(TezosConfig.Xtz);
-
             return new ReceiveViewModel(
                 app: AtomexApp,
-                currency: tezosConfig,
+                currency: TezosConfig,
                 tokenContract: Contract.Address,
                 tokenType: Contract.GetContractType());
         }

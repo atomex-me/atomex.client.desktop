@@ -58,10 +58,10 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
         public WalletViewModel(
             IAtomexApp app,
-            Action<CurrencyConfig>? setConversionTab,
-            Action<string>? setWertCurrency,
             Action<ViewModelBase?> showRightPopupContent,
-            CurrencyConfig? currency)
+            CurrencyConfig? currency = null,
+            Action<CurrencyConfig>? setConversionTab = null,
+            Action<string>? setWertCurrency = null)
         {
             _app = app ?? throw new ArgumentNullException(nameof(app));
             ShowRightPopupContent = showRightPopupContent ??

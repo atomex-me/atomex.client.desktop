@@ -21,7 +21,6 @@
         <converters:StringsConcatConverter x:Key="StringsConcatConverter" />
         <converters:AddressShouldShrinkConverter x:Key="AddressShouldShrinkConverter" />
         <converters:AddressShouldExpandConverter x:Key="AddressShouldExpandConverter" />
-        <converters:ShortenedAddressConverter x:Key="ShortenedAddressConverter" />
         <converters:ObjectsEqualConverter x:Key="ObjectsEqualConverter" />
         <converters:PercentConverter x:Key="PercentConverter" />
     </UserControl.Resources>
@@ -302,7 +301,8 @@
                                                              Classes="SolidHover"
                                                              FontSize="16"
                                                              HorizontalAlignment="Left"
-                                                             Content="{Binding Address, Converter={StaticResource ShortenedAddressConverter}}"
+                                                             Content="{Binding Address,
+                                                             Converter={x:Static converters:StringConverters.ToLongShortenedAddress}}"
                                                              Command="{Binding $parent[ListBox].DataContext.OpenAddressInExplorerCommand}"
                                                              CommandParameter="{Binding Address}"
                                                              IsVisible="{Binding $parent[Border].Bounds.Width,

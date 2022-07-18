@@ -2,7 +2,10 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:svg="clr-namespace:Avalonia.Svg.Skia;assembly=Avalonia.Svg.Skia"
              xmlns:walletViewModels="clr-namespace:Atomex.Client.Desktop.ViewModels.WalletViewModels"
+             xmlns:controls="clr-namespace:Atomex.Client.Desktop.Controls"
+             xmlns:converters="clr-namespace:Atomex.Client.Desktop.Converters"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="Atomex.Client.Desktop.Views.WalletViews.CollectibleWalletView">
     <Design.DataContext>
@@ -10,10 +13,10 @@
     </Design.DataContext>
 
     <Grid RowDefinitions="Auto,*"
-          ColumnDefinitions="*,280">
+          Margin="0 32 0 0">
 
-        <Grid Grid.Row="0"
-              Grid.Column="0"
+        <Grid Grid.Column="0"
+              Grid.Row="0"
               ColumnDefinitions="252,*"
               RowDefinitions="252">
             <Border Grid.Column="0"
@@ -26,6 +29,104 @@
                        StretchDirection="Both"
                        Stretch="UniformToFill" />
             </Border>
+
+            <Grid Grid.Column="1"
+                  Grid.Row="0"
+                  HorizontalAlignment="Stretch"
+                  ColumnDefinitions="*"
+                  RowDefinitions="*,Auto"
+                  Margin="32 0 0 0">
+
+                <StackPanel Grid.Row="0">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Foreground="{DynamicResource DefaultForegroundBrush}"
+                                   FontSize="32"
+                                   LineHeight="40"
+                                   MaxWidth="470"
+                                   TextTrimming="CharacterEllipsis"
+                                   Text="{Binding Collectible.TokenBalance.Name}" />
+
+                        <controls:IconButton Classes="Update Big WithToolTipContent"
+                                             HorizontalAlignment="Left"
+                                             Margin="16 0 0 0"
+                                             Classes.Updating="{Binding IsBalanceUpdating}"
+                                             Classes.NotUpdating="{Binding IsBalanceUpdating,
+                                                         Converter={x:Static BoolConverters.Not}}"
+                                             Command="{Binding UpdateCommand}">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="Update " />
+                                <TextBlock Text="{Binding Collectible.TokenBalance.Name}" />
+                            </StackPanel>
+                        </controls:IconButton>
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal"
+                                Margin="0 12 0 0">
+                        <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
+                                   FontSize="16"
+                                   Text="Contract " />
+
+                        <controls:LinkButton Underlined="True"
+                                             Classes="SolidHover"
+                                             FontSize="16"
+                                             Content="{Binding Collectible.Contract.Address,
+                                             Converter={x:Static converters:StringConverters.ToShortenedAddress}}"
+                                             ToolText="{Binding ContractExplorerUri}"
+                                             Command="{Binding OpenInExplorerCommand}" />
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
+                                   FontSize="16"
+                                   Text="Token ID #" />
+                        <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
+                                   FontSize="16"
+                                   Text="{Binding Collectible.TokenBalance.TokenId}" />
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
+                                   FontSize="16"
+                                   Text="Amount " />
+                        <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
+                                   FontSize="16"
+                                   Text="{Binding Collectible.TotalAmount}" />
+                    </StackPanel>
+
+                    <TextBlock Foreground="{DynamicResource DefaultForegroundBrush}"
+                               FontSize="16"
+                               Margin="0 16 0 0"
+                               Text="{Binding Collectible.TokenBalance.Description}"
+                               TextTrimming="CharacterEllipsis"
+                               MaxHeight="50" />
+                </StackPanel>
+
+                <StackPanel Grid.Row="1" Orientation="Horizontal">
+                    <controls:RoundedButton Height="46"
+                                            Width="190"
+                                            Command="{Binding SendCommand}"
+                                            Margin="0 0 12 0">
+                        <TextBlock Text="Send"
+                                   FontSize="18"
+                                   Foreground="{DynamicResource RoundedButtonForegroundBrush}" />
+                    </controls:RoundedButton>
+
+                    <controls:RoundedButton Height="46"
+                                            Width="190"
+                                            Command="{Binding SendCommand}"
+                                            Classes="GrayButton">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Margin="0 0 12 0"
+                                       Text="View on ipfs"
+                                       FontSize="18"
+                                       Foreground="{DynamicResource RoundedButtonForegroundBrush}" />
+                            <svg:Svg HorizontalAlignment="Center"
+                                     Width="18"
+                                     Path="/Resources/Icons/link-icon.svg" />
+                        </StackPanel>
+                    </controls:RoundedButton>
+                </StackPanel>
+            </Grid>
         </Grid>
 
         <TabControl Grid.Row="1"

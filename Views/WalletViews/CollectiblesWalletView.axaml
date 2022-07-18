@@ -10,7 +10,8 @@
         <walletViewModels:CollectiblesWalletViewModel />
     </Design.DataContext>
     
-    <ListBox Items="{Binding Tokens}">
+    <ListBox Items="{Binding Tokens}"
+             Margin="0 4 0 0">
         <ListBox.Styles>
             <Style Selector="ListBox">
                 <Setter Property="Background" Value="Transparent" />

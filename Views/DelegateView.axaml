@@ -17,7 +17,6 @@
 
     <UserControl.Resources>
         <converters:PercentConverter x:Key="PercentConverter" />
-        <converters:ShortenedAddressConverter x:Key="ShortenedAddressConverter" />
         <converters:AmountToStringConverter x:Key="AmountToStringConverter" />
     </UserControl.Resources>
 
@@ -426,8 +425,7 @@
                                    FontSize="16"
                                    VerticalAlignment="Center"
                                    Text="{Binding DelegateAddress,
-                                   Converter={StaticResource ShortenedAddressConverter},
-                                   ConverterParameter={x:Static abstract:AddressTruncateType.Short}}" />
+                                   Converter={x:Static converters:StringConverters.ToShortenedAddress}}" />
 
                         <controls:CopyButton ToolText="Copy your delegating address"
                                              DoneToolText="Copied!"
@@ -455,8 +453,7 @@
                                    FontSize="16"
                                    VerticalAlignment="Center"
                                    Text="{Binding SelectedBaker.Address,
-                                   Converter={StaticResource ShortenedAddressConverter},
-                                   ConverterParameter={x:Static abstract:AddressTruncateType.Short}}" />
+                                   Converter={x:Static converters:StringConverters.ToShortenedAddress}}" />
 
                         <controls:CopyButton ToolText="Copy baker address"
                                              DoneToolText="Copied!"

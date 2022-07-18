@@ -220,7 +220,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             Action<CurrencyConfig> setConversionTab,
             Action<string>? setWertCurrency,
             Action<ViewModelBase?> showRightPopupContent
-        ) : base(app, setConversionTab, setWertCurrency, showRightPopupContent, null)
+        ) : base(app, showRightPopupContent, setConversionTab : setConversionTab, setWertCurrency: setWertCurrency)
         {
             _ = ReloadTokenContractsAsync();
         }
