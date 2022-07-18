@@ -72,9 +72,9 @@
                                              FontSize="16"
                                              Content="{Binding Collectible.Contract.Address,
                                              Converter={x:Static converters:StringConverters.ToShortenedAddress}}"
-                                             ToolText="{Binding ContractExplorerUri}"
+                                             ToolText="{Binding TokenExplorerUri}"
                                              Command="{Binding OpenInExplorerCommand}"
-                                             CommandParameter="{Binding ContractExplorerUri}" />
+                                             CommandParameter="{Binding TokenExplorerUri}" />
                     </StackPanel>
 
                     <StackPanel Orientation="Horizontal">
@@ -145,13 +145,12 @@
                                FontSize="16"
                                Text="Activity" />
                 </TabItem.Header>
-
-                <!-- <controls:TransactionsList Margin="0 16 0 0" -->
-                <!--                            Transactions="{Binding Transactions}" -->
-                <!--                            SelectedTransaction="{Binding SelectedTransaction}" -->
-                <!--                            CurrentSortField="{Binding CurrentSortField}" -->
-                <!--                            CurrentSortDirection="{Binding CurrentSortDirection}" -->
-                <!--                            SetSortTypeCommand="{Binding SetSortTypeCommand}" /> -->
+                <controls:TransactionsList Margin="0 16 0 0"
+                                           Transactions="{Binding Transactions}"
+                                           SelectedTransaction="{Binding SelectedTransaction}"
+                                           CurrentSortField="{Binding CurrentSortField}"
+                                           CurrentSortDirection="{Binding CurrentSortDirection}"
+                                           SetSortTypeCommand="{Binding SetSortTypeCommand}" />
             </TabItem>
             <TabItem Margin="16 0 0 0"
                      Classes="WalletTabItem">
@@ -160,7 +159,7 @@
                                FontSize="16"
                                Text="Addresses" />
                 </TabItem.Header>
-                <!-- <ContentControl Content="{Binding AddressesViewModel}" /> -->
+                <ContentControl Content="{Binding AddressesViewModel}" />
             </TabItem>
         </TabControl>
     </Grid>

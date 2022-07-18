@@ -98,7 +98,6 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         {
             try
             {
-                //if (!Currencies.IsTezosBased(args.Currency) || TokenViewModel == null) return;
                 if (!args.IsTokenUpdate ||
                     TokenViewModel == null ||
                     args.TokenContract != null && (args.TokenContract != TokenViewModel.Contract.Address || args.TokenId != TokenViewModel.TokenBalance.TokenId))
