@@ -138,7 +138,7 @@ namespace Atomex.Client.Desktop
         {
             get
             {
-                var resourceName = "currencies.json";
+                const string resourceName = "currencies.json";
                 var resourceNames = CoreAssembly.GetManifestResourceNames();
                 var fullFileName = resourceNames.FirstOrDefault(n => n.EndsWith(resourceName));
                 var stream = CoreAssembly.GetManifestResourceStream(fullFileName!);

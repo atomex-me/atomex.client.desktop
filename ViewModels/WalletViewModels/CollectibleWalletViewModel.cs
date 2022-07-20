@@ -5,6 +5,7 @@ using System.Reactive;
 using System.Threading.Tasks;
 using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
+using Atomex.Client.Desktop.ViewModels.SendViewModels;
 using Atomex.Client.Desktop.ViewModels.TransactionViewModels;
 using Atomex.Common;
 using Atomex.Wallet;
@@ -21,7 +22,9 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
     {
         private readonly TezosConfig _tezosConfig;
         [Reactive] public TezosTokenViewModel? Collectible { get; set; }
-        public string TokenExplorerUri => $"{_tezosConfig.AddressExplorerUri}{Collectible?.Contract.Address}/tokens/{Collectible?.TokenBalance.TokenId}";
+
+        public string TokenExplorerUri =>
+            $"{_tezosConfig.AddressExplorerUri}{Collectible?.Contract.Address}/tokens/{Collectible?.TokenBalance.TokenId}";
 
         public CollectibleWalletViewModel(IAtomexApp app, Action<ViewModelBase?> showRightPopupContent)
             : base(app: app, showRightPopupContent)
@@ -128,6 +131,20 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                 tokenId: Collectible.TokenBalance.TokenId);
         }
 
+        protected override void OnSendClick()
+        {
+            if (Collectible == null) return;
+
+            var sendViewModel = new CollectibleSendViewModel(
+                app: _app,
+                tokenContract: Collectible.Contract.Address,
+                tokenId: (int)Collectible.TokenBalance.TokenId,
+                tokenType: Collectible.Contract.GetContractType(),
+                previewUrl: Collectible.CollectiblePreviewUrl,
+                from: null);
+
+            App.DialogService.Show(sendViewModel.SelectFromViewModel);
+        }
 
         private ReactiveCommand<string, Unit>? _openInExplorerCommand;
 

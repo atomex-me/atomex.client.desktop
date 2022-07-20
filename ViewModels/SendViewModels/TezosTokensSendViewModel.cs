@@ -31,23 +31,23 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         public const string DefaultBaseCurrencyCode = "USD";
         public const string DefaultBaseCurrencyFormat = "$0.00";
 
-        private readonly IAtomexApp _app;
+        protected readonly IAtomexApp _app;
         [Reactive] public decimal SelectedFromBalance { get; set; }
         [Reactive] public string From { get; set; }
         [ObservableAsProperty] public string FromBeautified { get; }
-        [Reactive] private string TokenContract { get; set; }
+        [Reactive] protected string TokenContract { get; set; }
         [ObservableAsProperty] public string TokenContractBeautified { get; }
         [Reactive] public int TokenId { get; set; }
         [Reactive] public string To { get; set; }
         [Reactive] public IBitmap? TokenPreview { get; set; }
-        private readonly string _tokenType;
+        protected readonly string _tokenType;
         public bool IsFa2 => _tokenType == "FA2";
 
         [Reactive] public string CurrencyFormat { get; set; }
-        private string FeeCurrencyFormat { get; set; }
+        protected string FeeCurrencyFormat { get; set; }
         [Reactive] public string BaseCurrencyFormat { get; set; }
-        [Reactive] private decimal Amount { get; set; }
-        [Reactive] private decimal Fee { get; set; }
+        [Reactive] protected decimal Amount { get; set; }
+        [Reactive] protected decimal Fee { get; set; }
         [Reactive] public bool UseDefaultFee { get; set; }
         [Reactive] public decimal AmountInBase { get; set; }
         [Reactive] public decimal FeeInBase { get; set; }
@@ -209,27 +209,27 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 _app.QuotesProvider.QuotesUpdated += OnQuotesUpdatedEventHandler;
         }
 
-        private ReactiveCommand<Unit, Unit> _backCommand;
+        private ReactiveCommand<Unit, Unit>? _backCommand;
         public ReactiveCommand<Unit, Unit> BackCommand => _backCommand ??= (_backCommand = ReactiveCommand.Create(() =>
         {
             App.DialogService.Close();
         }));
 
-        private ReactiveCommand<Unit, Unit> _nextCommand;
+        private ReactiveCommand<Unit, Unit>? _nextCommand;
         public ReactiveCommand<Unit, Unit> NextCommand => _nextCommand ??= ReactiveCommand.CreateFromTask(OnNextCommand);
 
-        private ReactiveCommand<Unit, Unit> _maxCommand;
+        private ReactiveCommand<Unit, Unit>? _maxCommand;
         public ReactiveCommand<Unit, Unit> MaxCommand => _maxCommand ??= ReactiveCommand.Create(OnMaxClick);
 
-        private ReactiveCommand<Unit, Unit> _undoConfirmStageCommand;
+        private ReactiveCommand<Unit, Unit>? _undoConfirmStageCommand;
         public ReactiveCommand<Unit, Unit> UndoConfirmStageCommand => _undoConfirmStageCommand ??=
             (_undoConfirmStageCommand = ReactiveCommand.Create(() => { ConfirmStage = false; }));
 
-        private ReactiveCommand<Unit, Unit> _selectFromCommand;
+        private ReactiveCommand<Unit, Unit>? _selectFromCommand;
         public ReactiveCommand<Unit, Unit> SelectFromCommand => _selectFromCommand ??=
             (_selectFromCommand = ReactiveCommand.Create(FromClick));
 
-        private ReactiveCommand<Unit, Unit> _selectToCommand;
+        private ReactiveCommand<Unit, Unit>? _selectToCommand;
         public ReactiveCommand<Unit, Unit> SelectToCommand => _selectToCommand ??=
             (_selectToCommand = ReactiveCommand.Create(ToClick));
 
@@ -554,7 +554,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             }
         }
 
-        protected void OnQuotesUpdatedEventHandler(object? sender, EventArgs args)
+        private void OnQuotesUpdatedEventHandler(object? sender, EventArgs args)
         {
             if (sender is not IQuotesProvider quotesProvider)
                 return;
