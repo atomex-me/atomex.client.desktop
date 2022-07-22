@@ -4,14 +4,12 @@ using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-
 using Avalonia.Controls;
 using Avalonia.Media.Imaging;
 using Avalonia.Threading;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using Serilog;
-
 using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.Properties;
 using Atomex.Client.Desktop.ViewModels.Abstract;
@@ -79,7 +77,8 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             string tokenType,
             IBitmap? tokenPreview,
             string? balanceFormat = null,
-            string? from = null)
+            string? from = null,
+            bool showToSelectDialog = true)
         {
             _app = app ?? throw new ArgumentNullException(nameof(app));
 
@@ -93,6 +92,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
             this.WhenAnyValue(
                     vm => vm.From,
+                    vm => vm.To,
                     vm => vm.Amount,
                     vm => vm.Fee)
                 .SubscribeInMainThread(_ => Warning = string.Empty);
@@ -145,7 +145,8 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     {
                         CanSend = To != null &&
                                   Amount > 0 &&
-                                  (string.IsNullOrEmpty(Warning) || (Warning != null && WarningType != MessageType.Error));
+                                  (string.IsNullOrEmpty(Warning) ||
+                                   (Warning != null && WarningType != MessageType.Error));
                     }
                     else
                     {
@@ -180,17 +181,22 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             SubscribeToServices();
             UseDefaultFee = true;
 
-            SelectFromViewModel =
-                new SelectAddressViewModel(_app.Account, tezosConfig, SelectAddressMode.SendFrom, from, tokenId, tokenContract)
+            SelectFromViewModel = new SelectAddressViewModel(
+                _app.Account,
+                tezosConfig,
+                SelectAddressMode.SendFrom,
+                from,
+                tokenId,
+                tokenContract)
+            {
+                BackAction = () => { App.DialogService.Show(this); },
+                ConfirmAction = walletAddressViewModel =>
                 {
-                    BackAction = () => { App.DialogService.Show(this); },
-                    ConfirmAction = walletAddressViewModel =>
-                    {
-                        TokenId = walletAddressViewModel.TokenId;
-                        From = walletAddressViewModel.Address;
-                        App.DialogService.Show(SelectToViewModel!);
-                    }
-                };
+                    TokenId = walletAddressViewModel.TokenId;
+                    From = walletAddressViewModel.Address;
+                    App.DialogService.Show(showToSelectDialog ? SelectToViewModel! : this);
+                }
+            };
 
             SelectToViewModel = new SelectAddressViewModel(_app.Account, tezosConfig)
             {
@@ -210,26 +216,32 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         }
 
         private ReactiveCommand<Unit, Unit>? _backCommand;
+
         public ReactiveCommand<Unit, Unit> BackCommand => _backCommand ??= (_backCommand = ReactiveCommand.Create(() =>
         {
             App.DialogService.Close();
         }));
 
         private ReactiveCommand<Unit, Unit>? _nextCommand;
-        public ReactiveCommand<Unit, Unit> NextCommand => _nextCommand ??= ReactiveCommand.CreateFromTask(OnNextCommand);
+
+        public ReactiveCommand<Unit, Unit> NextCommand =>
+            _nextCommand ??= ReactiveCommand.CreateFromTask(OnNextCommand);
 
         private ReactiveCommand<Unit, Unit>? _maxCommand;
         public ReactiveCommand<Unit, Unit> MaxCommand => _maxCommand ??= ReactiveCommand.Create(OnMaxClick);
 
         private ReactiveCommand<Unit, Unit>? _undoConfirmStageCommand;
+
         public ReactiveCommand<Unit, Unit> UndoConfirmStageCommand => _undoConfirmStageCommand ??=
             (_undoConfirmStageCommand = ReactiveCommand.Create(() => { ConfirmStage = false; }));
 
         private ReactiveCommand<Unit, Unit>? _selectFromCommand;
+
         public ReactiveCommand<Unit, Unit> SelectFromCommand => _selectFromCommand ??=
             (_selectFromCommand = ReactiveCommand.Create(FromClick));
 
         private ReactiveCommand<Unit, Unit>? _selectToCommand;
+
         public ReactiveCommand<Unit, Unit> SelectToCommand => _selectToCommand ??=
             (_selectToCommand = ReactiveCommand.Create(ToClick));
 
@@ -241,7 +253,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 From = walletAddressViewModel.Address;
                 App.DialogService.Show(this);
             };
-            
+
             SelectFromViewModel.BackAction = () => App.DialogService.Show(this);
             App.DialogService.Show(SelectFromViewModel);
         }
@@ -315,7 +327,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             if (Amount > fromTokenAddress.Balance)
             {
                 Warning = $"Insufficient token funds on address {fromTokenAddress.Address}! " +
-                    $"Please use Max button to find out how many tokens you can send!";
+                          $"Please use Max button to find out how many tokens you can send!";
                 return;
             }
 
@@ -380,16 +392,16 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
                 if (From == null)
                 {
-                    Warning        = Resources.SvInvalidFromAddress;
+                    Warning = Resources.SvInvalidFromAddress;
                     WarningToolTip = "";
-                    WarningType    = MessageType.Error;
+                    WarningType = MessageType.Error;
                 }
 
                 if (TokenContract == null || !tezosConfig.IsValidAddress(TokenContract))
                 {
-                    Warning        = Resources.SvInvalidTokenContract;
+                    Warning = Resources.SvInvalidTokenContract;
                     WarningToolTip = "";
-                    WarningType    = MessageType.Error;
+                    WarningType = MessageType.Error;
                     return;
                 }
 
@@ -402,17 +414,17 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
                 if (fromTokenAddress == null)
                 {
-                    Warning        = Resources.CvInsufficientFunds;
+                    Warning = Resources.CvInsufficientFunds;
                     WarningToolTip = "";
-                    WarningType    = MessageType.Error;
+                    WarningType = MessageType.Error;
                     return;
                 }
 
                 if (Amount > fromTokenAddress.Balance)
                 {
-                    Warning        = Resources.CvInsufficientFunds;
+                    Warning = Resources.CvInsufficientFunds;
                     WarningToolTip = Resources.CvBigAmount;
-                    WarningType    = MessageType.Error;
+                    WarningType = MessageType.Error;
                 }
             }
             catch (Exception e)
@@ -431,16 +443,16 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
                 if (From == null)
                 {
-                    Warning        = Resources.SvInvalidFromAddress;
+                    Warning = Resources.SvInvalidFromAddress;
                     WarningToolTip = "";
-                    WarningType    = MessageType.Error;
+                    WarningType = MessageType.Error;
                 }
 
                 if (TokenContract == null || !tezosConfig.IsValidAddress(TokenContract))
                 {
-                    Warning        = Resources.SvInvalidTokenContract;
+                    Warning = Resources.SvInvalidTokenContract;
                     WarningToolTip = "";
-                    WarningType    = MessageType.Error;
+                    WarningType = MessageType.Error;
                     return;
                 }
 
@@ -455,9 +467,9 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
                     if (fromTokenAddress == null)
                     {
-                        Warning        = Resources.CvInsufficientFunds;
+                        Warning = Resources.CvInsufficientFunds;
                         WarningToolTip = "";
-                        WarningType    = MessageType.Error;
+                        WarningType = MessageType.Error;
                         return;
                     }
 
@@ -469,9 +481,9 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
                     if (!isEnougth)
                     {
-                        Warning        = string.Format(Resources.SvInsufficientChainFundsWithDetails, "XTZ", estimatedFee);
+                        Warning = string.Format(Resources.SvInsufficientChainFundsWithDetails, "XTZ", estimatedFee);
                         WarningToolTip = "";
-                        WarningType    = MessageType.Error;
+                        WarningType = MessageType.Error;
                         return;
                     }
 
@@ -484,9 +496,9 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
                     if (xtzAddress == null)
                     {
-                        Warning        = string.Format(Resources.CvInsufficientChainFunds, "XTZ");
+                        Warning = string.Format(Resources.CvInsufficientChainFunds, "XTZ");
                         WarningToolTip = "";
-                        WarningType    = MessageType.Error;
+                        WarningType = MessageType.Error;
                         return;
                     }
 
@@ -494,9 +506,9 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
                     if (xtzAddress.AvailableBalance() < Fee)
                     {
-                        Warning        = string.Format(Resources.CvInsufficientChainFunds, "XTZ");
+                        Warning = string.Format(Resources.CvInsufficientChainFunds, "XTZ");
                         WarningToolTip = "";
-                        WarningType    = MessageType.Error;
+                        WarningType = MessageType.Error;
                         return;
                     }
                 }
@@ -523,10 +535,10 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
                 if (TokenContract == null || !tezosConfig.IsValidAddress(TokenContract))
                 {
-                    Warning        = Resources.SvInvalidTokenContract;
+                    Warning = Resources.SvInvalidTokenContract;
                     WarningToolTip = "";
-                    WarningType    = MessageType.Error;
-                    Amount         = 0;
+                    WarningType = MessageType.Error;
+                    Amount = 0;
                     return;
                 }
 
@@ -539,10 +551,10 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
                 if (fromTokenAddress == null)
                 {
-                    Warning        = Resources.CvInsufficientFunds;
+                    Warning = Resources.CvInsufficientFunds;
                     WarningToolTip = "";
-                    WarningType    = MessageType.Error;
-                    Amount         = 0;
+                    WarningType = MessageType.Error;
+                    Amount = 0;
                     return;
                 }
 

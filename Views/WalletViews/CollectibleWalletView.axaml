@@ -7,6 +7,7 @@
              xmlns:controls="clr-namespace:Atomex.Client.Desktop.Controls"
              xmlns:converters="clr-namespace:Atomex.Client.Desktop.Converters"
              xmlns:asyncImageLoader="clr-namespace:AsyncImageLoader;assembly=AsyncImageLoader.Avalonia"
+             xmlns:services="clr-namespace:Atomex.Client.Desktop.Services"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="Atomex.Client.Desktop.Views.WalletViews.CollectibleWalletView">
     <Design.DataContext>
@@ -26,9 +27,10 @@
                     HorizontalAlignment="Stretch"
                     ClipToBounds="True"
                     CornerRadius="8">
-                <Image asyncImageLoader:ImageLoader.Source="{Binding Collectible.CollectiblePreviewUrl}"
-                       StretchDirection="Both"
-                       Stretch="UniformToFill" />
+                <asyncImageLoader:AdvancedImage StretchDirection="Both"
+                                                Stretch="UniformToFill"
+                                                Source="{Binding Collectible.CollectiblePreviewUrl}"
+                                                Loader="{x:Static services:ImageLoader.Instance}" />
             </Border>
 
             <Grid Grid.Column="1"

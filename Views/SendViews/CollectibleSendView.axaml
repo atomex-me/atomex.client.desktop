@@ -10,7 +10,9 @@
              xmlns:helpers="clr-namespace:Atomex.Client.Desktop.Helpers"
              xmlns:behaviors="clr-namespace:Atomex.Client.Desktop.Helpers"
              xmlns:asyncImageLoader="clr-namespace:AsyncImageLoader;assembly=AsyncImageLoader.Avalonia"
-             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             xmlns:svg="clr-namespace:Avalonia.Svg.Skia;assembly=Avalonia.Svg.Skia"
+             xmlns:services="clr-namespace:Atomex.Client.Desktop.Services"
+             mc:Ignorable="d" d:DesignWidth="700" d:DesignHeight="600"
              x:Class="Atomex.Client.Desktop.Views.SendViews.CollectibleSendView">
     <Design.DataContext>
         <sendViewModels:CollectibleSendViewModel />
@@ -68,13 +70,13 @@
                                                 ComparisonCondition="Equal"
                                                 Value="False">
                             <ia:ChangePropertyAction PropertyName="Text"
-                                                     Value="Send" />
+                                                     Value="Send collectible" />
                         </ia:DataTriggerBehavior>
                         <ia:DataTriggerBehavior Binding="{Binding ConfirmStage}"
                                                 ComparisonCondition="Equal"
                                                 Value="True">
                             <ia:ChangePropertyAction PropertyName="Text"
-                                                     Value="Confirm sending" />
+                                                     Value="Review" />
                         </ia:DataTriggerBehavior>
                     </i:Interaction.Behaviors>
                 </TextBlock>
@@ -85,10 +87,61 @@
                     Margin="-24 0 -24 0"
                     Background="{DynamicResource LightDefaultOpacity10}" />
 
+            <Border CornerRadius="{DynamicResource AtomexCornerRadius}"
+                    Width="440"
+                    Height="80"
+                    Margin="0 32 0 0"
+                    Padding="20 0"
+                    VerticalAlignment="Center"
+                    Classes="Editable"
+                    Classes.ReadOnly="{Binding ConfirmStage}">
+                <Grid ColumnDefinitions="32,*"
+                      RowDefinitions="*,*">
+                    <Border Grid.Column="0"
+                            Grid.Row="0"
+                            Grid.RowSpan="2"
+                            Width="32"
+                            Height="32"
+                            ClipToBounds="True"
+                            CornerRadius="4">
+                        <asyncImageLoader:AdvancedImage StretchDirection="Both"
+                                                        Stretch="UniformToFill"
+                                                        Source="{Binding PreviewUrl}"
+                                                        Loader="{x:Static services:ImageLoader.Instance}" />
+                    </Border>
+
+                    <TextBlock Grid.Column="1"
+                               Grid.Row="0"
+                               Text="{Binding CollectibleName}"
+                               Foreground="{DynamicResource DefaultForegroundBrush}"
+                               TextTrimming="CharacterEllipsis"
+                               FontSize="16"
+                               Margin="12 0 0 0"
+                               VerticalAlignment="Bottom" />
+
+                    <StackPanel Grid.Column="1"
+                                Grid.Row="1"
+                                Orientation="Horizontal">
+                        <TextBlock
+                            Text="#"
+                            Foreground="{DynamicResource SecondaryForegroundBrush}"
+                            FontSize="16"
+                            Margin="12 0 0 0"
+                            VerticalAlignment="Top" />
+                        <TextBlock
+                            Text="{Binding TokenId}"
+                            Foreground="{DynamicResource SecondaryForegroundBrush}"
+                            FontSize="16"
+                            VerticalAlignment="Top" />
+                    </StackPanel>
+                </Grid>
+
+            </Border>
+
             <!-- from -->
             <StackPanel Orientation="Horizontal"
                         HorizontalAlignment="Center"
-                        Margin="0 32 0 0">
+                        Margin="0 12 0 0">
                 <Border Width="50"
                         Margin="-50 0 0 0">
                     <TextBlock Text="From"
@@ -104,44 +157,37 @@
                         Width="440"
                         Height="80"
                         VerticalAlignment="Center"
-                        Classes="Editable"
-                        Classes.ReadOnly="{Binding ConfirmStage}">
+                        Classes="ReadOnly">
                     <Button Padding="20 0"
                             Width="440"
                             Height="80"
                             Command="{Binding SelectFromCommand}"
                             IsEnabled="{Binding !ConfirmStage}"
                             Classes="EmptyBtnWithContent">
-                        <Grid ColumnDefinitions="24,*, Auto">
-                            <Border Grid.Column="0"
-                                    Grid.Row="0"
-                                    Width="24"
-                                    Height="24"
-                                    ClipToBounds="True"
-                                    CornerRadius="16">
-                                <Image asyncImageLoader:ImageLoader.Source="{Binding PreviewUrl}"
-                                       StretchDirection="Both"
-                                       Stretch="UniformToFill" />
-                            </Border>
+                        <Grid ColumnDefinitions="24,*,Auto">
+                            <svg:Svg Grid.Row="0"
+                                     Grid.Column="0"
+                                     Width="24"
+                                     Path="/Resources/Icons/tezos.svg" />
 
                             <TextBlock Grid.Column="1"
                                        Grid.Row="0"
-                                       Text="{Binding FromBeautified}"
+                                       Text="{Binding From}"
+                                       HorizontalAlignment="Left"
+                                       TextWrapping="Wrap"
                                        FontFamily="{DynamicResource DefaultMediumFontFamily}"
                                        FontSize="16"
+                                       MaxWidth="248"
                                        Margin="17 0 0 0"
                                        VerticalAlignment="Center">
                                 <i:Interaction.Behaviors>
                                     <ia:DataTriggerBehavior
-                                        Binding="{Binding From, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                                        Binding="{Binding From,
+                                        Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
                                         ComparisonCondition="Equal"
                                         Value="False">
                                         <ia:ChangePropertyAction PropertyName="Text"
                                                                  Value="Select source address..." />
-
-                                        <ia:ChangePropertyAction TargetObject="{Binding #FromAddressTextBox}"
-                                                                 PropertyName="Foreground"
-                                                                 Value="{StaticResource SecondaryForegroundBrush}" />
                                     </ia:DataTriggerBehavior>
                                     <ia:DataTriggerBehavior
                                         Binding="{Binding From, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
@@ -159,7 +205,7 @@
                                 <TextBlock FontFamily="{DynamicResource DefaultMediumFontFamily}"
                                            FontSize="13"
                                            LineHeight="16"
-                                           Foreground="{DynamicResource SecondaryForegroundBrush}"
+                                           Foreground="{DynamicResource DefaultForegroundBrush}"
                                            VerticalAlignment="Center">
                                     <TextBlock.Text>
                                         <MultiBinding Converter="{StaticResource AmountToStringConverter}">
@@ -172,81 +218,10 @@
                                 <TextBlock Text="{Binding CurrencyCode}"
                                            FontSize="13"
                                            LineHeight="16"
-                                           Foreground="{DynamicResource SecondaryForegroundBrush}"
+                                           Foreground="{DynamicResource DefaultForegroundBrush}"
                                            VerticalAlignment="Center"
                                            Margin="2 0 0 0" />
                             </StackPanel>
-                        </Grid>
-                    </Button>
-                </Border>
-            </StackPanel>
-
-            <!-- to -->
-            <StackPanel Orientation="Horizontal"
-                        HorizontalAlignment="Center"
-                        Margin="0 12 0 0">
-                <Border Width="50"
-                        Margin="-50 0 0 0">
-                    <TextBlock Text="To"
-                               Margin="0 0 12 0"
-                               Foreground="{DynamicResource SecondaryForegroundBrush}"
-                               FontFamily="{DynamicResource DefaultMediumFontFamily}"
-                               FontSize="13"
-                               VerticalAlignment="Center"
-                               HorizontalAlignment="Right" />
-                </Border>
-
-                <Border CornerRadius="{DynamicResource AtomexCornerRadius}"
-                        Width="440"
-                        Height="80"
-                        VerticalAlignment="Center"
-                        Classes="Editable"
-                        Classes.ReadOnly="{Binding ConfirmStage}">
-                    <Button Padding="20 0"
-                            Width="440"
-                            Height="80"
-                            Command="{Binding SelectToCommand}"
-                            IsEnabled="{Binding !ConfirmStage}"
-                            VerticalContentAlignment="Center"
-                            Classes="EmptyBtnWithContent">
-                        <Grid ColumnDefinitions="24,*">
-                            <Ellipse Grid.Column="0"
-                                     Grid.Row="0"
-                                     Width="24"
-                                     Height="24">
-                                <Ellipse.Fill>
-                                    <ImageBrush Source="{Binding TokenPreview}"
-                                                BitmapInterpolationMode="HighQuality"
-                                                Stretch="Fill" />
-                                </Ellipse.Fill>
-                            </Ellipse>
-
-                            <TextBlock Grid.Column="1"
-                                       FontFamily="{DynamicResource DefaultMediumFontFamily}"
-                                       Text="{Binding To}"
-                                       FontSize="16"
-                                       Margin="17 0 0 0"
-                                       VerticalAlignment="Center"
-                                       Name="ToTextBox">
-                                <i:Interaction.Behaviors>
-                                    <ia:DataTriggerBehavior
-                                        Binding="{Binding To, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
-                                        ComparisonCondition="Equal"
-                                        Value="False">
-                                        <ia:ChangePropertyAction PropertyName="Text"
-                                                                 Value="Select destination address..." />
-                                        <ia:ChangePropertyAction PropertyName="Foreground"
-                                                                 Value="{StaticResource SecondaryForegroundBrush}" />
-                                    </ia:DataTriggerBehavior>
-                                    <ia:DataTriggerBehavior
-                                        Binding="{Binding To, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
-                                        ComparisonCondition="Equal"
-                                        Value="True">
-                                        <ia:ChangePropertyAction PropertyName="Foreground"
-                                                                 Value="{StaticResource DefaultForegroundBrush}" />
-                                    </ia:DataTriggerBehavior>
-                                </i:Interaction.Behaviors>
-                            </TextBlock>
                         </Grid>
                     </Button>
                 </Border>
@@ -257,6 +232,29 @@
                         IsVisible="{Binding !ConfirmStage}">
                 <StackPanel Orientation="Horizontal"
                             HorizontalAlignment="Center">
+                    <!-- to -->
+                    <Border Width="60"
+                            Margin="-60 0 0 0">
+                        <TextBlock Text="To"
+                                   Margin="0 0 12 0"
+                                   Foreground="{DynamicResource SecondaryForegroundBrush}"
+                                   FontFamily="{DynamicResource DefaultMediumFontFamily}"
+                                   FontSize="13"
+                                   VerticalAlignment="Center"
+                                   HorizontalAlignment="Right" />
+                    </Border>
+
+                    <Grid ColumnDefinitions="440">
+                        <TextBox Grid.Column="0"
+                                 Watermark="Paste recipient address"
+                                 Text="{Binding To, Mode=TwoWay}"
+                                 Classes="AtomexTextBox AmountTextBox" />
+                    </Grid>
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal"
+                            HorizontalAlignment="Center"
+                            Margin="0 12 0 0">
                     <!-- amount -->
                     <Border Width="60"
                             Margin="-60 0 0 0">
@@ -386,63 +384,29 @@
                               Foreground="{DynamicResource SecondaryForegroundBrush}"
                               Content="Use default fee" />
 
-                    <!-- token id -->
-                    <StackPanel Grid.Row="0"
-                                Grid.Column="1"
-                                IsVisible="{Binding IsFa2}"
-                                HorizontalAlignment="Right"
-                                VerticalAlignment="Center"
-                                Orientation="Horizontal">
-                        <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
-                                   LineHeight="20"
-                                   TextAlignment="Right"
-                                   Text="Token ID:" />
-                        <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
-                                   LineHeight="20"
-                                   Margin="3 0 0 0"
-                                   TextAlignment="Right"
-                                   Text="{Binding TokenId}" />
-                    </StackPanel>
-
-                    <!-- token contract -->
-                    <StackPanel Grid.Row="1"
-                                Grid.Column="1"
-                                HorizontalAlignment="Right"
-                                VerticalAlignment="Center"
-                                Orientation="Horizontal">
-                        <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
-                                   LineHeight="20"
-                                   TextAlignment="Right"
-                                   Text="Token contract:" />
-                        <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
-                                   LineHeight="20"
-                                   Margin="3 0 0 0"
-                                   TextAlignment="Right"
-                                   Text="{Binding TokenContractBeautified}" />
-                    </StackPanel>
 
                     <!-- fee -->
-                    <StackPanel Grid.Row="2"
-                                Grid.Column="1"
+                    <StackPanel Grid.Column="1"
+                                Grid.Row="0"
+                                Grid.RowSpan="3"
                                 HorizontalAlignment="Right"
-                                VerticalAlignment="Center"
                                 Orientation="Horizontal">
                         <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
-                                   LineHeight="20"
+                                   VerticalAlignment="Center"
                                    TextAlignment="Right"
                                    Text="Fee:" />
                         <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
-                                   LineHeight="20"
+                                   VerticalAlignment="Center"
                                    Margin="3 0 0 0"
                                    TextAlignment="Right"
                                    Text="{Binding Fee}" />
                         <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
-                                   LineHeight="20"
+                                   VerticalAlignment="Center"
                                    Margin="3 0 0 0"
                                    TextAlignment="Right"
                                    Text="{Binding FeeCurrencyCode}" />
                         <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
-                                   LineHeight="20"
+                                   VerticalAlignment="Center"
                                    Margin="3 0 0 0"
                                    TextAlignment="Right">
                             <TextBlock.Text>

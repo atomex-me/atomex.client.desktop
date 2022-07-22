@@ -141,6 +141,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                 tokenId: (int)Collectible.TokenBalance.TokenId,
                 tokenType: Collectible.Contract.GetContractType(),
                 previewUrl: Collectible.CollectiblePreviewUrl,
+                collectibleName: Collectible.TokenBalance.Name,
                 from: null);
 
             App.DialogService.Show(sendViewModel.SelectFromViewModel);

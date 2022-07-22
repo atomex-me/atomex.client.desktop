@@ -2,10 +2,9 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Drawing.Drawing2D;
-using System.Drawing.Imaging;
 using System.IO;
 using System.Threading.Tasks;
+using AsyncImageLoader.Loaders;
 using Atomex.Common;
 using Avalonia;
 using Avalonia.Media.Imaging;
@@ -55,7 +54,7 @@ namespace Atomex.Client.Desktop.Services
                 Log.Error(e, "Error during loading image {Url}", url);
             }
         }
-        
+
         public bool TryGetImage(string url, [MaybeNullWhen(false)] out IBitmap value)
         {
             return Images.TryGetValue(url, out value);
@@ -83,5 +82,10 @@ namespace Atomex.Client.Desktop.Services
                 ? image
                 : Images["default"];
         }
+    }
+
+    public class ImageLoader : DiskCachedWebImageLoader
+    {
+        public static ImageLoader Instance { get; } = new();
     }
 }
