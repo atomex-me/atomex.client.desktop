@@ -302,7 +302,7 @@ namespace Atomex.Client.Desktop.ViewModels
         {
             try
             {
-                var updateTask = new HdWalletScanner(_app.Account)
+                var updateTask = new WalletScanner(_app.Account)
                     .ScanAddressAsync(_currency.Name, address);
 
                 await Task.WhenAll(Task.Delay(Constants.MinimalAddressUpdateTimeMs), updateTask);
@@ -313,7 +313,7 @@ namespace Atomex.Client.Desktop.ViewModels
                     var tezosAccount = _app.Account
                         .GetCurrencyAccount<TezosAccount>(TezosConfig.Xtz);
 
-                    await new TezosTokensScanner(tezosAccount)
+                    await new TezosTokensWalletScanner(tezosAccount)
                         .UpdateBalanceAsync(address, _tokenContract, (int)_tokenId);
                  }
 

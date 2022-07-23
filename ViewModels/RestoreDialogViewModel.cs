@@ -28,7 +28,7 @@ namespace Atomex.Client.Desktop.ViewModels
         {
             var cancellation = new CancellationTokenSource();
             var currencies = _app.Account.Currencies.ToList();
-            var hdWalletScanner = new HdWalletScanner(_app.Account);
+            var hdWalletScanner = new WalletScanner(_app.Account);
 
             if (currenciesArr != null)
             {
@@ -70,7 +70,7 @@ namespace Atomex.Client.Desktop.ViewModels
                     var tezosAccount = _app.Account
                         .GetCurrencyAccount<TezosAccount>(TezosConfig.Xtz);
 
-                    var tezosTokensScanner = new TezosTokensScanner(tezosAccount);
+                    var tezosTokensScanner = new TezosTokensWalletScanner(tezosAccount);
 
                     await tezosTokensScanner.UpdateBalanceAsync(
                         cancellationToken: default);
@@ -126,7 +126,7 @@ namespace Atomex.Client.Desktop.ViewModels
                 var tezosAccount = _app.Account
                     .GetCurrencyAccount<TezosAccount>(TezosConfig.Xtz);
 
-                var tezosTokensScanner = new TezosTokensScanner(tezosAccount);
+                var tezosTokensScanner = new TezosTokensWalletScanner(tezosAccount);
 
                 await tezosTokensScanner.UpdateBalanceAsync(
                     cancellationToken: cancellation.Token);
