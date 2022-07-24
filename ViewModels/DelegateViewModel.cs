@@ -430,8 +430,6 @@ namespace Atomex.Client.Desktop.ViewModels
                             StakingAvailable = bakerData.StakingAvailable
                         })
                         .ToList();
-
-                    bakers.ForEach(bakerVm => _ = App.ImageService.LoadImageFromUrl(bakerVm.Logo));
                 });
             }
             catch (Exception e)

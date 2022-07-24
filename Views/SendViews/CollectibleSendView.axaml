@@ -12,6 +12,7 @@
              xmlns:asyncImageLoader="clr-namespace:AsyncImageLoader;assembly=AsyncImageLoader.Avalonia"
              xmlns:svg="clr-namespace:Avalonia.Svg.Skia;assembly=Avalonia.Svg.Skia"
              xmlns:services="clr-namespace:Atomex.Client.Desktop.Services"
+             xmlns:atomex="clr-namespace:Atomex;assembly=Atomex.Client.Core"
              mc:Ignorable="d" d:DesignWidth="700" d:DesignHeight="600"
              x:Class="Atomex.Client.Desktop.Views.SendViews.CollectibleSendView">
     <Design.DataContext>
@@ -93,8 +94,7 @@
                     Margin="0 32 0 0"
                     Padding="20 0"
                     VerticalAlignment="Center"
-                    Classes="Editable"
-                    Classes.ReadOnly="{Binding ConfirmStage}">
+                    Classes="Editable">
                 <Grid ColumnDefinitions="32,*"
                       RowDefinitions="*,*">
                     <Border Grid.Column="0"
@@ -141,6 +141,7 @@
             <!-- from -->
             <StackPanel Orientation="Horizontal"
                         HorizontalAlignment="Center"
+                        IsVisible="{Binding !ConfirmStage}"
                         Margin="0 12 0 0">
                 <Border Width="50"
                         Margin="-50 0 0 0">
@@ -421,105 +422,143 @@
             </StackPanel>
 
             <!-- confirmation stage -->
-            <StackPanel Margin="0 18 0 0"
-                        IsVisible="{Binding ConfirmStage}"
-                        Width="440"
-                        HorizontalAlignment="Center">
-                <Grid ColumnDefinitions="*,Auto,Auto,Auto">
-                    <TextBlock Grid.Column="0"
-                               Text="Amount"
-                               Foreground="{DynamicResource SecondaryForegroundBrush}"
-                               FontSize="13" />
+            <Grid ColumnDefinitions="*,Auto"
+                  RowDefinitions="30,30,30,Auto,Auto"
+                  IsVisible="{Binding ConfirmStage}"
+                  Width="440"
+                  Margin="0 25 0 0"
+                  HorizontalAlignment="Center">
+                <TextBlock Grid.Column="0"
+                           Grid.Row="0"
+                           Foreground="{DynamicResource SecondaryForegroundBrush}"
+                           FontSize="16"
+                           VerticalAlignment="Center"
+                           Text="From" />
 
-                    <TextBlock Grid.Column="1"
-                               Text="{Binding Amount}"
+                <StackPanel Grid.Column="1"
+                            Grid.Row="0"
+                            HorizontalAlignment="Right"
+                            Orientation="Horizontal">
+                    <svg:Svg HorizontalAlignment="Center"
+                             Width="18"
+                             Height="18"
+                             Path="/Resources/Icons/tezos-disabled.svg" />
+                    <TextBlock Margin="8 0 0 0"
                                Foreground="{DynamicResource DefaultForegroundBrush}"
-                               FontSize="13" />
+                               FontSize="16"
+                               VerticalAlignment="Center"
+                               Text="{Binding From,
+                                   Converter={x:Static converters:StringConverters.ToShortenedAddress}}" />
 
-                    <TextBlock Grid.Column="2"
-                               Margin="3 0 0 0"
-                               Text="{Binding CurrencyCode}"
-                               Foreground="{DynamicResource DefaultForegroundBrush}"
-                               FontSize="13" />
+                    <controls:CopyButton ToolText="Copy from address"
+                                         DoneToolText="Copied!"
+                                         Margin="6 0 0 0"
+                                         Command="{Binding CopyCommand}"
+                                         CommandParameter="{Binding From}" />
+                </StackPanel>
 
-                    <TextBlock Grid.Column="3"
+                <TextBlock Grid.Column="0"
+                           Grid.Row="1"
+                           Foreground="{DynamicResource SecondaryForegroundBrush}"
+                           FontSize="16"
+                           VerticalAlignment="Center"
+                           Text="To" />
+
+                <StackPanel Grid.Column="1"
+                            Grid.Row="1"
+                            HorizontalAlignment="Right"
+                            Orientation="Horizontal">
+                    <svg:Svg HorizontalAlignment="Center"
+                             Width="18"
+                             Height="18"
+                             Path="/Resources/Icons/tezos-disabled.svg" />
+                    <TextBlock Margin="8 0 0 0"
                                Foreground="{DynamicResource DefaultForegroundBrush}"
-                               FontSize="13"
-                               Margin="3 0 0 0">
+                               FontSize="16"
+                               VerticalAlignment="Center"
+                               Text="{Binding To,
+                                   Converter={x:Static converters:StringConverters.ToShortenedAddress}}" />
+
+                    <controls:CopyButton ToolText="Copy to address"
+                                         DoneToolText="Copied!"
+                                         Margin="6 0 0 0"
+                                         Command="{Binding CopyCommand}"
+                                         CommandParameter="{Binding To}" />
+                </StackPanel>
+
+                <TextBlock Grid.Column="0"
+                           Grid.Row="2"
+                           Foreground="{DynamicResource SecondaryForegroundBrush}"
+                           FontSize="16"
+                           VerticalAlignment="Center"
+                           Text="Amount" />
+
+                <StackPanel Grid.Column="1"
+                            Grid.Row="2"
+                            HorizontalAlignment="Right"
+                            Orientation="Horizontal">
+
+                    <TextBlock Foreground="{DynamicResource DefaultForegroundBrush}"
+                               FontSize="16"
+                               VerticalAlignment="Center"
+                               Text="{Binding Amount}" />
+
+                    <TextBlock Foreground="{DynamicResource DefaultForegroundBrush}"
+                               Margin="4 0 0 0"
+                               FontSize="16"
+                               VerticalAlignment="Center"
+                               Text="{Binding CurrencyCode}" />
+                </StackPanel>
+
+                <!-- separator -->
+                <Border Grid.Column="0"
+                        Grid.ColumnSpan="2"
+                        Grid.Row="3"
+                        Margin="0 16"
+                        Height="1"
+                        Background="{DynamicResource LightDefaultOpacity10}" />
+
+                <TextBlock Grid.Column="0"
+                           Grid.Row="4"
+                           Foreground="{DynamicResource SecondaryForegroundBrush}"
+                           FontSize="16"
+                           VerticalAlignment="Center"
+                           Text="Total fee" />
+
+                <StackPanel Grid.Column="1"
+                            Grid.Row="4"
+                            HorizontalAlignment="Right">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Foreground="{DynamicResource DefaultForegroundBrush}"
+                                   FontSize="22"
+                                   VerticalAlignment="Center"
+                                   Text="{Binding Fee}" />
+
+                        <TextBlock Foreground="{DynamicResource DefaultForegroundBrush}"
+                                   Margin="4 0 0 0"
+                                   FontSize="22"
+                                   VerticalAlignment="Center"
+                                   Text="{x:Static atomex:TezosConfig.Xtz}" />
+                    </StackPanel>
+
+                    <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
+                               FontSize="16"
+                               HorizontalAlignment="Right">
                         <TextBlock.Text>
-                            <MultiBinding Converter="{StaticResource AmountToStringInBracketsConverter}">
-                                <Binding Path="AmountInBase" Mode="OneWay" />
-                                <Binding Path="BaseCurrencyFormat" Mode="OneWay" />
-                            </MultiBinding>
-                        </TextBlock.Text>
-                    </TextBlock>
-                </Grid>
-
-                <Grid ColumnDefinitions="*,Auto,Auto,Auto"
-                      Margin="0 6 0 0">
-                    <TextBlock Grid.Column="0"
-                               Text="Fee"
-                               Foreground="{DynamicResource SecondaryForegroundBrush}"
-                               FontSize="13" />
-
-                    <TextBlock Grid.Column="1"
-                               Text="{Binding Fee}"
-                               Foreground="{DynamicResource DefaultForegroundBrush}"
-                               FontSize="13" />
-
-                    <TextBlock Grid.Column="2"
-                               Margin="3 0 0 0"
-                               Text="{Binding FeeCurrencyCode}"
-                               Foreground="{DynamicResource DefaultForegroundBrush}"
-                               FontSize="13" />
-
-                    <TextBlock Grid.Column="3"
-                               Foreground="{DynamicResource DefaultForegroundBrush}"
-                               FontSize="13"
-                               Margin="3 0 0 0">
-                        <TextBlock.Text>
-                            <MultiBinding Converter="{StaticResource AmountToStringInBracketsConverter}">
+                            <MultiBinding Converter="{StaticResource AmountToStringConverter}">
                                 <Binding Path="FeeInBase" Mode="OneWay" />
                                 <Binding Path="BaseCurrencyFormat" Mode="OneWay" />
                             </MultiBinding>
                         </TextBlock.Text>
                     </TextBlock>
-                </Grid>
-
-                <Border Height="1"
-                        Margin="0 18 0 18"
-                        Background="{DynamicResource LightDefaultOpacity10}" />
-
-                <Grid ColumnDefinitions="*,Auto,Auto"
-                      Margin="0 6 0 0">
-                    <TextBlock Grid.Column="0"
-                               Text="Total (without fees)"
-                               Foreground="{DynamicResource SecondaryForegroundBrush}"
-                               VerticalAlignment="Center"
-                               FontSize="13"
-                               Name="TotalString" />
-
-                    <TextBlock Grid.Column="1"
-                               Text="{Binding Amount}"
-                               Foreground="{DynamicResource DefaultForegroundBrush}"
-                               VerticalAlignment="Center"
-                               FontSize="22" />
-
-                    <TextBlock Grid.Column="2"
-                               Margin="4 0 0 0"
-                               Text="{Binding CurrencyCode}"
-                               Foreground="{DynamicResource DefaultForegroundBrush}"
-                               VerticalAlignment="Center"
-                               FontSize="22" />
-                </Grid>
-            </StackPanel>
+                </StackPanel>
+            </Grid>
 
             <!-- send button -->
             <StackPanel Orientation="Horizontal"
                         HorizontalAlignment="Center"
                         Margin="0 32 0 60">
                 <controls:RoundedButton Width="440"
-                                        Content="Send"
                                         Command="{Binding NextCommand}"
                                         Classes.Loading="{Binding IsSending}"
                                         IsEnabled="{Binding CanSend}">
@@ -528,13 +567,13 @@
                                                 ComparisonCondition="Equal"
                                                 Value="False">
                             <ia:ChangePropertyAction PropertyName="Content"
-                                                     Value="Send" />
+                                                     Value="Review" />
                         </ia:DataTriggerBehavior>
                         <ia:DataTriggerBehavior Binding="{Binding ConfirmStage}"
                                                 ComparisonCondition="Equal"
                                                 Value="True">
                             <ia:ChangePropertyAction PropertyName="Content"
-                                                     Value="Confirm sending" />
+                                                     Value="Send" />
                         </ia:DataTriggerBehavior>
                     </i:Interaction.Behaviors>
                 </controls:RoundedButton>

@@ -195,11 +195,6 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                             currentCycle - txCycle < 7 ? DelegationStatus.Confirmed :
                             DelegationStatus.Active
                     });
-
-                    if (!string.IsNullOrEmpty(baker.Logo))
-                    {
-                        _ = Task.Run(() => { _ = App.ImageService.LoadImageFromUrl(baker.Logo); });
-                    }
                 }
 
                 await Dispatcher.UIThread.InvokeAsync(() =>

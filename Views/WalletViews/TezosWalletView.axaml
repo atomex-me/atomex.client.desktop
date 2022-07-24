@@ -11,7 +11,9 @@
              xmlns:ia="clr-namespace:Avalonia.Xaml.Interactions.Core;assembly=Avalonia.Xaml.Interactions"
              xmlns:atomexCore="clr-namespace:Atomex;assembly=Atomex.Client.Core"
              xmlns:atomexBlockchainTezos="clr-namespace:Atomex.Blockchain.Tezos;assembly=Atomex.Client.Core"
-             xmlns:abstract="clr-namespace:Atomex.Client.Desktop.ViewModels.Abstract">
+             xmlns:abstract="clr-namespace:Atomex.Client.Desktop.ViewModels.Abstract"
+             xmlns:asyncImageLoader="clr-namespace:AsyncImageLoader;assembly=AsyncImageLoader.Avalonia"
+             xmlns:services="clr-namespace:Atomex.Client.Desktop.Services">
 
     <Design.DataContext>
         <vm:TezosWalletViewModel />
@@ -331,12 +333,17 @@
 
                                         <Grid Grid.Column="2"
                                               ColumnDefinitions="Auto,*">
-                                            <Image Width="22"
-                                                   Height="22"
-                                                   Source="{Binding Baker.Logo,
-                                                   Converter={x:Static converters:ImageConverters.ToImage}}"
-                                                   VerticalAlignment="Center" />
-
+                                            <Border Grid.Column="0"
+                                                    Width="22"
+                                                    Height="22"
+                                                    ClipToBounds="True"
+                                                    CornerRadius="4">
+                                                <asyncImageLoader:AdvancedImage StretchDirection="Both"
+                                                    Stretch="UniformToFill"
+                                                    Source="{Binding Baker.Logo}"
+                                                    Loader="{x:Static services:ImageLoader.Instance}" />
+                                            </Border>
+                                            
                                             <TextBlock Grid.Column="1"
                                                        Foreground="{DynamicResource DefaultForegroundBrush}"
                                                        VerticalAlignment="Center"
