@@ -127,7 +127,8 @@ namespace Atomex.Client.Desktop.ViewModels
                     Selected = Wallets.First(wallet => wallet is TezosWalletViewModel);
                     return;
 
-                case CollectibleWalletViewModel:
+                case CollectibleWalletViewModel collectibleWalletViewModel:
+                    collectibleWalletViewModel.Collectible = null;
                     Selected = Wallets.First(wallet => wallet is CollectiblesWalletViewModel);
                     return;
 

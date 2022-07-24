@@ -2,6 +2,8 @@
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive;
+using System.Reactive.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
@@ -40,6 +42,10 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                     LoadAddresses();
                     _ = LoadTransfers(tokenViewModel);
                 });
+            
+            this.WhenAnyValue(vm => vm.Collectible)
+                .Where(collectible => collectible == null && AddressesViewModel != null)
+                .SubscribeInMainThread(_ => AddressesViewModel.Dispose());
         }
 
         private async Task LoadTransfers(TezosTokenViewModel collectible)
@@ -111,6 +117,32 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             catch (Exception e)
             {
                 Log.Error(e, "Account balance updated event handler error");
+            }
+        }
+        
+        protected override async Task OnUpdateClick()
+        {
+            _cancellation = new CancellationTokenSource();
+
+            try
+            {
+                var tezosAccount = _app.Account
+                    .GetCurrencyAccount<TezosAccount>(TezosConfig.Xtz);
+
+                var tezosTokensScanner = new TezosTokensScanner(tezosAccount);
+
+                await tezosTokensScanner.UpdateBalanceAsync(
+                    tokenContract: Collectible!.Contract.Address,
+                    tokenId: (int)Collectible!.TokenBalance.TokenId,
+                    cancellationToken: _cancellation.Token);
+            }
+            catch (OperationCanceledException)
+            {
+                Log.Debug("Tezos tokens Wallet update operation canceled");
+            }
+            catch (Exception e)
+            {
+                Log.Error(e, "Tezos tokens Wallet update exception");
             }
         }
 

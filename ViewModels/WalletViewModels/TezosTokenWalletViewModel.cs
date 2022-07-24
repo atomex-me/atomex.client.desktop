@@ -41,6 +41,10 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                     LoadAddresses();
                     _ = LoadTransfers(tokenViewModel);
                 });
+            
+            this.WhenAnyValue(vm => vm.TokenViewModel)
+                .Where(token => token == null && AddressesViewModel != null)
+                .SubscribeInMainThread(_ => AddressesViewModel.Dispose());
         }
 
         private async Task LoadTransfers(TezosTokenViewModel tokenViewModel)
