@@ -165,7 +165,7 @@ namespace Atomex.Client.Desktop.ViewModels
                     .GetSymbols(_app.Account.Network)
                     .SymbolByCurrencies(FromCurrencyViewModel.Currency, ToCurrencyViewModel.Currency);
 
-                var baseCurrency = _app.Account.Currencies.GetByName(symbol.Base);
+                var baseCurrency = account.Currencies.GetByName(symbol.Base);
                 var side         = symbol.OrderSideForBuyCurrency(ToCurrencyViewModel.Currency);
                 var atomexClient = _app.AtomexClient;
                 var price        = EstimatedPrice;
@@ -197,17 +197,16 @@ namespace Atomex.Client.Desktop.ViewModels
 
                 var order = new Order
                 {
-                    ClientOrderId     = Guid.NewGuid().ToByteArray().ToHexString(0, 16),
-                    Status            = OrderStatus.Pending,
-                    Symbol            = symbol.Name,
-                    TimeStamp         = DateTime.UtcNow,
-                    Price             = orderPrice,
-                    Qty               = qty,
-                    LeaveQty          = qty,
-                    Side              = side,
-                    Type              = OrderType.FillOrKill,
-                    FromWallets       = fromWallets.ToList(),
-                    MakerNetworkFee   = EstimatedMakerNetworkFee,
+                    ClientOrderId   = Guid.NewGuid().ToByteArray().ToHexString(0, 16),
+                    Status          = OrderStatus.Pending,
+                    Symbol          = symbol.Name,
+                    TimeStamp       = DateTime.UtcNow,
+                    Price           = orderPrice,
+                    Qty             = qty,
+                    LeaveQty        = qty,
+                    Side            = side,
+                    Type            = OrderType.FillOrKill,
+                    MakerNetworkFee = EstimatedMakerNetworkFee,
 
                     FromAddress = FromSource is FromAddress fromAddress ? fromAddress.Address : null,
                     FromOutputs = FromSource is FromOutputs fromOutputs ? fromOutputs.Outputs.ToList() : null,
@@ -221,32 +220,30 @@ namespace Atomex.Client.Desktop.ViewModels
                         : RedeemFromAddress
                 };
 
-                await order
-                    .CreateProofOfPossessionAsync(account);
-
                 await _app.Account
                     .UpsertOrderAsync(order);
 
+                //await order
+                //    .CreateProofOfPossessionAsync(account);
+                var fromWalletsWithProofs = await fromWallets
+                    .CreateProofOfPossessionAsync(
+                        timeStamp: order.TimeStamp,
+                        account: account);
+
+                if (fromWalletsWithProofs == null)
+                    return new Error(Errors.SwapError, "Can't create proofs for used wallets");
+
                 atomexClient.OrderSendAsync(new V1.Entities.Order
                 {
-                    ClientOrderId = order.ClientOrderId,
-                    Symbol        = order.Symbol,
-                    TimeStamp     = order.TimeStamp,
-                    Price         = order.Price,
-                    Qty           = order.Qty,
-                    Side          = order.Side,
-                    Type          = order.Type,
-                    FromWallets   = order.FromWallets
-                        .Select(w => new V1.Entities.WalletAddress
-                        {
-                            Address           = w.Address,
-                            Currency          = w.Currency,
-                            Nonce             = w.Nonce,
-                            ProofOfPossession = w.ProofOfPossession,
-                            PublicKey         = w.PublicKey,
-                        })
-                        .ToList(),
-                    BaseCurrencyContract = GetSwapContract(order.Symbol.BaseCurrency()),
+                    ClientOrderId         = order.ClientOrderId,
+                    Symbol                = order.Symbol,
+                    TimeStamp             = order.TimeStamp,
+                    Price                 = order.Price,
+                    Qty                   = order.Qty,
+                    Side                  = order.Side,
+                    Type                  = order.Type,
+                    FromWallets           = fromWalletsWithProofs.ToList(),
+                    BaseCurrencyContract  = GetSwapContract(order.Symbol.BaseCurrency()),
                     QuoteCurrencyContract = GetSwapContract(order.Symbol.QuoteCurrency())
                 });
 
@@ -322,7 +319,6 @@ namespace Atomex.Client.Desktop.ViewModels
                     .Select(o => o.DestinationAddress(config.Network))
                     .Distinct()
                     .Select(async a => await _app.Account.GetAddressAsync(FromCurrencyViewModel.Currency.Name, a)));
-  
             }
 
             throw new NotSupportedException("Not supported type of From field");
