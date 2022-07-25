@@ -204,22 +204,22 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             return SelectedAddress;
         }
 
-        private ReactiveCommand<Unit, Unit> _backCommand;
+        private ReactiveCommand<Unit, Unit>? _backCommand;
 
         public ReactiveCommand<Unit, Unit> BackCommand => _backCommand ??=
             (_backCommand = ReactiveCommand.Create(() => { BackAction?.Invoke(); }));
 
-        private ReactiveCommand<Unit, Unit> _changeSortTypeCommand;
+        private ReactiveCommand<Unit, Unit>? _changeSortTypeCommand;
 
         public ReactiveCommand<Unit, Unit> ChangeSortTypeCommand => _changeSortTypeCommand ??=
             (_changeSortTypeCommand = ReactiveCommand.Create(() => { SortByDate = !SortByDate; }));
 
-        private ReactiveCommand<Unit, Unit> _changeSortDirectionCommand;
+        private ReactiveCommand<Unit, Unit>? _changeSortDirectionCommand;
 
         public ReactiveCommand<Unit, Unit> ChangeSortDirectionCommand => _changeSortDirectionCommand ??=
             (_changeSortDirectionCommand = ReactiveCommand.Create(() => { SortIsAscending = !SortIsAscending; }));
 
-        private ReactiveCommand<Unit, Unit> _confirmCommand;
+        private ReactiveCommand<Unit, Unit>? _confirmCommand;
 
         public ReactiveCommand<Unit, Unit> ConfirmCommand => _confirmCommand ??=
             (_confirmCommand = ReactiveCommand.Create(() =>
@@ -234,15 +234,11 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 ConfirmAction?.Invoke(selectedAddress);
             }));
 
-        private ICommand _copyAddressCommand;
+        private ICommand? _copyAddressCommand;
         public ICommand CopyAddressCommand =>
             _copyAddressCommand ??= (_copyAddressCommand = ReactiveCommand.Create((WalletAddress address) =>
             {
                 _ = App.Clipboard.SetTextAsync(address.Address);
-
-                // MyAddresses.ForEachDo(o => o.CopyButtonToolTip = AddressViewModel.DefaultCopyButtonToolTip);
-                // MyAddresses.First(o => o.WalletAddress.Address == address.Address).CopyButtonToolTip =
-                //     AddressViewModel.CopiedButtonToolTip;
             }));
 #if DEBUG
         private void DesignerMode()

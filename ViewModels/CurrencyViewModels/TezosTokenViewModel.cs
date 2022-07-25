@@ -59,8 +59,6 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
         public string CurrencyDescription => TokenBalance.Name;
         string IAssetViewModel.BaseCurrencyFormat => BaseCurrencyFormat;
 
-        public decimal? DailyChangePercent => null;
-
         private ThumbsApi ThumbsApi => new(
             new ThumbsApiSettings
             {

@@ -4,6 +4,7 @@ using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Atomex.Blockchain.Tezos;
 using Avalonia.Controls;
 using Avalonia.Media.Imaging;
 using Avalonia.Threading;
@@ -618,16 +619,21 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             }
             else
             {
-                CurrencyCode = _app.Account.Currencies
+                var currencyCode = _app.Account.Currencies
                     .FirstOrDefault(c => c is Fa12Config fa12 && fa12.TokenContractAddress == TokenContract)
-                    ?.Name ?? "TOKENS";
+                    ?.Name;
+
                 CurrencyFormat = DefaultCurrencyFormat;
+                
+                if (currencyCode == null)
+                {
+                    CurrencyCode = string.Empty;
+                    CurrencyFormat = "F0";
+                }
             }
 
             SelectedFromBalance = tokenAddress?.AvailableBalance() ?? 0;
             this.RaisePropertyChanged(nameof(Amount));
-
-            // TokenPreview = GetTokenPreview(From, TokenId);
         }
 
         private async Task<Error> Send(CancellationToken cancellationToken = default)
