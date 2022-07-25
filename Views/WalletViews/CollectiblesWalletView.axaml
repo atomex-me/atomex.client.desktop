@@ -5,13 +5,14 @@
              xmlns:walletViewModels="clr-namespace:Atomex.Client.Desktop.ViewModels.WalletViewModels"
              xmlns:asyncImageLoader="clr-namespace:AsyncImageLoader;assembly=AsyncImageLoader.Avalonia"
              xmlns:services="clr-namespace:Atomex.Client.Desktop.Services"
+             xmlns:converters="clr-namespace:Atomex.Client.Desktop.Converters"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="Atomex.Client.Desktop.Views.WalletViews.CollectiblesWalletView">
 
     <Design.DataContext>
         <walletViewModels:CollectiblesWalletViewModel />
     </Design.DataContext>
-    
+
     <ListBox Items="{Binding Tokens}"
              Margin="0 4 0 0">
         <ListBox.Styles>
@@ -66,12 +67,24 @@
                                        FontSize="16"
                                        TextTrimming="CharacterEllipsis"
                                        Text="{Binding TokenBalance.Name}" />
-                            
-                            <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
-                                       Margin="0 4 0 0"
-                                       FontSize="13"
-                                       TextTrimming="CharacterEllipsis"
-                                       Text="{Binding TokenBalance.Description}" />
+
+                            <StackPanel Orientation="Horizontal"
+                                        Margin="0 4 0 0">
+                                <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
+                                           FontSize="13"
+                                           TextTrimming="CharacterEllipsis"
+                                           Text="{Binding TotalAmount}" />
+                                <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
+                                           FontSize="13"
+                                           IsVisible="{Binding TotalAmount,
+                                       Converter={x:Static converters:NumericConverters.IsOne}}"
+                                           Text=" collectible" />
+                                <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
+                                           FontSize="13"
+                                           IsVisible="{Binding TotalAmount,
+                                       Converter={x:Static converters:NumericConverters.GreaterThanOne}}"
+                                           Text=" collectibles" />
+                            </StackPanel>
                         </StackPanel>
                     </Grid>
                 </Button>
