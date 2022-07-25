@@ -19,12 +19,14 @@ using Serilog;
 
 namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 {
-    public class Collectible : ViewModelBase
+    public class Collectible
     {
         public IEnumerable<TezosTokenViewModel> Tokens { get; set; }
         public string Name => Tokens.First().Contract.Name ?? Tokens.First().Contract.Address.TruncateAddress();
+
         public string PreviewUrl => ThumbsApi.GetCollectiblePreviewUrl(Tokens.First().Contract.Address,
             Tokens.First().TokenBalance.TokenId);
+
         public int Amount => Tokens
             .Aggregate(0, (result, tokenViewModel) => result + decimal.ToInt32(tokenViewModel.TotalAmount));
 
@@ -120,37 +122,6 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 #if DEBUG
         private void DesignerMode()
         {
-            // Collectibles = new ObservableCollection<Collectible>
-            // {
-            //     new()
-            //     {
-            //         Amount = 3,
-            //         Name = "ONIMATA - SSR Card",
-            //         Contract = "KT1RJ6PbjHpwc3M5rw5s2Nbmefwbuwbdxton",
-            //         TokenId = 129753,
-            //     },
-            //     new()
-            //     {
-            //         Amount = 3,
-            //         Name = "ONIMATA - SSR Card",
-            //         Contract = "KT1RJ6PbjHpwc3M5rw5s2Nbmefwbuwbdxton",
-            //         TokenId = 129753,
-            //     },
-            //     new()
-            //     {
-            //         Amount = 3,
-            //         Name = "ONIMATA - SSR Card",
-            //         Contract = "KT1RJ6PbjHpwc3M5rw5s2Nbmefwbuwbdxton",
-            //         TokenId = 129753,
-            //     },
-            //     new()
-            //     {
-            //         Amount = 3,
-            //         Name = "ONIMATA - SSR Card",
-            //         Contract = "KT1RJ6PbjHpwc3M5rw5s2Nbmefwbuwbdxton",
-            //         TokenId = 129753,
-            //     },
-            // };
         }
 #endif
     }
