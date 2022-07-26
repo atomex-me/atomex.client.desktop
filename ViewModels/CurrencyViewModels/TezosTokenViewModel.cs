@@ -53,6 +53,7 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
 
         public string IconPath => string.Empty;
         public string DisabledIconPath => string.Empty;
+        public string PreviewUrl => ThumbsApi.GetCollectiblePreviewUrl(Contract.Address, TokenBalance.TokenId);
 
         public string CurrencyName => TokenBalance.Symbol;
         public string CurrencyCode => TokenBalance.Symbol;

@@ -109,7 +109,9 @@
                     <controls:RoundedButton Height="46"
                                             Width="190"
                                             Command="{Binding SendCommand}"
-                                            Margin="0 0 12 0">
+                                            Margin="0 0 12 0"
+                                            IsEnabled="{Binding TokenViewModel.TotalAmount,
+                                            Converter={x:Static converters:NumericConverters.GreaterThanZero}}">
                         <TextBlock Text="Send"
                                    FontSize="18"
                                    Foreground="{DynamicResource RoundedButtonForegroundBrush}" />

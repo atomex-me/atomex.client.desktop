@@ -46,7 +46,14 @@
                         HorizontalAlignment="Stretch"
                         VerticalAlignment="Stretch"
                         Padding="0"
-                        Classes="EmptyBtnWithContent">
+                        Classes="EmptyBtnWithContent"
+                        Classes.Disabled="{Binding TotalAmount,
+                        Converter={x:Static converters:NumericConverters.IsZero}}">
+                    <Button.Styles>
+                        <Style Selector="Button.Disabled">
+                            <Setter Property="Opacity" Value="0.5" />
+                        </Style>
+                    </Button.Styles>
                     <Grid ColumnDefinitions="156"
                           RowDefinitions="156,40">
                         <Border Grid.Column="0"

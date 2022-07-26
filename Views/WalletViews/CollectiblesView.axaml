@@ -50,7 +50,14 @@
                         HorizontalAlignment="Stretch"
                         VerticalAlignment="Stretch"
                         Padding="0"
-                        Classes="EmptyBtnWithContent">
+                        Classes="EmptyBtnWithContent"
+                        Classes.Disabled="{Binding TotalAmount,
+                        Converter={x:Static converters:NumericConverters.IsZero}}">
+                    <Button.Styles>
+                        <Style Selector="Button.Disabled">
+                            <Setter Property="Opacity" Value="0.5" />
+                        </Style>
+                    </Button.Styles>
                     <Grid ColumnDefinitions="156"
                           RowDefinitions="156,40">
                         <Border Grid.Column="0"
@@ -77,16 +84,16 @@
                                         Margin="0 4 0 0">
                                 <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
                                            FontSize="13"
-                                           Text="{Binding Amount}" />
+                                           Text="{Binding TotalAmount}" />
                                 <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
                                            FontSize="13"
-                                           IsVisible="{Binding Amount,
-                                       Converter={x:Static converters:NumericConverters.IsOne}}"
+                                           IsVisible="{Binding TotalAmount,
+                                           Converter={x:Static converters:NumericConverters.IsOne}}"
                                            Text=" collectible" />
                                 <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
                                            FontSize="13"
-                                           IsVisible="{Binding Amount,
-                                       Converter={x:Static converters:NumericConverters.GreaterThanOne}}"
+                                           IsVisible="{Binding TotalAmount,
+                                           Converter={x:Static converters:NumericConverters.IsNotOne}}"
                                            Text=" collectibles" />
                             </StackPanel>
                         </StackPanel>

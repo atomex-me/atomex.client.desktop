@@ -6,6 +6,7 @@ using System.Reactive.Linq;
 using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.ViewModels.Abstract;
 using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
+using Atomex.Client.Desktop.ViewModels.WalletViewModels;
 using Atomex.Common;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
@@ -13,6 +14,13 @@ using ReactiveUI.Fody.Helpers;
 
 namespace Atomex.Client.Desktop.ViewModels
 {
+    public enum ManageAssetsUseCase
+    {
+        Portfolio,
+        Tokens,
+        Collectibles
+    }
+
     public class AssetWithSelection : ViewModelBase
     {
         public IAssetViewModel Asset { get; set; }
@@ -29,6 +37,7 @@ namespace Atomex.Client.Desktop.ViewModels
 
     public class ManageAssetsViewModel : ViewModelBase
     {
+        [Reactive] public ManageAssetsUseCase UseCase { get; set; }
         private ObservableCollection<AssetWithSelection> InitialAssets { get; set; }
         [Reactive] public ObservableCollection<AssetWithSelection> AvailableAssets { get; set; }
         [Reactive] public string SearchPattern { get; set; }
@@ -51,6 +60,17 @@ namespace Atomex.Client.Desktop.ViewModels
                     });
 
                     InitialAssets = new ObservableCollection<AssetWithSelection>(AvailableAssets);
+
+                    var firstAsset = AvailableAssets.FirstOrDefault();
+                    if (firstAsset is null) return;
+
+                    UseCase = firstAsset.Asset switch
+                    {
+                        CurrencyViewModel => ManageAssetsUseCase.Portfolio,
+                        TezosTokenViewModel => ManageAssetsUseCase.Tokens,
+                        Collectible => ManageAssetsUseCase.Collectibles,
+                        _ => UseCase
+                    };
                 });
 
             this.WhenAnyValue(vm => vm.SearchPattern)
@@ -80,7 +100,7 @@ namespace Atomex.Client.Desktop.ViewModels
 
                         asset.IsHidden = asset.Asset.TotalAmountInBase <= Constants.MinBalanceForTokensUsd;
                     });
-                    
+
                     InitialAssets.ForEachDo(asset =>
                     {
                         if (!hideZeroBalances)
@@ -91,7 +111,7 @@ namespace Atomex.Client.Desktop.ViewModels
 
                         asset.IsHidden = asset.Asset.TotalAmountInBase <= Constants.MinBalanceForTokensUsd;
                     });
-                    
+
                     OnHideZeroBalancesChanges?.Invoke(hideZeroBalances);
                 });
 

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive;
+using System.Reactive.Linq;
 using System.Threading.Tasks;
 using Atomex.Blockchain.Tezos;
 using Atomex.Client.Common;
@@ -12,6 +13,7 @@ using Atomex.ViewModels;
 using Atomex.Wallet;
 using Atomex.Wallet.Tezos;
 using Avalonia.Controls;
+using Avalonia.Media.Imaging;
 using Avalonia.Threading;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
@@ -19,30 +21,41 @@ using Serilog;
 
 namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 {
-    public class Collectible
+    public class Collectible : IAssetViewModel
     {
         public IEnumerable<TezosTokenViewModel> Tokens { get; set; }
-        public string Name => Tokens.First().Contract.Name ?? Tokens.First().Contract.Address.TruncateAddress();
+        public string ContractAddress => Tokens.First().Contract.Address;
+        public string Name => Tokens.First().Contract.Name ?? ContractAddress.TruncateAddress();
+        public string PreviewUrl => Tokens.First().PreviewUrl;
 
-        public string PreviewUrl => ThumbsApi.GetCollectiblePreviewUrl(Tokens.First().Contract.Address,
-            Tokens.First().TokenBalance.TokenId);
+        public decimal TotalAmount =>
+            Tokens.Aggregate(0m, (result, tokenViewModel) => result + tokenViewModel.TotalAmount);
 
-        public int Amount => Tokens
-            .Aggregate(0, (result, tokenViewModel) => result + decimal.ToInt32(tokenViewModel.TotalAmount));
-
-        public Action<IEnumerable<TezosTokenViewModel>> OnCollectionClick { get; set; }
+        public string? IconPath => null;
+        public IBitmap? BitmapIcon => null;
+        public string? DisabledIconPath => null;
+        public string CurrencyName => string.Empty;
+        public string CurrencyCode => ContractAddress;
+        public string CurrencyDescription => Name;
+        public string CurrencyFormat => "F0";
+        public string BaseCurrencyFormat => string.Empty;
+        public decimal TotalAmountInBase => 0;
 
         private ReactiveCommand<Unit, Unit>? _onCollectionClickCommand;
 
         public ReactiveCommand<Unit, Unit> OnCollectionClickCommand => _onCollectionClickCommand ??=
-            ReactiveCommand.Create(() => { OnCollectionClick?.Invoke(Tokens); });
+            ReactiveCommand.Create(() => { OnCollectibleClick?.Invoke(Tokens); });
+
+        public Action<IEnumerable<TezosTokenViewModel>> OnCollectibleClick { get; set; }
     }
 
     public class CollectiblesViewModel : ViewModelBase
     {
         private readonly IAtomexApp _app;
         [Reactive] private ObservableCollection<TokenContract>? Contracts { get; set; }
+        [Reactive] public string[] DisabledCollectibles { get; set; }
         [Reactive] public ObservableCollection<Collectible> Collectibles { get; set; }
+        public ObservableCollection<Collectible> InitialCollectibles { get; set; }
         private Action<IEnumerable<TezosTokenViewModel>> ShowTezosCollection { get; }
 
         public CollectiblesViewModel(IAtomexApp app, Action<IEnumerable<TezosTokenViewModel>> showTezosCollection)
@@ -53,10 +66,21 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             _app.AtomexClientChanged += OnAtomexClientChanged;
             _app.Account.BalanceUpdated += OnBalanceUpdatedEventHandler;
 
+            this.WhenAnyValue(vm => vm.DisabledCollectibles)
+                .WhereNotNull()
+                .Skip(1)
+                .SubscribeInMainThread(disabledCollectibles =>
+                {
+                    _app.Account.UserData.DisabledCollectibles = disabledCollectibles;
+                    _app.Account.UserData.SaveToFile(_app.Account.SettingsFilePath);
+                    _ = LoadCollectibles();
+                });
+
             this.WhenAnyValue(vm => vm.Contracts)
                 .WhereNotNull()
                 .SubscribeInMainThread(collectibles => _ = LoadCollectibles());
 
+            DisabledCollectibles = _app.Account.UserData.DisabledCollectibles ?? Array.Empty<string>();
             _ = ReloadTokenContractsAsync();
         }
 
@@ -102,14 +126,21 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             foreach (var contract in Contracts!)
                 nftTokens.AddRange(await TezosTokenViewModelCreator.CreateOrGet(_app, contract, isNft: true));
 
-            Collectibles = new ObservableCollection<Collectible>(nftTokens
+            var collectibles = nftTokens
                 .GroupBy(nft => nft.Contract.Address)
                 .Select(nftGroup => new Collectible
                 {
                     Tokens = nftGroup.Select(g => g),
-                    OnCollectionClick = tokens => ShowTezosCollection.Invoke(tokens)
-                })
-                .OrderByDescending(collectible => collectible.Amount));
+                    OnCollectibleClick = tokens => ShowTezosCollection.Invoke(tokens
+                        .OrderByDescending(token => token.TotalAmount != 0)
+                        .ThenBy(token => token.TokenBalance.Name))
+                });
+
+            InitialCollectibles = new ObservableCollection<Collectible>(collectibles);
+            Collectibles = new ObservableCollection<Collectible>(collectibles
+                .Where(collectible => !DisabledCollectibles.Contains(collectible.Tokens.First().Contract.Address))
+                .OrderByDescending(collectible => collectible.TotalAmount != 0)
+                .ThenBy(collectible => collectible.Name));
         }
 
         public CollectiblesViewModel()

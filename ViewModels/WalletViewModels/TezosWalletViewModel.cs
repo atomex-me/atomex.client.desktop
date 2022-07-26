@@ -289,6 +289,42 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                 App.DialogService.Show(manageAssetsViewModel);
             });
         
+        private ReactiveCommand<Unit, Unit>? _manageCollectiblesCommand;
+
+        public ReactiveCommand<Unit, Unit> ManageCollectiblesCommand =>
+            _manageCollectiblesCommand ??= _manageCollectiblesCommand = ReactiveCommand.Create(() =>
+            {
+                var manageCollectiblesViewModel = new ManageAssetsViewModel
+                {
+                    AvailableAssets = new ObservableCollection<AssetWithSelection>(
+                        CollectiblesViewModel
+                            .InitialCollectibles
+                            .Select(collectible => new AssetWithSelection
+                            {
+                                Asset = collectible,
+                                IsSelected = !_app.Account.UserData.DisabledCollectibles?
+                                    .Contains(collectible.ContractAddress) ?? true
+                            })
+                    ),
+                    OnAssetsChanged = selectedCollectibles =>
+                    {
+                        var disabledCollectibles = CollectiblesViewModel
+                            .InitialCollectibles
+                            .Select(collectible => collectible.ContractAddress)
+                            .Where(contractAddress => !selectedCollectibles.Contains(contractAddress))
+                            .ToArray();
+                
+                        CollectiblesViewModel.DisabledCollectibles = disabledCollectibles;
+                    },
+                    // OnHideZeroBalancesChanges =
+                    //     hideLowBalances => TezosTokensViewModel.HideLowBalances = hideLowBalances,
+                    //
+                    // HideZeroBalances = _app.Account.UserData.HideTokensWithLowBalance ?? false
+                };
+                
+                App.DialogService.Show(manageCollectiblesViewModel);
+            });
+        
 
         private ReactiveCommand<Unit, Unit>? _updateTokensCommand;
 
