@@ -29,7 +29,7 @@
                     CornerRadius="8">
                 <asyncImageLoader:AdvancedImage StretchDirection="Both"
                                                 Stretch="UniformToFill"
-                                                Source="{Binding Collectible.CollectiblePreviewUrl}"
+                                                Source="{Binding TokenViewModel.CollectiblePreviewUrl}"
                                                 Loader="{x:Static services:ImageLoader.Instance}" />
             </Border>
 
@@ -47,7 +47,7 @@
                                    LineHeight="40"
                                    MaxWidth="470"
                                    TextTrimming="CharacterEllipsis"
-                                   Text="{Binding Collectible.TokenBalance.Name}" />
+                                   Text="{Binding TokenViewModel.TokenBalance.Name}" />
 
                         <controls:IconButton Classes="Update Big WithToolTipContent"
                                              HorizontalAlignment="Left"
@@ -58,7 +58,7 @@
                                              Command="{Binding UpdateCommand}">
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock Text="Update " />
-                                <TextBlock Text="{Binding Collectible.TokenBalance.Name}" />
+                                <TextBlock Text="{Binding TokenViewModel.TokenBalance.Name}" />
                             </StackPanel>
                         </controls:IconButton>
                     </StackPanel>
@@ -72,7 +72,7 @@
                         <controls:LinkButton Underlined="True"
                                              Classes="SolidHover"
                                              FontSize="16"
-                                             Content="{Binding Collectible.Contract.Address,
+                                             Content="{Binding TokenViewModel.Contract.Address,
                                              Converter={x:Static converters:StringConverters.ToShortenedAddress}}"
                                              ToolText="{Binding TokenExplorerUri}"
                                              Command="{Binding OpenInExplorerCommand}"
@@ -85,7 +85,7 @@
                                    Text="Token ID #" />
                         <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
                                    FontSize="16"
-                                   Text="{Binding Collectible.TokenBalance.TokenId}" />
+                                   Text="{Binding TokenViewModel.TokenBalance.TokenId}" />
                     </StackPanel>
 
                     <StackPanel Orientation="Horizontal">
@@ -94,13 +94,13 @@
                                    Text="Amount " />
                         <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
                                    FontSize="16"
-                                   Text="{Binding Collectible.TotalAmount}" />
+                                   Text="{Binding TokenViewModel.TotalAmount}" />
                     </StackPanel>
 
                     <TextBlock Foreground="{DynamicResource DefaultForegroundBrush}"
                                FontSize="16"
                                Margin="0 16 0 0"
-                               Text="{Binding Collectible.TokenBalance.Description}"
+                               Text="{Binding TokenViewModel.TokenBalance.Description}"
                                TextTrimming="CharacterEllipsis"
                                MaxHeight="50" />
                 </StackPanel>
@@ -118,7 +118,7 @@
                     <controls:RoundedButton Height="46"
                                             Width="190"
                                             Command="{Binding OpenInExplorerCommand}"
-                                            CommandParameter="{Binding Collectible.AssetUrl}"
+                                            CommandParameter="{Binding TokenViewModel.AssetUrl}"
                                             Classes="GrayButton">
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Margin="0 0 12 0"

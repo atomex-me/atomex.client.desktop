@@ -4,7 +4,6 @@ using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Atomex.Blockchain.Tezos;
 using Avalonia.Controls;
 using Avalonia.Media.Imaging;
 using Avalonia.Threading;
@@ -39,9 +38,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         [Reactive] public int TokenId { get; set; }
         [Reactive] public string To { get; set; }
         [Reactive] public IBitmap? TokenPreview { get; set; }
-        protected readonly string _tokenType;
-        public bool IsFa2 => _tokenType == "FA2";
-
+        private readonly string _tokenType;
         [Reactive] public string CurrencyFormat { get; set; }
         protected string FeeCurrencyFormat { get; set; }
         [Reactive] public string BaseCurrencyFormat { get; set; }

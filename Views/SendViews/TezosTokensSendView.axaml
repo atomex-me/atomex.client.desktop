@@ -390,7 +390,7 @@
                 <!-- token id -->
                 <StackPanel Grid.Row="0"
                             Grid.Column="1"
-                            IsVisible="{Binding IsFa2}"
+                            
                             HorizontalAlignment="Right"
                             VerticalAlignment="Center"
                             Orientation="Horizontal">

@@ -31,6 +31,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         {
             this.WhenAnyValue(vm => vm.TokenViewModel)
                 .WhereNotNull()
+                .Where(_ => this is not CollectibleWalletViewModel)
                 .Select(tokenViewModel => tokenViewModel.TokenBalance.Name)
                 .SubscribeInMainThread(header => Header = header);
 

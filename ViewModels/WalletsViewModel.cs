@@ -108,7 +108,7 @@ namespace Atomex.Client.Desktop.ViewModels
             var walletViewModel = Wallets.FirstOrDefault(w => w is CollectibleWalletViewModel);
             if (walletViewModel is not CollectibleWalletViewModel collectibleWalletViewModel) return;
 
-            collectibleWalletViewModel.Collectible = tokenViewModel;
+            collectibleWalletViewModel.TokenViewModel = tokenViewModel;
             Selected = collectibleWalletViewModel;
         }
 
@@ -118,6 +118,11 @@ namespace Atomex.Client.Desktop.ViewModels
         {
             switch (Selected)
             {
+                case CollectibleWalletViewModel collectibleWalletViewModel:
+                    collectibleWalletViewModel.TokenViewModel = null;
+                    Selected = Wallets.First(wallet => wallet is CollectiblesWalletViewModel);
+                    return;
+
                 case TezosTokenWalletViewModel tokenWalletViewModel:
                     tokenWalletViewModel.TokenViewModel = null;
                     Selected = Wallets.First(wallet => wallet is TezosWalletViewModel);
@@ -125,11 +130,6 @@ namespace Atomex.Client.Desktop.ViewModels
 
                 case CollectiblesWalletViewModel:
                     Selected = Wallets.First(wallet => wallet is TezosWalletViewModel);
-                    return;
-
-                case CollectibleWalletViewModel collectibleWalletViewModel:
-                    collectibleWalletViewModel.Collectible = null;
-                    Selected = Wallets.First(wallet => wallet is CollectiblesWalletViewModel);
                     return;
 
                 default:
