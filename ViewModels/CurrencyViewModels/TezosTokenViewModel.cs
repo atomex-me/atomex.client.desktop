@@ -116,8 +116,9 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
                 }
             }
         }
-        
-        public string CollectiblePreviewUrl => ThumbsApi.GetCollectiblePreviewUrl(Contract.Address, TokenBalance.TokenId);
+
+        public string CollectiblePreviewUrl =>
+            ThumbsApi.GetCollectiblePreviewUrl(Contract.Address, TokenBalance.TokenId);
 
         public TezosTokenViewModel()
         {
@@ -202,8 +203,7 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
             var tokenBalance = 0m;
             addresses.ForEach(a => { tokenBalance += a.TokenBalance.GetTokenBalance(); });
 
-            await Dispatcher.UIThread.InvokeAsync(() => { TotalAmount = tokenBalance; },
-                DispatcherPriority.Background);
+            TotalAmount = tokenBalance;
         }
 
         private ReceiveViewModel GetReceiveDialog()

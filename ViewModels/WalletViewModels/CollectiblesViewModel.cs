@@ -123,21 +123,25 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
         private async Task LoadCollectibles()
         {
-            var nftTokens = new List<TezosTokenViewModel>();
+            var nfts = new List<TezosTokenViewModel>();
 
             foreach (var contract in Contracts!)
-                nftTokens.AddRange(await TezosTokenViewModelCreator.CreateOrGet(_app, contract, isNft: true));
+                nfts.AddRange(await TezosTokenViewModelCreator.CreateOrGet(_app, contract, isNft: true));
 
-            var collectibles = nftTokens
-                .GroupBy(nft => nft.Contract.Address)
-                .Select(nftGroup => new Collectible
+            var collectibles = nfts
+                .GroupBy(collectible => collectible.Contract.Address)
+                .Select(collectibleGroup => new Collectible
                 {
-                    Tokens = nftGroup.Select(g => g),
+                    Tokens = new ObservableCollection<TezosTokenViewModel>(collectibleGroup
+                        .Select(g => g)
+                        .OrderByDescending(token => token.TotalAmount != 0)
+                        .ThenBy(token => token.TokenBalance.Name)
+                    ),
                     OnCollectibleClick = tokens => ShowTezosCollection.Invoke(tokens
                         .OrderByDescending(token => token.TotalAmount != 0)
                         .ThenBy(token => token.TokenBalance.Name))
                 });
-
+            
             InitialCollectibles = new ObservableCollection<Collectible>(collectibles);
             Collectibles = new ObservableCollection<Collectible>(collectibles
                 .Where(collectible => !DisabledCollectibles.Contains(collectible.Tokens.First().Contract.Address))
