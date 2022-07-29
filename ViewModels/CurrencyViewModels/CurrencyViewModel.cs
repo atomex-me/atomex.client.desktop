@@ -33,7 +33,7 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
         public Color AccentColor { get; set; }
         public string IconPath { get; set; }
         public IBitmap? BitmapIcon => null;
-        public bool CanExchange => true;
+        public string? PreviewUrl => null;
         public string DisabledIconPath { get; set; }
         [Reactive] public decimal CurrentQuote { get; set; }
         [Reactive] public decimal? DailyChangePercent { get; set; }
@@ -48,9 +48,9 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
         public string CurrencyCode => Currency.Name;
         public string CurrencyDescription => Currency.Description;
         public string FeeCurrencyCode => Currency.FeeCode;
-        public string BaseCurrencyCode => "USD"; // todo: use base currency from settings
         public string CurrencyFormat => Currency.Format;
         public string FeeCurrencyFormat => Currency.FeeFormat;
+        public string BaseCurrencyCode => "USD"; // todo: use base currency from settings
         public string BaseCurrencyFormat => "$0.##"; // todo: use base currency format from settings
         public string FeeName { get; set; }
 

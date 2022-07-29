@@ -7,7 +7,11 @@
              xmlns:vm="clr-namespace:Atomex.Client.Desktop.ViewModels"
              xmlns:controls="clr-namespace:Atomex.Client.Desktop.Controls"
              xmlns:svg="clr-namespace:Avalonia.Svg.Skia;assembly=Avalonia.Svg.Skia"
-             xmlns:converters="clr-namespace:Atomex.Client.Desktop.Converters">
+             xmlns:converters="clr-namespace:Atomex.Client.Desktop.Converters"
+             xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
+             xmlns:ia="clr-namespace:Avalonia.Xaml.Interactions.Core;assembly=Avalonia.Xaml.Interactions"
+             xmlns:asyncImageLoader="clr-namespace:AsyncImageLoader;assembly=AsyncImageLoader.Avalonia"
+             xmlns:services="clr-namespace:Atomex.Client.Desktop.Services">
 
     <Design.DataContext>
         <vm:ManageAssetsViewModel />
@@ -22,8 +26,28 @@
                        HorizontalAlignment="Center"
                        VerticalAlignment="Center"
                        Foreground="{DynamicResource LightDefault}"
-                       Grid.Column="0"
-                       Text="Manage assets" />
+                       Grid.Column="0">
+                <i:Interaction.Behaviors>
+                    <ia:DataTriggerBehavior Binding="{Binding UseCase}"
+                                            ComparisonCondition="Equal"
+                                            Value="{x:Static vm:ManageAssetsUseCase.Portfolio}">
+                        <ia:ChangePropertyAction PropertyName="Text"
+                                                 Value="Manage assets" />
+                    </ia:DataTriggerBehavior>
+                    <ia:DataTriggerBehavior Binding="{Binding UseCase}"
+                                            ComparisonCondition="Equal"
+                                            Value="{x:Static vm:ManageAssetsUseCase.Tokens}">
+                        <ia:ChangePropertyAction PropertyName="Text"
+                                                 Value="Manage Tezos tokens" />
+                    </ia:DataTriggerBehavior>
+                    <ia:DataTriggerBehavior Binding="{Binding UseCase}"
+                                            ComparisonCondition="Equal"
+                                            Value="{x:Static vm:ManageAssetsUseCase.Collectibles}">
+                        <ia:ChangePropertyAction PropertyName="Text"
+                                                 Value="Manage Tezos collectibles" />
+                    </ia:DataTriggerBehavior>
+                </i:Interaction.Behaviors>
+            </TextBlock>
 
             <Border Grid.Row="0"
                     Height="1"
@@ -51,29 +75,48 @@
 
             <Grid Grid.Row="2"
                   Margin="16 24 16 0"
-                  IsVisible="{Binding OnHideZeroBalancesChanges,
-                  Converter={x:Static ObjectConverters.IsNotNull}}"
+                  IsVisible="{Binding UseCase,
+                  Converter={x:Static converters:EnumToStringNotEqualConverter.Instance},
+                  ConverterParameter={x:Static vm:ManageAssetsUseCase.Portfolio}}"
                   ColumnDefinitions="*,Auto">
                 <TextBlock Grid.Column="0"
                            VerticalAlignment="Center"
                            Foreground="{DynamicResource SecondaryForegroundBrush}"
-                           FontSize="13"
-                           Text="My tokens" />
+                           FontSize="13">
+                    <i:Interaction.Behaviors>
+                        <ia:DataTriggerBehavior Binding="{Binding UseCase}"
+                                                ComparisonCondition="Equal"
+                                                Value="{x:Static vm:ManageAssetsUseCase.Tokens}">
+                            <ia:ChangePropertyAction PropertyName="Text"
+                                                     Value="My tokens" />
+                        </ia:DataTriggerBehavior>
+                        <ia:DataTriggerBehavior Binding="{Binding UseCase}"
+                                                ComparisonCondition="Equal"
+                                                Value="{x:Static vm:ManageAssetsUseCase.Collectibles}">
+                            <ia:ChangePropertyAction PropertyName="Text"
+                                                     Value="My collectibles" />
+                        </ia:DataTriggerBehavior>
+                    </i:Interaction.Behaviors>
+                </TextBlock>
 
                 <CheckBox Grid.Column="1"
                           Padding="12 0 0 0"
                           IsChecked="{Binding HideZeroBalances, Mode=TwoWay}"
+                          IsVisible="{Binding UseCase,
+                          Converter={x:Static converters:EnumToStringEqualConverter.Instance},
+                          ConverterParameter={x:Static vm:ManageAssetsUseCase.Tokens}}"
                           FontSize="13"
                           FontFamily="{DynamicResource DefaultLightFontFamily}"
                           Foreground="{DynamicResource SecondaryForegroundBrush}"
-                          Content="Hide zero balances" />
+                          Content="Hide low balances" />
             </Grid>
 
             <Border Grid.Row="3"
                     Grid.ColumnSpan="2"
                     Margin="16 8 16 0"
-                    IsVisible="{Binding OnHideZeroBalancesChanges,
-                    Converter={x:Static ObjectConverters.IsNotNull}}"
+                    IsVisible="{Binding UseCase,
+                          Converter={x:Static converters:EnumToStringNotEqualConverter.Instance},
+                          ConverterParameter={x:Static vm:ManageAssetsUseCase.Portfolio}}"
                     Height="1"
                     Background="{DynamicResource LightDefaultOpacity10}"
                     VerticalAlignment="Bottom" />
@@ -129,6 +172,28 @@
                                                     Stretch="Fill" />
                                     </Ellipse.Fill>
                                 </Ellipse>
+                                <Border Width="28"
+                                        Height="28"
+                                        ClipToBounds="True"
+                                        CornerRadius="2"
+                                        IsVisible="{Binding Asset.PreviewUrl,
+                                        Converter={x:Static ObjectConverters.IsNotNull}}"
+                                        Classes.Enabled="{Binding IsSelected}"
+                                        Classes.Disabled="{Binding !IsSelected}">
+                                    <Border.Styles>
+                                        <Style Selector="Border.Disabled">
+                                            <Setter Property="Opacity" Value="0.5" />
+                                        </Style>
+                                        <Style Selector="Border.Enabled">
+                                            <Setter Property="Opacity" Value="1" />
+                                        </Style>
+                                    </Border.Styles>
+                                    <asyncImageLoader:AdvancedImage StretchDirection="Both"
+                                                                    Stretch="UniformToFill"
+                                                                    Source="{Binding Asset.PreviewUrl}"
+                                                                    Loader="{x:Static services:ImageLoader.Instance}" />
+                                </Border>
+
                                 <TextBlock Margin="17 0 0 0"
                                            Text="{Binding Asset.CurrencyDescription}"
                                            FontFamily="{DynamicResource DefaultLightFontFamily}"
@@ -144,11 +209,11 @@
                                         VerticalAlignment="Center"
                                         Margin="16 11">
                                 <StackPanel VerticalAlignment="Center">
-                                    <StackPanel Orientation="Horizontal"
-                                                Classes.ZeroBalance="{Binding Asset.TotalAmount,
-                                                Converter={x:Static converters:NumericConverters.IsZero}}"
-                                                Classes.NotZeroBalance="{Binding Asset.TotalAmount,
-                                                Converter={x:Static converters:NumericConverters.NotZero}}">
+                                    <!-- Classes.ZeroBalance="{Binding Asset.TotalAmount, -->
+                                    <!-- Converter={x:Static converters:NumericConverters.IsZero}}" -->
+                                    <!-- Classes.NotZeroBalance="{Binding Asset.TotalAmount, -->
+                                    <!-- Converter={x:Static converters:NumericConverters.NotZero}}" -->
+                                    <StackPanel Orientation="Horizontal">
                                         <StackPanel.Styles>
                                             <Style Selector="StackPanel.ZeroBalance">
                                                 <Setter Property="Margin" Value="0" />
@@ -176,18 +241,29 @@
                                                    VerticalAlignment="Center"
                                                    FontSize="16"
                                                    Text="{Binding Asset.CurrencyName}"
+                                                   IsVisible="{Binding Asset.CurrencyName,
+                                                   Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
                                                    Margin="3 0 0 0"
                                                    Classes.IsHidden="{Binding IsHidden}"
                                                    Classes.IsSelected="{Binding IsSelected}"
                                                    Classes.NotSelected="{Binding !IsSelected}" />
                                     </StackPanel>
 
+                                    <!-- IsVisible="{Binding Asset.TotalAmount, -->
+                                    <!-- Converter={x:Static converters:NumericConverters.GreaterThanZero}} -->
                                     <TextBlock HorizontalAlignment="Right"
                                                Foreground="{DynamicResource SecondaryForegroundBrush}"
                                                FontSize="13"
-                                               IsVisible="{Binding Asset.TotalAmount,
-                                               Converter={x:Static converters:NumericConverters.GreaterThanZero}}"
                                                Margin="0 2 0 0">
+                                        <TextBlock.IsVisible>
+                                            <MultiBinding Converter="{x:Static BoolConverters.And}">
+                                                <Binding Path="Asset.TotalAmount"
+                                                         Converter="{x:Static converters:NumericConverters.GreaterThanZero}" />
+                                                <Binding Path="$parent[ListBox].DataContext.UseCase"
+                                                         Converter="{x:Static converters:EnumToStringNotEqualConverter.Instance}"
+                                                         ConverterParameter="{x:Static vm:ManageAssetsUseCase.Collectibles}"/>
+                                            </MultiBinding>
+                                        </TextBlock.IsVisible>
                                         <TextBlock.Text>
                                             <MultiBinding Converter="{StaticResource AmountToStringConverter}">
                                                 <Binding Path="Asset.TotalAmountInBase" Mode="OneWay" />

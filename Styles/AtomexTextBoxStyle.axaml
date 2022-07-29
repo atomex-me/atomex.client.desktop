@@ -1,12 +1,12 @@
 <Styles xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-    
+
     <Style Selector="TextBox.AtomexTextBox">
         <Setter Property="Background" Value="{DynamicResource AlmostTransparentBrush}" />
         <Setter Property="Foreground" Value="{DynamicResource DefaultForegroundBrush}" />
         <Setter Property="Padding" Value="20 0" />
         <Setter Property="Height" Value="50" />
-        <Setter Property="BorderBrush" Value="{DynamicResource CustomTextBoxBorderBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource LightDefaultOpacity10}" />
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="CaretBrush" Value="{DynamicResource CustomTextBoxCaretBrush}" />
         <Setter Property="VerticalContentAlignment" Value="Center" />

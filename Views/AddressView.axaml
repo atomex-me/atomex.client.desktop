@@ -15,7 +15,6 @@
     <UserControl.Resources>
         <converters:AddressShouldShrinkConverter x:Key="AddressShouldShrinkConverter" />
         <converters:AddressShouldExpandConverter x:Key="AddressShouldExpandConverter" />
-        <converters:ShortenedAddressConverter x:Key="ShortenedAddressConverter" />
     </UserControl.Resources>
 
     <Border Padding="12 0">
@@ -37,7 +36,8 @@
                 <controls:LinkButton Underlined="True"
                                      Classes="SolidHover"
                                      FontSize="16"
-                                     Content="{Binding Address, Converter={StaticResource ShortenedAddressConverter}}"
+                                     Content="{Binding Address,
+                                     Converter={x:Static converters:StringConverters.ToLongShortenedAddress}}"
                                      ToolText="{Binding AddressExplorerUri}"
                                      Command="{Binding OpenInExplorerCommand}"
                                      IsVisible="{Binding $parent[Border].Bounds.Width,

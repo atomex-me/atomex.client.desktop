@@ -6,8 +6,8 @@
         <UseAppHost>true</UseAppHost>
         <ApplicationIcon>Resources/Images/atomex_logo_256x256_ico.ico</ApplicationIcon>
 
-        <AssemblyVersion>1.2.19</AssemblyVersion>
-        <Version>1.2.19</Version>
+        <AssemblyVersion>1.2.21</AssemblyVersion>
+        <Version>1.2.21</Version>
     </PropertyGroup>
     <Choose>
         <When Condition=" '$(Configuration)' == 'Debug' ">
@@ -49,6 +49,7 @@
         <PackageReference Include="Serilog.Settings.Configuration" Version="3.1.0" />
         <PackageReference Include="Serilog.Sinks.Console" Version="3.1.1" />
         <PackageReference Include="ReactiveUI.Fody" Version="16.4.1" />
+        <PackageReference Include="AsyncImageLoader.Avalonia" Version="2.4.0" />
     </ItemGroup>
 
 

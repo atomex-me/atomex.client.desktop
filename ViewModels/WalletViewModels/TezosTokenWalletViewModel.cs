@@ -27,14 +27,11 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         public TezosTokenWalletViewModel(
             IAtomexApp app,
             Action<ViewModelBase?> showRightPopupContent) :
-            base(app: app,
-                showRightPopupContent: showRightPopupContent,
-                setConversionTab: null,
-                setWertCurrency: null,
-                currency: null)
+            base(app: app, showRightPopupContent: showRightPopupContent)
         {
             this.WhenAnyValue(vm => vm.TokenViewModel)
                 .WhereNotNull()
+                .Where(_ => this is not CollectibleWalletViewModel)
                 .Select(tokenViewModel => tokenViewModel.TokenBalance.Name)
                 .SubscribeInMainThread(header => Header = header);
 
@@ -45,6 +42,10 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                     LoadAddresses();
                     _ = LoadTransfers(tokenViewModel);
                 });
+            
+            this.WhenAnyValue(vm => vm.TokenViewModel)
+                .Where(token => token == null && AddressesViewModel != null)
+                .SubscribeInMainThread(_ => AddressesViewModel.Dispose());
         }
 
         private async Task LoadTransfers(TezosTokenViewModel tokenViewModel)
@@ -102,7 +103,6 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         {
             try
             {
-                //if (!Currencies.IsTezosBased(args.Currency) || TokenViewModel == null) return;
                 if (!args.IsTokenUpdate ||
                     TokenViewModel == null ||
                     args.TokenContract != null && (args.TokenContract != TokenViewModel.Contract.Address || args.TokenId != TokenViewModel.TokenBalance.TokenId))

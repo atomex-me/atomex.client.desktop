@@ -1,9 +1,10 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Drawing.Imaging;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Threading.Tasks;
+using AsyncImageLoader.Loaders;
 using Atomex.Common;
 using Avalonia;
 using Avalonia.Media.Imaging;
@@ -26,7 +27,7 @@ namespace Atomex.Client.Desktop.Services
             Images["default"] = defaultBitmap;
         }
 
-        public async Task LoadImageFromUrl(string url, Action successCallback = null)
+        public async Task LoadImageFromUrl(string url, Action? successCallback = null)
         {
             try
             {
@@ -40,33 +41,51 @@ namespace Atomex.Client.Desktop.Services
                         .ReadAsByteArrayAsync()
                         .ConfigureAwait(false);
 
-                    Stream imgStream = new MemoryStream(previewBytes);
-                    using System.Drawing.Bitmap bmp = new(imgStream);
-                    await using MemoryStream memory = new();
-                    bmp.Save(memory, ImageFormat.Png);
-                    memory.Position = 0;
-                    Images
-                        [url] = new Bitmap(memory);
+                    using (var ms = new MemoryStream(previewBytes))
+                    {
+                        Images[url] = new Bitmap(ms);
+                    }
 
                     successCallback?.Invoke();
                 }
             }
             catch (Exception e)
             {
-                Log.Error($"Error during loading image {url} \n {e}");
+                Log.Error(e, "Error during loading image {Url}", url);
             }
         }
 
-        public bool GetImageLoaded(string url)
+        public bool TryGetImage(string url, [MaybeNullWhen(false)] out IBitmap value)
         {
-            return url != null && Images.TryGetValue(url, out _);
+            return Images.TryGetValue(url, out value);
         }
 
-        public IBitmap GetImage(string url)
+        public IBitmap GetImage(string? imageSource)
         {
-            return url != null && Images.TryGetValue(url, out var image)
+            if (imageSource == null) return Images["default"];
+
+            if (!imageSource.StartsWith("http"))
+            {
+                try
+                {
+                    var assets = AvaloniaLocator.Current.GetService<IAssetLoader>();
+                    return new Bitmap(
+                        assets!.Open(new Uri($"avares://Atomex.Client.Desktop/Resources/Images/{imageSource}")));
+                }
+                catch (Exception e)
+                {
+                    Log.Error(e, "Can't find image {Source} in resources", imageSource);
+                }
+            }
+
+            return Images.TryGetValue(imageSource, out var image)
                 ? image
                 : Images["default"];
         }
+    }
+
+    public class ImageLoader : DiskCachedWebImageLoader
+    {
+        public static ImageLoader Instance { get; } = new();
     }
 }

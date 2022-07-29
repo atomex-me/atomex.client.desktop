@@ -14,7 +14,6 @@ using Atomex.Client.Desktop.ViewModels.Abstract;
 using Atomex.Common;
 using Atomex.Core;
 using Atomex.Cryptography;
-using Atomex.ViewModels;
 using Atomex.Wallet;
 using Atomex.Wallet.Tezos;
 using Avalonia.Controls;
@@ -58,7 +57,7 @@ namespace Atomex.Client.Desktop.ViewModels
                 _ => throw new NotSupportedException($"Key type {keyType} not supported.")
             };
 
-        private ReactiveCommand<Unit, Unit> _updateAddressCommand;
+        private ReactiveCommand<Unit, Unit>? _updateAddressCommand;
 
         public ReactiveCommand<Unit, Unit> UpdateAddressCommand => _updateAddressCommand ??=
             ReactiveCommand.CreateFromTask(async () =>
@@ -67,17 +66,17 @@ namespace Atomex.Client.Desktop.ViewModels
                 await UpdateAddress(Address);
             });
 
-        private ReactiveCommand<Unit, Unit> _copyCommand;
+        private ReactiveCommand<Unit, Unit>? _copyCommand;
 
         public ReactiveCommand<Unit, Unit> CopyCommand => _copyCommand ??= ReactiveCommand.Create(
             () => CopyToClipboard?.Invoke(Address));
 
-        private ReactiveCommand<Unit, Unit> _openInExplorerCommand;
+        private ReactiveCommand<Unit, Unit>? _openInExplorerCommand;
 
         public ReactiveCommand<Unit, Unit> OpenInExplorerCommand => _openInExplorerCommand ??= ReactiveCommand.Create(
             () => OpenInExplorer?.Invoke(Address));
 
-        private ReactiveCommand<Unit, Unit> _exportKeyCommand;
+        private ReactiveCommand<Unit, Unit>? _exportKeyCommand;
 
         public ReactiveCommand<Unit, Unit> ExportKeyCommand => _exportKeyCommand ??= ReactiveCommand.Create(
             () => ExportKey?.Invoke(Address));
@@ -261,7 +260,7 @@ namespace Atomex.Client.Desktop.ViewModels
             }
         }
 
-        private ReactiveCommand<AddressesSortField, Unit> _setSortTypeCommand;
+        private ReactiveCommand<AddressesSortField, Unit>? _setSortTypeCommand;
 
         public ReactiveCommand<AddressesSortField, Unit> SetSortTypeCommand =>
             _setSortTypeCommand ??= ReactiveCommand.Create<AddressesSortField>(sortField =>

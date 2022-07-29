@@ -123,6 +123,7 @@
                 <svg:Svg Path="/Resources/Icons/logo-only-title.svg"
                          HorizontalAlignment="Right"
                          VerticalAlignment="Center"
+                         Margin="8 0 0 0"
                          Height="12" />
 
                 <svg:Svg Path="/Resources/Icons/logo.svg"

@@ -5,13 +5,11 @@ using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
-
 using Avalonia.Threading;
 using DynamicData;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using Serilog;
-
 using Atomex.Blockchain.Tezos;
 using Atomex.Client.Common;
 using Atomex.Client.Desktop.Common;
@@ -21,6 +19,8 @@ using Atomex.Core;
 using Atomex.MarketData.Abstract;
 using Atomex.Wallet;
 using Atomex.Wallet.Tezos;
+using Avalonia.Controls;
+
 
 namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 {
@@ -94,21 +94,24 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             var tokens = new ObservableCollection<TezosTokenViewModel>();
 
             foreach (var contract in Contracts!)
-                tokens.AddRange(await TezosTokenViewModelCreator.CreateOrGet(_app, contract, SetConversionTab));
+                tokens.AddRange(await TezosTokenViewModelCreator.CreateOrGet(_app, contract, false, SetConversionTab));
 
             return tokens.OrderByDescending(token => token.CanExchange)
                 .ThenByDescending(token => token.TotalAmountInBase);
         }
 
 
-        private ReactiveCommand<TezosTokenViewModel, Unit> _setTokenCommand;
+        private ReactiveCommand<TezosTokenViewModel, Unit>? _setTokenCommand;
 
         private ReactiveCommand<TezosTokenViewModel, Unit> SetTokenCommand => _setTokenCommand ??=
             ReactiveCommand.Create<TezosTokenViewModel>(
                 tezosTokenViewModel => ShowTezosToken.Invoke(tezosTokenViewModel));
 
-        private void OnAtomexClientChanged(object sender, AtomexClientChangedEventArgs e)
+        private void OnAtomexClientChanged(object sender, AtomexClientChangedEventArgs args)
         {
+            if (_app.Account != null) return;
+
+            _app.AtomexClientChanged -= OnAtomexClientChanged;
             Contracts?.Clear();
         }
 
@@ -116,11 +119,13 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         {
             try
             {
-                if (!args.IsTokenUpdate)
-                    return;
-
-                await Dispatcher.UIThread.InvokeAsync(async () => { await ReloadTokenContractsAsync(); },
-                    DispatcherPriority.Background);
+                if (args.IsTokenUpdate &&
+                    (args.TokenContract == null || (Contracts != null && Contracts.Select(c => c.Address)
+                        .Contains(args.TokenContract))))
+                {
+                    await Dispatcher.UIThread.InvokeAsync(async () => { await ReloadTokenContractsAsync(); },
+                        DispatcherPriority.Background);
+                }
             }
             catch (Exception e)
             {
@@ -147,7 +152,8 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         public TezosTokensViewModel()
         {
 #if DEBUG
-            DesignerMode();
+            if (Design.IsDesignMode)
+                DesignerMode();
 #endif
         }
 #if DEBUG

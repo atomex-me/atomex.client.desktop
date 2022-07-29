@@ -6,7 +6,6 @@ using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
-
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Input.Platform;
@@ -19,7 +18,6 @@ using Serilog.Events;
 using Serilog.Formatting;
 using Serilog.Formatting.Display;
 using Sentry;
-
 using Atomex.Client.Desktop.Services;
 using Atomex.Client.Desktop.ViewModels;
 using Atomex.Client.Desktop.Views;
@@ -70,7 +68,7 @@ namespace Atomex.Client.Desktop
 
             var tezToolsQuotesProvider = new TezToolsQuotesProvider(
                 log: LoggerFactory.CreateLogger<TezToolsQuotesProvider>());
-            
+
             var quotesProvider = new MultiSourceQuotesProvider(
                 log: LoggerFactory.CreateLogger<MultiSourceQuotesProvider>(),
                 bitfinexQuotesProvider, tezToolsQuotesProvider);
@@ -140,7 +138,7 @@ namespace Atomex.Client.Desktop
         {
             get
             {
-                var resourceName = "currencies.json";
+                const string resourceName = "currencies.json";
                 var resourceNames = CoreAssembly.GetManifestResourceNames();
                 var fullFileName = resourceNames.FirstOrDefault(n => n.EndsWith(resourceName));
                 var stream = CoreAssembly.GetManifestResourceStream(fullFileName!);

@@ -35,6 +35,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         private bool HasDelegations { get; set; }
         private DelegateViewModel DelegateViewModel { get; }
         private TezosTokensViewModel TezosTokensViewModel { get; set; }
+        private CollectiblesViewModel CollectiblesViewModel { get; set; }
         private TezosConfig? Tezos { get; }
 
         public TezosWalletViewModel()
@@ -47,8 +48,9 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             Action<string>? setWertCurrency,
             Action<ViewModelBase?> showRightPopupContent,
             Action<TezosTokenViewModel> showTezosToken,
+            Action<IEnumerable<TezosTokenViewModel>> showTezosCollection,
             CurrencyConfig currency)
-            : base(app, setConversionTab, setWertCurrency, showRightPopupContent, currency)
+            : base(app, showRightPopupContent, currency, setConversionTab, setWertCurrency)
         {
             Tezos = currency as TezosConfig;
             Delegations = new ObservableCollection<Delegation>();
@@ -70,6 +72,8 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
             DelegateViewModel = new DelegateViewModel(_app);
             TezosTokensViewModel = new TezosTokensViewModel(_app, showTezosToken, setConversionTab);
+            CollectiblesViewModel = new CollectiblesViewModel(_app, showTezosCollection);
+
             CurrentDelegationSortField = DelegationSortField.ByBalance;
             CurrentDelegationSortDirection = SortDirection.Desc;
         }
@@ -191,11 +195,6 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                             currentCycle - txCycle < 7 ? DelegationStatus.Confirmed :
                             DelegationStatus.Active
                     });
-
-                    if (!string.IsNullOrEmpty(baker.Logo))
-                    {
-                        _ = Task.Run(() => { _ = App.ImageService.LoadImageFromUrl(baker.Logo); });
-                    }
                 }
 
                 await Dispatcher.UIThread.InvokeAsync(() =>
@@ -268,7 +267,8 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                             .Select(token => new AssetWithSelection
                             {
                                 Asset = token,
-                                IsSelected = !_app.Account.UserData.DisabledTokens?.Contains(token.TokenBalance.Symbol) ?? true
+                                IsSelected =
+                                    !_app.Account.UserData.DisabledTokens?.Contains(token.TokenBalance.Symbol) ?? true
                             })
                     ),
                     OnAssetsChanged = selectedSymbols =>
@@ -283,13 +283,47 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                     },
                     OnHideZeroBalancesChanges =
                         hideLowBalances => TezosTokensViewModel.HideLowBalances = hideLowBalances,
-                    
+
                     HideZeroBalances = _app.Account.UserData.HideTokensWithLowBalance ?? false
                 };
 
                 App.DialogService.Show(manageAssetsViewModel);
             });
-        
+
+        private ReactiveCommand<Unit, Unit>? _manageCollectiblesCommand;
+
+        public ReactiveCommand<Unit, Unit> ManageCollectiblesCommand =>
+            _manageCollectiblesCommand ??= _manageCollectiblesCommand = ReactiveCommand.Create(() =>
+            {
+                var manageCollectiblesViewModel = new ManageAssetsViewModel
+                {
+                    AvailableAssets = new ObservableCollection<AssetWithSelection>(
+                        CollectiblesViewModel
+                            .InitialCollectibles
+                            .OrderByDescending(collectible => collectible.TotalAmount != 0)
+                            .ThenBy(collectible => collectible.Name)
+                            .Select(collectible => new AssetWithSelection
+                            {
+                                Asset = collectible,
+                                IsSelected = !_app.Account.UserData.DisabledCollectibles?
+                                    .Contains(collectible.ContractAddress) ?? true
+                            })
+                    ),
+                    OnAssetsChanged = selectedCollectibles =>
+                    {
+                        var disabledCollectibles = CollectiblesViewModel
+                            .InitialCollectibles
+                            .Select(collectible => collectible.ContractAddress)
+                            .Where(contractAddress => !selectedCollectibles.Contains(contractAddress))
+                            .ToArray();
+
+                        CollectiblesViewModel.DisabledCollectibles = disabledCollectibles;
+                    }
+                };
+
+                App.DialogService.Show(manageCollectiblesViewModel);
+            });
+
 
         private ReactiveCommand<Unit, Unit>? _updateTokensCommand;
 
