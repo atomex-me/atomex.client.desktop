@@ -73,7 +73,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             DelegateViewModel = new DelegateViewModel(_app);
             TezosTokensViewModel = new TezosTokensViewModel(_app, showTezosToken, setConversionTab);
             CollectiblesViewModel = new CollectiblesViewModel(_app, showTezosCollection);
-            
+
             CurrentDelegationSortField = DelegationSortField.ByBalance;
             CurrentDelegationSortDirection = SortDirection.Desc;
         }
@@ -267,7 +267,8 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                             .Select(token => new AssetWithSelection
                             {
                                 Asset = token,
-                                IsSelected = !_app.Account.UserData.DisabledTokens?.Contains(token.TokenBalance.Symbol) ?? true
+                                IsSelected =
+                                    !_app.Account.UserData.DisabledTokens?.Contains(token.TokenBalance.Symbol) ?? true
                             })
                     ),
                     OnAssetsChanged = selectedSymbols =>
@@ -282,13 +283,13 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                     },
                     OnHideZeroBalancesChanges =
                         hideLowBalances => TezosTokensViewModel.HideLowBalances = hideLowBalances,
-                    
+
                     HideZeroBalances = _app.Account.UserData.HideTokensWithLowBalance ?? false
                 };
 
                 App.DialogService.Show(manageAssetsViewModel);
             });
-        
+
         private ReactiveCommand<Unit, Unit>? _manageCollectiblesCommand;
 
         public ReactiveCommand<Unit, Unit> ManageCollectiblesCommand =>
@@ -299,6 +300,8 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                     AvailableAssets = new ObservableCollection<AssetWithSelection>(
                         CollectiblesViewModel
                             .InitialCollectibles
+                            .OrderByDescending(collectible => collectible.TotalAmount != 0)
+                            .ThenBy(collectible => collectible.Name)
                             .Select(collectible => new AssetWithSelection
                             {
                                 Asset = collectible,
@@ -313,18 +316,14 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                             .Select(collectible => collectible.ContractAddress)
                             .Where(contractAddress => !selectedCollectibles.Contains(contractAddress))
                             .ToArray();
-                
+
                         CollectiblesViewModel.DisabledCollectibles = disabledCollectibles;
-                    },
-                    // OnHideZeroBalancesChanges =
-                    //     hideLowBalances => TezosTokensViewModel.HideLowBalances = hideLowBalances,
-                    //
-                    // HideZeroBalances = _app.Account.UserData.HideTokensWithLowBalance ?? false
+                    }
                 };
-                
+
                 App.DialogService.Show(manageCollectiblesViewModel);
             });
-        
+
 
         private ReactiveCommand<Unit, Unit>? _updateTokensCommand;
 

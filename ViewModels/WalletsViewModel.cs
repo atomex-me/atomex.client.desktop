@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive;
-using System.Reactive.Linq;
 using Avalonia.Controls;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
@@ -25,9 +24,6 @@ namespace Atomex.Client.Desktop.ViewModels
         [Reactive] public ObservableCollection<IWalletViewModel> Wallets { get; private set; }
         [Reactive] public IWalletViewModel Selected { get; set; }
 
-        // todo: remove
-        [Reactive] private bool IsTezosTokensSelected { get; set; }
-
         public WalletsViewModel()
         {
 #if DEBUG
@@ -39,13 +35,6 @@ namespace Atomex.Client.Desktop.ViewModels
         public WalletsViewModel(IAtomexApp app)
         {
             App = app ?? throw new ArgumentNullException(nameof(app));
-
-            // todo: remove
-            this.WhenAnyValue(vm => vm.Selected)
-                .WhereNotNull()
-                .Select(walletViewModel => walletViewModel is TezosTokensWalletViewModel)
-                .SubscribeInMainThread(res => IsTezosTokensSelected = res);
-
             SubscribeToServices();
         }
 

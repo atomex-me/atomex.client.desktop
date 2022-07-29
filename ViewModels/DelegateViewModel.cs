@@ -441,7 +441,6 @@ namespace Atomex.Client.Desktop.ViewModels
             {
                 BakersList = bakers;
                 InitialBakersList = new List<BakerViewModel>(BakersList);
-                //UseDefaultFee = _useDefaultFee;
             }, DispatcherPriority.Background);
         }
 
