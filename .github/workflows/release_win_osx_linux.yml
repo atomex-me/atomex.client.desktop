@@ -42,10 +42,10 @@ jobs:
       - name: Build Desktop app .msi installer
         run: MSBuild Atomex.Client.Desktop.Installer/Atomex.Client.Desktop.Installer.wixproj /p:Configuration=Release /p:RuntimeIdentifiers=win-x64 /clp:ErrorsOnly
         
-      - name: Sign MSI installer
-        run: |
-          $version=(git describe --tags --abbrev=0)
-          & "C:\Program Files (x86)\Windows Kits\10\bin\10.0.19041.0\x64\signtool.exe" sign /f certificate\certificate.pfx /p '${{ secrets.WINDOWS_CERT_PFX_PASS }}' /t http://timestamp.comodoca.com/authenticode "Atomex.Client.Desktop.Installer\Installs\Atomex.Client-$version.0-x64.msi"
+#      - name: Sign MSI installer
+#        run: |
+#          $version=(git describe --tags --abbrev=0)
+#          & "C:\Program Files (x86)\Windows Kits\10\bin\10.0.19041.0\x64\signtool.exe" sign /f certificate\certificate.pfx /p '${{ secrets.WINDOWS_CERT_PFX_PASS }}' /t http://timestamp.comodoca.com/authenticode "Atomex.Client.Desktop.Installer\Installs\Atomex.Client-$version.0-x64.msi"
           
       - name: Upload windows release artifacts
         uses: actions/upload-artifact@v2
