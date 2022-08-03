@@ -26,8 +26,10 @@
                     VerticalAlignment="Stretch"
                     HorizontalAlignment="Stretch"
                     ClipToBounds="True"
-                    CornerRadius="8">
-                <asyncImageLoader:AdvancedImage StretchDirection="Both"
+                    CornerRadius="8"
+                    Classes.IsImageLoading="{Binding #PreviewImg.IsLoading}">
+                <asyncImageLoader:AdvancedImage Name="PreviewImg"
+                                                StretchDirection="Both"
                                                 Stretch="UniformToFill"
                                                 Source="{Binding TokenViewModel.CollectiblePreviewUrl}"
                                                 Loader="{x:Static services:ImageLoader.Instance}" />
