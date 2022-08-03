@@ -5,6 +5,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Threading.Tasks;
 using AsyncImageLoader.Loaders;
+using Atomex.Client.Desktop.Common;
 using Atomex.Common;
 using Avalonia;
 using Avalonia.Media.Imaging;
@@ -86,6 +87,10 @@ namespace Atomex.Client.Desktop.Services
 
     public class ImageLoader : DiskCachedWebImageLoader
     {
+        private ImageLoader() : base(cacheFolder: $"{WalletInfo.BaseUserDataDirectory}Cache/Images/")
+        {
+        }
+
         public static ImageLoader Instance { get; } = new();
     }
 }
