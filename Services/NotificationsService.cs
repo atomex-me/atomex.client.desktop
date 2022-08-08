@@ -2,13 +2,15 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using Atomex.Blockchain;
-using Atomex.Common;
-using Atomex.Services;
-using Atomex.Wallet;
+
 using Avalonia.Controls.Notifications;
 using Avalonia.Threading;
 using Serilog;
+
+using Atomex.Blockchain;
+using Atomex.Client.Common;
+using Atomex.Common;
+using Atomex.Wallet;
 
 namespace Atomex.Client.Desktop.Services
 {
@@ -35,14 +37,12 @@ namespace Atomex.Client.Desktop.Services
             Manager = manager;
             App = atomexApp;
 
-            App.AtomexClientChanged += OnAtomexClientChangedEventHandler!;
+            // App.AtomexClientChanged += OnAtomexClientChangedEventHandler!;
         }
 
         private void OnAtomexClientChangedEventHandler(object sender, AtomexClientChangedEventArgs args)
         {
-            var atomexClient = args?.AtomexClient;
-
-            if (atomexClient?.Account == null)
+            if (App?.Account == null)
                 return;
 
             // App.Account.UserData.Notifications ??= new List<AtomexNotification>();

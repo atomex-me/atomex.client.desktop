@@ -15,7 +15,6 @@
     <UserControl.Resources>
         <converters:AddressShouldShrinkConverter x:Key="AddressShouldShrinkConverter" />
         <converters:AddressShouldExpandConverter x:Key="AddressShouldExpandConverter" />
-        <converters:ShortenedAddressConverter x:Key="ShortenedAddressConverter" />
     </UserControl.Resources>
 
     <Border Padding="12 0">
@@ -37,7 +36,8 @@
                 <controls:LinkButton Underlined="True"
                                      Classes="SolidHover"
                                      FontSize="16"
-                                     Content="{Binding Address, Converter={StaticResource ShortenedAddressConverter}}"
+                                     Content="{Binding Address,
+                                     Converter={x:Static converters:StringConverters.ToLongShortenedAddress}}"
                                      ToolText="{Binding AddressExplorerUri}"
                                      Command="{Binding OpenInExplorerCommand}"
                                      IsVisible="{Binding $parent[Border].Bounds.Width,
@@ -53,25 +53,29 @@
                        Foreground="{DynamicResource SecondaryForegroundBrush}"
                        VerticalAlignment="Center"
                        FontSize="13"
+                       TextTrimming="CharacterEllipsis"
                        Text="{Binding Path}" />
 
             <TextBlock Grid.Column="2"
                        Foreground="{DynamicResource SecondaryForegroundBrush}"
                        VerticalAlignment="Center"
                        FontSize="13"
+                       TextTrimming="CharacterEllipsis"
                        Text="{Binding Type}" />
 
             <TextBlock Grid.Column="3"
                        Foreground="{DynamicResource SecondaryForegroundBrush}"
                        VerticalAlignment="Center"
                        FontSize="13"
+                       TextTrimming="CharacterEllipsis"
                        Text="{Binding Balance}" />
 
             <TextBlock Grid.Column="4"
                        Foreground="{DynamicResource SecondaryForegroundBrush}"
                        VerticalAlignment="Center"
                        FontSize="13"
-                       Text="{Binding TokenBalance}" />
+                       TextTrimming="CharacterEllipsis"
+                       Text="{Binding TokenBalanceString}" />
 
             <controls:IconButton Grid.Column="5"
                                  Classes="Key"

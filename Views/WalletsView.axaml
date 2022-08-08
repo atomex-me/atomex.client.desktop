@@ -2,7 +2,6 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:converters="clr-namespace:Atomex.Client.Desktop.Converters"
              xmlns:controls="clr-namespace:Atomex.Client.Desktop.Controls"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="Atomex.Client.Desktop.Views.WalletsView"
@@ -11,26 +10,8 @@
     <Design.DataContext>
         <vm:WalletsViewModel />
     </Design.DataContext>
-
-    <UserControl.Resources>
-        <converters:WalletsViewMarginConverter x:Key="WalletsViewMarginConverter" />
-    </UserControl.Resources>
     
-    <UserControl.Styles>
-        <Style Selector="Border.WithTezosTokens">
-            <Setter Property="Padding" Value="10 0 10 10" />
-        </Style>
-        
-        <Style Selector="Border.WithoutTezosTokens">
-            <Setter Property="Padding" Value="50 0 50 0" />
-        </Style>
-    </UserControl.Styles>
-
-    <!-- todo: remove -->
-    <Border Classes.WithTezosTokens="{Binding IsTezosTokensSelected}"
-            Classes.WithoutTezosTokens="{Binding !IsTezosTokensSelected}"
-            Margin="{Binding $parent[Window].DataContext.IsLinux,
-            Converter={StaticResource WalletsViewMarginConverter}}"
+    <Border Padding="50 0 50 0"
             Name="MainControl">
         <Grid RowDefinitions="Auto,Auto,*">
             <Grid Grid.Row="0"

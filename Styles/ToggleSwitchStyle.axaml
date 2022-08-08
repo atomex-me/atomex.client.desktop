@@ -52,6 +52,28 @@
         <Setter Property="Background" Value="{DynamicResource ToggleSwitchContainerBackgroundPointerOver}" />
     </Style>
 
+    <!-- DisabledState -->
+    <Style Selector="ToggleSwitch:disabled">
+        <Setter Property="Opacity" Value="0.2"/>
+    </Style>
+
+    <Style Selector="ToggleSwitch:disabled /template/ Border#OuterBorder">
+        <Setter Property="Background" Value="{DynamicResource LightDefaultOpacity10}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource LightDefaultOpacity10}" />
+    </Style>
+
+    <Style Selector="ToggleSwitch:disabled /template/ Ellipse#SwitchKnobOff">
+        <Setter Property="Fill" Value="{DynamicResource LightDefaultOpacity50}" />
+    </Style>
+
+    <Style Selector="ToggleSwitch:disabled /template/ Ellipse#SwitchKnobOn">
+        <Setter Property="Fill" Value="{DynamicResource ToggleSwitchKnobFillOnPointerOver}" />
+    </Style>
+
+    <Style Selector="ToggleSwitch:disabled /template/ Border#SwitchKnobBounds">
+        <Setter Property="Background" Value="{DynamicResource Emerald}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource Emerald}" />
+    </Style>
 
     <Style Selector="ToggleSwitch /template/ ContentPresenter#PART_OffContentPresenter">
         <Setter Property="IsVisible" Value="False" />

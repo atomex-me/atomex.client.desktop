@@ -1,0 +1,60 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:walletViewModels="clr-namespace:Atomex.Client.Desktop.ViewModels.WalletViewModels"
+             xmlns:controls="clr-namespace:Atomex.Client.Desktop.Controls"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="Atomex.Client.Desktop.Views.WalletViews.TezosTokenWalletView">
+
+    <Design.DataContext>
+        <walletViewModels:TezosTokenWalletViewModel />
+    </Design.DataContext>
+
+    <Grid RowDefinitions="Auto,*"
+          ColumnDefinitions="*,280">
+
+        <controls:WalletCurrency Grid.Row="0"
+                                 Grid.Column="0"
+                                 Grid.ColumnSpan="2"
+                                 Margin="0 40 0 0"
+                                 AssetViewModel="{Binding TokenViewModel}"
+                                 IsBalanceUpdating="{Binding IsBalanceUpdating}"
+                                 SendCommand="{Binding SendCommand}"
+                                 ReceiveCommand="{Binding ReceiveCommand}"
+                                 ExchangeCommand="{Binding ExchangeCommand}"
+                                 UpdateCommand="{Binding UpdateCommand}" />
+
+        <TabControl Grid.Row="1"
+                    Grid.Column="0"
+                    Grid.ColumnSpan="2"
+                    SelectedIndex="{Binding SelectedTabIndex}"
+                    Margin="0 4 0 0"
+                    Classes="WalletTabControl">
+            <TabItem Margin="0 0 16 0"
+                     Classes="WalletTabItem">
+                <TabItem.Header>
+                    <TextBlock VerticalAlignment="Center"
+                               FontSize="16"
+                               Text="Activity" />
+                </TabItem.Header>
+
+                <controls:TransactionsList Margin="0 16 0 0"
+                                           Transactions="{Binding Transactions}"
+                                           SelectedTransaction="{Binding SelectedTransaction}"
+                                           CurrentSortField="{Binding CurrentSortField}"
+                                           CurrentSortDirection="{Binding CurrentSortDirection}"
+                                           SetSortTypeCommand="{Binding SetSortTypeCommand}" />
+            </TabItem>
+            <TabItem Margin="16 0 0 0"
+                     Classes="WalletTabItem">
+                <TabItem.Header>
+                    <TextBlock VerticalAlignment="Center"
+                               FontSize="16"
+                               Text="Addresses" />
+                </TabItem.Header>
+                <ContentControl Content="{Binding AddressesViewModel}" />
+            </TabItem>
+        </TabControl>
+    </Grid>
+</UserControl>

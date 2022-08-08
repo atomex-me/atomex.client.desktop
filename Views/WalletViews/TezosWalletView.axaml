@@ -11,7 +11,9 @@
              xmlns:ia="clr-namespace:Avalonia.Xaml.Interactions.Core;assembly=Avalonia.Xaml.Interactions"
              xmlns:atomexCore="clr-namespace:Atomex;assembly=Atomex.Client.Core"
              xmlns:atomexBlockchainTezos="clr-namespace:Atomex.Blockchain.Tezos;assembly=Atomex.Client.Core"
-             xmlns:abstract="clr-namespace:Atomex.Client.Desktop.ViewModels.Abstract">
+             xmlns:abstract="clr-namespace:Atomex.Client.Desktop.ViewModels.Abstract"
+             xmlns:asyncImageLoader="clr-namespace:AsyncImageLoader;assembly=AsyncImageLoader.Avalonia"
+             xmlns:services="clr-namespace:Atomex.Client.Desktop.Services">
 
     <Design.DataContext>
         <vm:TezosWalletViewModel />
@@ -21,7 +23,6 @@
         <converters:StringsConcatConverter x:Key="StringsConcatConverter" />
         <converters:AddressShouldShrinkConverter x:Key="AddressShouldShrinkConverter" />
         <converters:AddressShouldExpandConverter x:Key="AddressShouldExpandConverter" />
-        <converters:ShortenedAddressConverter x:Key="ShortenedAddressConverter" />
         <converters:ObjectsEqualConverter x:Key="ObjectsEqualConverter" />
         <converters:PercentConverter x:Key="PercentConverter" />
     </UserControl.Resources>
@@ -29,11 +30,10 @@
 
     <Grid RowDefinitions="Auto,*"
           Name="DesignGrid">
-
         <controls:WalletCurrency Grid.Row="0"
                                  Grid.Column="0"
                                  Margin="0 40 0 0"
-                                 CurrencyViewModel="{Binding CurrencyViewModel}"
+                                 AssetViewModel="{Binding CurrencyViewModel}"
                                  IsBalanceUpdating="{Binding IsBalanceUpdating}"
                                  SendCommand="{Binding SendCommand}"
                                  ReceiveCommand="{Binding ReceiveCommand}"
@@ -41,9 +41,53 @@
                                  BuyCommand="{Binding BuyCommand}"
                                  UpdateCommand="{Binding UpdateCommand}"
                                  ConnectDappCommand="{Binding ConnectDappCommand}" />
+        <StackPanel Grid.Row="1"
+                    Height="72"
+                    ZIndex="1"
+                    Margin="0 4 18 0"
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Top"
+                    IsVisible="{Binding #TokensTab.IsSelected}">
+            <controls:IconButton Classes="Update Big"
+                                 Classes.Updating="{Binding IsTokensUpdating}"
+                                 Classes.NotUpdating="{Binding !IsTokensUpdating}"
+                                 VerticalAlignment="Center"
+                                 ToolText="Update Tokens"
+                                 Margin="0 0 12 0"
+                                 Command="{Binding UpdateTokensCommand}" />
+            <controls:IconButton Classes="SetupAssets"
+                                 VerticalAlignment="Center"
+                                 ToolText="Manage tokens"
+                                 Margin="12 0 0 0"
+                                 Command="{Binding ManageTokensCommand}" />
+        </StackPanel>
+
+        <StackPanel Grid.Row="1"
+                    Height="72"
+                    ZIndex="1"
+                    Margin="0 4 18 0"
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Top"
+                    IsVisible="{Binding #CollectiblesTab.IsSelected}">
+            <controls:IconButton Classes="Update Big"
+                                 Classes.Updating="{Binding IsTokensUpdating}"
+                                 Classes.NotUpdating="{Binding !IsTokensUpdating}"
+                                 VerticalAlignment="Center"
+                                 ToolText="Update Collectibles"
+                                 Margin="0 0 12 0"
+                                 Command="{Binding UpdateTokensCommand}" />
+            <controls:IconButton Classes="SetupAssets"
+                                 VerticalAlignment="Center"
+                                 ToolText="Manage collectibles"
+                                 Margin="12 0 0 0"
+                                 Command="{Binding ManageCollectiblesCommand}" />
+        </StackPanel>
 
         <TabControl Grid.Row="1"
                     Margin="0 4 0 0"
+                    SelectedIndex="{Binding SelectedTabIndex}"
                     Classes="WalletTabControl">
             <TabItem Margin="0 0 16 0"
                      Classes="WalletTabItem">
@@ -60,15 +104,6 @@
                                            CurrentSortDirection="{Binding CurrentSortDirection}"
                                            SetSortTypeCommand="{Binding SetSortTypeCommand}" />
             </TabItem>
-            <!-- <TabItem Margin="16 0" -->
-            <!--          Classes="WalletTabItem"> -->
-            <!--     <TabItem.Header> -->
-            <!--         <TextBlock VerticalAlignment="Center" -->
-            <!--                    FontSize="16" -->
-            <!--                    Text="Collectibles" /> -->
-            <!--     </TabItem.Header> -->
-            <!--     <TextBlock Text="Collectibles tab" /> -->
-            <!-- </TabItem> -->
             <TabItem Margin="16 0 "
                      Classes="WalletTabItem">
                 <TabItem.Header>
@@ -77,6 +112,26 @@
                                Text="Addresses" />
                 </TabItem.Header>
                 <ContentControl Content="{Binding AddressesViewModel}" />
+            </TabItem>
+            <TabItem Margin="16 0"
+                     Classes="WalletTabItem"
+                     Name="TokensTab">
+                <TabItem.Header>
+                    <TextBlock VerticalAlignment="Center"
+                               FontSize="16"
+                               Text="Tokens" />
+                </TabItem.Header>
+                <ContentControl Content="{Binding TezosTokensViewModel}" />
+            </TabItem>
+            <TabItem Margin="16 0"
+                     Classes="WalletTabItem"
+                     Name="CollectiblesTab">
+                <TabItem.Header>
+                    <TextBlock VerticalAlignment="Center"
+                               FontSize="16"
+                               Text="Collectibles" />
+                </TabItem.Header>
+                <ContentControl Content="{Binding CollectiblesViewModel}" />
             </TabItem>
             <TabItem Margin="16 0"
                      Classes="WalletTabItem">
@@ -249,7 +304,8 @@
                                                              Classes="SolidHover"
                                                              FontSize="16"
                                                              HorizontalAlignment="Left"
-                                                             Content="{Binding Address, Converter={StaticResource ShortenedAddressConverter}}"
+                                                             Content="{Binding Address,
+                                                             Converter={x:Static converters:StringConverters.ToLongShortenedAddress}}"
                                                              Command="{Binding $parent[ListBox].DataContext.OpenAddressInExplorerCommand}"
                                                              CommandParameter="{Binding Address}"
                                                              IsVisible="{Binding $parent[Border].Bounds.Width,
@@ -278,12 +334,17 @@
 
                                         <Grid Grid.Column="2"
                                               ColumnDefinitions="Auto,*">
-                                            <Image Width="22"
-                                                   Height="22"
-                                                   Source="{Binding Baker.Logo,
-                                                   Converter={x:Static converters:StringConverters.ToImage}}"
-                                                   VerticalAlignment="Center" />
-
+                                            <Border Grid.Column="0"
+                                                    Width="22"
+                                                    Height="22"
+                                                    ClipToBounds="True"
+                                                    CornerRadius="2">
+                                                <asyncImageLoader:AdvancedImage StretchDirection="Both"
+                                                    Stretch="UniformToFill"
+                                                    Source="{Binding Baker.Logo}"
+                                                    Loader="{x:Static services:ImageLoader.Instance}" />
+                                            </Border>
+                                            
                                             <TextBlock Grid.Column="1"
                                                        Foreground="{DynamicResource DefaultForegroundBrush}"
                                                        VerticalAlignment="Center"
@@ -305,6 +366,7 @@
                                                        VerticalAlignment="Center"
                                                        FontSize="16"
                                                        Text="{Binding StatusString}"
+                                                       TextTrimming="CharacterEllipsis"
                                                        Name="StatusText">
                                                 <i:Interaction.Behaviors>
                                                     <ia:DataTriggerBehavior Binding="{Binding Status}"
@@ -353,47 +415,26 @@
                                                     <Border Background="{DynamicResource DeepBlue}"
                                                             CornerRadius="{DynamicResource AtomexCornerRadius}"
                                                             Padding="12 16">
-                                                        <StackPanel>
-                                                            <StackPanel.Styles>
-                                                                <Style
-                                                                    Selector="Button:pointerover /template/ ContentPresenter#PART_ContentPresenter">
-                                                                    <Setter Property="Background"
-                                                                            Value="{DynamicResource LightDefaultOpacity6}" />
-                                                                </Style>
-                                                                <Style
-                                                                    Selector="Button:not(:pointerover) /template/ ContentPresenter#PART_ContentPresenter">
-                                                                    <Setter Property="Background"
-                                                                            Value="{DynamicResource AlmostTransparentBrush}" />
-                                                                </Style>
-                                                                <Style
-                                                                    Selector="Button:pressed /template/ ContentPresenter#PART_ContentPresenter">
-                                                                    <Setter Property="Background"
-                                                                            Value="{DynamicResource LightDefaultOpacity6}" />
-                                                                </Style>
-                                                            </StackPanel.Styles>
+                                                        <StackPanel Classes="Popup">
                                                             <StackPanel Orientation="Vertical"
                                                                         IsVisible="{Binding Status,
                                                                         Converter={x:Static converters:EnumToStringNotEqualConverter.Instance},
                                                                         ConverterParameter={x:Static atomexBlockchainTezos:DelegationStatus.NotDelegated}}">
-                                                                <Button Width="180"
-                                                                        Height="40"
-                                                                        Padding="12 0"
-                                                                        CornerRadius="{DynamicResource AtomexCornerRadius}"
-                                                                        VerticalContentAlignment="Center"
-                                                                        Command="{Binding $parent[ListBox].DataContext.DelegateCommand}"
-                                                                        CommandParameter="{Binding Address}">
+                                                                <Button
+                                                                    CornerRadius="{DynamicResource AtomexCornerRadius}"
+                                                                    VerticalContentAlignment="Center"
+                                                                    Command="{Binding $parent[ListBox].DataContext.DelegateCommand}"
+                                                                    CommandParameter="{Binding Address}">
                                                                     <TextBlock Text="Change Validator"
                                                                                Foreground="{DynamicResource DefaultForegroundBrush}"
                                                                                VerticalAlignment="Center"
                                                                                FontSize="16" />
                                                                 </Button>
-                                                                <Button Width="180"
-                                                                        Height="40"
-                                                                        Padding="12 0"
-                                                                        CornerRadius="{DynamicResource AtomexCornerRadius}"
-                                                                        VerticalContentAlignment="Center"
-                                                                        Command="{Binding $parent[ListBox].DataContext.UndelegateCommand}"
-                                                                        CommandParameter="{Binding Address}">
+                                                                <Button
+                                                                    CornerRadius="{DynamicResource AtomexCornerRadius}"
+                                                                    VerticalContentAlignment="Center"
+                                                                    Command="{Binding $parent[ListBox].DataContext.UndelegateCommand}"
+                                                                    CommandParameter="{Binding Address}">
                                                                     <TextBlock Text="Undelegate"
                                                                                Foreground="{DynamicResource DefaultForegroundBrush}"
                                                                                VerticalAlignment="Center"
@@ -405,13 +446,11 @@
                                                                         IsVisible="{Binding Status,
                                                                         Converter={x:Static converters:EnumToStringEqualConverter.Instance},
                                                                         ConverterParameter={x:Static atomexBlockchainTezos:DelegationStatus.NotDelegated}}">
-                                                                <Button Width="180"
-                                                                        Height="40"
-                                                                        Padding="12 0"
-                                                                        CornerRadius="{DynamicResource AtomexCornerRadius}"
-                                                                        VerticalContentAlignment="Center"
-                                                                        Command="{Binding $parent[ListBox].DataContext.DelegateCommand}"
-                                                                        CommandParameter="{Binding Address}">
+                                                                <Button
+                                                                    CornerRadius="{DynamicResource AtomexCornerRadius}"
+                                                                    VerticalContentAlignment="Center"
+                                                                    Command="{Binding $parent[ListBox].DataContext.DelegateCommand}"
+                                                                    CommandParameter="{Binding Address}">
                                                                     <TextBlock Text="Delegate"
                                                                                Foreground="{DynamicResource DefaultForegroundBrush}"
                                                                                VerticalAlignment="Center"

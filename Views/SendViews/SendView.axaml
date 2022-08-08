@@ -211,7 +211,7 @@
                         <TextBox Grid.Column="0"
                                  Grid.ColumnSpan="2"
                                  Text="{Binding Amount, Converter={StaticResource StringToDecimalConverter}}"
-                                 helpers:AmountTextBoxHelper.CurrencyCode="{Binding CurrencyCode}"
+                                 helpers:AmountTextBoxHelper.CurrencyCode="{Binding CurrencyName}"
                                  helpers:AmountTextBoxHelper.BaseCurrencyCode="{Binding BaseCurrencyCode}"
                                  helpers:AmountTextBoxHelper.AmountInBaseMargin="0 0 34 0"
                                  Classes="AtomexTextBox AmountTextBox">
@@ -415,7 +415,7 @@
 
                     <TextBlock Grid.Column="2"
                                Margin="3 0 0 0"
-                               Text="{Binding CurrencyCode}"
+                               Text="{Binding CurrencyName}"
                                Foreground="{DynamicResource DefaultForegroundBrush}"
                                FontSize="13" />
 
@@ -492,7 +492,7 @@
 
                     <TextBlock Grid.Column="2"
                                Margin="4 0 0 0"
-                               Text="{Binding CurrencyCode}"
+                               Text="{Binding CurrencyName}"
                                Foreground="{DynamicResource DefaultForegroundBrush}"
                                VerticalAlignment="Center"
                                FontSize="22" />
@@ -527,6 +527,7 @@
                         Margin="0 32 0 60">
                 <controls:RoundedButton Width="440"
                                         Command="{Binding NextCommand}"
+                                        Classes.Loading="{Binding IsSending}"
                                         IsEnabled="{Binding CanSend}">
                     <i:Interaction.Behaviors>
                         <ia:DataTriggerBehavior Binding="{Binding Stage}"

@@ -1,13 +1,11 @@
 using System;
-using System.Runtime.InteropServices;
-using System.Security;
+using System.IO;
 using System.Threading.Tasks;
-using System.Windows.Input;
+using ReactiveUI;
 using Serilog;
+using Atomex.Client.Desktop.Properties;
 using Atomex.Common;
 using Atomex.Wallet;
-using Atomex.Client.Desktop.Properties;
-using ReactiveUI;
 
 namespace Atomex.Client.Desktop.ViewModels.CreateWalletViewModels
 {
@@ -79,12 +77,12 @@ namespace Atomex.Client.Desktop.ViewModels.CreateWalletViewModels
         private void PasswordChanged()
         {
             Warning = string.Empty;
-            PasswordScore = (int) PasswordAdvisor.CheckStrength(PasswordVM.SecurePass);
+            PasswordScore = (int)PasswordAdvisor.CheckStrength(PasswordVM.SecurePass);
         }
 
         public override void Initialize(object o)
         {
-            Wallet = (HdWallet) o;
+            Wallet = (HdWallet)o;
         }
 
         public override void Back()
@@ -99,7 +97,7 @@ namespace Atomex.Client.Desktop.ViewModels.CreateWalletViewModels
 
         public override async void Next()
         {
-            // todo: rollback password strength cheking;
+            // todo: rollback password strength checking;
             // if (PasswordScore < (int) PasswordAdvisor.PasswordScore.Medium)
             // {
             //     Warning = Resources.CwvPasswordInsufficientComplexity;
@@ -123,18 +121,18 @@ namespace Atomex.Client.Desktop.ViewModels.CreateWalletViewModels
                 {
                     await Wallet.EncryptAsync(PasswordVM.SecurePass);
 
-                    Wallet.SaveToFile(Wallet.PathToWallet, PasswordVM.SecurePass);
+                    var saved = Wallet.SaveToFile(Wallet.PathToWallet, PasswordVM.SecurePass);
 
-                    var clientType = ClientType.Unknown;
-                    if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) clientType = ClientType.AvaloniaWindows;
-                    if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX)) clientType = ClientType.AvaloniaMac;
-                    if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux)) clientType = ClientType.AvaloniaLinux;
+                    if (!saved)
+                    {
+                        Warning = "Can't save wallet file to file system. Try to use different wallet name.";
+                        throw new IOException(Warning);
+                    }
 
                     var acc = new Account(
                         Wallet,
                         PasswordVM.SecurePass,
-                        App.CurrenciesProvider,
-                        clientType);
+                        App.CurrenciesProvider);
 
                     PasswordVM.StringPass = string.Empty;
                     PasswordConfirmationVM.StringPass = string.Empty;

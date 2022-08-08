@@ -6,6 +6,8 @@
              xmlns:vm="clr-namespace:Atomex.Client.Desktop.ViewModels"
              xmlns:converters="clr-namespace:Atomex.Client.Desktop.Converters"
              xmlns:controls="clr-namespace:Atomex.Client.Desktop.Controls"
+             xmlns:asyncImageLoader="clr-namespace:AsyncImageLoader;assembly=AsyncImageLoader.Avalonia"
+             xmlns:services="clr-namespace:Atomex.Client.Desktop.Services"
              x:Class="Atomex.Client.Desktop.Views.DappsView">
 
     <Design.DataContext>
@@ -101,11 +103,16 @@
                               RowDefinitions="Auto">
                             <Grid Grid.Column="0"
                                   ColumnDefinitions="Auto,*">
-                                <Image Width="22"
-                                       Height="22"
-                                       Source="{Binding BitmapLogo,
-                                       Converter={x:Static converters:StringConverters.ToImage}}"
-                                       VerticalAlignment="Center" />
+                                <Border Grid.Column="0"
+                                        Width="22"
+                                        Height="22"
+                                        ClipToBounds="True"
+                                        CornerRadius="4">
+                                    <asyncImageLoader:AdvancedImage StretchDirection="Both"
+                                                                    Stretch="UniformToFill"
+                                                                    Source="{Binding Logo}"
+                                                                    Loader="{x:Static services:ImageLoader.Instance}" />
+                                </Border>
 
                                 <TextBlock Grid.Column="1"
                                            Foreground="{DynamicResource DefaultForegroundBrush}"
@@ -124,7 +131,7 @@
                                                      Content="{Binding ConnectedAddress}"
                                                      ToolText="{Binding ConnectedAddress}"
                                                      Command="{Binding OpenInExplorerCommand}" />
-                                
+
                                 <controls:CopyButton ToolText="Copy address to clipboard"
                                                      DoneToolText="Copied!"
                                                      Margin="16 0 0 0"

@@ -62,7 +62,7 @@
                                  Grid.Column="0"
                                  Grid.ColumnSpan="2"
                                  Margin="0 40 0 0"
-                                 CurrencyViewModel="{Binding CurrencyViewModel}"
+                                 AssetViewModel="{Binding CurrencyViewModel}"
                                  IsBalanceUpdating="{Binding IsBalanceUpdating}"
                                  SendCommand="{Binding SendCommand}"
                                  ReceiveCommand="{Binding ReceiveCommand}"
@@ -73,6 +73,7 @@
         <TabControl Grid.Row="1"
                     Grid.Column="0"
                     Grid.ColumnSpan="2"
+                    SelectedIndex="{Binding SelectedTabIndex}"
                     Margin="0 4 0 0"
                     Classes="WalletTabControl">
             <TabItem Margin="0 0 16 0"

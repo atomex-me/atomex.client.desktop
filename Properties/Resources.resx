@@ -223,7 +223,7 @@
     <value>Wallet with the same name already exists</value>
   </data>
   <data name="CvConversionError" xml:space="preserve">
-    <value>Conversion error. Please contant technical support.</value>
+    <value>Conversion error. Please contact technical support.</value>
   </data>
   <data name="CvError" xml:space="preserve">
     <value>Error</value>

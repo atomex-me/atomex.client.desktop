@@ -1,10 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.Reactive;
-using System.Reactive.Linq;
 using System.Runtime.InteropServices;
-using System.Windows.Input;
+
+using Avalonia.Controls;
 using ReactiveUI;
+using ReactiveUI.Fody.Helpers;
+
+using Atomex.Client.Common;
 using Atomex.Client.Desktop.Common;
 using Atomex.Common;
 using Atomex.Core;
@@ -12,16 +15,14 @@ using Atomex.LiteDb;
 using Atomex.Services;
 using Atomex.Wallet;
 using Atomex.Wallet.Abstract;
-using Avalonia.Controls;
-using ReactiveUI.Fody.Helpers;
 
 namespace Atomex.Client.Desktop.ViewModels
 {
     public class MyWalletsViewModel : ViewModelBase
     {
-        private IAtomexApp AtomexApp { get; }
-        private readonly Action<ViewModelBase> ShowContent;
-        private Action DoAfterAtomexClientChanged;
+        private readonly IAtomexApp _app;
+        private readonly Action<ViewModelBase> _showContent;
+        private Action _doAfterAtomexClientChanged;
 
         public IEnumerable<WalletInfo> Wallets { get; set; }
         [Reactive] public WalletInfo? SelectedWallet { get; set; }
@@ -38,16 +39,16 @@ namespace Atomex.Client.Desktop.ViewModels
             IAtomexApp app,
             Action<ViewModelBase> showContent)
         {
-            AtomexApp = app ?? throw new ArgumentNullException(nameof(app));
+            _app = app ?? throw new ArgumentNullException(nameof(app));
             Wallets = WalletInfo.AvailableWallets();
 
             this.WhenAnyValue(vm => vm.SelectedWallet)
                 .WhereNotNull()
                 .InvokeCommandInMainThread(SelectWalletCommand);
 
-            AtomexApp.AtomexClientChanged += OnAtomexClientChangedEventHandler;
+            _app.AtomexClientChanged += OnAtomexClientChangedEventHandler;
 
-            ShowContent += showContent;
+            _showContent += showContent;
         }
 
         private ReactiveCommand<WalletInfo, Unit> _selectWalletCommand;
@@ -63,61 +64,61 @@ namespace Atomex.Client.Desktop.ViewModels
                 walletName: info.Name,
                 unlockAction: password =>
                 {
-                    var clientType = ClientType.Unknown;
-                    if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-                        clientType = ClientType.AvaloniaWindows;
-                    if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX)) clientType = ClientType.AvaloniaMac;
-                    if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux)) clientType = ClientType.AvaloniaLinux;
-
                     account = Account.LoadFromFile(
                         pathToAccount: info.Path,
                         password: password,
-                        currenciesProvider: AtomexApp.CurrenciesProvider,
-                        clientType: clientType,
-                        migrationCompleteCallback: (MigrationActionType actionType) =>
+                        currenciesProvider: _app.CurrenciesProvider,
+                        migrationCompleteCallback: actionType =>
                         {
-                            if (actionType == MigrationActionType.XtzTransactionsDeleted)
+                            _doAfterAtomexClientChanged = actionType switch
                             {
-                                DoAfterAtomexClientChanged = TezosTransactionsDeleted;
-                            }
+                                MigrationActionType.XtzTransactionsDeleted => TezosTransactionsDeleted,
+                                MigrationActionType.XtzTokensDataDeleted => OnTezosTokensDataDeleted,
+                                _ => _doAfterAtomexClientChanged
+                            };
                         });
                 },
                 goBack: () =>
                 {
-                    ShowContent(this);
+                    _showContent(this);
                     SelectedWallet = null;
                 },
                 onUnlock: () =>
                 {
-                    var atomexClient = new WebSocketAtomexClient(
-                        configuration: App.Configuration,
-                        account: account,
-                        symbolsProvider: AtomexApp.SymbolsProvider);
+                    var atomexClient = new WebSocketAtomexClientLegacy(
+                        exchangeUrl: App.Configuration[$"Services:{account!.Network}:Exchange:Url"],
+                        marketDataUrl: App.Configuration[$"Services:{account!.Network}:MarketData:Url"],
+                        clientType: PlatformHelper.GetClientType(),
+                        authMessageSigner: account.DefaultAuthMessageSigner());
 
-                    AtomexApp.UseAtomexClient(atomexClient, restart: true);
+                    _app.ChangeAtomexClient(atomexClient, account, restart: true);
                 });
 
-            ShowContent?.Invoke(unlockViewModel);
+            _showContent?.Invoke(unlockViewModel);
         }
 
         private void TezosTransactionsDeleted()
         {
-            var xtzCurrencies = new[] { "XTZ", "TZBTC", "KUSD" };
-            var restoreDialogViewModel = new RestoreDialogViewModel(AtomexApp);
+            var xtzCurrencies = new[] { "XTZ", "TZBTC", "KUSD", "USDT_XTZ" };
+            var restoreDialogViewModel = new RestoreDialogViewModel(_app);
             restoreDialogViewModel.ScanCurrenciesAsync(xtzCurrencies);
+        }
+
+        private void OnTezosTokensDataDeleted()
+        {
+            var restoreDialogViewModel = new RestoreDialogViewModel(_app);
+            restoreDialogViewModel.ScanTezosTokens();
         }
 
         private void OnAtomexClientChangedEventHandler(object? sender, AtomexClientChangedEventArgs args)
         {
-            var atomexClient = args.AtomexClient;
-
-            if (atomexClient?.Account == null)
+            if (_app?.AtomexClient == null)
             {
-                AtomexApp.AtomexClientChanged -= OnAtomexClientChangedEventHandler;
+                _app.AtomexClientChanged -= OnAtomexClientChangedEventHandler;
                 return;
             }
 
-            DoAfterAtomexClientChanged?.Invoke();
+            _doAfterAtomexClientChanged?.Invoke();
         }
 
         private void DesignerMode()

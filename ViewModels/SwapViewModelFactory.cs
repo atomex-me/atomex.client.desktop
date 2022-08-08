@@ -22,11 +22,11 @@ namespace Atomex.Client.Desktop.ViewModels
                 var soldCurrency = currencies.GetByName(swap.SoldCurrency);
                 var purchasedCurrency = currencies.GetByName(swap.PurchasedCurrency);
 
-                var fromCurrencyViewModel = CurrencyViewModelCreator.CreateViewModel(
+                var fromCurrencyViewModel = CurrencyViewModelCreator.CreateOrGet(
                     currencyConfig: soldCurrency,
                     subscribeToUpdates: false);
 
-                var toCurrencyViewModel = CurrencyViewModelCreator.CreateViewModel(
+                var toCurrencyViewModel = CurrencyViewModelCreator.CreateOrGet(
                     currencyConfig: purchasedCurrency,
                     subscribeToUpdates: false);
 
@@ -62,16 +62,12 @@ namespace Atomex.Client.Desktop.ViewModels
                     Time                  = swap.TimeStamp,
 
                     FromCurrencyViewModel = fromCurrencyViewModel,
-                    FromBrush             = new SolidColorBrush(fromCurrencyViewModel.AmountColor),
                     FromAmount            = fromAmount,
                     FromAmountFormat      = fromCurrencyViewModel.CurrencyFormat,
-                    FromCurrencyCode      = fromCurrencyViewModel.CurrencyCode,
 
                     ToCurrencyViewModel   = toCurrencyViewModel,
-                    ToBrush               = new SolidColorBrush(toCurrencyViewModel.AmountColor),
                     ToAmount              = toAmount,
                     ToAmountFormat        = toCurrencyViewModel.CurrencyFormat,
-                    ToCurrencyCode        = toCurrencyViewModel.CurrencyCode,
 
                     Price                 = swap.Price,
                     PriceFormat           = $"F{quoteCurrency.Digits}",

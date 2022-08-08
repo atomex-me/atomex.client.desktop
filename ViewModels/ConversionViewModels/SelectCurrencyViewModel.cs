@@ -24,12 +24,6 @@ using Atomex.Wallet.BitcoinBased;
 
 namespace Atomex.Client.Desktop.ViewModels.ConversionViewModels
 {
-    public enum SelectCurrencyType
-    {
-        From,
-        To
-    }
-
     public abstract class SelectCurrencyViewModelItem : ViewModelBase
     {
         [Reactive] public CurrencyViewModel CurrencyViewModel { get; set; }
@@ -67,7 +61,7 @@ namespace Atomex.Client.Desktop.ViewModels.ConversionViewModels
                     var totalAmount          = currency.SatoshiToCoin(totalAmountInSatoshi);
                     var totalAmountString    = totalAmount.ToString(CurrencyViewModel.CurrencyFormat);
 
-                    return $"from {outputs.Count()} outputs ({totalAmountString} {currency.Name})";
+                    return $"from {outputs.Count()} outputs ({totalAmountString} {currency.DisplayedName})";
                 })
                 .ToPropertyExInMainThread(this, vm => vm.SelectedAddressDescription);
 
@@ -131,7 +125,7 @@ namespace Atomex.Client.Desktop.ViewModels.ConversionViewModels
                     var prefix = _type == SelectCurrencyType.From ? "from" : "to";
                     var balanceString = address.Balance.ToString(CurrencyViewModel.CurrencyFormat);
 
-                    return $"{prefix} {address.Address.TruncateAddress()} ({balanceString} {CurrencyViewModel.Currency.Name})";
+                    return $"{prefix} {address.Address.TruncateAddress()} ({balanceString} {CurrencyViewModel.Currency.DisplayedName})";
                 })
                 .ToPropertyExInMainThread(this, vm => vm.SelectedAddressDescription);
 
@@ -304,7 +298,7 @@ namespace Atomex.Client.Desktop.ViewModels.ConversionViewModels
                         };
 
                         return new SelectCurrencyWithOutputsViewModelItem(
-                            currencyViewModel: CurrencyViewModelCreator.CreateViewModel(c, subscribeToUpdates: false),
+                            currencyViewModel: CurrencyViewModelCreator.CreateOrGet(c, subscribeToUpdates: false),
                             availableOutputs: outputs,
                             selectedOutputs: outputs);
                     }
@@ -317,7 +311,7 @@ namespace Atomex.Client.Desktop.ViewModels.ConversionViewModels
                         };
 
                         return new SelectCurrencyWithAddressViewModelItem(
-                            currencyViewModel: CurrencyViewModelCreator.CreateViewModel(c, subscribeToUpdates: false),
+                            currencyViewModel: CurrencyViewModelCreator.CreateOrGet(c, subscribeToUpdates: false),
                             type: SelectCurrencyType.From,
                             availableAddresses: new WalletAddress[] { address },
                             selectedAddress: address);

@@ -61,7 +61,6 @@ namespace Atomex.Client.Desktop.ViewModels
 
                 await Task.Run(() =>
                         Task.WhenAll(primaryCurrencies
-                            .Where(currency => currency.Name != TezosConfig.Xtz)
                             .Select(currency =>
                                 hdWalletScanner.ScanAsync(currency.Name, cancellationToken: cancellation.Token))),
                     cancellation.Token);
@@ -73,18 +72,8 @@ namespace Atomex.Client.Desktop.ViewModels
 
                     var tezosTokensScanner = new TezosTokensScanner(tezosAccount);
 
-                    await tezosTokensScanner.ScanAsync(
-                        skipUsed: false,
+                    await tezosTokensScanner.UpdateBalanceAsync(
                         cancellationToken: default);
-
-                    // reload balances for all tezos tokens account
-                    foreach (var currency in _app.Account.Currencies)
-                    {
-                        if (Currencies.IsTezosToken(currency.Name))
-                            _app.Account
-                                .GetCurrencyAccount<TezosTokenAccount>(currency.Name)
-                                .ReloadBalances();
-                    }
                 }
 
                 await Task.Run(() =>
@@ -93,7 +82,7 @@ namespace Atomex.Client.Desktop.ViewModels
                             .Select(currency =>
                                 hdWalletScanner.ScanAsync(currency.Name, cancellationToken: cancellation.Token))),
                     cancellation.Token);
-                
+
                 Log.Information($"Scan {_restoringEntityTitle} done");
             }
             catch (OperationCanceledException)
@@ -109,8 +98,47 @@ namespace Atomex.Client.Desktop.ViewModels
             {
                 if (App.DialogService.IsCurrentlyShowing(restoreModalVm))
                     App.DialogService.Close();
-                
+
                 OnRestored?.Invoke();
+            }
+        }
+
+        public async void ScanTezosTokens()
+        {
+            var cancellation = new CancellationTokenSource();
+
+            var restoreModalVm = MessageViewModel.Message(
+                title: "Scanning",
+                text: "Tezos tokens scanning, please wait",
+                nextAction: () =>
+                {
+                    App.DialogService.Close();
+                    cancellation.Cancel();
+                },
+                buttonTitle: "Cancel",
+                withProgressBar: true
+            );
+
+            try
+            {
+                App.DialogService.Show(restoreModalVm);
+
+                var tezosAccount = _app.Account
+                    .GetCurrencyAccount<TezosAccount>(TezosConfig.Xtz);
+
+                var tezosTokensScanner = new TezosTokensScanner(tezosAccount);
+
+                await tezosTokensScanner.UpdateBalanceAsync(
+                    cancellationToken: cancellation.Token);
+            }
+            catch (Exception e)
+            {
+                Log.Error("Error during scanning Tezos tokens {Error}", e);
+            }
+            finally
+            {
+                if (App.DialogService.IsCurrentlyShowing(restoreModalVm))
+                    App.DialogService.Close();
             }
         }
     }

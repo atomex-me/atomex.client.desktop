@@ -3,6 +3,7 @@ using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
 using Avalonia;
 using Avalonia.Controls;
 
+
 namespace Atomex.Client.Desktop.Controls
 {
     public class WalletCurrency : UserControl
@@ -10,10 +11,10 @@ namespace Atomex.Client.Desktop.Controls
         static WalletCurrency()
         {
             AffectsRender<WalletCurrency>(
-                CurrencyViewModelProperty,
+                AssetViewModelProperty,
                 IsBalanceUpdatingProperty
             );
-            
+
             // var baseLight = (IStyle)AvaloniaXamlLoader.Load(
             //     new Uri("avares://Avalonia.Themes.Default/Accents/BaseLight.xaml"));
         }
@@ -32,20 +33,6 @@ namespace Atomex.Client.Desktop.Controls
         //             });
         //     }
         // }
-
-        public static readonly DirectProperty<WalletCurrency, CurrencyViewModel> CurrencyViewModelProperty =
-            AvaloniaProperty.RegisterDirect<WalletCurrency, CurrencyViewModel>(
-                nameof(CurrencyViewModel),
-                o => o.CurrencyViewModel,
-                (o, v) => o.CurrencyViewModel = v);
-
-        private CurrencyViewModel _currencyViewModel;
-
-        public CurrencyViewModel CurrencyViewModel
-        {
-            get => _currencyViewModel;
-            set => SetAndRaise(CurrencyViewModelProperty, ref _currencyViewModel, value);
-        }
 
 
         public static readonly DirectProperty<WalletCurrency, ICommand> UpdateCommandProperty =
@@ -86,7 +73,6 @@ namespace Atomex.Client.Desktop.Controls
             set => SetAndRaise(ReceiveCommandProperty, ref _receiveCommand, value);
         }
 
-
         public static readonly DirectProperty<WalletCurrency, ICommand> ExchangeCommandProperty =
             AvaloniaProperty.RegisterDirect<WalletCurrency, ICommand>(nameof(ExchangeCommand),
                 control => control.ExchangeCommand, (control, command) => control.ExchangeCommand = command);
@@ -124,13 +110,31 @@ namespace Atomex.Client.Desktop.Controls
             set => SetAndRaise(ConnectDappCommandProperty, ref _connectDappCommand, value);
         }
 
-        public static readonly StyledProperty<bool> IsBalanceUpdatingProperty =
-            AvaloniaProperty.Register<WalletCurrency, bool>(nameof(IsBalanceUpdating));
+
+        public static readonly DirectProperty<WalletCurrency, bool> IsBalanceUpdatingProperty =
+            AvaloniaProperty.RegisterDirect<WalletCurrency, bool>(nameof(IsBalanceUpdating),
+                control => control.IsBalanceUpdating, (control, value) => control.IsBalanceUpdating = value);
+
+        private bool _IsBalanceUpdating;
 
         public bool IsBalanceUpdating
         {
-            get => GetValue(IsBalanceUpdatingProperty);
-            set => SetValue(IsBalanceUpdatingProperty, value);
+            get => _IsBalanceUpdating;
+            set => SetAndRaise(IsBalanceUpdatingProperty, ref _IsBalanceUpdating, value);
+        }
+
+        public static readonly DirectProperty<WalletCurrency, IAssetViewModel> AssetViewModelProperty =
+            AvaloniaProperty.RegisterDirect<WalletCurrency, IAssetViewModel>(
+                nameof(AssetViewModel),
+                o => o.AssetViewModel,
+                (o, v) => o.AssetViewModel = v);
+
+        private IAssetViewModel _assetViewModel;
+
+        public IAssetViewModel AssetViewModel
+        {
+            get => _assetViewModel;
+            set => SetAndRaise(AssetViewModelProperty, ref _assetViewModel, value);
         }
     }
 }

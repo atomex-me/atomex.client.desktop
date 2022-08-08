@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Atomex.Blockchain.Tezos;
 using Atomex.Blockchain.Tezos.Internal;
+using Atomex.Client.Common;
 using Atomex.Client.Desktop.ViewModels.Abstract;
 using Atomex.Client.Desktop.ViewModels.SendViewModels;
 using Atomex.Cryptography;
@@ -32,18 +33,17 @@ namespace Atomex.Client.Desktop.ViewModels
     public class DappViewModel : ViewModelBase
     {
         public string Logo { get; set; }
-        public IBitmap BitmapLogo => App.ImageService.GetImage(Logo);
         public string Name { get; set; }
         public string ConnectedAddress { get; set; }
         public DateTime ConnectTime { get; set; }
 
 
-        private ReactiveCommand<Unit, Unit> _openInExplorerCommand;
+        private ReactiveCommand<Unit, Unit>? _openInExplorerCommand;
 
         public ReactiveCommand<Unit, Unit> OpenInExplorerCommand => _openInExplorerCommand ??= ReactiveCommand.Create(
             () => { Log.Information(ConnectedAddress); });
 
-        private ReactiveCommand<Unit, Unit> _copyCommand;
+        private ReactiveCommand<Unit, Unit>? _copyCommand;
 
         public ReactiveCommand<Unit, Unit> CopyCommand => _copyCommand ??= ReactiveCommand.Create(() =>
         {
@@ -89,7 +89,7 @@ namespace Atomex.Client.Desktop.ViewModels
             AtomexApp.AtomexClientChanged += OnAtomexClientChangedEventHandler;
 
             Tezos = (TezosConfig)AtomexApp.Account.Currencies.GetByName(TezosConfig.Xtz);
-            
+
             // todo: recreate after balance updated
             SelectAddressViewModel =
                 new SelectAddressViewModel(AtomexApp.Account, Tezos, SelectAddressMode.Connect)
@@ -111,7 +111,7 @@ namespace Atomex.Client.Desktop.ViewModels
 
             _ = Task.Run(async () =>
             {
-                if (AtomexApp.AtomexClient.Account == null) return;
+                if (AtomexApp.Account == null) return;
 
                 BeaconWalletClient = BeaconServicesProvider.GetRequiredService<IWalletBeaconClient>();
                 BeaconWalletClient.OnBeaconMessageReceived += OnBeaconWalletClientMessageReceived;
@@ -125,7 +125,7 @@ namespace Atomex.Client.Desktop.ViewModels
 
         private async void Connect(string qrCodeString)
         {
-            if (AtomexApp.AtomexClient.Account == null) return;
+            if (AtomexApp.Account == null) return;
 
             Log.Debug("{@Sender}: WalletClient connected {@Connected}", "Beacon", BeaconWalletClient.Connected);
             Log.Debug("{@Sender}: WalletClient logged in {@LoggedIn}", "Beacon", BeaconWalletClient.LoggedIn);
@@ -189,7 +189,7 @@ namespace Atomex.Client.Desktop.ViewModels
                     // var walletKey = Key.FromBase58(base58Private);
 
                     var walletKey = Key.FromBytes(unsecuredPrivateKey);
-                    
+
                     var response = new PermissionResponse(
                         id: permissionRequest!.Id,
                         senderId: BeaconWalletClient.SenderId,
@@ -236,6 +236,8 @@ namespace Atomex.Client.Desktop.ViewModels
 
                     try
                     {
+                        var stringPayload =
+                            "Tezos Signed Message: Confirming my identity as tz1LsedWYEdgQp6wP8peiFCrJ7GYqgGKsCS1 on objkt.com, sig:WhISRumFAOabmTZ8NG8fuh4FHDuj0vs";
                         dataToSign = Hex.FromString(signRequest.Payload);
                     }
                     catch (Exception)
@@ -291,7 +293,9 @@ namespace Atomex.Client.Desktop.ViewModels
 
         private void OnAtomexClientChangedEventHandler(object? sender, AtomexClientChangedEventArgs args)
         {
-            if (args.AtomexClient?.Account == null) return;
+            if (args.AtomexClient == null || AtomexApp.Account == null) return;
+
+            var a = 5;
         }
 
         private void DesignerMode()

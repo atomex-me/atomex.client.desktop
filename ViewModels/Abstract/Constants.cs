@@ -4,5 +4,6 @@
     {
         public const int MinimalAddressUpdateTimeMs = 1000;
         public const int DelayBeforeSendMs = 1000;
+        public const decimal MinBalanceForTokensUsd = 0.5m;
     }
 }

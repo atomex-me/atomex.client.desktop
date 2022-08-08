@@ -1,7 +1,5 @@
 ﻿using System;
 
-using Avalonia.Media;
-
 using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
 
 namespace Atomex.Client.Desktop.ViewModels
@@ -31,13 +29,11 @@ namespace Atomex.Client.Desktop.ViewModels
         public DateTime LocalTime => Time.ToLocalTime();
 
         public CurrencyViewModel FromCurrencyViewModel { get; set; }
-        public IBrush FromBrush { get; set; }
         public decimal FromAmount { get; set; }
         public string FromAmountFormat { get; set; }
         public string FromCurrencyCode { get; set; }
 
         public CurrencyViewModel ToCurrencyViewModel { get; set; }
-        public IBrush ToBrush { get; set; }
         public decimal ToAmount { get; set; }
         public string ToAmountFormat { get; set; }
         public string ToCurrencyCode { get; set; }

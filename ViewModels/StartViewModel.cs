@@ -2,12 +2,13 @@ using System;
 using System.Windows.Input;
 using System.Linq;
 
+using Avalonia.Controls;
 using ReactiveUI;
 
 using Atomex.Client.Desktop.Common;
+using Atomex.Common;
 using Atomex.Services;
 using Atomex.Wallet.Abstract;
-using Avalonia.Controls;
 
 namespace Atomex.Client.Desktop.ViewModels
 {
@@ -32,14 +33,14 @@ namespace Atomex.Client.Desktop.ViewModels
                 DesignerMode();
 #endif
             AtomexApp = app ?? throw new ArgumentNullException(nameof(app));
-            HasWallets = WalletInfo.AvailableWallets().Count() > 0;
+            HasWallets = WalletInfo.AvailableWallets().Any();
 
             MainWindowVM = mainWindowWM;
             ShowContent += showContent;
             ShowStart += showStart;
         }
 
-        private MainWindowViewModel MainWindowVM;
+        private readonly MainWindowViewModel MainWindowVM;
 
         public event Action<ViewModelBase> ShowContent;
         public event Action ShowStart;
@@ -106,24 +107,26 @@ namespace Atomex.Client.Desktop.ViewModels
 
         private void OnAccountCreated(IAccount account)
         {
-            var atomexClient = new WebSocketAtomexClient(
-                configuration: App.Configuration,
-                account: account,
-                symbolsProvider: AtomexApp.SymbolsProvider);
+            var atomexClient = new WebSocketAtomexClientLegacy(
+                exchangeUrl: App.Configuration[$"Services:{account!.Network}:Exchange:Url"],
+                marketDataUrl: App.Configuration[$"Services:{account!.Network}:MarketData:Url"],
+                clientType: PlatformHelper.GetClientType(),
+                authMessageSigner: account.DefaultAuthMessageSigner());
 
-            AtomexApp.UseAtomexClient(atomexClient, restart: true);
+            AtomexApp.ChangeAtomexClient(atomexClient, account, restart: true);
         }
         
         private void OnAccountRestored(IAccount account)
         {
-            var atomexClient = new WebSocketAtomexClient(
-                configuration: App.Configuration,
-                account: account,
-                symbolsProvider: AtomexApp.SymbolsProvider);
+            var atomexClient = new WebSocketAtomexClientLegacy(
+                exchangeUrl: App.Configuration[$"Services:{account!.Network}:Exchange:Url"],
+                marketDataUrl: App.Configuration[$"Services:{account!.Network}:MarketData:Url"],
+                clientType: PlatformHelper.GetClientType(),
+                authMessageSigner: account.DefaultAuthMessageSigner());
 
             MainWindowVM.AccountRestored = true;
 
-            AtomexApp.UseAtomexClient(atomexClient, restart: true);
+            AtomexApp.ChangeAtomexClient(atomexClient, account, restart: true);
         }
 
         private void DesignerMode()

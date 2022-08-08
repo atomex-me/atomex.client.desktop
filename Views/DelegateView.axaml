@@ -10,6 +10,8 @@
              xmlns:abstract="clr-namespace:Atomex.Client.Desktop.ViewModels.Abstract"
              xmlns:atomex="clr-namespace:Atomex;assembly=Atomex.Client.Core"
              xmlns:svg="clr-namespace:Avalonia.Svg.Skia;assembly=Avalonia.Svg.Skia"
+             xmlns:asyncImageLoader="clr-namespace:AsyncImageLoader;assembly=AsyncImageLoader.Avalonia"
+             xmlns:services="clr-namespace:Atomex.Client.Desktop.Services"
              Width="700">
     <Design.DataContext>
         <viewModels:DelegateViewModel />
@@ -17,9 +19,6 @@
 
     <UserControl.Resources>
         <converters:PercentConverter x:Key="PercentConverter" />
-        <converters:LowerThanZeroConverter x:Key="LowerThanZeroConverter" />
-        <converters:GreaterThanZeroConverter x:Key="GreaterThanZeroConverter" />
-        <converters:ShortenedAddressConverter x:Key="ShortenedAddressConverter" />
         <converters:AmountToStringConverter x:Key="AmountToStringConverter" />
     </UserControl.Resources>
 
@@ -214,9 +213,15 @@
                                   RowDefinitions="Auto">
                                 <StackPanel Orientation="Horizontal"
                                             Grid.Column="0">
-                                    <Image Width="32"
-                                           Height="32"
-                                           Source="{Binding BitmapLogo}" />
+                                    <Border Width="32"
+                                            Height="32"
+                                            ClipToBounds="True"
+                                            CornerRadius="4">
+                                        <asyncImageLoader:AdvancedImage StretchDirection="Both"
+                                                                        Stretch="UniformToFill"
+                                                                        Source="{Binding Logo}"
+                                                                        Loader="{x:Static services:ImageLoader.Instance}" />
+                                    </Border>
 
                                     <StackPanel Margin="16 0 0 0"
                                                 VerticalAlignment="Center">
@@ -245,16 +250,16 @@
                                             <TextBlock VerticalAlignment="Center"
                                                        FontSize="13"
                                                        Classes.BakerFull="{Binding StakingAvailable,
-                                                       Converter={StaticResource LowerThanZeroConverter}}"
+                                                       Converter={x:Static converters:NumericConverters.LowerThanZero}}"
                                                        Classes.BakerNotFull="{Binding StakingAvailable,
-                                                   Converter={StaticResource GreaterThanZeroConverter}}"
+                                                   Converter={x:Static converters:NumericConverters.GreaterThanZero}}"
                                                        Text="Free space" />
                                             <TextBlock VerticalAlignment="Center"
                                                        Margin="4 0 0 0"
                                                        Classes.BakerFull="{Binding StakingAvailable,
-                                                       Converter={StaticResource LowerThanZeroConverter}}"
+                                                       Converter={x:Static converters:NumericConverters.LowerThanZero}}"
                                                        Classes.BakerNotFull="{Binding StakingAvailable,
-                                                   Converter={StaticResource GreaterThanZeroConverter}}"
+                                                   Converter={x:Static converters:NumericConverters.GreaterThanZero}}"
                                                        FontSize="13"
                                                        Text="{Binding FreeSpaceFormatted}" />
                                             <TextBlock VerticalAlignment="Center"
@@ -262,7 +267,7 @@
                                                        FontSize="13"
                                                        Foreground="{DynamicResource Orange}"
                                                        IsVisible="{Binding StakingAvailable,
-                                                       Converter={StaticResource LowerThanZeroConverter}}"
+                                                       Converter={x:Static converters:NumericConverters.LowerThanZero}}"
                                                        Text="(baker is full)" />
                                         </StackPanel>
                                     </StackPanel>
@@ -328,11 +333,18 @@
                         BorderBrush="{DynamicResource LightDefaultOpacity10}"
                         BorderThickness="1">
                     <Grid ColumnDefinitions="Auto,*,Auto">
-                        <Image Grid.Column="0"
-                               Width="32"
-                               Height="32"
-                               HorizontalAlignment="Left"
-                               Source="{Binding SelectedBaker.BitmapLogo}" />
+                        <Border Grid.Column="0"
+                                Width="32"
+                                Height="32"
+                                HorizontalAlignment="Left"
+                                ClipToBounds="True"
+                                CornerRadius="4">
+                            <asyncImageLoader:AdvancedImage StretchDirection="Both"
+                                                            Stretch="UniformToFill"
+                                                            Source="{Binding SelectedBaker.Logo}"
+                                                            Loader="{x:Static services:ImageLoader.Instance}" />
+                        </Border>
+
                         <StackPanel Grid.Column="1"
                                     Margin="16 0 0 0"
                                     VerticalAlignment="Center">
@@ -347,16 +359,16 @@
                                 <TextBlock VerticalAlignment="Center"
                                            FontSize="13"
                                            Classes.BakerFull="{Binding SelectedBaker.StakingAvailable,
-                                                       Converter={StaticResource LowerThanZeroConverter}}"
+                                                       Converter={x:Static converters:NumericConverters.LowerThanZero}}"
                                            Classes.BakerNotFull="{Binding SelectedBaker.StakingAvailable,
-                                                   Converter={StaticResource GreaterThanZeroConverter}}"
+                                                   Converter={x:Static converters:NumericConverters.GreaterThanZero}}"
                                            Text="Free space" />
                                 <TextBlock VerticalAlignment="Center"
                                            Margin="4 0 0 0"
                                            Classes.BakerFull="{Binding SelectedBaker.StakingAvailable,
-                                                       Converter={StaticResource LowerThanZeroConverter}}"
+                                                       Converter={x:Static converters:NumericConverters.LowerThanZero}}"
                                            Classes.BakerNotFull="{Binding SelectedBaker.StakingAvailable,
-                                                   Converter={StaticResource GreaterThanZeroConverter}}"
+                                                   Converter={x:Static converters:NumericConverters.GreaterThanZero}}"
                                            FontSize="13"
                                            Text="{Binding SelectedBaker.FreeSpaceFormatted}" />
                                 <TextBlock VerticalAlignment="Center"
@@ -364,7 +376,7 @@
                                            FontSize="13"
                                            Foreground="{DynamicResource Orange}"
                                            IsVisible="{Binding SelectedBaker.StakingAvailable,
-                                                       Converter={StaticResource LowerThanZeroConverter}}"
+                                                       Converter={x:Static converters:NumericConverters.LowerThanZero}}"
                                            Text="(baker is full)" />
                             </StackPanel>
                         </StackPanel>
@@ -422,14 +434,13 @@
                         <svg:Svg HorizontalAlignment="Center"
                                  Width="18"
                                  Height="18"
-                                 Path="/Resources/Icons/tezos.svg" />
-                        <TextBlock Margin="6 0 0 0"
+                                 Path="/Resources/Icons/tezos-disabled.svg" />
+                        <TextBlock Margin="8 0 0 0"
                                    Foreground="{DynamicResource DefaultForegroundBrush}"
                                    FontSize="16"
                                    VerticalAlignment="Center"
                                    Text="{Binding DelegateAddress,
-                                   Converter={StaticResource ShortenedAddressConverter},
-                                   ConverterParameter={x:Static abstract:AddressTruncateType.Short}}" />
+                                   Converter={x:Static converters:StringConverters.ToShortenedAddress}}" />
 
                         <controls:CopyButton ToolText="Copy your delegating address"
                                              DoneToolText="Copied!"
@@ -449,16 +460,22 @@
                                 Grid.Row="1"
                                 HorizontalAlignment="Right"
                                 Orientation="Horizontal">
-                        <Image Width="18"
-                               Height="18"
-                               Source="{Binding SelectedBaker.BitmapLogo}" />
-                        <TextBlock Margin="6 0 0 0"
+                        <Border Width="18"
+                                Height="18"
+                                ClipToBounds="True"
+                                CornerRadius="4">
+                            <asyncImageLoader:AdvancedImage StretchDirection="Both"
+                                                            Stretch="UniformToFill"
+                                                            Source="{Binding SelectedBaker.Logo}"
+                                                            Loader="{x:Static services:ImageLoader.Instance}" />
+                        </Border>
+                        
+                        <TextBlock Margin="8 0 0 0"
                                    Foreground="{DynamicResource DefaultForegroundBrush}"
                                    FontSize="16"
                                    VerticalAlignment="Center"
                                    Text="{Binding SelectedBaker.Address,
-                                   Converter={StaticResource ShortenedAddressConverter},
-                                   ConverterParameter={x:Static abstract:AddressTruncateType.Short}}" />
+                                   Converter={x:Static converters:StringConverters.ToShortenedAddress}}" />
 
                         <controls:CopyButton ToolText="Copy baker address"
                                              DoneToolText="Copied!"

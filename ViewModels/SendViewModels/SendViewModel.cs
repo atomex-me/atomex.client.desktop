@@ -19,6 +19,7 @@ using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
 using Atomex.Core;
 using Atomex.MarketData.Abstract;
 using Atomex.ViewModels;
+using Atomex.Common;
 
 namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 {
@@ -53,6 +54,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         [Reactive] public bool UseRecommendedAmount { get; set; }
         [Reactive] public bool UseEnteredAmount { get; set; }
         [Reactive] public bool CanSend { get; set; }
+        [ObservableAsProperty] public bool IsSending { get; }
         public decimal AmountToSend => UseRecommendedAmount && (RecommendedMaxAmount < Amount)
             ? RecommendedMaxAmount
             : Amount;
@@ -60,6 +62,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         [Reactive] public string SendRecommendedAmountMenu { get; set; }
         [Reactive] public string SendEnteredAmountMenu { get; set; }
 
+        public string CurrencyName => CurrencyViewModel.CurrencyName;
         public string CurrencyCode => CurrencyViewModel.CurrencyCode;
         public string FeeCurrencyCode => CurrencyViewModel.FeeCurrencyCode;
         public string BaseCurrencyCode => CurrencyViewModel.BaseCurrencyCode;
@@ -135,18 +138,15 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             {
                 try
                 {
-                    App.DialogService.Show(
-                        MessageViewModel.Message(title: "Sending, please wait", withProgressBar: true));
-
                     var error = await Send();
 
                     if (error != null)
-                    {
+                    { 
                         App.DialogService.Show(MessageViewModel.Error(
                             text: error.Description,
                             backAction: () => App.DialogService.Show(this)));
-
-                        return;
+                        
+                        return;   
                     }
 
                     App.DialogService.Show(MessageViewModel.Success(
@@ -191,7 +191,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             _app = app ?? throw new ArgumentNullException(nameof(app));
             Currency = currency ?? throw new ArgumentNullException(nameof(currency));
 
-            CurrencyViewModel = CurrencyViewModelCreator.CreateViewModel(currency);
+            CurrencyViewModel = CurrencyViewModelCreator.CreateOrGet(currency);
             UseDefaultFee = true;
 
             var updateAmountCommand = ReactiveCommand.CreateFromTask(UpdateAmount);
@@ -308,6 +308,10 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                         Currency.Name);
                 });
 
+            NextCommand
+                .IsExecuting
+                .ToPropertyExInMainThread(this, vm => vm.IsSending);
+
             SubscribeToServices();
         }
 
@@ -336,7 +340,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
         protected virtual void OnQuotesUpdatedEventHandler(object sender, EventArgs args)
         {
-            if (sender is not ICurrencyQuotesProvider quotesProvider)
+            if (sender is not IQuotesProvider quotesProvider)
                 return;
 
             var quote = quotesProvider.GetQuote(CurrencyCode, BaseCurrencyCode);
@@ -354,7 +358,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         protected void DesignerMode()
         {
             var fromCurrencies = DesignTime.TestNetCurrencies
-                .Select(c => CurrencyViewModelCreator.CreateViewModel(c, subscribeToUpdates: false))
+                .Select(c => CurrencyViewModelCreator.CreateOrGet(c, subscribeToUpdates: false))
                 .ToList();
 
             Currency          = fromCurrencies[0].Currency;

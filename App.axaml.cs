@@ -6,25 +6,26 @@ using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
-
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Input.Platform;
 using Avalonia.Markup.Xaml;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Serilog;
 using Serilog.Core;
 using Serilog.Events;
 using Serilog.Formatting;
 using Serilog.Formatting.Display;
 using Sentry;
-
 using Atomex.Client.Desktop.Services;
 using Atomex.Client.Desktop.ViewModels;
 using Atomex.Client.Desktop.Views;
 using Atomex.Common.Configuration;
 using Atomex.Core;
+using Atomex.MarketData;
 using Atomex.MarketData.Bitfinex;
+using Atomex.MarketData.TezTools;
 using Atomex.Services;
 
 namespace Atomex.Client.Desktop
@@ -36,6 +37,7 @@ namespace Atomex.Client.Desktop
         public static ImageService ImageService;
         public static IClipboard Clipboard;
         public static NotificationsService NotificationsService;
+        public static ILoggerFactory LoggerFactory;
 
         public override void Initialize()
         {
@@ -51,24 +53,25 @@ namespace Atomex.Client.Desktop
             // set invariant culture by default
             CultureInfo.CurrentCulture = CultureInfo.InvariantCulture;
 
-            // init logger
-            Log.Logger = new LoggerConfiguration()
-#if DEBUG
-                .ReadFrom.Configuration(Configuration)
-#else
-                .WriteTo.Sentry(o =>
-                {
-                    o.Dsn = "https://e6728d16ed934432b6dd6735df8bd37b@newsentry.baking-bad.org/3";
-                    // Debug and higher are stored as breadcrumbs (default is Information)
-                    o.MinimumBreadcrumbLevel = LogEventLevel.Information;
-                    // Warning and higher is sent as event (default is Error)
-                    o.MinimumEventLevel = LogEventLevel.Error;
-                })
-#endif
-                .CreateLogger();
+            // configure loggers
+            ConfigureLoggers();
 
             var currenciesProvider = new CurrenciesProvider(CurrenciesConfigurationString);
             var symbolsProvider = new SymbolsProvider(SymbolsConfiguration);
+
+            var bitfinexQuotesProvider = new BitfinexQuotesProvider(
+                currencies: currenciesProvider
+                    .GetCurrencies(Network.MainNet)
+                    .Select(c => c.Name),
+                baseCurrency: BitfinexQuotesProvider.Usd,
+                log: LoggerFactory.CreateLogger<BitfinexQuotesProvider>());
+
+            var tezToolsQuotesProvider = new TezToolsQuotesProvider(
+                log: LoggerFactory.CreateLogger<TezToolsQuotesProvider>());
+
+            var quotesProvider = new MultiSourceQuotesProvider(
+                log: LoggerFactory.CreateLogger<MultiSourceQuotesProvider>(),
+                bitfinexQuotesProvider, tezToolsQuotesProvider);
 
             // init Atomex client app
             AtomexApp = new AtomexApp()
@@ -76,9 +79,7 @@ namespace Atomex.Client.Desktop
                 .UseSymbolsProvider(symbolsProvider)
                 .UseCurrenciesUpdater(new CurrenciesUpdater(currenciesProvider))
                 .UseSymbolsUpdater(new SymbolsUpdater(symbolsProvider))
-                .UseQuotesProvider(new BitfinexQuotesProvider(
-                    currencies: currenciesProvider.GetCurrencies(Network.MainNet),
-                    baseCurrency: BitfinexQuotesProvider.Usd));
+                .UseQuotesProvider(quotesProvider);
 
             if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
             {
@@ -137,10 +138,10 @@ namespace Atomex.Client.Desktop
         {
             get
             {
-                var resourceName  = "currencies.json";
+                const string resourceName = "currencies.json";
                 var resourceNames = CoreAssembly.GetManifestResourceNames();
-                var fullFileName  = resourceNames.FirstOrDefault(n => n.EndsWith(resourceName));
-                var stream        = CoreAssembly.GetManifestResourceStream(fullFileName!);
+                var fullFileName = resourceNames.FirstOrDefault(n => n.EndsWith(resourceName));
+                var stream = CoreAssembly.GetManifestResourceStream(fullFileName!);
                 using StreamReader reader = new(stream!);
                 return reader.ReadToEnd();
             }
@@ -161,11 +162,11 @@ namespace Atomex.Client.Desktop
             }
             else
             {
-                using Process process = Process.Start(new ProcessStartInfo
+                using var process = Process.Start(new ProcessStartInfo
                 {
-                    FileName        = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? url : "open",
-                    Arguments       = RuntimeInformation.IsOSPlatform(OSPlatform.OSX) ? $"{url}" : "",
-                    CreateNoWindow  = true,
+                    FileName = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? url : "open",
+                    Arguments = RuntimeInformation.IsOSPlatform(OSPlatform.OSX) ? $"{url}" : "",
+                    CreateNoWindow = true,
                     UseShellExecute = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
                 });
             }
@@ -178,17 +179,42 @@ namespace Atomex.Client.Desktop
             using var process = Process.Start(
                 new ProcessStartInfo
                 {
-                    FileName               = "/bin/bash",
-                    Arguments              = $"-c \"{escapedArgs}\"",
+                    FileName = "/bin/bash",
+                    Arguments = $"-c \"{escapedArgs}\"",
                     RedirectStandardOutput = true,
-                    UseShellExecute        = false,
-                    CreateNoWindow         = true,
-                    WindowStyle            = ProcessWindowStyle.Hidden
+                    UseShellExecute = false,
+                    CreateNoWindow = true,
+                    WindowStyle = ProcessWindowStyle.Hidden
                 }
             );
 
             if (waitForExit)
                 process?.WaitForExit();
+        }
+
+        private void ConfigureLoggers()
+        {
+            // todo: remove Serilog static logger and use Serilog only as provider for Microsoft.Extensions.Logging
+
+            // init Serilog static logger
+            Log.Logger = new LoggerConfiguration()
+#if DEBUG
+                .ReadFrom.Configuration(Configuration)
+#else
+                .WriteTo.Sentry(o =>
+                {
+                    o.Dsn = "https://e6728d16ed934432b6dd6735df8bd37b@newsentry.baking-bad.org/3";
+                    // Debug and higher are stored as breadcrumbs (default is Information)
+                    o.MinimumBreadcrumbLevel = LogEventLevel.Information;
+                    // Warning and higher is sent as event (default is Error)
+                    o.MinimumEventLevel = LogEventLevel.Error;
+                })
+#endif
+                .CreateLogger();
+
+            // init Microsoft.Extensions.Logging logger factory
+            LoggerFactory = new LoggerFactory()
+                .AddSerilog();
         }
     }
 

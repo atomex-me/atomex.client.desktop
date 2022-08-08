@@ -32,8 +32,8 @@ namespace Atomex.Client.Desktop.ViewModels
         public decimal ToAmount { get; set; }
         public string FromAmountFormat => FromCurrencyViewModel.CurrencyFormat;
         public string ToAmountFormat => ToCurrencyViewModel.CurrencyFormat;
-        public string FromCurrencyCode => FromCurrencyViewModel.CurrencyCode;
-        public string ToCurrencyCode => ToCurrencyViewModel.CurrencyCode;
+        public string FromCurrencyCode => FromCurrencyViewModel.CurrencyName;
+        public string ToCurrencyCode => ToCurrencyViewModel.CurrencyName;
         public IEnumerable<Atomex.ViewModels.Helpers.SwapDetailingInfo> DetailingInfo { get; set; }
 
 #if DEBUG
@@ -164,8 +164,8 @@ namespace Atomex.Client.Desktop.ViewModels
             var btc = DesignTime.TestNetCurrencies.Get<BitcoinConfig>("BTC");
             var ltc = DesignTime.TestNetCurrencies.Get<LitecoinConfig>("LTC");
 
-            FromCurrencyViewModel = CurrencyViewModelCreator.CreateViewModel(btc, subscribeToUpdates: false);
-            ToCurrencyViewModel = CurrencyViewModelCreator.CreateViewModel(ltc, subscribeToUpdates: false);
+            FromCurrencyViewModel = CurrencyViewModelCreator.CreateOrGet(btc, subscribeToUpdates: false);
+            ToCurrencyViewModel = CurrencyViewModelCreator.CreateOrGet(ltc, subscribeToUpdates: false);
 
             CompactState = SwapCompactState.InProgress;
         }

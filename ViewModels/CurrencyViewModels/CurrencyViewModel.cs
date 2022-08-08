@@ -2,12 +2,9 @@ using System;
 using System.Threading.Tasks;
 using System.Reactive.Linq;
 
-using Avalonia;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
-using Avalonia.Platform;
 using Avalonia.Threading;
-
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using Serilog;
@@ -17,31 +14,29 @@ using Atomex.MarketData.Abstract;
 using Atomex.Wallet;
 using Atomex.Wallet.Abstract;
 using Atomex.Client.Desktop.Common;
+using System.Linq;
+using Atomex.TezosTokens;
 
 namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
 {
-    public abstract class CurrencyViewModel : ViewModelBase
+    public abstract class CurrencyViewModel : ViewModelBase, IAssetViewModel, IDisposable
     {
-        private const string PathToImages = "avares://Atomex.Client.Desktop/Resources/Images";
         protected const string PathToIcons = "/Resources/Icons";
 
         protected IAccount Account { get; set; }
-        private ICurrencyQuotesProvider QuotesProvider { get; set; }
-
+        private IQuotesProvider QuotesProvider { get; set; }
         public event EventHandler AmountUpdated;
 
         public CurrencyConfig Currency { get; set; }
         public CurrencyConfig ChainCurrency { get; set; }
         public string Header { get; set; }
-        public Brush IconBrush { get; set; }
-        public IBrush UnselectedIconBrush { get; set; }
-        public Brush IconMaskBrush { get; set; }
         public Color AccentColor { get; set; }
-        public Color AmountColor { get; set; }
         public string IconPath { get; set; }
+        public IBitmap? BitmapIcon => null;
+        public string? PreviewUrl => null;
         public string DisabledIconPath { get; set; }
         [Reactive] public decimal CurrentQuote { get; set; }
-        [Reactive] public decimal DailyChangePercent { get; set; }
+        [Reactive] public decimal? DailyChangePercent { get; set; }
         [Reactive] public decimal TotalAmount { get; set; }
         [Reactive] public decimal TotalAmountInBase { get; set; }
         [Reactive] public decimal AvailableAmount { get; set; }
@@ -49,11 +44,13 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
         [Reactive] public decimal UnconfirmedAmount { get; set; }
         [Reactive] public decimal UnconfirmedAmountInBase { get; set; }
 
+        public string CurrencyName => Currency.DisplayedName;
         public string CurrencyCode => Currency.Name;
+        public string CurrencyDescription => Currency.Description;
         public string FeeCurrencyCode => Currency.FeeCode;
-        public string BaseCurrencyCode => "USD"; // todo: use base currency from settings
         public string CurrencyFormat => Currency.Format;
         public string FeeCurrencyFormat => Currency.FeeFormat;
+        public string BaseCurrencyCode => "USD"; // todo: use base currency from settings
         public string BaseCurrencyFormat => "$0.##"; // todo: use base currency format from settings
         public string FeeName { get; set; }
 
@@ -97,7 +94,7 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
             Account.BalanceUpdated += OnBalanceChangedEventHandler;
         }
 
-        public void SubscribeToRatesProvider(ICurrencyQuotesProvider quotesProvider)
+        public void SubscribeToRatesProvider(IQuotesProvider quotesProvider)
         {
             QuotesProvider = quotesProvider;
             QuotesProvider.QuotesUpdated += OnQuotesUpdatedEventHandler;
@@ -107,9 +104,14 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
         {
             try
             {
-                if (Currency.Name.Equals(args.Currency))
-                    await UpdateAsync()
-                        .ConfigureAwait(false);
+                if ((args.Currency != null && args.Currency == Currency.Name) ||
+                    (args.IsTokenUpdate && (args.TokenContract == null || Account.Currencies.FirstOrDefault(c =>
+                        c is TezosTokenConfig tc &&
+                        tc.TokenContractAddress == args.TokenContract &&
+                        tc.TokenId == args.TokenId) != null)))
+                {
+                    await UpdateAsync();
+                }
             }
             catch (Exception e)
             {
@@ -119,13 +121,13 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
 
         private void OnQuotesUpdatedEventHandler(object? sender, EventArgs args)
         {
-            if (sender is not ICurrencyQuotesProvider quotesProvider)
+            if (sender is not IQuotesProvider quotesProvider)
                 return;
 
             UpdateQuotesInBaseCurrency(quotesProvider);
         }
 
-        private void UpdateQuotesInBaseCurrency(ICurrencyQuotesProvider quotesProvider)
+        private void UpdateQuotesInBaseCurrency(IQuotesProvider quotesProvider)
         {
             var quote = quotesProvider.GetQuote(CurrencyCode, BaseCurrencyCode);
 
@@ -136,17 +138,6 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
             DailyChangePercent = quote?.DailyChangePercent ?? 0;
 
             AmountUpdated?.Invoke(this, EventArgs.Empty);
-        }
-
-        protected static string PathToImage(string imageName)
-        {
-            return $"{PathToImages}/{imageName}";
-        }
-
-        protected static IBitmap GetBitmap(string uri)
-        {
-            var assets = AvaloniaLocator.Current.GetService<IAssetLoader>();
-            return new Bitmap(assets.Open(new Uri(uri)));
         }
 
         #region IDisposable Support

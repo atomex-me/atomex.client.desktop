@@ -2,12 +2,11 @@ using System;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive;
+using System.Reactive.Linq;
 using System.Windows.Input;
-
 using Avalonia.Controls;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
-
 using Atomex.Common;
 using Atomex.Core;
 using Atomex.ViewModels;
@@ -33,6 +32,8 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         [Reactive] private bool SortIsAscending { get; set; }
         [Reactive] private bool SortByDate { get; set; }
         [Reactive] public WalletAddressViewModel? SelectedAddress { get; set; }
+        [ObservableAsProperty] public bool CanConfirm { get; }
+        [ObservableAsProperty] public bool ExternalWarning { get; }
 
         public SelectAddressViewModel()
         {
@@ -47,7 +48,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             CurrencyConfig currency,
             SelectAddressMode mode = SelectAddressMode.ReceiveTo,
             string? selectedAddress = null,
-            decimal? selectedTokenId = null,
+            int selectedTokenId = 0,
             string? tokenContract = null)
         {
             this.WhenAnyValue(
@@ -125,15 +126,43 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     }
                 });
 
+            this.WhenAnyValue(vm => vm.SelectedAddress, vm => vm.SearchPattern)
+                .Select(value =>
+                {
+                    var (address, searchPattern) = value;
+                    if (SelectAddressMode == SelectAddressMode.SendFrom)
+                    {
+                        return address != null;
+                    }
+
+                    return currency.IsValidAddress(address?.Address ?? searchPattern);
+                })
+                .ToPropertyExInMainThread(this, vm => vm.CanConfirm);
+
+            this.WhenAnyValue(vm => vm.SearchPattern)
+                .Where(_ => MyAddresses != null)
+                .Select(searchPattern =>
+                {
+                    if (SelectAddressMode != SelectAddressMode.SendFrom && !string.IsNullOrEmpty(searchPattern))
+                    {
+                        return MyAddresses!.Count == 0 && currency.IsValidAddress(searchPattern);
+                    }
+
+                    return false;
+                })
+                .ToPropertyExInMainThread(this, vm => vm.ExternalWarning);
+
             Currency = currency;
             SelectAddressMode = mode;
-            var onlyAddressesWithBalances = SelectAddressMode is SelectAddressMode.SendFrom or SelectAddressMode.Connect;
+            var onlyAddressesWithBalances =
+                SelectAddressMode is SelectAddressMode.SendFrom or SelectAddressMode.Connect;
 
             var addresses = AddressesHelper
                 .GetReceivingAddressesAsync(
                     account: account,
                     currency: currency,
-                    tokenContract: tokenContract)
+                    tokenContract: tokenContract,
+                    tokenId: selectedTokenId)
                 .WaitForResult()
                 .Where(address => !onlyAddressesWithBalances || address.Balance != 0)
                 .OrderByDescending(address => address.Balance);
@@ -143,8 +172,8 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
             SelectedAddress = selectedAddress != null
                 ? MyAddresses.FirstOrDefault(vm =>
-                    vm.Address == selectedAddress && (selectedTokenId == null || vm.TokenId == selectedTokenId))
-                : onlyAddressesWithBalances
+                    vm.Address == selectedAddress && vm.TokenId == selectedTokenId)
+                : SelectAddressMode == SelectAddressMode.SendFrom
                     ? SelectDefaultAddress()
                     : null;
         }
@@ -159,11 +188,12 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
                 if (activeAddressViewModel != null)
                 {
-                    SelectedAddress = activeAddressViewModel;   
+                    SelectedAddress = activeAddressViewModel;
                 }
                 else
                 {
-                    SelectedAddress = MyAddresses.FirstOrDefault(vm => vm.IsFreeAddress) ?? MyAddresses.FirstOrDefault();
+                    SelectedAddress = MyAddresses.FirstOrDefault(vm => vm.IsFreeAddress) ??
+                                      MyAddresses.FirstOrDefault();
                 }
             }
             else
@@ -174,19 +204,23 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             return SelectedAddress;
         }
 
-        private ReactiveCommand<Unit, Unit> _backCommand;
+        private ReactiveCommand<Unit, Unit>? _backCommand;
+
         public ReactiveCommand<Unit, Unit> BackCommand => _backCommand ??=
             (_backCommand = ReactiveCommand.Create(() => { BackAction?.Invoke(); }));
 
-        private ReactiveCommand<Unit, Unit> _changeSortTypeCommand;
+        private ReactiveCommand<Unit, Unit>? _changeSortTypeCommand;
+
         public ReactiveCommand<Unit, Unit> ChangeSortTypeCommand => _changeSortTypeCommand ??=
             (_changeSortTypeCommand = ReactiveCommand.Create(() => { SortByDate = !SortByDate; }));
 
-        private ReactiveCommand<Unit, Unit> _changeSortDirectionCommand;
+        private ReactiveCommand<Unit, Unit>? _changeSortDirectionCommand;
+
         public ReactiveCommand<Unit, Unit> ChangeSortDirectionCommand => _changeSortDirectionCommand ??=
             (_changeSortDirectionCommand = ReactiveCommand.Create(() => { SortIsAscending = !SortIsAscending; }));
 
-        private ReactiveCommand<Unit, Unit> _confirmCommand;
+        private ReactiveCommand<Unit, Unit>? _confirmCommand;
+
         public ReactiveCommand<Unit, Unit> ConfirmCommand => _confirmCommand ??=
             (_confirmCommand = ReactiveCommand.Create(() =>
             {
@@ -200,15 +234,11 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 ConfirmAction?.Invoke(selectedAddress);
             }));
 
-        private ICommand _copyAddressCommand;
+        private ICommand? _copyAddressCommand;
         public ICommand CopyAddressCommand =>
             _copyAddressCommand ??= (_copyAddressCommand = ReactiveCommand.Create((WalletAddress address) =>
             {
                 _ = App.Clipboard.SetTextAsync(address.Address);
-
-                // MyAddresses.ForEachDo(o => o.CopyButtonToolTip = AddressViewModel.DefaultCopyButtonToolTip);
-                // MyAddresses.First(o => o.WalletAddress.Address == address.Address).CopyButtonToolTip =
-                //     AddressViewModel.CopiedButtonToolTip;
             }));
 #if DEBUG
         private void DesignerMode()

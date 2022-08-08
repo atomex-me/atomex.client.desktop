@@ -12,6 +12,7 @@ using Serilog;
 using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.Properties;
 using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
+using Atomex.Client.Entities;
 using Atomex.Common;
 using Atomex.Core;
 using Atomex.ViewModels;
@@ -196,10 +197,13 @@ namespace Atomex.Client.Desktop.ViewModels
 
                 var order = new Order
                 {
+                    ClientOrderId     = Guid.NewGuid().ToByteArray().ToHexString(0, 16),
+                    Status            = OrderStatus.Pending,
                     Symbol            = symbol.Name,
                     TimeStamp         = DateTime.UtcNow,
                     Price             = orderPrice,
                     Qty               = qty,
+                    LeaveQty          = qty,
                     Side              = side,
                     Type              = OrderType.FillOrKill,
                     FromWallets       = fromWallets.ToList(),
@@ -217,9 +221,34 @@ namespace Atomex.Client.Desktop.ViewModels
                         : RedeemFromAddress
                 };
 
-                await order.CreateProofOfPossessionAsync(account);
+                await order
+                    .CreateProofOfPossessionAsync(account);
 
-                atomexClient.OrderSendAsync(order);
+                await _app.Account
+                    .UpsertOrderAsync(order);
+
+                atomexClient.OrderSendAsync(new V1.Entities.Order
+                {
+                    ClientOrderId = order.ClientOrderId,
+                    Symbol        = order.Symbol,
+                    TimeStamp     = order.TimeStamp,
+                    Price         = order.Price,
+                    Qty           = order.Qty,
+                    Side          = order.Side,
+                    Type          = order.Type,
+                    FromWallets   = order.FromWallets
+                        .Select(w => new V1.Entities.WalletAddress
+                        {
+                            Address           = w.Address,
+                            Currency          = w.Currency,
+                            Nonce             = w.Nonce,
+                            ProofOfPossession = w.ProofOfPossession,
+                            PublicKey         = w.PublicKey,
+                        })
+                        .ToList(),
+                    BaseCurrencyContract = GetSwapContract(order.Symbol.BaseCurrency()),
+                    QuoteCurrencyContract = GetSwapContract(order.Symbol.QuoteCurrency())
+                });
 
                 // wait for swap confirmation
                 var timeStamp = DateTime.UtcNow;
@@ -228,7 +257,7 @@ namespace Atomex.Client.Desktop.ViewModels
                 {
                     await Task.Delay(SwapCheckInterval);
 
-                    var currentOrder = atomexClient.Account.GetOrderById(order.ClientOrderId);
+                    var currentOrder = _app.Account.GetOrderById(order.ClientOrderId);
 
                     if (currentOrder == null)
                         continue;
@@ -238,7 +267,7 @@ namespace Atomex.Client.Desktop.ViewModels
 
                     if (currentOrder.Status == OrderStatus.PartiallyFilled || currentOrder.Status == OrderStatus.Filled)
                     {
-                        var swap = (await atomexClient.Account
+                        var swap = (await _app.Account
                             .GetSwapsAsync())
                             .FirstOrDefault(s => s.OrderId == currentOrder.Id);
 
@@ -264,7 +293,18 @@ namespace Atomex.Client.Desktop.ViewModels
                 return new Error(Errors.SwapError, Resources.CvConversionError);
             }
         }
-        
+
+        private string GetSwapContract(string currency)
+        {
+            if (currency == "ETH" || Currencies.IsEthereumToken(currency))
+                return _app.Account.Currencies.Get<EthereumConfig>(currency).SwapContractAddress;
+
+            if (currency == "XTZ" || Currencies.IsTezosToken(currency))
+                return _app.Account.Currencies.Get<TezosConfig>(currency).SwapContractAddress;
+
+            return null;
+        }
+
         private async Task<IEnumerable<WalletAddress>> GetFromAddressesAsync()
         {
             if (FromSource is FromAddress fromAddress)
@@ -308,8 +348,8 @@ namespace Atomex.Client.Desktop.ViewModels
             var btc = DesignTime.TestNetCurrencies.Get<BitcoinConfig>("BTC");
             var ltc = DesignTime.TestNetCurrencies.Get<LitecoinConfig>("LTC");
 
-            FromCurrencyViewModel     = CurrencyViewModelCreator.CreateViewModel(btc, subscribeToUpdates: false);
-            ToCurrencyViewModel       = CurrencyViewModelCreator.CreateViewModel(ltc, subscribeToUpdates: false);
+            FromCurrencyViewModel     = CurrencyViewModelCreator.CreateOrGet(btc, subscribeToUpdates: false);
+            ToCurrencyViewModel       = CurrencyViewModelCreator.CreateOrGet(ltc, subscribeToUpdates: false);
 
             FromSource                = new FromAddress("13V2gzjUL9DiHZLy1WFk9q6pZ3yBsb4TzP");
             ToAddress                 = "13V2gzjUL9DiHZLy1WFk9q6pZ3yBsb4TzP";

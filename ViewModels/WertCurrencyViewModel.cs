@@ -7,18 +7,16 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
 
-using Avalonia.Media;
 using ReactiveUI;
 
 using Atomex.Client.Desktop.Api;
 using Atomex.Client.Desktop.Common;
-using Atomex.Core;
 using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
 using Atomex.Common;
-using Atomex.Cryptography;
-using Atomex.Wallet.Abstract;
-using Atomex.ViewModels;
+using Atomex.Core;
 using Atomex.Cryptography.Abstract;
+using Atomex.ViewModels;
+using Atomex.Wallet.Abstract;
 
 namespace Atomex.Client.Desktop.ViewModels
 {
@@ -42,7 +40,6 @@ namespace Atomex.Client.Desktop.ViewModels
         protected CancellationTokenSource _cancellationTokenSource;
 
         private CurrencyViewModel _currencyViewModel;
-
         public CurrencyViewModel CurrencyViewModel
         {
             get => _currencyViewModel;
@@ -56,16 +53,7 @@ namespace Atomex.Client.Desktop.ViewModels
         public string Header => CurrencyViewModel.Header;
         public CurrencyConfig Currency => CurrencyViewModel.Currency;
 
-        public IBrush Background => IsSelected
-            ? CurrencyViewModel.IconBrush
-            : CurrencyViewModel.UnselectedIconBrush;
-
-        public IBrush OpacityMask => IsSelected
-            ? CurrencyViewModel.IconBrush is ImageBrush ? null : CurrencyViewModel.IconMaskBrush
-            : CurrencyViewModel.IconMaskBrush;
-
         private bool _isSelected;
-
         public bool IsSelected
         {
             get => _isSelected;
@@ -73,10 +61,13 @@ namespace Atomex.Client.Desktop.ViewModels
             {
                 _isSelected = value;
                 OnPropertyChanged(nameof(IsSelected));
-                OnPropertyChanged(nameof(Background));
-                OnPropertyChanged(nameof(OpacityMask));
+                OnPropertyChanged(nameof(IconPath));
             }
         }
+
+        public string IconPath => _isSelected
+            ? CurrencyViewModel.IconPath
+            : CurrencyViewModel.DisabledIconPath;
 
         private string GetUserId()
         {
@@ -95,7 +86,7 @@ namespace Atomex.Client.Desktop.ViewModels
         {
             _app = app ?? throw new ArgumentNullException(nameof(app));
             _api = wertApi ?? throw new ArgumentNullException(nameof(wertApi));
-            CurrencyViewModel = CurrencyViewModelCreator.CreateViewModel(currency);
+            CurrencyViewModel = CurrencyViewModelCreator.CreateOrGet(currency);
             _cancellationTokenSource = new CancellationTokenSource();
 
             // get all addresses with tokens (if exists)
@@ -132,12 +123,12 @@ namespace Atomex.Client.Desktop.ViewModels
 
                     return new WalletAddressViewModel
                     {
-                        Address = g.Key,
-                        HasActivity = address?.HasActivity ?? hasTokens,
+                        Address          = g.Key,
+                        HasActivity      = address?.HasActivity ?? hasTokens,
                         AvailableBalance = address?.AvailableBalance() ?? 0m,
-                        CurrencyFormat = Currency.Format,
-                        CurrencyCode = Currency.Name,
-                        IsFreeAddress = isFreeAddress,
+                        CurrencyFormat   = Currency.Format,
+                        CurrencyCode     = Currency.DisplayedName,
+                        IsFreeAddress    = isFreeAddress,
                     };
                 })
                 .ToList();
@@ -248,10 +239,8 @@ namespace Atomex.Client.Desktop.ViewModels
             set { _selectedAddress = value; }
         }
 
-
         protected string CurrencyFormat => CurrencyViewModel.CurrencyFormat;
         protected string BaseCurrencyFormat => "0.00";
-
 
         protected decimal _fromAmount;
 

@@ -23,13 +23,13 @@ using Atomex.Wallet;
 using Avalonia.Controls;
 using ReactiveUI.Fody.Helpers;
 using Network = NBitcoin.Network;
-
+using Atomex.TezosTokens;
 
 namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 {
     public class WalletViewModel : ViewModelBase, IWalletViewModel
     {
-        protected IAtomexApp _app;
+        protected readonly IAtomexApp _app;
         [Reactive] public ObservableCollection<TransactionViewModelBase> Transactions { get; set; }
         [Reactive] public TransactionViewModelBase? SelectedTransaction { get; set; }
         private TransactionViewModelBase? PreviousSelectedTransaction { get; set; }
@@ -37,13 +37,13 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         [ObservableAsProperty] public bool IsBalanceUpdating { get; }
         [Reactive] public TxSortField? CurrentSortField { get; set; }
         [Reactive] public SortDirection? CurrentSortDirection { get; set; }
+        [Reactive] public int SelectedTabIndex { get; set; }
         protected bool IsTransactionsLoading { get; set; }
         public AddressesViewModel AddressesViewModel { get; set; }
-        protected Action<CurrencyConfig> SetConversionTab { get; }
-        private Action<string> SetWertCurrency { get; }
+        protected Action<CurrencyConfig>? SetConversionTab { get; }
+        private Action<string>? SetWertCurrency { get; }
         protected Action<ViewModelBase?> ShowRightPopupContent { get; }
-
-        public string Header => CurrencyViewModel.Header;
+        public string Header { get; set; }
         public CurrencyConfig Currency => CurrencyViewModel.Currency;
 
         protected CancellationTokenSource _cancellation { get; set; }
@@ -58,20 +58,23 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
         public WalletViewModel(
             IAtomexApp app,
-            Action<CurrencyConfig> setConversionTab,
-            Action<string> setWertCurrency,
             Action<ViewModelBase?> showRightPopupContent,
-            CurrencyConfig? currency)
+            CurrencyConfig? currency = null,
+            Action<CurrencyConfig>? setConversionTab = null,
+            Action<string>? setWertCurrency = null)
         {
             _app = app ?? throw new ArgumentNullException(nameof(app));
-            SetConversionTab = setConversionTab ?? throw new ArgumentNullException(nameof(setConversionTab));
-            SetWertCurrency = setWertCurrency ?? throw new ArgumentNullException(nameof(setWertCurrency));
-            ShowRightPopupContent =
-                showRightPopupContent ?? throw new ArgumentNullException(nameof(showRightPopupContent));
+            ShowRightPopupContent = showRightPopupContent ??
+                                    throw new ArgumentNullException(nameof(showRightPopupContent));
+            
+            SetConversionTab = setConversionTab;
+            SetWertCurrency = setWertCurrency;
 
             if (currency != null)
             {
-                CurrencyViewModel = CurrencyViewModelCreator.CreateViewModel(currency);
+                CurrencyViewModel = CurrencyViewModelCreator.CreateOrGet(currency);
+                Header = CurrencyViewModel.Header;
+                
                 LoadAddresses();
                 _ = LoadTransactionsAsync();
             }
@@ -109,7 +112,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
                     PreviousSelectedTransaction = selectedTransaction;
                 });
-            
+
             UpdateCommand
                 .IsExecuting
                 .ToPropertyExInMainThread(this, vm => vm.IsBalanceUpdating);
@@ -130,7 +133,8 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         {
             try
             {
-                if (Currency.Name != args.Currency) return;
+                if (args.Currency != Currency.Name)
+                    return;
 
                 // update transactions list
                 await LoadTransactionsAsync();
@@ -243,31 +247,33 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             }
         }
 
-        private ReactiveCommand<Unit, Unit> _sendCommand;
+        private ReactiveCommand<Unit, Unit>? _sendCommand;
         public ReactiveCommand<Unit, Unit> SendCommand => _sendCommand ??= ReactiveCommand.Create(OnSendClick);
 
-        private ReactiveCommand<Unit, Unit> _receiveCommand;
+        private ReactiveCommand<Unit, Unit>? _receiveCommand;
         public ReactiveCommand<Unit, Unit> ReceiveCommand => _receiveCommand ??= ReactiveCommand.Create(OnReceiveClick);
 
-        private ReactiveCommand<Unit, Unit> _exchangeCommand;
+        private ReactiveCommand<Unit, Unit>? _exchangeCommand;
 
         public ReactiveCommand<Unit, Unit> ExchangeCommand =>
             _exchangeCommand ??= ReactiveCommand.Create(OnConvertClick);
 
-        private ReactiveCommand<Unit, Unit> _updateCommand;
-        public ReactiveCommand<Unit, Unit> UpdateCommand => _updateCommand ??= ReactiveCommand.CreateFromTask(OnUpdateClick);
+        private ReactiveCommand<Unit, Unit>? _updateCommand;
 
-        private ReactiveCommand<Unit, Unit> _cancelUpdateCommand;
+        public ReactiveCommand<Unit, Unit> UpdateCommand =>
+            _updateCommand ??= ReactiveCommand.CreateFromTask(OnUpdateClick);
+
+        private ReactiveCommand<Unit, Unit>? _cancelUpdateCommand;
 
         public ReactiveCommand<Unit, Unit> CancelUpdateCommand => _cancelUpdateCommand ??= ReactiveCommand.Create(
             () => _cancellation?.Cancel());
 
-        private ReactiveCommand<Unit, Unit> _buyCommand;
+        private ReactiveCommand<Unit, Unit>? _buyCommand;
 
         public ReactiveCommand<Unit, Unit> BuyCommand => _buyCommand ??= ReactiveCommand.Create(
             () => SetWertCurrency?.Invoke(CurrencyViewModel.Header));
 
-        private ReactiveCommand<TxSortField, Unit> _setSortTypeCommand;
+        private ReactiveCommand<TxSortField, Unit>? _setSortTypeCommand;
 
         public ReactiveCommand<TxSortField, Unit> SetSortTypeCommand =>
             _setSortTypeCommand ??= ReactiveCommand.Create<TxSortField>(sortField =>
@@ -357,7 +363,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         {
             var currencies = DesignTime.TestNetCurrencies.ToList();
 
-            CurrencyViewModel = CurrencyViewModelCreator.CreateViewModel(currencies[3], subscribeToUpdates: false);
+            CurrencyViewModel = CurrencyViewModelCreator.CreateOrGet(currencies[3], subscribeToUpdates: false);
             CurrencyViewModel.TotalAmount = 0.01012345m;
             CurrencyViewModel.TotalAmountInBase = 16.51m;
             CurrencyViewModel.AvailableAmount = 0.01010005m;

@@ -7,22 +7,23 @@ using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+
+using Avalonia.Controls;
 using Avalonia.Threading;
 using Newtonsoft.Json.Linq;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using Serilog;
+
 using Atomex.Blockchain.Tezos;
 using Atomex.Blockchain.Tezos.Internal;
 using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.Properties;
 using Atomex.Client.Desktop.ViewModels.Abstract;
 using Atomex.Common;
-using Atomex.Core;
 using Atomex.MarketData.Abstract;
 using Atomex.Wallet;
 using Atomex.Wallet.Tezos;
-using Avalonia.Controls;
 
 namespace Atomex.Client.Desktop.ViewModels
 {
@@ -321,6 +322,13 @@ namespace Atomex.Client.Desktop.ViewModels
         {
             _app = app ?? throw new ArgumentNullException(nameof(app));
             _tezosConfig = _app.Account.Currencies.Get<TezosConfig>(TezosConfig.Xtz);
+            FeeFormat = _tezosConfig.FeeFormat;
+            FeeCurrencyCode = _tezosConfig.FeeCode;
+            BaseCurrencyCode = "USD";
+            BaseCurrencyFormat = "$0.00";
+            UseDefaultFee = true;
+            Stage = SendStage.Edit;
+            CurrentSortDirection = SortDirection.Desc;
 
             this.WhenAnyValue(vm => vm.Fee)
                 .SubscribeInMainThread(f => { OnQuotesUpdatedEventHandler(_app.QuotesProvider, EventArgs.Empty); });
@@ -361,14 +369,6 @@ namespace Atomex.Client.Desktop.ViewModels
 
             SendCommand.IsExecuting.ToPropertyExInMainThread(this, vm => vm.IsSending);
             CheckDelegationCommand.IsExecuting.ToPropertyExInMainThread(this, vm => vm.IsChecking);
-
-            FeeFormat = _tezosConfig.FeeFormat;
-            FeeCurrencyCode = _tezosConfig.FeeCode;
-            BaseCurrencyCode = "USD";
-            BaseCurrencyFormat = "$0.00";
-            UseDefaultFee = true;
-            Stage = SendStage.Edit;
-            CurrentSortDirection = SortDirection.Desc;
 
             SubscribeToServices();
             _ = LoadBakerList();
@@ -430,8 +430,6 @@ namespace Atomex.Client.Desktop.ViewModels
                             StakingAvailable = bakerData.StakingAvailable
                         })
                         .ToList();
-
-                    bakers.ForEach(bakerVm => _ = App.ImageService.LoadImageFromUrl(bakerVm.Logo));
                 });
             }
             catch (Exception e)
@@ -443,7 +441,6 @@ namespace Atomex.Client.Desktop.ViewModels
             {
                 BakersList = bakers;
                 InitialBakersList = new List<BakerViewModel>(BakersList);
-                //UseDefaultFee = _useDefaultFee;
             }, DispatcherPriority.Background);
         }
 
@@ -598,7 +595,7 @@ namespace Atomex.Client.Desktop.ViewModels
 
         private void OnQuotesUpdatedEventHandler(object? sender, EventArgs args)
         {
-            if (sender is not ICurrencyQuotesProvider quotesProvider)
+            if (sender is not IQuotesProvider quotesProvider )
                 return;
 
             var quote = quotesProvider.GetQuote(FeeCurrencyCode, BaseCurrencyCode);
@@ -609,7 +606,7 @@ namespace Atomex.Client.Desktop.ViewModels
 
         private void OnQuotesProviderAvailabilityChangedEventHandler(object? sender, EventArgs args)
         {
-            if (sender is not ICurrencyQuotesProvider provider)
+            if (sender is not IQuotesProvider provider)
                 return;
 
             if (provider.IsAvailable)

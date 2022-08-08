@@ -40,7 +40,7 @@ namespace Atomex.Client.Desktop.Common
 
         private static CurrencyViewModel GetCurrencyViewModel(CurrencyConfig config)
         {
-            var currencyViewModel = CurrencyViewModelCreator.CreateViewModel(
+            var currencyViewModel = CurrencyViewModelCreator.CreateOrGet(
                 config, subscribeToUpdates: false);
 
             currencyViewModel.TotalAmount = 123.32m;

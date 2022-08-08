@@ -23,7 +23,6 @@
         <converters:ObjectsNotEqualConverter x:Key="ObjectsNotEqualConverter" />
         <converters:ShowBuyButton x:Key="ShowBuyButton" />
         <converters:PercentConverter x:Key="PercentConverter" />
-        <converters:LowerThanZeroConverter x:Key="LowerThanZeroConverter" />
     </UserControl.Resources>
 
     <Border Padding="50 16 50 0">
@@ -159,7 +158,7 @@
                                Text="Coins &amp; Tokens" />
 
                     <controls:IconButton Grid.Column="1"
-                                         Classes="Settings"
+                                         Classes="SetupAssets"
                                          Margin="0 0 12 0"
                                          Command="{Binding ManageAssetsCommand}" />
                 </Grid>
@@ -249,9 +248,11 @@
                                                 </TextBlock>
                                                 <TextBlock VerticalAlignment="Center"
                                                            FontSize="13"
-                                                           Text="{Binding DailyChangePercent, Converter={StaticResource PercentConverter}}"
+                                                           Text="{Binding DailyChangePercent,
+                                                           Converter={StaticResource PercentConverter}}"
                                                            Classes="Success"
-                                                           Classes.UnSuccess="{Binding DailyChangePercent, Converter={StaticResource LowerThanZeroConverter}}" />
+                                                           Classes.UnSuccess="{Binding DailyChangePercent,
+                                                           Converter={x:Static converters:NumericConverters.LowerThanZero}}" />
                                             </StackPanel>
                                         </StackPanel>
                                         <StackPanel Grid.Column="1"
@@ -273,7 +274,7 @@
                                                     <TextBlock HorizontalAlignment="Right"
                                                                Foreground="{DynamicResource DefaultForegroundBrush}"
                                                                FontSize="16"
-                                                               Text="{Binding CurrencyCode}"
+                                                               Text="{Binding CurrencyName}"
                                                                Margin="3 0 0 0" />
                                                 </StackPanel>
                                                 <TextBlock HorizontalAlignment="Right"
@@ -291,13 +292,6 @@
                                             </StackPanel>
 
                                             <StackPanel Orientation="Horizontal">
-                                                <!-- todo: remove -->
-                                                <StackPanel.IsVisible>
-                                                    <MultiBinding Converter="{StaticResource ObjectsNotEqualConverter}">
-                                                        <Binding Path="$parent[ListBox].DataContext.TezosTokens" />
-                                                        <Binding Path="Header" />
-                                                    </MultiBinding>
-                                                </StackPanel.IsVisible>
                                                 <TextBlock IsVisible="{Binding !AvailableAmount}"
                                                            HorizontalAlignment="Right"
                                                            Foreground="{DynamicResource DefaultForegroundBrush}"
@@ -311,7 +305,7 @@
                                                            FontSize="16"
                                                            VerticalAlignment="Center"
                                                            Margin="3 0 0 0"
-                                                           Text="{Binding CurrencyCode}" />
+                                                           Text="{Binding CurrencyName}" />
 
                                                 <WrapPanel VerticalAlignment="Center">
                                                     <controls:IconButton Classes="MenuDots"
@@ -334,100 +328,74 @@
                                                         <Border Background="{DynamicResource DeepBlue}"
                                                                 CornerRadius="{DynamicResource AtomexCornerRadius}"
                                                                 Padding="12 16">
-                                                            <StackPanel>
-                                                                <StackPanel.Styles>
-                                                                    <Style
-                                                                        Selector="Button:pointerover /template/ ContentPresenter#PART_ContentPresenter">
-                                                                        <Setter Property="Background"
-                                                                            Value="{DynamicResource LightDefaultOpacity6}" />
-                                                                    </Style>
-                                                                    <Style
-                                                                        Selector="Button:not(:pointerover) /template/ ContentPresenter#PART_ContentPresenter">
-                                                                        <Setter Property="Background"
-                                                                            Value="{DynamicResource AlmostTransparentBrush}" />
-                                                                    </Style>
-                                                                    <Style
-                                                                        Selector="Button:pressed /template/ ContentPresenter#PART_ContentPresenter">
-                                                                        <Setter Property="Background"
-                                                                            Value="{DynamicResource LightDefaultOpacity6}" />
-                                                                    </Style>
-                                                                </StackPanel.Styles>
-
-                                                                <Button Width="180"
-                                                                        Height="40"
-                                                                        Padding="12 0"
-                                                                        CornerRadius="{DynamicResource AtomexCornerRadius}"
-                                                                        VerticalContentAlignment="Center"
-                                                                        Command="{Binding $parent[ListBox].DataContext.SendFromPopupCommand}"
-                                                                        CommandParameter="{Binding}">
+                                                            <StackPanel Classes="Popup">
+                                                                <Button
+                                                                    CornerRadius="{DynamicResource AtomexCornerRadius}"
+                                                                    VerticalContentAlignment="Center"
+                                                                    Command="{Binding $parent[ListBox].DataContext.SendFromPopupCommand}"
+                                                                    CommandParameter="{Binding}">
                                                                     <StackPanel Orientation="Horizontal"
                                                                         VerticalAlignment="Stretch">
                                                                         <TextBlock Text="Send"
                                                                             Foreground="{DynamicResource DefaultForegroundBrush}"
                                                                             VerticalAlignment="Center"
                                                                             FontSize="16" />
-                                                                        <TextBlock Text="{Binding CurrencyCode}"
+                                                                        <TextBlock Text="{Binding CurrencyName}"
                                                                             Foreground="{DynamicResource DefaultForegroundBrush}"
                                                                             VerticalAlignment="Center"
                                                                             FontSize="16"
                                                                             Margin="3 0 0 0" />
                                                                     </StackPanel>
                                                                 </Button>
-                                                                <Button Width="180"
-                                                                        Height="40"
-                                                                        Padding="12 0"
-                                                                        CornerRadius="{DynamicResource AtomexCornerRadius}"
-                                                                        VerticalContentAlignment="Center"
-                                                                        Command="{Binding $parent[ListBox].DataContext.ReceiveFromPopupCommand}"
-                                                                        CommandParameter="{Binding}">
+                                                                <Button
+                                                                    CornerRadius="{DynamicResource AtomexCornerRadius}"
+                                                                    VerticalContentAlignment="Center"
+                                                                    Command="{Binding $parent[ListBox].DataContext.ReceiveFromPopupCommand}"
+                                                                    CommandParameter="{Binding}">
                                                                     <StackPanel Orientation="Horizontal"
                                                                         VerticalAlignment="Stretch">
                                                                         <TextBlock Text="Receive"
                                                                             Foreground="{DynamicResource DefaultForegroundBrush}"
                                                                             VerticalAlignment="Center"
                                                                             FontSize="16" />
-                                                                        <TextBlock Text="{Binding CurrencyCode}"
+                                                                        <TextBlock Text="{Binding CurrencyName}"
                                                                             Foreground="{DynamicResource DefaultForegroundBrush}"
                                                                             VerticalAlignment="Center"
                                                                             FontSize="16"
                                                                             Margin="3 0 0 0" />
                                                                     </StackPanel>
                                                                 </Button>
-                                                                <Button Width="180"
-                                                                        Height="40"
-                                                                        Padding="12 0"
-                                                                        CornerRadius="{DynamicResource AtomexCornerRadius}"
-                                                                        VerticalContentAlignment="Center"
-                                                                        Command="{Binding $parent[ListBox].DataContext.ExchangeCommand}"
-                                                                        CommandParameter="{Binding}">
+                                                                <Button
+                                                                    CornerRadius="{DynamicResource AtomexCornerRadius}"
+                                                                    VerticalContentAlignment="Center"
+                                                                    Command="{Binding $parent[ListBox].DataContext.ExchangeCommand}"
+                                                                    CommandParameter="{Binding}">
                                                                     <StackPanel Orientation="Horizontal"
                                                                         VerticalAlignment="Stretch">
                                                                         <TextBlock Text="Exchange"
                                                                             Foreground="{DynamicResource DefaultForegroundBrush}"
                                                                             VerticalAlignment="Center"
                                                                             FontSize="16" />
-                                                                        <TextBlock Text="{Binding CurrencyCode}"
+                                                                        <TextBlock Text="{Binding CurrencyName}"
                                                                             Foreground="{DynamicResource DefaultForegroundBrush}"
                                                                             VerticalAlignment="Center"
                                                                             FontSize="16"
                                                                             Margin="3 0 0 0" />
                                                                     </StackPanel>
                                                                 </Button>
-                                                                <Button Width="180"
-                                                                        Height="40"
-                                                                        Padding="12 0"
-                                                                        CornerRadius="{DynamicResource AtomexCornerRadius}"
-                                                                        VerticalContentAlignment="Center"
-                                                                        IsVisible="{Binding CurrencyCode, Converter={StaticResource ShowBuyButton}}"
-                                                                        Command="{Binding $parent[ListBox].DataContext.SetWertCurrencyCommand}"
-                                                                        CommandParameter="{Binding}">
+                                                                <Button
+                                                                    CornerRadius="{DynamicResource AtomexCornerRadius}"
+                                                                    VerticalContentAlignment="Center"
+                                                                    IsVisible="{Binding CurrencyCode, Converter={StaticResource ShowBuyButton}}"
+                                                                    Command="{Binding $parent[ListBox].DataContext.SetWertCurrencyCommand}"
+                                                                    CommandParameter="{Binding}">
                                                                     <StackPanel Orientation="Horizontal"
                                                                         VerticalAlignment="Stretch">
                                                                         <TextBlock Text="Buy"
                                                                             Foreground="{DynamicResource DefaultForegroundBrush}"
                                                                             VerticalAlignment="Center"
                                                                             FontSize="16" />
-                                                                        <TextBlock Text="{Binding CurrencyCode}"
+                                                                        <TextBlock Text="{Binding CurrencyName}"
                                                                             Foreground="{DynamicResource DefaultForegroundBrush}"
                                                                             VerticalAlignment="Center"
                                                                             FontSize="16"

@@ -13,10 +13,11 @@
 
     <Grid RowDefinitions="Auto,*"
           Name="DesignGrid">
+
         <controls:WalletCurrency Grid.Row="0"
                                  Grid.Column="0"
                                  Margin="0 40 0 0"
-                                 CurrencyViewModel="{Binding CurrencyViewModel}"
+                                 AssetViewModel="{Binding CurrencyViewModel}"
                                  IsBalanceUpdating="{Binding IsBalanceUpdating}"
                                  SendCommand="{Binding SendCommand}"
                                  ReceiveCommand="{Binding ReceiveCommand}"
@@ -26,6 +27,7 @@
 
         <TabControl Grid.Row="1"
                     Margin="0 4 0 0"
+                    SelectedIndex="{Binding SelectedTabIndex}"
                     Classes="WalletTabControl">
             <TabItem Margin="0 0 16 0"
                      Classes="WalletTabItem">

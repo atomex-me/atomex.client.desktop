@@ -4,7 +4,9 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive.Linq;
 using Atomex.Client.Desktop.Common;
+using Atomex.Client.Desktop.ViewModels.Abstract;
 using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
+using Atomex.Client.Desktop.ViewModels.WalletViewModels;
 using Atomex.Common;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
@@ -12,13 +14,21 @@ using ReactiveUI.Fody.Helpers;
 
 namespace Atomex.Client.Desktop.ViewModels
 {
-    public class CurrencyWithSelection : ViewModelBase
+    public enum ManageAssetsUseCase
     {
-        public CurrencyViewModel Currency { get; set; }
+        Portfolio,
+        Tokens,
+        Collectibles
+    }
+
+    public class AssetWithSelection : ViewModelBase
+    {
+        public IAssetViewModel Asset { get; set; }
         [Reactive] public bool IsSelected { get; set; }
+        [Reactive] public bool IsHidden { get; set; }
         public Action OnChanged { get; set; }
 
-        public CurrencyWithSelection()
+        public AssetWithSelection()
         {
             this.WhenAnyValue(vm => vm.IsSelected)
                 .SubscribeInMainThread(_ => OnChanged?.Invoke());
@@ -27,44 +37,82 @@ namespace Atomex.Client.Desktop.ViewModels
 
     public class ManageAssetsViewModel : ViewModelBase
     {
-        private ObservableCollection<CurrencyWithSelection> InitialCurrencies { get; set; }
-        private ObservableCollection<CurrencyWithSelection> BeforeSearchCurrencies { get; set; }
-        [Reactive] public ObservableCollection<CurrencyWithSelection> AvailableCurrencies { get; set; }
+        [Reactive] public ManageAssetsUseCase UseCase { get; set; }
+        private ObservableCollection<AssetWithSelection> InitialAssets { get; set; }
+        [Reactive] public ObservableCollection<AssetWithSelection> AvailableAssets { get; set; }
         [Reactive] public string SearchPattern { get; set; }
-        public Action<IEnumerable<CurrencyViewModel>> OnAssetsChanged { get; set; }
+        [Reactive] public bool HideZeroBalances { get; set; }
+        public Action<IEnumerable<string>> OnAssetsChanged { get; set; }
+        public Action<bool>? OnHideZeroBalancesChanges { get; set; }
 
         public ManageAssetsViewModel()
         {
-            this.WhenAnyValue(vm => vm.AvailableCurrencies)
+            this.WhenAnyValue(vm => vm.AvailableAssets)
                 .WhereNotNull()
                 .Take(1)
                 .SubscribeInMainThread(_ =>
                 {
-                    AvailableCurrencies.ForEachDo(curr => curr.OnChanged = () =>
+                    AvailableAssets.ForEachDo(asset => asset.OnChanged = () =>
                     {
-                        OnAssetsChanged?.Invoke(InitialCurrencies
-                            .Where(currency => currency.IsSelected)
-                            .Select(currencyWithSelection => currencyWithSelection.Currency));
+                        OnAssetsChanged?.Invoke(InitialAssets
+                            .Where(a => a.IsSelected)
+                            .Select(assetWithSelection => assetWithSelection.Asset.CurrencyCode));
                     });
 
-                    InitialCurrencies = new ObservableCollection<CurrencyWithSelection>(AvailableCurrencies);
+                    InitialAssets = new ObservableCollection<AssetWithSelection>(AvailableAssets);
+
+                    var firstAsset = AvailableAssets.FirstOrDefault();
+                    if (firstAsset is null) return;
+
+                    UseCase = firstAsset.Asset switch
+                    {
+                        CurrencyViewModel => ManageAssetsUseCase.Portfolio,
+                        TezosTokenViewModel => ManageAssetsUseCase.Tokens,
+                        Collectible => ManageAssetsUseCase.Collectibles,
+                        _ => UseCase
+                    };
                 });
 
             this.WhenAnyValue(vm => vm.SearchPattern)
                 .WhereNotNull()
-                .Where(_ => AvailableCurrencies != null)
+                .Where(_ => AvailableAssets != null)
                 .SubscribeInMainThread(searchPattern =>
                 {
-                    if (searchPattern == string.Empty)
-                        BeforeSearchCurrencies = new ObservableCollection<CurrencyWithSelection>(AvailableCurrencies);
+                    var filteredAssets = InitialAssets
+                        .Where(a => a.Asset is { CurrencyCode: { }, CurrencyDescription: { } })
+                        .Where(c => c.Asset.CurrencyCode.ToLower().Contains(searchPattern.ToLower())
+                                    || c.Asset.CurrencyDescription.ToLower().Contains(searchPattern.ToLower()));
 
-                    var filteredCurrencies = InitialCurrencies
-                        .Where(c => c.Currency.Currency.Name.ToLower()
-                                        .Contains(searchPattern?.ToLower() ?? string.Empty) ||
-                                    c.Currency.Currency.Description.ToLower()
-                                        .Contains(searchPattern?.ToLower() ?? string.Empty));
+                    AvailableAssets = new ObservableCollection<AssetWithSelection>(filteredAssets);
+                });
 
-                    AvailableCurrencies = new ObservableCollection<CurrencyWithSelection>(filteredCurrencies);
+            this.WhenAnyValue(vm => vm.HideZeroBalances)
+                .Where(_ => AvailableAssets != null && InitialAssets != null)
+                .SubscribeInMainThread(hideZeroBalances =>
+                {
+                    AvailableAssets.ForEachDo(asset =>
+                    {
+                        if (!hideZeroBalances)
+                        {
+                            asset.IsHidden = false;
+                            return;
+                        }
+
+                        asset.IsHidden = asset.Asset.TotalAmountInBase <= Constants.MinBalanceForTokensUsd;
+                    });
+
+                    InitialAssets.ForEachDo(asset =>
+                    {
+                        if (!hideZeroBalances)
+                        {
+                            asset.IsHidden = false;
+                            return;
+                        }
+
+                        asset.IsHidden = asset.Asset.TotalAmountInBase <= Constants.MinBalanceForTokensUsd;
+                    });
+
+                    OnHideZeroBalancesChanges?.Invoke(hideZeroBalances);
                 });
 
             SearchPattern = string.Empty;

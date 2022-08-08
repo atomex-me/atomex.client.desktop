@@ -10,7 +10,7 @@ using Atomex.TezosTokens;
 using Atomex.Core;
 using Atomex.Wallet.Tezos;
 using Avalonia.Controls;
-
+using Atomex.Wallet;
 
 namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 {
@@ -29,15 +29,36 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         public Fa12WalletViewModel(
             IAtomexApp app,
             Action<CurrencyConfig> setConversionTab,
-            Action<string> setWertCurrency,
+            Action<string>? setWertCurrency,
             Action<ViewModelBase?> showRightPopupContent,
-            CurrencyConfig currency) : base(app, setConversionTab, setWertCurrency, showRightPopupContent, currency)
+            CurrencyConfig currency) : base(app, showRightPopupContent, currency, setConversionTab, setWertCurrency)
         {
         }
 
         protected override void SubscribeToServices()
         {
             _app.Account.BalanceUpdated += OnBalanceUpdatedEventHandler;
+        }
+
+        protected virtual async void OnBalanceUpdatedEventHandler(object sender, CurrencyEventArgs args)
+        {
+            try
+            {
+                var tezosTokenConfig = (TezosTokenConfig)Currency;
+
+                if (!args.IsTokenUpdate ||
+                   args.TokenContract != null && (args.TokenContract != tezosTokenConfig.TokenContractAddress || args.TokenId != tezosTokenConfig.TokenId))
+                {
+                    return;
+                }
+
+                // update transactions list
+                await LoadTransactionsAsync();
+            }
+            catch (Exception e)
+            {
+                Log.Error(e, "Account balance updated event handler error");
+            }
         }
 
         protected sealed override async Task LoadTransactionsAsync()
@@ -67,8 +88,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                             transactions
                                 .Select(t => new TezosTokenTransferViewModel(t, Currency))
                                 .ToList()
-                                .ForEachDo(t => t.OnClose = () => ShowRightPopupContent?.Invoke(null)
-                                ));
+                                .ForEachDo(t => t.OnClose = () => ShowRightPopupContent?.Invoke(null)));
 
                         if (selectedTransactionId != null)
                             SelectedTransaction = Transactions.FirstOrDefault(t => t.Id == selectedTransactionId);

@@ -7,13 +7,11 @@ using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
-
 using Avalonia.Controls;
 using NBitcoin;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using Network = NBitcoin.Network;
-
 using Atomex.Blockchain.BitcoinBased;
 using Atomex.Client.Desktop.Common;
 using Atomex.Common;
@@ -161,6 +159,23 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     }
                 });
 
+            this.WhenAnyValue(vm => vm.TotalSelected)
+                .WhereNotNull()
+                .Select(totalSelected => $"{totalSelected} selected")
+                .ToPropertyExInMainThread(this, vm => vm.TotalSelectedString);
+
+            this.WhenAnyValue(vm => vm.TotalSelected)
+                .WhereNotNull()
+                .Where(_ => Config != null && Outputs != null)
+                .Select(_ =>
+                {
+                    var totalCoinAmount = Outputs!.Aggregate(0m,
+                        (result, output) => output.IsSelected ? result + output.Balance : result);
+
+                    return $"Total {totalCoinAmount.ToString(Config!.Format, CultureInfo.CurrentCulture)} {Config.DisplayedName}";
+                })
+                .ToPropertyExInMainThread(this, vm => vm.TotalCoinAmountSelected);
+
             Account = account;
             Config = config;
             Outputs = new ObservableCollection<OutputViewModel>(outputs);
@@ -173,27 +188,19 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         [Reactive] public bool SelectAll { get; set; }
         [Reactive] private bool SortIsAscending { get; set; }
         [Reactive] private bool SortByDate { get; set; }
-        [Reactive] public string TotalSelected { get; set; }
-        [Reactive] public string TotalCoinAmountSelected { get; set; }
+        [Reactive] public int TotalSelected { get; set; }
+        [ObservableAsProperty] public string TotalSelectedString { get; }
+        [ObservableAsProperty] public string TotalCoinAmountSelected { get; }
 
         private void RecalculateTotalStats()
         {
-            Task.Run(() =>
-            {
-                TotalSelected =
-                    $"{Outputs.Aggregate(0, (result, output) => output.IsSelected ? result + 1 : result)} selected";
-
-                var totalCoinAmount = Outputs.Aggregate(0m,
-                    (result, output) => output.IsSelected ? result + output.Balance : result);
-
-                TotalCoinAmountSelected =
-                    $"Total {totalCoinAmount.ToString(Config.Format, CultureInfo.CurrentCulture)} {Config.Name}";
-            });
+            TotalSelected = Outputs.Aggregate(0, (result, output) => output.IsSelected ? result + 1 : result);
         }
 
         private bool _checkedFromList;
 
         private ReactiveCommand<Unit, Unit> _outputCheckCommand;
+
         public ReactiveCommand<Unit, Unit> OutputCheckCommand => _outputCheckCommand ??=
             (_outputCheckCommand = ReactiveCommand.Create(() =>
             {
@@ -206,26 +213,32 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             }));
 
         private ReactiveCommand<Unit, Unit> _selectAllCommand;
+
         public ReactiveCommand<Unit, Unit> SelectAllCommand => _selectAllCommand ??=
             (_selectAllCommand = ReactiveCommand.Create(() => { _checkedFromList = false; }));
 
         private ReactiveCommand<Unit, Unit> _closeCommand;
+
         public ReactiveCommand<Unit, Unit> CloseCommand => _closeCommand ??=
             (_closeCommand = ReactiveCommand.Create(() => { App.DialogService.Close(); }));
 
         private ReactiveCommand<Unit, Unit> _backCommand;
+
         public ReactiveCommand<Unit, Unit> BackCommand => _backCommand ??=
             (_backCommand = ReactiveCommand.Create(() => { BackAction?.Invoke(); }));
 
         private ReactiveCommand<Unit, Unit> _changeSortTypeCommand;
+
         public ReactiveCommand<Unit, Unit> ChangeSortTypeCommand => _changeSortTypeCommand ??=
             (_changeSortTypeCommand = ReactiveCommand.Create(() => { SortByDate = !SortByDate; }));
 
         private ReactiveCommand<Unit, Unit> _changeSortDirectionCommand;
+
         public ReactiveCommand<Unit, Unit> ChangeSortDirectionCommand => _changeSortDirectionCommand ??=
             (_changeSortDirectionCommand = ReactiveCommand.Create(() => { SortIsAscending = !SortIsAscending; }));
 
         private ReactiveCommand<Unit, Unit> _confirmCommand;
+
         public ReactiveCommand<Unit, Unit> ConfirmCommand => _confirmCommand ??=
             (_confirmCommand =
                 ReactiveCommand.Create(() =>
@@ -238,6 +251,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
 
         private ICommand _copyAddressCommand;
+
         public ICommand CopyAddressCommand =>
             _copyAddressCommand ??= (_copyAddressCommand = ReactiveCommand.Create((OutputViewModel output) =>
             {
@@ -302,7 +316,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         public BitcoinBasedConfig Config { get; set; }
         public WalletAddress? WalletAddress { get; set; }
         public decimal Balance => Config.SatoshiToCoin(Output.Value);
-        public string BalanceString => $"{Balance.ToString(Config.Format, CultureInfo.CurrentCulture)} {Config.Name}";
+        public string BalanceString => $"{Balance.ToString(Config.Format, CultureInfo.CurrentCulture)} {Config.DisplayedName}";
         public string Address => Output.DestinationAddress(Config.Network);
     }
 }

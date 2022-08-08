@@ -15,10 +15,6 @@
         <vm:ConnectDappViewModel />
     </Design.DataContext>
 
-    <UserControl.Resources>
-        <converters:ShortenedAddressConverter x:Key="ShortenedAddressConverter" />
-    </UserControl.Resources>
-
     <Border Classes="ChildViewBorder"
             Padding="24 0 24 16">
         <StackPanel Orientation="Vertical">
@@ -90,8 +86,7 @@
                                FontSize="16"
                                VerticalAlignment="Center"
                                Text="{Binding AddressToConnect,
-                                   Converter={StaticResource ShortenedAddressConverter},
-                                   ConverterParameter={x:Static abstract:AddressTruncateType.Short}}" />
+                                   Converter={x:Static converters:StringConverters.ToShortenedAddress}}" />
 
                     <controls:CopyButton ToolText="Copy address"
                                          DoneToolText="Copied!"

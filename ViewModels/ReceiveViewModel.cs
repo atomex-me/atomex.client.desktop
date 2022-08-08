@@ -30,8 +30,8 @@ namespace Atomex.Client.Desktop.ViewModels
         [Reactive] public IBitmap QrCode { get; private set; }
         public string TokenContract { get; private set; }
         public string TokenType { get; private set; }
-        public string TitleText => $"Your receiving {Currency.Name} address";
-        public string MyAddressesText => $"My {Currency.Name} addresses";
+        public string TitleText => $"Your receiving {Currency.DisplayedName} address";
+        public string MyAddressesText => $"My {Currency.DisplayedName} addresses";
         public SelectAddressViewModel SelectAddressViewModel { get; set; }
         public Action? OnBack { get; set; }
         public bool IsBackVisible => OnBack != null;
@@ -143,7 +143,7 @@ namespace Atomex.Client.Desktop.ViewModels
                 HasActivity = true,
                 AvailableBalance = 123.456789m,
                 CurrencyFormat = Currency.Format,
-                CurrencyCode = Currency.Name,
+                CurrencyCode = Currency.DisplayedName,
                 IsFreeAddress = false,
                 ShowTokenBalance = true,
                 TokenBalance = 100.00000000m,

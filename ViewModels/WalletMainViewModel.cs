@@ -3,17 +3,19 @@ using System.Diagnostics;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
+
 using Avalonia.Threading;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
+
+using Atomex.Client.Common;
 using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.ViewModels.TransactionViewModels;
 using Atomex.Client.Desktop.ViewModels.WalletViewModels;
 using Atomex.Core;
-using Atomex.MarketData;
 using Atomex.MarketData.Abstract;
-using Atomex.Services;
-using Atomex.Services.Abstract;
+using Atomex.Client.Abstract;
+using Atomex.Client.V1.Entities;
 
 namespace Atomex.Client.Desktop.ViewModels
 {
@@ -135,27 +137,27 @@ namespace Atomex.Client.Desktop.ViewModels
         private void OnAtomexClientChangedEventHandler(object? sender, AtomexClientChangedEventArgs args)
         {
             var atomexClient = args.AtomexClient;
-            if (atomexClient?.Account == null)
+            if (atomexClient == null || AtomexApp?.Account == null)
             {
                 SelectPortfolio();
                 ShowRightPopupContent(null);
                 return;
             }
 
-            atomexClient.ServiceConnected += OnAtomexClientServiceStateChangedEventHandler;
-            atomexClient.ServiceDisconnected += OnAtomexClientServiceStateChangedEventHandler;
+            atomexClient.ServiceStatusChanged += OnAtomexClientServiceStateChangedEventHandler;
         }
 
-        private void OnAtomexClientServiceStateChangedEventHandler(object? sender, AtomexClientServiceEventArgs args)
+        private void OnAtomexClientServiceStateChangedEventHandler(object? sender, ServiceEventArgs args)
         {
             if (sender is not IAtomexClient atomexClient)
                 return;
 
-            IsExchangeConnected = atomexClient.IsServiceConnected(AtomexClientService.Exchange);
-            IsMarketDataConnected = atomexClient.IsServiceConnected(AtomexClientService.MarketData);
+            IsExchangeConnected = atomexClient.IsServiceConnected(Service.Exchange);
+            IsMarketDataConnected = atomexClient.IsServiceConnected(Service.MarketData);
 
             // subscribe to symbols updates
-            if (args.Service != AtomexClientService.MarketData || !IsMarketDataConnected) return;
+            if (args.Service != Service.MarketData || !IsMarketDataConnected)
+                return;
 
             atomexClient.SubscribeToMarketData(SubscriptionType.TopOfBook);
             atomexClient.SubscribeToMarketData(SubscriptionType.DepthTwenty);
@@ -163,7 +165,7 @@ namespace Atomex.Client.Desktop.ViewModels
 
         private void OnQuotesProviderAvailabilityChangedEventHandler(object? sender, EventArgs args)
         {
-            if (sender is not ICurrencyQuotesProvider provider)
+            if (sender is not IQuotesProvider provider)
                 return;
 
             IsQuotesProviderAvailable = provider.IsAvailable;
@@ -214,17 +216,7 @@ namespace Atomex.Client.Desktop.ViewModels
 
         private void SelectCurrencyWallet(string? currencyDescription = null)
         {
-            // todo: remove
-            if (currencyDescription == PortfolioViewModel.TezosTokens)
-            {
-                WalletsViewModel.Selected = new TezosTokensWalletViewModel(
-                    app: AtomexApp,
-                    setConversionTab: SelectConversion,
-                    setWertCurrency: SelectWert,
-                    showRightPopupContent: ShowRightPopupContent);
-            }
-
-            else if (currencyDescription != null)
+            if (currencyDescription != null)
             {
                 WalletsViewModel.Selected = WalletsViewModel
                     .Wallets

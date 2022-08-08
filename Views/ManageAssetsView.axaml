@@ -6,7 +6,12 @@
              x:Class="Atomex.Client.Desktop.Views.ManageAssetsView"
              xmlns:vm="clr-namespace:Atomex.Client.Desktop.ViewModels"
              xmlns:controls="clr-namespace:Atomex.Client.Desktop.Controls"
-             xmlns:svg="clr-namespace:Avalonia.Svg.Skia;assembly=Avalonia.Svg.Skia">
+             xmlns:svg="clr-namespace:Avalonia.Svg.Skia;assembly=Avalonia.Svg.Skia"
+             xmlns:converters="clr-namespace:Atomex.Client.Desktop.Converters"
+             xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
+             xmlns:ia="clr-namespace:Avalonia.Xaml.Interactions.Core;assembly=Avalonia.Xaml.Interactions"
+             xmlns:asyncImageLoader="clr-namespace:AsyncImageLoader;assembly=AsyncImageLoader.Avalonia"
+             xmlns:services="clr-namespace:Atomex.Client.Desktop.Services">
 
     <Design.DataContext>
         <vm:ManageAssetsViewModel />
@@ -14,17 +19,38 @@
 
     <Border Classes="ChildViewBorder"
             Width="700">
-        <Grid RowDefinitions="72,Auto,*">
-            <!-- title -->
-            <TextBlock Name="Title"
+        <Grid RowDefinitions="72,Auto,Auto,Auto,*">
+            <TextBlock Grid.Row="0"
+                       Name="Title"
                        FontSize="22"
                        HorizontalAlignment="Center"
                        VerticalAlignment="Center"
                        Foreground="{DynamicResource LightDefault}"
-                       Grid.Column="0"
-                       Text="Manage assets" />
+                       Grid.Column="0">
+                <i:Interaction.Behaviors>
+                    <ia:DataTriggerBehavior Binding="{Binding UseCase}"
+                                            ComparisonCondition="Equal"
+                                            Value="{x:Static vm:ManageAssetsUseCase.Portfolio}">
+                        <ia:ChangePropertyAction PropertyName="Text"
+                                                 Value="Manage assets" />
+                    </ia:DataTriggerBehavior>
+                    <ia:DataTriggerBehavior Binding="{Binding UseCase}"
+                                            ComparisonCondition="Equal"
+                                            Value="{x:Static vm:ManageAssetsUseCase.Tokens}">
+                        <ia:ChangePropertyAction PropertyName="Text"
+                                                 Value="Manage Tezos tokens" />
+                    </ia:DataTriggerBehavior>
+                    <ia:DataTriggerBehavior Binding="{Binding UseCase}"
+                                            ComparisonCondition="Equal"
+                                            Value="{x:Static vm:ManageAssetsUseCase.Collectibles}">
+                        <ia:ChangePropertyAction PropertyName="Text"
+                                                 Value="Manage Tezos collectibles" />
+                    </ia:DataTriggerBehavior>
+                </i:Interaction.Behaviors>
+            </TextBlock>
 
-            <Border Height="1"
+            <Border Grid.Row="0"
+                    Height="1"
                     Background="{DynamicResource LightDefaultOpacity10}"
                     VerticalAlignment="Bottom" />
 
@@ -38,7 +64,8 @@
                      Classes="SearchTextBox">
                 <TextBox.InnerRightContent>
                     <StackPanel VerticalAlignment="Center"
-                                IsVisible="{Binding SearchPattern, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+                                IsVisible="{Binding SearchPattern,
+                                Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
                         <controls:IconButton Classes="Clear NoEffects"
                                              Command="{ReflectionBinding $parent[TextBox].Clear}"
                                              Margin="0 0 15 0" />
@@ -46,36 +73,133 @@
                 </TextBox.InnerRightContent>
             </TextBox>
 
-            <ListBox Margin="16"
+            <Grid Grid.Row="2"
+                  Margin="16 24 16 0"
+                  IsVisible="{Binding UseCase,
+                  Converter={x:Static converters:EnumToStringNotEqualConverter.Instance},
+                  ConverterParameter={x:Static vm:ManageAssetsUseCase.Portfolio}}"
+                  ColumnDefinitions="*,Auto">
+                <TextBlock Grid.Column="0"
+                           VerticalAlignment="Center"
+                           Foreground="{DynamicResource SecondaryForegroundBrush}"
+                           FontSize="13">
+                    <i:Interaction.Behaviors>
+                        <ia:DataTriggerBehavior Binding="{Binding UseCase}"
+                                                ComparisonCondition="Equal"
+                                                Value="{x:Static vm:ManageAssetsUseCase.Tokens}">
+                            <ia:ChangePropertyAction PropertyName="Text"
+                                                     Value="My tokens" />
+                        </ia:DataTriggerBehavior>
+                        <ia:DataTriggerBehavior Binding="{Binding UseCase}"
+                                                ComparisonCondition="Equal"
+                                                Value="{x:Static vm:ManageAssetsUseCase.Collectibles}">
+                            <ia:ChangePropertyAction PropertyName="Text"
+                                                     Value="My collectibles" />
+                        </ia:DataTriggerBehavior>
+                    </i:Interaction.Behaviors>
+                </TextBlock>
+
+                <CheckBox Grid.Column="1"
+                          Padding="12 0 0 0"
+                          IsChecked="{Binding HideZeroBalances, Mode=TwoWay}"
+                          IsVisible="{Binding UseCase,
+                          Converter={x:Static converters:EnumToStringEqualConverter.Instance},
+                          ConverterParameter={x:Static vm:ManageAssetsUseCase.Tokens}}"
+                          FontSize="13"
+                          FontFamily="{DynamicResource DefaultLightFontFamily}"
+                          Foreground="{DynamicResource SecondaryForegroundBrush}"
+                          Content="Hide low balances" />
+            </Grid>
+
+            <Border Grid.Row="3"
+                    Grid.ColumnSpan="2"
+                    Margin="16 8 16 0"
+                    IsVisible="{Binding UseCase,
+                          Converter={x:Static converters:EnumToStringNotEqualConverter.Instance},
+                          ConverterParameter={x:Static vm:ManageAssetsUseCase.Portfolio}}"
+                    Height="1"
+                    Background="{DynamicResource LightDefaultOpacity10}"
+                    VerticalAlignment="Bottom" />
+
+            <ListBox Grid.Row="4"
+                     Margin="16 8 16 16"
                      MaxHeight="460"
                      MinHeight="300"
-                     Grid.Row="2"
                      ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                      Background="{DynamicResource AlmostTransparentBrush}"
-                     Items="{Binding AvailableCurrencies}"
+                     Items="{Binding AvailableAssets}"
                      Classes="SelectCurrencyListBox ManageAssets">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
-                        <Grid ColumnDefinitions="*,Auto">
+                        <Grid ColumnDefinitions="*,Auto"
+                              IsEnabled="{Binding !IsHidden}">
                             <StackPanel Margin="16 14"
                                         Orientation="Horizontal"
                                         VerticalAlignment="Center"
                                         Grid.Column="0">
-                                <svg:Svg Path="{Binding Currency.IconPath}"
-                                         Width="28"
-                                         VerticalAlignment="Top"
-                                         Classes="BaseDisabledStyle"
-                                         IsVisible="{Binding IsSelected}" />
-                                <svg:Svg Path="{Binding Currency.DisabledIconPath}"
-                                         Width="28"
-                                         VerticalAlignment="Top"
-                                         Classes="BaseDisabledStyle"
-                                         IsVisible="{Binding !IsSelected}" />
+                                <Panel
+                                    IsVisible="{Binding Asset.IconPath,
+                                    Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+                                    <svg:Svg Path="{Binding Asset.IconPath}"
+                                             Width="28"
+                                             VerticalAlignment="Top"
+                                             Classes="BaseDisabledStyle"
+                                             IsVisible="{Binding IsSelected}" />
+                                    <svg:Svg Path="{Binding Asset.DisabledIconPath}"
+                                             Width="28"
+                                             VerticalAlignment="Top"
+                                             Classes="BaseDisabledStyle"
+                                             IsVisible="{Binding !IsSelected}" />
+                                </Panel>
+                                <Ellipse
+                                    IsVisible="{Binding Asset.BitmapIcon,
+                                    Converter={x:Static ObjectConverters.IsNotNull}}"
+                                    Classes.Enabled="{Binding IsSelected}"
+                                    Classes.Disabled="{Binding !IsSelected}"
+                                    Width="28"
+                                    Height="28">
+                                    <Ellipse.Styles>
+                                        <Style Selector="Ellipse.Disabled">
+                                            <Setter Property="Opacity" Value="0.5" />
+                                        </Style>
+                                        <Style Selector="Ellipse.Enabled">
+                                            <Setter Property="Opacity" Value="1" />
+                                        </Style>
+                                    </Ellipse.Styles>
+                                    <Ellipse.Fill>
+                                        <ImageBrush Source="{Binding Asset.BitmapIcon}"
+                                                    BitmapInterpolationMode="HighQuality"
+                                                    Stretch="Fill" />
+                                    </Ellipse.Fill>
+                                </Ellipse>
+                                <Border Width="28"
+                                        Height="28"
+                                        ClipToBounds="True"
+                                        CornerRadius="2"
+                                        IsVisible="{Binding Asset.PreviewUrl,
+                                        Converter={x:Static ObjectConverters.IsNotNull}}"
+                                        Classes.Enabled="{Binding IsSelected}"
+                                        Classes.Disabled="{Binding !IsSelected}">
+                                    <Border.Styles>
+                                        <Style Selector="Border.Disabled">
+                                            <Setter Property="Opacity" Value="0.5" />
+                                        </Style>
+                                        <Style Selector="Border.Enabled">
+                                            <Setter Property="Opacity" Value="1" />
+                                        </Style>
+                                    </Border.Styles>
+                                    <asyncImageLoader:AdvancedImage StretchDirection="Both"
+                                                                    Stretch="UniformToFill"
+                                                                    Source="{Binding Asset.PreviewUrl}"
+                                                                    Loader="{x:Static services:ImageLoader.Instance}" />
+                                </Border>
+
                                 <TextBlock Margin="17 0 0 0"
-                                           Text="{Binding Currency.Header}"
+                                           Text="{Binding Asset.CurrencyDescription}"
                                            FontFamily="{DynamicResource DefaultLightFontFamily}"
                                            FontSize="18"
                                            VerticalAlignment="Center"
+                                           Classes.IsHidden="{Binding IsHidden}"
                                            Classes.IsSelected="{Binding IsSelected}"
                                            Classes.NotSelected="{Binding !IsSelected}" />
                             </StackPanel>
@@ -85,39 +209,65 @@
                                         VerticalAlignment="Center"
                                         Margin="16 11">
                                 <StackPanel VerticalAlignment="Center">
-                                    <StackPanel Orientation="Horizontal"
-                                                Margin="0 0 0 2">
+                                    <!-- Classes.ZeroBalance="{Binding Asset.TotalAmount, -->
+                                    <!-- Converter={x:Static converters:NumericConverters.IsZero}}" -->
+                                    <!-- Classes.NotZeroBalance="{Binding Asset.TotalAmount, -->
+                                    <!-- Converter={x:Static converters:NumericConverters.NotZero}}" -->
+                                    <StackPanel Orientation="Horizontal">
+                                        <StackPanel.Styles>
+                                            <Style Selector="StackPanel.ZeroBalance">
+                                                <Setter Property="Margin" Value="0" />
+                                            </Style>
+                                            <Style Selector="StackPanel.NotZeroBalance">
+                                                <Setter Property="Margin" Value="0 0 0 2" />
+                                            </Style>
+                                        </StackPanel.Styles>
                                         <TextBlock Margin="12 0 0 0"
                                                    FontFamily="{DynamicResource DefaultLightFontFamily}"
                                                    FontSize="16"
                                                    HorizontalAlignment="Right"
                                                    VerticalAlignment="Center"
+                                                   Classes.IsHidden="{Binding IsHidden}"
                                                    Classes.IsSelected="{Binding IsSelected}"
                                                    Classes.NotSelected="{Binding !IsSelected}">
                                             <TextBlock.Text>
                                                 <MultiBinding Converter="{StaticResource AmountToStringConverter}">
-                                                    <Binding Path="Currency.TotalAmount" Mode="OneWay" />
-                                                    <Binding Path="Currency.CurrencyFormat" Mode="OneWay" />
+                                                    <Binding Path="Asset.TotalAmount" Mode="OneWay" />
+                                                    <Binding Path="Asset.CurrencyFormat" Mode="OneWay" />
                                                 </MultiBinding>
                                             </TextBlock.Text>
                                         </TextBlock>
                                         <TextBlock HorizontalAlignment="Right"
                                                    VerticalAlignment="Center"
                                                    FontSize="16"
-                                                   Text="{Binding Currency.CurrencyCode}"
+                                                   Text="{Binding Asset.CurrencyName}"
+                                                   IsVisible="{Binding Asset.CurrencyName,
+                                                   Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
                                                    Margin="3 0 0 0"
+                                                   Classes.IsHidden="{Binding IsHidden}"
                                                    Classes.IsSelected="{Binding IsSelected}"
                                                    Classes.NotSelected="{Binding !IsSelected}" />
                                     </StackPanel>
 
+                                    <!-- IsVisible="{Binding Asset.TotalAmount, -->
+                                    <!-- Converter={x:Static converters:NumericConverters.GreaterThanZero}} -->
                                     <TextBlock HorizontalAlignment="Right"
                                                Foreground="{DynamicResource SecondaryForegroundBrush}"
                                                FontSize="13"
                                                Margin="0 2 0 0">
+                                        <TextBlock.IsVisible>
+                                            <MultiBinding Converter="{x:Static BoolConverters.And}">
+                                                <Binding Path="Asset.TotalAmount"
+                                                         Converter="{x:Static converters:NumericConverters.GreaterThanZero}" />
+                                                <Binding Path="$parent[ListBox].DataContext.UseCase"
+                                                         Converter="{x:Static converters:EnumToStringNotEqualConverter.Instance}"
+                                                         ConverterParameter="{x:Static vm:ManageAssetsUseCase.Collectibles}"/>
+                                            </MultiBinding>
+                                        </TextBlock.IsVisible>
                                         <TextBlock.Text>
                                             <MultiBinding Converter="{StaticResource AmountToStringConverter}">
-                                                <Binding Path="Currency.AvailableAmountInBase" Mode="OneWay" />
-                                                <Binding Path="Currency.BaseCurrencyFormat" Mode="OneWay" />
+                                                <Binding Path="Asset.TotalAmountInBase" Mode="OneWay" />
+                                                <Binding Path="Asset.BaseCurrencyFormat" Mode="OneWay" />
                                             </MultiBinding>
                                         </TextBlock.Text>
                                     </TextBlock>
