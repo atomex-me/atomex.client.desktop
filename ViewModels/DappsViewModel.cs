@@ -181,13 +181,7 @@ namespace Atomex.Client.Desktop.ViewModels
                         keyType: AddressToConnect.WalletAddress.KeyType);
 
                     var unsecuredPrivateKey = privateKey.ToUnsecuredBytes();
-
-                    // var base58Private = unsecuredPrivateKey.Length == 32
-                    //     ? Base58Check.Encode(unsecuredPrivateKey, Prefix.Edsk)
-                    //     : Base58Check.Encode(unsecuredPrivateKey, Prefix.EdskSecretKey);
-
-                    // var walletKey = Key.FromBase58(base58Private);
-
+                    
                     var walletKey = Key.FromBytes(unsecuredPrivateKey);
 
                     var response = new PermissionResponse(
@@ -201,6 +195,8 @@ namespace Atomex.Client.Desktop.ViewModels
                         version: permissionRequest.Version);
 
                     _ = BeaconWalletClient.SendResponseAsync(receiverId: e.SenderId, response);
+                    
+                    Log.Fatal($"Permission response vs addr {walletKey.PubKey.Address}");
                     break;
                 }
                 case BeaconMessageType.operation_request:
@@ -236,8 +232,6 @@ namespace Atomex.Client.Desktop.ViewModels
 
                     try
                     {
-                        var stringPayload =
-                            "Tezos Signed Message: Confirming my identity as tz1LsedWYEdgQp6wP8peiFCrJ7GYqgGKsCS1 on objkt.com, sig:WhISRumFAOabmTZ8NG8fuh4FHDuj0vs";
                         dataToSign = Hex.FromString(signRequest.Payload);
                     }
                     catch (Exception)
@@ -258,8 +252,7 @@ namespace Atomex.Client.Desktop.ViewModels
                         privateKey: privateKey.ToUnsecuredBytes(),
                         watermark: null,
                         isExtendedKey: privateKey.Length == 64);
-
-                    // todo: check signing method
+                    
                     var response = new SignPayloadResponse(
                         signature: signedMessage.EncodedSignature,
                         version: signRequest.Version,
@@ -267,6 +260,8 @@ namespace Atomex.Client.Desktop.ViewModels
                         senderId: BeaconWalletClient.SenderId);
 
                     _ = BeaconWalletClient.SendResponseAsync(receiverId: e.SenderId, response);
+                    Log.Fatal($"Payload: {signRequest.Payload}");
+                    Log.Fatal($"SIGNATIRE: {signedMessage.EncodedSignature}");
                     break;
                 }
                 case BeaconMessageType.broadcast_request:
