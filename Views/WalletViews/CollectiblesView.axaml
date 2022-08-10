@@ -21,9 +21,9 @@
 
     <StackPanel>
         <TextBox Height="44"
-                 Margin="0 16 0 0 "
+                 Margin="0 16 0 -4"
                  CornerRadius="8"
-                 Watermark="Search"
+                 Watermark="Search collection"
                  FontSize="16"
                  Text="{Binding SearchPattern, Mode=TwoWay}"
                  Classes="SearchTextBox">

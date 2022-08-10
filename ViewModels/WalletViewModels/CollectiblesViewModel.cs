@@ -160,7 +160,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                         .OrderByDescending(token => token.TotalAmount != 0)
                         .ThenBy(token => token.TokenBalance.Name))
                 });
-            
+
             InitialCollectibles = new ObservableCollection<Collectible>(collectibles);
             Collectibles = new ObservableCollection<Collectible>(collectibles
                 .Where(collectible => !DisabledCollectibles.Contains(collectible.Tokens.First().Contract.Address))
