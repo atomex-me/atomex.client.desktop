@@ -16,8 +16,9 @@
         <converters:AmountToStringConverter x:Key="AmountToStringConverter" />
     </UserControl.Resources>
 
-    <StackPanel>
-        <TextBox Height="44"
+    <Grid RowDefinitions="Auto,*">
+        <TextBox Grid.Row="0"
+                 Height="44"
                  Margin="0 16 0 -4"
                  CornerRadius="8"
                  Watermark="Search tokens"
@@ -35,7 +36,8 @@
             </TextBox.InnerRightContent>
         </TextBox>
 
-        <ListBox Background="{DynamicResource AlmostTransparentBrush}"
+        <ListBox Grid.Row="1"
+                 Background="{DynamicResource AlmostTransparentBrush}"
                  Margin="0 24 0 0"
                  Items="{Binding Tokens}"
                  HorizontalAlignment="Stretch"
@@ -201,5 +203,5 @@
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>
-    </StackPanel>
+    </Grid>
 </UserControl>

@@ -19,8 +19,9 @@
         </Style>
     </Design.DesignStyle>
 
-    <StackPanel>
-        <TextBox Height="44"
+    <Grid RowDefinitions="Auto,*">
+        <TextBox Grid.Row="0"
+                 Height="44"
                  Margin="0 16 0 -4"
                  CornerRadius="8"
                  Watermark="Search collection"
@@ -38,7 +39,8 @@
             </TextBox.InnerRightContent>
         </TextBox>
 
-        <ListBox Items="{Binding Collectibles}"
+        <ListBox Grid.Row="1"
+                 Items="{Binding Collectibles}"
                  Classes="Designer">
             <ListBox.Styles>
                 <Style Selector="ListBox">
@@ -124,5 +126,5 @@
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>
-    </StackPanel>
+    </Grid>
 </UserControl>

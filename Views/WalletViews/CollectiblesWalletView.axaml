@@ -14,8 +14,9 @@
         <walletViewModels:CollectiblesWalletViewModel />
     </Design.DataContext>
 
-    <StackPanel>
-        <TextBox Height="44"
+    <Grid RowDefinitions="Auto,*">
+        <TextBox Grid.Row="0"
+                 Height="44"
                  Margin="0 16 0 -4"
                  CornerRadius="8"
                  Watermark="Search token ID"
@@ -33,7 +34,8 @@
             </TextBox.InnerRightContent>
         </TextBox>
 
-        <ListBox Items="{Binding Tokens}">
+        <ListBox Grid.Row="1"
+                 Items="{Binding Tokens}">
             <ListBox.Styles>
                 <Style Selector="ListBox">
                     <Setter Property="Background" Value="Transparent" />
@@ -119,5 +121,5 @@
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>
-    </StackPanel>
+    </Grid>
 </UserControl>
