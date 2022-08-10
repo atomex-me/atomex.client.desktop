@@ -57,7 +57,6 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         [Reactive] public string SearchPattern { get; set; }
         [Reactive] public ObservableCollection<Collectible> Collectibles { get; set; }
         public ObservableCollection<Collectible> InitialCollectibles { get; set; }
-        public ObservableCollection<Collectible> AllCollectibles { get; set; }
         private Action<IEnumerable<TezosTokenViewModel>> ShowTezosCollection { get; }
 
         public CollectiblesViewModel(IAtomexApp app, Action<IEnumerable<TezosTokenViewModel>> showTezosCollection)
@@ -83,7 +82,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                 .SubscribeInMainThread(collectibles => _ = LoadCollectibles());
 
             this.WhenAnyValue(vm => vm.SearchPattern)
-                .Where(_ => InitialCollectibles != null)
+                .Where(_ => InitialCollectibles != null && DisabledCollectibles != null)
                 .SubscribeInMainThread(searchPattern =>
                     Collectibles = new ObservableCollection<Collectible>(InitialCollectibles.Where(c =>
                         {
@@ -96,6 +95,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
                             return firstContract.Address.ToLower().Contains(searchPattern.ToLower());
                         })
+                        .Where(c => !DisabledCollectibles!.Contains(c.ContractAddress))
                         .OrderByDescending(c => c.TotalAmount != 0)
                         .ThenBy(c => c.Name)));
 
@@ -160,8 +160,6 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                         .OrderByDescending(token => token.TotalAmount != 0)
                         .ThenBy(token => token.TokenBalance.Name))
                 });
-
-            
             
             InitialCollectibles = new ObservableCollection<Collectible>(collectibles);
             Collectibles = new ObservableCollection<Collectible>(collectibles
