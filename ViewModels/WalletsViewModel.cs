@@ -89,6 +89,7 @@ namespace Atomex.Client.Desktop.ViewModels
             if (walletViewModel is not CollectiblesWalletViewModel collectiblesWalletViewModel) return;
 
             collectiblesWalletViewModel.Tokens = new ObservableCollection<TezosTokenViewModel>(tokens);
+            collectiblesWalletViewModel.InitialTokens = new ObservableCollection<TezosTokenViewModel>(tokens);
             Selected = collectiblesWalletViewModel;
         }
 
