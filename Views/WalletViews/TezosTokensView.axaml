@@ -6,6 +6,8 @@
              xmlns:converters="clr-namespace:Atomex.Client.Desktop.Converters"
              xmlns:controls="clr-namespace:Atomex.Client.Desktop.Controls"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             xmlns:asyncImageLoader="clr-namespace:AsyncImageLoader;assembly=AsyncImageLoader.Avalonia"
+             xmlns:services="clr-namespace:Atomex.Client.Desktop.Services"
              x:Class="Atomex.Client.Desktop.Views.WalletViews.TezosTokensView">
 
     <Design.DataContext>
@@ -76,14 +78,19 @@
                                   RowDefinitions="Auto">
                                 <StackPanel Orientation="Horizontal"
                                             Grid.Column="0">
-                                    <Ellipse Width="30"
-                                             Height="30">
-                                        <Ellipse.Fill>
-                                            <ImageBrush Source="{Binding BitmapIcon}"
-                                                        BitmapInterpolationMode="HighQuality"
-                                                        Stretch="Fill" />
-                                        </Ellipse.Fill>
-                                    </Ellipse>
+                                    <Border Width="30"
+                                            Height="30"
+                                            VerticalAlignment="Stretch"
+                                            HorizontalAlignment="Stretch"
+                                            ClipToBounds="True"
+                                            CornerRadius="16"
+                                            Classes.IsImageLoading="{Binding #PreviewImg.IsLoading}">
+                                        <asyncImageLoader:AdvancedImage Name="PreviewImg"
+                                                                        StretchDirection="Both"
+                                                                        Stretch="UniformToFill"
+                                                                        Source="{Binding PreviewUrl}"
+                                                                        Loader="{x:Static services:ImageLoader.Instance}" />
+                                    </Border>
                                     <TextBlock VerticalAlignment="Center"
                                                Foreground="{DynamicResource DefaultForegroundBrush}"
                                                FontSize="18"

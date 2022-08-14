@@ -13,7 +13,6 @@ using Atomex.ViewModels;
 using Atomex.Wallet;
 using Atomex.Wallet.Tezos;
 using Avalonia.Controls;
-using Avalonia.Media.Imaging;
 using Avalonia.Threading;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
@@ -32,7 +31,6 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             Tokens.Aggregate(0m, (result, tokenViewModel) => result + tokenViewModel.TotalAmount);
 
         public string? IconPath => null;
-        public IBitmap? BitmapIcon => null;
         public string? DisabledIconPath => null;
         public string CurrencyName => string.Empty;
         public string CurrencyCode => ContractAddress;

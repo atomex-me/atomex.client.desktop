@@ -34,7 +34,6 @@ namespace Atomex.Client.Desktop
     {
         public static DialogService DialogService;
         public static TemplateService TemplateService;
-        public static ImageService ImageService;
         public static IClipboard Clipboard;
         public static NotificationsService NotificationsService;
         public static ILoggerFactory LoggerFactory;
@@ -47,7 +46,6 @@ namespace Atomex.Client.Desktop
         public override void OnFrameworkInitializationCompleted()
         {
             TemplateService = new TemplateService();
-            ImageService = new ImageService();
             Clipboard = AvaloniaLocator.Current.GetService<IClipboard>();
 
             // set invariant culture by default

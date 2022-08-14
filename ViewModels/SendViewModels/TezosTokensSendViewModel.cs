@@ -5,7 +5,6 @@ using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Avalonia.Controls;
-using Avalonia.Media.Imaging;
 using Avalonia.Threading;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
@@ -37,7 +36,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         [ObservableAsProperty] public string TokenContractBeautified { get; }
         [Reactive] public int TokenId { get; set; }
         [Reactive] public string To { get; set; }
-        [Reactive] public IBitmap? TokenPreview { get; set; }
+        public string TokenPreviewUrl { get; set; }
         private readonly string _tokenType;
         [Reactive] public string CurrencyFormat { get; set; }
         protected string FeeCurrencyFormat { get; set; }
@@ -73,7 +72,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             string tokenContract,
             int tokenId,
             string tokenType,
-            IBitmap? tokenPreview,
+            string tokenPreviewUrl,
             string? balanceFormat = null,
             string? from = null,
             bool showToSelectDialog = true)
@@ -167,7 +166,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
             TokenId = tokenId;
             _tokenType = tokenType;
-            TokenPreview = tokenPreview;
+            TokenPreviewUrl = tokenPreviewUrl;
 
             if (from != null)
             {
