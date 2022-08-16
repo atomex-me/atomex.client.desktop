@@ -1,5 +1,6 @@
 using System;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Reactive;
 using System.Text;
 using System.Threading.Tasks;
@@ -118,6 +119,14 @@ namespace Atomex.Client.Desktop.ViewModels
                 await BeaconWalletClient.InitAsync();
                 BeaconWalletClient.Connect();
 
+                var peers = BeaconWalletClient.GetAllPeers();
+
+                Dapps = new ObservableCollection<DappViewModel>(
+                    peers.Select(peer => new DappViewModel()
+                    {
+                        Name = peer.Name,
+                    }));
+
                 Log.Debug("{@Sender}: WalletClient connected {@Connected}", "Beacon", BeaconWalletClient.Connected);
                 Log.Debug("{@Sender}: WalletClient logged in {@LoggedIn}", "Beacon", BeaconWalletClient.LoggedIn);
             });
@@ -181,7 +190,7 @@ namespace Atomex.Client.Desktop.ViewModels
                         keyType: AddressToConnect.WalletAddress.KeyType);
 
                     var unsecuredPrivateKey = privateKey.ToUnsecuredBytes();
-                    
+
                     var walletKey = Key.FromBytes(unsecuredPrivateKey);
 
                     var response = new PermissionResponse(
@@ -195,7 +204,7 @@ namespace Atomex.Client.Desktop.ViewModels
                         version: permissionRequest.Version);
 
                     _ = BeaconWalletClient.SendResponseAsync(receiverId: e.SenderId, response);
-                    
+
                     Log.Fatal($"Permission response vs addr {walletKey.PubKey.Address}");
                     break;
                 }
@@ -252,7 +261,7 @@ namespace Atomex.Client.Desktop.ViewModels
                         privateKey: privateKey.ToUnsecuredBytes(),
                         watermark: null,
                         isExtendedKey: privateKey.Length == 64);
-                    
+
                     var response = new SignPayloadResponse(
                         signature: signedMessage.EncodedSignature,
                         version: signRequest.Version,
