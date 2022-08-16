@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 using System.Reactive.Linq;
 
 using Avalonia.Media;
-using Avalonia.Media.Imaging;
 using Avalonia.Threading;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
@@ -32,7 +31,6 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
         public string Header { get; set; }
         public Color AccentColor { get; set; }
         public string IconPath { get; set; }
-        public IBitmap? BitmapIcon => null;
         public string? PreviewUrl => null;
         public string DisabledIconPath { get; set; }
         [Reactive] public decimal CurrentQuote { get; set; }

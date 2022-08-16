@@ -32,6 +32,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         [Reactive] public bool HideLowBalances { get; set; }
         [Reactive] public string[] DisabledTokens { get; set; }
         [Reactive] private ObservableCollection<TokenContract>? Contracts { get; set; }
+        [Reactive] public string SearchPattern { get; set; }
         [Reactive] public ObservableCollection<TezosTokenViewModel> Tokens { get; set; }
         public ObservableCollection<TezosTokenViewModel> InitialTokens { get; set; }
 
@@ -71,6 +72,24 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                     _app.Account.UserData.SaveToFile(_app.Account.SettingsFilePath);
                     OnQuotesUpdatedEventHandler(_app.QuotesProvider, EventArgs.Empty);
                 });
+
+            this.WhenAnyValue(vm => vm.SearchPattern)
+                .WhereNotNull()
+                .SubscribeInMainThread(searchPattern =>
+                    Tokens = new ObservableCollection<TezosTokenViewModel>(InitialTokens.Where(token =>
+                        {
+                            if (token.TokenBalance.Name != null && token.TokenBalance.Symbol != null)
+                            {
+                                return token.TokenBalance.Name.ToLower().Contains(searchPattern.ToLower()) ||
+                                       token.TokenBalance.Symbol.ToLower().Contains(searchPattern.ToLower()) ||
+                                       token.TokenBalance.Contract.Contains(searchPattern.ToLower());
+                            }
+
+                            return token.TokenBalance.Contract.Contains(searchPattern.ToLower());
+                        })
+                        .Where(token => !DisabledTokens!.Contains(token.TokenBalance.Symbol))
+                        .OrderByDescending(token => token.CanExchange)
+                        .ThenByDescending(token => token.TotalAmountInBase)));
 
             DisabledTokens = _app.Account.UserData.DisabledTokens ?? Array.Empty<string>();
             HideLowBalances = _app.Account.UserData.HideTokensWithLowBalance ?? false;

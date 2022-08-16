@@ -54,7 +54,6 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
                         result.ArtifactUri   ??= tb.ArtifactUri;
                         result.Contract      ??= tb.Contract;
                         result.ContractAlias ??= tb.ContractAlias;
-                        result.Creators      ??= tb.Creators;
                         result.Decimals        = tb.Decimals;
                         result.Description   ??= tb.Description;
                         result.DisplayUri    ??= tb.DisplayUri;

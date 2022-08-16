@@ -23,7 +23,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 tokenContract: tokenContract,
                 tokenId: tokenId,
                 tokenType: tokenType,
-                tokenPreview: null,
+                tokenPreviewUrl: null,
                 from: from,
                 showToSelectDialog: false)
         {

@@ -13,7 +13,6 @@ using Atomex.ViewModels;
 using Atomex.Wallet;
 using Atomex.Wallet.Tezos;
 using Avalonia.Controls;
-using Avalonia.Media.Imaging;
 using Avalonia.Threading;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
@@ -32,7 +31,6 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             Tokens.Aggregate(0m, (result, tokenViewModel) => result + tokenViewModel.TotalAmount);
 
         public string? IconPath => null;
-        public IBitmap? BitmapIcon => null;
         public string? DisabledIconPath => null;
         public string CurrencyName => string.Empty;
         public string CurrencyCode => ContractAddress;
@@ -54,6 +52,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         private readonly IAtomexApp _app;
         [Reactive] private ObservableCollection<TokenContract>? Contracts { get; set; }
         [Reactive] public string[] DisabledCollectibles { get; set; }
+        [Reactive] public string SearchPattern { get; set; }
         [Reactive] public ObservableCollection<Collectible> Collectibles { get; set; }
         public ObservableCollection<Collectible> InitialCollectibles { get; set; }
         private Action<IEnumerable<TezosTokenViewModel>> ShowTezosCollection { get; }
@@ -79,6 +78,24 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             this.WhenAnyValue(vm => vm.Contracts)
                 .WhereNotNull()
                 .SubscribeInMainThread(collectibles => _ = LoadCollectibles());
+
+            this.WhenAnyValue(vm => vm.SearchPattern)
+                .Where(_ => InitialCollectibles != null && DisabledCollectibles != null)
+                .SubscribeInMainThread(searchPattern =>
+                    Collectibles = new ObservableCollection<Collectible>(InitialCollectibles.Where(c =>
+                        {
+                            var firstContract = c.Tokens.First().Contract;
+                            if (firstContract.Name != null)
+                            {
+                                return firstContract.Name.ToLower().Contains(searchPattern.ToLower()) ||
+                                       firstContract.Address.ToLower().Contains(searchPattern.ToLower());
+                            }
+
+                            return firstContract.Address.ToLower().Contains(searchPattern.ToLower());
+                        })
+                        .Where(c => !DisabledCollectibles!.Contains(c.ContractAddress))
+                        .OrderByDescending(c => c.TotalAmount != 0)
+                        .ThenBy(c => c.Name)));
 
             DisabledCollectibles = _app.Account.UserData.DisabledCollectibles ?? Array.Empty<string>();
             _ = ReloadTokenContractsAsync();
@@ -141,7 +158,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                         .OrderByDescending(token => token.TotalAmount != 0)
                         .ThenBy(token => token.TokenBalance.Name))
                 });
-            
+
             InitialCollectibles = new ObservableCollection<Collectible>(collectibles);
             Collectibles = new ObservableCollection<Collectible>(collectibles
                 .Where(collectible => !DisabledCollectibles.Contains(collectible.Tokens.First().Contract.Address))

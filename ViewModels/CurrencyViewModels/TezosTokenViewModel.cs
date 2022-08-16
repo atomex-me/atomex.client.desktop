@@ -1,12 +1,9 @@
 using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
-using Avalonia.Media.Imaging;
-using Avalonia.Threading;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using Serilog;
@@ -53,7 +50,7 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
 
         public string IconPath => string.Empty;
         public string DisabledIconPath => string.Empty;
-        public string PreviewUrl => ThumbsApi.GetCollectiblePreviewUrl(Contract.Address, TokenBalance.TokenId);
+        public string PreviewUrl => ThumbsApi.GetTokenPreviewUrl(Contract.Address, TokenBalance.TokenId);
 
         public string CurrencyName => TokenBalance.Symbol;
         public string CurrencyCode => TokenBalance.Symbol;
@@ -67,58 +64,9 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
                 IpfsGatewayUri = TezosConfig.IpfsGatewayUri,
                 CatavaApiUri = TezosConfig.CatavaApiUri
             });
-
-        private bool _isPreviewDownloading;
-
-        public IBitmap? BitmapIcon
-        {
-            get
-            {
-                if (_isPreviewDownloading)
-                    return null;
-
-                var previewUrlSources = TokenBalance.IsNft
-                    ? new List<string>
-                        { ThumbsApi.GetCollectiblePreviewUrl(TokenBalance.Contract, TokenBalance.TokenId) }
-                    : new List<string>(ThumbsApi.GetTokenPreviewUrls(TokenBalance.Contract, TokenBalance.ThumbnailUri,
-                        TokenBalance.DisplayUri ?? TokenBalance.ArtifactUri));
-
-                try
-                {
-                    foreach (var url in previewUrlSources)
-                    {
-                        if (App.ImageService.TryGetImage(url, out var image)) return image;
-
-                        _isPreviewDownloading = true;
-                        _ = Task.Run(() =>
-                        {
-                            _ = App.ImageService.LoadImageFromUrl(url, () =>
-                            {
-                                _isPreviewDownloading = false;
-                                _ = Dispatcher.UIThread.InvokeAsync(() => OnPropertyChanged(nameof(BitmapIcon)));
-                            });
-                        });
-
-                        return null;
-                    }
-
-                    return null;
-                }
-                catch (Exception)
-                {
-                    Log.Error("Error during loading preview for Tezos token {Contract} {TokenId}",
-                        TokenBalance.Contract, TokenBalance.TokenId);
-                    return null;
-                }
-                finally
-                {
-                    _isPreviewDownloading = false;
-                }
-            }
-        }
-
+        
         public string CollectiblePreviewUrl =>
-            ThumbsApi.GetCollectiblePreviewUrl(Contract.Address, TokenBalance.TokenId);
+            ThumbsApi.GetTokenPreviewUrl(Contract.Address, TokenBalance.TokenId);
 
         public TezosTokenViewModel()
         {
@@ -222,7 +170,7 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
                 tokenContract: Contract.Address,
                 tokenId: (int)TokenBalance.TokenId,
                 tokenType: Contract.GetContractType(),
-                tokenPreview: BitmapIcon,
+                tokenPreviewUrl: PreviewUrl,
                 from: null);
         }
 

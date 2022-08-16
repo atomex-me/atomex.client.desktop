@@ -3,7 +3,9 @@
         xmlns:controls="clr-namespace:Atomex.Client.Desktop.Controls"
         xmlns:converters="clr-namespace:Atomex.Client.Desktop.Converters"
         xmlns:svg="clr-namespace:Avalonia.Svg.Skia;assembly=Avalonia.Svg.Skia"
-        xmlns:common="clr-namespace:Atomex.Client.Desktop.Common">
+        xmlns:common="clr-namespace:Atomex.Client.Desktop.Common"
+        xmlns:asyncImageLoader="clr-namespace:AsyncImageLoader;assembly=AsyncImageLoader.Avalonia"
+        xmlns:services="clr-namespace:Atomex.Client.Desktop.Services">
 
     <Design.PreviewWith>
         <Border Padding="40 10"
@@ -12,9 +14,6 @@
                                      AssetViewModel="{x:Static common:DesignTime.BtcCurrencyViewModel}" />
         </Border>
     </Design.PreviewWith>
-
-    <!-- <Design.DesignStyle> -->
-    <!-- </Design.DesignStyle> -->
 
     <Styles.Resources>
         <converters:AmountToStringConverter x:Key="AmountToStringConverter" />
@@ -41,20 +40,26 @@
                                  RelativeSource={RelativeSource TemplatedParent}}"
                                  Height="55" />
 
-                        <Ellipse Grid.Column="0"
-                                 Width="55"
-                                 Height="55"
-                                 IsVisible="{Binding AssetViewModel.BitmapIcon,
-                                 RelativeSource={RelativeSource TemplatedParent},
-                                 Converter={x:Static ObjectConverters.IsNotNull}}">
-                            <Ellipse.Fill>
-                                <ImageBrush
-                                    Source="{Binding AssetViewModel.BitmapIcon,
-                                    RelativeSource={RelativeSource TemplatedParent}}"
-                                    BitmapInterpolationMode="HighQuality"
-                                    Stretch="Fill" />
-                            </Ellipse.Fill>
-                        </Ellipse>
+                        <Border Grid.Column="0"
+                                Width="55"
+                                Height="55"
+                                VerticalAlignment="Stretch"
+                                HorizontalAlignment="Stretch"
+                                ClipToBounds="True"
+                                CornerRadius="26"
+                                IsVisible="{Binding AssetViewModel.IconPath,
+                                RelativeSource={RelativeSource TemplatedParent},
+                                Converter={x:Static StringConverters.IsNullOrEmpty}}"
+                                Classes.IsImageLoading="{Binding #PreviewImg.IsLoading}"
+                                Classes.ImageNotLoaded="{Binding #PreviewImg.CurrentImage,
+                                Converter={x:Static ObjectConverters.IsNull}}">
+                            <asyncImageLoader:AdvancedImage Name="PreviewImg"
+                                                            StretchDirection="Both"
+                                                            Stretch="UniformToFill"
+                                                            Source="{Binding AssetViewModel.PreviewUrl,
+                                                            RelativeSource={RelativeSource TemplatedParent}}"
+                                                            Loader="{x:Static services:FileCacheImageLoader.Instance}" />
+                        </Border>
 
                         <StackPanel Grid.Column="1"
                                     Margin="40 0 0 0">
