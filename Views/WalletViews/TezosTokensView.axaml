@@ -21,7 +21,7 @@
     <Grid RowDefinitions="Auto,*">
         <TextBox Grid.Row="0"
                  Height="44"
-                 Margin="0 16 0 -4"
+                 Margin="0 16 0 0"
                  CornerRadius="8"
                  Watermark="Search tokens"
                  FontSize="16"
