@@ -84,12 +84,14 @@
                                             HorizontalAlignment="Stretch"
                                             ClipToBounds="True"
                                             CornerRadius="16"
-                                            Classes.IsImageLoading="{Binding #PreviewImg.IsLoading}">
+                                            Classes.IsImageLoading="{Binding #PreviewImg.IsLoading}"
+                                            Classes.ImageNotLoaded="{Binding #PreviewImg.CurrentImage,
+                                            Converter={x:Static ObjectConverters.IsNull}}">
                                         <asyncImageLoader:AdvancedImage Name="PreviewImg"
                                                                         StretchDirection="Both"
                                                                         Stretch="UniformToFill"
                                                                         Source="{Binding PreviewUrl}"
-                                                                        Loader="{x:Static services:ImageLoader.Instance}" />
+                                                                        Loader="{x:Static services:FileCacheImageLoader.Instance}" />
                                     </Border>
                                     <TextBlock VerticalAlignment="Center"
                                                Foreground="{DynamicResource DefaultForegroundBrush}"

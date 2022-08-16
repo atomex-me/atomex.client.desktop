@@ -129,7 +129,7 @@
                                                                 StretchDirection="Both"
                                                                 Stretch="UniformToFill"
                                                                 Source="{Binding TokenPreviewUrl}"
-                                                                Loader="{x:Static services:ImageLoader.Instance}" />
+                                                                Loader="{x:Static services:FileCacheImageLoader.Instance}" />
                             </Border>
 
                             <TextBlock Grid.Column="1"
@@ -231,7 +231,7 @@
                                                                 StretchDirection="Both"
                                                                 Stretch="UniformToFill"
                                                                 Source="{Binding TokenPreviewUrl}"
-                                                                Loader="{x:Static services:ImageLoader.Instance}" />
+                                                                Loader="{x:Static services:FileCacheImageLoader.Instance}" />
                             </Border>
 
                             <TextBlock Grid.Column="1"

@@ -2,15 +2,28 @@ using System;
 using System.Net.Http;
 using AsyncImageLoader.Loaders;
 using Atomex.Client.Desktop.Common;
+
 namespace Atomex.Client.Desktop.Services
 {
-    public class ImageLoader : DiskCachedWebImageLoader
+    public class FileCacheImageLoader : DiskCachedWebImageLoader
     {
-        private ImageLoader() : base(cacheFolder: $"{WalletInfo.BaseUserDataDirectory}Cache/Images/",
+        private FileCacheImageLoader() : base(cacheFolder: $"{WalletInfo.BaseUserDataDirectory}Cache/Images/",
             httpClient: new HttpClient
             {
-                Timeout = TimeSpan.FromSeconds(180)
+                Timeout = TimeSpan.FromSeconds(200)
             }, disposeHttpClient: true)
+        {
+        }
+
+        public static FileCacheImageLoader Instance { get; } = new();
+    }
+
+    public class ImageLoader : RamCachedWebImageLoader
+    {
+        private ImageLoader() : base(httpClient: new HttpClient
+        {
+            Timeout = TimeSpan.FromSeconds(200)
+        }, disposeHttpClient: true)
         {
         }
 

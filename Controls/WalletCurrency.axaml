@@ -50,13 +50,15 @@
                                 IsVisible="{Binding AssetViewModel.IconPath,
                                 RelativeSource={RelativeSource TemplatedParent},
                                 Converter={x:Static StringConverters.IsNullOrEmpty}}"
-                                Classes.IsImageLoading="{Binding #PreviewImg.IsLoading}">
+                                Classes.IsImageLoading="{Binding #PreviewImg.IsLoading}"
+                                Classes.ImageNotLoaded="{Binding #PreviewImg.CurrentImage,
+                                Converter={x:Static ObjectConverters.IsNull}}">
                             <asyncImageLoader:AdvancedImage Name="PreviewImg"
                                                             StretchDirection="Both"
                                                             Stretch="UniformToFill"
                                                             Source="{Binding AssetViewModel.PreviewUrl,
                                                             RelativeSource={RelativeSource TemplatedParent}}"
-                                                            Loader="{x:Static services:ImageLoader.Instance}" />
+                                                            Loader="{x:Static services:FileCacheImageLoader.Instance}" />
                         </Border>
 
                         <StackPanel Grid.Column="1"

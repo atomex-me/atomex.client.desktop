@@ -341,7 +341,7 @@
                                                 <asyncImageLoader:AdvancedImage StretchDirection="Both"
                                                     Stretch="UniformToFill"
                                                     Source="{Binding Baker.Logo}"
-                                                    Loader="{x:Static services:ImageLoader.Instance}" />
+                                                    Loader="{x:Static services:FileCacheImageLoader.Instance}" />
                                             </Border>
                                             
                                             <TextBlock Grid.Column="1"

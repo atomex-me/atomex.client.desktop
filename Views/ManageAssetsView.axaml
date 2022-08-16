@@ -191,7 +191,7 @@
                                     <asyncImageLoader:AdvancedImage StretchDirection="Both"
                                                                     Stretch="UniformToFill"
                                                                     Source="{Binding Asset.PreviewUrl}"
-                                                                    Loader="{x:Static services:ImageLoader.Instance}" />
+                                                                    Loader="{x:Static services:FileCacheImageLoader.Instance}" />
                                 </Border>
 
                                 <TextBlock Margin="17 0 0 0"
