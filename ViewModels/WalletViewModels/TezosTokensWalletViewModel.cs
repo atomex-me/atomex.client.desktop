@@ -260,7 +260,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         {
             var tokensContractsViewModels = (await _app.Account
                     .GetCurrencyAccount<TezosAccount>(TezosConfig.Xtz)
-                    .DataRepository
+                    .LocalStorage
                     .GetTezosTokenContractsAsync())
                 .Select(c => new TezosTokenContractViewModel
                 {
@@ -368,11 +368,11 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                     .GetCurrencyAccount<TezosAccount>(TezosConfig.Xtz);
 
                 var tokenAddresses = await tezosAccount
-                    .DataRepository
+                    .LocalStorage
                     .GetTezosTokenAddressesByContractAsync(tokenContract.Contract.Address);
 
                 Transactions = new ObservableCollection<TransactionViewModelBase>((await tezosAccount
-                        .DataRepository
+                        .LocalStorage
                         .GetTezosTokenTransfersAsync(tokenContract.Contract.Address, offset: 0, limit: int.MaxValue))
                     .Select(t => new TezosTokenTransferViewModel(t, tezosConfig))
                     .ToList()

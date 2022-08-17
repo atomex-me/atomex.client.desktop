@@ -66,7 +66,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
                 Transactions = SortTransactions(
                     new ObservableCollection<TransactionViewModelBase>((await tezosAccount
-                            .DataRepository
+                            .LocalStorage
                             .GetTezosTokenTransfersAsync(tokenViewModel.Contract.Address,
                                 offset: 0,
                                 limit: int.MaxValue))

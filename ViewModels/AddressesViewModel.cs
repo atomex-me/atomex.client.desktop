@@ -166,7 +166,7 @@ namespace Atomex.Client.Desktop.ViewModels
                     var tezosAccount = account as TezosAccount;
 
                     (await tezosAccount
-                            .DataRepository
+                            .LocalStorage
                             .GetTezosTokenAddressesByContractAsync(_tokenContract))
                         .Where(w => w.TokenBalance.TokenId == _tokenId)
                         .Where(w => w.Balance != 0)

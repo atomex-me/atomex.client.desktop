@@ -82,7 +82,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         {
             var contracts = (await _app.Account
                     .GetCurrencyAccount<TezosAccount>(TezosConfig.Xtz)
-                    .DataRepository
+                    .LocalStorage
                     .GetTezosTokenContractsAsync())
                 .ToList();
 

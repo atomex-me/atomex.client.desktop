@@ -582,7 +582,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 .GetCurrencyAccount<TezosAccount>(TezosConfig.Xtz);
 
             return await tezosAccount
-                .DataRepository
+                .LocalStorage
                 .GetTezosTokenAddressAsync(tokenType, tokenContract, tokenId, address);
         }
 

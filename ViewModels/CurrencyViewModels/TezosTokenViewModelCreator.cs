@@ -23,7 +23,7 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
             var tezosAccount = atomexApp.Account.GetCurrencyAccount<TezosAccount>(TezosConfig.Xtz);
 
             var tokenWalletAddresses = await tezosAccount
-                .DataRepository
+                .LocalStorage
                 .GetTezosTokenAddressesByContractAsync(contract.Address);
 
             var tokenGroups = tokenWalletAddresses
