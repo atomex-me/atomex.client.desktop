@@ -190,7 +190,7 @@ namespace Atomex.Client.Desktop.ViewModels
                     var walletKey = Key.FromBytes(unsecuredPrivateKey);
 
                     var response = new PermissionResponse(
-                        id: permissionRequest!.Id,
+                        id: permissionRequest.Id,
                         senderId: BeaconWalletClient.SenderId,
                         appMetadata: BeaconWalletClient.Metadata,
                         network: permissionRequest.Network,
@@ -270,14 +270,6 @@ namespace Atomex.Client.Desktop.ViewModels
                     break;
                 }
                 case BeaconMessageType.broadcast_request:
-                    break;
-                case BeaconMessageType.permission_response:
-                    break;
-                case BeaconMessageType.sign_payload_response:
-                    break;
-                case BeaconMessageType.operation_response:
-                    break;
-                case BeaconMessageType.broadcast_response:
                     break;
                 case BeaconMessageType.acknowledge:
                     break;

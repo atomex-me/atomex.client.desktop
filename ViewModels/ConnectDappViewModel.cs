@@ -11,20 +11,20 @@ namespace Atomex.Client.Desktop.ViewModels
         public Action OnBack;
         public Action<string> OnConnect;
         public string AddressToConnect { get; set; }
-        
+
         [Reactive] public string QrCodeString { get; set; }
 
-        private ReactiveCommand<Unit, Unit> _backCommand;
+        private ReactiveCommand<Unit, Unit>? _backCommand;
 
         public ReactiveCommand<Unit, Unit> BackCommand =>
-            _backCommand ??= (_backCommand = ReactiveCommand.Create(() => { OnBack?.Invoke(); }));
+            _backCommand ??= _backCommand = ReactiveCommand.Create(() => { OnBack?.Invoke(); });
 
-        private ReactiveCommand<Unit, Unit> _connectCommand;
+        private ReactiveCommand<Unit, Unit>? _connectCommand;
 
         public ReactiveCommand<Unit, Unit> ConnectCommand =>
-            _connectCommand ??= (_connectCommand = ReactiveCommand.Create(() => { OnConnect?.Invoke(QrCodeString); }));
+            _connectCommand ??= _connectCommand = ReactiveCommand.Create(() => { OnConnect?.Invoke(QrCodeString); });
 
-        private ReactiveCommand<string, Unit> _copyCommand;
+        private ReactiveCommand<string, Unit>? _copyCommand;
 
         public ReactiveCommand<string, Unit> CopyCommand => _copyCommand ??= ReactiveCommand.Create<string>(data =>
         {
