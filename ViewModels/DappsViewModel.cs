@@ -5,17 +5,14 @@ using System.Reactive;
 using System.Text;
 using System.Threading.Tasks;
 using Atomex.Blockchain.Tezos;
-using Atomex.Blockchain.Tezos.Internal;
 using Atomex.Client.Common;
 using Atomex.Client.Desktop.ViewModels.Abstract;
 using Atomex.Client.Desktop.ViewModels.SendViewModels;
 using Atomex.Cryptography;
-using Atomex.Services;
 using Atomex.ViewModels;
 using Atomex.Wallet;
 using Atomex.Common;
 using Avalonia.Controls;
-using Avalonia.Media.Imaging;
 using Beacon.Sdk;
 using Beacon.Sdk.Beacon;
 using Beacon.Sdk.Beacon.Operation;
@@ -165,11 +162,10 @@ namespace Atomex.Client.Desktop.ViewModels
                 {
                     if (message is not PermissionRequest permissionRequest) return;
 
-                    if (permissionRequest?.Network.Type != null &&
-                        string.IsNullOrEmpty(permissionRequest.Network.RpcUrl))
+                    if (string.IsNullOrEmpty(permissionRequest.Network.RpcUrl))
                         permissionRequest.Network.RpcUrl = $"https://rpc.tzkt.io/{permissionRequest.Network.Type}";
 
-                    if (permissionRequest?.Network.Type != null && string.IsNullOrEmpty(permissionRequest.Network.Name))
+                    if (string.IsNullOrEmpty(permissionRequest.Network.Name))
                         permissionRequest.Network.Name = string.Concat(
                             permissionRequest.Network.Type.ToString()[0].ToString().ToUpper(),
                             permissionRequest.Network.Type.ToString().AsSpan(1));
