@@ -138,7 +138,6 @@ namespace Atomex.Client.Desktop.ViewModels
 
         private void OnDappConnected(object? sender, DappConnectedEventArgs e)
         {
-            Log.Information($"Dapp connected: {e.dappMetadata.Name} with icon {e.dappMetadata.Icon}");
             var peers = BeaconWalletClient.GetAllPeers();
 
             Dapps = new ObservableCollection<DappViewModel>(
@@ -147,22 +146,19 @@ namespace Atomex.Client.Desktop.ViewModels
                     Peer = peer,
                     OnDisconnect = p => BeaconWalletClient.RemovePeerAsync(p)
                 }));
+
+            Log.Information("{@Sender}: connected dapp: {@Dapp}", "Beacon", e.dappMetadata.Name);
         }
 
         private async void Connect(string qrCodeString)
         {
             if (AtomexApp.Account == null) return;
 
-            Log.Debug("{@Sender}: WalletClient connected {@Connected}", "Beacon", BeaconWalletClient.Connected);
-            Log.Debug("{@Sender}: WalletClient logged in {@LoggedIn}", "Beacon", BeaconWalletClient.LoggedIn);
-
-            var pairingRequest = ConnectToPeer();
+            var pairingRequest = GetPairingRequest();
             await BeaconWalletClient.AddPeerAsync(pairingRequest, AddressToConnect.Address);
-
-            ConnectDappViewModel.AddressToConnect = null;
             App.DialogService.Close();
 
-            P2PPairingRequest ConnectToPeer()
+            P2PPairingRequest GetPairingRequest()
             {
                 var decodedQr = Base58Check.Decode(qrCodeString);
                 var message = Encoding.UTF8.GetString(decodedQr.ToArray());
@@ -224,7 +220,12 @@ namespace Atomex.Client.Desktop.ViewModels
 
                     _ = BeaconWalletClient.SendResponseAsync(receiverId: e.SenderId, response);
 
-                    Log.Fatal($"Permission response vs addr {walletKey.PubKey.Address}");
+                    Log.Information(
+                        "{@Sender}: Issued permissions [{@PermissionsList}] to dapp {@Dapp} with address {@Address}",
+                        "Beacon",
+                        permissionRequest.Scopes.Aggregate(string.Empty,
+                            (res, scope) => res + $"{scope.ToString()}, "),
+                        permissionRequest.AppMetadata.Name, walletKey.PubKey.Address);
                     break;
                 }
                 case BeaconMessageType.operation_request:
@@ -241,13 +242,18 @@ namespace Atomex.Client.Desktop.ViewModels
                         // string transactionHash =
                         //     await MakeTransactionAsync(walletKey, operation.Destination, amount);
 
+                        var txHash = "txHash";
+
                         var response = new OperationResponse(
                             id: operationRequest.Id,
                             senderId: BeaconWalletClient.SenderId,
-                            transactionHash: "txHash",
+                            transactionHash: txHash,
                             operationRequest.Version);
 
                         _ = BeaconWalletClient.SendResponseAsync(receiverId: e.SenderId, response);
+
+                        Log.Information("{@Sender}: operation done with transaction hash: {@Hash}", "Beacon",
+                            txHash);
                     }
 
                     break;
@@ -288,8 +294,9 @@ namespace Atomex.Client.Desktop.ViewModels
                         senderId: BeaconWalletClient.SenderId);
 
                     _ = BeaconWalletClient.SendResponseAsync(receiverId: e.SenderId, response);
-                    Log.Fatal($"Payload: {signRequest.Payload}");
-                    Log.Fatal($"SIGNATIRE: {signedMessage.EncodedSignature}");
+
+                    Log.Information("{@Sender}: signed payload with signature: {@Signature}", "Beacon",
+                        signedMessage.EncodedSignature);
                     break;
                 }
                 case BeaconMessageType.broadcast_request:
@@ -308,9 +315,11 @@ namespace Atomex.Client.Desktop.ViewModels
 
         private void OnAtomexClientChangedEventHandler(object? sender, AtomexClientChangedEventArgs args)
         {
-            if (args.AtomexClient == null || AtomexApp.Account == null) return;
-
-            var a = 5;
+            if (args.AtomexClient == null || AtomexApp.Account == null)
+            {
+                BeaconWalletClient.OnBeaconMessageReceived -= OnBeaconWalletClientMessageReceived;
+                BeaconWalletClient.OnDappConnected -= OnDappConnected;
+            }
         }
 
         private void DesignerMode()

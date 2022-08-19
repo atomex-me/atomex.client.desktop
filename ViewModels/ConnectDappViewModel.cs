@@ -16,7 +16,12 @@ namespace Atomex.Client.Desktop.ViewModels
         private ReactiveCommand<Unit, Unit>? _backCommand;
 
         public ReactiveCommand<Unit, Unit> BackCommand =>
-            _backCommand ??= _backCommand = ReactiveCommand.Create(() => { OnBack?.Invoke(); });
+            _backCommand ??= _backCommand = ReactiveCommand.Create(() =>
+            {
+                OnBack?.Invoke();
+                QrCodeString = string.Empty;
+                AddressToConnect = null;
+            });
 
         private ReactiveCommand<Unit, Unit>? _connectCommand;
 
