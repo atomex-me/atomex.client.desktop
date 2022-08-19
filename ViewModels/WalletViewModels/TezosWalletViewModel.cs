@@ -248,7 +248,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                         : SortDirection.Asc;
             });
         
-        private ReactiveCommand<Unit, Unit> _connectDappCommand;
+        private ReactiveCommand<Unit, Unit>? _connectDappCommand;
 
         public ReactiveCommand<Unit, Unit> ConnectDappCommand =>
             _connectDappCommand ??= ReactiveCommand.Create(() =>

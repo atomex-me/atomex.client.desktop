@@ -10,8 +10,7 @@ namespace Atomex.Client.Desktop.ViewModels
     {
         public Action OnBack;
         public Action<string> OnConnect;
-        public string AddressToConnect { get; set; }
-
+        [Reactive] public string? AddressToConnect { get; set; }
         [Reactive] public string QrCodeString { get; set; }
 
         private ReactiveCommand<Unit, Unit>? _backCommand;

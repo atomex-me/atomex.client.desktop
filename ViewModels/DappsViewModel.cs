@@ -18,6 +18,7 @@ using Beacon.Sdk.Beacon;
 using Beacon.Sdk.Beacon.Operation;
 using Beacon.Sdk.Beacon.Permission;
 using Beacon.Sdk.Beacon.Sign;
+using Beacon.Sdk.Core.Domain.Entities;
 using Matrix.Sdk;
 using Microsoft.Extensions.DependencyInjection;
 using Netezos.Keys;
@@ -30,16 +31,23 @@ namespace Atomex.Client.Desktop.ViewModels
 {
     public class DappViewModel : ViewModelBase
     {
-        public string Logo { get; set; }
-        public string Name { get; set; }
-        public string ConnectedAddress { get; set; }
-        public DateTime ConnectTime { get; set; }
+        public Peer Peer { get; set; }
+        public string Name => Peer.Name;
+        public string ConnectedAddress => Peer.ConnectedAddress;
+        public Action<Peer> OnDisconnect { get; set; }
+        public Action<Peer> OnDappClick { get; set; }
 
 
-        private ReactiveCommand<Unit, Unit>? _openInExplorerCommand;
+        private ReactiveCommand<Unit, Unit>? _disconnectCommand;
 
-        public ReactiveCommand<Unit, Unit> OpenInExplorerCommand => _openInExplorerCommand ??= ReactiveCommand.Create(
-            () => { Log.Information(ConnectedAddress); });
+        public ReactiveCommand<Unit, Unit> DisconnectCommand =>
+            _disconnectCommand ??= ReactiveCommand.Create(() => OnDisconnect?.Invoke(Peer));
+
+        private ReactiveCommand<Unit, Unit>? _dappClickCommand;
+
+        public ReactiveCommand<Unit, Unit> DappClickCommand =>
+            _dappClickCommand ??= ReactiveCommand.Create(() => OnDappClick?.Invoke(Peer));
+
 
         private ReactiveCommand<Unit, Unit>? _copyCommand;
 
@@ -81,25 +89,22 @@ namespace Atomex.Client.Desktop.ViewModels
             var beaconServices = new ServiceCollection();
             beaconServices.AddLogging(loggingBuilder => loggingBuilder.AddSerilog(dispose: true));
             beaconServices.AddMatrixClient();
-            beaconServices.AddBeaconClient();
+            beaconServices.AddBeaconClient(appName: "Atomex desktop");
             BeaconServicesProvider = beaconServices.BuildServiceProvider();
 
             AtomexApp.AtomexClientChanged += OnAtomexClientChangedEventHandler;
-
             Tezos = (TezosConfig)AtomexApp.Account.Currencies.GetByName(TezosConfig.Xtz);
 
-            // todo: recreate after balance updated
-            SelectAddressViewModel =
-                new SelectAddressViewModel(AtomexApp.Account, Tezos, SelectAddressMode.Connect)
+            SelectAddressViewModel = new SelectAddressViewModel(AtomexApp.Account, Tezos, SelectAddressMode.Connect)
+            {
+                BackAction = () => { App.DialogService.Close(); },
+                ConfirmAction = walletAddressViewModel =>
                 {
-                    BackAction = () => { App.DialogService.Close(); },
-                    ConfirmAction = walletAddressViewModel =>
-                    {
-                        AddressToConnect = walletAddressViewModel;
-                        ConnectDappViewModel!.AddressToConnect = AddressToConnect.Address;
-                        App.DialogService.Show(ConnectDappViewModel!);
-                    }
-                };
+                    AddressToConnect = walletAddressViewModel;
+                    ConnectDappViewModel!.AddressToConnect = AddressToConnect.Address;
+                    App.DialogService.Show(ConnectDappViewModel!);
+                }
+            };
 
             ConnectDappViewModel = new ConnectDappViewModel
             {
@@ -113,20 +118,35 @@ namespace Atomex.Client.Desktop.ViewModels
 
                 BeaconWalletClient = BeaconServicesProvider.GetRequiredService<IWalletBeaconClient>();
                 BeaconWalletClient.OnBeaconMessageReceived += OnBeaconWalletClientMessageReceived;
+                BeaconWalletClient.OnDappConnected += OnDappConnected;
                 await BeaconWalletClient.InitAsync();
                 BeaconWalletClient.Connect();
 
                 var peers = BeaconWalletClient.GetAllPeers();
 
                 Dapps = new ObservableCollection<DappViewModel>(
-                    peers.Select(peer => new DappViewModel()
+                    peers.Select(peer => new DappViewModel
                     {
-                        Name = peer.Name,
+                        Peer = peer,
+                        OnDisconnect = p => BeaconWalletClient.RemovePeerAsync(p)
                     }));
 
                 Log.Debug("{@Sender}: WalletClient connected {@Connected}", "Beacon", BeaconWalletClient.Connected);
                 Log.Debug("{@Sender}: WalletClient logged in {@LoggedIn}", "Beacon", BeaconWalletClient.LoggedIn);
             });
+        }
+
+        private void OnDappConnected(object? sender, DappConnectedEventArgs e)
+        {
+            Log.Information($"Dapp connected: {e.dappMetadata.Name} with icon {e.dappMetadata.Icon}");
+            var peers = BeaconWalletClient.GetAllPeers();
+
+            Dapps = new ObservableCollection<DappViewModel>(
+                peers.Select(peer => new DappViewModel
+                {
+                    Peer = peer,
+                    OnDisconnect = p => BeaconWalletClient.RemovePeerAsync(p)
+                }));
         }
 
         private async void Connect(string qrCodeString)
@@ -137,7 +157,10 @@ namespace Atomex.Client.Desktop.ViewModels
             Log.Debug("{@Sender}: WalletClient logged in {@LoggedIn}", "Beacon", BeaconWalletClient.LoggedIn);
 
             var pairingRequest = ConnectToPeer();
-            await BeaconWalletClient.AddPeerAsync(pairingRequest);
+            await BeaconWalletClient.AddPeerAsync(pairingRequest, AddressToConnect.Address);
+
+            ConnectDappViewModel.AddressToConnect = null;
+            App.DialogService.Close();
 
             P2PPairingRequest ConnectToPeer()
             {
@@ -292,23 +315,6 @@ namespace Atomex.Client.Desktop.ViewModels
 
         private void DesignerMode()
         {
-            Dapps = new ObservableCollection<DappViewModel>
-            {
-                new()
-                {
-                    Logo = "atomex_logo",
-                    Name = "objkt.com",
-                    ConnectedAddress = "tz1gh1J44YMxugkf7AZ8q1MQZEu88T4RVa4i",
-                    ConnectTime = DateTime.Now
-                },
-                new()
-                {
-                    Logo = "atomex_logo",
-                    Name = "Plenty",
-                    ConnectedAddress = "tz1gh1J44YMxugkf7AZ8q1MQZEu88T4RVa4i",
-                    ConnectTime = DateTime.Now
-                }
-            };
         }
     }
 }

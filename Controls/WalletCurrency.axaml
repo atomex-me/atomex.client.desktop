@@ -222,32 +222,8 @@
                                                         RelativeSource={RelativeSource TemplatedParent},
                                                         Converter={StaticResource ShowBuyButton}}"
                                                         Classes="GrayButton">
-                                    <StackPanel Orientation="Horizontal">
-                                        <svg:Svg HorizontalAlignment="Center"
-                                                 Width="24"
-                                                 Height="24"
-                                                 Path="/Resources/Icons/plus.svg" />
-                                        <TextBlock Margin="8 0 0 0"
-                                                   Text="Buy"
-                                                   FontSize="18" />
-                                    </StackPanel>
-                                </controls:RoundedButton>
-                                <controls:RoundedButton Height="46"
-                                                        Padding="26 0"
-                                                        Command="{TemplateBinding ConnectDappCommand}"
-                                                        IsVisible="{TemplateBinding ConnectDappCommand,
-                                                        Converter={x:Static ObjectConverters.IsNotNull}}"
-                                                        Margin="0 0 0 12"
-                                                        Classes="GrayButton">
-                                    <StackPanel Orientation="Horizontal">
-                                        <svg:Svg HorizontalAlignment="Center"
-                                                 Width="24"
-                                                 Height="24"
-                                                 Path="/Resources/Icons/plus.svg" />
-                                        <TextBlock Margin="8 0 0 0"
-                                                   Text="Connect Dapp"
-                                                   FontSize="18" />
-                                    </StackPanel>
+                                    <TextBlock Text="Buy"
+                                               FontSize="18" />
                                 </controls:RoundedButton>
                             </WrapPanel>
                         </StackPanel>
