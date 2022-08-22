@@ -1,5 +1,6 @@
 using System;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
 using System.Reactive;
 using System.Text;
@@ -15,6 +16,7 @@ using Atomex.Common;
 using Avalonia.Controls;
 using Beacon.Sdk;
 using Beacon.Sdk.Beacon;
+using Beacon.Sdk.Beacon.Error;
 using Beacon.Sdk.Beacon.Operation;
 using Beacon.Sdk.Beacon.Permission;
 using Beacon.Sdk.Beacon.Sign;
@@ -26,6 +28,7 @@ using Newtonsoft.Json;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using Serilog;
+using Network = Atomex.Core.Network;
 
 namespace Atomex.Client.Desktop.ViewModels
 {
@@ -85,11 +88,13 @@ namespace Atomex.Client.Desktop.ViewModels
         public DappsViewModel(IAtomexApp atomexApp)
         {
             AtomexApp = atomexApp ?? throw new ArgumentNullException(nameof(atomexApp));
+            if (AtomexApp.Account == null) return;
 
             var beaconServices = new ServiceCollection();
             beaconServices.AddLogging(loggingBuilder => loggingBuilder.AddSerilog(dispose: true));
             beaconServices.AddMatrixClient();
-            beaconServices.AddBeaconClient(appName: "Atomex desktop");
+            beaconServices.AddBeaconClient(pathToDb: Path.GetDirectoryName(AtomexApp.Account.Wallet.PathToWallet)!,
+                appName: "Atomex desktop");
             BeaconServicesProvider = beaconServices.BuildServiceProvider();
 
             AtomexApp.AtomexClientChanged += OnAtomexClientChangedEventHandler;
@@ -114,8 +119,6 @@ namespace Atomex.Client.Desktop.ViewModels
 
             _ = Task.Run(async () =>
             {
-                if (AtomexApp.Account == null) return;
-
                 BeaconWalletClient = BeaconServicesProvider.GetRequiredService<IWalletBeaconClient>();
                 BeaconWalletClient.OnBeaconMessageReceived += OnBeaconWalletClientMessageReceived;
                 BeaconWalletClient.OnDappConnected += OnDappConnected;
@@ -181,6 +184,15 @@ namespace Atomex.Client.Desktop.ViewModels
                 {
                     if (message is not PermissionRequest permissionRequest) return;
 
+                    if (permissionRequest.Network.Type == NetworkType.mainnet &&
+                        AtomexApp.Account.Network != Network.MainNet)
+                    {
+                        // todo: change response Error type;
+                        _ = BeaconWalletClient.SendResponseAsync(receiverId: e.SenderId,
+                            new BeaconAbortedError(permissionRequest.Id, BeaconWalletClient.SenderId));
+                        return;
+                    }
+
                     if (string.IsNullOrEmpty(permissionRequest.Network.RpcUrl))
                         permissionRequest.Network.RpcUrl = $"https://rpc.tzkt.io/{permissionRequest.Network.Type}";
 
@@ -188,14 +200,6 @@ namespace Atomex.Client.Desktop.ViewModels
                         permissionRequest.Network.Name = string.Concat(
                             permissionRequest.Network.Type.ToString()[0].ToString().ToUpper(),
                             permissionRequest.Network.Type.ToString().AsSpan(1));
-
-                    // // swap sign permission to encrypt
-                    // var scopes = request?.Scopes
-                    //     .Select(s => s == PermissionScope.sign ? PermissionScope.encrypt : s)
-                    //     .ToList();
-
-                    // if (request!.Scopes.Any(s => s == PermissionScope.sign))
-                    //     request.Scopes.Add(PermissionScope.encrypt);
 
                     var hdWallet = AtomexApp.Account.Wallet as HdWallet;
 
@@ -205,7 +209,6 @@ namespace Atomex.Client.Desktop.ViewModels
                         keyType: AddressToConnect.WalletAddress.KeyType);
 
                     var unsecuredPrivateKey = privateKey.ToUnsecuredBytes();
-
                     var walletKey = Key.FromBytes(unsecuredPrivateKey);
 
                     var response = new PermissionResponse(
@@ -232,8 +235,11 @@ namespace Atomex.Client.Desktop.ViewModels
                 {
                     if (message is not OperationRequest operationRequest) return;
 
-                    // todo: return error response;
-                    if (operationRequest.OperationDetails.Count <= 0) return;
+                    if (operationRequest.OperationDetails.Count == 0)
+                    {
+                        _ = BeaconWalletClient.SendResponseAsync(receiverId: e.SenderId,
+                            new BeaconAbortedError(operationRequest.Id, BeaconWalletClient.SenderId));
+                    }
 
                     var operation = operationRequest.OperationDetails[0];
 
@@ -315,11 +321,11 @@ namespace Atomex.Client.Desktop.ViewModels
 
         private void OnAtomexClientChangedEventHandler(object? sender, AtomexClientChangedEventArgs args)
         {
-            if (args.AtomexClient == null || AtomexApp.Account == null)
-            {
-                BeaconWalletClient.OnBeaconMessageReceived -= OnBeaconWalletClientMessageReceived;
-                BeaconWalletClient.OnDappConnected -= OnDappConnected;
-            }
+            if (args.AtomexClient != null && AtomexApp.Account != null) return;
+
+            AtomexApp.AtomexClientChanged -= OnAtomexClientChangedEventHandler;
+            BeaconWalletClient.OnBeaconMessageReceived -= OnBeaconWalletClientMessageReceived;
+            BeaconWalletClient.OnDappConnected -= OnDappConnected;
         }
 
         private void DesignerMode()
