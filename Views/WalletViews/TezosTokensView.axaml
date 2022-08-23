@@ -97,7 +97,16 @@
                                                Foreground="{DynamicResource DefaultForegroundBrush}"
                                                FontSize="18"
                                                Margin="10 0 0 0"
+                                               IsVisible="{Binding TokenBalance.Name,
+                                               Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
                                                Text="{Binding TokenBalance.Name}" />
+                                    <TextBlock VerticalAlignment="Center"
+                                               Foreground="{DynamicResource DefaultForegroundBrush}"
+                                               FontSize="18"
+                                               Margin="10 0 0 0"
+                                               IsVisible="{Binding TokenBalance.Name,
+                                               Converter={x:Static StringConverters.IsNullOrEmpty}}"
+                                               Text="{Binding TokenBalance.Symbol}" />
                                     <TextBlock VerticalAlignment="Center"
                                                Foreground="{DynamicResource SecondaryForegroundBrush}"
                                                FontSize="13"

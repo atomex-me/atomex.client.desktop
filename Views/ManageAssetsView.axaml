@@ -44,7 +44,7 @@
                                             ComparisonCondition="Equal"
                                             Value="{x:Static vm:ManageAssetsUseCase.Collectibles}">
                         <ia:ChangePropertyAction PropertyName="Text"
-                                                 Value="Manage Tezos collectibles" />
+                                                 Value="Manage Tezos collections" />
                     </ia:DataTriggerBehavior>
                 </i:Interaction.Behaviors>
             </TextBlock>
@@ -94,7 +94,7 @@
                                                 ComparisonCondition="Equal"
                                                 Value="{x:Static vm:ManageAssetsUseCase.Collectibles}">
                             <ia:ChangePropertyAction PropertyName="Text"
-                                                     Value="My collectibles" />
+                                                     Value="My collections" />
                         </ia:DataTriggerBehavior>
                     </i:Interaction.Behaviors>
                 </TextBlock>
@@ -151,27 +151,6 @@
                                              Classes="BaseDisabledStyle"
                                              IsVisible="{Binding !IsSelected}" />
                                 </Panel>
-                                <Ellipse
-                                    IsVisible="{Binding Asset.BitmapIcon,
-                                    Converter={x:Static ObjectConverters.IsNotNull}}"
-                                    Classes.Enabled="{Binding IsSelected}"
-                                    Classes.Disabled="{Binding !IsSelected}"
-                                    Width="28"
-                                    Height="28">
-                                    <Ellipse.Styles>
-                                        <Style Selector="Ellipse.Disabled">
-                                            <Setter Property="Opacity" Value="0.5" />
-                                        </Style>
-                                        <Style Selector="Ellipse.Enabled">
-                                            <Setter Property="Opacity" Value="1" />
-                                        </Style>
-                                    </Ellipse.Styles>
-                                    <Ellipse.Fill>
-                                        <ImageBrush Source="{Binding Asset.BitmapIcon}"
-                                                    BitmapInterpolationMode="HighQuality"
-                                                    Stretch="Fill" />
-                                    </Ellipse.Fill>
-                                </Ellipse>
                                 <Border Width="28"
                                         Height="28"
                                         ClipToBounds="True"
@@ -199,6 +178,18 @@
                                            FontFamily="{DynamicResource DefaultLightFontFamily}"
                                            FontSize="18"
                                            VerticalAlignment="Center"
+                                           IsVisible="{Binding Asset.CurrencyDescription,
+                                           Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                                           Classes.IsHidden="{Binding IsHidden}"
+                                           Classes.IsSelected="{Binding IsSelected}"
+                                           Classes.NotSelected="{Binding !IsSelected}" />
+                                <TextBlock Margin="17 0 0 0"
+                                           Text="{Binding Asset.CurrencyName}"
+                                           FontFamily="{DynamicResource DefaultLightFontFamily}"
+                                           FontSize="18"
+                                           VerticalAlignment="Center"
+                                           IsVisible="{Binding Asset.CurrencyDescription,
+                                           Converter={x:Static StringConverters.IsNullOrEmpty}}"
                                            Classes.IsHidden="{Binding IsHidden}"
                                            Classes.IsSelected="{Binding IsSelected}"
                                            Classes.NotSelected="{Binding !IsSelected}" />
