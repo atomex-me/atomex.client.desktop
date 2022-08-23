@@ -17,7 +17,7 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
             return currencyConfig switch
             {
                 BitcoinBasedConfig config =>
-                    new BitcoinBasedTransactionViewModel(tx as IBitcoinBasedTransaction, config),
+                    new BitcoinBasedTransactionViewModel(tx as BitcoinBasedTransaction, config),
                 Erc20Config config =>
                     new EthereumERC20TransactionViewModel(tx as EthereumTransaction, config),
                 EthereumConfig config =>
