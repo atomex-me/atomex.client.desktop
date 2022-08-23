@@ -127,11 +127,12 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
 
         public void UpdateQuotesInBaseCurrency(IQuotesProvider quotesProvider)
         {
-            var quote = quotesProvider.GetQuote(TokenBalance.Symbol, BaseCurrencyCode);
-            if (quote == null) return;
+            var tokenQuote = quotesProvider.GetQuote(TokenBalance.Symbol, BaseCurrencyCode);
+            var xtzQuote = quotesProvider.GetQuote(TezosConfig.Xtz, BaseCurrencyCode);
+            if (tokenQuote == null || xtzQuote == null) return;
 
-            CurrentQuote = quote.Bid;
-            TotalAmountInBase = TotalAmount.SafeMultiply(quote.Bid);
+            CurrentQuote = tokenQuote.Bid.SafeMultiply(xtzQuote.Bid);
+            TotalAmountInBase = TotalAmount.SafeMultiply(CurrentQuote);
 
             Log.Debug("Quotes updated for tezos token {Symbol}", TokenBalance.Symbol);
         }
