@@ -121,7 +121,7 @@ namespace Atomex.Client.Desktop.ViewModels
             {
                 BeaconWalletClient = BeaconServicesProvider.GetRequiredService<IWalletBeaconClient>();
                 BeaconWalletClient.OnBeaconMessageReceived += OnBeaconWalletClientMessageReceived;
-                BeaconWalletClient.OnDappConnected += OnDappConnected;
+                BeaconWalletClient.OnDappsListChanged += OnDappsListChanged;
                 await BeaconWalletClient.InitAsync();
                 BeaconWalletClient.Connect();
 
@@ -131,7 +131,7 @@ namespace Atomex.Client.Desktop.ViewModels
                     peers.Select(peer => new DappViewModel
                     {
                         Peer = peer,
-                        OnDisconnect = p => BeaconWalletClient.RemovePeerAsync(p)
+                        OnDisconnect = p => BeaconWalletClient.RemovePeerAsync(p.SenderId)
                     }));
 
                 Log.Debug("{@Sender}: WalletClient connected {@Connected}", "Beacon", BeaconWalletClient.Connected);
@@ -139,7 +139,7 @@ namespace Atomex.Client.Desktop.ViewModels
             });
         }
 
-        private void OnDappConnected(object? sender, DappConnectedEventArgs e)
+        private void OnDappsListChanged(object? sender, DappConnectedEventArgs e)
         {
             var peers = BeaconWalletClient.GetAllPeers();
 
@@ -147,7 +147,7 @@ namespace Atomex.Client.Desktop.ViewModels
                 peers.Select(peer => new DappViewModel
                 {
                     Peer = peer,
-                    OnDisconnect = p => BeaconWalletClient.RemovePeerAsync(p)
+                    OnDisconnect = p => BeaconWalletClient.RemovePeerAsync(p.SenderId)
                 }));
 
             Log.Information("{@Sender}: connected dapp: {@Dapp}", "Beacon", e.dappMetadata.Name);
@@ -323,9 +323,10 @@ namespace Atomex.Client.Desktop.ViewModels
         {
             if (args.AtomexClient != null && AtomexApp.Account != null) return;
 
+            BeaconWalletClient.Disconnect();
             AtomexApp.AtomexClientChanged -= OnAtomexClientChangedEventHandler;
             BeaconWalletClient.OnBeaconMessageReceived -= OnBeaconWalletClientMessageReceived;
-            BeaconWalletClient.OnDappConnected -= OnDappConnected;
+            BeaconWalletClient.OnDappsListChanged -= OnDappsListChanged;
         }
 
         private void DesignerMode()
