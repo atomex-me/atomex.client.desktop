@@ -10,10 +10,11 @@ using Atomex.Blockchain.Tezos;
 using Atomex.Client.Common;
 using Atomex.Client.Desktop.ViewModels.Abstract;
 using Atomex.Client.Desktop.ViewModels.SendViewModels;
+using Atomex.Common;
 using Atomex.Cryptography;
 using Atomex.Wallet;
-using Atomex.Common;
 using Avalonia.Controls;
+using Avalonia.Threading;
 using Beacon.Sdk;
 using Beacon.Sdk.Beacon;
 using Beacon.Sdk.Beacon.Error;
@@ -31,7 +32,7 @@ using ReactiveUI.Fody.Helpers;
 using Serilog;
 using Network = Atomex.Core.Network;
 
-namespace Atomex.Client.Desktop.ViewModels
+namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
 {
     public class DappViewModel : ViewModelBase
     {
@@ -144,7 +145,7 @@ namespace Atomex.Client.Desktop.ViewModels
         private void OnDappsListChanged(object? sender, DappConnectedEventArgs e)
         {
             GetAllDapps();
-            Log.Information("{@Sender}: connected dapp: {@Dapp}", "Beacon", e.dappMetadata.Name);
+            Log.Information("{@Sender}: connected dapp: {@Dapp}", "Beacon", e?.dappMetadata.Name);
         }
 
         private void GetAllDapps()
@@ -161,10 +162,9 @@ namespace Atomex.Client.Desktop.ViewModels
                 }));
         }
 
-        private async void Connect(string qrCodeString, string addressToConnect)
+        private async Task Connect(string qrCodeString, string addressToConnect)
         {
             if (AtomexApp.Account == null) return;
-
             var pairingRequest = GetPairingRequest();
             await BeaconWalletClient.AddPeerAsync(pairingRequest, addressToConnect);
             App.DialogService.Close();
@@ -229,14 +229,38 @@ namespace Atomex.Client.Desktop.ViewModels
                         address: connectedWalletAddress.Address,
                         version: permissionRequest.Version);
 
-                    _ = BeaconWalletClient.SendResponseAsync(receiverId: e.SenderId, response);
+                    var permissionRequestViewModel = new PermissionRequestViewModel
+                    {
+                        DappName = permissionRequest.AppMetadata.Name,
+                        Address = connectedWalletAddress.Address,
+                        Permissions = permissionRequest.Scopes,
+                        OnReject = async () =>
+                        {
+                            await BeaconWalletClient.SendResponseAsync(receiverId: e.SenderId,
+                                new BeaconAbortedError(permissionRequest.Id, BeaconWalletClient.SenderId));
+                            await BeaconWalletClient.RemovePeerAsync(message.SenderId);
+                            App.DialogService.Close();
+                            Log.Information(
+                                "{@Sender}: Rejected permissions [{@PermissionsList}] to dapp {@Dapp} with address {@Address}",
+                                "Beacon",
+                                permissionRequest.Scopes.Aggregate(string.Empty,
+                                    (res, scope) => res + $"{scope.ToString()}, "),
+                                permissionRequest.AppMetadata.Name, connectedWalletAddress.Address);
+                        },
+                        OnAllow = async () =>
+                        {
+                            await BeaconWalletClient.SendResponseAsync(receiverId: e.SenderId, response);
+                            App.DialogService.Close();
+                            Log.Information(
+                                "{@Sender}: Issued permissions [{@PermissionsList}] to dapp {@Dapp} with address {@Address}",
+                                "Beacon",
+                                permissionRequest.Scopes.Aggregate(string.Empty,
+                                    (res, scope) => res + $"{scope.ToString()}, "),
+                                permissionRequest.AppMetadata.Name, connectedWalletAddress.Address);
+                        }
+                    };
 
-                    Log.Information(
-                        "{@Sender}: Issued permissions [{@PermissionsList}] to dapp {@Dapp} with address {@Address}",
-                        "Beacon",
-                        permissionRequest.Scopes.Aggregate(string.Empty,
-                            (res, scope) => res + $"{scope.ToString()}, "),
-                        permissionRequest.AppMetadata.Name, connectedWalletAddress.Address);
+                    await Dispatcher.UIThread.InvokeAsync(() => { App.DialogService.Show(permissionRequestViewModel); });
                     break;
                 }
                 case BeaconMessageType.operation_request:

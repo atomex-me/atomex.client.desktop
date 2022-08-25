@@ -15,6 +15,7 @@ using Atomex.Blockchain.Tezos.Tzkt;
 using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.ViewModels.Abstract;
 using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
+using Atomex.Client.Desktop.ViewModels.DappsViewModels;
 using Atomex.Core;
 using Atomex.Wallet;
 using Atomex.Wallet.Tezos;

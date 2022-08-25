@@ -2,11 +2,11 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 
-namespace Atomex.Client.Desktop.Views
+namespace Atomex.Client.Desktop.Views.DappsViews
 {
-    public partial class DappsView : UserControl
+    public partial class ConnectDappView : UserControl
     {
-        public DappsView()
+        public ConnectDappView()
         {
             InitializeComponent();
         }

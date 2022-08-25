@@ -1,12 +1,12 @@
-using Avalonia;
+
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 
-namespace Atomex.Client.Desktop.Views
+namespace Atomex.Client.Desktop.Views.DappsViews
 {
-    public partial class ConnectDappView : UserControl
+    public partial class PermissionRequestView : UserControl
     {
-        public ConnectDappView()
+        public PermissionRequestView()
         {
             InitializeComponent();
         }

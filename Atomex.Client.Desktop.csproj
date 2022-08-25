@@ -217,6 +217,18 @@
             <SubType>Code</SubType>
             <DependentUpon>TransactionsList.axaml</DependentUpon>
         </Compile>
+        <Compile Update="Views\DappsViews\ConnectDappView.axaml.cs">
+          <DependentUpon>ConnectDappView.axaml</DependentUpon>
+          <SubType>Code</SubType>
+        </Compile>
+        <Compile Update="Views\DappsViews\DappsView.axaml.cs">
+          <DependentUpon>DappsView.axaml</DependentUpon>
+          <SubType>Code</SubType>
+        </Compile>
+        <Compile Update="Views\DappsViews\PermissionRequestView.axaml.cs">
+          <DependentUpon>PermissionRequestView.axaml</DependentUpon>
+          <SubType>Code</SubType>
+        </Compile>
     </ItemGroup>
     <ItemGroup>
         <ProjectReference Include="..\matrix-dotnet-sdk\Matrix.Sdk\Matrix.Sdk.csproj" />

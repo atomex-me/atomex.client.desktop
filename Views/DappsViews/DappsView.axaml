@@ -3,11 +3,11 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d" d:DesignWidth="680" d:DesignHeight="450"
-             xmlns:vm="clr-namespace:Atomex.Client.Desktop.ViewModels"
+             xmlns:vm="clr-namespace:Atomex.Client.Desktop.ViewModels.DappsViewModels"
              xmlns:controls="clr-namespace:Atomex.Client.Desktop.Controls"
              xmlns:asyncImageLoader="clr-namespace:AsyncImageLoader;assembly=AsyncImageLoader.Avalonia"
              xmlns:services="clr-namespace:Atomex.Client.Desktop.Services"
-             x:Class="Atomex.Client.Desktop.Views.DappsView">
+             x:Class="Atomex.Client.Desktop.Views.DappsViews.DappsView">
 
     <Design.DataContext>
         <vm:DappsViewModel />
