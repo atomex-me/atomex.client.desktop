@@ -181,6 +181,7 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
         {
             var message = e.Request;
             var peer = BeaconWalletClient.GetPeer(message.SenderId);
+
             if (peer == null)
             {
                 _ = BeaconWalletClient.SendResponseAsync(receiverId: e.SenderId,
@@ -260,7 +261,10 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
                         }
                     };
 
-                    await Dispatcher.UIThread.InvokeAsync(() => { App.DialogService.Show(permissionRequestViewModel); });
+                    await Dispatcher.UIThread.InvokeAsync(() =>
+                    {
+                        App.DialogService.Show(permissionRequestViewModel);
+                    });
                     break;
                 }
                 case BeaconMessageType.operation_request:
@@ -359,30 +363,51 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
                         // data is not in HEX format
                         dataToSign = Encoding.UTF8.GetBytes(signRequest.Payload);
                     }
+                    
+                    var permissionInfo =
+                        await BeaconWalletClient.PermissionInfoRepository.TryReadBySenderIdAsync(message.SenderId);
 
-                    var hdWallet = AtomexApp.Account.Wallet as HdWallet;
+                    var signatureRequestViewModel = new SignatureRequestViewModel()
+                    {
+                        DappName = permissionInfo!.AppMetadata.Name,
+                        Payload = signRequest.Payload,
+                        OnSign = async () =>
+                        {
+                            var hdWallet = AtomexApp.Account.Wallet as HdWallet;
 
-                    using var privateKey = hdWallet!.KeyStorage.GetPrivateKey(
-                        currency: Tezos,
-                        keyIndex: connectedWalletAddress.KeyIndex,
-                        keyType: connectedWalletAddress.KeyType);
+                            using var privateKey = hdWallet!.KeyStorage.GetPrivateKey(
+                                currency: Tezos,
+                                keyIndex: connectedWalletAddress.KeyIndex,
+                                keyType: connectedWalletAddress.KeyType);
 
-                    var signedMessage = TezosSigner.SignHash(
-                        data: dataToSign,
-                        privateKey: privateKey.ToUnsecuredBytes(),
-                        watermark: null,
-                        isExtendedKey: privateKey.Length == 64);
+                            var signedMessage = TezosSigner.SignHash(
+                                data: dataToSign,
+                                privateKey: privateKey.ToUnsecuredBytes(),
+                                watermark: null,
+                                isExtendedKey: privateKey.Length == 64);
 
-                    var response = new SignPayloadResponse(
-                        signature: signedMessage.EncodedSignature,
-                        version: signRequest.Version,
-                        id: signRequest.Id,
-                        senderId: BeaconWalletClient.SenderId);
+                            var response = new SignPayloadResponse(
+                                signature: signedMessage.EncodedSignature,
+                                version: signRequest.Version,
+                                id: signRequest.Id,
+                                senderId: BeaconWalletClient.SenderId);
 
-                    _ = BeaconWalletClient.SendResponseAsync(receiverId: e.SenderId, response);
+                            await BeaconWalletClient.SendResponseAsync(receiverId: e.SenderId, response);
+                            App.DialogService.Close();
+                            Log.Information("{@Sender}: signed payload for {@Dapp} with signature: {@Signature}",
+                                "Beacon", permissionInfo.AppMetadata.Name, signedMessage.EncodedSignature);
+                        },
+                        OnReject = async () =>
+                        {
+                            await BeaconWalletClient.SendResponseAsync(receiverId: e.SenderId,
+                                new BeaconAbortedError(signRequest.Id, BeaconWalletClient.SenderId));
+                            App.DialogService.Close();
+                            Log.Information("{@Sender}: user Aborted signing payload from {@Dapp}", "Beacon",
+                                permissionInfo.AppMetadata.Name);
+                        }
+                    };
 
-                    Log.Information("{@Sender}: signed payload with signature: {@Signature}", "Beacon",
-                        signedMessage.EncodedSignature);
+                    await Dispatcher.UIThread.InvokeAsync(() => { App.DialogService.Show(signatureRequestViewModel); });
                     break;
                 }
                 case BeaconMessageType.broadcast_request:

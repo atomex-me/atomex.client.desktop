@@ -14,7 +14,7 @@
 
     <Border Classes="ChildViewBorder"
             Padding="0 0 0 60">
-        <StackPanel Orientation="Vertical">
+        <StackPanel>
             <Grid RowDefinitions="72,Auto">
                 <TextBlock Grid.Row="0"
                            Foreground="{DynamicResource DefaultForegroundBrush}"
@@ -74,7 +74,7 @@
                              Margin="0 8 0 0"
                              Text="{Binding Address}"
                              IsEnabled="False"
-                             Classes="AtomexTextBox AmountTextBox" />
+                             Classes="AtomexTextBox" />
 
                     <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
                                Margin="0 32 0 0"
