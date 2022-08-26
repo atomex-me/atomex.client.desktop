@@ -29,7 +29,7 @@
                            FontSize="22"
                            HorizontalAlignment="Center"
                            VerticalAlignment="Center"
-                           Text="Connect to Dapp" />
+                           Text="Connect dapps" />
             </Grid>
 
             <!-- separator -->
@@ -49,28 +49,27 @@
                            Foreground="{DynamicResource SecondaryForegroundBrush}"
                            FontSize="16"
                            VerticalAlignment="Center"
-                           Text="Dapp QrCode" />
+                           Text="Dapp pairing request" />
 
                 <TextBox Grid.Column="0"
                          Grid.Row="1"
                          Grid.ColumnSpan="2"
-                         Margin="0 0 0 10"
+                         Margin="0 8"
+                         Padding="16 10 16 0"
                          Text="{Binding QrCodeString}"
-                         HorizontalAlignment="Stretch"
-                         VerticalAlignment="Stretch"
                          VerticalContentAlignment="Top"
-                         Classes="SearchTextBox"
-                         FontSize="13"
+                         Classes="AtomexTextBox"
+                         FontSize="16"
                          TextWrapping="Wrap"
                          BorderThickness="0"
-                         Height="120" />
+                         Height="176" />
 
                 <TextBlock Grid.Column="0"
                            Grid.Row="2"
                            Foreground="{DynamicResource SecondaryForegroundBrush}"
                            FontSize="16"
                            VerticalAlignment="Center"
-                           Text="Connect address" />
+                           Text="Address to connect" />
 
                 <StackPanel Grid.Column="1"
                             Grid.Row="2"
