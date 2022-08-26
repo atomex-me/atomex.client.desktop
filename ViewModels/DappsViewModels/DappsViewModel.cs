@@ -306,16 +306,21 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
                 case BeaconMessageType.operation_request:
                 {
                     if (message is not OperationRequest operationRequest) return;
+                    var permissionInfo = BeaconWalletClient
+                        .PermissionInfoRepository
+                        .TryReadBySenderIdAsync(operationRequest.SenderId)
+                        .Result;
 
-                    if (operationRequest.OperationDetails.Count != 1)
+                    if (operationRequest.OperationDetails.Count != 1 || permissionInfo == null)
                     {
-                        _ = BeaconWalletClient.SendResponseAsync(receiverId: e.SenderId,
+                        await BeaconWalletClient.SendResponseAsync(receiverId: e.SenderId,
                             new BeaconAbortedError(operationRequest.Id, BeaconWalletClient.SenderId));
+                        return;
                     }
 
                     var operation = operationRequest.OperationDetails[0];
 
-                    if (long.TryParse(operation?.Amount, out var amount))
+                    if (long.TryParse(operation.Amount, out var amount))
                     {
                         var autofillOperation = await RunAutofillOperation(
                             fromAddress: connectedWalletAddress.Address,
@@ -345,41 +350,66 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
                         tx.GasLimit = tx.Operations?.Last?["gas_limit"]?.Value<decimal>() ?? Tezos.GasLimit;
                         tx.StorageLimit = tx.Operations?.Last?["storage_limit"]?.Value<decimal>() ?? Tezos.StorageLimit;
 
-                        var wallet = (HdWallet)AtomexApp.Account.Wallet;
-                        var keyStorage = wallet.KeyStorage;
-
-                        var signResult = await tx
-                            .SignAsync(keyStorage, connectedWalletAddress, Tezos);
-
-                        if (!signResult)
+                        var operationRequestViewModel = new OperationRequestViewModel(AtomexApp, Tezos)
                         {
-                            Log.Error("Beacon transaction signing error");
-                            _ = BeaconWalletClient.SendResponseAsync(receiverId: e.SenderId,
-                                new BeaconAbortedError(operationRequest.Id, BeaconWalletClient.SenderId));
-                            return;
-                        }
+                            DappName = peer.Name,
+                            DappLogo = permissionInfo.AppMetadata.Icon,
+                            Transaction = tx,
+                            OnReject = async () =>
+                            {
+                                await BeaconWalletClient.SendResponseAsync(receiverId: e.SenderId,
+                                    new BeaconAbortedError(operationRequest.Id, BeaconWalletClient.SenderId));
+                                App.DialogService.Close();
+                            },
 
-                        var result = await Tezos.BlockchainApi
-                            .TryBroadcastAsync(tx);
+                            OnConfirm = async () =>
+                            {
+                                var wallet = (HdWallet)AtomexApp.Account.Wallet;
+                                var keyStorage = wallet.KeyStorage;
 
-                        if (result.Error != null)
+                                var signResult = await tx
+                                    .SignAsync(keyStorage, connectedWalletAddress, Tezos);
+
+                                if (!signResult)
+                                {
+                                    Log.Error("Beacon transaction signing error");
+                                    _ = BeaconWalletClient.SendResponseAsync(receiverId: e.SenderId,
+                                        new BeaconAbortedError(operationRequest.Id, BeaconWalletClient.SenderId));
+                                    return;
+                                }
+
+                                var result = await Tezos.BlockchainApi
+                                    .TryBroadcastAsync(tx);
+
+                                if (result.Error != null)
+                                {
+                                    Log.Error("Beacon transaction broadcast error");
+                                    await BeaconWalletClient.SendResponseAsync(receiverId: e.SenderId,
+                                        new BeaconAbortedError(operationRequest.Id, BeaconWalletClient.SenderId));
+                                    return;
+                                }
+
+                                var response = new OperationResponse(
+                                    id: operationRequest.Id,
+                                    senderId: BeaconWalletClient.SenderId,
+                                    transactionHash: result.Value,
+                                    operationRequest.Version);
+
+                                await BeaconWalletClient.SendResponseAsync(receiverId: e.SenderId, response);
+
+                                App.DialogService.Close();
+                                Log.Information("{@Sender}: operation done with transaction hash: {@Hash}", "Beacon",
+                                    result.Value);
+                            }
+                        };
+                        await Dispatcher.UIThread.InvokeAsync(() =>
                         {
-                            Log.Error("Beacon transaction broadcast error");
-                            _ = BeaconWalletClient.SendResponseAsync(receiverId: e.SenderId,
-                                new BeaconAbortedError(operationRequest.Id, BeaconWalletClient.SenderId));
-                            return;
-                        }
-
-                        var response = new OperationResponse(
-                            id: operationRequest.Id,
-                            senderId: BeaconWalletClient.SenderId,
-                            transactionHash: result.Value,
-                            operationRequest.Version);
-
-                        _ = BeaconWalletClient.SendResponseAsync(receiverId: e.SenderId, response);
-
-                        Log.Information("{@Sender}: operation done with transaction hash: {@Hash}", "Beacon",
-                            result.Value);
+                            App.DialogService.Show(operationRequestViewModel);
+                        });
+                    }
+                    else
+                    {
+                        Log.Error("Cant parse amount from operation request");
                     }
 
                     break;

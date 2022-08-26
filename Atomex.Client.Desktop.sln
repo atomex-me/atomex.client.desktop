@@ -31,12 +31,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Atomex.MarketData", "atomex
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Atomex.Core", "Atomex.Core", "{6165844F-33D3-433A-91B8-62481908D2C7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Beacon.Sdk", "..\beacon-dotnet-sdk\Beacon.Sdk\Beacon.Sdk.csproj", "{00D49D30-4373-4A8A-A3A8-9481F110A7F9}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Beacon.Sdk.Sample.Console", "..\beacon-dotnet-sdk\Beacon.Sdk.Sample.Console\Beacon.Sdk.Sample.Console.csproj", "{A55B7C8E-1E34-400C-8362-7A9F12EC03A2}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Matrix.Sdk", "..\matrix-dotnet-sdk\Matrix.Sdk\Matrix.Sdk.csproj", "{973E3C65-B305-4DB3-AE78-7694E7F38A92}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

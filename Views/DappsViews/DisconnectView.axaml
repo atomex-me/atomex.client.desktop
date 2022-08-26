@@ -34,7 +34,7 @@
                                FontSize="16"
                                LineHeight="24"
                                TextWrapping="Wrap"
-                               HorizontalAlignment="Left"
+                               HorizontalAlignment="Center"
                                Text="{Binding SubTitle}" />
 
                     <Grid ColumnDefinitions="*,16,*"

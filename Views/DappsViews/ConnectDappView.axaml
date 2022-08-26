@@ -78,13 +78,13 @@
                     <svg:Svg HorizontalAlignment="Center"
                              Width="18"
                              Height="18"
-                             Path="/Resources/Icons/tezos.svg" />
+                             Path="/Resources/Icons/tezos-disabled.svg" />
                     <TextBlock Margin="6 0 0 0"
                                Foreground="{DynamicResource DefaultForegroundBrush}"
                                FontSize="16"
                                VerticalAlignment="Center"
                                Text="{Binding AddressToConnect,
-                                   Converter={x:Static converters:StringConverters.ToShortenedAddress}}" />
+                               Converter={x:Static converters:StringConverters.ToShortenedAddress}}" />
 
                     <controls:CopyButton ToolText="Copy address"
                                          DoneToolText="Copied!"
