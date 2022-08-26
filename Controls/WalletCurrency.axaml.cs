@@ -98,7 +98,6 @@ namespace Atomex.Client.Desktop.Controls
             set => SetAndRaise(BuyCommandProperty, ref _buyCommand, value);
         }
 
-
         public static readonly DirectProperty<WalletCurrency, bool> IsBalanceUpdatingProperty =
             AvaloniaProperty.RegisterDirect<WalletCurrency, bool>(nameof(IsBalanceUpdating),
                 control => control.IsBalanceUpdating, (control, value) => control.IsBalanceUpdating = value);

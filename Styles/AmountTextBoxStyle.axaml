@@ -8,7 +8,6 @@
       <Setter Property="helpers:AmountTextBoxHelper.BaseCurrencyCodeFontSize" Value="10" />
       <Setter Property="helpers:AmountTextBoxHelper.AmountInBaseMargin" Value="0" />
       <Setter Property="helpers:AmountTextBoxHelper.AmountInBaseFontSize" Value="13" />
-      <Setter Property="CaretBrush" Value="{DynamicResource AmountTextBoxCaretBrush}" />
   </Style>
   <Style Selector="TextBox.AmountTextBox">
       <Setter Property="Template">

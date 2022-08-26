@@ -93,7 +93,7 @@ namespace Atomex.Client.Desktop.ViewModels
             {
                 ShowRightPopupContent = ShowRightPopupContent
             };
-
+            
             SettingsViewModel = new SettingsViewModel(AtomexApp);
             WertViewModel = new WertViewModel(AtomexApp);
             NotificationsViewModel = new NotificationsViewModel();

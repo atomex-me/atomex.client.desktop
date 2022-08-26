@@ -1,11 +1,15 @@
 ﻿{
   "Serilog": {
-    "Using": [ "Serilog.Sinks.Console", "Atomex.Client.Core" ],
+    "Using": [
+      "Serilog.Sinks.Console",
+      "Atomex.Client.Core",
+      "Beacon.Sdk"
+    ],
     "MinimumLevel": {
       "Default": "Debug",
       "Override": {
-        "Microsoft": "Warning",
-        "System": "Warning"
+        "Microsoft": "Debug",
+        "System": "Debug"
       }
     },
     "WriteTo": [
@@ -14,16 +18,14 @@
         "Args": {
           "restrictedToMinimumLevel": "Debug"
         }
-      },
-      {
-        "Name": "RollingFile",
-        "Args": {
-          "pathFormat": "logs/log-{Date}.txt",
-          "outputTemplate": "{Timestamp:yyyy-MM-dd HH:mm:ss.fff K} [{Level:u3}] [{Class}] {Message:lj} (at {Caller}){NewLine}{Exception}"
-        }
       }
     ],
-    "Enrich": [ "FromLogContext", "WithMachineName", "WithThreadId", "WithCaller" ]
+    "Enrich": [
+      "FromLogContext",
+      "WithMachineName",
+      "WithThreadId",
+      "WithCaller"
+    ]
   },
   "Services": {
     "MainNet": {

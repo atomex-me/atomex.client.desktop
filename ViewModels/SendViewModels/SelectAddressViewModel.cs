@@ -4,11 +4,9 @@ using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Windows.Input;
-
 using Avalonia.Controls;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
-
 using Atomex.Common;
 using Atomex.Core;
 using Atomex.ViewModels;
@@ -156,6 +154,8 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
             Currency = currency;
             SelectAddressMode = mode;
+            var onlyAddressesWithBalances =
+                SelectAddressMode is SelectAddressMode.SendFrom or SelectAddressMode.Connect;
 
             var addresses = AddressesHelper
                 .GetReceivingAddressesAsync(
@@ -164,8 +164,10 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     tokenContract: tokenContract,
                     tokenId: selectedTokenId)
                 .WaitForResult()
-                .Where(address => SelectAddressMode != SelectAddressMode.SendFrom || address.Balance != 0)
-                .OrderByDescending(address => address.Balance);
+                .Where(address => !onlyAddressesWithBalances || address.Balance != 0)
+                .OrderByDescending(address => address.Balance)
+                .Where(address => SelectAddressMode != SelectAddressMode.Connect ||
+                                  address.WalletAddress.KeyType == CurrencyConfig.StandardKey);
 
             MyAddresses = new ObservableCollection<WalletAddressViewModel>(addresses);
             InitialMyAddresses = new ObservableCollection<WalletAddressViewModel>(addresses);

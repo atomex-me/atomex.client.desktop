@@ -15,6 +15,7 @@ using Atomex.Blockchain.Tezos.Tzkt;
 using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.ViewModels.Abstract;
 using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
+using Atomex.Client.Desktop.ViewModels.DappsViewModels;
 using Atomex.Core;
 using Atomex.Wallet;
 using Atomex.Wallet.Tezos;
@@ -29,6 +30,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         [Reactive] public SortDirection? CurrentDelegationSortDirection { get; set; }
         [Reactive] public DelegationSortField? CurrentDelegationSortField { get; set; }
         [Reactive] public string? DelegationAddressPopupOpened { get; set; }
+        [Reactive] public DappsViewModel DappsViewModel { get; set; }
         [ObservableAsProperty] public bool IsTokensUpdating { get; }
 
         private bool CanDelegate { get; set; }
@@ -71,9 +73,10 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             _ = LoadDelegationInfoAsync();
 
             DelegateViewModel = new DelegateViewModel(_app);
+            DappsViewModel = new DappsViewModel(_app);
             TezosTokensViewModel = new TezosTokensViewModel(_app, showTezosToken, setConversionTab);
             CollectiblesViewModel = new CollectiblesViewModel(_app, showTezosCollection);
-
+            
             CurrentDelegationSortField = DelegationSortField.ByBalance;
             CurrentDelegationSortDirection = SortDirection.Desc;
         }
@@ -245,7 +248,14 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                         ? SortDirection.Desc
                         : SortDirection.Asc;
             });
+        
+        private ReactiveCommand<Unit, Unit>? _connectDappCommand;
 
+        public ReactiveCommand<Unit, Unit> ConnectDappCommand =>
+            _connectDappCommand ??= ReactiveCommand.Create(() =>
+            {
+                App.DialogService.Show(DappsViewModel.SelectAddressViewModel);
+            });
 
         private ReactiveCommand<string, Unit>? _openDelegationPopupCommand;
 
