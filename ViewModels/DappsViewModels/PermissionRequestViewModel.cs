@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reactive;
 using System.Threading.Tasks;
 using Atomex.Client.Desktop.Common;
@@ -16,15 +15,7 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
         public string DappName { get; set; }
         public string Address { get; set; }
         public List<PermissionScope> Permissions { get; set; }
-
-        public List<string> PermissionStrings => Permissions.Select(p => p switch
-        {
-            PermissionScope.sign => "Sign transactions",
-            PermissionScope.operation_request => "Operation request",
-            PermissionScope.encrypt => "Encrypt",
-            PermissionScope.threshold => "Treshold",
-            _ => "Unknown permission"
-        }).ToList();
+        public List<string> PermissionStrings => BeaconHelper.GetPermissionStrings(Permissions);
         
         public string SubTitle =>
             $"{DappName} wants to connect to your account. The app is requesting the following permissions:";

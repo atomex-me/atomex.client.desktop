@@ -85,7 +85,6 @@
                     <Grid ColumnDefinitions="*"
                           VerticalAlignment="Stretch">
                         <Button Command="{Binding DappClickCommand}"
-                                CommandParameter="{Binding}"
                                 HorizontalAlignment="Stretch"
                                 VerticalContentAlignment="Center"
                                 Padding="0"

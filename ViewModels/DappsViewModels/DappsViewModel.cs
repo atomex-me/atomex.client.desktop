@@ -158,7 +158,43 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
                     Peer = peer,
                     PermissionInfo = BeaconWalletClient.PermissionInfoRepository
                         .TryReadBySenderIdAsync(peer.SenderId).Result,
-                    OnDisconnect = p => BeaconWalletClient.RemovePeerAsync(p.SenderId)
+                    OnDisconnect = disconnectPeer =>
+                    {
+                        var disconnectViewModel = new DisconnectViewModel
+                        {
+                            DappName = disconnectPeer.Name,
+                            OnDisconnect = async () => await BeaconWalletClient.RemovePeerAsync(disconnectPeer.SenderId)
+                        };
+
+                        App.DialogService.Show(disconnectViewModel);
+                    },
+                    OnDappClick = clickedPeer =>
+                    {
+                        var permissionInfo = BeaconWalletClient.PermissionInfoRepository
+                            .TryReadBySenderIdAsync(clickedPeer.SenderId).Result;
+                        if (permissionInfo == null) return;
+
+                        var showDappViewModel = new ShowDappViewModel
+                        {
+                            DappName = clickedPeer.Name,
+                            DappId = clickedPeer.SenderId,
+                            Address = clickedPeer.ConnectedAddress,
+                            Permissions = permissionInfo.Scopes,
+                            OnDisconnect = () =>
+                            {
+                                var disconnectViewModel = new DisconnectViewModel
+                                {
+                                    DappName = clickedPeer.Name,
+                                    OnDisconnect = async () =>
+                                        await BeaconWalletClient.RemovePeerAsync(clickedPeer.SenderId)
+                                };
+
+                                App.DialogService.Show(disconnectViewModel);
+                            }
+                        };
+
+                        App.DialogService.Show(showDappViewModel);
+                    }
                 }));
         }
 
@@ -363,7 +399,7 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
                         // data is not in HEX format
                         dataToSign = Encoding.UTF8.GetBytes(signRequest.Payload);
                     }
-                    
+
                     var permissionInfo =
                         await BeaconWalletClient.PermissionInfoRepository.TryReadBySenderIdAsync(message.SenderId);
 

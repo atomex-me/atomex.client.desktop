@@ -2,14 +2,14 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:controls="clr-namespace:Atomex.Client.Desktop.Controls"
-             mc:Ignorable="d" d:DesignWidth="700" d:DesignHeight="520"
-             x:Class="Atomex.Client.Desktop.Views.DappsViews.PermissionRequestView"
+             mc:Ignorable="d" d:DesignWidth="700" d:DesignHeight="550"
+             x:Class="Atomex.Client.Desktop.Views.DappsViews.ShowDappView"
              xmlns:vm="clr-namespace:Atomex.Client.Desktop.ViewModels.DappsViewModels"
+             xmlns:controls="clr-namespace:Atomex.Client.Desktop.Controls"
+             xmlns:svg="clr-namespace:Avalonia.Svg.Skia;assembly=Avalonia.Svg.Skia"
              Width="700">
-
     <Design.DataContext>
-        <vm:PermissionRequestViewModel />
+        <vm:ShowDappViewModel />
     </Design.DataContext>
 
     <Border Classes="ChildViewBorder"
@@ -21,7 +21,7 @@
                            FontSize="22"
                            HorizontalAlignment="Center"
                            VerticalAlignment="Center"
-                           Text="Connection Request" />
+                           Text="{Binding DappName}" />
                 <Border Grid.Row="1"
                         Height="1"
                         Background="{DynamicResource LightDefaultOpacity10}" />
@@ -30,15 +30,15 @@
             <Grid ColumnDefinitions="130,*,130">
                 <StackPanel Grid.Column="1">
                     <TextBlock Margin="0 32 0 0"
-                               Foreground="{DynamicResource DefaultForegroundBrush}"
+                               Foreground="{DynamicResource SecondaryForegroundBrush}"
                                FontSize="16"
                                LineHeight="24"
                                TextWrapping="Wrap"
                                HorizontalAlignment="Left"
-                               Text="{Binding SubTitle}" />
+                               Text="Permissions" />
                     <ListBox Items="{Binding PermissionStrings}"
-                             Background="Transparent"
-                             Margin="0 20 0 0">
+                             Margin="0 8 0 0"
+                             Background="Transparent">
                         <ListBox.Styles>
                             <Style Selector="ListBoxItem">
                                 <Setter Property="Padding" Value="0 0 0 6" />
@@ -68,7 +68,7 @@
                                Margin="0 28 0 0"
                                FontSize="16"
                                LineHeight="24"
-                               Text="Address to connect" />
+                               Text="Connected to address" />
                     <TextBox FontSize="16"
                              Margin="0 8 0 0"
                              Text="{Binding Address}"
@@ -76,24 +76,28 @@
                              Classes="AtomexTextBox" />
 
                     <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
-                               Margin="0 32 0 0"
-                               FontSize="13"
-                               LineHeight="16"
-                               HorizontalAlignment="Center"
-                               Text="Only connect to websites you trust." />
+                               Margin="0 16 0 0"
+                               FontSize="16"
+                               LineHeight="24"
+                               Text="Dapp IP" />
+                    <TextBox FontSize="16"
+                             Margin="0 8 0 0"
+                             Text="{Binding DappId}"
+                             IsReadOnly="True"
+                             Classes="AtomexTextBox" />
 
-                    <Grid ColumnDefinitions="*,16,*"
-                          Margin="0 16 0 0">
-                        <controls:RoundedButton Grid.Column="0"
-                                                Classes="GrayButton"
-                                                Content="Reject"
-                                                Command="{Binding OnRejectCommand}"
-                                                Classes.Loading="{Binding IsRejecting}" />
-                        <controls:RoundedButton Grid.Column="2"
-                                                Content="Allow"
-                                                Command="{Binding OnAllowCommand}"
-                                                Classes.Loading="{Binding IsSending}" />
-                    </Grid>
+                    <controls:RoundedButton Margin="0 32 0 0"
+                                            Classes="GrayButton"
+                                            Command="{Binding OnDisconnectCommand}">
+                        <StackPanel Orientation="Horizontal">
+                            <svg:Svg Width="22"
+                                     Path="/Resources/Icons/disconnect-white.svg" />
+                            <TextBlock Foreground="White"
+                                       Margin="10 0 0 0"
+                                       FontSize="18"
+                                       Text="Disconnect" />
+                        </StackPanel>
+                    </controls:RoundedButton>
                 </StackPanel>
             </Grid>
         </StackPanel>
