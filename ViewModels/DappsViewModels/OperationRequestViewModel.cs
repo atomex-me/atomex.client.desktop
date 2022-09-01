@@ -36,7 +36,7 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
         public OperationRequestViewModel(IAtomexApp app, TezosConfig tezosConfig)
         {
             AtomexApp = app ?? throw new ArgumentNullException(nameof(app));
-            TezosConfig = tezosConfig ?? throw new ArgumentNullException(nameof(tezosConfig));
+            //TezosConfig = tezosConfig ?? throw new ArgumentNullException(nameof(tezosConfig));
 
             OnConfirmCommand
                 .IsExecuting
