@@ -254,6 +254,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         public ReactiveCommand<Unit, Unit> ConnectDappCommand =>
             _connectDappCommand ??= ReactiveCommand.Create(() =>
             {
+                DappsViewModel.CreateAddresses();
                 App.DialogService.Show(DappsViewModel.SelectAddressViewModel);
             });
 

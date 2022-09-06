@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.0.32112.3
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31424.327
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Atomex.Client.Desktop", "Atomex.Client.Desktop.csproj", "{C1323E2C-7DE2-4D2B-A5FF-72590F809842}"
 EndProject
@@ -31,9 +31,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Atomex.MarketData", "atomex
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Atomex.Core", "Atomex.Core", "{6165844F-33D3-433A-91B8-62481908D2C7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Beacon.Sdk", "..\beacon-dotnet-sdk\Beacon.Sdk\Beacon.Sdk.csproj", "{00D49D30-4373-4A8A-A3A8-9481F110A7F9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Beacon.Sdk", "..\beacon-dotnet-sdk\Beacon.Sdk\Beacon.Sdk.csproj", "{00D49D30-4373-4A8A-A3A8-9481F110A7F9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Matrix.Sdk", "..\matrix-dotnet-sdk\Matrix.Sdk\Matrix.Sdk.csproj", "{973E3C65-B305-4DB3-AE78-7694E7F38A92}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Matrix.Sdk", "..\matrix-dotnet-sdk\Matrix.Sdk\Matrix.Sdk.csproj", "{973E3C65-B305-4DB3-AE78-7694E7F38A92}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -200,10 +200,28 @@ Global
 		{6A38B71F-6E88-4A2B-BF1B-B39E7565BAB6}.Release|x86.Build.0 = Release|Any CPU
 		{00D49D30-4373-4A8A-A3A8-9481F110A7F9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{00D49D30-4373-4A8A-A3A8-9481F110A7F9}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A55B7C8E-1E34-400C-8362-7A9F12EC03A2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A55B7C8E-1E34-400C-8362-7A9F12EC03A2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{00D49D30-4373-4A8A-A3A8-9481F110A7F9}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{00D49D30-4373-4A8A-A3A8-9481F110A7F9}.Debug|x64.Build.0 = Debug|Any CPU
+		{00D49D30-4373-4A8A-A3A8-9481F110A7F9}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{00D49D30-4373-4A8A-A3A8-9481F110A7F9}.Debug|x86.Build.0 = Debug|Any CPU
+		{00D49D30-4373-4A8A-A3A8-9481F110A7F9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{00D49D30-4373-4A8A-A3A8-9481F110A7F9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{00D49D30-4373-4A8A-A3A8-9481F110A7F9}.Release|x64.ActiveCfg = Release|Any CPU
+		{00D49D30-4373-4A8A-A3A8-9481F110A7F9}.Release|x64.Build.0 = Release|Any CPU
+		{00D49D30-4373-4A8A-A3A8-9481F110A7F9}.Release|x86.ActiveCfg = Release|Any CPU
+		{00D49D30-4373-4A8A-A3A8-9481F110A7F9}.Release|x86.Build.0 = Release|Any CPU
 		{973E3C65-B305-4DB3-AE78-7694E7F38A92}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{973E3C65-B305-4DB3-AE78-7694E7F38A92}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{973E3C65-B305-4DB3-AE78-7694E7F38A92}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{973E3C65-B305-4DB3-AE78-7694E7F38A92}.Debug|x64.Build.0 = Debug|Any CPU
+		{973E3C65-B305-4DB3-AE78-7694E7F38A92}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{973E3C65-B305-4DB3-AE78-7694E7F38A92}.Debug|x86.Build.0 = Debug|Any CPU
+		{973E3C65-B305-4DB3-AE78-7694E7F38A92}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{973E3C65-B305-4DB3-AE78-7694E7F38A92}.Release|Any CPU.Build.0 = Release|Any CPU
+		{973E3C65-B305-4DB3-AE78-7694E7F38A92}.Release|x64.ActiveCfg = Release|Any CPU
+		{973E3C65-B305-4DB3-AE78-7694E7F38A92}.Release|x64.Build.0 = Release|Any CPU
+		{973E3C65-B305-4DB3-AE78-7694E7F38A92}.Release|x86.ActiveCfg = Release|Any CPU
+		{973E3C65-B305-4DB3-AE78-7694E7F38A92}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

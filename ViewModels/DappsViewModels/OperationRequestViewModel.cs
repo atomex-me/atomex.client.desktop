@@ -1,49 +1,105 @@
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
-using Atomex.Blockchain.Tezos;
 using Atomex.Client.Desktop.Common;
 using Atomex.MarketData.Abstract;
 using Avalonia.Controls;
 using Netezos.Forging.Models;
+using Newtonsoft.Json;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using Serilog;
 
 namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
 {
-    public class TransactionContentViewModel : ViewModelBase
+    public abstract class BaseBeaconOperationViewModel : ViewModelBase, IDisposable
     {
         public int Id { get; set; }
-        public TransactionContent Operation { get; set; }
+        protected static string BaseCurrencyCode => "USD";
+        public string BaseCurrencyFormat => "$0.##";
+        [Reactive] public IQuotesProvider? QuotesProvider { get; set; }
+        [Reactive] public bool IsDetailsOpened { get; set; }
 
+        protected BaseBeaconOperationViewModel()
+        {
+            this.WhenAnyValue(vm => vm.QuotesProvider)
+                .WhereNotNull()
+                .Take(1)
+                .SubscribeInMainThread(quotesProvider =>
+                {
+                    quotesProvider.QuotesUpdated += OnQuotesUpdatedEventHandler;
+                    OnQuotesUpdatedEventHandler(quotesProvider, EventArgs.Empty);
+                });
+        }
+
+        protected abstract void OnQuotesUpdatedEventHandler(object? sender, EventArgs args);
+
+        private ReactiveCommand<Unit, Unit>? _onOpenDetailsCommand;
+
+        public ReactiveCommand<Unit, Unit> OnOpenDetailsCommand =>
+            _onOpenDetailsCommand ??= ReactiveCommand.Create(() => { IsDetailsOpened = !IsDetailsOpened; });
+
+        public void Dispose()
+        {
+            if (QuotesProvider != null)
+                QuotesProvider.QuotesUpdated -= OnQuotesUpdatedEventHandler;
+        }
+    }
+
+    public class TransactionContentViewModel : BaseBeaconOperationViewModel
+    {
+        public TransactionContent Operation { get; set; }
+        public string JsonStringOperation => JsonConvert.SerializeObject(Operation, Formatting.Indented);
+        public decimal AmountInTez => TezosConfig.MtzToTz(Convert.ToDecimal(Operation.Amount));
+        public decimal FeeInTez => TezosConfig.MtzToTz(Convert.ToDecimal(Operation.Fee));
         [Reactive] public decimal AmountInBase { get; set; }
         [Reactive] public decimal FeeInBase { get; set; }
+
+        protected override void OnQuotesUpdatedEventHandler(object? sender, EventArgs args)
+        {
+            if (sender is not IQuotesProvider quotesProvider)
+                return;
+
+            var xtzQuote = quotesProvider.GetQuote(TezosConfig.Xtz, BaseCurrencyCode);
+            AmountInBase = AmountInTez.SafeMultiply(xtzQuote?.Bid ?? 0);
+            FeeInBase = FeeInTez.SafeMultiply(xtzQuote?.Bid ?? 0);
+            Log.Debug("Quotes updated for beacon TransactionContent operation {Id}", Id);
+        }
+    }
+
+    public class RevealContentViewModel : BaseBeaconOperationViewModel
+    {
+        public RevealContent Operation { get; set; }
+        public decimal FeeInTz => TezosConfig.MtzToTz(Convert.ToDecimal(Operation.Fee));
+        [Reactive] public decimal FeeInBase { get; set; }
+
+        protected override void OnQuotesUpdatedEventHandler(object? sender, EventArgs args)
+        {
+            if (sender is not IQuotesProvider quotesProvider)
+                return;
+
+            var xtzQuote = quotesProvider.GetQuote(TezosConfig.Xtz, BaseCurrencyCode);
+            FeeInBase = FeeInTz.SafeMultiply(xtzQuote?.Bid ?? 0);
+            Log.Debug("Quotes updated for beacon RevealContent operation {Id}", Id);
+        }
     }
 
     public class OperationRequestViewModel : ViewModelBase, IDisposable
     {
-        private IAtomexApp AtomexApp { get; }
-        private TezosConfig TezosConfig { get; }
-        private string BaseCurrencyCode => "USD";
-        public string BaseCurrencyFormat => "$0.##";
         public string DappName { get; set; }
         public string SubTitle => $"{DappName} is asking to confirm the following transactions:";
         public string? DappLogo { get; set; }
 
-        [Reactive] public IEnumerable<TransactionContentViewModel> Operations { get; set; }
+        [Reactive] public IEnumerable<BaseBeaconOperationViewModel> Operations { get; set; }
         [Reactive] public decimal AmountInBase { get; set; }
         [Reactive] public decimal FeeInBase { get; set; }
         [ObservableAsProperty] public bool IsSending { get; }
         [ObservableAsProperty] public bool IsRejecting { get; }
 
-        public OperationRequestViewModel(IAtomexApp app, TezosConfig tezosConfig)
+        public OperationRequestViewModel()
         {
-            AtomexApp = app ?? throw new ArgumentNullException(nameof(app));
-
             OnConfirmCommand
                 .IsExecuting
                 .ToPropertyExInMainThread(this, vm => vm.IsSending);
@@ -52,27 +108,10 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
                 .IsExecuting
                 .ToPropertyExInMainThread(this, vm => vm.IsRejecting);
 
-            AtomexApp.QuotesProvider.QuotesUpdated += OnQuotesUpdatedEventHandler;
-
-            this.WhenAnyValue(vm => vm.Operations)
-                .WhereNotNull()
-                .Take(1)
-                .SubscribeInMainThread(_ => OnQuotesUpdatedEventHandler(AtomexApp.QuotesProvider, EventArgs.Empty));
 #if DEBUG
             if (Design.IsDesignMode)
                 DesignerMode();
 #endif
-        }
-
-
-        private void OnQuotesUpdatedEventHandler(object? sender, EventArgs e)
-        {
-            if (sender is not IQuotesProvider quotesProvider)
-                return;
-
-            var quote = quotesProvider.GetQuote(TezosConfig.Xtz, BaseCurrencyCode);
-            // AmountInBase = Amount.SafeMultiply(quote?.Bid ?? 0);
-            // FeeInBase = Transaction.Fee.SafeMultiply(quote?.Bid ?? 0);
         }
 
         public Func<Task> OnConfirm { get; set; }
@@ -104,7 +143,10 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
 
         public void Dispose()
         {
-            AtomexApp.QuotesProvider.QuotesUpdated -= OnQuotesUpdatedEventHandler;
+            foreach (var operation in Operations)
+            {
+                operation.Dispose();
+            }
         }
 
 #if DEBUG

@@ -26,7 +26,7 @@
                         Height="1"
                         Background="{DynamicResource LightDefaultOpacity10}" />
             </Grid>
-
+        
             <Grid ColumnDefinitions="130,*,130">
                 <StackPanel Grid.Column="1">
                     <TextBlock Margin="0 32 0 0"
@@ -63,7 +63,7 @@
                             </DataTemplate>
                         </ListBox.ItemTemplate>
                     </ListBox>
-
+        
                     <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
                                Margin="0 28 0 0"
                                FontSize="16"
@@ -74,14 +74,14 @@
                              Text="{Binding Address}"
                              IsReadOnly="True"
                              Classes="AtomexTextBox" />
-
+        
                     <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
                                Margin="0 32 0 0"
                                FontSize="13"
                                LineHeight="16"
                                HorizontalAlignment="Center"
                                Text="Only connect to websites you trust." />
-
+        
                     <Grid ColumnDefinitions="*,16,*"
                           Margin="0 16 0 0">
                         <controls:RoundedButton Grid.Column="0"

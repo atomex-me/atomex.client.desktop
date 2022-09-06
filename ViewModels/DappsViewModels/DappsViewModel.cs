@@ -90,9 +90,9 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
         private ServiceProvider BeaconServicesProvider;
 
         [Reactive] public ObservableCollection<DappViewModel> Dapps { get; set; }
-        public TezosConfig Tezos { get; set; }
-        public SelectAddressViewModel SelectAddressViewModel { get; set; }
-        public ConnectDappViewModel ConnectDappViewModel { get; set; }
+        public SelectAddressViewModel SelectAddressViewModel { get; private set; }
+        private TezosConfig Tezos { get; }
+        private ConnectDappViewModel ConnectDappViewModel { get; }
 
         public DappsViewModel()
         {
@@ -118,19 +118,9 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
             AtomexApp.AtomexClientChanged += OnAtomexClientChangedEventHandler;
             Tezos = (TezosConfig)AtomexApp.Account.Currencies.GetByName(TezosConfig.Xtz);
 
-            SelectAddressViewModel = new SelectAddressViewModel(AtomexApp.Account, Tezos, SelectAddressMode.Connect)
-            {
-                BackAction = () => { App.DialogService.Close(); },
-                ConfirmAction = walletAddressViewModel =>
-                {
-                    ConnectDappViewModel!.AddressToConnect = walletAddressViewModel.Address;
-                    App.DialogService.Show(ConnectDappViewModel);
-                }
-            };
-
             ConnectDappViewModel = new ConnectDappViewModel
             {
-                OnBack = () => App.DialogService.Show(SelectAddressViewModel),
+                OnBack = () => App.DialogService.Show(SelectAddressViewModel!),
                 OnConnect = Connect
             };
 
@@ -147,6 +137,19 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
                 Log.Debug("{@Sender}: WalletClient connected {@Connected}", "Beacon", BeaconWalletClient.Connected);
                 Log.Debug("{@Sender}: WalletClient logged in {@LoggedIn}", "Beacon", BeaconWalletClient.LoggedIn);
             });
+        }
+
+        public void CreateAddresses()
+        {
+            SelectAddressViewModel = new SelectAddressViewModel(AtomexApp.Account, Tezos, SelectAddressMode.Connect)
+            {
+                BackAction = () => { App.DialogService.Close(); },
+                ConfirmAction = walletAddressViewModel =>
+                {
+                    ConnectDappViewModel.AddressToConnect = walletAddressViewModel.Address;
+                    App.DialogService.Show(ConnectDappViewModel);
+                }
+            };
         }
 
         private void OnDappsListChanged(object? sender, DappConnectedEventArgs e)
@@ -262,10 +265,10 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
                     if (permissionRequest.Network.Type == NetworkType.mainnet &&
                         AtomexApp.Account.Network != Network.MainNet)
                     {
-                        // todo: change response Error type;
                         await BeaconWalletClient.SendResponseAsync(
                             receiverId: e.SenderId,
-                            response: new BeaconAbortedError(permissionRequest.Id, BeaconWalletClient.SenderId));
+                            response: new NetworkNotSupportedBeaconError(permissionRequest.Id,
+                                BeaconWalletClient.SenderId));
                         return;
                     }
 
@@ -324,10 +327,7 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
                         }
                     };
 
-                    await Dispatcher.UIThread.InvokeAsync(() =>
-                    {
-                        App.DialogService.Show(permissionRequestViewModel);
-                    });
+                    App.DialogService.Show(permissionRequestViewModel);
                     break;
                 }
                 case BeaconMessageType.operation_request:
@@ -360,15 +360,12 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
                         .ConfigureAwait(false);
 
                     var revealed = managerKey.Value<string>() != null;
-                    var usedCounters = operationRequest.OperationDetails.Count + (revealed ? 0 : 1);
 
-                    var counter = await TezosCounter.Instance
-                        .GetOfflineCounterAsync(
-                            address: connectedWalletAddress.Address,
-                            head: head["hash"]!.ToString(),
-                            rpcNodeUri: Tezos.RpcNodeUri,
-                            numberOfCounters: usedCounters)
+                    var account = await rpc
+                        .GetAccountForBlock(head["hash"]!.ToString(), connectedWalletAddress.Address)
                         .ConfigureAwait(false);
+
+                    var counter = int.Parse(account["counter"].ToString());
 
                     var operations = new List<ManagerOperationContent>();
 
@@ -376,7 +373,7 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
                     {
                         operations.Add(new RevealContent
                         {
-                            Counter = counter++,
+                            Counter = ++counter,
                             Fee = 0,
                             GasLimit = 1_000_000,
                             Source = connectedWalletAddress.Address,
@@ -395,9 +392,9 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
                             Source = connectedWalletAddress.Address,
                             Destination = o.Destination,
                             Amount = amount,
-                            Counter = counter++,
+                            Counter = ++counter,
                             Fee = 0,
-                            GasLimit = 1_000_000,
+                            GasLimit = 500_000,
                             StorageLimit = 5000,
                             Parameters = new Parameters
                             {
@@ -419,8 +416,10 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
                     {
                         await BeaconWalletClient.SendResponseAsync(
                             receiverId: e.SenderId,
-                            response: new TransactionInvalidBeaconError(operationRequest.Id, BeaconWalletClient.SenderId));
+                            response: new TransactionInvalidBeaconError(operationRequest.Id,
+                                BeaconWalletClient.SenderId));
 
+                        Log.Error("{@Sender}: error during AutoFill transaction, {@Msg}", "Beacon", error.Description);
                         return;
                     }
 
@@ -428,11 +427,39 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
                         operations: operations,
                         branch: head["hash"]!.ToString());
 
-                    var operationRequestViewModel = new OperationRequestViewModel(AtomexApp, Tezos)
+                    var operationsViewModel = new ObservableCollection<BaseBeaconOperationViewModel>();
+
+                    foreach (var item in operations.Select((value, idx) => new { idx, value }))
+                    {
+                        var operation = item.value;
+                        var index = item.idx;
+
+                        switch (operation)
+                        {
+                            case TransactionContent transactionOperation:
+                                operationsViewModel.Add(new TransactionContentViewModel
+                                {
+                                    Id = index + 1,
+                                    Operation = transactionOperation,
+                                    QuotesProvider = AtomexApp.QuotesProvider,
+                                });
+                                break;
+                            case RevealContent revealOperation:
+                                operationsViewModel.Add(new RevealContentViewModel
+                                {
+                                    Id = index + 1,
+                                    Operation = revealOperation,
+                                    QuotesProvider = AtomexApp.QuotesProvider,
+                                });
+                                break;
+                        }
+                    }
+
+                    var operationRequestViewModel = new OperationRequestViewModel
                     {
                         DappName = peer.Name,
                         DappLogo = permissionInfo.AppMetadata.Icon,
-                        Operations = operations,
+                        Operations = operationsViewModel,
                         OnReject = async () =>
                         {
                             await BeaconWalletClient.SendResponseAsync(
@@ -466,7 +493,8 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
 
                                 await BeaconWalletClient.SendResponseAsync(
                                     receiverId: e.SenderId,
-                                    response: new TransactionInvalidBeaconError(operationRequest.Id, BeaconWalletClient.SenderId));
+                                    response: new TransactionInvalidBeaconError(operationRequest.Id,
+                                        BeaconWalletClient.SenderId));
 
                                 return;
                             }
@@ -487,7 +515,8 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
 
                                 await BeaconWalletClient.SendResponseAsync(
                                     receiverId: e.SenderId,
-                                    response: new BroadcastBeaconError(operationRequest.Id, BeaconWalletClient.SenderId));
+                                    response: new BroadcastBeaconError(operationRequest.Id,
+                                        BeaconWalletClient.SenderId));
 
                                 return;
                             }
@@ -500,7 +529,7 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
                             await BeaconWalletClient.SendResponseAsync(
                                 receiverId: e.SenderId,
                                 response);
-                            
+
                             App.DialogService.Close();
                             Log.Information("{@Sender}: operation done with transaction hash: {@Hash}",
                                 "Beacon",
@@ -508,7 +537,7 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
                         }
                     };
 
-                    await Dispatcher.UIThread.InvokeAsync(() => { App.DialogService.Show(operationRequestViewModel); });
+                    App.DialogService.Show(operationRequestViewModel);
                     break;
                 }
                 case BeaconMessageType.sign_payload_request:
@@ -584,7 +613,7 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
                         }
                     };
 
-                    await Dispatcher.UIThread.InvokeAsync(() => { App.DialogService.Show(signatureRequestViewModel); });
+                    App.DialogService.Show(signatureRequestViewModel);
                     break;
                 }
                 case BeaconMessageType.broadcast_request:

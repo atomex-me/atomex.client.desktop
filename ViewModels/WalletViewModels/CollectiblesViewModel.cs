@@ -113,12 +113,12 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         {
             try
             {
-                if (args.IsTokenUpdate &&
-                    (args.TokenContract == null || (Contracts != null && Contracts.Select(c => c.Address)
-                        .Contains(args.TokenContract))))
+                if (args.IsTokenUpdate && (args.TokenContract == null || Contracts != null))
                 {
                     await Dispatcher.UIThread.InvokeAsync(async () => { await ReloadTokenContractsAsync(); },
                         DispatcherPriority.Background);
+                    
+                    Log.Debug("Tezos collectibles balance updated with contract {@Contract}", args.TokenContract);
                 }
             }
             catch (Exception e)
