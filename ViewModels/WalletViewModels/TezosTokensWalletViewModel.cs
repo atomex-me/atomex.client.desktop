@@ -326,7 +326,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                     tokenId: 0);
 
                 var tokenAddresses = await tokenAccount
-                    .DataRepository
+                    .LocalStorage
                     .GetTezosTokenAddressesByContractAsync(tokenContract.Contract.Address);
 
                 var tokenAddress = tokenAddresses.FirstOrDefault();
@@ -353,7 +353,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                 OnPropertyChanged(nameof(BalanceCurrencyCode));
 
                 Transactions = new ObservableCollection<TransactionViewModelBase>((await tokenAccount
-                        .DataRepository
+                        .LocalStorage
                         .GetTezosTokenTransfersAsync(tokenContract.Contract.Address, offset: 0, limit: int.MaxValue))
                     .Select(t => new TezosTokenTransferViewModel(t, tezosConfig))
                     .ToList()
