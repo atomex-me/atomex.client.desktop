@@ -6,10 +6,15 @@ using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+
+using Avalonia.Controls;
 using Avalonia.Threading;
 using NBitcoin;
 using ReactiveUI;
+using ReactiveUI.Fody.Helpers;
 using Serilog;
+using Network = NBitcoin.Network;
+
 using Atomex.Blockchain;
 using Atomex.Blockchain.BitcoinBased;
 using Atomex.Client.Desktop.Common;
@@ -20,10 +25,6 @@ using Atomex.Client.Desktop.ViewModels.TransactionViewModels;
 using Atomex.Common;
 using Atomex.Core;
 using Atomex.Wallet;
-using Avalonia.Controls;
-using ReactiveUI.Fody.Helpers;
-using Network = NBitcoin.Network;
-using Atomex.TezosTokens;
 
 namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 {
@@ -46,7 +47,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         public string Header { get; set; }
         public CurrencyConfig Currency => CurrencyViewModel.Currency;
 
-        protected CancellationTokenSource _cancellation { get; set; }
+        protected CancellationTokenSource _cancellation;
 
         public WalletViewModel()
         {
@@ -64,8 +65,8 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             CurrencyConfig? currency)
         {
             _app = app ?? throw new ArgumentNullException(nameof(app));
-            ShowRightPopupContent = showRightPopupContent ??
-                                    throw new ArgumentNullException(nameof(showRightPopupContent));
+            ShowRightPopupContent = showRightPopupContent
+                ?? throw new ArgumentNullException(nameof(showRightPopupContent));
             
             SetConversionTab = setConversionTab;
             SetWertCurrency = setWertCurrency;
@@ -149,7 +150,8 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         {
             try
             {
-                if (Currency.Name != args.Transaction.Currency) return;
+                if (Currency.Name != args.Transaction.Currency)
+                    return;
 
                 // update transactions list
                 await LoadTransactionsAsync();
@@ -202,6 +204,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             await LoadTransactionsSemaphore.WaitAsync();
 
             Log.Debug("LoadTransactionsAsync for {@currency}", Currency.Name);
+
             try
             {
                 if (_app.Account == null)
@@ -210,7 +213,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                 IsTransactionsLoading = true;
 
                 var transactions = (await _app.Account
-                        .GetTransactionsAsync(Currency.Name))
+                    .GetTransactionsAsync(Currency.Name))
                     .ToList();
 
                 await Dispatcher.UIThread.InvokeAsync(() =>
@@ -234,7 +237,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             }
             catch (OperationCanceledException)
             {
-                Log.Debug("LoadTransactionsAsync canceled.");
+                Log.Debug("LoadTransactionsAsync canceled");
             }
             catch (Exception e)
             {
@@ -351,6 +354,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                 if (!isRemoved) return;
 
                 ShowRightPopupContent?.Invoke(null);
+
                 await LoadTransactionsAsync();
             }
             catch (Exception e)

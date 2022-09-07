@@ -1,11 +1,13 @@
 using System;
-using System.Windows.Input;
-using Atomex.Wallet.Abstract;
-using Atomex.Client.Desktop.ViewModels.CreateWalletViewModels;
 using System.Collections.Generic;
+using System.Windows.Input;
+
 using Avalonia.Controls;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
+
+using Atomex.Wallet.Abstract;
+using Atomex.Client.Desktop.ViewModels.CreateWalletViewModels;
 
 namespace Atomex.Client.Desktop.ViewModels
 {
@@ -26,10 +28,11 @@ namespace Atomex.Client.Desktop.ViewModels
         private const int WriteDerivedKeyPasswordViewIndex = 6;
         private const int CreateStoragePasswordViewIndex = 7;
         
-        public event Action<IAccount> OnAccountCreated;
+        public event Action<IAccount, ILocalStorage> OnAccountCreated;
         public event Action OnCanceled;
-        private IAtomexApp App { get; }
-        private List<StepViewModel> ViewModels { get; }
+
+        private readonly IAtomexApp _app;
+        private readonly List<StepViewModel> _viewModels;
 
         private int[] CreateNewWalletViewIndexes { get; } =
         {
@@ -72,7 +75,7 @@ namespace Atomex.Client.Desktop.ViewModels
                     return;
 
                 CurrentViewIndex = ViewIndexes[_step];
-                ViewModels[CurrentViewIndex].Step = _step + 1;
+                _viewModels[CurrentViewIndex].Step = _step + 1;
 
                 NextText = _step < ViewIndexes.Length - 1
                     ? Properties.Resources.CwvNext
@@ -88,7 +91,7 @@ namespace Atomex.Client.Desktop.ViewModels
             set
             {
                 _currentViewIndex = value;
-                Content = ViewModels[_currentViewIndex];
+                Content = _viewModels[_currentViewIndex];
             }
         }
 
@@ -103,12 +106,12 @@ namespace Atomex.Client.Desktop.ViewModels
         public CreateWalletViewModel(
             IAtomexApp app,
             CreateWalletScenario scenario,
-            Action<IAccount>? onAccountCreated = null,
+            Action<IAccount, ILocalStorage>? onAccountCreated = null,
             Action? onCanceled = null)
         {
-            App = app ?? throw new ArgumentNullException(nameof(app));
+            _app = app ?? throw new ArgumentNullException(nameof(app));
 
-            ViewModels = new List<StepViewModel>
+            _viewModels = new List<StepViewModel>
             {
                 new WalletTypeViewModel(),
                 new WalletNameViewModel(),
@@ -117,7 +120,7 @@ namespace Atomex.Client.Desktop.ViewModels
                 new ConfirmMnemonicViewModel(),
                 new CreateDerivedKeyPasswordViewModel(),
                 new WriteDerivedKeyPasswordViewModel(),
-                new CreateStoragePasswordViewModel(App)
+                new CreateStoragePasswordViewModel(_app)
             };
 
             InProgress = false;
@@ -132,7 +135,7 @@ namespace Atomex.Client.Desktop.ViewModels
 
             foreach (var viewIndex in ViewIndexes)
             {
-                var viewModel = ViewModels[viewIndex];
+                var viewModel = _viewModels[viewIndex];
 
                 viewModel.OnBack += arg =>
                 {
@@ -148,12 +151,14 @@ namespace Atomex.Client.Desktop.ViewModels
                 {
                     if (Step == ViewIndexes.Length - 1)
                     {
-                        OnAccountCreated?.Invoke((IAccount)arg);
+                        var (account, localStorage) = ((IAccount, ILocalStorage))arg;
+
+                        OnAccountCreated?.Invoke(account, localStorage);
                         return;
                     }
 
                     Step++;
-                    ViewModels[CurrentViewIndex].Initialize(arg);
+                    _viewModels[CurrentViewIndex].Initialize(arg);
                 };
                 viewModel.ProgressBarShow += () => { InProgress = true; };
                 viewModel.ProgressBarHide += () => { InProgress = false; };
@@ -170,13 +175,13 @@ namespace Atomex.Client.Desktop.ViewModels
         private ICommand? _backCommand;
 
         public ICommand BackCommand =>
-            _backCommand ??= ReactiveCommand.Create(() => { ViewModels[CurrentViewIndex].Back(); });
+            _backCommand ??= ReactiveCommand.Create(() => { _viewModels[CurrentViewIndex].Back(); });
 
 
         private ICommand? _nextCommand;
 
         public ICommand NextCommand =>
-            _nextCommand ??= ReactiveCommand.Create(() => { ViewModels[CurrentViewIndex].Next(); });
+            _nextCommand ??= ReactiveCommand.Create(() => { _viewModels[CurrentViewIndex].Next(); });
 
         private int[] ResolveViewIndexes(CreateWalletScenario scenario)
         {

@@ -287,14 +287,18 @@ namespace Atomex.Client.Desktop.ViewModels.ConversionViewModels
                                     fromOutputIndex: 0u,
                                     amount: Money.Satoshis(1234567),
                                     scriptPubKey: BitcoinAddress.Create("muRDku2ZwNTz2msCZCHSUhDD5o6NxGsoXM", Network.TestNet).ScriptPubKey),
-                                spentTxPoint: null),
+                                confirmations: 10,
+                                spentTxPoint: null,
+                                spentTxConfirmations: 0),
                             new BitcoinBasedTxOutput(
                                 coin: new Coin(
                                     fromTxHash: new uint256("d70fa62762775362e767737e56cab7e8a094eafa8f96b935530d6450be1cfbce"),
                                     fromOutputIndex: 0u,
                                     amount: Money.Satoshis(100120000),
                                     scriptPubKey: BitcoinAddress.Create("mg8DcFTnNAJRHEZ248nVjeJuEjTsHn4vrZ", Network.TestNet).ScriptPubKey),
-                                spentTxPoint: null)
+                                confirmations: 5,
+                                spentTxPoint: null,
+                                spentTxConfirmations: 0)
                         };
 
                         return new SelectCurrencyWithOutputsViewModelItem(

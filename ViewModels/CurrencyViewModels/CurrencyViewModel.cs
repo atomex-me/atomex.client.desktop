@@ -75,7 +75,7 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
             await Dispatcher.UIThread.InvokeAsync(() =>
             {
                 TotalAmount = balance.Confirmed;
-                AvailableAmount = balance.Available;
+                AvailableAmount = balance.Confirmed; // todo: use unconfirmed income for Bitcoin based currencies?
                 UnconfirmedAmount = balance.UnconfirmedIncome + balance.UnconfirmedOutcome;
 
                 UpdateQuotesInBaseCurrency(QuotesProvider);

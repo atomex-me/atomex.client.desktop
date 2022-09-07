@@ -48,7 +48,6 @@ namespace Atomex.Client.Desktop.ViewModels
         private IAtomexApp AtomexApp { get; }
 
         private bool _hasWallets;
-
         public bool HasWallets
         {
             get => _hasWallets;
@@ -56,14 +55,12 @@ namespace Atomex.Client.Desktop.ViewModels
         }
 
         private ICommand _myWalletsCommand;
-
         public ICommand MyWalletsCommand => _myWalletsCommand ??= ReactiveCommand.Create(() =>
         {
             ShowContent?.Invoke(new MyWalletsViewModel(AtomexApp, ShowContent));
         });
 
         private ICommand _createNewCommand;
-
         public ICommand CreateNewCommand => _createNewCommand ??=
             ReactiveCommand.Create(() =>
             {
@@ -75,7 +72,6 @@ namespace Atomex.Client.Desktop.ViewModels
             });
 
         private ICommand _restoreByMnemonicCommand;
-
         public ICommand RestoreByMnemonicCommand => _restoreByMnemonicCommand ??= ReactiveCommand.Create(() =>
         {
             ShowContent?.Invoke(new CreateWalletViewModel(
@@ -105,7 +101,7 @@ namespace Atomex.Client.Desktop.ViewModels
             ShowStart();
         }
 
-        private void OnAccountCreated(IAccount account)
+        private void OnAccountCreated(IAccount account, ILocalStorage localStorage)
         {
             var atomexClient = new WebSocketAtomexClientLegacy(
                 exchangeUrl: App.Configuration[$"Services:{account!.Network}:Exchange:Url"],
@@ -113,10 +109,10 @@ namespace Atomex.Client.Desktop.ViewModels
                 clientType: PlatformHelper.GetClientType(),
                 authMessageSigner: account.DefaultAuthMessageSigner());
 
-            AtomexApp.ChangeAtomexClient(atomexClient, account, restart: true);
+            AtomexApp.ChangeAtomexClient(atomexClient, account, localStorage, restart: true);
         }
         
-        private void OnAccountRestored(IAccount account)
+        private void OnAccountRestored(IAccount account, ILocalStorage localStorage)
         {
             var atomexClient = new WebSocketAtomexClientLegacy(
                 exchangeUrl: App.Configuration[$"Services:{account!.Network}:Exchange:Url"],
@@ -126,7 +122,7 @@ namespace Atomex.Client.Desktop.ViewModels
 
             MainWindowVM.AccountRestored = true;
 
-            AtomexApp.ChangeAtomexClient(atomexClient, account, restart: true);
+            AtomexApp.ChangeAtomexClient(atomexClient, account, localStorage, restart: true);
         }
 
         private void DesignerMode()

@@ -277,10 +277,7 @@ namespace Atomex.Client.Desktop.ViewModels
                 walletName: accountName,
                 unlockAction: password =>
                 {
-                    var _ = Account.LoadFromFile(
-                        pathToAccount: pathToAccount,
-                        password: password,
-                        currenciesProvider: _app.CurrenciesProvider);
+                    var _ = HdWallet.LoadFromFile(pathToAccount, password);
                 },
                 goBack: async () => await SignOut(),
                 onUnlock: async () =>

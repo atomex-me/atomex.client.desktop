@@ -171,23 +171,23 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                         .GetBaker(@delegate, _app.Account.Network)
                         .ConfigureAwait(false) ?? new BakerData { Address = @delegate };
 
-                    var account = await tzktApi.GetAccountByAddressAsync(wa.Address);
+                    var account = await tzktApi.GetAccountAsync(wa.Address);
 
                     if (account.HasError)
                         continue;
 
                     var txCycle = _app.Account.Network == Network.MainNet
-                        ? Math.Floor((account.Value.DelegationLevel - 1) / 4096)
-                        : Math.Floor((account.Value.DelegationLevel - 1) / 2048);
+                        ? Math.Floor((account.Value.DelegationLevel - 1) / 4096m)
+                        : Math.Floor((account.Value.DelegationLevel - 1) / 2048m);
 
                     delegations.Add(new Delegation
                     {
-                        Baker = baker,
-                        Address = wa.Address,
-                        ExplorerUri = Tezos.BbUri,
-                        Balance = wa.Balance,
-                        DelegationTime = account.Value.DelegationTime,
-                        Status = currentCycle - txCycle < 2 ? DelegationStatus.Pending :
+                        Baker          = baker,
+                        Address        = wa.Address,
+                        ExplorerUri    = Tezos.BbUri,
+                        Balance        = wa.Balance,
+                        DelegationTime = DateTime.Parse(account.Value.DelegationTime),
+                        Status         = currentCycle - txCycle < 2 ? DelegationStatus.Pending :
                             currentCycle - txCycle < 7 ? DelegationStatus.Confirmed :
                             DelegationStatus.Active
                     });
@@ -200,7 +200,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
                 await Dispatcher.UIThread.InvokeAsync(() =>
                     {
-                        CanDelegate = balance.Available > 0;
+                        CanDelegate = balance.Confirmed > 0;
                         HasDelegations = delegations.Count > 0;
                         SortDelegations(delegations);
                     },

@@ -336,9 +336,10 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                                          c is Fa12Config fa12Config &&
                                          fa12Config.TokenContractAddress == tokenContract.Contract.Address);
 
-                Balance = tokenAccount
-                    .GetBalance()
-                    .Available;
+                Balance = (await tokenAccount
+                    .GetBalanceAsync()
+                    .ConfigureAwait(false))
+                    .Confirmed;
 
                 BalanceFormat = tokenAddress?.TokenBalance != null && tokenAddress.TokenBalance.Decimals != 0
                     ? $"F{Math.Min(tokenAddress.TokenBalance.Decimals, MaxAmountDecimals)}"

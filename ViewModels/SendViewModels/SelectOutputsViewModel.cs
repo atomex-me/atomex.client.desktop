@@ -275,7 +275,9 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                         fromOutputIndex: 123u,
                         amount: amount,
                         scriptPubKey: script),
-                    spentTxPoint: null),
+                    confirmations: 5,
+                    spentTxPoint: null,
+                    spentTxConfirmations: 0),
 
                 new BitcoinBasedTxOutput(
                     coin: new Coin(
@@ -283,7 +285,9 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                         fromOutputIndex: 0u,
                         amount: amount,
                         scriptPubKey: script),
-                    spentTxPoint: null)
+                    confirmations: 4,
+                    spentTxPoint: null,
+                    spentTxConfirmations: 0)
             };
 
             var btcCurrencyConfig = DesignTime.TestNetCurrencies
