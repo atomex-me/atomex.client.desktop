@@ -54,6 +54,12 @@ namespace Atomex.Client.Desktop.Services
         SwapRefundTemplate,
         SwapUnsettledTemplate
     }
+    
+    public enum BeaconOperationTemplate
+    {
+        BeaconTransactionTemplate,
+        BeaconRevealTemplate,
+    }
 
     public class TemplateService
     {
@@ -69,6 +75,7 @@ namespace Atomex.Client.Desktop.Services
             LoadTemplates(typeof(TxDetailsTemplate));
             LoadTemplates(typeof(SwapStateTemplate));
             LoadTemplates(typeof(TxDescriptionTemplate));
+            LoadTemplates(typeof(BeaconOperationTemplate));
         }
         
         public DataTemplate GetTxTypeTemplate(TxTypeTemplate templateType)
@@ -104,6 +111,13 @@ namespace Atomex.Client.Desktop.Services
             return Templates.TryGetValue(templateType.ToString(), out var template)
                 ? template
                 : Templates[TxDescriptionTemplate.BtcBasedDescriptionTemplate.ToString()];
+        }
+        
+        public DataTemplate GetBeaconOperationTemplate(BeaconOperationTemplate templateType)
+        {
+            return Templates.TryGetValue(templateType.ToString(), out var template)
+                ? template
+                : Templates[BeaconOperationTemplate.BeaconTransactionTemplate.ToString()];
         }
 
         private void LoadTemplates(Type enumType)

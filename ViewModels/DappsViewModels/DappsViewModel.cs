@@ -13,7 +13,6 @@ using Atomex.Client.Desktop.ViewModels.SendViewModels;
 using Atomex.Cryptography;
 using Atomex.Wallet;
 using Avalonia.Controls;
-using Avalonia.Threading;
 using Beacon.Sdk;
 using Beacon.Sdk.Beacon;
 using Beacon.Sdk.Beacon.Error;

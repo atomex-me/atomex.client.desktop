@@ -3,6 +3,7 @@
         xmlns:controls="clr-namespace:Atomex.Client.Desktop.Controls"
         xmlns:viewModels="clr-namespace:Atomex.Client.Desktop.ViewModels.TransactionViewModels"
         xmlns:views="clr-namespace:Atomex.Client.Desktop.Views.TransactionViews"
+        xmlns:dappsViews="clr-namespace:Atomex.Client.Desktop.Views.DappsViews"
         xmlns:svg="clr-namespace:Avalonia.Svg.Skia;assembly=Avalonia.Svg.Skia">
 
     <Styles.Resources>
@@ -177,6 +178,15 @@
                                Foreground="{DynamicResource SecondaryForegroundBrush}" />
                 </StackPanel>
             </StackPanel>
+        </DataTemplate>
+
+
+        <DataTemplate x:Key="BeaconTransactionTemplate">
+            <dappsViews:TransactionOperationView />
+        </DataTemplate>
+
+        <DataTemplate x:Key="BeaconRevealTemplate">
+            <dappsViews:RevealOperationView />
         </DataTemplate>
     </Styles.Resources>
 

@@ -19,7 +19,8 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
         public int Id { get; set; }
         protected static string BaseCurrencyCode => "USD";
         public string BaseCurrencyFormat => "$0.##";
-        [Reactive] public IQuotesProvider? QuotesProvider { get; set; }
+        public abstract string JsonStringOperation { get; }
+        [Reactive] public IQuotesProvider? QuotesProvider { get; init; }
         [Reactive] public bool IsDetailsOpened { get; set; }
 
         protected BaseBeaconOperationViewModel()
@@ -51,7 +52,7 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
     public class TransactionContentViewModel : BaseBeaconOperationViewModel
     {
         public TransactionContent Operation { get; set; }
-        public string JsonStringOperation => JsonConvert.SerializeObject(Operation, Formatting.Indented);
+        public override string JsonStringOperation => JsonConvert.SerializeObject(Operation, Formatting.Indented);
         public decimal AmountInTez => TezosConfig.MtzToTz(Convert.ToDecimal(Operation.Amount));
         public decimal FeeInTez => TezosConfig.MtzToTz(Convert.ToDecimal(Operation.Fee));
         [Reactive] public decimal AmountInBase { get; set; }
@@ -72,7 +73,8 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
     public class RevealContentViewModel : BaseBeaconOperationViewModel
     {
         public RevealContent Operation { get; set; }
-        public decimal FeeInTz => TezosConfig.MtzToTz(Convert.ToDecimal(Operation.Fee));
+        public override string JsonStringOperation => JsonConvert.SerializeObject(Operation, Formatting.Indented);
+        public decimal FeeInTez => TezosConfig.MtzToTz(Convert.ToDecimal(Operation.Fee));
         [Reactive] public decimal FeeInBase { get; set; }
 
         protected override void OnQuotesUpdatedEventHandler(object? sender, EventArgs args)
@@ -81,7 +83,7 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
                 return;
 
             var xtzQuote = quotesProvider.GetQuote(TezosConfig.Xtz, BaseCurrencyCode);
-            FeeInBase = FeeInTz.SafeMultiply(xtzQuote?.Bid ?? 0);
+            FeeInBase = FeeInTez.SafeMultiply(xtzQuote?.Bid ?? 0);
             Log.Debug("Quotes updated for beacon RevealContent operation {Id}", Id);
         }
     }
