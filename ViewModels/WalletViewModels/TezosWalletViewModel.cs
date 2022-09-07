@@ -6,9 +6,12 @@ using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+
 using Avalonia.Threading;
 using Serilog;
 using ReactiveUI;
+using ReactiveUI.Fody.Helpers;
+
 using Atomex.Blockchain.Tezos;
 using Atomex.Blockchain.Tezos.Internal;
 using Atomex.Blockchain.Tezos.Tzkt;
@@ -18,8 +21,6 @@ using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
 using Atomex.Core;
 using Atomex.Wallet;
 using Atomex.Wallet.Tezos;
-using ReactiveUI.Fody.Helpers;
-
 
 namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 {
@@ -102,11 +103,12 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             };
         }
 
-        protected override async void OnBalanceUpdatedEventHandler(object sender, CurrencyEventArgs args)
+        protected override async void OnBalanceChangedEventHandler(object sender, BalanceChangedEventArgs args)
         {
             try
             {
-                if (Currency.Name != args.Currency) return;
+                if (Currency.Name != args.Currency)
+                    return;
 
                 // update transactions list
                 await LoadTransactionsAsync();

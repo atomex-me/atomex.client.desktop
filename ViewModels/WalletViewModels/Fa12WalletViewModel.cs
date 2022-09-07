@@ -2,15 +2,17 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Serilog;
+
+using Avalonia.Controls;
 using Avalonia.Threading;
+using Serilog;
+
 using Atomex.Client.Desktop.ViewModels.TransactionViewModels;
 using Atomex.Common;
-using Atomex.TezosTokens;
 using Atomex.Core;
-using Atomex.Wallet.Tezos;
-using Avalonia.Controls;
+using Atomex.TezosTokens;
 using Atomex.Wallet;
+using Atomex.Wallet.Tezos;
 
 namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 {
@@ -37,17 +39,17 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
         protected override void SubscribeToServices()
         {
-            _app.Account.BalanceUpdated += OnBalanceUpdatedEventHandler;
+            _app.LocalStorage.BalanceChanged += OnBalanceChangedEventHandler;
         }
 
-        protected virtual async void OnBalanceUpdatedEventHandler(object sender, CurrencyEventArgs args)
+        protected override async void OnBalanceChangedEventHandler(object? sender, BalanceChangedEventArgs args)
         {
             try
             {
                 var tezosTokenConfig = (TezosTokenConfig)Currency;
 
-                if (!args.IsTokenUpdate ||
-                   args.TokenContract != null && (args.TokenContract != tezosTokenConfig.TokenContractAddress || args.TokenId != tezosTokenConfig.TokenId))
+                if (args is not TokenBalanceChangedEventArgs eventArgs ||
+                    eventArgs.TokenContract != null && (eventArgs.TokenContract != tezosTokenConfig.TokenContractAddress || eventArgs.TokenId != tezosTokenConfig.TokenId))
                 {
                     return;
                 }
@@ -74,10 +76,10 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                 IsTransactionsLoading = true;
 
                 var transactions = (await _app.Account
-                        .GetCurrencyAccount<Fa12Account>(Currency.Name)
-                        .LocalStorage
-                        .GetTezosTokenTransfersAsync(Currency.TokenContractAddress, offset: 0, limit: int.MaxValue)
-                        .ConfigureAwait(false))
+                    .GetCurrencyAccount<Fa12Account>(Currency.Name)
+                    .LocalStorage
+                    .GetTokenTransfersAsync(Currency.TokenContractAddress, offset: 0, limit: int.MaxValue)
+                    .ConfigureAwait(false))
                     .ToList();
 
                 await Dispatcher.UIThread.InvokeAsync(() =>

@@ -77,13 +77,14 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                 Header = CurrencyViewModel.Header;
                 
                 LoadAddresses();
+
                 _ = LoadTransactionsAsync();
             }
 
             this.WhenAnyValue(vm => vm.CurrentSortField, vm => vm.CurrentSortDirection)
                 .WhereAllNotNull()
                 .Where(_ => Transactions != null)
-                .SubscribeInMainThread(_ => { Transactions = SortTransactions(Transactions); });
+                .SubscribeInMainThread(_ => { Transactions = SortTransactions(Transactions!); });
 
             this.WhenAnyValue(vm => vm.SelectedTransaction)
                 .Skip(1)
@@ -126,11 +127,11 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
         protected virtual void SubscribeToServices()
         {
-            _app.Account.BalanceUpdated += OnBalanceUpdatedEventHandler;
-            _app.Account.UnconfirmedTransactionAdded += OnUnconfirmedTransactionAdded;
+            _app.LocalStorage.BalanceChanged += OnBalanceChangedEventHandler;
+            _app.LocalStorage.TransactionsChanged += OnTransactionsChangedEventHandler;
         }
 
-        protected virtual async void OnBalanceUpdatedEventHandler(object sender, CurrencyEventArgs args)
+        protected virtual async void OnBalanceChangedEventHandler(object? sender, BalanceChangedEventArgs args)
         {
             try
             {
@@ -146,11 +147,11 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             }
         }
 
-        private async void OnUnconfirmedTransactionAdded(object sender, TransactionEventArgs args)
+        private async void OnTransactionsChangedEventHandler(object? sender, TransactionsChangedEventArgs args)
         {
             try
             {
-                if (Currency.Name != args.Transaction.Currency)
+                if (Currency.Name != args.Currency)
                     return;
 
                 // update transactions list
@@ -195,7 +196,6 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                 _ => Transactions
             };
         }
-
 
         protected readonly SemaphoreSlim LoadTransactionsSemaphore = new(1, 1);
 
@@ -257,27 +257,22 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         public ReactiveCommand<Unit, Unit> ReceiveCommand => _receiveCommand ??= ReactiveCommand.Create(OnReceiveClick);
 
         private ReactiveCommand<Unit, Unit> _exchangeCommand;
-
         public ReactiveCommand<Unit, Unit> ExchangeCommand =>
             _exchangeCommand ??= ReactiveCommand.Create(OnConvertClick);
 
         private ReactiveCommand<Unit, Unit> _updateCommand;
-
         public ReactiveCommand<Unit, Unit> UpdateCommand =>
             _updateCommand ??= ReactiveCommand.CreateFromTask(OnUpdateClick);
 
         private ReactiveCommand<Unit, Unit> _cancelUpdateCommand;
-
         public ReactiveCommand<Unit, Unit> CancelUpdateCommand => _cancelUpdateCommand ??= ReactiveCommand.Create(
             () => _cancellation?.Cancel());
 
         private ReactiveCommand<Unit, Unit> _buyCommand;
-
         public ReactiveCommand<Unit, Unit> BuyCommand => _buyCommand ??= ReactiveCommand.Create(
             () => SetWertCurrency?.Invoke(CurrencyViewModel.Header));
 
         private ReactiveCommand<TxSortField, Unit> _setSortTypeCommand;
-
         public ReactiveCommand<TxSortField, Unit> SetSortTypeCommand =>
             _setSortTypeCommand ??= ReactiveCommand.Create<TxSortField>(sortField =>
             {
@@ -334,12 +329,12 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             }
         }
 
-        private void UpdateTransactionEventHandler(object sender, TransactionEventArgs args)
+        private void UpdateTransactionEventHandler(object? sender, TransactionEventArgs args)
         {
             // todo:
         }
 
-        private async void RemoveTransactionEventHandler(object sender, TransactionEventArgs args)
+        private async void RemoveTransactionEventHandler(object? sender, TransactionEventArgs args)
         {
             if (_app.Account == null)
                 return;
@@ -351,7 +346,8 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                 var isRemoved = await _app.Account
                     .RemoveTransactionAsync(txId);
 
-                if (!isRemoved) return;
+                if (!isRemoved)
+                    return;
 
                 ShowRightPopupContent?.Invoke(null);
 

@@ -1,24 +1,25 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
 using System.Globalization;
+using System.Linq;
 using System.Reactive;
 using System.Threading.Tasks;
-using Atomex.Blockchain.Tezos;
-using Serilog;
+
+using Avalonia.Controls;
 using ReactiveUI;
+using ReactiveUI.Fody.Helpers;
+using Serilog;
+
+using Atomex.Blockchain.Tezos;
 using Atomex.Blockchain.Tezos.Internal;
 using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.ViewModels.Abstract;
 using Atomex.Common;
 using Atomex.Core;
 using Atomex.Cryptography;
-using Atomex.ViewModels;
 using Atomex.Wallet;
 using Atomex.Wallet.Tezos;
-using Avalonia.Controls;
-using ReactiveUI.Fody.Helpers;
 
 namespace Atomex.Client.Desktop.ViewModels
 {
@@ -50,7 +51,7 @@ namespace Atomex.Client.Desktop.ViewModels
                 .ToPropertyExInMainThread(this, vm => vm.IsUpdating);
         }
 
-        private string KeyTypeToString(int keyType) =>
+        private static string KeyTypeToString(int keyType) =>
             keyType switch
             {
                 CurrencyConfig.StandardKey => "Standard",
@@ -59,7 +60,6 @@ namespace Atomex.Client.Desktop.ViewModels
             };
 
         private ReactiveCommand<Unit, Unit> _updateAddressCommand;
-
         public ReactiveCommand<Unit, Unit> UpdateAddressCommand => _updateAddressCommand ??=
             ReactiveCommand.CreateFromTask(async () =>
             {
@@ -68,17 +68,14 @@ namespace Atomex.Client.Desktop.ViewModels
             });
 
         private ReactiveCommand<Unit, Unit> _copyCommand;
-
         public ReactiveCommand<Unit, Unit> CopyCommand => _copyCommand ??= ReactiveCommand.Create(
             () => CopyToClipboard?.Invoke(Address));
 
         private ReactiveCommand<Unit, Unit> _openInExplorerCommand;
-
         public ReactiveCommand<Unit, Unit> OpenInExplorerCommand => _openInExplorerCommand ??= ReactiveCommand.Create(
             () => OpenInExplorer?.Invoke(Address));
 
         private ReactiveCommand<Unit, Unit> _exportKeyCommand;
-
         public ReactiveCommand<Unit, Unit> ExportKeyCommand => _exportKeyCommand ??= ReactiveCommand.Create(
             () => ExportKey?.Invoke(Address));
     }
@@ -126,7 +123,7 @@ namespace Atomex.Client.Desktop.ViewModels
                 ? SortDirection.Desc
                 : SortDirection.Asc;
 
-            _app.Account.BalanceUpdated += OnBalanceUpdatedEventHandler;
+            _app.LocalStorage.BalanceChanged += OnBalanceChangedEventHandler;
         }
 
         private async Task ReloadAddresses()
@@ -137,7 +134,7 @@ namespace Atomex.Client.Desktop.ViewModels
                     .GetCurrencyAccount(_currency.Name);
 
                 var addresses = (await account
-                        .GetAddressesAsync())
+                    .GetAddressesAsync())
                     .ToList();
 
                 var addressesViewModels = addresses.Select(a =>
@@ -166,8 +163,8 @@ namespace Atomex.Client.Desktop.ViewModels
                     var tezosAccount = account as TezosAccount;
 
                     (await tezosAccount
-                            .LocalStorage
-                            .GetTezosTokenAddressesByContractAsync(_tokenContract))
+                        .LocalStorage
+                        .GetTokenAddressesByContractAsync(_tokenContract))
                         .Where(w => w.TokenBalance.TokenId == _tokenId)
                         .Where(w => w.Balance != 0)
                         .ToList()
@@ -262,7 +259,6 @@ namespace Atomex.Client.Desktop.ViewModels
         }
 
         private ReactiveCommand<AddressesSortField, Unit> _setSortTypeCommand;
-
         public ReactiveCommand<AddressesSortField, Unit> SetSortTypeCommand =>
             _setSortTypeCommand ??= ReactiveCommand.Create<AddressesSortField>(sortField =>
             {
@@ -274,10 +270,15 @@ namespace Atomex.Client.Desktop.ViewModels
                         : SortDirection.Asc;
             });
 
-        private async void OnBalanceUpdatedEventHandler(object? sender, CurrencyEventArgs args)
+        private async void OnBalanceChangedEventHandler(object? sender, BalanceChangedEventArgs args)
         {
-            if ((args.Currency != null && _currency.Name == args.Currency) ||
-                (args.IsTokenUpdate && (args.TokenContract == null || (args.TokenContract == _tokenContract && args.TokenId == _tokenId))))
+            var isCurrencyUpdate = args.Currency != null && _currency.Name == args.Currency;
+            
+            // any token update
+            var isTokenUpdate = (args is TokenBalanceChangedEventArgs eventArgs) &&
+                (eventArgs.TokenContract == null || (eventArgs.TokenContract == _tokenContract && eventArgs.TokenId == _tokenId));
+
+            if (isCurrencyUpdate || isTokenUpdate)
             {
                 await ReloadAddresses();
             }
@@ -392,14 +393,16 @@ namespace Atomex.Client.Desktop.ViewModels
             }
         }
         
-        public void Dispose() => _app.Account.BalanceUpdated -= OnBalanceUpdatedEventHandler;
+        public void Dispose() => _app.LocalStorage.BalanceChanged -= OnBalanceChangedEventHandler;
 
         private void DesignerMode()
         {
             _currency = DesignTime.TestNetCurrencies.First();
 
-            var walletAddress = new WalletAddress();
-            walletAddress.Address = "mzztP8VVJYxV93EUiiYrJUbL55MLx7KLoM";
+            var walletAddress = new WalletAddress
+            {
+                Address = "mzztP8VVJYxV93EUiiYrJUbL55MLx7KLoM"
+            };
 
             Addresses = new ObservableCollection<AddressViewModel>(
                 new List<AddressViewModel>

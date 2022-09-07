@@ -66,10 +66,10 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
                 Transactions = SortTransactions(
                     new ObservableCollection<TransactionViewModelBase>((await tezosAccount
-                            .LocalStorage
-                            .GetTezosTokenTransfersAsync(tokenViewModel.Contract.Address,
-                                offset: 0,
-                                limit: int.MaxValue))
+                        .LocalStorage
+                        .GetTokenTransfersAsync(tokenViewModel.Contract.Address,
+                            offset: 0,
+                            limit: int.MaxValue))
                         .Where(token => token.Token.TokenId == tokenViewModel.TokenBalance.TokenId)
                         .Select(t => new TezosTokenTransferViewModel(t, tezosConfig))
                         .ToList()
@@ -89,23 +89,23 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             finally
             {
                 LoadTransactionsSemaphore.Release();
+
                 Log.Debug("Token transfers loaded for contract {Contract}", tokenViewModel.Contract.Address);
             }
         }
 
         protected override void SubscribeToServices()
         {
-            _app.Account.BalanceUpdated += OnBalanceUpdatedEventHandler;
+            _app.LocalStorage.BalanceChanged += OnBalanceChangedEventHandler;
         }
 
-        protected override async void OnBalanceUpdatedEventHandler(object sender, CurrencyEventArgs args)
+        protected override async void OnBalanceChangedEventHandler(object sender, BalanceChangedEventArgs args)
         {
             try
             {
-                //if (!Currencies.IsTezosBased(args.Currency) || TokenViewModel == null) return;
-                if (!args.IsTokenUpdate ||
+                if (args is not TokenBalanceChangedEventArgs eventArgs ||
                     TokenViewModel == null ||
-                    args.TokenContract != null && (args.TokenContract != TokenViewModel.Contract.Address || args.TokenId != TokenViewModel.TokenBalance.TokenId))
+                    eventArgs.TokenContract != null && (eventArgs.TokenContract != TokenViewModel.Contract.Address || eventArgs.TokenId != TokenViewModel.TokenBalance.TokenId))
                 {
                     return;
                 }
@@ -136,7 +136,8 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
         protected override void LoadAddresses()
         {
-            if (TokenViewModel == null) return;
+            if (TokenViewModel == null)
+                return;
 
             var tezosConfig = _app.Account
                 .Currencies

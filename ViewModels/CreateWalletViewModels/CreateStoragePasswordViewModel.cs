@@ -128,7 +128,7 @@ namespace Atomex.Client.Desktop.ViewModels.CreateWalletViewModels
                         throw new IOException(Warning);
                     }
 
-                    var localStorage = new LiteDbLocalStorage(
+                    var localStorage = new LiteDbCachedLocalStorage(
                         pathToDb: Path.Combine(Path.GetDirectoryName(_wallet.PathToWallet), Account.DefaultDataFileName),
                         password: PasswordVM.SecurePass,
                         currencies: _app.CurrenciesProvider.GetCurrencies(_wallet.Network),

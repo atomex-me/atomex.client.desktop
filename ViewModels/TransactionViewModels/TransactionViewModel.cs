@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Reactive;
+
+using Avalonia.Controls;
 using ReactiveUI;
 using Serilog;
+
 using Atomex.Blockchain;
 using Atomex.Blockchain.Abstract;
 using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
 using Atomex.Core;
-using Avalonia.Controls;
-
 
 namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
 {
@@ -29,15 +30,11 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
         public Action? OnClose { get; set; }
         public bool CanBeRemoved { get; set; }
 
-
         private ReactiveCommand<Unit, Unit> _openTxInExplorerCommand;
-
         public ReactiveCommand<Unit, Unit> OpenTxInExplorerCommand => _openTxInExplorerCommand ??=
             ReactiveCommand.Create(() => App.OpenBrowser(TxExplorerUri));
 
-
         private ReactiveCommand<string, Unit> _openAddressInExplorerCommand;
-
         public ReactiveCommand<string, Unit> OpenAddressInExplorerCommand => _openAddressInExplorerCommand ??=
             ReactiveCommand.Create<string>((address) =>
             {
@@ -62,17 +59,14 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
         });
 
         private ReactiveCommand<Unit, Unit> _updateCommand;
-
         public ReactiveCommand<Unit, Unit> UpdateCommand => _updateCommand ??= ReactiveCommand.Create(
             () => UpdateClicked?.Invoke(this, new TransactionEventArgs(Transaction)));
 
         private ReactiveCommand<Unit, Unit> _removeCommand;
-
         public ReactiveCommand<Unit, Unit> RemoveCommand => _removeCommand ??= ReactiveCommand.Create(
             () => RemoveClicked?.Invoke(this, new TransactionEventArgs(Transaction)));
 
         private ReactiveCommand<Unit, Unit> _onCloseCommand;
-
         public ReactiveCommand<Unit, Unit> OnCloseCommand => _onCloseCommand ??= ReactiveCommand.Create(
             () => OnClose?.Invoke());
 

@@ -67,7 +67,7 @@ namespace Atomex.Client.Desktop.ViewModels
                 {
                     var wallet = HdWallet.LoadFromFile(info.Path, password);
 
-                    localStorage = new LiteDbLocalStorage(
+                    localStorage = new LiteDbCachedLocalStorage(
                         pathToDb: Path.Combine(Path.GetDirectoryName(wallet.PathToWallet), Account.DefaultDataFileName),
                         password: password,
                         currencies: _app.CurrenciesProvider.GetCurrencies(wallet.Network),

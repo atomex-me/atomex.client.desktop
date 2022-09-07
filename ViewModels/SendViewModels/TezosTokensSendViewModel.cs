@@ -583,7 +583,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
             return await tezosAccount
                 .LocalStorage
-                .GetTezosTokenAddressAsync(tokenType, tokenContract, tokenId, address);
+                .GetTokenAddressAsync(tokenType, tokenContract, tokenId, address);
         }
 
         private async void UpdateCurrencyCode()

@@ -1,21 +1,19 @@
-using System;
-using System.Threading.Tasks;
-using System.Reactive.Linq;
-
+using Atomex.Client.Desktop.Common;
+using Atomex.Core;
+using Atomex.MarketData.Abstract;
+using Atomex.TezosTokens;
+using Atomex.Wallet;
+using Atomex.Wallet.Abstract;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Avalonia.Threading;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using Serilog;
-
-using Atomex.Core;
-using Atomex.MarketData.Abstract;
-using Atomex.Wallet;
-using Atomex.Wallet.Abstract;
-using Atomex.Client.Desktop.Common;
+using System;
 using System.Linq;
-using Atomex.TezosTokens;
+using System.Reactive.Linq;
+using System.Threading.Tasks;
 
 namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
 {
@@ -23,10 +21,11 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
     {
         protected const string PathToIcons = "/Resources/Icons";
 
-        protected IAccount Account { get; set; }
-        private IQuotesProvider QuotesProvider { get; set; }
         public event EventHandler AmountUpdated;
 
+        protected IAccount _account;
+        protected ILocalStorage _localStorage;
+        private IQuotesProvider _quotesProvider;
         public CurrencyConfig Currency { get; set; }
         public CurrencyConfig ChainCurrency { get; set; }
         public string Header { get; set; }
@@ -68,7 +67,7 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
 
         protected virtual async Task UpdateAsync()
         {
-            var balance = await Account
+            var balance = await _account
                 .GetBalanceAsync(Currency.Name)
                 .ConfigureAwait(false);
 
@@ -78,7 +77,7 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
                 AvailableAmount = balance.Confirmed; // todo: use unconfirmed income for Bitcoin based currencies?
                 UnconfirmedAmount = balance.UnconfirmedIncome + balance.UnconfirmedOutcome;
 
-                UpdateQuotesInBaseCurrency(QuotesProvider);
+                UpdateQuotesInBaseCurrency(_quotesProvider);
 
             }, DispatcherPriority.Background);
         }
@@ -88,27 +87,28 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
             return Task.Run(UpdateAsync);
         }
 
-        public void SubscribeToUpdates(IAccount account)
+        public void SubscribeToUpdates(IAccount account, ILocalStorage localStorage)
         {
-            Account = account;
-            Account.BalanceUpdated += OnBalanceChangedEventHandler;
+            _account = account;
+            _localStorage = localStorage;
+            _localStorage.BalanceChanged += OnBalanceChangedEventHandler;
         }
 
         public void SubscribeToRatesProvider(IQuotesProvider quotesProvider)
         {
-            QuotesProvider = quotesProvider;
-            QuotesProvider.QuotesUpdated += OnQuotesUpdatedEventHandler;
+            _quotesProvider = quotesProvider;
+            _quotesProvider.QuotesUpdated += OnQuotesUpdatedEventHandler;
         }
 
-        private async void OnBalanceChangedEventHandler(object? sender, CurrencyEventArgs args)
+        private async void OnBalanceChangedEventHandler(object? sender, BalanceChangedEventArgs args)
         {
             try
             {
                 if ((args.Currency != null && args.Currency == Currency.Name) ||
-                    (args.IsTokenUpdate && (args.TokenContract == null || Account.Currencies.FirstOrDefault(c =>
+                    (args is TokenBalanceChangedEventArgs eventArgs && (eventArgs.TokenContract == null || _account.Currencies.FirstOrDefault(c =>
                         c is TezosTokenConfig tc &&
-                        tc.TokenContractAddress == args.TokenContract &&
-                        tc.TokenId == args.TokenId) != null)))
+                        tc.TokenContractAddress == eventArgs.TokenContract &&
+                        tc.TokenId == eventArgs.TokenId) != null)))
                 {
                     await UpdateAsync();
                 }
@@ -146,14 +146,16 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
 
         protected virtual void Dispose(bool disposing)
         {
-            if (_disposedValue) return;
+            if (_disposedValue)
+                return;
+
             if (disposing)
             {
-                if (Account != null)
-                    Account.BalanceUpdated -= OnBalanceChangedEventHandler;
+                if (_localStorage != null)
+                    _localStorage.BalanceChanged -= OnBalanceChangedEventHandler;
 
-                if (QuotesProvider != null)
-                    QuotesProvider.QuotesUpdated -= OnQuotesUpdatedEventHandler;
+                if (_quotesProvider != null)
+                    _quotesProvider.QuotesUpdated -= OnQuotesUpdatedEventHandler;
             }
 
             _disposedValue = true;

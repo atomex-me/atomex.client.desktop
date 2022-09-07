@@ -39,20 +39,20 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
         protected override void SubscribeToServices()
         {
-            _app.Account.BalanceUpdated += OnBalanceUpdatedEventHandler;
+            _app.LocalStorage.BalanceChanged += OnBalanceChangedEventHandler;
         }
 
-        protected virtual async void OnBalanceUpdatedEventHandler(object sender, CurrencyEventArgs args)
+        protected virtual async void OnBalanceChangedEventHandler(object sender, BalanceChangedEventArgs args)
         {
             try
             {
                 var tezosTokenConfig = (TezosTokenConfig)Currency;
 
-                if (!args.IsTokenUpdate ||
-                   args.TokenContract != null && (args.TokenContract != tezosTokenConfig.TokenContractAddress || args.TokenId != tezosTokenConfig.TokenId))
-                {
+                var isTokenUpdate = (args is TokenBalanceChangedEventArgs eventArgs) &&
+                    (eventArgs.TokenContract == null || (eventArgs.TokenContract == tezosTokenConfig.TokenContractAddress && eventArgs.TokenId == tezosTokenConfig.TokenId));
+
+                if (!isTokenUpdate)
                     return;
-                }
 
                 // update transactions list
                 await LoadTransactionsAsync();
@@ -78,7 +78,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                 var transactions = (await _app.Account
                     .GetCurrencyAccount<Fa2Account>(Currency.Name)
                     .LocalStorage
-                    .GetTezosTokenTransfersAsync(Currency.TokenContractAddress, offset: 0, limit: int.MaxValue)
+                    .GetTokenTransfersAsync(Currency.TokenContractAddress, offset: 0, limit: int.MaxValue)
                     .ConfigureAwait(false))
                     .ToList();
 

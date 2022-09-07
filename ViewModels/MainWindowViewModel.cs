@@ -13,7 +13,6 @@ using Serilog;
 using Atomex.Client.Common;
 using Atomex.Client.Desktop.Controls;
 using Atomex.Client.Desktop.Properties;
-using Atomex.Common;
 using Atomex.Wallet;
 
 namespace Atomex.Client.Desktop.ViewModels
@@ -69,12 +68,11 @@ namespace Atomex.Client.Desktop.ViewModels
             ShowStart();
         }
 
-        private IAtomexApp _app;
+        private readonly IAtomexApp _app;
         private IMainView MainView { get; set; }
 
 
         private bool _hasAccount;
-
         public bool HasAccount
         {
             get => _hasAccount;
@@ -193,9 +191,8 @@ namespace Atomex.Client.Desktop.ViewModels
         private ICommand _signOutCommand;
         public ICommand SignOutCommand => _signOutCommand ??= ReactiveCommand.Create(() => SignOut());
 
-        private bool _userIgnoreActiveSwaps { get; set; }
-
-        private UnlockViewModel _unlockViewModel { get; set; }
+        private bool _userIgnoreActiveSwaps;
+        private UnlockViewModel _unlockViewModel;
 
         private async Task SignOut(bool withAppUpdate = false)
         {
@@ -341,12 +338,18 @@ namespace Atomex.Client.Desktop.ViewModels
                     else
                     {
                         await Task.Delay(delayInterval);
-                        if (!_hasAccount) return;
+
+                        if (!_hasAccount)
+                            return;
                     }
 
-                    if (AccountRestored || Content is UnlockViewModel) continue;
+                    if (AccountRestored || Content is UnlockViewModel)
+                        continue;
+
                     var messages = await Atomex.ViewModels.Helpers.GetUserMessages(userId);
-                    if (messages == null) continue;
+
+                    if (messages == null)
+                        continue;
 
                     foreach (var message in messages.Where(message => !message.IsReaded))
                     {

@@ -55,7 +55,7 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
 
             if (!subscribeToUpdates) return currencyViewModel;
 
-            currencyViewModel.SubscribeToUpdates(App.AtomexApp.Account);
+            currencyViewModel.SubscribeToUpdates(App.AtomexApp.Account, App.AtomexApp.LocalStorage);
             currencyViewModel.SubscribeToRatesProvider(App.AtomexApp.QuotesProvider);
             currencyViewModel.UpdateInBackgroundAsync();
             Instances.TryAdd(currency, currencyViewModel);
