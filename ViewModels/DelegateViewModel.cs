@@ -27,7 +27,7 @@ using Atomex.Wallet.Tezos;
 
 namespace Atomex.Client.Desktop.ViewModels
 {
-    public class DelegateViewModel : ViewModelBase
+    public class DelegateViewModel : ViewModelBase, IDisposable
     {
         private readonly IAtomexApp _app;
         private readonly TezosConfig _tezosConfig;
@@ -611,6 +611,12 @@ namespace Atomex.Client.Desktop.ViewModels
 
             if (provider.IsAvailable)
                 _ = LoadBakerList();
+        }
+        
+        public void Dispose()
+        {
+            _app.QuotesProvider.QuotesUpdated -= OnQuotesUpdatedEventHandler;
+            _app.QuotesProvider.AvailabilityChanged -= OnQuotesProviderAvailabilityChangedEventHandler;
         }
 
 #if DEBUG

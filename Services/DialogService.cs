@@ -1,6 +1,7 @@
 using System;
 using Atomex.Client.Desktop.Dialogs.ViewModels;
 using Atomex.Client.Desktop.ViewModels;
+using Avalonia.Threading;
 using DialogHost;
 
 
@@ -11,6 +12,8 @@ namespace Atomex.Client.Desktop.Services
         private static string MainDialogHostIdentifier => "MainDialogHost";
         private bool _isDialogOpened;
         private readonly DialogServiceViewModel _dialogServiceViewModel;
+        private bool _walletLocked;
+        private bool _showAfterUnlock;
 
         public DialogService()
         {
@@ -21,7 +24,8 @@ namespace Atomex.Client.Desktop.Services
         {
             var result = _isDialogOpened;
             if (!_isDialogOpened) return result;
-            DialogHost.DialogHost.GetDialogSession(MainDialogHostIdentifier)?.Close();
+            Dispatcher.UIThread.InvokeAsync(() =>
+                DialogHost.DialogHost.GetDialogSession(MainDialogHostIdentifier)?.Close());
             _isDialogOpened = false;
 
             return result;
@@ -35,8 +39,8 @@ namespace Atomex.Client.Desktop.Services
         public void ShowPrevious()
         {
             if (_isDialogOpened) return;
-            _ = DialogHost.DialogHost.Show(_dialogServiceViewModel, MainDialogHostIdentifier, ClosingEventHandler);
-
+            Dispatcher.UIThread.InvokeAsync(() =>
+                DialogHost.DialogHost.Show(_dialogServiceViewModel, MainDialogHostIdentifier, ClosingEventHandler));
             _isDialogOpened = true;
         }
 
@@ -52,7 +56,27 @@ namespace Atomex.Client.Desktop.Services
         public void Show(ViewModelBase viewModel)
         {
             _dialogServiceViewModel.Content = viewModel;
+
+            if (!_walletLocked)
+                ShowPrevious();
+            else
+                _showAfterUnlock = true;
+        }
+
+        public void LockWallet()
+        {
+            _walletLocked = true;
+            if (_isDialogOpened)
+                _showAfterUnlock = Close();
+        }
+
+        public void UnlockWallet()
+        {
+            _walletLocked = false;
+            if (!_showAfterUnlock) return;
+            
             ShowPrevious();
+            _showAfterUnlock = false;
         }
     }
 }

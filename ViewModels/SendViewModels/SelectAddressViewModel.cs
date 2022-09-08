@@ -154,8 +154,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
             Currency = currency;
             SelectAddressMode = mode;
-            var onlyAddressesWithBalances =
-                SelectAddressMode is SelectAddressMode.SendFrom or SelectAddressMode.Connect;
+            var onlyAddressesWithBalances = SelectAddressMode is SelectAddressMode.SendFrom;
 
             var addresses = AddressesHelper
                 .GetReceivingAddressesAsync(

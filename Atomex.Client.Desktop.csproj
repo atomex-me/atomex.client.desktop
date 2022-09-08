@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<Project Sdk="Microsoft.NET.Sdk" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
     <PropertyGroup>
         <TargetFramework>net5.0</TargetFramework>
         <Nullable>enable</Nullable>
@@ -6,8 +6,8 @@
         <UseAppHost>true</UseAppHost>
         <ApplicationIcon>Resources/Images/atomex_logo_256x256_ico.ico</ApplicationIcon>
 
-        <AssemblyVersion>1.2.34</AssemblyVersion>
-        <Version>1.2.34</Version>
+        <AssemblyVersion>1.2.35</AssemblyVersion>
+        <Version>1.2.35</Version>
     </PropertyGroup>
     <Choose>
         <When Condition=" '$(Configuration)' == 'Debug' ">
@@ -37,9 +37,10 @@
         <PackageReference Include="Avalonia.ReactiveUI" Version="0.10.15" />
         <PackageReference Include="Avalonia.Xaml.Behaviors" Version="0.10.13.3" />
         <PackageReference Include="Avalonia.Svg.Skia" Version="0.10.13" />
+        <PackageReference Include="Beacon.Sdk" Version="1.0.4" />
         <PackageReference Include="DialogHost.Avalonia" Version="0.4.0" />
         <PackageReference Include="Deadpikle.AvaloniaProgressRing" Version="0.9.0" />
-        <PackageReference Include="Netezos" Version="2.4.6" />
+        <PackageReference Include="Netezos" Version="2.6.2" />
         <PackageReference Include="NetSparkleUpdater.SparkleUpdater" Version="2.0.7" />
         <PackageReference Include="NetSparkleUpdater.UI.Avalonia" Version="2.0.8" />
         <PackageReference Include="OxyPlot.Avalonia" Version="2.1.0-20201211.2" />
@@ -52,10 +53,8 @@
         <PackageReference Include="Serilog.Extensions.Logging" Version="3.1.0" />
         <PackageReference Include="ReactiveUI.Fody" Version="16.4.1" />
         <PackageReference Include="AsyncImageLoader.Avalonia" Version="2.4.0" />
-        <PackageReference Include="Beacon.Sdk" Version="1.0.0" />
     </ItemGroup>
-
-
+    
     <ItemGroup>
         <None Remove="config.debug.json" />
         <None Remove="config.json" />
@@ -232,7 +231,7 @@
     </ItemGroup>
     <ItemGroup>
         <ProjectReference Include="atomex.client.core\Atomex.Client.Core\Atomex.Client.Core.csproj">
-            <GlobalPropertiesToRemove></GlobalPropertiesToRemove>
+            <GlobalPropertiesToRemove />
         </ProjectReference>
     </ItemGroup>
     <ItemGroup>
