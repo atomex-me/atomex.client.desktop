@@ -23,7 +23,7 @@ using Atomex.Common;
 
 namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 {
-    public abstract class SendViewModel : ViewModelBase
+    public abstract class SendViewModel : ViewModelBase, IDisposable
     {
         protected readonly IAtomexApp _app;
         protected CurrencyConfig Currency;
@@ -353,6 +353,11 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         }
 
         protected abstract Task<Error> Send(CancellationToken cancellationToken = default);
+        
+        public void Dispose()
+        {
+            _app.QuotesProvider.QuotesUpdated -= OnQuotesUpdatedEventHandler;
+        }
 
 #if DEBUG
         protected void DesignerMode()

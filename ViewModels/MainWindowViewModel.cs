@@ -269,10 +269,7 @@ namespace Atomex.Client.Desktop.ViewModels
                 return;
 
             var accountName = new DirectoryInfo(accountDirectory).Name;
-
-            var wasClosed = false;
-            Dispatcher.UIThread.InvokeAsync(() => { wasClosed = App.DialogService.Close(); });
-
+            
             _unlockViewModel = new UnlockViewModel(
                 walletName: accountName,
                 unlockAction: password =>
@@ -286,33 +283,30 @@ namespace Atomex.Client.Desktop.ViewModels
                 onUnlock: async () =>
                 {
                     ShowContent(WalletMainViewModel);
+                    App.DialogService.UnlockWallet();
 
                     var userId = Atomex.ViewModels.Helpers.GetUserId(_app.Account);
                     var messages = await Atomex.ViewModels.Helpers.GetUserMessages(userId);
-                    if (messages != null)
+                    if (messages == null) return;
+                    
+                    foreach (var message in messages.Where(message => !message.IsReaded))
                     {
-                        foreach (var message in messages.Where(message => !message.IsReaded))
+                        _ = Dispatcher.UIThread.InvokeAsync(() =>
                         {
-                            _ = Dispatcher.UIThread.InvokeAsync(() =>
-                            {
-                                App.DialogService.Show(
-                                    MessageViewModel.Success(
-                                        title: Resources.CvWarning,
-                                        text: message.Message,
-                                        nextAction: async () =>
-                                        {
-                                            await Atomex.ViewModels.Helpers.MarkUserMessageReaded(message.Id);
-                                            App.DialogService.Close();
-                                        }));
-                            });
-                        }
-                    }
-                    else if (wasClosed)
-                    {
-                        App.DialogService.ShowPrevious();
+                            App.DialogService.Show(
+                                MessageViewModel.Success(
+                                    title: Resources.CvWarning,
+                                    text: message.Message,
+                                    nextAction: async () =>
+                                    {
+                                        await Atomex.ViewModels.Helpers.MarkUserMessageReaded(message.Id);
+                                        App.DialogService.Close();
+                                    }));
+                        });
                     }
                 });
 
+            App.DialogService.LockWallet();
             ShowContent(_unlockViewModel);
         }
 

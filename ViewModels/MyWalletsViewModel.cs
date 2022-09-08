@@ -92,6 +92,8 @@ namespace Atomex.Client.Desktop.ViewModels
                         authMessageSigner: account.DefaultAuthMessageSigner());
 
                     _app.ChangeAtomexClient(atomexClient, account, restart: true);
+                    
+                    App.DialogService.UnlockWallet();
                 });
 
             _showContent?.Invoke(unlockViewModel);

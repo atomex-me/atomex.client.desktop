@@ -12,6 +12,8 @@ namespace Atomex.Client.Desktop.Services
         private static string MainDialogHostIdentifier => "MainDialogHost";
         private bool _isDialogOpened;
         private readonly DialogServiceViewModel _dialogServiceViewModel;
+        private bool _walletLocked;
+        private bool _showAfterUnlock;
 
         public DialogService()
         {
@@ -54,7 +56,27 @@ namespace Atomex.Client.Desktop.Services
         public void Show(ViewModelBase viewModel)
         {
             _dialogServiceViewModel.Content = viewModel;
+
+            if (!_walletLocked)
+                ShowPrevious();
+            else
+                _showAfterUnlock = true;
+        }
+
+        public void LockWallet()
+        {
+            _walletLocked = true;
+            if (_isDialogOpened)
+                _showAfterUnlock = Close();
+        }
+
+        public void UnlockWallet()
+        {
+            _walletLocked = false;
+            if (!_showAfterUnlock) return;
+            
             ShowPrevious();
+            _showAfterUnlock = false;
         }
     }
 }

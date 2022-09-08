@@ -95,8 +95,6 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
         public string? DappLogo { get; set; }
 
         [Reactive] public IEnumerable<BaseBeaconOperationViewModel> Operations { get; set; }
-        [Reactive] public decimal AmountInBase { get; set; }
-        [Reactive] public decimal FeeInBase { get; set; }
         [ObservableAsProperty] public bool IsSending { get; }
         [ObservableAsProperty] public bool IsRejecting { get; }
 
