@@ -1,10 +1,5 @@
 ﻿{
   "Serilog": {
-    "Using": [
-      "Serilog.Sinks.Console",
-      "Atomex.Client.Core",
-      "Beacon.Sdk"
-    ],
     "MinimumLevel": {
       "Default": "Debug",
       "Override": {
@@ -19,12 +14,6 @@
           "restrictedToMinimumLevel": "Debug"
         }
       }
-    ],
-    "Enrich": [
-      "FromLogContext",
-      "WithMachineName",
-      "WithThreadId",
-      "WithCaller"
     ]
   },
   "Services": {
