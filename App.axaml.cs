@@ -26,10 +26,10 @@ using Atomex.Client.Desktop.Views;
 using Atomex.Common.Configuration;
 using Atomex.Core;
 using Atomex.MarketData;
+using Atomex.MarketData.Abstract;
 using Atomex.MarketData.Bitfinex;
 using Atomex.MarketData.TezTools;
 using Atomex.Services;
-using Atomex.MarketData.Abstract;
 
 namespace Atomex.Client.Desktop
 {

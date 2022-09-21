@@ -13,21 +13,45 @@
       }
     ]
   },
-  "Services": {
+  "AtomexClients": {
     "MainNet": {
-      "Exchange": {
-        "Url": "wss://atomex.me/exchange"
+      "DefaultClientType": "WebSocketAtomexClientLegacy",
+      "WebSocketAtomexClient": {
+        "AuthTokenBaseUrl": "https://api.atomex.me/v1/",
+        "Exchange": {
+          "Url": "wss://api.atomex.me/ws/exchange"
+        },
+        "MarketData": {
+          "Url": "wss://api.atomex.me/ws/marketdata"
+        }
       },
-      "MarketData": {
-        "Url": "wss://atomex.me/marketdata"
+      "WebSocketAtomexClientLegacy": {
+        "Exchange": {
+          "Url": "wss://atomex.me/exchange"
+        },
+        "MarketData": {
+          "Url": "wss://atomex.me/marketdata"
+        }
       }
     },
     "TestNet": {
-      "Exchange": {
-        "Url": "wss://test.atomex.me/exchange"
+      "DefaultClientType": "WebSocketAtomexClient",
+      "WebSocketAtomexClient": {
+        "AuthTokenBaseUrl": "https://api.test.atomex.me/v1/",
+        "Exchange": {
+          "Url": "wss://ws.api.test.atomex.me/ws/exchange"
+        },
+        "MarketData": {
+          "Url": "wss://ws.api.test.atomex.me/ws/marketdata"
+        }
       },
-      "MarketData": {
-        "Url": "wss://test.atomex.me/marketdata"
+      "WebSocketAtomexClientLegacy": {
+        "Exchange": {
+          "Url": "wss://test.atomex.me/exchange"
+        },
+        "MarketData": {
+          "Url": "wss://test.atomex.me/marketdata"
+        }
       }
     }
   }
