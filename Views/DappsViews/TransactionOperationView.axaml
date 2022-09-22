@@ -85,7 +85,7 @@
                                  DoneToolText="Copied!"
                                  Margin="6 0 0 0"
                                  Command="{Binding $parent[ListBox].DataContext.CopyCommand}"
-                                 CommandParameter="{Binding Operation.Destination.Destination}" />
+                                 CommandParameter="{Binding Operation.Destination}" />
         </StackPanel>
 
         <TextBlock Grid.Column="0"
