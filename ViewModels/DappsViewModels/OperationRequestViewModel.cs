@@ -91,7 +91,7 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
     public class OperationRequestViewModel : ViewModelBase, IDisposable
     {
         public string DappName { get; set; }
-        public string SubTitle => $"{DappName} is asking to confirm the following transactions:";
+        public string SubTitle => $"{DappName} is asking to confirm the following operations:";
         public string? DappLogo { get; set; }
 
         [Reactive] public IEnumerable<BaseBeaconOperationViewModel> Operations { get; set; }
