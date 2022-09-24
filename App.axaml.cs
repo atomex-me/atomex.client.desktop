@@ -6,6 +6,7 @@ using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
+
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Input.Platform;
@@ -18,12 +19,14 @@ using Serilog.Events;
 using Serilog.Formatting;
 using Serilog.Formatting.Display;
 using Sentry;
+
 using Atomex.Client.Desktop.Services;
 using Atomex.Client.Desktop.ViewModels;
 using Atomex.Client.Desktop.Views;
 using Atomex.Common.Configuration;
 using Atomex.Core;
 using Atomex.MarketData;
+using Atomex.MarketData.Abstract;
 using Atomex.MarketData.Bitfinex;
 using Atomex.MarketData.TezTools;
 using Atomex.Services;
@@ -61,7 +64,7 @@ namespace Atomex.Client.Desktop
                 currencies: currenciesProvider
                     .GetCurrencies(Network.MainNet)
                     .Select(c => c.Name),
-                baseCurrency: BitfinexQuotesProvider.Usd,
+                baseCurrency: QuotesProvider.Usd,
                 log: LoggerFactory.CreateLogger<BitfinexQuotesProvider>());
 
             var tezToolsQuotesProvider = new TezToolsQuotesProvider(

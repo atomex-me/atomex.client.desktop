@@ -85,11 +85,11 @@ namespace Atomex.Client.Desktop.ViewModels
                 },
                 onUnlock: () =>
                 {
-                    var atomexClient = new WebSocketAtomexClientLegacy(
-                        exchangeUrl: App.Configuration[$"Services:{account!.Network}:Exchange:Url"],
-                        marketDataUrl: App.Configuration[$"Services:{account!.Network}:MarketData:Url"],
-                        clientType: PlatformHelper.GetClientType(),
-                        authMessageSigner: account.DefaultAuthMessageSigner());
+                    var atomexClient = AtomexClientCreator.Create(
+                        configuration: App.Configuration,
+                        network: account!.Network,
+                        platformType: PlatformHelper.GetClientType(),
+                        account.DefaultAuthMessageSigner());
 
                     _app.ChangeAtomexClient(atomexClient, account, restart: true);
                     
