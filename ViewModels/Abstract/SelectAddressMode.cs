@@ -1,9 +1,10 @@
-﻿namespace Atomex.Client.Desktop.ViewModels.Abstract
+namespace Atomex.Client.Desktop.ViewModels.Abstract
 {
     public enum SelectAddressMode
     {
         SendFrom,
         ReceiveTo,
-        ChangeRedeemAddress
+        ChangeRedeemAddress,
+        Connect
     }
 }

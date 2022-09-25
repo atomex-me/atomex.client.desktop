@@ -8,10 +8,11 @@
              xmlns:vm="clr-namespace:Atomex.Client.Desktop.ViewModels.SendViewModels"
              xmlns:controls="clr-namespace:Atomex.Client.Desktop.Controls"
              xmlns:converters="clr-namespace:Atomex.Client.Desktop.Converters"
-             xmlns:svg="clr-namespace:Avalonia.Svg.Skia;assembly=Avalonia.Svg.Skia"
              xmlns:behaviors="clr-namespace:Atomex.Client.Desktop.Helpers"
              xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
              xmlns:ia="clr-namespace:Avalonia.Xaml.Interactions.Core;assembly=Avalonia.Xaml.Interactions"
+             xmlns:asyncImageLoader="clr-namespace:AsyncImageLoader;assembly=AsyncImageLoader.Avalonia"
+             xmlns:services="clr-namespace:Atomex.Client.Desktop.Services"
              Width="700">
 
     <Design.DataContext>
@@ -55,7 +56,7 @@
                 <controls:IconButton Grid.Column="0"
                                      Classes="Back"
                                      IsVisible="{Binding ConfirmStage}"
-                                     Command="{Binding UndoConfirmStageCommand}"/>
+                                     Command="{Binding UndoConfirmStageCommand}" />
 
                 <!-- window title -->
                 <TextBlock Grid.Column="1"
@@ -115,16 +116,21 @@
                             IsEnabled="{Binding !ConfirmStage}"
                             Classes="EmptyBtnWithContent">
                         <Grid ColumnDefinitions="24,*, Auto">
-                            <Ellipse Grid.Column="0"
-                                     Grid.Row="0"
-                                     Width="24"
-                                     Height="24">
-                                <Ellipse.Fill>
-                                    <ImageBrush Source="{Binding TokenPreview}"
-                                                BitmapInterpolationMode="HighQuality"
-                                                Stretch="Fill" />
-                                </Ellipse.Fill>
-                            </Ellipse>
+                            <Border Grid.Column="0"
+                                    Grid.Row="0"
+                                    Width="24"
+                                    Height="24"
+                                    VerticalAlignment="Stretch"
+                                    HorizontalAlignment="Stretch"
+                                    ClipToBounds="True"
+                                    CornerRadius="16"
+                                    Classes.IsImageLoading="{Binding #PreviewImg.IsLoading}">
+                                <asyncImageLoader:AdvancedImage Name="PreviewImg"
+                                                                StretchDirection="Both"
+                                                                Stretch="UniformToFill"
+                                                                Source="{Binding TokenPreviewUrl}"
+                                                                Loader="{x:Static services:FileCacheImageLoader.Instance}" />
+                            </Border>
 
                             <TextBlock Grid.Column="1"
                                        Grid.Row="0"
@@ -212,16 +218,21 @@
                             VerticalContentAlignment="Center"
                             Classes="EmptyBtnWithContent">
                         <Grid ColumnDefinitions="24,*">
-                            <Ellipse Grid.Column="0"
-                                     Grid.Row="0"
-                                     Width="24"
-                                     Height="24">
-                                <Ellipse.Fill>
-                                    <ImageBrush Source="{Binding TokenPreview}"
-                                                BitmapInterpolationMode="HighQuality"
-                                                Stretch="Fill" />
-                                </Ellipse.Fill>
-                            </Ellipse>
+                            <Border Grid.Column="0"
+                                    Grid.Row="0"
+                                    Width="24"
+                                    Height="24"
+                                    VerticalAlignment="Stretch"
+                                    HorizontalAlignment="Stretch"
+                                    ClipToBounds="True"
+                                    CornerRadius="16"
+                                    Classes.IsImageLoading="{Binding #PreviewImg2.IsLoading}">
+                                <asyncImageLoader:AdvancedImage Name="PreviewImg2"
+                                                                StretchDirection="Both"
+                                                                Stretch="UniformToFill"
+                                                                Source="{Binding TokenPreviewUrl}"
+                                                                Loader="{x:Static services:FileCacheImageLoader.Instance}" />
+                            </Border>
 
                             <TextBlock Grid.Column="1"
                                        FontFamily="{DynamicResource DefaultMediumFontFamily}"
@@ -350,11 +361,11 @@
                                FontFamily="{DynamicResource DefaultLightFontFamily}"
                                Classes="Message"
                                Classes.Warning="{Binding WarningType,
-                               Converter={x:Static converters:EnumToStringEqualConverter.Instance},
-                               ConverterParameter=Warning}"
+                           Converter={x:Static converters:EnumToStringEqualConverter.Instance},
+                           ConverterParameter=Warning}"
                                Classes.Error="{Binding WarningType,
-                               Converter={x:Static converters:EnumToStringEqualConverter.Instance},
-                               ConverterParameter=Error}" />
+                           Converter={x:Static converters:EnumToStringEqualConverter.Instance},
+                           ConverterParameter=Error}" />
 
                     <controls:IconButton Classes="Question WithToolTipContent"
                                          VerticalAlignment="Center"
@@ -363,11 +374,11 @@
                         <TextBlock TextWrapping="Wrap"
                                    Text="{Binding WarningToolTip}"
                                    Classes.Warning="{Binding WarningType,
-                                   Converter={x:Static converters:EnumToStringEqualConverter.Instance},
-                                   ConverterParameter=Warning}"
+                               Converter={x:Static converters:EnumToStringEqualConverter.Instance},
+                               ConverterParameter=Warning}"
                                    Classes.Error="{Binding WarningType,
-                                   Converter={x:Static converters:EnumToStringEqualConverter.Instance},
-                                   ConverterParameter=Error}" />
+                               Converter={x:Static converters:EnumToStringEqualConverter.Instance},
+                               ConverterParameter=Error}" />
                     </controls:IconButton>
                 </StackPanel>
 
@@ -391,7 +402,7 @@
                     <!-- token id -->
                     <StackPanel Grid.Row="0"
                                 Grid.Column="1"
-                                IsVisible="{Binding IsFa2}"
+
                                 HorizontalAlignment="Right"
                                 VerticalAlignment="Center"
                                 Orientation="Horizontal">

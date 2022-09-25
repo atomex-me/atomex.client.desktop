@@ -6,6 +6,8 @@
              xmlns:converters="clr-namespace:Atomex.Client.Desktop.Converters"
              xmlns:controls="clr-namespace:Atomex.Client.Desktop.Controls"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             xmlns:asyncImageLoader="clr-namespace:AsyncImageLoader;assembly=AsyncImageLoader.Avalonia"
+             xmlns:services="clr-namespace:Atomex.Client.Desktop.Services"
              x:Class="Atomex.Client.Desktop.Views.WalletViews.TezosTokensView">
 
     <Design.DataContext>
@@ -16,170 +18,208 @@
         <converters:AmountToStringConverter x:Key="AmountToStringConverter" />
     </UserControl.Resources>
 
-    <ListBox Background="{DynamicResource AlmostTransparentBrush}"
-             Margin="0 8 0 0"
-             Items="{Binding Tokens}"
-             HorizontalAlignment="Stretch"
-             SelectionMode="Toggle">
-        <ListBox.Styles>
-            <Style Selector="ListBoxItem">
-                <Setter Property="Padding" Value="16 0" />
-                <Setter Property="Height" Value="60" />
-                <Setter Property="VerticalContentAlignment" Value="Center" />
-                <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-                <Setter Property="Cursor" Value="Hand" />
-                <Setter Property="BorderThickness" Value="0 0 0 1" />
-                <Setter Property="BorderBrush" Value="{DynamicResource LightDefaultOpacity10}" />
-            </Style>
-            <Style Selector="ListBoxItem:pointerover /template/ ContentPresenter">
-                <Setter Property="Background" Value="{DynamicResource ListBoxItemPointeroverBrush}" />
-                <Setter Property="CornerRadius" Value="8" />
-            </Style>
+    <Grid RowDefinitions="Auto,*">
+        <TextBox Grid.Row="0"
+                 Height="44"
+                 Margin="0 16 0 0"
+                 CornerRadius="8"
+                 Watermark="Search tokens"
+                 FontSize="16"
+                 Text="{Binding SearchPattern, Mode=TwoWay}"
+                 Classes="SearchTextBox">
+            <TextBox.InnerRightContent>
+                <StackPanel VerticalAlignment="Center"
+                            IsVisible="{Binding SearchPattern,
+                                Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+                    <controls:IconButton Classes="Clear NoEffects"
+                                         Command="{ReflectionBinding $parent[TextBox].Clear}"
+                                         Margin="0 0 15 0" />
+                </StackPanel>
+            </TextBox.InnerRightContent>
+        </TextBox>
 
-            <Style Selector="ListBoxItem:not(:pointerover) /template/ ContentPresenter">
-                <Setter Property="Background" Value="{DynamicResource AlmostTransparentBrush}" />
-            </Style>
-        </ListBox.Styles>
+        <ListBox Grid.Row="1"
+                 Background="{DynamicResource AlmostTransparentBrush}"
+                 Margin="0 20 0 0"
+                 Items="{Binding Tokens}"
+                 HorizontalAlignment="Stretch"
+                 SelectionMode="Toggle">
+            <ListBox.Styles>
+                <Style Selector="ListBoxItem">
+                    <Setter Property="Padding" Value="16 0" />
+                    <Setter Property="Height" Value="60" />
+                    <Setter Property="VerticalContentAlignment" Value="Center" />
+                    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                    <Setter Property="Cursor" Value="Hand" />
+                    <Setter Property="BorderThickness" Value="0 0 0 1" />
+                    <Setter Property="BorderBrush" Value="{DynamicResource LightDefaultOpacity10}" />
+                </Style>
+                <Style Selector="ListBoxItem:pointerover /template/ ContentPresenter">
+                    <Setter Property="Background" Value="{DynamicResource ListBoxItemPointeroverBrush}" />
+                    <Setter Property="CornerRadius" Value="8" />
+                </Style>
 
-        <ListBox.ItemTemplate>
-            <DataTemplate>
-                <Grid ColumnDefinitions="*"
-                      VerticalAlignment="Stretch">
-                    <Button Command="{Binding $parent[ListBox].DataContext.SetTokenCommand}"
-                            CommandParameter="{Binding}"
-                            HorizontalAlignment="Stretch"
-                            VerticalContentAlignment="Center"
-                            Padding="0"
-                            Classes="EmptyBtnWithContent">
-                        <Grid ColumnDefinitions="*,Auto,40"
-                              RowDefinitions="Auto">
-                            <StackPanel Orientation="Horizontal"
-                                        Grid.Column="0">
-                                <Ellipse Width="30"
-                                         Height="30">
-                                    <Ellipse.Fill>
-                                        <ImageBrush Source="{Binding BitmapIcon}"
-                                                    BitmapInterpolationMode="HighQuality"
-                                                    Stretch="Fill" />
-                                    </Ellipse.Fill>
-                                </Ellipse>
-                                <TextBlock VerticalAlignment="Center"
-                                           Foreground="{DynamicResource DefaultForegroundBrush}"
-                                           FontSize="18"
-                                           Margin="10 0 0 0"
-                                           Text="{Binding TokenBalance.Name}" />
-                                <TextBlock VerticalAlignment="Center"
-                                           Foreground="{DynamicResource SecondaryForegroundBrush}"
-                                           FontSize="13"
-                                           Margin="24 0 0 0">
-                                    <TextBlock.Text>
-                                        <MultiBinding
-                                            Converter="{StaticResource AmountToStringConverter}">
-                                            <Binding Path="CurrentQuote" Mode="OneWay" />
-                                            <Binding Path="BaseCurrencyFormat" Mode="OneWay" />
-                                        </MultiBinding>
-                                    </TextBlock.Text>
-                                </TextBlock>
-                            </StackPanel>
-                            <StackPanel Grid.Column="1"
-                                        VerticalAlignment="Center"
-                                        Orientation="Vertical">
-                                <TextBlock Foreground="{DynamicResource DefaultForegroundBrush}"
-                                           FontSize="16"
-                                           Margin="0 0 0 2"
-                                           VerticalAlignment="Stretch"
-                                           HorizontalAlignment="Right"
-                                           Text="{Binding Balance}" />
-                                <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
-                                           FontSize="13"
-                                           Margin="0 2 0 0"
-                                           HorizontalAlignment="Right"
-                                           VerticalAlignment="Stretch"
-                                           IsVisible="{Binding TotalAmount,
-                                           Converter={x:Static converters:NumericConverters.NotZero}}">
-                                    <TextBlock.Text>
-                                        <MultiBinding Converter="{StaticResource AmountToStringConverter}">
-                                            <Binding Path="TotalAmountInBase" Mode="OneWay" />
-                                            <Binding Path="BaseCurrencyFormat" Mode="OneWay" />
-                                        </MultiBinding>
-                                    </TextBlock.Text>
-                                </TextBlock>
-                            </StackPanel>
+                <Style Selector="ListBoxItem:not(:pointerover) /template/ ContentPresenter">
+                    <Setter Property="Background" Value="{DynamicResource AlmostTransparentBrush}" />
+                </Style>
+            </ListBox.Styles>
 
-                            <WrapPanel Grid.Column="2"
-                                       HorizontalAlignment="Stretch"
-                                       VerticalAlignment="Center">
-                                <controls:IconButton Classes="MenuDots"
-                                                     Margin="12 0"
-                                                     Command="{Binding OpenPopupCommand}"
-                                                     HorizontalAlignment="Right" />
-                                <Popup PlacementMode="Left"
-                                       VerticalAlignment="Center"
-                                       WindowManagerAddShadowHint="False"
-                                       IsLightDismissEnabled="True"
-                                       IsOpen="{Binding IsPopupOpened, Mode=TwoWay}">
-                                    <Border Background="{DynamicResource DeepBlue}"
-                                            CornerRadius="{DynamicResource AtomexCornerRadius}"
-                                            Padding="12 16">
-                                        <StackPanel Classes="Popup">
-                                            <Button CornerRadius="{DynamicResource AtomexCornerRadius}"
-                                                    VerticalContentAlignment="Center"
-                                                    Command="{Binding SendCommand}">
-                                                <StackPanel Orientation="Horizontal"
-                                                            VerticalAlignment="Stretch">
-                                                    <TextBlock Text="Send"
-                                                               Foreground="{DynamicResource DefaultForegroundBrush}"
-                                                               VerticalAlignment="Center"
-                                                               FontSize="16" />
-                                                    <TextBlock Text="{Binding TokenBalance.Symbol}"
-                                                               Foreground="{DynamicResource DefaultForegroundBrush}"
-                                                               VerticalAlignment="Center"
-                                                               FontSize="16"
-                                                               Margin="3 0 0 0" />
-                                                </StackPanel>
-                                            </Button>
-                                            <Button CornerRadius="{DynamicResource AtomexCornerRadius}"
-                                                    VerticalContentAlignment="Center"
-                                                    Command="{Binding ReceiveCommand}">
-                                                <StackPanel Orientation="Horizontal"
-                                                            VerticalAlignment="Stretch">
-                                                    <TextBlock Text="Receive"
-                                                               Foreground="{DynamicResource DefaultForegroundBrush}"
-                                                               VerticalAlignment="Center"
-                                                               FontSize="16" />
-                                                    <TextBlock Text="{Binding TokenBalance.Symbol}"
-                                                               Foreground="{DynamicResource DefaultForegroundBrush}"
-                                                               VerticalAlignment="Center"
-                                                               FontSize="16"
-                                                               Margin="3 0 0 0" />
-                                                </StackPanel>
-                                            </Button>
-
-                                            <Button CornerRadius="{DynamicResource AtomexCornerRadius}"
-                                                    VerticalContentAlignment="Center"
-                                                    IsVisible="{Binding CanExchange}"
-                                                    Command="{Binding ExchangeCommand}">
-                                                <StackPanel Orientation="Horizontal"
-                                                            VerticalAlignment="Stretch">
-                                                    <TextBlock Text="Exchange"
-                                                               Foreground="{DynamicResource DefaultForegroundBrush}"
-                                                               VerticalAlignment="Center"
-                                                               FontSize="16" />
-                                                    <TextBlock Text="{Binding TokenBalance.Symbol}"
-                                                               Foreground="{DynamicResource DefaultForegroundBrush}"
-                                                               VerticalAlignment="Center"
-                                                               FontSize="16"
-                                                               Margin="3 0 0 0" />
-                                                </StackPanel>
-                                            </Button>
-                                        </StackPanel>
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <Grid ColumnDefinitions="*"
+                          VerticalAlignment="Stretch">
+                        <Button Command="{Binding $parent[ListBox].DataContext.SetTokenCommand}"
+                                CommandParameter="{Binding}"
+                                HorizontalAlignment="Stretch"
+                                VerticalContentAlignment="Center"
+                                Padding="0"
+                                Classes="EmptyBtnWithContent">
+                            <Grid ColumnDefinitions="*,Auto,40"
+                                  RowDefinitions="Auto">
+                                <StackPanel Orientation="Horizontal"
+                                            Grid.Column="0">
+                                    <Border Width="30"
+                                            Height="30"
+                                            VerticalAlignment="Stretch"
+                                            HorizontalAlignment="Stretch"
+                                            ClipToBounds="True"
+                                            CornerRadius="16"
+                                            Classes.IsImageLoading="{Binding #PreviewImg.IsLoading}"
+                                            Classes.ImageNotLoaded="{Binding #PreviewImg.CurrentImage,
+                                            Converter={x:Static ObjectConverters.IsNull}}">
+                                        <asyncImageLoader:AdvancedImage Name="PreviewImg"
+                                                                        StretchDirection="Both"
+                                                                        Stretch="UniformToFill"
+                                                                        Source="{Binding PreviewUrl}"
+                                                                        Loader="{x:Static services:FileCacheImageLoader.Instance}" />
                                     </Border>
-                                </Popup>
-                            </WrapPanel>
-                        </Grid>
-                    </Button>
-                </Grid>
-            </DataTemplate>
-        </ListBox.ItemTemplate>
-    </ListBox>
+                                    <TextBlock VerticalAlignment="Center"
+                                               Foreground="{DynamicResource DefaultForegroundBrush}"
+                                               FontSize="18"
+                                               Margin="10 0 0 0"
+                                               IsVisible="{Binding TokenBalance.Name,
+                                               Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                                               Text="{Binding TokenBalance.Name}" />
+                                    <TextBlock VerticalAlignment="Center"
+                                               Foreground="{DynamicResource DefaultForegroundBrush}"
+                                               FontSize="18"
+                                               Margin="10 0 0 0"
+                                               IsVisible="{Binding TokenBalance.Name,
+                                               Converter={x:Static StringConverters.IsNullOrEmpty}}"
+                                               Text="{Binding TokenBalance.Symbol}" />
+                                    <TextBlock VerticalAlignment="Center"
+                                               Foreground="{DynamicResource SecondaryForegroundBrush}"
+                                               FontSize="13"
+                                               Margin="24 0 0 0">
+                                        <TextBlock.Text>
+                                            <MultiBinding
+                                                Converter="{StaticResource AmountToStringConverter}">
+                                                <Binding Path="CurrentQuote" Mode="OneWay" />
+                                                <Binding Path="BaseCurrencyFormat" Mode="OneWay" />
+                                            </MultiBinding>
+                                        </TextBlock.Text>
+                                    </TextBlock>
+                                </StackPanel>
+                                <StackPanel Grid.Column="1"
+                                            VerticalAlignment="Center"
+                                            Orientation="Vertical">
+                                    <TextBlock Foreground="{DynamicResource DefaultForegroundBrush}"
+                                               FontSize="16"
+                                               Margin="0 0 0 2"
+                                               VerticalAlignment="Stretch"
+                                               HorizontalAlignment="Right"
+                                               Text="{Binding Balance}" />
+                                    <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
+                                               FontSize="13"
+                                               Margin="0 2 0 0"
+                                               HorizontalAlignment="Right"
+                                               VerticalAlignment="Stretch"
+                                               IsVisible="{Binding TotalAmount,
+                                           Converter={x:Static converters:NumericConverters.NotZero}}">
+                                        <TextBlock.Text>
+                                            <MultiBinding Converter="{StaticResource AmountToStringConverter}">
+                                                <Binding Path="TotalAmountInBase" Mode="OneWay" />
+                                                <Binding Path="BaseCurrencyFormat" Mode="OneWay" />
+                                            </MultiBinding>
+                                        </TextBlock.Text>
+                                    </TextBlock>
+                                </StackPanel>
+
+                                <WrapPanel Grid.Column="2"
+                                           HorizontalAlignment="Stretch"
+                                           VerticalAlignment="Center">
+                                    <controls:IconButton Classes="MenuDots"
+                                                         Margin="12 0"
+                                                         Command="{Binding OpenPopupCommand}"
+                                                         HorizontalAlignment="Right" />
+                                    <Popup PlacementMode="Left"
+                                           VerticalAlignment="Center"
+                                           WindowManagerAddShadowHint="False"
+                                           IsLightDismissEnabled="True"
+                                           IsOpen="{Binding IsPopupOpened, Mode=TwoWay}">
+                                        <Border Background="{DynamicResource DeepBlue}"
+                                                CornerRadius="{DynamicResource AtomexCornerRadius}"
+                                                Padding="12 16">
+                                            <StackPanel Classes="Popup">
+                                                <Button CornerRadius="{DynamicResource AtomexCornerRadius}"
+                                                        VerticalContentAlignment="Center"
+                                                        Command="{Binding SendCommand}">
+                                                    <StackPanel Orientation="Horizontal"
+                                                                VerticalAlignment="Stretch">
+                                                        <TextBlock Text="Send"
+                                                                   Foreground="{DynamicResource DefaultForegroundBrush}"
+                                                                   VerticalAlignment="Center"
+                                                                   FontSize="16" />
+                                                        <TextBlock Text="{Binding TokenBalance.Symbol}"
+                                                                   Foreground="{DynamicResource DefaultForegroundBrush}"
+                                                                   VerticalAlignment="Center"
+                                                                   FontSize="16"
+                                                                   Margin="3 0 0 0" />
+                                                    </StackPanel>
+                                                </Button>
+                                                <Button CornerRadius="{DynamicResource AtomexCornerRadius}"
+                                                        VerticalContentAlignment="Center"
+                                                        Command="{Binding ReceiveCommand}">
+                                                    <StackPanel Orientation="Horizontal"
+                                                                VerticalAlignment="Stretch">
+                                                        <TextBlock Text="Receive"
+                                                                   Foreground="{DynamicResource DefaultForegroundBrush}"
+                                                                   VerticalAlignment="Center"
+                                                                   FontSize="16" />
+                                                        <TextBlock Text="{Binding TokenBalance.Symbol}"
+                                                                   Foreground="{DynamicResource DefaultForegroundBrush}"
+                                                                   VerticalAlignment="Center"
+                                                                   FontSize="16"
+                                                                   Margin="3 0 0 0" />
+                                                    </StackPanel>
+                                                </Button>
+
+                                                <Button CornerRadius="{DynamicResource AtomexCornerRadius}"
+                                                        VerticalContentAlignment="Center"
+                                                        IsVisible="{Binding CanExchange}"
+                                                        Command="{Binding ExchangeCommand}">
+                                                    <StackPanel Orientation="Horizontal"
+                                                                VerticalAlignment="Stretch">
+                                                        <TextBlock Text="Exchange"
+                                                                   Foreground="{DynamicResource DefaultForegroundBrush}"
+                                                                   VerticalAlignment="Center"
+                                                                   FontSize="16" />
+                                                        <TextBlock Text="{Binding TokenBalance.Symbol}"
+                                                                   Foreground="{DynamicResource DefaultForegroundBrush}"
+                                                                   VerticalAlignment="Center"
+                                                                   FontSize="16"
+                                                                   Margin="3 0 0 0" />
+                                                    </StackPanel>
+                                                </Button>
+                                            </StackPanel>
+                                        </Border>
+                                    </Popup>
+                                </WrapPanel>
+                            </Grid>
+                        </Button>
+                    </Grid>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+    </Grid>
 </UserControl>

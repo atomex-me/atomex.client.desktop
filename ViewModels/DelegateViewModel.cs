@@ -27,7 +27,7 @@ using Atomex.Wallet.Tezos;
 
 namespace Atomex.Client.Desktop.ViewModels
 {
-    public class DelegateViewModel : ViewModelBase
+    public class DelegateViewModel : ViewModelBase, IDisposable
     {
         private readonly IAtomexApp _app;
         private readonly TezosConfig _tezosConfig;
@@ -430,8 +430,6 @@ namespace Atomex.Client.Desktop.ViewModels
                             StakingAvailable = bakerData.StakingAvailable
                         })
                         .ToList();
-
-                    bakers.ForEach(bakerVm => _ = App.ImageService.LoadImageFromUrl(bakerVm.Logo));
                 });
             }
             catch (Exception e)
@@ -443,7 +441,6 @@ namespace Atomex.Client.Desktop.ViewModels
             {
                 BakersList = bakers;
                 InitialBakersList = new List<BakerViewModel>(BakersList);
-                //UseDefaultFee = _useDefaultFee;
             }, DispatcherPriority.Background);
         }
 
@@ -614,6 +611,12 @@ namespace Atomex.Client.Desktop.ViewModels
 
             if (provider.IsAvailable)
                 _ = LoadBakerList();
+        }
+        
+        public void Dispose()
+        {
+            _app.QuotesProvider.QuotesUpdated -= OnQuotesUpdatedEventHandler;
+            _app.QuotesProvider.AvailabilityChanged -= OnQuotesProviderAvailabilityChangedEventHandler;
         }
 
 #if DEBUG

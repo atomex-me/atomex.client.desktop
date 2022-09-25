@@ -3,12 +3,9 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive;
-using System.Reactive.Linq;
-
 using Avalonia.Controls;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
-
 using Atomex.Client.Common;
 using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
@@ -27,9 +24,6 @@ namespace Atomex.Client.Desktop.ViewModels
         [Reactive] public ObservableCollection<IWalletViewModel> Wallets { get; private set; }
         [Reactive] public IWalletViewModel Selected { get; set; }
 
-        // todo: remove
-        [Reactive] private bool IsTezosTokensSelected { get; set; }
-
         public WalletsViewModel()
         {
 #if DEBUG
@@ -41,13 +35,6 @@ namespace Atomex.Client.Desktop.ViewModels
         public WalletsViewModel(IAtomexApp app)
         {
             App = app ?? throw new ArgumentNullException(nameof(app));
-
-            // todo: remove
-            this.WhenAnyValue(vm => vm.Selected)
-                .WhereNotNull()
-                .Select(walletViewModel => walletViewModel is TezosTokensWalletViewModel)
-                .SubscribeInMainThread(res => IsTezosTokensSelected = res);
-
             SubscribeToServices();
         }
 
@@ -69,11 +56,14 @@ namespace Atomex.Client.Desktop.ViewModels
                         setWertCurrency: SetWertCurrency,
                         showRightPopupContent: ShowRightPopupContent,
                         showTezosToken: ShowTezosToken,
+                        showTezosCollection: ShowTezosCollection,
                         currency: currency))
                     .ToList();
 
                 walletsViewModels.AddRange(wallets);
                 walletsViewModels.Add(new TezosTokenWalletViewModel(App, ShowRightPopupContent));
+                walletsViewModels.Add(new CollectiblesWalletViewModel(ShowTezosCollectible));
+                walletsViewModels.Add(new CollectibleWalletViewModel(App, ShowRightPopupContent));
             }
             else
             {
@@ -86,26 +76,57 @@ namespace Atomex.Client.Desktop.ViewModels
 
         private void ShowTezosToken(TezosTokenViewModel tokenViewModel)
         {
-            if (Wallets.Last() is not TezosTokenWalletViewModel tezosTokenWalletViewModel) return;
+            var walletViewModel = Wallets.FirstOrDefault(w => w is TezosTokenWalletViewModel);
+            if (walletViewModel is not TezosTokenWalletViewModel tezosTokenWalletViewModel) return;
 
             tezosTokenWalletViewModel.TokenViewModel = tokenViewModel;
             Selected = tezosTokenWalletViewModel;
         }
 
-        private ReactiveCommand<Unit, Unit> _backCommand;
+        private void ShowTezosCollection(IEnumerable<TezosTokenViewModel> tokens)
+        {
+            var walletViewModel = Wallets.FirstOrDefault(w => w is CollectiblesWalletViewModel);
+            if (walletViewModel is not CollectiblesWalletViewModel collectiblesWalletViewModel) return;
 
-        public ReactiveCommand<Unit, Unit> BackCommand => _backCommand ??=
-            (_backCommand = ReactiveCommand.Create(() =>
+            collectiblesWalletViewModel.Tokens = new ObservableCollection<TezosTokenViewModel>(tokens);
+            collectiblesWalletViewModel.InitialTokens = new ObservableCollection<TezosTokenViewModel>(tokens);
+            Selected = collectiblesWalletViewModel;
+        }
+
+        private void ShowTezosCollectible(TezosTokenViewModel tokenViewModel)
+        {
+            var walletViewModel = Wallets.FirstOrDefault(w => w is CollectibleWalletViewModel);
+            if (walletViewModel is not CollectibleWalletViewModel collectibleWalletViewModel) return;
+
+            collectibleWalletViewModel.TokenViewModel = tokenViewModel;
+            Selected = collectibleWalletViewModel;
+        }
+
+        private ReactiveCommand<Unit, Unit>? _backCommand;
+
+        public ReactiveCommand<Unit, Unit> BackCommand => _backCommand ??= _backCommand = ReactiveCommand.Create(() =>
+        {
+            switch (Selected)
             {
-                if (Selected is TezosTokenWalletViewModel tokenWalletViewModel)
-                {
+                case CollectibleWalletViewModel collectibleWalletViewModel:
+                    collectibleWalletViewModel.TokenViewModel = null;
+                    Selected = Wallets.First(wallet => wallet is CollectiblesWalletViewModel);
+                    return;
+
+                case TezosTokenWalletViewModel tokenWalletViewModel:
                     tokenWalletViewModel.TokenViewModel = null;
                     Selected = Wallets.First(wallet => wallet is TezosWalletViewModel);
                     return;
-                }
 
-                BackAction?.Invoke();
-            }));
+                case CollectiblesWalletViewModel:
+                    Selected = Wallets.First(wallet => wallet is TezosWalletViewModel);
+                    return;
+
+                default:
+                    BackAction?.Invoke();
+                    break;
+            }
+        });
 
         private void DesignerMode()
         {

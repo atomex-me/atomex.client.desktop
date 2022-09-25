@@ -59,10 +59,10 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
         public WalletViewModel(
             IAtomexApp app,
-            Action<CurrencyConfig>? setConversionTab,
-            Action<string>? setWertCurrency,
             Action<ViewModelBase?> showRightPopupContent,
-            CurrencyConfig? currency)
+            CurrencyConfig? currency = null,
+            Action<CurrencyConfig>? setConversionTab = null,
+            Action<string>? setWertCurrency = null)
         {
             _app = app ?? throw new ArgumentNullException(nameof(app));
             ShowRightPopupContent = showRightPopupContent
@@ -250,29 +250,29 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             }
         }
 
-        private ReactiveCommand<Unit, Unit> _sendCommand;
+        private ReactiveCommand<Unit, Unit>? _sendCommand;
         public ReactiveCommand<Unit, Unit> SendCommand => _sendCommand ??= ReactiveCommand.Create(OnSendClick);
 
-        private ReactiveCommand<Unit, Unit> _receiveCommand;
+        private ReactiveCommand<Unit, Unit>? _receiveCommand;
         public ReactiveCommand<Unit, Unit> ReceiveCommand => _receiveCommand ??= ReactiveCommand.Create(OnReceiveClick);
 
-        private ReactiveCommand<Unit, Unit> _exchangeCommand;
+        private ReactiveCommand<Unit, Unit>? _exchangeCommand;
         public ReactiveCommand<Unit, Unit> ExchangeCommand =>
             _exchangeCommand ??= ReactiveCommand.Create(OnConvertClick);
 
-        private ReactiveCommand<Unit, Unit> _updateCommand;
+        private ReactiveCommand<Unit, Unit>? _updateCommand;
         public ReactiveCommand<Unit, Unit> UpdateCommand =>
             _updateCommand ??= ReactiveCommand.CreateFromTask(OnUpdateClick);
 
-        private ReactiveCommand<Unit, Unit> _cancelUpdateCommand;
+        private ReactiveCommand<Unit, Unit>? _cancelUpdateCommand;
         public ReactiveCommand<Unit, Unit> CancelUpdateCommand => _cancelUpdateCommand ??= ReactiveCommand.Create(
             () => _cancellation?.Cancel());
 
-        private ReactiveCommand<Unit, Unit> _buyCommand;
+        private ReactiveCommand<Unit, Unit>? _buyCommand;
         public ReactiveCommand<Unit, Unit> BuyCommand => _buyCommand ??= ReactiveCommand.Create(
             () => SetWertCurrency?.Invoke(CurrencyViewModel.Header));
 
-        private ReactiveCommand<TxSortField, Unit> _setSortTypeCommand;
+        private ReactiveCommand<TxSortField, Unit>? _setSortTypeCommand;
         public ReactiveCommand<TxSortField, Unit> SetSortTypeCommand =>
             _setSortTypeCommand ??= ReactiveCommand.Create<TxSortField>(sortField =>
             {

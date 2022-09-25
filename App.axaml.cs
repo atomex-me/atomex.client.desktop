@@ -26,6 +26,7 @@ using Atomex.Client.Desktop.Views;
 using Atomex.Common.Configuration;
 using Atomex.Core;
 using Atomex.MarketData;
+using Atomex.MarketData.Abstract;
 using Atomex.MarketData.Bitfinex;
 using Atomex.MarketData.TezTools;
 using Atomex.Services;
@@ -36,7 +37,6 @@ namespace Atomex.Client.Desktop
     {
         public static DialogService DialogService;
         public static TemplateService TemplateService;
-        public static ImageService ImageService;
         public static IClipboard Clipboard;
         public static NotificationsService NotificationsService;
         public static ILoggerFactory LoggerFactory;
@@ -49,7 +49,6 @@ namespace Atomex.Client.Desktop
         public override void OnFrameworkInitializationCompleted()
         {
             TemplateService = new TemplateService();
-            ImageService = new ImageService();
             Clipboard = AvaloniaLocator.Current.GetService<IClipboard>();
 
             // set invariant culture by default
@@ -65,12 +64,12 @@ namespace Atomex.Client.Desktop
                 currencies: currenciesProvider
                     .GetCurrencies(Network.MainNet)
                     .Select(c => c.Name),
-                baseCurrency: BitfinexQuotesProvider.Usd,
+                baseCurrency: QuotesProvider.Usd,
                 log: LoggerFactory.CreateLogger<BitfinexQuotesProvider>());
 
             var tezToolsQuotesProvider = new TezToolsQuotesProvider(
                 log: LoggerFactory.CreateLogger<TezToolsQuotesProvider>());
-            
+
             var quotesProvider = new MultiSourceQuotesProvider(
                 log: LoggerFactory.CreateLogger<MultiSourceQuotesProvider>(),
                 bitfinexQuotesProvider, tezToolsQuotesProvider);
@@ -140,7 +139,7 @@ namespace Atomex.Client.Desktop
         {
             get
             {
-                var resourceName = "currencies.json";
+                const string resourceName = "currencies.json";
                 var resourceNames = CoreAssembly.GetManifestResourceNames();
                 var fullFileName = resourceNames.FirstOrDefault(n => n.EndsWith(resourceName));
                 var stream = CoreAssembly.GetManifestResourceStream(fullFileName!);

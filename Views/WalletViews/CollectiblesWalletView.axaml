@@ -1,0 +1,128 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:walletViewModels="clr-namespace:Atomex.Client.Desktop.ViewModels.WalletViewModels"
+             xmlns:asyncImageLoader="clr-namespace:AsyncImageLoader;assembly=AsyncImageLoader.Avalonia"
+             xmlns:services="clr-namespace:Atomex.Client.Desktop.Services"
+             xmlns:converters="clr-namespace:Atomex.Client.Desktop.Converters"
+             xmlns:controls="clr-namespace:Atomex.Client.Desktop.Controls"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="Atomex.Client.Desktop.Views.WalletViews.CollectiblesWalletView">
+
+    <Design.DataContext>
+        <walletViewModels:CollectiblesWalletViewModel />
+    </Design.DataContext>
+
+    <Grid RowDefinitions="Auto,*">
+        <TextBox Grid.Row="0"
+                 Height="44"
+                 Margin="0 16 0 0"
+                 CornerRadius="8"
+                 Watermark="Search token ID"
+                 FontSize="16"
+                 Text="{Binding SearchPattern, Mode=TwoWay}"
+                 Classes="SearchTextBox">
+            <TextBox.InnerRightContent>
+                <StackPanel VerticalAlignment="Center"
+                            IsVisible="{Binding SearchPattern,
+                                Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+                    <controls:IconButton Classes="Clear NoEffects"
+                                         Command="{ReflectionBinding $parent[TextBox].Clear}"
+                                         Margin="0 0 15 0" />
+                </StackPanel>
+            </TextBox.InnerRightContent>
+        </TextBox>
+
+        <ListBox Grid.Row="1"
+                 Padding="0 24 0 0"
+                 Items="{Binding Tokens}">
+            <ListBox.Styles>
+                <Style Selector="ListBox">
+                    <Setter Property="Background" Value="Transparent" />
+                    <Setter Property="ItemsPanel">
+                        <ItemsPanelTemplate>
+                            <WrapPanel />
+                        </ItemsPanelTemplate>
+                    </Setter>
+                </Style>
+                <Style Selector="ListBoxItem">
+                    <Setter Property="VerticalContentAlignment" Value="Stretch" />
+                    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                    <Setter Property="Background" Value="Transparent" />
+                    <Setter Property="Padding" Value="0" />
+                    <Setter Property="Margin" Value="0 0 32 28" />
+                    <Setter Property="Cursor" Value="Hand" />
+                </Style>
+                <Style Selector="ListBoxItem:selected /template/ ContentPresenter">
+                    <Setter Property="Background" Value="Transparent" />
+                </Style>
+                <Style Selector="ListBoxItem:not(:selected) /template/ ContentPresenter">
+                    <Setter Property="Background" Value="Transparent" />
+                </Style>
+            </ListBox.Styles>
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <Button Command="{Binding $parent[ListBox].DataContext.OnCollectibleClickCommand}"
+                            CommandParameter="{Binding}"
+                            HorizontalAlignment="Stretch"
+                            VerticalAlignment="Stretch"
+                            Padding="0"
+                            Classes="EmptyBtnWithContent"
+                            Classes.Disabled="{Binding TotalAmount,
+                        Converter={x:Static converters:NumericConverters.IsZero}}">
+                        <Button.Styles>
+                            <Style Selector="Button.Disabled">
+                                <Setter Property="Opacity" Value="0.5" />
+                            </Style>
+                        </Button.Styles>
+                        <Grid ColumnDefinitions="156"
+                              RowDefinitions="156,40">
+                            <Border Grid.Column="0"
+                                    Grid.Row="0"
+                                    VerticalAlignment="Stretch"
+                                    HorizontalAlignment="Stretch"
+                                    ClipToBounds="True"
+                                    CornerRadius="8"
+                                    Classes.IsImageLoading="{Binding #PreviewImg.IsLoading}"
+                                    Classes.ImageNotLoaded="{Binding #PreviewImg.CurrentImage,
+                                    Converter={x:Static ObjectConverters.IsNull}}">
+                                <asyncImageLoader:AdvancedImage Name="PreviewImg"
+                                                                StretchDirection="Both"
+                                                                Stretch="UniformToFill"
+                                                                Source="{Binding CollectiblePreviewUrl}"
+                                                                Loader="{x:Static services:FileCacheImageLoader.Instance}" />
+                            </Border>
+                            <StackPanel Grid.Column="0"
+                                        Grid.Row="1"
+                                        Margin="0 10 0 0">
+                                <TextBlock Foreground="{DynamicResource DefaultForegroundBrush}"
+                                           FontSize="16"
+                                           TextTrimming="CharacterEllipsis"
+                                           Text="{Binding TokenBalance.Name}" />
+
+                                <StackPanel Orientation="Horizontal"
+                                            Margin="0 4 0 0">
+                                    <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
+                                               FontSize="13"
+                                               TextTrimming="CharacterEllipsis"
+                                               Text="{Binding TotalAmount}" />
+                                    <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
+                                               FontSize="13"
+                                               IsVisible="{Binding TotalAmount,
+                                       Converter={x:Static converters:NumericConverters.IsOne}}"
+                                               Text=" collectible" />
+                                    <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
+                                               FontSize="13"
+                                               IsVisible="{Binding TotalAmount,
+                                       Converter={x:Static converters:NumericConverters.IsNotOne}}"
+                                               Text=" collectibles" />
+                                </StackPanel>
+                            </StackPanel>
+                        </Grid>
+                    </Button>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+    </Grid>
+</UserControl>

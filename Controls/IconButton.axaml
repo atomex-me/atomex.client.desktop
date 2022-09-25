@@ -33,7 +33,9 @@
 
                     <controls:IconButton Classes="Back"
                                          Margin="10 0 0 0" />
-
+                    
+                    <controls:IconButton Classes="Disconnect"
+                                         Margin="10 0 0 0" />
                 </StackPanel>
 
                 <StackPanel Margin="0 25 0 0 "
@@ -340,6 +342,18 @@
     </Style>
     <Style Selector="controls|IconButton.Back:pointerover svg|Svg">
         <Setter Property="Path" Value="/Resources/Icons/back-light.svg" />
+    </Style>
+    
+    <Style Selector="controls|IconButton.Disconnect">
+        <Setter Property="Width" Value="28" />
+        <Setter Property="Height" Value="28" />
+    </Style>
+    <Style Selector="controls|IconButton.Disconnect svg|Svg">
+        <Setter Property="Path" Value="/Resources/Icons/disconnect.svg" />
+        <Setter Property="Width" Value="22" />
+    </Style>
+    <Style Selector="controls|IconButton.Disconnect:pointerover svg|Svg">
+        <Setter Property="Path" Value="/Resources/Icons/disconnect-light.svg" />
     </Style>
 
     <Style Selector="controls|IconButton.Close">

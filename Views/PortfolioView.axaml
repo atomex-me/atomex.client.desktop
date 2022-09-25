@@ -292,13 +292,6 @@
                                             </StackPanel>
 
                                             <StackPanel Orientation="Horizontal">
-                                                <!-- todo: remove -->
-                                                <StackPanel.IsVisible>
-                                                    <MultiBinding Converter="{StaticResource ObjectsNotEqualConverter}">
-                                                        <Binding Path="$parent[ListBox].DataContext.TezosTokens" />
-                                                        <Binding Path="Header" />
-                                                    </MultiBinding>
-                                                </StackPanel.IsVisible>
                                                 <TextBlock IsVisible="{Binding !AvailableAmount}"
                                                            HorizontalAlignment="Right"
                                                            Foreground="{DynamicResource DefaultForegroundBrush}"
@@ -336,10 +329,11 @@
                                                                 CornerRadius="{DynamicResource AtomexCornerRadius}"
                                                                 Padding="12 16">
                                                             <StackPanel Classes="Popup">
-                                                                <Button CornerRadius="{DynamicResource AtomexCornerRadius}"
-                                                                        VerticalContentAlignment="Center"
-                                                                        Command="{Binding $parent[ListBox].DataContext.SendFromPopupCommand}"
-                                                                        CommandParameter="{Binding}">
+                                                                <Button
+                                                                    CornerRadius="{DynamicResource AtomexCornerRadius}"
+                                                                    VerticalContentAlignment="Center"
+                                                                    Command="{Binding $parent[ListBox].DataContext.SendFromPopupCommand}"
+                                                                    CommandParameter="{Binding}">
                                                                     <StackPanel Orientation="Horizontal"
                                                                         VerticalAlignment="Stretch">
                                                                         <TextBlock Text="Send"
@@ -353,10 +347,11 @@
                                                                             Margin="3 0 0 0" />
                                                                     </StackPanel>
                                                                 </Button>
-                                                                <Button CornerRadius="{DynamicResource AtomexCornerRadius}"
-                                                                        VerticalContentAlignment="Center"
-                                                                        Command="{Binding $parent[ListBox].DataContext.ReceiveFromPopupCommand}"
-                                                                        CommandParameter="{Binding}">
+                                                                <Button
+                                                                    CornerRadius="{DynamicResource AtomexCornerRadius}"
+                                                                    VerticalContentAlignment="Center"
+                                                                    Command="{Binding $parent[ListBox].DataContext.ReceiveFromPopupCommand}"
+                                                                    CommandParameter="{Binding}">
                                                                     <StackPanel Orientation="Horizontal"
                                                                         VerticalAlignment="Stretch">
                                                                         <TextBlock Text="Receive"
@@ -370,10 +365,11 @@
                                                                             Margin="3 0 0 0" />
                                                                     </StackPanel>
                                                                 </Button>
-                                                                <Button CornerRadius="{DynamicResource AtomexCornerRadius}"
-                                                                        VerticalContentAlignment="Center"
-                                                                        Command="{Binding $parent[ListBox].DataContext.ExchangeCommand}"
-                                                                        CommandParameter="{Binding}">
+                                                                <Button
+                                                                    CornerRadius="{DynamicResource AtomexCornerRadius}"
+                                                                    VerticalContentAlignment="Center"
+                                                                    Command="{Binding $parent[ListBox].DataContext.ExchangeCommand}"
+                                                                    CommandParameter="{Binding}">
                                                                     <StackPanel Orientation="Horizontal"
                                                                         VerticalAlignment="Stretch">
                                                                         <TextBlock Text="Exchange"
@@ -387,11 +383,12 @@
                                                                             Margin="3 0 0 0" />
                                                                     </StackPanel>
                                                                 </Button>
-                                                                <Button CornerRadius="{DynamicResource AtomexCornerRadius}"
-                                                                        VerticalContentAlignment="Center"
-                                                                        IsVisible="{Binding CurrencyCode, Converter={StaticResource ShowBuyButton}}"
-                                                                        Command="{Binding $parent[ListBox].DataContext.SetWertCurrencyCommand}"
-                                                                        CommandParameter="{Binding}">
+                                                                <Button
+                                                                    CornerRadius="{DynamicResource AtomexCornerRadius}"
+                                                                    VerticalContentAlignment="Center"
+                                                                    IsVisible="{Binding CurrencyCode, Converter={StaticResource ShowBuyButton}}"
+                                                                    Command="{Binding $parent[ListBox].DataContext.SetWertCurrencyCommand}"
+                                                                    CommandParameter="{Binding}">
                                                                     <StackPanel Orientation="Horizontal"
                                                                         VerticalAlignment="Stretch">
                                                                         <TextBlock Text="Buy"

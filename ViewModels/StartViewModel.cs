@@ -103,22 +103,22 @@ namespace Atomex.Client.Desktop.ViewModels
 
         private void OnAccountCreated(IAccount account, ILocalStorage localStorage)
         {
-            var atomexClient = new WebSocketAtomexClientLegacy(
-                exchangeUrl: App.Configuration[$"Services:{account!.Network}:Exchange:Url"],
-                marketDataUrl: App.Configuration[$"Services:{account!.Network}:MarketData:Url"],
-                clientType: PlatformHelper.GetClientType(),
-                authMessageSigner: account.DefaultAuthMessageSigner());
+            var atomexClient = AtomexClientCreator.Create(
+                configuration: App.Configuration,
+                network: account!.Network,
+                platformType: PlatformHelper.GetClientType(),
+                account.DefaultAuthMessageSigner());
 
             AtomexApp.ChangeAtomexClient(atomexClient, account, localStorage, restart: true);
         }
         
         private void OnAccountRestored(IAccount account, ILocalStorage localStorage)
         {
-            var atomexClient = new WebSocketAtomexClientLegacy(
-                exchangeUrl: App.Configuration[$"Services:{account!.Network}:Exchange:Url"],
-                marketDataUrl: App.Configuration[$"Services:{account!.Network}:MarketData:Url"],
-                clientType: PlatformHelper.GetClientType(),
-                authMessageSigner: account.DefaultAuthMessageSigner());
+            var atomexClient = AtomexClientCreator.Create(
+                configuration: App.Configuration,
+                network: account!.Network,
+                platformType: PlatformHelper.GetClientType(),
+                account.DefaultAuthMessageSigner());
 
             MainWindowVM.AccountRestored = true;
 

@@ -173,7 +173,6 @@
                 <WrapPanel />
             </ItemsPanelTemplate>
         </Setter>
-
     </Style>
 
     <Style Selector="TabItem">

@@ -155,6 +155,7 @@
 
         <ListBox Grid.Row="1"
                  Name="AddressesListBox"
+                 Margin="0 1 0 0"
                  Background="{DynamicResource AlmostTransparentBrush}"
                  Items="{Binding Addresses}"
                  HorizontalAlignment="Stretch"

@@ -93,7 +93,7 @@ namespace Atomex.Client.Desktop.ViewModels
             {
                 ShowRightPopupContent = ShowRightPopupContent
             };
-
+            
             SettingsViewModel = new SettingsViewModel(AtomexApp);
             WertViewModel = new WertViewModel(AtomexApp);
             NotificationsViewModel = new NotificationsViewModel();
@@ -216,17 +216,7 @@ namespace Atomex.Client.Desktop.ViewModels
 
         private void SelectCurrencyWallet(string? currencyDescription = null)
         {
-            // todo: remove
-            if (currencyDescription == PortfolioViewModel.TezosTokens)
-            {
-                WalletsViewModel.Selected = new TezosTokensWalletViewModel(
-                    app: AtomexApp,
-                    setConversionTab: SelectConversion,
-                    setWertCurrency: SelectWert,
-                    showRightPopupContent: ShowRightPopupContent);
-            }
-
-            else if (currencyDescription != null)
+            if (currencyDescription != null)
             {
                 WalletsViewModel.Selected = WalletsViewModel
                     .Wallets

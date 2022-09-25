@@ -33,7 +33,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             Action<CurrencyConfig> setConversionTab,
             Action<string>? setWertCurrency,
             Action<ViewModelBase?> showRightPopupContent,
-            CurrencyConfig currency) : base(app, setConversionTab, setWertCurrency, showRightPopupContent, currency)
+            CurrencyConfig currency) : base(app, showRightPopupContent, currency, setConversionTab, setWertCurrency)
         {
         }
 
