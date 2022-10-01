@@ -57,14 +57,6 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
         public string CurrencyDescription => TokenBalance.Name;
         string IAssetViewModel.BaseCurrencyFormat => BaseCurrencyFormat;
 
-        private ThumbsApi ThumbsApi => new(
-            new ThumbsApiSettings
-            {
-                ThumbsApiUri = TezosConfig.ThumbsApiUri,
-                IpfsGatewayUri = TezosConfig.IpfsGatewayUri,
-                CatavaApiUri = TezosConfig.CatavaApiUri
-            });
-        
         public string CollectiblePreviewUrl =>
             ThumbsApi.GetTokenPreviewUrl(Contract.Address, TokenBalance.TokenId);
 
