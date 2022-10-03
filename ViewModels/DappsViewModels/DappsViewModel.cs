@@ -279,13 +279,20 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
                             permissionRequest.Network.Type.ToString()[0].ToString().ToUpper(),
                             permissionRequest.Network.Type.ToString().AsSpan(1));
 
+                    var securedPublicKey = AtomexApp.Account.Wallet.GetPublicKey(
+                        Tezos,
+                        connectedWalletAddress.KeyIndex,
+                        connectedWalletAddress.KeyType);
+
+                    var publicKey = securedPublicKey.ToUnsecuredBytes(); 
+
                     var response = new PermissionResponse(
                         id: permissionRequest.Id,
                         senderId: BeaconWalletClient.SenderId,
                         appMetadata: BeaconWalletClient.Metadata,
                         network: permissionRequest.Network,
                         scopes: permissionRequest.Scopes,
-                        publicKey: PubKey.FromBase64(connectedWalletAddress.PublicKey).ToString(),
+                        publicKey: PubKey.FromBytes(publicKey).ToString(),
                         address: connectedWalletAddress.Address,
                         version: permissionRequest.Version);
 
@@ -370,13 +377,20 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
 
                     if (!revealed)
                     {
+                        var securedPublicKey = AtomexApp.Account.Wallet.GetPublicKey(
+                            Tezos,
+                            connectedWalletAddress.KeyIndex,
+                            connectedWalletAddress.KeyType);
+
+                        var publicKey = securedPublicKey.ToUnsecuredBytes();
+
                         operations.Add(new RevealContent
                         {
                             Counter = ++counter,
                             Fee = 0,
                             GasLimit = 1_000_000,
                             Source = connectedWalletAddress.Address,
-                            PublicKey = PubKey.FromBase64(connectedWalletAddress.PublicKey).ToString(),
+                            PublicKey = PubKey.FromBytes(publicKey).ToString(),
                             StorageLimit = 0
                         });
                     }

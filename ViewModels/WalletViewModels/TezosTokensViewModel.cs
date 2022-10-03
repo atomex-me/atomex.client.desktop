@@ -137,13 +137,13 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         {
             try
             {
-                if (args is not TokenBalanceChangedEventArgs)
+                if (args is not TokenBalanceChangedEventArgs tbcArgs)
                     return;
 
                 await Dispatcher.UIThread.InvokeAsync(async () => { await ReloadTokenContractsAsync(); },
                     DispatcherPriority.Background);
 
-                Log.Debug("Tezos tokens balances updated with contract {@Contract}", args.TokenContract);
+                Log.Debug("Tezos tokens balances updated with contract {@Contract}", tbcArgs.TokenContract);
             }
             catch (Exception e)
             {

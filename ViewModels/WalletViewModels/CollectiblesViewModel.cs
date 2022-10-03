@@ -63,7 +63,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             ShowTezosCollection = showTezosCollection ?? throw new ArgumentNullException(nameof(showTezosCollection));
 
             _app.AtomexClientChanged += OnAtomexClientChanged;
-            _app.Account.BalanceUpdated += OnBalanceUpdatedEventHandler;
+            _app.LocalStorage.BalanceChanged += OnBalanceChangedEventHandler;
 
             this.WhenAnyValue(vm => vm.DisabledCollectibles)
                 .WhereNotNull()
@@ -101,7 +101,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             _ = ReloadTokenContractsAsync();
         }
 
-        private void OnAtomexClientChanged(object sender, AtomexClientChangedEventArgs args)
+        private void OnAtomexClientChanged(object? sender, AtomexClientChangedEventArgs args)
         {
             if (_app.Account != null) return;
 
@@ -109,16 +109,16 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             Contracts?.Clear();
         }
 
-        private async void OnBalanceUpdatedEventHandler(object sender, CurrencyEventArgs args)
+        private async void OnBalanceChangedEventHandler(object? sender, BalanceChangedEventArgs args)
         {
             try
             {
-                if (args.IsTokenUpdate && (args.TokenContract == null || Contracts != null))
+                if (args is TokenBalanceChangedEventArgs tbcArds && (tbcArds.TokenContract == null || Contracts != null))
                 {
                     await Dispatcher.UIThread.InvokeAsync(async () => { await ReloadTokenContractsAsync(); },
                         DispatcherPriority.Background);
                     
-                    Log.Debug("Tezos collectibles balance updated with contract {@Contract}", args.TokenContract);
+                    Log.Debug("Tezos collectibles balance updated with contract {@Contract}", tbcArds.TokenContract);
                 }
             }
             catch (Exception e)
@@ -130,9 +130,9 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         private async Task ReloadTokenContractsAsync()
         {
             var contracts = (await _app.Account
-                    .GetCurrencyAccount<TezosAccount>(TezosConfig.Xtz)
-                    .DataRepository
-                    .GetTezosTokenContractsAsync())
+                .GetCurrencyAccount<TezosAccount>(TezosConfig.Xtz)
+                .LocalStorage
+                .GetTokenContractsAsync())
                 .ToList();
 
             Contracts = new ObservableCollection<TokenContract>(contracts);
