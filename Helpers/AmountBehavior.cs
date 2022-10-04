@@ -64,10 +64,6 @@ namespace Atomex.Client.Desktop.Helpers
             {
                 AssociatedObject.Text = "0";
             }
-            else if (decimal.TryParse(AssociatedObject.Text, out var decimalValue))
-            {
-                AssociatedObject.Text = decimalValue.ToString(Format, CultureInfo.CurrentCulture);
-            }
         }
 
         private void PastingFromClipboardEventHandler(object? sender, RoutedEventArgs args)
