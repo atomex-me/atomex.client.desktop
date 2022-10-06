@@ -5,6 +5,13 @@ using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
+
+using Avalonia.Controls;
+using Avalonia.Threading;
+using ReactiveUI;
+using ReactiveUI.Fody.Helpers;
+using Serilog;
+
 using Atomex.Blockchain.Tezos;
 using Atomex.Client.Common;
 using Atomex.Client.Desktop.Common;
@@ -12,11 +19,6 @@ using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
 using Atomex.ViewModels;
 using Atomex.Wallet;
 using Atomex.Wallet.Tezos;
-using Avalonia.Controls;
-using Avalonia.Threading;
-using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
-using Serilog;
 
 namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 {
@@ -113,12 +115,12 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         {
             try
             {
-                if (args is TokenBalanceChangedEventArgs tbcArds && (tbcArds.TokenContract == null || Contracts != null))
+                if (args is TokenBalanceChangedEventArgs eventArgs)
                 {
                     await Dispatcher.UIThread.InvokeAsync(async () => { await ReloadTokenContractsAsync(); },
                         DispatcherPriority.Background);
                     
-                    Log.Debug("Tezos collectibles balance updated with contract {@Contract}", tbcArds.TokenContract);
+                    Log.Debug("Tezos collectibles balance updated for contracts {@Contracts}", string.Join(',', eventArgs.Tokens.Select(t => t.Item1)));
                 }
             }
             catch (Exception e)

@@ -102,18 +102,21 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
         {
             try
             {
-                if ((args.Currency != null && args.Currency == Currency.Name) ||
-                    (args is TokenBalanceChangedEventArgs eventArgs && (eventArgs.TokenContract == null || _account.Currencies.FirstOrDefault(c =>
+                var needReload = args.Currencies.Any()
+                    ? args.Currencies.Contains(Currency.Name)
+                    : args is TokenBalanceChangedEventArgs eventArgs && _account.Currencies.FirstOrDefault(c =>
                         c is TezosTokenConfig tc &&
-                        tc.TokenContractAddress == eventArgs.TokenContract &&
-                        tc.TokenId == eventArgs.TokenId) != null)))
+                        eventArgs.Tokens.Contains((tc.TokenContractAddress, tc.TokenId)) &&
+                        tc.Name == Currency.Name) != null;
+
+                if (needReload)
                 {
                     await UpdateAsync();
                 }
             }
             catch (Exception e)
             {
-                Log.Error(e, $"Error for currency {args.Currency}");
+                Log.Error(e, $"Error for currency {Currency.Name}");
             }
         }
 

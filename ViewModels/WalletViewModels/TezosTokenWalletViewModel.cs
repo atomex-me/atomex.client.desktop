@@ -100,17 +100,17 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             _app.LocalStorage.BalanceChanged += OnBalanceChangedEventHandler;
         }
 
-        protected override async void OnBalanceChangedEventHandler(object sender, BalanceChangedEventArgs args)
+        protected override async void OnBalanceChangedEventHandler(object? sender, BalanceChangedEventArgs args)
         {
             try
             {
-                if (args is not TokenBalanceChangedEventArgs eventArgs ||
-                    TokenViewModel == null ||
-                    eventArgs.TokenContract != null && (eventArgs.TokenContract != TokenViewModel.Contract.Address || eventArgs.TokenId != TokenViewModel.TokenBalance.TokenId))
-                {
-                    return;
-                }
+                var isTokenUpdate = args is TokenBalanceChangedEventArgs eventArgs &&
+                    TokenViewModel != null &&
+                    eventArgs.Tokens.Contains((TokenViewModel.Contract.Address, TokenViewModel.TokenBalance.TokenId));
 
+                if (!isTokenUpdate)
+                    return;
+ 
                 await Dispatcher.UIThread.InvokeAsync(async () => await LoadTransfers(TokenViewModel),
                     DispatcherPriority.Background);
             }

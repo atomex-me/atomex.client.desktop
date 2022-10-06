@@ -48,11 +48,11 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             {
                 var tezosTokenConfig = (TezosTokenConfig)Currency;
 
-                if (args is not TokenBalanceChangedEventArgs eventArgs ||
-                    eventArgs.TokenContract != null && (eventArgs.TokenContract != tezosTokenConfig.TokenContractAddress || eventArgs.TokenId != tezosTokenConfig.TokenId))
-                {
+                var isTokenUpdate = args is TokenBalanceChangedEventArgs eventArgs &&
+                    eventArgs.Tokens.Contains((tezosTokenConfig.TokenContractAddress, tezosTokenConfig.TokenId));
+
+                if (!isTokenUpdate)
                     return;
-                }
 
                 // update transactions list
                 await LoadTransactionsAsync();

@@ -135,7 +135,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         {
             try
             {
-                if (args.Currency != Currency.Name)
+                if (!args.Currencies.Contains(Currency.Name))
                     return;
 
                 // update transactions list

@@ -102,11 +102,11 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
         {
             try
             {
-                if (args is not TokenBalanceChangedEventArgs eventArgs ||
-                    eventArgs.TokenContract != null && (eventArgs.TokenContract != TokenBalance.Contract || eventArgs.TokenId != TokenBalance.TokenId))
-                {
+                var isTokenUpdate = args is TokenBalanceChangedEventArgs eventArgs &&
+                    eventArgs.Tokens.Contains((TokenBalance.Contract, TokenBalance.TokenId));
+
+                if (!isTokenUpdate)
                     return;
-                }
 
                 await UpdateAsync();
 

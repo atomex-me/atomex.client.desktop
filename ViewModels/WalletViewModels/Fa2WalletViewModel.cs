@@ -42,14 +42,14 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             _app.LocalStorage.BalanceChanged += OnBalanceChangedEventHandler;
         }
 
-        protected virtual async void OnBalanceChangedEventHandler(object sender, BalanceChangedEventArgs args)
+        protected virtual async void OnBalanceChangedEventHandler(object? sender, BalanceChangedEventArgs args)
         {
             try
             {
                 var tezosTokenConfig = (TezosTokenConfig)Currency;
 
-                var isTokenUpdate = (args is TokenBalanceChangedEventArgs eventArgs) &&
-                    (eventArgs.TokenContract == null || (eventArgs.TokenContract == tezosTokenConfig.TokenContractAddress && eventArgs.TokenId == tezosTokenConfig.TokenId));
+                var isTokenUpdate = args is TokenBalanceChangedEventArgs eventArgs &&
+                    eventArgs.Tokens.Contains((tezosTokenConfig.TokenContractAddress, tezosTokenConfig.TokenId));
 
                 if (!isTokenUpdate)
                     return;

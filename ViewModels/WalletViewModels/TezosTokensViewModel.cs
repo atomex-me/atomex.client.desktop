@@ -5,11 +5,14 @@ using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
+
+using Avalonia.Controls;
 using Avalonia.Threading;
 using DynamicData;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using Serilog;
+
 using Atomex.Blockchain.Tezos;
 using Atomex.Client.Common;
 using Atomex.Client.Desktop.Common;
@@ -19,8 +22,6 @@ using Atomex.Core;
 using Atomex.MarketData.Abstract;
 using Atomex.Wallet;
 using Atomex.Wallet.Tezos;
-using Avalonia.Controls;
-
 
 namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 {
@@ -125,7 +126,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             ReactiveCommand.Create<TezosTokenViewModel>(
                 tezosTokenViewModel => ShowTezosToken.Invoke(tezosTokenViewModel));
 
-        private void OnAtomexClientChanged(object sender, AtomexClientChangedEventArgs args)
+        private void OnAtomexClientChanged(object? sender, AtomexClientChangedEventArgs args)
         {
             if (_app.Account != null) return;
 
@@ -137,13 +138,13 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         {
             try
             {
-                if (args is not TokenBalanceChangedEventArgs tbcArgs)
+                if (args is not TokenBalanceChangedEventArgs eventArgs)
                     return;
 
                 await Dispatcher.UIThread.InvokeAsync(async () => { await ReloadTokenContractsAsync(); },
                     DispatcherPriority.Background);
 
-                Log.Debug("Tezos tokens balances updated with contract {@Contract}", tbcArgs.TokenContract);
+                Log.Debug("Tezos tokens balances updated for contracts {@Contracts}", string.Join(',', eventArgs.Tokens.Select(p => p.Item1)));
             }
             catch (Exception e)
             {

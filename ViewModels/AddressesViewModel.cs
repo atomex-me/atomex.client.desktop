@@ -272,13 +272,11 @@ namespace Atomex.Client.Desktop.ViewModels
 
         private async void OnBalanceChangedEventHandler(object? sender, BalanceChangedEventArgs args)
         {
-            var isCurrencyUpdate = args.Currency != null && _currency.Name == args.Currency;
-            
-            // any token update
-            var isTokenUpdate = (args is TokenBalanceChangedEventArgs eventArgs) &&
-                (eventArgs.TokenContract == null || (eventArgs.TokenContract == _tokenContract && eventArgs.TokenId == _tokenId));
+            var needReload = _tokenContract == null
+                ? args.Currencies.Contains(_currency.Name)
+                : args is TokenBalanceChangedEventArgs eventArg && eventArg.Tokens.Contains((_tokenContract, _tokenId));
 
-            if (isCurrencyUpdate || isTokenUpdate)
+            if (needReload)
             {
                 await ReloadAddresses();
             }

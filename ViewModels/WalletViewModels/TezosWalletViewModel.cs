@@ -110,11 +110,11 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             };
         }
 
-        protected override async void OnBalanceChangedEventHandler(object sender, BalanceChangedEventArgs args)
+        protected override async void OnBalanceChangedEventHandler(object? sender, BalanceChangedEventArgs args)
         {
             try
             {
-                if (Currency.Name != args.Currency)
+                if (!args.Currencies.Contains(Currency.Name))
                     return;
 
                 // update transactions list
