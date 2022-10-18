@@ -365,8 +365,8 @@ namespace Atomex.Client.Desktop.ViewModels
                             else if (Currencies.IsTezosBased(_currency.Name))
                             {
                                 var base58 = unsecuredPrivateKey.Length == 32
-                                    ? Base58Check.Encode(unsecuredPrivateKey, Prefix.Edsk)
-                                    : Base58Check.Encode(unsecuredPrivateKey, Prefix.EdskSecretKey);
+                                    ? Cryptography.Base58Check.Encode(unsecuredPrivateKey, Prefix.Edsk)
+                                    : Cryptography.Base58Check.Encode(unsecuredPrivateKey, Prefix.EdskSecretKey);
 
                                 _ = App.Clipboard.SetTextAsync(base58);
                             }
