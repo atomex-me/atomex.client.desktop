@@ -12,7 +12,7 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
     public class ConnectDappViewModel : ViewModelBase
     {
         public Action OnBack;
-        public Func<string, string, Task> OnConnect;
+        public Func<string, Task> OnConnect;
         [Reactive] public string? AddressToConnect { get; set; }
         [Reactive] public string? QrCodeString { get; set; }
         [ObservableAsProperty] public bool IsSending { get; }
@@ -23,7 +23,6 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
                 .SubscribeInMainThread(_ =>
                 {
                     QrCodeString = null;
-                    AddressToConnect = null;
                 });
             
             ConnectCommand
@@ -42,7 +41,7 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
             _connectCommand ??= _connectCommand = ReactiveCommand.CreateFromTask(async () =>
             {
                 if (QrCodeString != null && AddressToConnect != null)
-                    await OnConnect(QrCodeString, AddressToConnect);
+                    await OnConnect(QrCodeString);
             });
 
         private ReactiveCommand<string, Unit>? _copyCommand;
