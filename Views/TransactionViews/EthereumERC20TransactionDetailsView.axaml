@@ -13,7 +13,7 @@
              xmlns:vm="clr-namespace:Atomex.Client.Desktop.ViewModels.TransactionViewModels">
 
     <Design.DataContext>
-        <vm:EthereumERC20TransactionViewModel />
+        <vm:EthereumErc20TransactionViewModel />
     </Design.DataContext>
 
     <UserControl.Resources>

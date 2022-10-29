@@ -246,8 +246,8 @@ namespace Atomex.Client.Desktop.ViewModels
                     tezosConfig: _tezosConfig,
                     headOffset: TezosConfig.HeadOffset);
 
-                var signResult = await tx
-                    .SignAsync(keyStorage, walletAddress, _tezosConfig);
+                var signResult = await tezosAccount
+                    .SignAsync(tx);
 
                 if (!signResult)
                 {

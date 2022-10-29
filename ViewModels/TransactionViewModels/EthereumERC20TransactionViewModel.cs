@@ -2,14 +2,13 @@
 
 using Atomex.Blockchain.Abstract;
 using Atomex.Blockchain.Ethereum;
-using Atomex.Client.Desktop.Common;
 using Atomex.EthereumTokens;
 using Atomex.ViewModels;
 using Avalonia.Controls;
 
 namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
 {
-    public class EthereumERC20TransactionViewModel : TransactionViewModel
+    public class EthereumErc20TransactionViewModel : TransactionViewModel
     {
         public string From { get; set; }    
         public string To { get; set; }
@@ -20,7 +19,7 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
         public string ToExplorerUri => $"{Currency.AddressExplorerUri}{To}";
         public string Alias { get; set; }
 
-        public EthereumERC20TransactionViewModel()
+        public EthereumErc20TransactionViewModel()
         {
 #if DEBUG
             if (Design.IsDesignMode)
@@ -28,7 +27,7 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
 #endif
         }
 
-        public EthereumERC20TransactionViewModel(
+        public EthereumErc20TransactionViewModel(
             EthereumTransaction tx,
             Erc20Config erc20Config)
             : base(tx, erc20Config, GetAmount(tx, erc20Config), 0)

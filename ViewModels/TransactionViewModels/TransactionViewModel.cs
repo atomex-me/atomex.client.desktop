@@ -30,11 +30,11 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
         public Action? OnClose { get; set; }
         public bool CanBeRemoved { get; set; }
 
-        private ReactiveCommand<Unit, Unit> _openTxInExplorerCommand;
+        private ReactiveCommand<Unit, Unit>? _openTxInExplorerCommand;
         public ReactiveCommand<Unit, Unit> OpenTxInExplorerCommand => _openTxInExplorerCommand ??=
             ReactiveCommand.Create(() => App.OpenBrowser(TxExplorerUri));
 
-        private ReactiveCommand<string, Unit> _openAddressInExplorerCommand;
+        private ReactiveCommand<string, Unit>? _openAddressInExplorerCommand;
         public ReactiveCommand<string, Unit> OpenAddressInExplorerCommand => _openAddressInExplorerCommand ??=
             ReactiveCommand.Create<string>((address) =>
             {
@@ -44,7 +44,7 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
                     Log.Error("Invalid uri for address explorer");
             });
 
-        private ReactiveCommand<string, Unit> _copyCommand;
+        private ReactiveCommand<string, Unit>? _copyCommand;
 
         public ReactiveCommand<string, Unit> CopyCommand => _copyCommand ??= ReactiveCommand.Create<string>((s) =>
         {
@@ -58,15 +58,15 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
             }
         });
 
-        private ReactiveCommand<Unit, Unit> _updateCommand;
+        private ReactiveCommand<Unit, Unit>? _updateCommand;
         public ReactiveCommand<Unit, Unit> UpdateCommand => _updateCommand ??= ReactiveCommand.Create(
             () => UpdateClicked?.Invoke(this, new TransactionEventArgs(Transaction)));
 
-        private ReactiveCommand<Unit, Unit> _removeCommand;
+        private ReactiveCommand<Unit, Unit>? _removeCommand;
         public ReactiveCommand<Unit, Unit> RemoveCommand => _removeCommand ??= ReactiveCommand.Create(
             () => RemoveClicked?.Invoke(this, new TransactionEventArgs(Transaction)));
 
-        private ReactiveCommand<Unit, Unit> _onCloseCommand;
+        private ReactiveCommand<Unit, Unit>? _onCloseCommand;
         public ReactiveCommand<Unit, Unit> OnCloseCommand => _onCloseCommand ??= ReactiveCommand.Create(
             () => OnClose?.Invoke());
 
@@ -142,36 +142,25 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
             string currencyCode)
         {
             if (type.HasFlag(BlockchainTransactionType.SwapPayment))
-            {
                 return $"Swap payment {Math.Abs(amount).ToString("0." + new string('#', amountDigits))} {currencyCode}";
-            }
 
             if (type.HasFlag(BlockchainTransactionType.SwapRefund))
-            {
-                return
-                    $"Swap refund {Math.Abs(netAmount).ToString("0." + new string('#', amountDigits))} {currencyCode}";
-            }
+                return $"Swap refund {Math.Abs(netAmount).ToString("0." + new string('#', amountDigits))} {currencyCode}";
 
             if (type.HasFlag(BlockchainTransactionType.SwapRedeem))
-            {
-                return
-                    $"Swap redeem {Math.Abs(netAmount).ToString("0." + new string('#', amountDigits))} {currencyCode}";
-            }
+                return $"Swap redeem {Math.Abs(netAmount).ToString("0." + new string('#', amountDigits))} {currencyCode}";
 
             if (type.HasFlag(BlockchainTransactionType.TokenApprove))
-            {
                 return "Token approve";
-            }
 
             if (type.HasFlag(BlockchainTransactionType.TokenCall))
-            {
                 return "Token call";
-            }
 
-            if (type.HasFlag(BlockchainTransactionType.SwapCall))
-            {
-                return "Token swap call";
-            }
+            if (type.HasFlag(BlockchainTransactionType.TokenTransfer))
+                return "Token transfer";
+
+            if (type.HasFlag(BlockchainTransactionType.ContractCall))
+                return "Contract call";
 
             return amount switch
             {

@@ -132,7 +132,7 @@
         </DataTemplate>
 
         <DataTemplate x:Key="EthereumERC20TransactionDetailsTemplate"
-                      DataType="viewModels:EthereumERC20TransactionViewModel">
+                      DataType="viewModels:EthereumErc20TransactionViewModel">
             <views:EthereumERC20TransactionDetailsView />
         </DataTemplate>
 

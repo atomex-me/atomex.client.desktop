@@ -19,7 +19,7 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
                 BitcoinBasedConfig config =>
                     new BitcoinBasedTransactionViewModel(tx as BitcoinBasedTransaction, config),
                 Erc20Config config =>
-                    new EthereumERC20TransactionViewModel(tx as EthereumTransaction, config),
+                    new EthereumErc20TransactionViewModel(tx as EthereumTransaction, config),
                 EthereumConfig config =>
                     new EthereumTransactionViewModel(tx as EthereumTransaction, config),
                 TezosConfig config =>

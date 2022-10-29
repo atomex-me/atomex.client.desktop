@@ -37,7 +37,7 @@ namespace Atomex.Client.Desktop.Controls
             if (tx.Type.HasFlag(BlockchainTransactionType.TokenCall))
                 return App.TemplateService.GetTxTypeTemplate(TxTypeTemplate.TokenApproveTypeTemplate);
 
-            if (tx.Type.HasFlag(BlockchainTransactionType.SwapCall))
+            if (tx.Type.HasFlag(BlockchainTransactionType.ContractCall))
                 return App.TemplateService.GetTxTypeTemplate(TxTypeTemplate.TokenApproveTypeTemplate);
 
             if (tx.Amount <= 0) //tx.Type.HasFlag(BlockchainTransactionType.Output))

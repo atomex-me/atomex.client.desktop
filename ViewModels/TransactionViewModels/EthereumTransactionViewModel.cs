@@ -1,9 +1,10 @@
 ﻿using System;
+
+using Avalonia.Controls;
+
 using Atomex.Blockchain.Abstract;
 using Atomex.Blockchain.Ethereum;
-using Atomex.Client.Desktop.Common;
 using Atomex.ViewModels;
-using Avalonia.Controls;
 
 namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
 {
