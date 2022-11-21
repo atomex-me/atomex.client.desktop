@@ -6,8 +6,7 @@
 <?define UpgradeCode = "2938733e-4104-443a-850b-3916f1f68430" ?>
 <?define ExeName = "Atomex.Client.Desktop.exe" ?>
 
-<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"
-     xmlns:netfx="http://schemas.microsoft.com/wix/NetFxExtension">
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
     <Product Id="*"
              Language="1033"
              Name="$(var.Name)"
@@ -96,28 +95,60 @@
                         Value="1"
                         KeyPath="yes"/>
             </Component>
+        </DirectoryRef>
 
-            <Component Id="ApplicationDeeplink" Guid="*">
-                <RegistryKey Root="HKCR"
-                         Key="protocolname"
-                             Action="createAndRemoveOnUninstall">
-                    <RegistryValue Type="string" Name="URL Protocol" Value="atomex"/>
-<!--                    <RegistryKey Key="DefaultIcon">-->
-<!--                        <RegistryValue Type="string" Value="Atomex.Client.Desktop.exe"/>-->
-<!--                    </RegistryKey>-->
-                    <RegistryKey Key="shell\open\command">
-                        <RegistryValue Type="string"
-                                       Value="&quot;[INSTALLDIR]Atomex.Client.Desktop.exe&quot; &quot;%1&quot;"/>
-                    </RegistryKey>
+
+        <ComponentGroup Id='RegistryComponents'>
+            <!--            <Component Id="ApplicationDeeplink"-->
+            <!--                       Directory='TARGETDIR'-->
+            <!--                       Guid="*">-->
+            <!--                <RegistryKey Root="HKCR"-->
+            <!--                             Key="atomex"-->
+            <!--                             Action="createAndRemoveOnUninstall">-->
+            <!--                    <RegistryValue Type="string"-->
+            <!--                                   Name="URL Protocol"-->
+            <!--                                   Value="atomex"/>-->
+            <!--                    &lt;!&ndash;                    <RegistryKey Key="DefaultIcon">&ndash;&gt;-->
+            <!--                    &lt;!&ndash;                        <RegistryValue Type="string" Value="Atomex.Client.Desktop.exe"/>&ndash;&gt;-->
+            <!--                    &lt;!&ndash;                    </RegistryKey>&ndash;&gt;-->
+            <!--                    <RegistryKey Key="shell\open\command">-->
+            <!--                        <RegistryValue Type="string"-->
+            <!--                                       Value="&quot;[INSTALLDIR]Atomex.Client.Desktop.exe&quot; &quot;%1&quot;"/>-->
+            <!--                    </RegistryKey>-->
+            <!--                </RegistryKey>-->
+            <!--            </Component>-->
+
+            <Component Id='ApplicationDeeplink'
+                       Directory='TARGETDIR'
+                       Guid='*'>
+                <RegistryKey
+                        Root='HKCR'
+                        Key='atomex'>
+                    <RegistryValue
+                            Type='string'
+                            Value='Atomex desktop'/>
+                    <RegistryValue
+                            Name='URL Protocol'
+                            Type='string'
+                            Value=''/>
+                    <!--                    <RegistryValue-->
+                    <!--                            Key='DefaultIcon'-->
+                    <!--                            Type='string'-->
+                    <!--                            Value='[#f_vmnetx.exe]'/>-->
+                    <RegistryValue
+                            Key='shell\open\command'
+                            Type='string'
+                            Value='&quot;[INSTALLDIR]Atomex.Client.Desktop.exe&quot; &quot;%1&quot;'/>
                 </RegistryKey>
             </Component>
-        </DirectoryRef>
+        </ComponentGroup>
+
 
         <Feature Id="App" Title="$(var.Name)" Level="1">
             <ComponentGroupRef Id="App"/>
             <ComponentRef Id="ApplicationShortcut"/>
-            <ComponentRef Id="ApplicationShortcutDesktop"/>
-            <ComponentRef Id="ApplicationDeeplink"/>
+        <ComponentRef Id="ApplicationShortcutDesktop"/>
+            <ComponentGroupRef Id='RegistryComponents'/>
         </Feature>
 
         <UI>
