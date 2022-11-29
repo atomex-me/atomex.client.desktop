@@ -83,9 +83,11 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
 
     public class DappsViewModel : ViewModelBase
     {
+        private const int GasLimitPerBlock = 5_200_000;
+        private const int StorageLimitPerOperation = 5000;
+
         private readonly IAtomexApp _atomexApp;
         private IWalletBeaconClient _beaconWalletClient;
-
         [Reactive] public ObservableCollection<DappViewModel> Dapps { get; set; }
         public SelectAddressViewModel SelectAddressViewModel { get; private set; }
         private TezosConfig Tezos { get; }
@@ -344,15 +346,21 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
 
                     var operations = new List<ManagerOperationContent>();
 
+                    var totalOperations = revealed
+                        ? operationRequest.OperationDetails.Count
+                        : operationRequest.OperationDetails.Count + 1;
+
+                    var operationGasLimit = Math.Min(GasLimitPerBlock / totalOperations, 500_000);
+
                     if (!revealed)
                     {
                         operations.Add(new RevealContent
                         {
                             Counter = ++counter,
-                            Fee = 0,
-                            GasLimit = 1_000_000,
                             Source = connectedWalletAddress.Address,
                             PublicKey = PubKey.FromBase64(connectedWalletAddress.PublicKey).ToString(),
+                            Fee = 0,
+                            GasLimit = operationGasLimit,
                             StorageLimit = 0
                         });
                     }
@@ -369,8 +377,8 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
                             Amount = amount,
                             Counter = ++counter,
                             Fee = 0,
-                            GasLimit = 500_000,
-                            StorageLimit = 5000,
+                            GasLimit = operationGasLimit,
+                            StorageLimit = StorageLimitPerOperation,
                         };
 
                         if (o.Parameters == null) return txContent;
