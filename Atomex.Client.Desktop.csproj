@@ -51,7 +51,7 @@
         <PackageReference Include="Serilog.Extensions.Logging" Version="3.1.0" />
         <PackageReference Include="ReactiveUI.Fody" Version="16.4.1" />
         <PackageReference Include="AsyncImageLoader.Avalonia" Version="2.4.0" />
-        <PackageReference Include="Beacon.Sdk" Version="1.0.9" />
+        <PackageReference Include="Beacon.Sdk" Version="1.0.11" />
     </ItemGroup>
     
     <ItemGroup>
