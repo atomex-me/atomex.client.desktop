@@ -14,7 +14,7 @@ using ReactiveUI.Fody.Helpers;
 using Serilog;
 
 using Atomex.Abstract;
-using Atomex.Blockchain.BitcoinBased;
+using Atomex.Blockchain.Bitcoin;
 using Atomex.Client.Common;
 using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.Properties;
@@ -561,7 +561,7 @@ namespace Atomex.Client.Desktop.ViewModels
                         .GetCurrencyAccount<BitcoinBasedAccount>(currencyName)
                         .GetAvailableOutputsAsync()
                         .ConfigureAwait(false))
-                    .Cast<BitcoinBasedTxOutput>();
+                    .Cast<BitcoinTxOutput>();
 
                 var selectedOutputs = FromCurrencyViewModelItem?.CurrencyViewModel.Currency.Name == currencyName
                     ? (FromCurrencyViewModelItem as SelectCurrencyWithOutputsViewModelItem)?.SelectedOutputs
@@ -708,7 +708,7 @@ namespace Atomex.Client.Desktop.ViewModels
                     if (swapParams.Error != null)
                     {
                         AmountValidationMessageType = MessageType.Error;
-                        AmountValidationMessage = swapParams.Error.Description;
+                        AmountValidationMessage = swapParams.Error.Message;
                         AmountValidationMessageToolTip = swapParams.Error.Details;
                     }
                     else

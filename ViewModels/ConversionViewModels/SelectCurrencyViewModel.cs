@@ -11,7 +11,7 @@ using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using Network = NBitcoin.Network;
 
-using Atomex.Blockchain.BitcoinBased;
+using Atomex.Blockchain.Bitcoin;
 using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.ViewModels.Abstract;
 using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
@@ -39,8 +39,8 @@ namespace Atomex.Client.Desktop.ViewModels.ConversionViewModels
 
     public class SelectCurrencyWithOutputsViewModelItem : SelectCurrencyViewModelItem
     {
-        public IEnumerable<BitcoinBasedTxOutput> AvailableOutputs { get; set; }
-        [Reactive] public IEnumerable<BitcoinBasedTxOutput> SelectedOutputs { get; set; }
+        public IEnumerable<BitcoinTxOutput> AvailableOutputs { get; set; }
+        [Reactive] public IEnumerable<BitcoinTxOutput> SelectedOutputs { get; set; }
         public override string? ShortAddressDescription => $"{SelectedOutputs?.Count() ?? 0} outputs";
         public override IFromSource? FromSource => SelectedOutputs != null
             ? new FromOutputs(SelectedOutputs)
@@ -48,8 +48,8 @@ namespace Atomex.Client.Desktop.ViewModels.ConversionViewModels
 
         public SelectCurrencyWithOutputsViewModelItem(
             CurrencyViewModel currencyViewModel,
-            IEnumerable<BitcoinBasedTxOutput> availableOutputs,
-            IEnumerable<BitcoinBasedTxOutput>? selectedOutputs = null)
+            IEnumerable<BitcoinTxOutput> availableOutputs,
+            IEnumerable<BitcoinTxOutput>? selectedOutputs = null)
             : base(currencyViewModel)
         {
             this.WhenAnyValue(vm => vm.SelectedOutputs)
@@ -74,7 +74,7 @@ namespace Atomex.Client.Desktop.ViewModels.ConversionViewModels
             if (source is not SelectCurrencyWithOutputsViewModelItem sourceWithOutputs)
                 return;
 
-            var selectedOutputs = new List<BitcoinBasedTxOutput>();
+            var selectedOutputs = new List<BitcoinTxOutput>();
 
             foreach (var output in sourceWithOutputs.SelectedOutputs)
             {
@@ -166,7 +166,7 @@ namespace Atomex.Client.Desktop.ViewModels.ConversionViewModels
 
                 var outputs = (await bitcoinBasedAccount
                     .GetAvailableOutputsAsync())
-                    .Cast<BitcoinBasedTxOutput>();
+                    .Cast<BitcoinTxOutput>();
 
                 var selectOutputsViewModel = new SelectOutputsViewModel(
                     outputs: outputs.Select(o => new OutputViewModel()
@@ -279,9 +279,9 @@ namespace Atomex.Client.Desktop.ViewModels.ConversionViewModels
                 {
                     if (Atomex.Currencies.IsBitcoinBased(c.Name))
                     {
-                        var outputs = new List<BitcoinBasedTxOutput>
+                        var outputs = new List<BitcoinTxOutput>
                         {
-                            new BitcoinBasedTxOutput(
+                            new BitcoinTxOutput(
                                 coin: new Coin(
                                     fromTxHash: new uint256("19aa2187cda7610590d09dfab41ed4720f8570d7414b71b3dc677e237f72d4a1"),
                                     fromOutputIndex: 0u,
@@ -290,7 +290,7 @@ namespace Atomex.Client.Desktop.ViewModels.ConversionViewModels
                                 confirmations: 10,
                                 spentTxPoint: null,
                                 spentTxConfirmations: 0),
-                            new BitcoinBasedTxOutput(
+                            new BitcoinTxOutput(
                                 coin: new Coin(
                                     fromTxHash: new uint256("d70fa62762775362e767737e56cab7e8a094eafa8f96b935530d6450be1cfbce"),
                                     fromOutputIndex: 0u,

@@ -12,7 +12,7 @@ using NBitcoin;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using Network = NBitcoin.Network;
-using Atomex.Blockchain.BitcoinBased;
+using Atomex.Blockchain.Bitcoin;
 using Atomex.Client.Desktop.Common;
 using Atomex.Common;
 using Atomex.Core;
@@ -24,7 +24,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
     {
         private BitcoinBasedAccount Account { get; }
         public BitcoinBasedConfig Config { get; set; }
-        public Action<IEnumerable<BitcoinBasedTxOutput>> ConfirmAction { get; set; }
+        public Action<IEnumerable<BitcoinTxOutput>> ConfirmAction { get; set; }
         private ObservableCollection<OutputViewModel> InitialOutputs { get; set; }
 
         public SelectOutputsViewModel()
@@ -267,9 +267,9 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             var amount = new Money((decimal)0.9999, MoneyUnit.Satoshi);
             var script = BitcoinAddress.Create("muRDku2ZwNTz2msCZCHSUhDD5o6NxGsoXM", Network.TestNet).ScriptPubKey;
 
-            var outputs = new List<BitcoinBasedTxOutput>
+            var outputs = new List<BitcoinTxOutput>
             {
-                new BitcoinBasedTxOutput(
+                new BitcoinTxOutput(
                     coin: new Coin(
                         fromTxHash: new uint256("19aa2187cda7610590d09dfab41ed4720f8570d7414b71b3dc677e237f72d4a1"),
                         fromOutputIndex: 123u,
@@ -279,7 +279,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     spentTxPoint: null,
                     spentTxConfirmations: 0),
 
-                new BitcoinBasedTxOutput(
+                new BitcoinTxOutput(
                     coin: new Coin(
                         fromTxHash: new uint256("19aa2187cda7610590d09dfab41ed4720f8570d7414b71b3dc677e237f72d4a1"),
                         fromOutputIndex: 0u,
@@ -316,7 +316,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         public int Id { get; set; }
         [Reactive] public bool IsSelected { get; set; }
         [Reactive] public string CopyButtonToolTip { get; set; }
-        public BitcoinBasedTxOutput Output { get; set; }
+        public BitcoinTxOutput Output { get; set; }
         public BitcoinBasedConfig Config { get; set; }
         public WalletAddress? WalletAddress { get; set; }
         public decimal Balance => Config.SatoshiToCoin(Output.Value);

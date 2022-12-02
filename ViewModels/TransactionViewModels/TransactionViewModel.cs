@@ -23,10 +23,10 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
         public string Id { get; set; }
         public CurrencyConfig Currency { get; set; }
         public DateTime LocalTime => Time.ToLocalTime();
-        public BlockchainTransactionState State { get; set; }
+        public TransactionStatus State { get; set; }
         public DateTime Time { get; set; }
-        public IBlockchainTransaction Transaction { get; set; }
-        public BlockchainTransactionType Type { get; set; }
+        public ITransaction Transaction { get; set; }
+        public TransactionType Type { get; set; }
         public Action? OnClose { get; set; }
         public bool CanBeRemoved { get; set; }
 
@@ -95,7 +95,7 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
         }
 
         public TransactionViewModel(
-            IBlockchainTransaction tx,
+            ITransaction tx,
             CurrencyConfig currencyConfig,
             decimal amount,
             decimal fee)
@@ -103,7 +103,7 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
             Transaction = tx ?? throw new ArgumentNullException(nameof(tx));
             Id = Transaction.Id;
             Currency = currencyConfig;
-            State = Transaction.State;
+            State = Transaction.Status;
             Type = Transaction.Type;
             Amount = amount;
             FeeCode = currencyConfig.FeeCode;
@@ -115,10 +115,10 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
             AmountFormat = currencyViewModel.CurrencyFormat;
             CurrencyCode = currencyViewModel.CurrencyCode;
             Time = tx.CreationTime ?? DateTime.UtcNow;
-            CanBeRemoved = tx.State is BlockchainTransactionState.Unknown or
-                BlockchainTransactionState.Failed or
-                BlockchainTransactionState.Pending or
-                BlockchainTransactionState.Unconfirmed;
+            CanBeRemoved = tx.Status is TransactionStatus.Unknown or
+                TransactionStatus.Failed or
+                TransactionStatus.Pending or
+                TransactionStatus.Unconfirmed;
 
             Description = GetDescription(
                 type: tx.Type,
@@ -135,31 +135,31 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
         }
 
         public static string GetDescription(
-            BlockchainTransactionType type,
+            TransactionType type,
             decimal amount,
             decimal netAmount,
             int amountDigits,
             string currencyCode)
         {
-            if (type.HasFlag(BlockchainTransactionType.SwapPayment))
+            if (type.HasFlag(TransactionType.SwapPayment))
                 return $"Swap payment {Math.Abs(amount).ToString("0." + new string('#', amountDigits))} {currencyCode}";
 
-            if (type.HasFlag(BlockchainTransactionType.SwapRefund))
+            if (type.HasFlag(TransactionType.SwapRefund))
                 return $"Swap refund {Math.Abs(netAmount).ToString("0." + new string('#', amountDigits))} {currencyCode}";
 
-            if (type.HasFlag(BlockchainTransactionType.SwapRedeem))
+            if (type.HasFlag(TransactionType.SwapRedeem))
                 return $"Swap redeem {Math.Abs(netAmount).ToString("0." + new string('#', amountDigits))} {currencyCode}";
 
-            if (type.HasFlag(BlockchainTransactionType.TokenApprove))
+            if (type.HasFlag(TransactionType.TokenApprove))
                 return "Token approve";
 
-            if (type.HasFlag(BlockchainTransactionType.TokenCall))
+            if (type.HasFlag(TransactionType.TokenCall))
                 return "Token call";
 
-            if (type.HasFlag(BlockchainTransactionType.TokenTransfer))
+            if (type.HasFlag(TransactionType.TokenTransfer))
                 return "Token transfer";
 
-            if (type.HasFlag(BlockchainTransactionType.ContractCall))
+            if (type.HasFlag(TransactionType.ContractCall))
                 return "Contract call";
 
             return amount switch

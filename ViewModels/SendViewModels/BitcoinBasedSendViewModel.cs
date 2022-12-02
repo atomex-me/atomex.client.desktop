@@ -13,7 +13,7 @@ using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using Serilog;
 
-using Atomex.Blockchain.BitcoinBased;
+using Atomex.Blockchain.Bitcoin;
 using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.Properties;
 using Atomex.Client.Desktop.ViewModels.Abstract;
@@ -26,7 +26,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 {
     public class BitcoinBasedSendViewModel : SendViewModel
     {
-        [Reactive] private ObservableCollection<BitcoinBasedTxOutput> Outputs { get; set; }
+        [Reactive] private ObservableCollection<BitcoinTxOutput> Outputs { get; set; }
         [Reactive] public decimal FeeRate { get; set; }
 
         public string FeeRateFormat => "0.#";
@@ -82,9 +82,9 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
             var outputs = Account.GetAvailableOutputsAsync()
                 .WaitForResult()
-                .Select(output => (BitcoinBasedTxOutput)output);
+                .Select(output => (BitcoinTxOutput)output);
 
-            Outputs = new ObservableCollection<BitcoinBasedTxOutput>(outputs);
+            Outputs = new ObservableCollection<BitcoinTxOutput>(outputs);
 
             SelectFromViewModel = new SelectOutputsViewModel(outputs
                 .Select(o => new OutputViewModel
@@ -97,7 +97,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 BackAction = () => { App.DialogService.Show(this); },
                 ConfirmAction = ots =>
                 {
-                    Outputs = new ObservableCollection<BitcoinBasedTxOutput>(ots);
+                    Outputs = new ObservableCollection<BitcoinTxOutput>(ots);
                     App.DialogService.Show(SelectToViewModel);
                 },
                 Config = Config,
@@ -120,7 +120,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 .WaitForResult()
                 .Select(o => new OutputViewModel()
                 {
-                    Output = (BitcoinBasedTxOutput)o,
+                    Output = (BitcoinTxOutput)o,
                     Config = Config,
                     IsSelected = Outputs.Any(output => output.TxId == o.TxId && output.Index == o.Index)
                 });
@@ -130,7 +130,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 BackAction = () => { App.DialogService.Show(this); },
                 ConfirmAction = ots =>
                 {
-                    Outputs = new ObservableCollection<BitcoinBasedTxOutput>(ots);
+                    Outputs = new ObservableCollection<BitcoinTxOutput>(ots);
                     App.DialogService.Show(this);
                 },
                 Config = Config,
@@ -287,7 +287,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
                     if (maxAmountEstimation.Error != null)
                     {
-                        Warning        = maxAmountEstimation.Error.Description;
+                        Warning        = maxAmountEstimation.Error.Message;
                         WarningToolTip = maxAmountEstimation.Error.Details;
                         WarningType    = MessageType.Error;
                         Amount         = 0;
@@ -377,9 +377,9 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             var amount = new Money((decimal)0.0001, MoneyUnit.Satoshi);
             var script = BitcoinAddress.Create("muRDku2ZwNTz2msCZCHSUhDD5o6NxGsoXM", Network.TestNet).ScriptPubKey;
 
-            var outputs = new List<BitcoinBasedTxOutput>
+            var outputs = new List<BitcoinTxOutput>
             {
-                new BitcoinBasedTxOutput(
+                new BitcoinTxOutput(
                     coin: new Coin(
                         fromTxHash: new uint256("19aa2187cda7610590d09dfab41ed4720f8570d7414b71b3dc677e237f72d4a1"),
                         fromOutputIndex: 0u,
@@ -390,7 +390,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     spentTxConfirmations: 0)
             };
 
-            Outputs = new ObservableCollection<BitcoinBasedTxOutput>(outputs);
+            Outputs = new ObservableCollection<BitcoinTxOutput>(outputs);
             Stage = SendStage.Edit;
             AmountInBase = 1233123.34m;
         }

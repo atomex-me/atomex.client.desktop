@@ -53,10 +53,10 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
         {
             var result = 0m;
 
-            if (tx.Type.HasFlag(BlockchainTransactionType.Input))
+            if (tx.Type.HasFlag(TransactionType.Input))
                 result += EthereumConfig.WeiToEth(tx.Amount);
 
-            if (tx.Type.HasFlag(BlockchainTransactionType.Output))
+            if (tx.Type.HasFlag(TransactionType.Output))
                 result += -EthereumConfig.WeiToEth(tx.Amount + tx.GasUsed * tx.GasPrice);
 
             tx.InternalTxs?.ForEach(t => result += GetAmount(t));
@@ -68,7 +68,7 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
         {
             var result = 0m;
 
-            if (tx.Type.HasFlag(BlockchainTransactionType.Output))
+            if (tx.Type.HasFlag(TransactionType.Output))
                 result += EthereumConfig.WeiToEth(tx.GasUsed * tx.GasPrice);
 
             tx.InternalTxs?.ForEach(t => result += GetFee(t));

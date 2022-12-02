@@ -46,7 +46,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
                 var maxAmountEstimation = await account.EstimateMaxAmountToSendAsync(
                     from: From,
-                    type: BlockchainTransactionType.Output,
+                    type: TransactionType.Output,
                     gasLimit: UseDefaultFee ? null : GasLimit,
                     gasPrice: UseDefaultFee ? null : GasPrice,
                     reserve: false);
@@ -61,7 +61,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
                 if (maxAmountEstimation.Error != null)
                 {
-                    Warning = maxAmountEstimation.Error.Description;
+                    Warning = maxAmountEstimation.Error.Message;
                     WarningToolTip = maxAmountEstimation.Error.Details;
                     WarningType = MessageType.Error;
                     return;
@@ -92,14 +92,14 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     // estimate max amount with new GasPrice
                     var maxAmountEstimation = await account.EstimateMaxAmountToSendAsync(
                         from: From,
-                        type: BlockchainTransactionType.Output,
+                        type: TransactionType.Output,
                         gasLimit: GasLimit,
                         gasPrice: GasPrice,
                         reserve: false);
 
                     if (maxAmountEstimation.Error != null)
                     {
-                        Warning = maxAmountEstimation.Error.Description;
+                        Warning = maxAmountEstimation.Error.Message;
                         WarningToolTip = maxAmountEstimation.Error.Details;
                         WarningType = MessageType.Error;
                         return;
@@ -129,7 +129,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 var maxAmountEstimation = await account
                     .EstimateMaxAmountToSendAsync(
                         from: From,
-                        type: BlockchainTransactionType.Output,
+                        type: TransactionType.Output,
                         gasLimit: UseDefaultFee ? null : GasLimit,
                         gasPrice: UseDefaultFee ? null : GasPrice,
                         reserve: false);
@@ -139,7 +139,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
                 if (maxAmountEstimation.Error != null)
                 {
-                    Warning = maxAmountEstimation.Error.Description;
+                    Warning = maxAmountEstimation.Error.Message;
                     WarningToolTip = maxAmountEstimation.Error.Details;
                     WarningType = MessageType.Error;
                     Amount = 0;

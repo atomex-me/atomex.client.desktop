@@ -16,7 +16,7 @@ using Serilog;
 using Network = NBitcoin.Network;
 
 using Atomex.Blockchain;
-using Atomex.Blockchain.BitcoinBased;
+using Atomex.Blockchain.Bitcoin;
 using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.ViewModels.Abstract;
 using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;

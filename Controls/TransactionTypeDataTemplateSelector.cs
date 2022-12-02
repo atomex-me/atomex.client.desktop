@@ -22,22 +22,22 @@ namespace Atomex.Client.Desktop.Controls
             if (data is not TransactionViewModelBase tx)
                 return null;
 
-            if (tx.Type.HasFlag(BlockchainTransactionType.SwapPayment))
+            if (tx.Type.HasFlag(TransactionType.SwapPayment))
                 return App.TemplateService.GetTxTypeTemplate(TxTypeTemplate.SwapPaymentTypeTemplate);
 
-            if (tx.Type.HasFlag(BlockchainTransactionType.SwapRefund))
+            if (tx.Type.HasFlag(TransactionType.SwapRefund))
                 return App.TemplateService.GetTxTypeTemplate(TxTypeTemplate.SwapRefundTypeTemplate);
 
-            if (tx.Type.HasFlag(BlockchainTransactionType.SwapRedeem))
+            if (tx.Type.HasFlag(TransactionType.SwapRedeem))
                 return App.TemplateService.GetTxTypeTemplate(TxTypeTemplate.SwapRedeemTypeTemplate);
 
-            if (tx.Type.HasFlag(BlockchainTransactionType.TokenApprove))
+            if (tx.Type.HasFlag(TransactionType.TokenApprove))
                 return App.TemplateService.GetTxTypeTemplate(TxTypeTemplate.TokenApproveTypeTemplate);
 
-            if (tx.Type.HasFlag(BlockchainTransactionType.TokenCall))
+            if (tx.Type.HasFlag(TransactionType.TokenCall))
                 return App.TemplateService.GetTxTypeTemplate(TxTypeTemplate.TokenApproveTypeTemplate);
 
-            if (tx.Type.HasFlag(BlockchainTransactionType.ContractCall))
+            if (tx.Type.HasFlag(TransactionType.ContractCall))
                 return App.TemplateService.GetTxTypeTemplate(TxTypeTemplate.TokenApproveTypeTemplate);
 
             if (tx.Amount <= 0) //tx.Type.HasFlag(BlockchainTransactionType.Output))

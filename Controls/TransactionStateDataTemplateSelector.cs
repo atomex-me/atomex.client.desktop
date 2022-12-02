@@ -24,15 +24,15 @@ namespace Atomex.Client.Desktop.Controls
 
             return transaction.State switch
             {
-                BlockchainTransactionState.Pending => App.TemplateService.GetTxStateTemplate(TxStateTemplate
+                TransactionStatus.Pending => App.TemplateService.GetTxStateTemplate(TxStateTemplate
                     .PendingStateTemplate),
-                BlockchainTransactionState.Confirmed => App.TemplateService.GetTxStateTemplate(TxStateTemplate
+                TransactionStatus.Confirmed => App.TemplateService.GetTxStateTemplate(TxStateTemplate
                     .ConfirmedStateTemplate),
-                BlockchainTransactionState.Unconfirmed => App.TemplateService.GetTxStateTemplate(TxStateTemplate
+                TransactionStatus.Unconfirmed => App.TemplateService.GetTxStateTemplate(TxStateTemplate
                     .UnconfirmedStateTemplate),
-                BlockchainTransactionState.Failed => App.TemplateService.GetTxStateTemplate(TxStateTemplate
+                TransactionStatus.Failed => App.TemplateService.GetTxStateTemplate(TxStateTemplate
                     .FailedStateTemplate),
-                BlockchainTransactionState.Unknown => App.TemplateService.GetTxStateTemplate(TxStateTemplate
+                TransactionStatus.Unknown => App.TemplateService.GetTxStateTemplate(TxStateTemplate
                     .UnknownStateTemplate),
                 _ => throw new ArgumentOutOfRangeException()
             };

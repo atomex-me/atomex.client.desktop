@@ -1,6 +1,6 @@
 ﻿using System;
 using Atomex.Blockchain.Abstract;
-using Atomex.Blockchain.BitcoinBased;
+using Atomex.Blockchain.Bitcoin;
 using Atomex.Blockchain.Ethereum;
 using Atomex.Blockchain.Tezos;
 using Atomex.Core;
@@ -11,13 +11,13 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
     public static class TransactionViewModelCreator
     {
         public static TransactionViewModel CreateViewModel(
-            IBlockchainTransaction tx,
+            ITransaction tx,
             CurrencyConfig currencyConfig)
         {
             return currencyConfig switch
             {
                 BitcoinBasedConfig config =>
-                    new BitcoinBasedTransactionViewModel(tx as BitcoinBasedTransaction, config),
+                    new BitcoinBasedTransactionViewModel(tx as BitcoinTransaction, config),
                 Erc20Config config =>
                     new EthereumErc20TransactionViewModel(tx as EthereumTransaction, config),
                 EthereumConfig config =>

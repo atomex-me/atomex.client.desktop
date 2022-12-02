@@ -63,13 +63,13 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
         {
             var result = 0m;
 
-            if (tx.Type.HasFlag(BlockchainTransactionType.Input))
+            if (tx.Type.HasFlag(TransactionType.Input))
                 result += tx.Amount / tezosConfig.DigitsMultiplier;
 
             var includeFee = tezosConfig.Name == tezosConfig.FeeCurrencyName;
             var fee = includeFee ? tx.Fee : 0;
 
-            if (tx.Type.HasFlag(BlockchainTransactionType.Output))
+            if (tx.Type.HasFlag(TransactionType.Output))
                 result += -(tx.Amount + fee) / tezosConfig.DigitsMultiplier;
 
             tx.InternalTxs?.ForEach(t => result += GetAmount(t, tezosConfig));
@@ -81,7 +81,7 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
         {
             var result = 0m;
 
-            if (tx.Type.HasFlag(BlockchainTransactionType.Output))
+            if (tx.Type.HasFlag(TransactionType.Output))
                 result += TezosConfig.MtzToTz(tx.Fee);
 
             tx.InternalTxs?.ForEach(t => result += GetFee(t));

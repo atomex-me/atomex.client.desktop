@@ -432,7 +432,7 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
                             response: new TransactionInvalidBeaconError(operationRequest.Id,
                                 BeaconWalletClient.SenderId));
 
-                        Log.Error("{@Sender}: error during AutoFill transaction, {@Msg}", "Beacon", error.Description);
+                        Log.Error("{@Sender}: error during AutoFill transaction, {@Msg}", "Beacon", error.Message);
                         return;
                     }
 

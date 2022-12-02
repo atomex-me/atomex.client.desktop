@@ -143,7 +143,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     if (error != null)
                     { 
                         App.DialogService.Show(MessageViewModel.Error(
-                            text: error.Description,
+                            text: error.Message,
                             backAction: () => App.DialogService.Show(this)));
                         
                         return;   

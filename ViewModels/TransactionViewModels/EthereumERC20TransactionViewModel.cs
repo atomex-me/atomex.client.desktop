@@ -52,14 +52,14 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
         {
             var result = 0m;
             
-            if (tx.Type.HasFlag(BlockchainTransactionType.SwapRedeem) ||
-                tx.Type.HasFlag(BlockchainTransactionType.SwapRefund))
+            if (tx.Type.HasFlag(TransactionType.SwapRedeem) ||
+                tx.Type.HasFlag(TransactionType.SwapRefund))
                 result += erc20Config.TokenDigitsToTokens(tx.Amount);
             else
             {
-                if (tx.Type.HasFlag(BlockchainTransactionType.Input))
+                if (tx.Type.HasFlag(TransactionType.Input))
                     result += erc20Config.TokenDigitsToTokens(tx.Amount);
-                if (tx.Type.HasFlag(BlockchainTransactionType.Output))
+                if (tx.Type.HasFlag(TransactionType.Output))
                     result += -erc20Config.TokenDigitsToTokens(tx.Amount);
             }
 

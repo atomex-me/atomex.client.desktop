@@ -137,7 +137,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     .EstimateMaxAmountToSendAsync(
                         from: From,
                         to: To,
-                        type: BlockchainTransactionType.Output,
+                        type: TransactionType.Output,
                         reserve: false);
 
                 if (UseDefaultFee && maxAmountEstimation.Fee > 0)
@@ -164,7 +164,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                         .EstimateMaxAmountToSendAsync(
                             from: From,
                             to: To,
-                            type: BlockchainTransactionType.Output,
+                            type: TransactionType.Output,
                             reserve: false);
 
                     CheckAmountCommand?.Execute(maxAmountEstimation).Subscribe();
@@ -187,7 +187,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     .EstimateMaxAmountToSendAsync(
                         from: From,
                         to: To,
-                        type: BlockchainTransactionType.Output,
+                        type: TransactionType.Output,
                         reserve: false);
 
                 if (UseDefaultFee && maxAmountEstimation.Fee > 0)
@@ -195,7 +195,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
                 if (maxAmountEstimation.Error != null)
                 {
-                    Warning = maxAmountEstimation.Error.Description;
+                    Warning = maxAmountEstimation.Error.Message;
                     WarningToolTip = maxAmountEstimation.Error.Details;
                     WarningType = MessageType.Error;
                     Amount = 0;
@@ -234,7 +234,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         {
             if (maxAmountEstimation.Error != null)
             {
-                Warning = maxAmountEstimation.Error.Description;
+                Warning = maxAmountEstimation.Error.Message;
                 WarningToolTip = maxAmountEstimation.Error.Details;
                 WarningType = MessageType.Error;
                 return;

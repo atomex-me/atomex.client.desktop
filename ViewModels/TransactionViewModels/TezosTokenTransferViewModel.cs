@@ -35,7 +35,7 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
 
             Transaction  = tx ?? throw new ArgumentNullException(nameof(tx));
             Id           = tx.Id;
-            State        = tx.State;
+            State        = tx.Status;
             Type         = tx.Type;
             From         = tx.From;
             To           = tx.To;
@@ -59,7 +59,7 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
         {
             if (tx.Amount.TryParseWithRound(tx.Token.Decimals, out var amount))
             {
-                var sign = tx.Type.HasFlag(BlockchainTransactionType.Input)
+                var sign = tx.Type.HasFlag(TransactionType.Input)
                     ? 1
                     : -1;
 
