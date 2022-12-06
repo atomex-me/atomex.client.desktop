@@ -6,8 +6,8 @@
         <UseAppHost>true</UseAppHost>
         <ApplicationIcon>Resources/Images/atomex_logo_256x256_ico.ico</ApplicationIcon>
 
-        <AssemblyVersion>1.2.42</AssemblyVersion>
-        <Version>1.2.42</Version>
+        <AssemblyVersion>1.2.43</AssemblyVersion>
+        <Version>1.2.43</Version>
     </PropertyGroup>
     <Choose>
         <When Condition=" '$(Configuration)' == 'Debug' ">
