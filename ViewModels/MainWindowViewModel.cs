@@ -4,16 +4,13 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using System.Windows.Input;
-
 using Avalonia.Controls;
 using Avalonia.Threading;
 using ReactiveUI;
 using Serilog;
-
 using Atomex.Client.Common;
 using Atomex.Client.Desktop.Controls;
 using Atomex.Client.Desktop.Properties;
-using Atomex.Common;
 using Atomex.Wallet;
 
 namespace Atomex.Client.Desktop.ViewModels
@@ -95,16 +92,37 @@ namespace Atomex.Client.Desktop.ViewModels
                         restoreViewModel.ScanCurrenciesAsync();
                     }
                 }
+                else
+                {
+                    AccountRestored = false;
+                    StartupData = null;
+                }
 
                 this.RaisePropertyChanged(nameof(HasAccount));
             }
         }
 
+        private string? _startupData;
+
+        public string? StartupData
+        {
+            get => _startupData;
+            set
+            {
+                _startupData = value;
+                if (!string.IsNullOrEmpty(_startupData) && HasAccount)
+                {
+                    App.ConnectTezosDapp?.Invoke(_startupData);
+                }
+            }
+        }
+
         public bool AccountRestored { get; set; }
         public bool UpdatesReady => HasUpdates && UpdateDownloadProgress == 100;
-        public bool IsDownloadingUpdate => HasUpdates && UpdateDownloadProgress > 0 && UpdateDownloadProgress < 100;
+        public bool IsDownloadingUpdate => HasUpdates && UpdateDownloadProgress is > 0 and < 100;
 
         private bool _hasUpdates;
+
         public bool HasUpdates
         {
             get => _hasUpdates;
@@ -116,6 +134,7 @@ namespace Atomex.Client.Desktop.ViewModels
         }
 
         private string _updateVersion;
+
         public string UpdateVersion
         {
             get => _updateVersion;
@@ -127,6 +146,7 @@ namespace Atomex.Client.Desktop.ViewModels
         }
 
         private bool _updateStarted;
+
         public bool UpdateStarted
         {
             get => _updateStarted;
@@ -138,6 +158,7 @@ namespace Atomex.Client.Desktop.ViewModels
         }
 
         private int _updateDownloadProgress;
+
         public int UpdateDownloadProgress
         {
             get => _updateDownloadProgress;
@@ -269,7 +290,7 @@ namespace Atomex.Client.Desktop.ViewModels
                 return;
 
             var accountName = new DirectoryInfo(accountDirectory).Name;
-            
+
             _unlockViewModel = new UnlockViewModel(
                 walletName: accountName,
                 unlockAction: password =>
@@ -288,7 +309,7 @@ namespace Atomex.Client.Desktop.ViewModels
                     var userId = Atomex.ViewModels.Helpers.GetUserId(_app.Account);
                     var messages = await Atomex.ViewModels.Helpers.GetUserMessages(userId);
                     if (messages == null) return;
-                    
+
                     foreach (var message in messages.Where(message => !message.IsReaded))
                     {
                         _ = Dispatcher.UIThread.InvokeAsync(() =>

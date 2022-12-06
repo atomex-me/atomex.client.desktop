@@ -105,6 +105,8 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
             if (_atomexApp.Account == null)
                 return;
 
+            App.ConnectTezosDapp = async qrCodeData => await Connect(qrCodeData);
+
             var pathToDb = $"{Path.GetDirectoryName(_atomexApp.Account.Wallet.PathToWallet)}/beacon.db";
             var beaconOptions = new BeaconOptions
             {
@@ -140,6 +142,11 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
 
                 Log.Debug("{@Sender}: WalletClient connected {@Connected}", "Beacon", _beaconWalletClient.Connected);
                 Log.Debug("{@Sender}: WalletClient logged in {@LoggedIn}", "Beacon", _beaconWalletClient.LoggedIn);
+
+                if (!string.IsNullOrEmpty(App.MainWindowViewModel.StartupData))
+                {
+                    await Connect(App.MainWindowViewModel.StartupData);
+                }
             });
         }
 
@@ -212,11 +219,21 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
 
         private async Task Connect(string qrCodeString)
         {
-            if (_atomexApp.Account == null)
+            if (_atomexApp.Account == null || !_beaconWalletClient.Connected || !_beaconWalletClient.LoggedIn)
                 return;
+            
+            Log.Error(qrCodeString);
 
-            var pairingRequest = _beaconWalletClient.GetPairingRequest(qrCodeString);
-            await _beaconWalletClient.AddPeerAsync(pairingRequest);
+            try
+            {
+                var pairingRequest = _beaconWalletClient.GetPairingRequest(qrCodeString);
+                await _beaconWalletClient.AddPeerAsync(pairingRequest);
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Can't connect to peer");
+            }
+
             App.DialogService.Close();
         }
 
