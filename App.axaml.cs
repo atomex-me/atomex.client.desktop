@@ -171,6 +171,7 @@ namespace Atomex.Client.Desktop
                         {
                             MainWindowViewModel.StartupData = receivedSocketText;
                             Log.Information("Received startup data from socket {Data}", receivedSocketText);
+                            _ = Dispatcher.UIThread.InvokeAsync(() => { desktop.MainWindow.Activate(); });
                         }
 
                         clientSocket.Disconnect(false);
