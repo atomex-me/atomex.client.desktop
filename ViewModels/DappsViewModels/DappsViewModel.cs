@@ -7,6 +7,7 @@ using System.Reactive;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web;
 using Atomex.Blockchain.Tezos;
 using Atomex.Client.Common;
 using Atomex.Client.Desktop.ViewModels.Abstract;
@@ -105,7 +106,7 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
             if (_atomexApp.Account == null)
                 return;
 
-            App.ConnectTezosDapp = async qrCodeData => await Connect(qrCodeData);
+            App.ConnectTezosDapp = qrCodeData => _ = TryPairFromDeeplinkData(qrCodeData);
 
             var pathToDb = $"{Path.GetDirectoryName(_atomexApp.Account.Wallet.PathToWallet)}/beacon.db";
             var beaconOptions = new BeaconOptions
@@ -145,9 +146,26 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
 
                 if (!string.IsNullOrEmpty(App.MainWindowViewModel.StartupData))
                 {
-                    await Connect(App.MainWindowViewModel.StartupData);
+                    await TryPairFromDeeplinkData(App.MainWindowViewModel.StartupData);
                 }
             });
+        }
+
+        private async Task TryPairFromDeeplinkData(string deeplinkData)
+        {
+            try
+            {
+                var uri = new Uri(deeplinkData);
+                var type = HttpUtility.ParseQueryString(uri.Query).Get("type");
+                var data = HttpUtility.ParseQueryString(uri.Query).Get("data");
+                if (string.IsNullOrEmpty(type) || string.IsNullOrEmpty(data) || type != "tzip10") return;
+
+                await Connect(data);
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Error during parsing deeplink with data {Data}", deeplinkData);
+            }
         }
 
         public void CreateAddresses()
@@ -221,8 +239,6 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
         {
             if (_atomexApp.Account == null || !_beaconWalletClient.Connected || !_beaconWalletClient.LoggedIn)
                 return;
-            
-            Log.Error(qrCodeString);
 
             try
             {

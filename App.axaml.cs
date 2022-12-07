@@ -33,6 +33,7 @@ using Atomex.MarketData.Abstract;
 using Atomex.MarketData.Bitfinex;
 using Atomex.MarketData.TezTools;
 using Atomex.Services;
+using Avalonia.Threading;
 
 
 namespace Atomex.Client.Desktop
@@ -46,7 +47,6 @@ namespace Atomex.Client.Desktop
         public static ILoggerFactory LoggerFactory;
         public static MainWindowViewModel MainWindowViewModel;
         public static Action<string> ConnectTezosDapp;
-
 
         public override void Initialize()
         {
@@ -62,10 +62,10 @@ namespace Atomex.Client.Desktop
 
             UrlsOpened += (sender, args) =>
             {
-                foreach (var url in args.Urls)
-                {
-                    Log.Error("OPENED URL WITH DATA {Data}", url);
-                }
+                if (args.Urls.Length == 0) return;
+
+                MainWindowViewModel.StartupData = args.Urls[0];
+                Log.Information("Setting startup data from URLOpened {Url}", args.Urls[0]);
             };
 
             if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
@@ -137,7 +137,7 @@ namespace Atomex.Client.Desktop
                 if (desktop.Args.Length != 0)
                 {
                     MainWindowViewModel.StartupData = desktop.Args[0];
-                    Log.Information("Setting startup data {Data}", desktop.Args[0]);
+                    Log.Information("Setting startup data from start args {Data}", desktop.Args[0]);
                 }
 
                 desktop.MainWindow = mainWindow;
