@@ -33,7 +33,7 @@ using Atomex.MarketData.Abstract;
 using Atomex.MarketData.Bitfinex;
 using Atomex.MarketData.TezTools;
 using Atomex.Services;
-using Avalonia.Threading;
+
 
 namespace Atomex.Client.Desktop
 {
@@ -47,6 +47,7 @@ namespace Atomex.Client.Desktop
         public static MainWindowViewModel MainWindowViewModel;
         public static Action<string> ConnectTezosDapp;
 
+
         public override void Initialize()
         {
             AvaloniaXamlLoader.Load(this);
@@ -58,6 +59,14 @@ namespace Atomex.Client.Desktop
             CultureInfo.CurrentCulture = CultureInfo.InvariantCulture;
             // configure loggers
             ConfigureLoggers();
+
+            UrlsOpened += (sender, args) =>
+            {
+                foreach (var url in args.Urls)
+                {
+                    Log.Error("OPENED URL WITH DATA {Data}", url);
+                }
+            };
 
             if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
             {
