@@ -335,7 +335,7 @@ namespace Atomex.Client.Desktop.ViewModels
 
         public void CloseDialog()
         {
-            App.DialogService.Close();
+            App.DialogService.Close(closedByButton: true);
         }
 
         private void DesignerMode()

@@ -21,13 +21,18 @@ namespace Atomex.Client.Desktop.Services
             _dialogServiceViewModel = new DialogServiceViewModel();
         }
 
-        public bool Close()
+        public bool Close(bool closedByButton = false)
         {
             var result = _isDialogOpened;
             if (!_isDialogOpened) return result;
             Dispatcher.UIThread.InvokeAsync(() =>
                 DialogHost.DialogHost.GetDialogSession(MainDialogHostIdentifier)?.Close());
             _isDialogOpened = false;
+            
+            if (_dialogServiceViewModel.Content is IDialogViewModel dialogViewModel && closedByButton)
+            {
+                dialogViewModel.OnClose?.Invoke();
+            }
 
             return result;
         }
@@ -50,11 +55,6 @@ namespace Atomex.Client.Desktop.Services
             if (_dialogServiceViewModel.Content is IDisposable vm)
             {
                 vm.Dispose();
-            }
-
-            if (_dialogServiceViewModel.Content is IDialogViewModel dialogViewModel)
-            {
-                dialogViewModel.OnClose?.Invoke();
             }
         }
 

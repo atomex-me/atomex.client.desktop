@@ -10,8 +10,6 @@ using System.Threading.Tasks;
 using System.Web;
 using Atomex.Blockchain.Tezos;
 using Atomex.Client.Common;
-using Atomex.Client.Desktop.ViewModels.Abstract;
-using Atomex.Client.Desktop.ViewModels.SendViewModels;
 using Atomex.Wallet;
 using Avalonia.Controls;
 using Beacon.Sdk;
@@ -29,8 +27,6 @@ using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using Serilog;
 using Atomex.Blockchain.Tezos.Internal;
-using Atomex.Common;
-using Atomex.ViewModels;
 using Atomex.Wallet.Tezos;
 using Atomex.Wallets.Tezos;
 using Beacon.Sdk.BeaconClients;
@@ -564,20 +560,41 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
                     {
                         dataToSign = Hex.FromString(signRequest.Payload);
                     }
-                    catch (Exception)
+                    catch (Exception ex)
                     {
-                        // data is not in HEX format
-                        dataToSign = Encoding.UTF8.GetBytes(signRequest.Payload);
+                        Log.Error(ex, "{Sender}: Can't parse income payload to sign, {Payload}", "Beacon",
+                            signRequest.Payload);
+
+                        await _beaconWalletClient.SendResponseAsync(
+                            receiverId: message.SenderId,
+                            response: new SignatureTypeNotSupportedBeaconError(signRequest.Id,
+                                _beaconWalletClient.SenderId));
+
+                        return;
                     }
 
                     var permissionInfo = await _beaconWalletClient
                         .PermissionInfoRepository
                         .TryReadBySenderIdAsync(message.SenderId);
 
+                    async Task OnRejectOrCloseAction()
+                    {
+                        await _beaconWalletClient.SendResponseAsync(
+                            receiverId: message.SenderId,
+                            response: new BeaconAbortedError(signRequest.Id, _beaconWalletClient.SenderId));
+
+                        App.DialogService.Close();
+
+                        Log.Information(
+                            "{@Sender}: user Aborted signing payload from {@Dapp}",
+                            "Beacon",
+                            permissionInfo.AppMetadata.Name);
+                    }
+
                     var signatureRequestViewModel = new SignatureRequestViewModel
                     {
                         DappName = permissionInfo!.AppMetadata.Name,
-                        Payload = signRequest.Payload,
+                        BytesPayload = signRequest.Payload,
                         OnSign = async () =>
                         {
                             var hdWallet = _atomexApp.Account.Wallet as HdWallet;
@@ -610,19 +627,8 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
                                 permissionInfo.AppMetadata.Name,
                                 signedMessage.EncodedSignature);
                         },
-                        OnReject = async () =>
-                        {
-                            await _beaconWalletClient.SendResponseAsync(
-                                receiverId: message.SenderId,
-                                response: new BeaconAbortedError(signRequest.Id, _beaconWalletClient.SenderId));
-
-                            App.DialogService.Close();
-
-                            Log.Information(
-                                "{@Sender}: user Aborted signing payload from {@Dapp}",
-                                "Beacon",
-                                permissionInfo.AppMetadata.Name);
-                        }
+                        OnReject = OnRejectOrCloseAction,
+                        OnClose = () => _ = OnRejectOrCloseAction()
                     };
 
                     App.DialogService.Show(signatureRequestViewModel);
