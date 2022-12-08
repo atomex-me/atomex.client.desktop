@@ -29,6 +29,8 @@ using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using Serilog;
 using Atomex.Blockchain.Tezos.Internal;
+using Atomex.Common;
+using Atomex.ViewModels;
 using Atomex.Wallet.Tezos;
 using Atomex.Wallets.Tezos;
 using Beacon.Sdk.BeaconClients;
@@ -89,10 +91,9 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
 
         private readonly IAtomexApp _atomexApp;
         private IWalletBeaconClient _beaconWalletClient;
-        [Reactive] public ObservableCollection<DappViewModel> Dapps { get; set; }
-        public SelectAddressViewModel SelectAddressViewModel { get; private set; }
         private TezosConfig Tezos { get; }
-        private ConnectDappViewModel ConnectDappViewModel { get; }
+        [Reactive] public ObservableCollection<DappViewModel> Dapps { get; set; }
+        public ConnectDappViewModel ConnectDappViewModel { get; }
 
         public DappsViewModel()
         {
@@ -126,7 +127,6 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
 
             ConnectDappViewModel = new ConnectDappViewModel
             {
-                OnBack = () => App.DialogService.Show(SelectAddressViewModel!),
                 OnConnect = Connect
             };
 
@@ -166,19 +166,6 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
             {
                 Log.Error(ex, "Error during parsing deeplink with data {Data}", deeplinkData);
             }
-        }
-
-        public void CreateAddresses()
-        {
-            SelectAddressViewModel = new SelectAddressViewModel(_atomexApp.Account, Tezos, SelectAddressMode.Connect)
-            {
-                BackAction = () => { App.DialogService.Close(); },
-                ConfirmAction = walletAddressViewModel =>
-                {
-                    ConnectDappViewModel.AddressToConnect = walletAddressViewModel.Address;
-                    App.DialogService.Show(ConnectDappViewModel);
-                }
-            };
         }
 
         private void OnDappsListChanged(object? sender, ConnectedClientsListChangedEventArgs? e)
@@ -287,23 +274,9 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
                         return;
                     }
 
-                    var addressToConnect = await _atomexApp
-                        .Account
-                        .GetAddressAsync(Tezos.Name, ConnectDappViewModel.AddressToConnect);
-
-                    var response = new PermissionResponse(
-                        id: permissionRequest.Id,
-                        senderId: _beaconWalletClient.SenderId,
-                        appMetadata: _beaconWalletClient.Metadata,
-                        network: permissionRequest.Network,
-                        scopes: permissionRequest.Scopes,
-                        publicKey: PubKey.FromBase64(addressToConnect.PublicKey).ToString(),
-                        version: permissionRequest.Version);
-
-                    var permissionRequestViewModel = new PermissionRequestViewModel
+                    var permissionRequestViewModel = new PermissionRequestViewModel(_atomexApp.Account, Tezos)
                     {
                         DappName = permissionRequest.AppMetadata.Name,
-                        Address = addressToConnect.Address,
                         Permissions = permissionRequest.Scopes,
                         OnReject = async () =>
                         {
@@ -315,14 +288,27 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
 
                             App.DialogService.Close();
                             Log.Information(
-                                "{@Sender}: Rejected permissions [{@PermissionsList}] to dapp {@Dapp} with address {@Address}",
+                                "{@Sender}: Rejected permissions [{@PermissionsList}] to dapp {@Dapp}",
                                 "Beacon",
                                 permissionRequest.Scopes.Aggregate(string.Empty,
                                     (res, scope) => res + $"{scope}, "),
-                                permissionRequest.AppMetadata.Name, addressToConnect.Address);
+                                permissionRequest.AppMetadata.Name);
                         },
-                        OnAllow = async () =>
+                        OnAllow = async selectedAddress =>
                         {
+                            var addressToConnect = await _atomexApp
+                                .Account
+                                .GetAddressAsync(Tezos.Name, selectedAddress.Address);
+
+                            var response = new PermissionResponse(
+                                id: permissionRequest.Id,
+                                senderId: _beaconWalletClient.SenderId,
+                                appMetadata: _beaconWalletClient.Metadata,
+                                network: permissionRequest.Network,
+                                scopes: permissionRequest.Scopes,
+                                publicKey: PubKey.FromBase64(addressToConnect.PublicKey).ToString(),
+                                version: permissionRequest.Version);
+
                             await _beaconWalletClient.SendResponseAsync(
                                 receiverId: message.SenderId,
                                 response);
