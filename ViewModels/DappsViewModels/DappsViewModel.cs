@@ -274,26 +274,25 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
                         return;
                     }
 
-                    var permissionRequestViewModel = new PermissionRequestViewModel(_atomexApp.Account, Tezos)
+                    async Task OnRejectOrCloseAction()
+                    {
+                        await _beaconWalletClient.SendResponseAsync(receiverId: message.SenderId,
+                            response: new BeaconAbortedError(permissionRequest.Id, _beaconWalletClient.SenderId));
+                        await _beaconWalletClient.RemovePeerAsync(message.SenderId);
+
+                        App.DialogService.Close();
+                        Log.Information("{@Sender}: Rejected permissions [{@PermissionsList}] to dapp {@Dapp}",
+                            "Beacon",
+                            permissionRequest.Scopes.Aggregate(string.Empty, (res, scope) => res + $"{scope}, "),
+                            permissionRequest.AppMetadata.Name);
+                    }
+
+                    var permissionRequestViewModel = new PermissionRequestViewModel(_atomexApp.Account, Tezos,
+                        () => _ = OnRejectOrCloseAction())
                     {
                         DappName = permissionRequest.AppMetadata.Name,
                         Permissions = permissionRequest.Scopes,
-                        OnReject = async () =>
-                        {
-                            await _beaconWalletClient.SendResponseAsync(
-                                receiverId: message.SenderId,
-                                response: new BeaconAbortedError(permissionRequest.Id, _beaconWalletClient.SenderId));
-                            await _beaconWalletClient.RemovePeerAsync(
-                                message.SenderId);
-
-                            App.DialogService.Close();
-                            Log.Information(
-                                "{@Sender}: Rejected permissions [{@PermissionsList}] to dapp {@Dapp}",
-                                "Beacon",
-                                permissionRequest.Scopes.Aggregate(string.Empty,
-                                    (res, scope) => res + $"{scope}, "),
-                                permissionRequest.AppMetadata.Name);
-                        },
+                        OnReject = OnRejectOrCloseAction,
                         OnAllow = async selectedAddress =>
                         {
                             var addressToConnect = await _atomexApp

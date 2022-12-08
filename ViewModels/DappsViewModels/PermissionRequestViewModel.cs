@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Reactive;
 using System.Threading.Tasks;
 using Atomex.Client.Desktop.Common;
+using Atomex.Client.Desktop.Dialogs;
 using Atomex.Client.Desktop.ViewModels.Abstract;
 using Atomex.Client.Desktop.ViewModels.SendViewModels;
 using Atomex.ViewModels;
@@ -14,7 +15,7 @@ using ReactiveUI.Fody.Helpers;
 
 namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
 {
-    public class PermissionRequestViewModel : ViewModelBase
+    public class PermissionRequestViewModel : ViewModelBase, IDialogViewModel
     {
         public SelectAddressViewModel SelectAddressViewModel { get; }
         public string DappName { get; set; }
@@ -26,8 +27,9 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
 
         [ObservableAsProperty] public bool IsSending { get; }
         [ObservableAsProperty] public bool IsRejecting { get; }
+        public Action? OnClose { get; set; }
 
-        public PermissionRequestViewModel(IAccount account, TezosConfig tezos)
+        public PermissionRequestViewModel(IAccount account, TezosConfig tezos, Action onClose)
         {
             OnAllowCommand
                 .IsExecuting
@@ -40,10 +42,11 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
             SelectAddressViewModel = new SelectAddressViewModel(account, tezos, SelectAddressMode.Connect)
             {
                 BackAction = () => { App.DialogService.Show(this); },
-                ConfirmAction = _ => { App.DialogService.Show(this); }
+                ConfirmAction = _ => { App.DialogService.Show(this); },
+                OnClose = onClose
             };
 
-            var a = 5;
+            OnClose = onClose;
 #if DEBUG
             if (Design.IsDesignMode)
                 DesignerMode();

@@ -12,6 +12,7 @@ using Atomex.Core;
 using Atomex.ViewModels;
 using Atomex.Wallet.Abstract;
 using Atomex.Client.Desktop.Common;
+using Atomex.Client.Desktop.Dialogs;
 using Atomex.Client.Desktop.ViewModels.Abstract;
 
 namespace Atomex.Client.Desktop.ViewModels.SendViewModels
@@ -21,7 +22,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         public Action BackAction { get; set; }
     }
 
-    public class SelectAddressViewModel : NavigatableSelectAddress
+    public class SelectAddressViewModel : NavigatableSelectAddress, IDialogViewModel
     {
         public Action<WalletAddressViewModel> ConfirmAction { get; set; }
         public SelectAddressMode SelectAddressMode { get; set; }
@@ -34,6 +35,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         [Reactive] public WalletAddressViewModel? SelectedAddress { get; set; }
         [ObservableAsProperty] public bool CanConfirm { get; }
         [ObservableAsProperty] public bool ExternalWarning { get; }
+        public Action? OnClose { get; set; }
 
         public SelectAddressViewModel()
         {
