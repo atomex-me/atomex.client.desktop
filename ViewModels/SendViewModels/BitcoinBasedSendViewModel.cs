@@ -387,7 +387,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                         scriptPubKey: script),
                     confirmations: 10,
                     spentTxPoint: null,
-                    spentTxConfirmations: 0)
+                    spentConfirmations: 0)
             };
 
             Outputs = new ObservableCollection<BitcoinTxOutput>(outputs);

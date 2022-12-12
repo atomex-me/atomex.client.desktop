@@ -289,7 +289,7 @@ namespace Atomex.Client.Desktop.ViewModels.ConversionViewModels
                                     scriptPubKey: BitcoinAddress.Create("muRDku2ZwNTz2msCZCHSUhDD5o6NxGsoXM", Network.TestNet).ScriptPubKey),
                                 confirmations: 10,
                                 spentTxPoint: null,
-                                spentTxConfirmations: 0),
+                                spentConfirmations: 0),
                             new BitcoinTxOutput(
                                 coin: new Coin(
                                     fromTxHash: new uint256("d70fa62762775362e767737e56cab7e8a094eafa8f96b935530d6450be1cfbce"),
@@ -298,7 +298,7 @@ namespace Atomex.Client.Desktop.ViewModels.ConversionViewModels
                                     scriptPubKey: BitcoinAddress.Create("mg8DcFTnNAJRHEZ248nVjeJuEjTsHn4vrZ", Network.TestNet).ScriptPubKey),
                                 confirmations: 5,
                                 spentTxPoint: null,
-                                spentTxConfirmations: 0)
+                                spentConfirmations: 0)
                         };
 
                         return new SelectCurrencyWithOutputsViewModelItem(
