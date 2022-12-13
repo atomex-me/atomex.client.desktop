@@ -8,6 +8,7 @@ using Atomex.Client.Desktop.Common;
 using Atomex.Common;
 using Atomex.Core;
 using Atomex.MarketData.Abstract;
+using Atomex.ViewModels;
 using Avalonia.Controls;
 using Netezos.Forging.Models;
 using Newtonsoft.Json;
@@ -73,6 +74,8 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
                 .WhereNotNull()
                 .SubscribeInMainThread(async operation =>
                 {
+                    DestinationAlias = operation.Destination.TruncateAddress();
+
                     using var response = await HttpHelper.GetAsync(
                         baseUri: "https://api.tzkt.io/",
                         relativeUri: $"v1/accounts/{operation.Destination}?metadata=true");
@@ -84,7 +87,9 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
                         .ReadAsStringAsync();
 
                     var responseJObj = JsonConvert.DeserializeObject<JObject>(responseContent);
-                    DestinationAlias = responseJObj?["metadata"]?["alias"]?.ToString();
+                    var alias = responseJObj?["metadata"]?["alias"]?.ToString();
+                    if (alias != null)
+                        DestinationAlias = alias;
                 });
 
             this.WhenAnyValue(vm => vm.Operation)
@@ -92,6 +97,11 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
                 .Select(operation =>
                     operation.Parameters == null ? "Transfer to " : $"Call {operation.Parameters.Entrypoint} in ")
                 .ToPropertyExInMainThread(this, vm => vm.Entrypoint);
+
+#if DEBUG
+            if (Design.IsDesignMode)
+                DesignerMode();
+#endif
         }
 
         protected override void OnQuotesUpdatedEventHandler(object? sender, EventArgs args)
@@ -113,6 +123,22 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
                 if (Uri.TryCreate($"{ExplorerUri}{Operation.Destination}", UriKind.Absolute, out var uri))
                     App.OpenBrowser(uri.ToString());
             });
+
+#if DEBUG
+
+        private void DesignerMode()
+        {
+            Operation = new TransactionContent
+            {
+                Amount = 0,
+                Destination = "KT1SjXiUX63QvdNMcM2m492f7kuf8JxXRLp4",
+                Parameters = new Parameters
+                {
+                    Entrypoint = "approve"
+                }
+            };
+        }
+#endif
     }
 
     public class RevealContentViewModel : BaseBeaconOperationViewModel

@@ -105,11 +105,10 @@
                                    Height="40"
                                    Margin="16 0 0 0"
                                    VerticalAlignment="Top">
-                                <TextBlock
-                                    Foreground="{DynamicResource SecondaryForegroundBrush}"
-                                    FontSize="13"
-                                    VerticalAlignment="Center"
-                                    Text="Operations" />
+                                <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
+                                           FontSize="13"
+                                           VerticalAlignment="Center"
+                                           Text="Operations" />
                             </Panel>
 
                             <TabControl Grid.Column="0"

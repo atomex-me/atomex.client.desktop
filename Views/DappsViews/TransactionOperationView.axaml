@@ -23,7 +23,6 @@
     <Grid ColumnDefinitions="Auto,*"
           RowDefinitions="*,Auto"
           Height="64">
-
         <Border Grid.Row="0"
                 Grid.Column="0"
                 Width="40"
@@ -42,9 +41,11 @@
                                             Source="{Binding DestinationIcon}"
                                             Loader="{x:Static services:FileCacheImageLoader.Instance}" />
         </Border>
-        <StackPanel Grid.Row="0"
-                    Grid.Column="1"
-                    VerticalAlignment="Center">
+
+        <WrapPanel Grid.Row="0"
+                   Grid.Column="1"
+                   Orientation="Vertical"
+                   VerticalAlignment="Center">
             <StackPanel Orientation="Horizontal"
                         Classes.OperationWithTezos="{Binding Operation.Amount,
                         Converter={x:Static converters:NumericConverters.NotZero}}">
@@ -53,7 +54,7 @@
                         <Setter Property="Margin" Value="0 0 0 2" />
                     </Style>
                 </StackPanel.Styles>
-                <TextBlock VerticalAlignment="Top"
+                <TextBlock VerticalAlignment="Center"
                            Foreground="{DynamicResource DefaultForegroundBrush}"
                            FontSize="13"
                            Text="{Binding Entrypoint}" />
@@ -62,24 +63,7 @@
                                      Classes="SolidHover"
                                      Content="{Binding DestinationAlias}"
                                      FontSize="13"
-                                     IsVisible="{Binding DestinationAlias,
-                                     Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
-                                     Command="{Binding OpenDestinationInExplorer}">
-                    <controls:LinkButton.ToolText>
-                        <MultiBinding Converter="{StaticResource StringsConcatConverter}">
-                            <Binding Path="ExplorerUri" />
-                            <Binding Path="Operation.Destination" />
-                        </MultiBinding>
-                    </controls:LinkButton.ToolText>
-                </controls:LinkButton>
-
-                <controls:LinkButton Underlined="True"
-                                     Classes="SolidHover"
-                                     Content="{Binding Operation.Destination,
-                                     Converter={x:Static converters:StringConverters.ToShortenedAddress}}"
-                                     FontSize="13"
-                                     IsVisible="{Binding DestinationAlias,
-                                     Converter={x:Static StringConverters.IsNullOrEmpty}}"
+                                     Margin="0 2 0 0"
                                      Command="{Binding OpenDestinationInExplorer}">
                     <controls:LinkButton.ToolText>
                         <MultiBinding Converter="{StaticResource StringsConcatConverter}">
@@ -104,7 +88,6 @@
                            FontSize="13"
                            Margin="0 0 2 0"
                            Text="{x:Static atomex:TezosConfig.Xtz}" />
-
                 <TextBlock HorizontalAlignment="Right"
                            VerticalAlignment="Center"
                            Foreground="{DynamicResource SecondaryForegroundBrush}"
@@ -118,7 +101,7 @@
                     </TextBlock.Text>
                 </TextBlock>
             </StackPanel>
-        </StackPanel>
+        </WrapPanel>
 
         <Border Grid.Row="1"
                 Grid.Column="0"
