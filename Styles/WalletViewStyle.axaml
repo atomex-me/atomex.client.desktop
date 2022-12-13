@@ -208,21 +208,20 @@
         <Setter Property="Margin" Value="0" />
         <Setter Property="Padding" Value="0" />
         <Setter Property="Background" Value="{DynamicResource AlmostTransparentBrush}" />
+        <Setter Property="BorderBrush" Value="{StaticResource LightDefaultOpacity10}" />
+        <Setter Property="BorderThickness" Value="0 0 0 1"/>
         <Setter Property="Template">
             <ControlTemplate>
-                <Border BorderBrush="{TemplateBinding BorderBrush}"
-                        BorderThickness="{TemplateBinding BorderThickness}"
-                        CornerRadius="0"
+                <Border CornerRadius="0"
                         Background="{TemplateBinding Background}"
                         HorizontalAlignment="{TemplateBinding HorizontalAlignment}"
                         VerticalAlignment="{TemplateBinding VerticalAlignment}">
                     <DockPanel>
                         <StackPanel Orientation="Vertical"
                                     DockPanel.Dock="{TemplateBinding TabStripPlacement}">
-                            <Border BorderThickness="0 0 0 1"
-                                    BorderBrush="{StaticResource LightDefaultOpacity10}">
+                            <Border BorderBrush="{TemplateBinding BorderBrush}"
+                                    BorderThickness="{TemplateBinding BorderThickness}">
                                 <ItemsPresenter Name="PART_ItemsPresenter"
-                                                HorizontalAlignment="Left"
                                                 Items="{TemplateBinding Items}"
                                                 ItemsPanel="{TemplateBinding ItemsPanel}"
                                                 Margin="0"
@@ -245,28 +244,23 @@
         <Setter Property="Foreground" Value="{DynamicResource SecondaryForegroundBrush}" />
         <Setter Property="FontFamily" Value="{DynamicResource DefaultFontFamily}" />
         <Setter Property="FontWeight" Value="Light" />
+        <Setter Property="Height" Value="72" />
         <Setter Property="Template">
             <ControlTemplate>
-                <Border Name="PART_LayoutRoot"
-                        BorderBrush="{TemplateBinding BorderBrush}"
-                        BorderThickness="{TemplateBinding BorderThickness}"
-                        CornerRadius="0"
-                        Height="72"
-                        Padding="0">
-                    <Panel>
-                        <ContentPresenter Name="PART_ContentPresenter"
-                                          ContentTemplate="{TemplateBinding HeaderTemplate}"
-                                          Content="{TemplateBinding Header}"
-                                          HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                          VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                                          TextBlock.FontFamily="{TemplateBinding FontFamily}"
-                                          TextBlock.FontSize="{TemplateBinding FontSize}"
-                                          TextBlock.FontWeight="{TemplateBinding FontWeight}" />
-                        <Border Name="PART_SelectedPipe"
-                                Margin="0"
-                                Background="{StaticResource LightDefault}" />
-                    </Panel>
-                </Border>
+                <Panel Height="{TemplateBinding Height}">
+                    <ContentPresenter Name="PART_ContentPresenter"
+                                      ContentTemplate="{TemplateBinding HeaderTemplate}"
+                                      Content="{TemplateBinding Header}"
+                                      HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                      VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                      TextBlock.FontFamily="{TemplateBinding FontFamily}"
+                                      TextBlock.FontSize="{TemplateBinding FontSize}"
+                                      TextBlock.FontWeight="{TemplateBinding FontWeight}" />
+                    <Border Name="PART_SelectedPipe"
+                            Margin="0"
+                            VerticalAlignment="Bottom"
+                            Background="{StaticResource LightDefault}" />
+                </Panel>
             </ControlTemplate>
         </Setter>
     </Style>

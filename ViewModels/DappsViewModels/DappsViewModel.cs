@@ -451,6 +451,7 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
                                     Id = index + 1,
                                     Operation = transactionOperation,
                                     QuotesProvider = _atomexApp.QuotesProvider,
+                                    ExplorerUri = Tezos.AddressExplorerUri
                                 });
                                 break;
                             case RevealContent revealOperation:
@@ -464,10 +465,15 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
                         }
                     }
 
+                    var connectedAddress = await _atomexApp
+                        .Account
+                        .GetAddressAsync(Tezos.Name, permissionInfo.Address);
+
                     var operationRequestViewModel = new OperationRequestViewModel
                     {
                         DappName = permissionInfo.AppMetadata.Name,
                         DappLogo = permissionInfo.AppMetadata.Icon,
+                        ConnectedAddress = connectedAddress,
                         Operations = operationsViewModel,
                         OnReject = async () =>
                         {

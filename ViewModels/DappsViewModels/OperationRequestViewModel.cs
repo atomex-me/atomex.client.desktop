@@ -1,16 +1,21 @@
 using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using Atomex.Client.Desktop.Common;
+using Atomex.Common;
+using Atomex.Core;
 using Atomex.MarketData.Abstract;
 using Avalonia.Controls;
 using Netezos.Forging.Models;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using Serilog;
+using DecimalExtensions = Atomex.Common.DecimalExtensions;
 
 namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
 {
@@ -51,12 +56,43 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
 
     public class TransactionContentViewModel : BaseBeaconOperationViewModel
     {
-        public TransactionContent Operation { get; set; }
+        [Reactive] public TransactionContent Operation { get; set; }
         public override string JsonStringOperation => JsonConvert.SerializeObject(Operation, Formatting.Indented);
         public decimal AmountInTez => TezosConfig.MtzToTz(Convert.ToDecimal(Operation.Amount));
         public decimal FeeInTez => TezosConfig.MtzToTz(Convert.ToDecimal(Operation.Fee));
+        public string DestinationIcon => $"https://services.tzkt.io/v1/avatars/{Operation.Destination}";
+        [Reactive] public string? DestinationAlias { get; set; }
         [Reactive] public decimal AmountInBase { get; set; }
         [Reactive] public decimal FeeInBase { get; set; }
+        [ObservableAsProperty] public string Entrypoint { get; }
+        public string ExplorerUri { get; set; }
+
+        public TransactionContentViewModel()
+        {
+            this.WhenAnyValue(vm => vm.Operation)
+                .WhereNotNull()
+                .SubscribeInMainThread(async operation =>
+                {
+                    using var response = await HttpHelper.GetAsync(
+                        baseUri: "https://api.tzkt.io/",
+                        relativeUri: $"v1/accounts/{operation.Destination}?metadata=true");
+
+                    if (response.StatusCode != HttpStatusCode.OK) return;
+
+                    var responseContent = await response
+                        .Content
+                        .ReadAsStringAsync();
+
+                    var responseJObj = JsonConvert.DeserializeObject<JObject>(responseContent);
+                    DestinationAlias = responseJObj?["metadata"]?["alias"]?.ToString();
+                });
+
+            this.WhenAnyValue(vm => vm.Operation)
+                .WhereNotNull()
+                .Select(operation =>
+                    operation.Parameters == null ? "Transfer to " : $"Call {operation.Parameters.Entrypoint} in ")
+                .ToPropertyExInMainThread(this, vm => vm.Entrypoint);
+        }
 
         protected override void OnQuotesUpdatedEventHandler(object? sender, EventArgs args)
         {
@@ -68,6 +104,15 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
             FeeInBase = FeeInTez.SafeMultiply(xtzQuote?.Bid ?? 0);
             Log.Debug("Quotes updated for beacon TransactionContent operation {Id}", Id);
         }
+
+        private ReactiveCommand<Unit, Unit>? _openDestinationInExplorer;
+
+        public ReactiveCommand<Unit, Unit> OpenDestinationInExplorer => _openDestinationInExplorer ??=
+            ReactiveCommand.Create(() =>
+            {
+                if (Uri.TryCreate($"{ExplorerUri}{Operation.Destination}", UriKind.Absolute, out var uri))
+                    App.OpenBrowser(uri.ToString());
+            });
     }
 
     public class RevealContentViewModel : BaseBeaconOperationViewModel
@@ -91,8 +136,12 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
     public class OperationRequestViewModel : ViewModelBase, IDisposable
     {
         public string DappName { get; set; }
-        public string SubTitle => $"{DappName} is asking to confirm the following operations:";
+        public string SubTitle => $"{DappName} requests to confirm operations";
         public string? DappLogo { get; set; }
+        public WalletAddress ConnectedAddress { get; set; }
+
+        public string TezosFormat =>
+            DecimalExtensions.GetFormatWithPrecision((int)Math.Round(Math.Log10(TezosConfig.XtzDigitsMultiplier)));
 
         [Reactive] public IEnumerable<BaseBeaconOperationViewModel> Operations { get; set; }
         [ObservableAsProperty] public bool IsSending { get; }
@@ -154,6 +203,11 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
         {
             DappName = "objkt.com";
             DappLogo = "";
+            ConnectedAddress = new WalletAddress
+            {
+                Address = "tzhSFN6677KThcTkTai3P1acVQtrujkkvVd",
+                Balance = (decimal)0.991873633123
+            };
         }
 #endif
     }

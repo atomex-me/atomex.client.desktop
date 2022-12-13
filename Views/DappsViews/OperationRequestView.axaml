@@ -9,11 +9,13 @@
              xmlns:asyncImageLoader="clr-namespace:AsyncImageLoader;assembly=AsyncImageLoader.Avalonia"
              xmlns:svg="clr-namespace:Avalonia.Svg.Skia;assembly=Avalonia.Svg.Skia"
              xmlns:services="clr-namespace:Atomex.Client.Desktop.Services"
+             xmlns:converters="clr-namespace:Atomex.Client.Desktop.Converters"
+             xmlns:atomex="clr-namespace:Atomex;assembly=Atomex.Client.Core"
              Width="700">
     <Design.DataContext>
         <dappsViewModels:OperationRequestViewModel />
     </Design.DataContext>
-    
+
     <Border Classes="ChildViewBorder"
             Padding="0 0 0 60">
         <StackPanel>
@@ -23,77 +25,158 @@
                            FontSize="22"
                            HorizontalAlignment="Center"
                            VerticalAlignment="Center"
-                           Text="Operation Request" />
+                           Text="Confirm operations" />
                 <Border Grid.Row="1"
                         Height="1"
                         Background="{DynamicResource LightDefaultOpacity10}" />
             </Grid>
 
-            <Grid ColumnDefinitions="130,*,130">
+            <Grid ColumnDefinitions="*,554,*">
                 <StackPanel Grid.Column="1"
-                            Margin="0 32 0 0">
-                    <Grid ColumnDefinitions="*,Auto,*">
-                        <StackPanel Grid.Column="1"
-                                    Orientation="Horizontal">
-                            <Border Width="40"
-                                    Height="40"
-                                    VerticalAlignment="Center"
-                                    HorizontalAlignment="Left"
-                                    ClipToBounds="True"
-                                    CornerRadius="20"
-                                    Classes.IsImageLoading="{Binding #DappPreviewImg.IsLoading}"
-                                    Classes.ImageNotLoaded="{Binding #DappPreviewImg.CurrentImage,
+                            Margin="0 23 0 0">
+                    <Border Width="52"
+                            Height="52"
+                            VerticalAlignment="Center"
+                            HorizontalAlignment="Center"
+                            ClipToBounds="True"
+                            CornerRadius="40"
+                            Classes.IsImageLoading="{Binding #DappPreviewImg.IsLoading}"
+                            Classes.ImageNotLoaded="{Binding #DappPreviewImg.CurrentImage,
                                             Converter={x:Static ObjectConverters.IsNull}}">
-                                <asyncImageLoader:AdvancedImage Name="DappPreviewImg"
-                                                                StretchDirection="Both"
-                                                                Stretch="UniformToFill"
-                                                                Source="{Binding DappLogo}"
-                                                                Loader="{x:Static services:FileCacheImageLoader.Instance}" />
-                            </Border>
-
-                            <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
-                                       Margin="12 0"
-                                       TextWrapping="Wrap"
-                                       VerticalAlignment="Center"
-                                       HorizontalAlignment="Center"
-                                       Text="• • •" />
-                            <svg:Svg Width="39"
-                                     Path="/Resources/Icons/atomex-logo-round-white.svg" />
-                        </StackPanel>
-                    </Grid>
+                        <asyncImageLoader:AdvancedImage Name="DappPreviewImg"
+                                                        StretchDirection="Both"
+                                                        Stretch="UniformToFill"
+                                                        Source="{Binding DappLogo}"
+                                                        Loader="{x:Static services:FileCacheImageLoader.Instance}" />
+                    </Border>
 
                     <TextBlock Foreground="{DynamicResource DefaultForegroundBrush}"
-                               Margin="0 16 0 0"
+                               Margin="0 10 0 0"
                                FontSize="16"
                                LineHeight="24"
                                HorizontalAlignment="Center"
                                Text="{Binding SubTitle}" />
 
-                    <Border Height="1"
-                            Margin="0 24 0 0"
-                            Background="{DynamicResource LightDefaultOpacity10}" />
-                    <ListBox Background="Transparent"
-                             Margin="0 0 -20 0"
-                             Items="{Binding Operations}"
-                             HorizontalAlignment="Stretch"
-                             MaxHeight="300"
-                             VirtualizationMode="None"
-                             VerticalAlignment="Stretch">
-                        <ListBox.Styles>
-                            <Style Selector="ListBoxItem">
-                                <Setter Property="Padding" Value="0 0 20 0" />
-                            </Style>
-                            <Style Selector="ListBoxItem:pointerover /template/ ContentPresenter">
-                                <Setter Property="Background" Value="Transparent" />
-                            </Style>
-                            <Style Selector="ListBoxItem:not(:pointerover) /template/ ContentPresenter">
-                                <Setter Property="Background" Value="Transparent" />
-                            </Style>
-                        </ListBox.Styles>
-                        <ListBox.ItemTemplate>
-                            <controls:BeaconOperationTemplateSelector />
-                        </ListBox.ItemTemplate>
-                    </ListBox>
+                    <Border BorderThickness="1"
+                            BorderBrush="{DynamicResource GrayBlue}"
+                            CornerRadius="8"
+                            Padding="8 9"
+                            Margin="0 10 0 0"
+                            HorizontalAlignment="Center">
+                        <StackPanel Orientation="Horizontal">
+                            <svg:Svg Width="24"
+                                     Path="/Resources/Icons/tezos.svg" />
+
+                            <TextBlock Foreground="{DynamicResource DefaultForegroundBrush}"
+                                       FontSize="16"
+                                       Margin="8 0"
+                                       VerticalAlignment="Center"
+                                       Text="{Binding ConnectedAddress.Address,
+                                       Converter={x:Static converters:StringConverters.ToShortenedAddress}}" />
+
+                            <TextBlock FontSize="16"
+                                       VerticalAlignment="Center"
+                                       Margin="8 0 3 0"
+                                       Foreground="{DynamicResource SecondaryForegroundBrush}">
+                                <TextBlock.Text>
+                                    <MultiBinding Converter="{StaticResource AmountToStringConverter}">
+                                        <Binding Path="ConnectedAddress.Balance" />
+                                        <Binding Path="TezosFormat" />
+                                    </MultiBinding>
+                                </TextBlock.Text>
+                            </TextBlock>
+
+                            <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
+                                       FontSize="16"
+                                       VerticalAlignment="Center"
+                                       Text="{x:Static atomex:TezosConfig.Xtz}" />
+                        </StackPanel>
+                    </Border>
+
+                    <Border BorderThickness="1"
+                            BorderBrush="{DynamicResource GrayBlue}"
+                            Background="{DynamicResource DarkGrayBlue}"
+                            CornerRadius="8"
+                            Margin="0 24 0 0">
+                        <Grid ColumnDefinitions="Auto,*"
+                              MinHeight="105"
+                              MaxHeight="200">
+                            <Panel Grid.Column="0"
+                                   Height="40"
+                                   Margin="16 0 0 0"
+                                   VerticalAlignment="Top">
+                                <TextBlock
+                                    Foreground="{DynamicResource SecondaryForegroundBrush}"
+                                    FontSize="13"
+                                    VerticalAlignment="Center"
+                                    Text="Operations" />
+                            </Panel>
+
+                            <TabControl Grid.Column="0"
+                                        Grid.ColumnSpan="2"
+                                        Classes="WalletTabControl"
+                                        BorderBrush="{DynamicResource GrayBlue2}">
+                                <TabControl.Styles>
+                                    <Style
+                                        Selector="TabControl.WalletTabControl /template/ ItemsPresenter#PART_ItemsPresenter">
+                                        <Setter Property="HorizontalAlignment" Value="Right" />
+                                        <Setter Property="Height" Value="40" />
+                                    </Style>
+                                </TabControl.Styles>
+                                <TabItem Classes="WalletTabItem"
+                                         Height="40">
+                                    <TabItem.Header>
+                                        <TextBlock VerticalAlignment="Center"
+                                                   HorizontalAlignment="Center"
+                                                   FontSize="13"
+                                                   Text="Preview" />
+                                    </TabItem.Header>
+
+                                    <ListBox Background="Transparent"
+                                             Margin="0 0 -20 0"
+                                             Items="{Binding Operations}"
+                                             HorizontalAlignment="Stretch"
+                                             MaxHeight="300"
+                                             VirtualizationMode="None"
+                                             VerticalAlignment="Stretch">
+                                        <ListBox.Styles>
+                                            <Style Selector="ListBoxItem">
+                                                <Setter Property="Padding" Value="0 0 20 0" />
+                                            </Style>
+                                            <Style Selector="ListBoxItem:pointerover /template/ ContentPresenter">
+                                                <Setter Property="Background" Value="Transparent" />
+                                            </Style>
+                                            <Style Selector="ListBoxItem:not(:pointerover) /template/ ContentPresenter">
+                                                <Setter Property="Background" Value="Transparent" />
+                                            </Style>
+                                        </ListBox.Styles>
+                                        <ListBox.ItemTemplate>
+                                            <controls:BeaconOperationTemplateSelector />
+                                        </ListBox.ItemTemplate>
+                                    </ListBox>
+                                </TabItem>
+                                <TabItem Classes="WalletTabItem"
+                                         Height="40"
+                                         Margin="16 0">
+                                    <TabItem.Header>
+                                        <TextBlock VerticalAlignment="Center"
+                                                   HorizontalAlignment="Center"
+                                                   FontSize="13"
+                                                   Text="Raw" />
+                                    </TabItem.Header>
+                                </TabItem>
+                                <TabItem Classes="WalletTabItem"
+                                         Height="40"
+                                         Margin="0 0 16 0">
+                                    <TabItem.Header>
+                                        <TextBlock VerticalAlignment="Center"
+                                                   FontSize="13"
+                                                   Text="Bytes" />
+                                    </TabItem.Header>
+                                </TabItem>
+                            </TabControl>
+                        </Grid>
+                    </Border>
 
                     <Grid ColumnDefinitions="*,16,*"
                           Margin="0 16 0 0">

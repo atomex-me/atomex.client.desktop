@@ -31,6 +31,7 @@ namespace Atomex.Client.Desktop.Converters
             {
                 decimal decimalValue => decimalValue != 0,
                 int intValue => intValue != 0,
+                long longValue => longValue != 0,
                 _ => false
             };
         });
@@ -41,6 +42,7 @@ namespace Atomex.Client.Desktop.Converters
             {
                 decimal decimalValue => decimalValue == 0,
                 int intValue => intValue == 0,
+                long longValue => longValue == 0,
                 _ => false
             };
         });

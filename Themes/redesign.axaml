@@ -31,6 +31,9 @@
     <Color x:Key="Blue">#20439E</Color>
     <Color x:Key="LightBlue">#3964D3</Color>
     <Color x:Key="DarkBlue">#0F3088</Color>
+    <Color x:Key="GrayBlue">#1F3756</Color>
+    <Color x:Key="GrayBlue2">#112541</Color>
+    <Color x:Key="DarkGrayBlue">#0B1C33</Color>
     <Color x:Key="DefaultButtonMouseOverColor">#265590</Color>
     <Color x:Key="DefaultButtonPressedColor">#1c3f6b</Color>
     <Color x:Key="DefaultButtonBackgroundLightColor">#92aec7</Color>

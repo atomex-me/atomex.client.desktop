@@ -47,7 +47,15 @@
                     </StackPanel>
 
                     <TabControl Classes="WalletTabControl">
+                        <TabControl.Styles>
+                            <Style
+                                Selector="TabControl.WalletTabControl /template/ ItemsPresenter#PART_ItemsPresenter">
+                                <Setter Property="HorizontalAlignment" Value="Right" />
+                                <Setter Property="Height" Value="50" />
+                            </Style>
+                        </TabControl.Styles>
                         <TabItem Classes="WalletTabItem"
+                                 Height="50"
                                  Width="220">
                             <TabItem.Header>
                                 <TextBlock VerticalAlignment="Center"
@@ -68,6 +76,7 @@
 
                         </TabItem>
                         <TabItem Classes="WalletTabItem"
+                                 Height="50"
                                  Width="220">
                             <TabItem.Header>
                                 <TextBlock VerticalAlignment="Center"
