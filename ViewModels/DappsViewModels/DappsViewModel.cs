@@ -475,6 +475,7 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
                         DappLogo = permissionInfo.AppMetadata.Icon,
                         ConnectedAddress = connectedAddress,
                         Operations = operationsViewModel,
+                        OperationsBytes = Hex.ToHexString(forgedOperations),
                         OnReject = async () =>
                         {
                             await _beaconWalletClient.SendResponseAsync(

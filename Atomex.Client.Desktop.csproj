@@ -227,6 +227,9 @@
           <DependentUpon>PermissionRequestView.axaml</DependentUpon>
           <SubType>Code</SubType>
         </Compile>
+        <Compile Update="Controls\CopyButtonWithText.axaml.cs">
+          <DependentUpon>CopyButtonWithStyles.axaml</DependentUpon>
+        </Compile>
     </ItemGroup>
     <ItemGroup>
         <ProjectReference Include="atomex.client.core\Atomex.Client.Core\Atomex.Client.Core.csproj">

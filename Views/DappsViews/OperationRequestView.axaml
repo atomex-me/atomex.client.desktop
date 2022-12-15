@@ -132,7 +132,6 @@
                                     </TabItem.Header>
 
                                     <ListBox Background="Transparent"
-                                             Margin="0 0 -20 0"
                                              Items="{Binding Operations}"
                                              HorizontalAlignment="Stretch"
                                              MaxHeight="300"
@@ -140,7 +139,7 @@
                                              VerticalAlignment="Stretch">
                                         <ListBox.Styles>
                                             <Style Selector="ListBoxItem">
-                                                <Setter Property="Padding" Value="0 0 20 0" />
+                                                <Setter Property="Padding" Value="0" />
                                             </Style>
                                             <Style Selector="ListBoxItem:pointerover /template/ ContentPresenter">
                                                 <Setter Property="Background" Value="Transparent" />
@@ -172,6 +171,32 @@
                                                    FontSize="13"
                                                    Text="Bytes" />
                                     </TabItem.Header>
+
+                                    <Grid ColumnDefinitions="*, Auto">
+                                        <TextBox Grid.Column="0"
+                                                 Grid.ColumnSpan="2"
+                                                 Text="{Binding OperationsBytes}"
+                                                 Foreground="{DynamicResource DefaultForegroundBrush}"
+                                                 MaxHeight="144"
+                                                 FontSize="13"
+                                                 Background="Transparent"
+                                                 BorderThickness="0"
+                                                 TextWrapping="Wrap"
+                                                 Padding="16 12 0 0"
+                                                 IsReadOnly="True">
+                                            <TextBox.Styles>
+                                                <Style Selector="TextBox /template/ TextPresenter">
+                                                    <Setter Property="Margin" Value="0 0 16 0" />
+                                                </Style>
+                                            </TextBox.Styles>
+                                        </TextBox>
+
+                                        <controls:CopyButtonWithText Grid.Column="1"
+                                                                     Margin="0 10 8 0"
+                                                                     VerticalAlignment="Top"
+                                                                     Command="{Binding CopyCommand}"
+                                                                     CommandParameter="{Binding OperationsBytes}" />
+                                    </Grid>
                                 </TabItem>
                             </TabControl>
                         </Grid>
