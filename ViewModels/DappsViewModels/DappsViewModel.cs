@@ -469,22 +469,25 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
                         .Account
                         .GetAddressAsync(Tezos.Name, permissionInfo.Address);
 
+                    async Task OnRejectOrCloseAction()
+                    {
+                        await _beaconWalletClient.SendResponseAsync(
+                            receiverId: message.SenderId,
+                            response: new BeaconAbortedError(operationRequest.Id, _beaconWalletClient.SenderId));
+
+                        App.DialogService.Close();
+                    }
+
                     var operationRequestViewModel = new OperationRequestViewModel
                     {
+                        QuotesProvider = _atomexApp.QuotesProvider,
                         DappName = permissionInfo.AppMetadata.Name,
                         DappLogo = permissionInfo.AppMetadata.Icon,
                         ConnectedAddress = connectedAddress,
                         Operations = operationsViewModel,
                         OperationsBytes = Hex.ToHexString(forgedOperations),
-                        OnReject = async () =>
-                        {
-                            await _beaconWalletClient.SendResponseAsync(
-                                receiverId: message.SenderId,
-                                response: new BeaconAbortedError(operationRequest.Id, _beaconWalletClient.SenderId));
-
-                            App.DialogService.Close();
-                        },
-
+                        OnReject = OnRejectOrCloseAction,
+                        OnClose = () => _ = OnRejectOrCloseAction(),
                         OnConfirm = async () =>
                         {
                             var wallet = (HdWallet)_atomexApp.Account.Wallet;

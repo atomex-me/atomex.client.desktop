@@ -16,6 +16,10 @@
         <dappsViewModels:OperationRequestViewModel />
     </Design.DataContext>
 
+    <UserControl.Resources>
+        <converters:AmountToStringConverter x:Key="AmountToStringConverter" />
+    </UserControl.Resources>
+
     <Border Classes="ChildViewBorder"
             Padding="0 0 0 60">
         <StackPanel>
@@ -201,6 +205,204 @@
                             </TabControl>
                         </Grid>
                     </Border>
+
+                    <CheckBox Padding="12 0 0 0"
+                              Margin="0 12 0 0"
+                              Classes="Primary"
+                              IsChecked="{Binding UseDefaultFee, Mode=TwoWay}"
+                              FontSize="16"
+                              FontFamily="{DynamicResource DefaultLightFontFamily}"
+                              Foreground="{DynamicResource DefaultForegroundBrush}"
+                              Content="Use default fees" />
+
+                    <controls:RoundedButton HorizontalAlignment="Left"
+                                            Height="24"
+                                            Margin="0 16 0 0"
+                                            Command="{Binding OpenDetailsCommand}"
+                                            Classes="Expander NoBorder">
+                        <TextBlock TextTrimming="CharacterEllipsis"
+                                   Foreground="{DynamicResource SecondaryForegroundBrush}"
+                                   FontFamily="{DynamicResource DefaultFontFamily}"
+                                   FontSize="16"
+                                   VerticalAlignment="Center"
+                                   Text="Details" />
+                    </controls:RoundedButton>
+
+                    <StackPanel IsVisible="{Binding DetailsOpened}">
+                        <Grid ColumnDefinitions="*,Auto"
+                              RowDefinitions="Auto,Auto,Auto,Auto">
+                            <TextBlock Grid.Column="0"
+                                       Grid.Row="0"
+                                       Margin="16 8 0 0"
+                                       Foreground="{DynamicResource SecondaryForegroundBrush}"
+                                       FontFamily="{DynamicResource DefaultFontFamily}"
+                                       FontSize="16"
+                                       VerticalAlignment="Center"
+                                       Text="Gas Limit" />
+
+                            <TextBlock Grid.Column="1"
+                                       Grid.Row="0"
+                                       Margin="0 8 0 0"
+                                       Foreground="{DynamicResource DefaultForegroundBrush}"
+                                       FontFamily="{DynamicResource DefaultFontFamily}"
+                                       FontSize="16"
+                                       HorizontalAlignment="Right"
+                                       VerticalAlignment="Center"
+                                       Text="{Binding TotalGasLimit}" />
+
+                            <TextBlock Grid.Column="0"
+                                       Grid.Row="1"
+                                       Margin="16 8 0 0"
+                                       Foreground="{DynamicResource SecondaryForegroundBrush}"
+                                       FontFamily="{DynamicResource DefaultFontFamily}"
+                                       FontSize="16"
+                                       VerticalAlignment="Center"
+                                       Text="Storage Limit" />
+
+                            <TextBlock Grid.Column="1"
+                                       Grid.Row="1"
+                                       Margin="0 8 0 0"
+                                       Foreground="{DynamicResource DefaultForegroundBrush}"
+                                       FontFamily="{DynamicResource DefaultFontFamily}"
+                                       FontSize="16"
+                                       HorizontalAlignment="Right"
+                                       VerticalAlignment="Center"
+                                       Text="{Binding TotalStorageLimit}" />
+
+                            <TextBlock Grid.Column="0"
+                                       Grid.Row="2"
+                                       Margin="16 8 0 0"
+                                       Foreground="{DynamicResource SecondaryForegroundBrush}"
+                                       FontFamily="{DynamicResource DefaultFontFamily}"
+                                       FontSize="16"
+                                       VerticalAlignment="Center"
+                                       Text="Gas Fee" />
+
+                            <StackPanel Grid.Column="1"
+                                        Grid.Row="2"
+                                        Margin="0 8 0 0"
+                                        HorizontalAlignment="Right"
+                                        Orientation="Horizontal">
+                                <TextBlock FontSize="16"
+                                           VerticalAlignment="Center"
+                                           Foreground="{DynamicResource DefaultForegroundBrush}">
+                                    <TextBlock.Text>
+                                        <MultiBinding Converter="{StaticResource AmountToStringConverter}">
+                                            <Binding Path="TotalGasFee" />
+                                            <Binding Path="TezosFormat" />
+                                        </MultiBinding>
+                                    </TextBlock.Text>
+                                </TextBlock>
+
+                                <TextBlock Foreground="{DynamicResource DefaultForegroundBrush}"
+                                           FontSize="16"
+                                           Margin="3 0 6 0"
+                                           VerticalAlignment="Center"
+                                           Text="{x:Static atomex:TezosConfig.Xtz}" />
+
+                                <TextBlock HorizontalAlignment="Right"
+                                           VerticalAlignment="Center"
+                                           Foreground="{DynamicResource SecondaryForegroundBrush}"
+                                           FontSize="16">
+                                    <TextBlock.Text>
+                                        <MultiBinding
+                                            Converter="{StaticResource AmountToStringConverter}">
+                                            <Binding Path="TotalGasFeeInBase" Mode="OneWay" />
+                                            <Binding Path="BaseCurrencyFormat" Mode="OneWay" />
+                                        </MultiBinding>
+                                    </TextBlock.Text>
+                                </TextBlock>
+                            </StackPanel>
+
+                            <TextBlock Grid.Column="0"
+                                       Grid.Row="3"
+                                       Margin="16 8 0 0"
+                                       Foreground="{DynamicResource SecondaryForegroundBrush}"
+                                       FontFamily="{DynamicResource DefaultFontFamily}"
+                                       FontSize="16"
+                                       VerticalAlignment="Center"
+                                       Text="Storage Fee" />
+
+                            <StackPanel Grid.Column="1"
+                                        Grid.Row="3"
+                                        Margin="0 8 0 0"
+                                        HorizontalAlignment="Right"
+                                        Orientation="Horizontal">
+                                <TextBlock FontSize="16"
+                                           VerticalAlignment="Center"
+                                           Foreground="{DynamicResource DefaultForegroundBrush}">
+                                    <TextBlock.Text>
+                                        <MultiBinding Converter="{StaticResource AmountToStringConverter}">
+                                            <Binding Path="TotalStorageFee" />
+                                            <Binding Path="TezosFormat" />
+                                        </MultiBinding>
+                                    </TextBlock.Text>
+                                </TextBlock>
+
+                                <TextBlock Foreground="{DynamicResource DefaultForegroundBrush}"
+                                           FontSize="16"
+                                           Margin="3 0 6 0"
+                                           VerticalAlignment="Center"
+                                           Text="{x:Static atomex:TezosConfig.Xtz}" />
+
+                                <TextBlock HorizontalAlignment="Right"
+                                           VerticalAlignment="Center"
+                                           Foreground="{DynamicResource SecondaryForegroundBrush}"
+                                           FontSize="16">
+                                    <TextBlock.Text>
+                                        <MultiBinding
+                                            Converter="{StaticResource AmountToStringConverter}">
+                                            <Binding Path="TotalStorageFeeInBase" Mode="OneWay" />
+                                            <Binding Path="BaseCurrencyFormat" Mode="OneWay" />
+                                        </MultiBinding>
+                                    </TextBlock.Text>
+                                </TextBlock>
+                            </StackPanel>
+                        </Grid>
+                    </StackPanel>
+
+                    <Grid ColumnDefinitions="*,Auto"
+                          Margin="0 16 0 0">
+                        <TextBlock Grid.Column="0"
+                                   Foreground="{DynamicResource SecondaryForegroundBrush}"
+                                   FontFamily="{DynamicResource DefaultFontFamily}"
+                                   FontSize="16"
+                                   VerticalAlignment="Center"
+                                   Text="Total Fees" />
+
+                        <StackPanel Grid.Column="1"
+                                    Orientation="Horizontal">
+                            <TextBlock FontSize="16"
+                                       VerticalAlignment="Center"
+                                       Foreground="{DynamicResource DefaultForegroundBrush}">
+                                <TextBlock.Text>
+                                    <MultiBinding Converter="{StaticResource AmountToStringConverter}">
+                                        <Binding Path="TotalFees" />
+                                        <Binding Path="TezosFormat" />
+                                    </MultiBinding>
+                                </TextBlock.Text>
+                            </TextBlock>
+
+                            <TextBlock Foreground="{DynamicResource DefaultForegroundBrush}"
+                                       FontSize="16"
+                                       Margin="3 0 6 0"
+                                       VerticalAlignment="Center"
+                                       Text="{x:Static atomex:TezosConfig.Xtz}" />
+
+                            <TextBlock HorizontalAlignment="Right"
+                                       VerticalAlignment="Center"
+                                       Foreground="{DynamicResource SecondaryForegroundBrush}"
+                                       FontSize="16">
+                                <TextBlock.Text>
+                                    <MultiBinding
+                                        Converter="{StaticResource AmountToStringConverter}">
+                                        <Binding Path="TotalFeesInBase" Mode="OneWay" />
+                                        <Binding Path="BaseCurrencyFormat" Mode="OneWay" />
+                                    </MultiBinding>
+                                </TextBlock.Text>
+                            </TextBlock>
+                        </StackPanel>
+                    </Grid>
 
                     <Grid ColumnDefinitions="*,16,*"
                           Margin="0 16 0 0">

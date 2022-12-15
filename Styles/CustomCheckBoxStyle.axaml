@@ -3,12 +3,12 @@
 
     <Style Selector="CheckBox:checked /template/ Border#NormalRectangle">
         <Setter Property="BorderBrush" Value="{DynamicResource LightDefaultOpacity20}" />
-        <Setter Property="Background" Value="{DynamicResource AlmostTransparentBrush}" />
+        <Setter Property="Background" Value="Transparent" />
     </Style>
 
     <Style Selector="CheckBox:not(:checked) /template/ Border#NormalRectangle">
         <Setter Property="BorderBrush" Value="{DynamicResource LightDefaultOpacity20}" />
-        <Setter Property="Background" Value="{DynamicResource AlmostTransparentBrush}" />
+        <Setter Property="Background" Value="Transparent" />
     </Style>
 
     <Style Selector="CheckBox:checked /template/ Path#CheckGlyph">
@@ -18,15 +18,13 @@
     <Style Selector="CheckBox:checked /template/ ContentPresenter#ContentPresenter">
         <Setter Property="TextBlock.Foreground" Value="{DynamicResource SecondaryForegroundBrush}" />
     </Style>
-
     <Style Selector="CheckBox:not(:checked) /template/ ContentPresenter#ContentPresenter">
         <Setter Property="TextBlock.Foreground" Value="{DynamicResource SecondaryForegroundBrush}" />
     </Style>
-    
+
     <Style Selector="CheckBox.Primary:checked /template/ ContentPresenter#ContentPresenter">
         <Setter Property="TextBlock.Foreground" Value="{DynamicResource DefaultForegroundBrush}" />
     </Style>
-
     <Style Selector="CheckBox.Primary:not(:checked) /template/ ContentPresenter#ContentPresenter">
         <Setter Property="TextBlock.Foreground" Value="{DynamicResource DefaultForegroundBrush}" />
     </Style>

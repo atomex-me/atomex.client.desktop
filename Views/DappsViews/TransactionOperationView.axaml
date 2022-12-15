@@ -81,8 +81,14 @@
                 <TextBlock VerticalAlignment="Center"
                            Foreground="{DynamicResource SecondaryForegroundBrush}"
                            FontSize="13"
-                           Margin="0 0 2 0"
-                           Text="{Binding AmountInTez}" />
+                           Margin="0 0 2 0">
+                    <TextBlock.Text>
+                        <MultiBinding Converter="{StaticResource AmountToStringConverter}">
+                            <Binding Path="AmountInTez" />
+                            <Binding Path="TezosFormat" />
+                        </MultiBinding>
+                    </TextBlock.Text>
+                </TextBlock>
                 <TextBlock VerticalAlignment="Center"
                            Foreground="{DynamicResource SecondaryForegroundBrush}"
                            FontSize="13"

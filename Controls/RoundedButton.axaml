@@ -32,13 +32,24 @@
                 <controls:RoundedButton Height="52"
                                         FontSize="18"
                                         Margin="0 10 0 0"
-                                        Classes="Border">
+                                        Classes="Expander">
                     <TextBlock TextTrimming="CharacterEllipsis"
                                Foreground="{DynamicResource DefaultForegroundBrush}"
                                FontFamily="{DynamicResource DefaultFontFamily}"
                                FontSize="16"
                                VerticalAlignment="Center"
                                Text="tz1Mrt2GJcKBCAWdwWK6mRwhpqt9XGGH6tLb" />
+                </controls:RoundedButton>
+
+                <controls:RoundedButton HorizontalAlignment="Left"
+                                        Height="24"
+                                        Classes="Expander NoBorder">
+                    <TextBlock TextTrimming="CharacterEllipsis"
+                               Foreground="{DynamicResource SecondaryForegroundBrush}"
+                               FontFamily="{DynamicResource DefaultFontFamily}"
+                               FontSize="16"
+                               VerticalAlignment="Center"
+                               Text="Details" />
                 </controls:RoundedButton>
             </StackPanel>
 
@@ -168,25 +179,25 @@
         <Setter Property="Foreground" Value="{DynamicResource GrayButtonDisabledForegroundBrush}" />
     </Style>
 
-    <Style Selector="controls|RoundedButton.Border">
+    <Style Selector="controls|RoundedButton.Expander">
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="Padding" Value="16 0" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type controls:RoundedButton}">
                     <Border Name="border"
-                            BorderThickness="1"
                             CornerRadius="{TemplateBinding CornerRadius}"
                             Background="{TemplateBinding Background}"
-                            Padding="{TemplateBinding Padding}">
+                            Padding="{TemplateBinding Padding}"
+                            Height="{TemplateBinding Height}">
                         <Grid ColumnDefinitions="*,Auto">
                             <ContentPresenter Grid.Column="0"
-                                              Content="{TemplateBinding Content}"
-                                              VerticalAlignment="Center" />
+                                              Content="{TemplateBinding Content}" />
                             <svg:Svg Grid.Column="1"
                                      Path="/Resources/Icons/arrow-sort-desc.svg"
                                      HorizontalAlignment="Right"
-                                     Margin="16 0 0 0"
+                                     VerticalAlignment="Center"
+                                     Margin="8 0 0 0"
                                      Width="16" />
                         </Grid>
                     </Border>
@@ -195,10 +206,17 @@
         </Setter>
     </Style>
 
-    <Style Selector="controls|RoundedButton.Border /template/ Border">
+    <Style Selector="controls|RoundedButton.Expander /template/ Border">
         <Setter Property="BorderBrush" Value="{DynamicResource LightDefaultOpacity20}" />
+        <Setter Property="BorderThickness" Value="1" />
     </Style>
-    <Style Selector="controls|RoundedButton.Border:pointerover /template/ Border">
+    <Style Selector="controls|RoundedButton.Expander:pointerover /template/ Border">
         <Setter Property="BorderBrush" Value="{DynamicResource LightDefaultOpacity50}" />
+    </Style>
+    <Style Selector="controls|RoundedButton.Expander.NoBorder">
+        <Setter Property="Padding" Value="0" />
+    </Style>
+    <Style Selector="controls|RoundedButton.Expander.NoBorder /template/ Border">
+        <Setter Property="BorderThickness" Value="0" />
     </Style>
 </Styles>

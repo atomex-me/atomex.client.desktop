@@ -71,7 +71,7 @@
                                Text="Select address to connect" />
 
                     <controls:RoundedButton Margin="0 8 0 0"
-                                            Classes="Border"
+                                            Classes="Expander"
                                             Command="{Binding SelectAddressCommand}">
                         <TextBlock TextTrimming="CharacterEllipsis"
                                    Foreground="{DynamicResource DefaultForegroundBrush}"
