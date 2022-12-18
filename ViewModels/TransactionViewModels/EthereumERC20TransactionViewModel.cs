@@ -63,7 +63,7 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
                     result += -erc20Config.TokenDigitsToTokens(tx.Amount);
             }
 
-            tx.InternalTxs?.ForEach(t => result += GetAmount(t, erc20Config));
+            tx.InternalTransactions?.ForEach(t => result += GetAmount(t, erc20Config));
 
             return result;
         }

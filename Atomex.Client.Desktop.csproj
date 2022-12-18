@@ -40,7 +40,7 @@
         <PackageReference Include="Beacon.Sdk" Version="1.0.4" />
         <PackageReference Include="DialogHost.Avalonia" Version="0.4.0" />
         <PackageReference Include="Deadpikle.AvaloniaProgressRing" Version="0.9.0" />
-        <PackageReference Include="Netezos" Version="2.6.2" />
+        <PackageReference Include="Netezos" Version="2.7.2" />
         <PackageReference Include="NetSparkleUpdater.SparkleUpdater" Version="2.0.7" />
         <PackageReference Include="NetSparkleUpdater.UI.Avalonia" Version="2.0.8" />
         <PackageReference Include="OxyPlot.Avalonia" Version="2.1.0-20201211.2" />
