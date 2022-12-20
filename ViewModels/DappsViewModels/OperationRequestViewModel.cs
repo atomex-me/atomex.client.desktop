@@ -198,6 +198,7 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
         [Reactive] public IQuotesProvider? QuotesProvider { get; init; }
         private static string BaseCurrencyCode => "USD";
         private static string BaseCurrencyFormat => "$0.##";
+        private int? ByteCost { get; set; }
         [ObservableAsProperty] public bool IsSending { get; }
         [ObservableAsProperty] public bool IsRejecting { get; }
 
@@ -259,16 +260,35 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
                             .ReadAsStringAsync();
 
                         var responseJObj = JsonConvert.DeserializeObject<JObject>(responseContent);
-                        if (int.TryParse(responseJObj?["constants"]?["byteCost"]?.ToString(), out var byteCost))
-                            TotalStorageFee = TezosConfig.MtzToTz(Convert.ToDecimal(byteCost)) * TotalStorageLimit;
+                        if (!int.TryParse(responseJObj?["constants"]?["byteCost"]?.ToString(), out var byteCost))
+                            return;
+
+                        ByteCost = byteCost;
+                        TotalStorageFee = TezosConfig.MtzToTz(Convert.ToDecimal(byteCost)) * TotalStorageLimit;
                     }
                     catch (Exception ex)
                     {
                         Log.Error(ex, "Error during sending request to {Url}", url);
                     }
+                });
 
-                    TotalFees = TotalGasFee + TotalStorageFee;
+            this.WhenAnyValue(vm => vm.TotalGasFee, vm => vm.TotalStorageFee)
+                .WhereAllNotNull()
+                .Throttle(TimeSpan.FromMilliseconds(1))
+                .Select(values => values.Item1 + values.Item2)
+                .SubscribeInMainThread(totalFees =>
+                {
+                    TotalFees = totalFees;
                     OnQuotesUpdatedEventHandler(QuotesProvider, EventArgs.Empty);
+                });
+
+            this.WhenAnyValue(vm => vm.TotalStorageLimit)
+                .WhereNotNull()
+                .Skip(1)
+                .SubscribeInMainThread(totalStorageLimit =>
+                {
+                    if (ByteCost != null)
+                        TotalStorageFee = TezosConfig.MtzToTz(Convert.ToDecimal(ByteCost)) * totalStorageLimit;
                 });
 
             UseDefaultFee = true;
@@ -347,13 +367,15 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
             };
 
             DetailsOpened = true;
-            TotalFees = (decimal)0.222223121331233;
+            // TotalFees = (decimal)0.222223121331233;
             TotalFeesInBase = (decimal)0.123123;
 
             TotalGasLimit = 234344;
             TotalStorageLimit = 16000;
             TotalGasFee = (decimal)0.002331231234;
             TotalStorageFee = (decimal)0.022331231234;
+
+            UseDefaultFee = false;
 
             OperationsBytes =
                 "tz1dwWLbMrt2tz1dwWLbMrt2GJcKBK6mRwhpqt9XGGH6tCAWtz1dwWLbMrt2GJcKBK6mRwhpqt9XGtz1dwWLbMrt2tz1dwWLbMrt2GJcKBK6mRwhpqt9XGGH6tCAWtz1dwWLbMrt2GJcKBK6mRwhpqt9XGGH6tCAWtz1dwWLbMrt2GJcKBK6mRwhpqt9XGGH6tCAWtz1dwWLbMrt2GJcKBK6mRwhpqt9XGGH6tCAWtz1dwWLbMrt2GJcKBK6mRwhpqt9XGGH6tCAWhpqt9XGGH6tCAWtz1dwWLbMrt2tz1dwWLbMrt2GJcKBK6mRwhpqt9XGGH6tCAWtz1dwWLbMrt2GJcKBK6mRwhpqt9XGGH6tCAWtz1dwWLbMrt2GJcKBK6mRwhpqt9XGGH6tCAWtz1dwWLbMrt2GJcKBK6mRwhpqt9XGGH6tCAWtz1dwWLbMrt2GJcKBK6mRwhpqt9XGGH6tCAWhpqt9XGGH6tCAWtz1dwWLbMrt2tz1dwWLbMrt2GJcKBK6mRwhpqt9XGGH6tCAWtz1dwWLbMrt2GJcKtz1dwWLbMrt2tz1dwWLbMrt2GJcKBK6mRwhpqt9XGGH6tCAWtz1dwWLbMrt2GJcKBK6mRwhpqt9XGtz1dwWLbMrt2tz1dwWLbMrt2GJcKBK6mRwhpqt9XGGH6tCAWtz1dwWLbMrt2GJcKBK6mRwhpqt9XGGH6tCAWtz1dwWLbMrt2GJcKBK6mRwhpqt9XGGH6tCAWtz1dwWLbMrt2GJcKBK6mRwhpqt9XGGH6tCAWtz1dwWLbMrt2GJcKBK6mRwhpqt9XGGH6tCAWhpqt9XGGH6tCAWtz1dwWLbMrt2tz1dwWLbMrt2GJcKBK6mRwhpqt9XGGH6tCAWtz1dwWLbMrt2GJcKBK6mRwhpqt9XGGH6tCAWtz1dwWLbMrt2GJcKBK6mRwhpqt9XGGH6tCAWtz1dwWLbMrt2GJcKBK6mRwhpqt9XGGH6tCAWtz1dwWLbMrt2GJcKBK6mRwhpqt9XGGH6tCAWhpqt9XGGH6tCAWtz1dwWLbMrt2tz1dwWLbMrt2GJcKBK6mRwhpqt9XGGH6tCAWtz1dwWLbMrt2GJcK";
