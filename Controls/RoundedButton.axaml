@@ -40,17 +40,6 @@
                                VerticalAlignment="Center"
                                Text="tz1Mrt2GJcKBCAWdwWK6mRwhpqt9XGGH6tLb" />
                 </controls:RoundedButton>
-
-                <controls:RoundedButton HorizontalAlignment="Left"
-                                        Height="24"
-                                        Classes="Expander NoBorder">
-                    <TextBlock TextTrimming="CharacterEllipsis"
-                               Foreground="{DynamicResource SecondaryForegroundBrush}"
-                               FontFamily="{DynamicResource DefaultFontFamily}"
-                               FontSize="16"
-                               VerticalAlignment="Center"
-                               Text="Details" />
-                </controls:RoundedButton>
             </StackPanel>
 
         </Border>
@@ -212,11 +201,5 @@
     </Style>
     <Style Selector="controls|RoundedButton.Expander:pointerover /template/ Border">
         <Setter Property="BorderBrush" Value="{DynamicResource LightDefaultOpacity50}" />
-    </Style>
-    <Style Selector="controls|RoundedButton.Expander.NoBorder">
-        <Setter Property="Padding" Value="0" />
-    </Style>
-    <Style Selector="controls|RoundedButton.Expander.NoBorder /template/ Border">
-        <Setter Property="BorderThickness" Value="0" />
     </Style>
 </Styles>

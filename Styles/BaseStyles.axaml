@@ -64,7 +64,7 @@
             </Animation>
         </Style.Animations>
     </Style>
-    
+
     <Style Selector="Border.ImageNotLoaded">
         <Setter Property="Background" Value="{DynamicResource LightDefaultOpacity10}" />
     </Style>
@@ -81,5 +81,19 @@
                 </KeyFrame>
             </Animation>
         </Style.Animations>
+    </Style>
+
+    <Style Selector="Panel.WithRotation">
+        <Setter Property="Transitions">
+            <Transitions>
+                <TransformOperationsTransition Property="RenderTransform" Duration="0:0:.1" />
+            </Transitions>
+        </Setter>
+    </Style>
+    <Style Selector="Panel.WithRotation.Rotated">
+        <Setter Property="RenderTransform" Value="rotate(180deg)" />
+    </Style>
+    <Style Selector="Panel.WithRotation.NotRotated">
+        <Setter Property="RenderTransform" Value="none" />
     </Style>
 </Styles>

@@ -115,26 +115,9 @@
                                  Content="Display extra operation details" />
 
             <Panel Margin="8 0 0 0"
+                   Classes="WithRotation"
                    Classes.Rotated="{Binding IsDetailsOpened}"
                    Classes.NotRotated="{Binding !IsDetailsOpened}">
-                <Panel.Styles>
-                    <Style Selector="Panel">
-                        <Setter Property="Transitions">
-                            <Transitions>
-                                <TransformOperationsTransition
-                                    Property="RenderTransform"
-                                    Duration="0:0:.075" />
-                            </Transitions>
-                        </Setter>
-                    </Style>
-                    <Style Selector="Panel.Rotated">
-                        <Setter Property="RenderTransform" Value="rotate(180deg)" />
-                    </Style>
-                    <Style Selector="Panel.NotRotated">
-                        <Setter Property="RenderTransform" Value="none" />
-                    </Style>
-                </Panel.Styles>
-
                 <svg:Svg Width="14"
                          Height="14"
                          VerticalAlignment="Center"

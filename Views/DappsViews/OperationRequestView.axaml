@@ -214,26 +214,39 @@
                               FontFamily="{DynamicResource DefaultLightFontFamily}"
                               Foreground="{DynamicResource DefaultForegroundBrush}"
                               Content="Use default fees" />
+                    
+                    <Button Classes="EmptyBtnWithContent"
+                            Padding="0"
+                            HorizontalAlignment="Left"
+                            Margin="0 16 0 0"
+                            Command="{Binding OpenDetailsCommand}">
+                        <StackPanel Orientation="Horizontal"
+                                    HorizontalAlignment="Left">
+                            <TextBlock TextTrimming="CharacterEllipsis"
+                                       Foreground="{DynamicResource SecondaryForegroundBrush}"
+                                       FontFamily="{DynamicResource DefaultFontFamily}"
+                                       FontSize="16"
+                                       VerticalAlignment="Center"
+                                       Text="Details" />
 
-                    <controls:RoundedButton HorizontalAlignment="Left"
-                                            Height="24"
-                                            Margin="0 16 0 0"
-                                            Command="{Binding OpenDetailsCommand}"
-                                            Classes="Expander NoBorder">
-                        <TextBlock TextTrimming="CharacterEllipsis"
-                                   Foreground="{DynamicResource SecondaryForegroundBrush}"
-                                   FontFamily="{DynamicResource DefaultFontFamily}"
-                                   FontSize="16"
-                                   VerticalAlignment="Center"
-                                   Text="Details" />
-                    </controls:RoundedButton>
+                            <Panel Margin="8 0 0 0"
+                                   Classes="WithRotation"
+                                   Classes.Rotated="{Binding DetailsOpened}">
+                                <svg:Svg Path="/Resources/Icons/arrow-sort-desc.svg"
+                                         HorizontalAlignment="Right"
+                                         VerticalAlignment="Center"
+                                         Width="16" />
+                            </Panel>
+                        </StackPanel>
+                    </Button>
 
                     <StackPanel IsVisible="{Binding DetailsOpened}">
                         <Grid ColumnDefinitions="*,Auto"
-                              RowDefinitions="Auto,Auto,Auto,Auto">
+                              RowDefinitions="Auto,Auto,Auto,Auto"
+                              IsVisible="{Binding UseDefaultFee}">
                             <TextBlock Grid.Column="0"
                                        Grid.Row="0"
-                                       Margin="16 8 0 0"
+                                       Margin="16 12 0 0"
                                        Foreground="{DynamicResource SecondaryForegroundBrush}"
                                        FontFamily="{DynamicResource DefaultFontFamily}"
                                        FontSize="16"

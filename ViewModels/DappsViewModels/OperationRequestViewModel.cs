@@ -244,7 +244,7 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
                         RevealContentViewModel revealOp => res + revealOp.FeeInTez,
                         _ => res
                     });
-                    
+
                     const string url = "v1/protocols/current";
                     try
                     {
@@ -270,6 +270,8 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
                     TotalFees = TotalGasFee + TotalStorageFee;
                     OnQuotesUpdatedEventHandler(QuotesProvider, EventArgs.Empty);
                 });
+
+            UseDefaultFee = true;
 #if DEBUG
             if (Design.IsDesignMode)
                 DesignerMode();
