@@ -5,7 +5,6 @@ using System.IO;
 using System.Linq;
 using System.Reactive;
 using System.Runtime.InteropServices;
-using System.Text;
 using System.Threading.Tasks;
 using System.Web;
 using Atomex.Blockchain.Tezos;
@@ -27,8 +26,6 @@ using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using Serilog;
 using Atomex.Blockchain.Tezos.Internal;
-using Atomex.Wallet.Tezos;
-using Atomex.Wallets.Tezos;
 using Beacon.Sdk.BeaconClients;
 using Beacon.Sdk.BeaconClients.Abstract;
 using Serilog.Extensions.Logging;
@@ -83,7 +80,7 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
     public class DappsViewModel : ViewModelBase
     {
         private const int GasLimitPerBlock = 5_200_000;
-        private const int StorageLimitPerOperation = 5000;
+        public const int StorageLimitPerOperation = 5000;
 
         private readonly IAtomexApp _atomexApp;
         private IWalletBeaconClient _beaconWalletClient;
@@ -413,61 +410,57 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
                         return txContent;
                     }));
 
-                    var error = await TezosOperationFiller
-                        .AutoFillAsync(
-                            operations,
-                            head["hash"]!.ToString(),
-                            head["chain_id"]!.ToString(),
-                            Tezos)
-                        .ConfigureAwait(false);
+                    // var error = await TezosOperationFiller
+                    //     .AutoFillAsync(
+                    //         operations,
+                    //         head["hash"]!.ToString(),
+                    //         head["chain_id"]!.ToString(),
+                    //         Tezos)
+                    //     .ConfigureAwait(false);
 
-                    if (error != null)
-                    {
-                        await _beaconWalletClient.SendResponseAsync(
-                            receiverId: message.SenderId,
-                            response: new TransactionInvalidBeaconError(operationRequest.Id,
-                                _beaconWalletClient.SenderId));
+                    // if (error != null)
+                    // {
+                    //     await _beaconWalletClient.SendResponseAsync(
+                    //         receiverId: message.SenderId,
+                    //         response: new TransactionInvalidBeaconError(operationRequest.Id,
+                    //             _beaconWalletClient.SenderId));
+                    //
+                    //     Log.Error("{@Sender}: error during AutoFill transaction, {@Msg}", "Beacon", error.Description);
+                    //     return;
+                    // }
 
-                        Log.Error("{@Sender}: error during AutoFill transaction, {@Msg}", "Beacon", error.Description);
-                        return;
-                    }
-
-                    var forgedOperations = await TezosForge.ForgeAsync(
-                        operations: operations,
-                        branch: head["hash"]!.ToString());
-
-                    var operationsViewModel = new ObservableCollection<BaseBeaconOperationViewModel>();
-
-                    foreach (var item in operations.Select((value, idx) => new { idx, value }))
-                    {
-                        var operation = item.value;
-                        var index = item.idx;
-
-                        switch (operation)
-                        {
-                            case TransactionContent transactionOperation:
-                                operationsViewModel.Add(new TransactionContentViewModel
-                                {
-                                    Id = index + 1,
-                                    Operation = transactionOperation,
-                                    QuotesProvider = _atomexApp.QuotesProvider,
-                                    ExplorerUri = Tezos.AddressExplorerUri
-                                });
-                                break;
-                            case RevealContent revealOperation:
-                                operationsViewModel.Add(new RevealContentViewModel
-                                {
-                                    Id = index + 1,
-                                    Operation = revealOperation,
-                                    QuotesProvider = _atomexApp.QuotesProvider,
-                                });
-                                break;
-                        }
-                    }
-
-                    var connectedAddress = await _atomexApp
-                        .Account
-                        .GetAddressAsync(Tezos.Name, permissionInfo.Address);
+                    // var forgedOperations = await TezosForge.ForgeAsync(
+                    //     operations: operations,
+                    //     branch: head["hash"]!.ToString());
+                    //
+                    // var operationsViewModel = new ObservableCollection<BaseBeaconOperationViewModel>();
+                    //
+                    // foreach (var item in operations.Select((value, idx) => new { idx, value }))
+                    // {
+                    //     var operation = item.value;
+                    //     var index = item.idx;
+                    //
+                    //     switch (operation)
+                    //     {
+                    //         case TransactionContent transactionOperation:
+                    //             operationsViewModel.Add(new TransactionContentViewModel
+                    //             {
+                    //                 Id = index + 1,
+                    //                 Operation = transactionOperation,
+                    //                 QuotesProvider = _atomexApp.QuotesProvider,
+                    //                 ExplorerUri = Tezos.AddressExplorerUri
+                    //             });
+                    //             break;
+                    //         case RevealContent revealOperation:
+                    //             operationsViewModel.Add(new RevealContentViewModel
+                    //             {
+                    //                 Id = index + 1,
+                    //                 Operation = revealOperation,
+                    //                 QuotesProvider = _atomexApp.QuotesProvider,
+                    //             });
+                    //             break;
+                    //     }
+                    // }
 
                     async Task OnRejectOrCloseAction()
                     {
@@ -478,17 +471,15 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
                         App.DialogService.Close();
                     }
 
-                    var operationRequestViewModel = new OperationRequestViewModel
+                    var operationRequestViewModel = new OperationRequestViewModel(operations, connectedWalletAddress,
+                        operationGasLimit, Tezos)
                     {
                         QuotesProvider = _atomexApp.QuotesProvider,
                         DappName = permissionInfo.AppMetadata.Name,
                         DappLogo = permissionInfo.AppMetadata.Icon,
-                        ConnectedAddress = connectedAddress,
-                        Operations = operationsViewModel,
-                        OperationsBytes = Hex.ToHexString(forgedOperations),
                         OnReject = OnRejectOrCloseAction,
                         OnClose = () => _ = OnRejectOrCloseAction(),
-                        OnConfirm = async () =>
+                        OnConfirm = async forgedOperations =>
                         {
                             var wallet = (HdWallet)_atomexApp.Account.Wallet;
                             var keyStorage = wallet.KeyStorage;

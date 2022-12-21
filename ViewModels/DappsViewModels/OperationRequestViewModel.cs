@@ -1,16 +1,21 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Net;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
+using Atomex.Blockchain.Tezos.Internal;
 using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.Dialogs;
+using Atomex.Client.Desktop.Helpers;
 using Atomex.Common;
 using Atomex.Core;
 using Atomex.MarketData.Abstract;
 using Atomex.ViewModels;
+using Atomex.Wallet.Tezos;
+using Atomex.Wallets.Tezos;
 using Avalonia.Controls;
 using Netezos.Forging.Models;
 using Newtonsoft.Json;
@@ -139,7 +144,6 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
             });
 
 #if DEBUG
-
         private void DesignerMode()
         {
             Operation = new TransactionContent
@@ -183,7 +187,10 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
         public string TezosFormat =>
             DecimalExtensions.GetFormatWithPrecision((int)Math.Round(Math.Log10(TezosConfig.XtzDigitsMultiplier)));
 
-        [Reactive] public IEnumerable<BaseBeaconOperationViewModel> Operations { get; set; }
+        [Reactive] public IEnumerable<BaseBeaconOperationViewModel>? Operations { get; set; }
+        private IEnumerable<ManagerOperationContent> InitialOperations { get; set; }
+        [Reactive] private byte[]? ForgedOperations { get; set; }
+        [ObservableAsProperty] public string OperationsBytes { get; set; }
         [Reactive] public decimal TotalFees { get; set; }
         [Reactive] public decimal TotalFeesInBase { get; set; }
         [Reactive] public int TotalGasLimit { get; set; }
@@ -193,17 +200,28 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
         [Reactive] public decimal TotalStorageFee { get; set; }
         [Reactive] public decimal TotalStorageFeeInBase { get; set; }
         [Reactive] public bool UseDefaultFee { get; set; }
+        [Reactive] public bool AutofillError { get; set; }
         [Reactive] public bool DetailsOpened { get; set; }
-        public string OperationsBytes { get; set; }
         [Reactive] public IQuotesProvider? QuotesProvider { get; init; }
         private static string BaseCurrencyCode => "USD";
-        private static string BaseCurrencyFormat => "$0.##";
+        public static string BaseCurrencyFormat => "$0.##";
         private int? ByteCost { get; set; }
+        private TezosConfig Tezos { get; }
+        private int DefaultOperationGasLimit { get; }
         [ObservableAsProperty] public bool IsSending { get; }
         [ObservableAsProperty] public bool IsRejecting { get; }
 
-        public OperationRequestViewModel()
+        public OperationRequestViewModel(
+            IEnumerable<ManagerOperationContent> operations,
+            WalletAddress connectedAddress,
+            int operationGasLimit,
+            TezosConfig tezosConfig)
         {
+            Tezos = tezosConfig;
+            ConnectedAddress = connectedAddress;
+            InitialOperations = operations;
+            DefaultOperationGasLimit = operationGasLimit;
+
             OnConfirmCommand
                 .IsExecuting
                 .ToPropertyExInMainThread(this, vm => vm.IsSending);
@@ -291,11 +309,141 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
                         TotalStorageFee = TezosConfig.MtzToTz(Convert.ToDecimal(ByteCost)) * totalStorageLimit;
                 });
 
+            this.WhenAnyValue(vm => vm.UseDefaultFee)
+                .WhereNotNull()
+                .Where(useDefaultFee => useDefaultFee)
+                .SubscribeInMainThread(_ => { AutofillOperations(); });
+
+            this.WhenAnyValue(vm => vm.TotalGasFee, vm => vm.TotalStorageLimit)
+                .WhereAllNotNull()
+                .Throttle(TimeSpan.FromMilliseconds(250))
+                .Where(_ => !UseDefaultFee)
+                .SubscribeInMainThread(_ => { AutofillOperations(); });
+
+            this.WhenAnyValue(vm => vm.ForgedOperations)
+                .WhereNotNull()
+                .Select(forgedOperations => forgedOperations.ToHexString())
+                .ToPropertyExInMainThread(this, vm => vm.OperationsBytes);
+
             UseDefaultFee = true;
+
 #if DEBUG
             if (Design.IsDesignMode)
                 DesignerMode();
 #endif
+        }
+
+        private async void AutofillOperations()
+        {
+            AutofillError = false;
+
+            var rpc = new Rpc(Tezos.RpcNodeUri);
+            var head = await rpc
+                .GetHeader()
+                .ConfigureAwait(false);
+
+            var operations = InitialOperations.Select(op => op switch
+                {
+                    TransactionContent txContent => new TransactionContent
+                    {
+                        Amount = txContent.Amount,
+                        Destination = txContent.Destination,
+                        Parameters = txContent.Parameters,
+                        Source = txContent.Source,
+                        Fee = UseDefaultFee ? 0 : txContent.Fee,
+                        Counter = txContent.Counter,
+                        GasLimit = UseDefaultFee ? DefaultOperationGasLimit : txContent.GasLimit,
+                        StorageLimit = UseDefaultFee ? DappsViewModel.StorageLimitPerOperation : txContent.StorageLimit
+                    },
+                    RevealContent revealContent => new RevealContent
+                    {
+                        PublicKey = revealContent.PublicKey,
+                        Source = revealContent.Source,
+                        Fee = UseDefaultFee ? 0 : revealContent.Fee,
+                        Counter = revealContent.Counter,
+                        GasLimit = UseDefaultFee ? DefaultOperationGasLimit : revealContent.GasLimit,
+                        StorageLimit = UseDefaultFee
+                            ? DappsViewModel.StorageLimitPerOperation
+                            : revealContent.StorageLimit
+                    },
+                    _ => op
+                })
+                .ToList();
+
+            if (!UseDefaultFee)
+            {
+                var avgFee = Convert.ToInt64(TotalGasFee * TezosConfig.XtzDigitsMultiplier / operations.Count);
+
+                foreach (var op in operations)
+                {
+                    op.Fee = avgFee;
+                }
+
+                if (TotalStorageLimit != 0)
+                {
+                    foreach (var op in operations.Where(op => op.StorageLimit != 0))
+                    {
+                        op.StorageLimit = TotalStorageLimit;
+                        break;
+                    }
+                }
+            }
+
+            var error = await TezosOperationFiller.AutoFillAsync(
+                    operations,
+                    head["hash"]!.ToString(),
+                    head["chain_id"]!.ToString(),
+                    Tezos)
+                .ConfigureAwait(false);
+
+            if (error != null)
+                AutofillError = true;
+
+            ForgedOperations = await TezosForge.ForgeAsync(
+                operations: operations,
+                branch: head["hash"]!.ToString());
+
+            if (!UseDefaultFee && Operations != null) return;
+
+            var operationsViewModel = new ObservableCollection<BaseBeaconOperationViewModel>();
+            foreach (var item in operations.Select((value, idx) => new { idx, value }))
+            {
+                var operation = item.value;
+                var index = item.idx;
+
+                switch (operation)
+                {
+                    case TransactionContent transactionOperation:
+                        operationsViewModel.Add(new TransactionContentViewModel
+                        {
+                            Id = index + 1,
+                            Operation = transactionOperation,
+                            QuotesProvider = QuotesProvider,
+                            ExplorerUri = Tezos.AddressExplorerUri
+                        });
+                        break;
+                    case RevealContent revealOperation:
+                        operationsViewModel.Add(new RevealContentViewModel
+                        {
+                            Id = index + 1,
+                            Operation = revealOperation,
+                            QuotesProvider = QuotesProvider,
+                        });
+                        break;
+                }
+            }
+
+            if (Operations != null)
+            {
+                foreach (var op in Operations)
+                {
+                    if (op is IDisposable disposable)
+                        disposable.Dispose();
+                }
+            }
+
+            InitialOperations = operations;
+            Operations = operationsViewModel;
         }
 
         private void OnQuotesUpdatedEventHandler(object? sender, EventArgs args)
@@ -312,13 +460,17 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
         }
 
         public Action? OnClose { get; set; }
-        public Func<Task> OnConfirm { get; init; }
+        public Func<byte[], Task> OnConfirm { get; init; }
         public Func<Task> OnReject { get; init; }
 
         private ReactiveCommand<Unit, Unit>? _onConfirmCommand;
 
         public ReactiveCommand<Unit, Unit> OnConfirmCommand =>
-            _onConfirmCommand ??= ReactiveCommand.CreateFromTask(async () => await OnConfirm());
+            _onConfirmCommand ??= ReactiveCommand.CreateFromTask(async () =>
+            {
+                if (ForgedOperations != null)
+                    await OnConfirm(ForgedOperations);
+            });
 
         private ReactiveCommand<Unit, Unit>? _onRejectCommand;
 
@@ -376,6 +528,7 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
             TotalStorageFee = (decimal)0.022331231234;
 
             UseDefaultFee = false;
+            AutofillError = true;
 
             OperationsBytes =
                 "tz1dwWLbMrt2tz1dwWLbMrt2GJcKBK6mRwhpqt9XGGH6tCAWtz1dwWLbMrt2GJcKBK6mRwhpqt9XGtz1dwWLbMrt2tz1dwWLbMrt2GJcKBK6mRwhpqt9XGGH6tCAWtz1dwWLbMrt2GJcKBK6mRwhpqt9XGGH6tCAWtz1dwWLbMrt2GJcKBK6mRwhpqt9XGGH6tCAWtz1dwWLbMrt2GJcKBK6mRwhpqt9XGGH6tCAWtz1dwWLbMrt2GJcKBK6mRwhpqt9XGGH6tCAWhpqt9XGGH6tCAWtz1dwWLbMrt2tz1dwWLbMrt2GJcKBK6mRwhpqt9XGGH6tCAWtz1dwWLbMrt2GJcKBK6mRwhpqt9XGGH6tCAWtz1dwWLbMrt2GJcKBK6mRwhpqt9XGGH6tCAWtz1dwWLbMrt2GJcKBK6mRwhpqt9XGGH6tCAWtz1dwWLbMrt2GJcKBK6mRwhpqt9XGGH6tCAWhpqt9XGGH6tCAWtz1dwWLbMrt2tz1dwWLbMrt2GJcKBK6mRwhpqt9XGGH6tCAWtz1dwWLbMrt2GJcKtz1dwWLbMrt2tz1dwWLbMrt2GJcKBK6mRwhpqt9XGGH6tCAWtz1dwWLbMrt2GJcKBK6mRwhpqt9XGtz1dwWLbMrt2tz1dwWLbMrt2GJcKBK6mRwhpqt9XGGH6tCAWtz1dwWLbMrt2GJcKBK6mRwhpqt9XGGH6tCAWtz1dwWLbMrt2GJcKBK6mRwhpqt9XGGH6tCAWtz1dwWLbMrt2GJcKBK6mRwhpqt9XGGH6tCAWtz1dwWLbMrt2GJcKBK6mRwhpqt9XGGH6tCAWhpqt9XGGH6tCAWtz1dwWLbMrt2tz1dwWLbMrt2GJcKBK6mRwhpqt9XGGH6tCAWtz1dwWLbMrt2GJcKBK6mRwhpqt9XGGH6tCAWtz1dwWLbMrt2GJcKBK6mRwhpqt9XGGH6tCAWtz1dwWLbMrt2GJcKBK6mRwhpqt9XGGH6tCAWtz1dwWLbMrt2GJcKBK6mRwhpqt9XGGH6tCAWhpqt9XGGH6tCAWtz1dwWLbMrt2tz1dwWLbMrt2GJcKBK6mRwhpqt9XGGH6tCAWtz1dwWLbMrt2GJcK";

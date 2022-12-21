@@ -4,7 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:dappsViewModels="clr-namespace:Atomex.Client.Desktop.ViewModels.DappsViewModels"
              xmlns:controls="clr-namespace:Atomex.Client.Desktop.Controls"
-             mc:Ignorable="d" d:DesignWidth="700" d:DesignHeight="750"
+             mc:Ignorable="d" d:DesignWidth="700" d:DesignHeight="850"
              x:Class="Atomex.Client.Desktop.Views.DappsViews.OperationRequestView"
              xmlns:asyncImageLoader="clr-namespace:AsyncImageLoader;assembly=AsyncImageLoader.Avalonia"
              xmlns:svg="clr-namespace:Avalonia.Svg.Skia;assembly=Avalonia.Svg.Skia"
@@ -568,9 +568,30 @@
                             </TextBlock>
                         </StackPanel>
                     </Grid>
+                    
+                    <Border Margin="0 16 0 0"
+                            Padding="14"
+                            Background="{DynamicResource DarkRedOpacity10}"
+                            CornerRadius="6"
+                            IsVisible="{Binding AutofillError}">
+                        <Grid ColumnDefinitions="Auto,*">
+                            <svg:Svg Grid.Column="0"
+                                     Width="18"
+                                     VerticalAlignment="Center"
+                                     Path="/Resources/Icons/warning-red.svg" />
 
-                    <Grid ColumnDefinitions="*,16,*"
-                          Margin="0 16 0 0">
+                            <TextBlock Grid.Column="1"
+                                       Margin="12 0 0 0"
+                                       Foreground="{DynamicResource DarkRed}"
+                                       FontFamily="{DynamicResource DefaultFontFamily}"
+                                       FontSize="13"
+                                       VerticalAlignment="Center"
+                                       TextWrapping="Wrap"
+                                       Text="Warning! Transaction with this parameters is likely to fail." />
+                        </Grid>
+                    </Border>
+
+                    <Grid ColumnDefinitions="*,16,*" Margin="0 24 0 0">
                         <controls:RoundedButton Grid.Column="0"
                                                 Classes="GrayButton"
                                                 Content="Reject"
