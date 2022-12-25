@@ -190,6 +190,7 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
         [Reactive] public IEnumerable<BaseBeaconOperationViewModel>? Operations { get; set; }
         private IEnumerable<ManagerOperationContent> InitialOperations { get; set; }
         [Reactive] private byte[]? ForgedOperations { get; set; }
+        [Reactive] private string? RawOperations { get; set; }
         [ObservableAsProperty] public string OperationsBytes { get; set; }
         [Reactive] public decimal TotalFees { get; set; }
         [Reactive] public decimal TotalFeesInBase { get; set; }
@@ -336,11 +337,20 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
         private async void AutofillOperations()
         {
             AutofillError = false;
-
+            
             var rpc = new Rpc(Tezos.RpcNodeUri);
-            var head = await rpc
-                .GetHeader()
-                .ConfigureAwait(false);
+            JObject head;
+            try
+            {
+                head = await rpc
+                    .GetHeader()
+                    .ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Error during querying rpc, {Message}", ex.Message);
+                return;
+            }
 
             var operations = InitialOperations.Select(op => op switch
                 {
@@ -370,22 +380,28 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
                 })
                 .ToList();
 
+            // if (!UseDefaultFee)  
+            // {
+            //     if (TotalStorageLimit != 0)
+            //     {
+            //         var notZeroStorageLimitIdx = operations.FindIndex(op => op.StorageLimit != 0);
+            //
+            //         foreach (var op in operations)
+            //         {
+            //             op.StorageLimit = 0;
+            //         }
+            //
+            //         operations[notZeroStorageLimitIdx].StorageLimit = TotalStorageLimit;
+            //     }
+            // }
+
+            var avgFee = Convert.ToInt64(TotalGasFee * TezosConfig.XtzDigitsMultiplier / operations.Count);
+
             if (!UseDefaultFee)
             {
-                var avgFee = Convert.ToInt64(TotalGasFee * TezosConfig.XtzDigitsMultiplier / operations.Count);
-
                 foreach (var op in operations)
                 {
                     op.Fee = avgFee;
-                }
-
-                if (TotalStorageLimit != 0)
-                {
-                    foreach (var op in operations.Where(op => op.StorageLimit != 0))
-                    {
-                        op.StorageLimit = TotalStorageLimit;
-                        break;
-                    }
                 }
             }
 
@@ -396,12 +412,30 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
                     Tezos)
                 .ConfigureAwait(false);
 
+            if (!UseDefaultFee)
+            {
+                foreach (var op in operations)
+                {
+                    op.Fee = avgFee;
+                }
+            }
+
             if (error != null)
                 AutofillError = true;
 
+            var branch = head["hash"]!.ToString();
+
             ForgedOperations = await TezosForge.ForgeAsync(
                 operations: operations,
-                branch: head["hash"]!.ToString());
+                branch: branch);
+
+            var rawJObj = new JObject
+            {
+                ["branch"] = branch,
+                ["contents"] = JArray.Parse(JsonConvert.SerializeObject(operations))
+            };
+
+            RawOperations = JsonConvert.SerializeObject(rawJObj, Formatting.Indented);
 
             if (!UseDefaultFee && Operations != null) return;
 

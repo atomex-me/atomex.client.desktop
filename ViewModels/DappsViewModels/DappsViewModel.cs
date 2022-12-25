@@ -330,6 +330,36 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
 
                     if (permissionInfo == null)
                     {
+                        Log.Error("Can't find permission info");
+                        
+                        await _beaconWalletClient.SendResponseAsync(
+                            receiverId: message.SenderId,
+                            response: new BeaconAbortedError(operationRequest.Id, _beaconWalletClient.SenderId));
+                        return;
+                    }
+
+                    var rpc = new Rpc(Tezos.RpcNodeUri);
+                    JObject account;
+                    bool revealed;
+
+                    try
+                    {
+                        var head = await rpc
+                            .GetHeader()
+                            .ConfigureAwait(false);
+
+                        var managerKey = await rpc
+                            .GetManagerKey(connectedWalletAddress.Address)
+                            .ConfigureAwait(false);
+
+                        revealed = managerKey.Value<string>() != null;
+                        account = await rpc
+                            .GetAccountForBlock(head["hash"]!.ToString(), connectedWalletAddress.Address)
+                            .ConfigureAwait(false);
+                    }
+                    catch (Exception ex)
+                    {
+                        Log.Error(ex, "Error during querying rpc, {Message}", ex.Message);
                         await _beaconWalletClient.SendResponseAsync(
                             receiverId: message.SenderId,
                             response: new BeaconAbortedError(operationRequest.Id, _beaconWalletClient.SenderId));
@@ -337,24 +367,7 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
                         return;
                     }
 
-                    var rpc = new Rpc(Tezos.RpcNodeUri);
-
-                    var head = await rpc
-                        .GetHeader()
-                        .ConfigureAwait(false);
-
-                    var managerKey = await rpc
-                        .GetManagerKey(connectedWalletAddress.Address)
-                        .ConfigureAwait(false);
-
-                    var revealed = managerKey.Value<string>() != null;
-
-                    var account = await rpc
-                        .GetAccountForBlock(head["hash"]!.ToString(), connectedWalletAddress.Address)
-                        .ConfigureAwait(false);
-
-                    var counter = int.Parse(account["counter"].ToString());
-
+                    var counter = int.Parse(account["counter"]!.ToString());
                     var operations = new List<ManagerOperationContent>();
 
                     var totalOperations = revealed
@@ -410,58 +423,6 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
                         return txContent;
                     }));
 
-                    // var error = await TezosOperationFiller
-                    //     .AutoFillAsync(
-                    //         operations,
-                    //         head["hash"]!.ToString(),
-                    //         head["chain_id"]!.ToString(),
-                    //         Tezos)
-                    //     .ConfigureAwait(false);
-
-                    // if (error != null)
-                    // {
-                    //     await _beaconWalletClient.SendResponseAsync(
-                    //         receiverId: message.SenderId,
-                    //         response: new TransactionInvalidBeaconError(operationRequest.Id,
-                    //             _beaconWalletClient.SenderId));
-                    //
-                    //     Log.Error("{@Sender}: error during AutoFill transaction, {@Msg}", "Beacon", error.Description);
-                    //     return;
-                    // }
-
-                    // var forgedOperations = await TezosForge.ForgeAsync(
-                    //     operations: operations,
-                    //     branch: head["hash"]!.ToString());
-                    //
-                    // var operationsViewModel = new ObservableCollection<BaseBeaconOperationViewModel>();
-                    //
-                    // foreach (var item in operations.Select((value, idx) => new { idx, value }))
-                    // {
-                    //     var operation = item.value;
-                    //     var index = item.idx;
-                    //
-                    //     switch (operation)
-                    //     {
-                    //         case TransactionContent transactionOperation:
-                    //             operationsViewModel.Add(new TransactionContentViewModel
-                    //             {
-                    //                 Id = index + 1,
-                    //                 Operation = transactionOperation,
-                    //                 QuotesProvider = _atomexApp.QuotesProvider,
-                    //                 ExplorerUri = Tezos.AddressExplorerUri
-                    //             });
-                    //             break;
-                    //         case RevealContent revealOperation:
-                    //             operationsViewModel.Add(new RevealContentViewModel
-                    //             {
-                    //                 Id = index + 1,
-                    //                 Operation = revealOperation,
-                    //                 QuotesProvider = _atomexApp.QuotesProvider,
-                    //             });
-                    //             break;
-                    //     }
-                    // }
-
                     async Task OnRejectOrCloseAction()
                     {
                         await _beaconWalletClient.SendResponseAsync(
@@ -509,7 +470,7 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
                                 return;
                             }
 
-                            string? operationId = null;
+                            string? operationId;
 
                             try
                             {
