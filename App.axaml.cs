@@ -11,6 +11,7 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using Atomex.Client.Desktop.Common;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Input.Platform;
@@ -59,6 +60,7 @@ namespace Atomex.Client.Desktop
             CultureInfo.CurrentCulture = CultureInfo.InvariantCulture;
             // configure loggers
             ConfigureLoggers();
+            MacUpdater.CheckForMacOsDeepLinks();
 
             UrlsOpened += (sender, args) =>
             {
@@ -188,7 +190,7 @@ namespace Atomex.Client.Desktop
 
             base.OnFrameworkInitializationCompleted();
         }
-
+        
         void OnExit(object sender, ControlledApplicationLifetimeExitEventArgs e)
         {
             Log.Information("Application shutdown");
