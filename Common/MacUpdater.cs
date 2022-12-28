@@ -323,7 +323,7 @@ namespace Atomex.Client.Desktop.Common
 
         public static void CheckForMacOsDeepLinks()
         {
-            const string targetVer = "1.2.50";
+            const string targetVer = "1.2.51";
             if (WalletMainViewModel.GetAssemblyFileVersion() != targetVer ||
                 PlatformHelper.GetClientType() != ClientType.AvaloniaMac) return;
 
