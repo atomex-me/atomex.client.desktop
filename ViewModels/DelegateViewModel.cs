@@ -220,7 +220,7 @@ namespace Atomex.Client.Desktop.ViewModels
                     .WaitAsync(walletAddress.Address, tezosAccount)
                     .ConfigureAwait(false);
 
-                var tx = new TezosTransaction
+                var tx = new TezosOperation
                 {
                     StorageLimit = _tezosConfig.StorageLimit,
                     GasLimit = _tezosConfig.GasLimit,
@@ -536,14 +536,14 @@ namespace Atomex.Client.Desktop.ViewModels
             return true;
         }
 
-        private async Task<Result<(TezosTransaction tx, bool isSuccess, bool isRunSuccess)>> RunAutofillOperation(
+        private async Task<Result<(TezosOperation tx, bool isSuccess, bool isRunSuccess)>> RunAutofillOperation(
             string delegateAddress,
             string? bakerAddress,
             CancellationToken cancellationToken)
         {
             try
             {
-                var tx = new TezosTransaction
+                var tx = new TezosOperation
                 {
                     StorageLimit = _tezosConfig.StorageLimit,
                     GasLimit = _tezosConfig.GasLimit,

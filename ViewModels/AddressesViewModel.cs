@@ -10,8 +10,6 @@ using Avalonia.Controls;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using Serilog;
-
-using Atomex.Blockchain.Tezos;
 using Atomex.Blockchain.Tezos.Internal;
 using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.ViewModels.Abstract;
@@ -20,6 +18,7 @@ using Atomex.Core;
 using Atomex.Cryptography;
 using Atomex.Wallet;
 using Atomex.Wallet.Tezos;
+using Atomex.Blockchain;
 
 namespace Atomex.Client.Desktop.ViewModels
 {

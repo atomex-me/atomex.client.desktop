@@ -11,14 +11,13 @@ using Avalonia.Threading;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using Serilog;
-
-using Atomex.Blockchain.Tezos;
 using Atomex.Client.Common;
 using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
 using Atomex.ViewModels;
 using Atomex.Wallet;
 using Atomex.Wallet.Tezos;
+using Atomex.Blockchain.Tezos.Tzkt;
 
 namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 {

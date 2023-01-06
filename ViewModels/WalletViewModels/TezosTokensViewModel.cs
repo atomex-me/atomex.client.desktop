@@ -12,8 +12,6 @@ using DynamicData;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using Serilog;
-
-using Atomex.Blockchain.Tezos;
 using Atomex.Client.Common;
 using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.ViewModels.Abstract;
@@ -22,6 +20,7 @@ using Atomex.Core;
 using Atomex.MarketData.Abstract;
 using Atomex.Wallet;
 using Atomex.Wallet.Tezos;
+using Atomex.Blockchain.Tezos.Tzkt;
 
 namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 {

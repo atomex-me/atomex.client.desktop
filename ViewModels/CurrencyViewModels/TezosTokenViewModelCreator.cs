@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 
 using Atomex.Blockchain.Tezos;
+using Atomex.Blockchain.Tezos.Tzkt;
 using Atomex.Core;
 using Atomex.Wallet.Tezos;
 

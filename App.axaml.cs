@@ -30,6 +30,9 @@ using Atomex.MarketData.Abstract;
 using Atomex.MarketData.Bitfinex;
 using Atomex.MarketData.TezTools;
 using Atomex.Services;
+using Atomex.Blockchain.Abstract;
+using Atomex.Blockchain.Ethereum;
+using Org.BouncyCastle.Bcpg;
 
 namespace Atomex.Client.Desktop
 {

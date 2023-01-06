@@ -23,7 +23,7 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
                 EthereumConfig config =>
                     new EthereumTransactionViewModel(tx as EthereumTransaction, config),
                 TezosConfig config =>
-                    new TezosTransactionViewModel(tx as TezosTransaction, config),
+                    new TezosTransactionViewModel(tx as TezosOperation, config),
 
                 _ => throw new ArgumentOutOfRangeException("Not supported transaction type.")
             };

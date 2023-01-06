@@ -29,7 +29,7 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
 #endif
         }
 
-        public TezosTokenTransferViewModel(TokenTransfer tx, TezosConfig tezosConfig)
+        public TezosTokenTransferViewModel(TezosTokenTransfer tx, TezosConfig tezosConfig)
         {
             Currency = tezosConfig ?? throw new ArgumentNullException(nameof(tezosConfig));
 
@@ -55,7 +55,7 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
             Direction = Amount <= 0 ? "to ": "from ";
         }
 
-        private static decimal GetAmount(TokenTransfer tx)
+        private static decimal GetAmount(TezosTokenTransfer tx)
         {
             if (tx.Amount.TryParseWithRound(tx.Token.Decimals, out var amount))
             {
