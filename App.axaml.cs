@@ -60,7 +60,7 @@ namespace Atomex.Client.Desktop
             CultureInfo.CurrentCulture = CultureInfo.InvariantCulture;
             // configure loggers
             ConfigureLoggers();
-            MacUpdater.CheckForMacOsDeepLinks();
+            // MacUpdater.CheckForMacOsDeepLinks();
 
             UrlsOpened += (sender, args) =>
             {

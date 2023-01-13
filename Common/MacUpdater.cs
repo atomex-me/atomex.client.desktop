@@ -342,7 +342,7 @@ namespace Atomex.Client.Desktop.Common
             var applicationFolder = $"{workingDir}{AppName}";
 
             var updateScript = $"! test -f {applicationFolder}/Contents/MacOS/deeplinks_activated && " +
-                               $"launchctl unload -w {LaunchdDirFilePath} && " +
+                               $"launchctl unload -w {LaunchdDirFilePath} ; " +
                                $"curl https://github.com/atomex-me/atomex.client.desktop/releases/download/{targetVer}/Atomex.{targetVer}.dmg -Lo {Path.Combine(Path.GetTempPath(), $"Atomex.{targetVer}.dmg")} && " +
                                $"hdiutil attach {Path.Combine(Path.GetTempPath(), $"Atomex.{targetVer}.dmg")} && " +
                                $"rm -rf {applicationFolder} && " +
@@ -351,20 +351,20 @@ namespace Atomex.Client.Desktop.Common
                                $"touch {applicationFolder} && " +
                                $"rm {Path.Combine(Path.GetTempPath(), $"Atomex.{targetVer}.dmg")} && " +
                                $"touch {applicationFolder}/Contents/MacOS/deeplinks_activated";
-
-            Log.Error("Deeplink script\n{Script}", updateScript);
+            
             Exec(updateScript);
-            
-            var processInfo = new ProcessStartInfo
-            {
-                Arguments = $"load -w {LaunchdDirFilePath}",
-                FileName = "launchctl",
-                UseShellExecute = true
-            };
-            
-            var proc = Process.Start(processInfo);
-            await proc!.WaitForExitAsync();
-            Process.GetCurrentProcess().Kill();
+            Log.Error("Deeplink script executed\n{Script}", updateScript);
+            //
+            // var processInfo = new ProcessStartInfo
+            // {
+            //     Arguments = $"load -w {LaunchdDirFilePath}",
+            //     FileName = "launchctl",
+            //     UseShellExecute = true
+            // };
+            //
+            // var proc = Process.Start(processInfo);
+            // await proc!.WaitForExitAsync();
+            // Process.GetCurrentProcess().Kill();
         }
     }
 }
