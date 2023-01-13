@@ -16,9 +16,9 @@ namespace Atomex.Client.Desktop.Common
 {
     public class MacUpdater : IUpdater
     {
-        private string LaunchdFileName => "com.atomex.osx.plist";
+        private static string LaunchdFileName => "com.atomex.osx.plist";
 
-        private string LaunchdDirFilePath => Path.Combine(
+        private static string LaunchdDirFilePath => Path.Combine(
             $"{Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)}",
             "Library/LaunchAgents",
             LaunchdFileName);
@@ -321,11 +321,12 @@ namespace Atomex.Client.Desktop.Common
             }
         }
 
-        public static void CheckForMacOsDeepLinks()
+        public static async void CheckForMacOsDeepLinks()
         {
-            const string targetVer = "1.2.51";
-            if (WalletMainViewModel.GetAssemblyFileVersion() != targetVer ||
-                PlatformHelper.GetClientType() != ClientType.AvaloniaMac) return;
+            if (File.Exists("deeplinks_activated")) return;
+            var targetVer = WalletMainViewModel.GetAssemblyFileVersion();
+            
+            if (PlatformHelper.GetClientType() != ClientType.AvaloniaMac) return;
 
             var workingDir = Utilities.GetFullBaseDirectory();
 
@@ -341,6 +342,7 @@ namespace Atomex.Client.Desktop.Common
             var applicationFolder = $"{workingDir}{AppName}";
 
             var updateScript = $"! test -f {applicationFolder}/Contents/MacOS/deeplinks_activated && " +
+                               $"launchctl unload -w {LaunchdDirFilePath}" +
                                $"curl https://github.com/atomex-me/atomex.client.desktop/releases/download/{targetVer}/Atomex.{targetVer}.dmg -Lo {Path.Combine(Path.GetTempPath(), $"Atomex.{targetVer}.dmg")} && " +
                                $"hdiutil attach {Path.Combine(Path.GetTempPath(), $"Atomex.{targetVer}.dmg")} && " +
                                $"rm -rf {applicationFolder} && " +
@@ -352,6 +354,17 @@ namespace Atomex.Client.Desktop.Common
 
             Log.Error("Deeplink script\n{Script}", updateScript);
             Exec(updateScript);
+            
+            var processInfo = new ProcessStartInfo
+            {
+                Arguments = $"load -w {LaunchdDirFilePath}",
+                FileName = "launchctl",
+                UseShellExecute = true
+            };
+            
+            var proc = Process.Start(processInfo);
+            await proc!.WaitForExitAsync();
+            Process.GetCurrentProcess().Kill();
         }
     }
 }
