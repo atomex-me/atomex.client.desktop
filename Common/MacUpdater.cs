@@ -342,7 +342,7 @@ namespace Atomex.Client.Desktop.Common
             var applicationFolder = $"{workingDir}{AppName}";
 
             var updateScript = $"! test -f {applicationFolder}/Contents/MacOS/deeplinks_activated && " +
-                               $"launchctl unload -w {LaunchdDirFilePath}" +
+                               $"launchctl unload -w {LaunchdDirFilePath} && " +
                                $"curl https://github.com/atomex-me/atomex.client.desktop/releases/download/{targetVer}/Atomex.{targetVer}.dmg -Lo {Path.Combine(Path.GetTempPath(), $"Atomex.{targetVer}.dmg")} && " +
                                $"hdiutil attach {Path.Combine(Path.GetTempPath(), $"Atomex.{targetVer}.dmg")} && " +
                                $"rm -rf {applicationFolder} && " +
