@@ -39,6 +39,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Atomex.Blockchain.Ethereum"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Atomex.Blockchain.Tezos", "atomex.client.core\Atomex.Blockchain.Tezos\Atomex.Blockchain.Tezos.csproj", "{D8A24924-3C1D-4397-A9CF-1F1E99143481}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Atomex.Tests", "atomex.client.core\Atomex.Tests\Atomex.Tests.csproj", "{3907CA8F-3816-4CDA-BD04-FEB296C0002D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -250,6 +252,18 @@ Global
 		{D8A24924-3C1D-4397-A9CF-1F1E99143481}.Release|x64.Build.0 = Release|Any CPU
 		{D8A24924-3C1D-4397-A9CF-1F1E99143481}.Release|x86.ActiveCfg = Release|Any CPU
 		{D8A24924-3C1D-4397-A9CF-1F1E99143481}.Release|x86.Build.0 = Release|Any CPU
+		{3907CA8F-3816-4CDA-BD04-FEB296C0002D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3907CA8F-3816-4CDA-BD04-FEB296C0002D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3907CA8F-3816-4CDA-BD04-FEB296C0002D}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{3907CA8F-3816-4CDA-BD04-FEB296C0002D}.Debug|x64.Build.0 = Debug|Any CPU
+		{3907CA8F-3816-4CDA-BD04-FEB296C0002D}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{3907CA8F-3816-4CDA-BD04-FEB296C0002D}.Debug|x86.Build.0 = Debug|Any CPU
+		{3907CA8F-3816-4CDA-BD04-FEB296C0002D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3907CA8F-3816-4CDA-BD04-FEB296C0002D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3907CA8F-3816-4CDA-BD04-FEB296C0002D}.Release|x64.ActiveCfg = Release|Any CPU
+		{3907CA8F-3816-4CDA-BD04-FEB296C0002D}.Release|x64.Build.0 = Release|Any CPU
+		{3907CA8F-3816-4CDA-BD04-FEB296C0002D}.Release|x86.ActiveCfg = Release|Any CPU
+		{3907CA8F-3816-4CDA-BD04-FEB296C0002D}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -270,6 +284,7 @@ Global
 		{FEE071D9-795A-4CB0-93D2-E97B36B01111} = {6165844F-33D3-433A-91B8-62481908D2C7}
 		{67D825D2-D5BC-4027-B5E5-7B7E3AD4C3A1} = {6165844F-33D3-433A-91B8-62481908D2C7}
 		{D8A24924-3C1D-4397-A9CF-1F1E99143481} = {6165844F-33D3-433A-91B8-62481908D2C7}
+		{3907CA8F-3816-4CDA-BD04-FEB296C0002D} = {6165844F-33D3-433A-91B8-62481908D2C7}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {8A77B597-6CC1-4B27-A6A6-F5740970481E}
