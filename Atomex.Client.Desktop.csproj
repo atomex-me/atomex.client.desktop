@@ -6,8 +6,8 @@
         <UseAppHost>true</UseAppHost>
         <ApplicationIcon>Resources/Images/atomex_logo_256x256_ico.ico</ApplicationIcon>
 
-        <AssemblyVersion>1.2.57</AssemblyVersion>
-        <Version>1.2.57</Version>
+        <AssemblyVersion>1.2.58</AssemblyVersion>
+        <Version>1.2.58</Version>
     </PropertyGroup>
     <Choose>
         <When Condition=" '$(Configuration)' == 'Debug' ">
@@ -51,7 +51,7 @@
         <PackageReference Include="Serilog.Extensions.Logging" Version="3.1.0" />
         <PackageReference Include="ReactiveUI.Fody" Version="16.4.1" />
         <PackageReference Include="AsyncImageLoader.Avalonia" Version="2.4.0" />
-        <PackageReference Include="Beacon.Sdk" Version="1.0.11" />
+        <PackageReference Include="Beacon.Sdk" Version="1.0.14" />
     </ItemGroup>
     
     <ItemGroup>
