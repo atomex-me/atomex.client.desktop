@@ -97,12 +97,14 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
         public DappsViewModel(IAtomexApp atomexApp)
         {
             _atomexApp = atomexApp ?? throw new ArgumentNullException(nameof(atomexApp));
-            if (_atomexApp.Account == null)
-                return;
+            if (_atomexApp.Account == null) return;
+            
+            var pathToWallet = Path.GetDirectoryName(_atomexApp.Account.Wallet.PathToWallet);
+            if (pathToWallet == null) return;
 
             App.ConnectTezosDapp = qrCodeData => _ = TryPairFromDeeplinkData(qrCodeData);
 
-            var pathToDb = $"{Path.GetDirectoryName(_atomexApp.Account.Wallet.PathToWallet)}/beacon.db";
+            var pathToDb = Path.Combine(pathToWallet, "beacon.db");
             var beaconOptions = new BeaconOptions
             {
                 AppName = "Atomex desktop",
@@ -331,7 +333,7 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
                     if (permissionInfo == null)
                     {
                         Log.Error("Can't find permission info");
-                        
+
                         await _beaconWalletClient.SendResponseAsync(
                             receiverId: message.SenderId,
                             response: new BeaconAbortedError(operationRequest.Id, _beaconWalletClient.SenderId));
