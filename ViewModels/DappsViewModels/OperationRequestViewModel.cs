@@ -177,6 +177,69 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
         }
     }
 
+    public class DelegationContentViewModel : BaseBeaconOperationViewModel
+    {
+        [Reactive] public DelegationContent Operation { get; set; }
+        public override string JsonStringOperation => JsonConvert.SerializeObject(Operation, Formatting.Indented);
+        public decimal FeeInTez => TezosConfig.MtzToTz(Convert.ToDecimal(Operation.Fee));
+        public string BakerIcon => $"https://services.tzkt.io/v1/avatars/{Operation.Delegate}";
+        [Reactive] public string BakerAlias { get; set; }
+        [Reactive] public decimal FeeInBase { get; set; }
+        public string ExplorerUri { get; set; }
+
+        public DelegationContentViewModel()
+        {
+            this.WhenAnyValue(vm => vm.Operation)
+                .WhereNotNull()
+                .SubscribeInMainThread(async operation =>
+                {
+                    BakerAlias = operation.Delegate.TruncateAddress();
+                    var url = $"v1/accounts/{operation.Delegate}?metadata=true";
+
+                    try
+                    {
+                        using var response = await HttpHelper.GetAsync(
+                            baseUri: "https://api.tzkt.io/",
+                            relativeUri: url);
+
+                        if (response.StatusCode != HttpStatusCode.OK) return;
+
+                        var responseContent = await response
+                            .Content
+                            .ReadAsStringAsync();
+
+                        var responseJObj = JsonConvert.DeserializeObject<JObject>(responseContent);
+                        var alias = responseJObj?["metadata"]?["alias"]?.ToString();
+                        if (alias != null)
+                            BakerAlias = alias;
+                    }
+                    catch (Exception ex)
+                    {
+                        Log.Error(ex, "Error during sending request to {Url}", url);
+                    }
+                });
+        }
+        
+        private ReactiveCommand<Unit, Unit>? _openBakerInExplorer;
+
+        public ReactiveCommand<Unit, Unit> OpenBakerInExplorer => _openBakerInExplorer ??=
+            ReactiveCommand.Create(() =>
+            {
+                if (Uri.TryCreate($"{ExplorerUri}{Operation.Delegate}", UriKind.Absolute, out var uri))
+                    App.OpenBrowser(uri.ToString());
+            });
+
+        protected override void OnQuotesUpdatedEventHandler(object? sender, EventArgs args)
+        {
+            if (sender is not IQuotesProvider quotesProvider)
+                return;
+
+            var xtzQuote = quotesProvider.GetQuote(TezosConfig.Xtz, BaseCurrencyCode);
+            FeeInBase = FeeInTez.SafeMultiply(xtzQuote?.Bid ?? 0);
+            Log.Debug("Quotes updated for beacon DelegationContent operation {Id}", Id);
+        }
+    }
+
     public class OperationRequestViewModel : ViewModelBase, IDialogViewModel, IDisposable
     {
         public string DappName { get; set; }
@@ -248,6 +311,7 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
                     {
                         TransactionContentViewModel transactionOp => res + transactionOp.Operation.GasLimit,
                         RevealContentViewModel revealOp => res + revealOp.Operation.GasLimit,
+                        DelegationContentViewModel delegationOp => res + delegationOp.Operation.GasLimit,
                         _ => res
                     });
 
@@ -255,6 +319,7 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
                     {
                         TransactionContentViewModel transactionOp => res + transactionOp.Operation.StorageLimit,
                         RevealContentViewModel revealOp => res + revealOp.Operation.StorageLimit,
+                        DelegationContentViewModel delegationOp => res + delegationOp.Operation.StorageLimit,
                         _ => res
                     });
 
@@ -262,6 +327,7 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
                     {
                         TransactionContentViewModel transactionOp => res + transactionOp.FeeInTez,
                         RevealContentViewModel revealOp => res + revealOp.FeeInTez,
+                        DelegationContentViewModel delegationOp => res + delegationOp.FeeInTez,
                         _ => res
                     });
 
@@ -337,7 +403,7 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
         private async void AutofillOperations()
         {
             AutofillError = false;
-            
+
             var rpc = new Rpc(Tezos.RpcNodeUri);
             JObject head;
             try
@@ -363,7 +429,9 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
                         Fee = UseDefaultFee ? 0 : txContent.Fee,
                         Counter = txContent.Counter,
                         GasLimit = UseDefaultFee ? DefaultOperationGasLimit : txContent.GasLimit,
-                        StorageLimit = UseDefaultFee ? DappsViewModel.StorageLimitPerOperation : txContent.StorageLimit
+                        StorageLimit = UseDefaultFee
+                            ? DappsViewModel.StorageLimitPerOperation
+                            : txContent.StorageLimit
                     },
                     RevealContent revealContent => new RevealContent
                     {
@@ -375,6 +443,17 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
                         StorageLimit = UseDefaultFee
                             ? DappsViewModel.StorageLimitPerOperation
                             : revealContent.StorageLimit
+                    },
+                    DelegationContent delegateContent => new DelegationContent
+                    {
+                        Delegate = delegateContent.Delegate,
+                        Source = delegateContent.Source,
+                        Fee = UseDefaultFee ? 0 : delegateContent.Fee,
+                        Counter = delegateContent.Counter,
+                        GasLimit = UseDefaultFee ? DefaultOperationGasLimit : delegateContent.GasLimit,
+                        StorageLimit = UseDefaultFee
+                            ? DappsViewModel.StorageLimitPerOperation
+                            : delegateContent.StorageLimit
                     },
                     _ => op
                 })
@@ -462,6 +541,15 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
                             Id = index + 1,
                             Operation = revealOperation,
                             QuotesProvider = QuotesProvider,
+                        });
+                        break;
+                    case DelegationContent delegationOperation:
+                        operationsViewModel.Add(new DelegationContentViewModel
+                        {
+                            Id = index + 1,
+                            Operation = delegationOperation,
+                            QuotesProvider = QuotesProvider,
+                            ExplorerUri = Tezos.AddressExplorerUri
                         });
                         break;
                 }

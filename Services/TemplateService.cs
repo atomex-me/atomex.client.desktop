@@ -59,6 +59,7 @@ namespace Atomex.Client.Desktop.Services
     {
         BeaconTransactionTemplate,
         BeaconRevealTemplate,
+        BeaconDelegationTemplate
     }
 
     public class TemplateService

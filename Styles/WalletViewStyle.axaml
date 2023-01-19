@@ -188,6 +188,10 @@
         <DataTemplate x:Key="BeaconRevealTemplate">
             <dappsViews:RevealOperationView />
         </DataTemplate>
+
+        <DataTemplate x:Key="BeaconDelegationTemplate">
+            <dappsViews:DelegationOperationView />
+        </DataTemplate>
     </Styles.Resources>
 
     <Style Selector="controls|RoundedButton.WalletMenuButton">
@@ -209,7 +213,7 @@
         <Setter Property="Padding" Value="0" />
         <Setter Property="Background" Value="{DynamicResource AlmostTransparentBrush}" />
         <Setter Property="BorderBrush" Value="{StaticResource LightDefaultOpacity10}" />
-        <Setter Property="BorderThickness" Value="0 0 0 1"/>
+        <Setter Property="BorderThickness" Value="0 0 0 1" />
         <Setter Property="Template">
             <ControlTemplate>
                 <Border CornerRadius="0"
