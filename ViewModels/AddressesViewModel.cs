@@ -10,7 +10,6 @@ using Avalonia.Controls;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using Serilog;
-using Atomex.Blockchain.Tezos.Internal;
 using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.ViewModels.Abstract;
 using Atomex.Common;
@@ -19,6 +18,7 @@ using Atomex.Cryptography;
 using Atomex.Wallet;
 using Atomex.Wallet.Tezos;
 using Atomex.Blockchain;
+using Atomex.Blockchain.Tezos.Common;
 
 namespace Atomex.Client.Desktop.ViewModels
 {
@@ -364,8 +364,8 @@ namespace Atomex.Client.Desktop.ViewModels
                             else if (Currencies.IsTezosBased(_currency.Name))
                             {
                                 var base58 = unsecuredPrivateKey.Length == 32
-                                    ? Base58Check.Encode(unsecuredPrivateKey, Prefix.Edsk)
-                                    : Base58Check.Encode(unsecuredPrivateKey, Prefix.EdskSecretKey);
+                                    ? Base58Check.Encode(unsecuredPrivateKey, TezosPrefix.Edsk)
+                                    : Base58Check.Encode(unsecuredPrivateKey, TezosPrefix.EdskSecretKey);
 
                                 _ = App.Clipboard.SetTextAsync(base58);
                             }

@@ -32,7 +32,6 @@ using ReactiveUI.Fody.Helpers;
 using Serilog;
 using Atomex.Blockchain.Tezos.Internal;
 using Atomex.Wallet.Tezos;
-using Atomex.Wallets.Tezos;
 using Network = Atomex.Core.Network;
 using Hex = Atomex.Common.Hex;
 
