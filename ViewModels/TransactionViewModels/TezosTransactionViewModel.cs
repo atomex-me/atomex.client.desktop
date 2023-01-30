@@ -43,7 +43,7 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
             GasUsed = tx.GasUsed;
             StorageLimit = tx.StorageLimit;
             StorageUsed = tx.StorageUsed;
-            Fee = TezosConfig.MtzToTz(tx.Fee);
+            Fee = tx.Fee; //TezosConfig.MtzToTz(tx.Fee);
 
             if (!string.IsNullOrEmpty(tx.Alias))
             {
@@ -82,7 +82,7 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
             var result = 0m;
 
             if (tx.Type.HasFlag(TransactionType.Output))
-                result += TezosConfig.MtzToTz(tx.Fee);
+                result += tx.Fee; //TezosConfig.MtzToTz(tx.Fee);
 
             tx.InternalTxs?.ForEach(t => result += GetFee(t));
 

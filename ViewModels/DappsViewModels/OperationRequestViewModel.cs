@@ -3,14 +3,17 @@ using System.Collections.Generic;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
-using Atomex.Client.Desktop.Common;
-using Atomex.MarketData.Abstract;
+
 using Avalonia.Controls;
 using Netezos.Forging.Models;
 using Newtonsoft.Json;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using Serilog;
+
+using Atomex.Blockchain.Tezos;
+using Atomex.Client.Desktop.Common;
+using Atomex.MarketData.Abstract;
 
 namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
 {
@@ -53,8 +56,8 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
     {
         public TransactionContent Operation { get; set; }
         public override string JsonStringOperation => JsonConvert.SerializeObject(Operation, Formatting.Indented);
-        public decimal AmountInTez => TezosConfig.MtzToTz(Convert.ToDecimal(Operation.Amount));
-        public decimal FeeInTez => TezosConfig.MtzToTz(Convert.ToDecimal(Operation.Fee));
+        public decimal AmountInTez => Operation.Amount.ToTez();
+        public decimal FeeInTez => Operation.Fee.ToTez();
         [Reactive] public decimal AmountInBase { get; set; }
         [Reactive] public decimal FeeInBase { get; set; }
 
@@ -74,7 +77,7 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
     {
         public RevealContent Operation { get; set; }
         public override string JsonStringOperation => JsonConvert.SerializeObject(Operation, Formatting.Indented);
-        public decimal FeeInTez => TezosConfig.MtzToTz(Convert.ToDecimal(Operation.Fee));
+        public decimal FeeInTez => Operation.Fee.ToTez();
         [Reactive] public decimal FeeInBase { get; set; }
 
         protected override void OnQuotesUpdatedEventHandler(object? sender, EventArgs args)
