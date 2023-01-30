@@ -32,8 +32,8 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         public string GasPriceCode => "GWEI";
         public string GasLimitCode => "GAS";
 
-        public int GasLimit => decimal.ToInt32(Currency.GetDefaultFee());
-        [Reactive] public int GasPrice { get; set; }
+        public long GasLimit => EthConfig.GasLimit;
+        [Reactive] public long GasPrice { get; set; }
         [Reactive] private decimal TotalFee { get; set; }
         [ObservableAsProperty] public string TotalFeeString { get; set; }
         protected override decimal FeeAmount => EthConfig.GetFeeInEth(GasLimit, GasPrice);
@@ -187,8 +187,8 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 if (UseDefaultFee)
                 {
                     GasPrice = maxAmountEstimation.Fee > 0
-                        ? decimal.ToInt32(ethConfig.GetGasPriceInGwei(maxAmountEstimation.Fee, GasLimit))
-                        : decimal.ToInt32(await ethConfig.GetGasPriceAsync());
+                        ? decimal.ToInt64(ethConfig.GetGasPriceInGwei(maxAmountEstimation.Fee, GasLimit))
+                        : decimal.ToInt64(await ethConfig.GetGasPriceAsync());
                 }
 
                 CheckAmountCommand?.Execute(maxAmountEstimation).Subscribe();
@@ -243,7 +243,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 var ethConfig = (EthereumConfig)Currency;
 
                 if (UseDefaultFee && maxAmountEstimation.Fee > 0)
-                    GasPrice = decimal.ToInt32(ethConfig.GetGasPriceInGwei(maxAmountEstimation.Fee, GasLimit));
+                    GasPrice = decimal.ToInt64(ethConfig.GetGasPriceInGwei(maxAmountEstimation.Fee, GasLimit));
 
                 if (maxAmountEstimation.Error != null)
                 {

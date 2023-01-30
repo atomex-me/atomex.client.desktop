@@ -54,12 +54,11 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
                 var erc20Config = (Erc20Config)Currency;
 
-                if (UseDefaultFee) {
-                    if (maxAmountEstimation.Fee > 0) {
-                        GasPrice = decimal.ToInt32(erc20Config.GetGasPriceInGwei(maxAmountEstimation.Fee, GasLimit));
-                    } else {
-                        GasPrice = decimal.ToInt32(await erc20Config.GetGasPriceAsync());
-                    }
+                if (UseDefaultFee)
+                {
+                    GasPrice = maxAmountEstimation.Fee > 0
+                        ? decimal.ToInt64(erc20Config.GetGasPriceInGwei(maxAmountEstimation.Fee, GasLimit))
+                        : decimal.ToInt64(await erc20Config.GetGasPriceAsync());
                 }
 
                 if (maxAmountEstimation.Error != null)
@@ -140,7 +139,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 var erc20Config = (Erc20Config)Currency;
 
                 if (UseDefaultFee && maxAmountEstimation.Fee > 0)
-                    GasPrice = decimal.ToInt32(erc20Config.GetGasPriceInGwei(maxAmountEstimation.Fee, GasLimit));
+                    GasPrice = decimal.ToInt64(erc20Config.GetGasPriceInGwei(maxAmountEstimation.Fee, GasLimit));
 
                 if (maxAmountEstimation.Error != null)
                 {
