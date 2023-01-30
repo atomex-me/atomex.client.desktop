@@ -16,12 +16,12 @@ using Atomex.Blockchain.Abstract;
 using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.Properties;
 using Atomex.Client.Desktop.ViewModels.Abstract;
+using Atomex.Common;
 using Atomex.Core;
 using Atomex.EthereumTokens;
 using Atomex.MarketData.Abstract;
 using Atomex.Wallet.Abstract;
 using Atomex.Wallet.Ethereum;
-using Atomex.Common;
 
 namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 {
@@ -36,9 +36,10 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         [Reactive] public int GasPrice { get; set; }
         [Reactive] private decimal TotalFee { get; set; }
         [ObservableAsProperty] public string TotalFeeString { get; set; }
-        protected override decimal FeeAmount => Currency.GetFeeAmount(GasLimit, GasPrice);
+        protected override decimal FeeAmount => EthConfig.GetFeeInEth(GasLimit, GasPrice);
         [Reactive] public bool HasTokens { get; set; }
         [Reactive] public bool HasActiveSwaps { get; set; }
+        public EthereumConfig EthConfig => (EthereumConfig)Currency;
 
         private ReactiveCommand<MaxAmountEstimation, MaxAmountEstimation> CheckAmountCommand;
 
@@ -181,17 +182,13 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     gasPrice: UseDefaultFee ? null : GasPrice,
                     reserve: false);
 
+                var ethConfig = (EthereumConfig)Currency;
+
                 if (UseDefaultFee)
                 {
-                    if (maxAmountEstimation.Fee > 0)
-                    {
-                        GasPrice = decimal.ToInt32(
-                            Currency.GetFeePriceFromFeeAmount(maxAmountEstimation.Fee, GasLimit));
-                    }
-                    else
-                    {
-                        GasPrice = decimal.ToInt32(await Currency.GetDefaultFeePriceAsync());
-                    }
+                    GasPrice = maxAmountEstimation.Fee > 0
+                        ? decimal.ToInt32(ethConfig.GetGasPriceInGwei(maxAmountEstimation.Fee, GasLimit))
+                        : decimal.ToInt32(await ethConfig.GetGasPriceAsync());
                 }
 
                 CheckAmountCommand?.Execute(maxAmountEstimation).Subscribe();
@@ -243,8 +240,10 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                         gasPrice: UseDefaultFee ? null : GasPrice,
                         reserve: false);
 
+                var ethConfig = (EthereumConfig)Currency;
+
                 if (UseDefaultFee && maxAmountEstimation.Fee > 0)
-                    GasPrice = decimal.ToInt32(Currency.GetFeePriceFromFeeAmount(maxAmountEstimation.Fee, GasLimit));
+                    GasPrice = decimal.ToInt32(ethConfig.GetGasPriceInGwei(maxAmountEstimation.Fee, GasLimit));
 
                 if (maxAmountEstimation.Error != null)
                 {
@@ -256,7 +255,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 }
 
                 var erc20Config = _app.Account.Currencies.Get<Erc20Config>("USDT");
-                var erc20TransferFee = erc20Config.GetFeeAmount(erc20Config.TransferGasLimit, GasPrice);
+                var erc20TransferFee = erc20Config.GetFeeInEth(erc20Config.TransferGasLimit, GasPrice);
 
                 RecommendedMaxAmount = HasActiveSwaps
                     ? Math.Max(maxAmountEstimation.Amount - maxAmountEstimation.Reserved, 0)
@@ -298,7 +297,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             }
 
             var erc20Config = _app.Account.Currencies.Get<Erc20Config>("USDT");
-            var erc20TransferFee = erc20Config.GetFeeAmount(erc20Config.TransferGasLimit, GasPrice);
+            var erc20TransferFee = erc20Config.GetFeeInEth(erc20Config.TransferGasLimit, GasPrice);
 
             RecommendedMaxAmount = HasActiveSwaps
                 ? Math.Max(maxAmountEstimation.Amount - maxAmountEstimation.Reserved, 0)

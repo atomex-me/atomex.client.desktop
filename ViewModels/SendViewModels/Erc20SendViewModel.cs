@@ -10,10 +10,11 @@ using Atomex.Blockchain.Abstract;
 using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.Properties;
 using Atomex.Client.Desktop.ViewModels.Abstract;
+using Atomex.Common;
 using Atomex.Core;
+using Atomex.EthereumTokens;
 using Atomex.MarketData.Abstract;
 using Atomex.Wallet.Ethereum;
-using Atomex.Common;
 
 namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 {
@@ -51,11 +52,13 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     gasPrice: UseDefaultFee ? null : GasPrice,
                     reserve: false);
 
+                var erc20Config = (Erc20Config)Currency;
+
                 if (UseDefaultFee) {
                     if (maxAmountEstimation.Fee > 0) {
-                        GasPrice = decimal.ToInt32(Currency.GetFeePriceFromFeeAmount(maxAmountEstimation.Fee, GasLimit));
+                        GasPrice = decimal.ToInt32(erc20Config.GetGasPriceInGwei(maxAmountEstimation.Fee, GasLimit));
                     } else {
-                        GasPrice = decimal.ToInt32(await Currency.GetDefaultFeePriceAsync());
+                        GasPrice = decimal.ToInt32(await erc20Config.GetGasPriceAsync());
                     }
                 }
 
@@ -134,8 +137,10 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                         gasPrice: UseDefaultFee ? null : GasPrice,
                         reserve: false);
 
+                var erc20Config = (Erc20Config)Currency;
+
                 if (UseDefaultFee && maxAmountEstimation.Fee > 0)
-                    GasPrice = decimal.ToInt32(Currency.GetFeePriceFromFeeAmount(maxAmountEstimation.Fee, GasLimit));
+                    GasPrice = decimal.ToInt32(erc20Config.GetGasPriceInGwei(maxAmountEstimation.Fee, GasLimit));
 
                 if (maxAmountEstimation.Error != null)
                 {
