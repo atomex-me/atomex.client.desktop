@@ -34,9 +34,9 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
         {
             From       = tx.From;
             To         = tx.To;
-            GasPrice   = EthereumConfig.WeiToGwei((decimal)tx.GasPrice);
+            GasPrice   = EthereumHelper.WeiToGwei(tx.GasPrice);
             GasUsed    = (decimal)tx.GasUsed;
-            Fee        = EthereumConfig.WeiToEth(tx.GasUsed * tx.GasPrice);
+            Fee        = EthereumHelper.WeiToEth(tx.GasUsed * tx.GasPrice);
             IsInternal = tx.IsInternal;
 
             Alias = Amount switch

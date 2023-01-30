@@ -34,12 +34,12 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
         public EthereumTransactionViewModel(EthereumTransaction tx, EthereumConfig ethereumConfig)
             : base(tx, ethereumConfig, GetAmount(tx), GetFee(tx))
         {
-            From = tx.From;
-            To = tx.To;
-            GasPrice = EthereumConfig.WeiToGwei((decimal)tx.GasPrice);
-            GasLimit = (decimal)tx.GasLimit;
-            GasUsed = (decimal)tx.GasUsed;
-            Fee = EthereumConfig.WeiToEth(tx.GasUsed * tx.GasPrice);
+            From       = tx.From;
+            To         = tx.To;
+            GasPrice   = EthereumHelper.WeiToGwei(tx.GasPrice);
+            GasLimit   = (decimal)tx.GasLimit;
+            GasUsed    = (decimal)tx.GasUsed;
+            Fee        = EthereumHelper.WeiToEth(tx.GasUsed * tx.GasPrice);
             IsInternal = tx.IsInternal;
 
             Alias = Amount switch
@@ -54,10 +54,10 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
             var result = 0m;
 
             if (tx.Type.HasFlag(TransactionType.Input))
-                result += EthereumConfig.WeiToEth(tx.Amount);
+                result += EthereumHelper.WeiToEth(tx.Amount);
 
             if (tx.Type.HasFlag(TransactionType.Output))
-                result += -EthereumConfig.WeiToEth(tx.Amount + tx.GasUsed * tx.GasPrice);
+                result += -EthereumHelper.WeiToEth(tx.Amount + tx.GasUsed * tx.GasPrice);
 
             tx.InternalTransactions?.ForEach(t => result += GetAmount(t));
 
@@ -69,7 +69,7 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
             var result = 0m;
 
             if (tx.Type.HasFlag(TransactionType.Output))
-                result += EthereumConfig.WeiToEth(tx.GasUsed * tx.GasPrice);
+                result += EthereumHelper.WeiToEth(tx.GasUsed * tx.GasPrice);
 
             tx.InternalTransactions?.ForEach(t => result += GetFee(t));
 
