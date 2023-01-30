@@ -871,7 +871,7 @@ namespace Atomex.Client.Desktop.ViewModels
         {
             try
             {
-                var swapPriceEstimation = await Atomex.ViewModels.Helpers
+                var swapPriceEstimation = await Task.Run(async () => await Atomex.ViewModels.Helpers
                     .EstimateSwapPriceAsync(
                         amount: _amountType == AmountType.Sold
                             ? FromViewModel.Amount
@@ -881,7 +881,7 @@ namespace Atomex.Client.Desktop.ViewModels
                         toCurrency: ToViewModel.CurrencyViewModel?.Currency,
                         account: _app.Account,
                         marketDataRepository: _app.MarketDataRepository,
-                        symbolsProvider: _app.SymbolsProvider);
+                        symbolsProvider: _app.SymbolsProvider));
 
                 await Dispatcher.UIThread.InvokeAsync(() =>
                 {
