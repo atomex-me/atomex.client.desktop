@@ -29,6 +29,9 @@ namespace Atomex.Client.Desktop.Controls
                 RevealContentViewModel => App.TemplateService
                     .GetBeaconOperationTemplate(BeaconOperationTemplate.BeaconRevealTemplate),
                 
+                DelegationContentViewModel => App.TemplateService
+                    .GetBeaconOperationTemplate(BeaconOperationTemplate.BeaconDelegationTemplate),
+                
                 _ => null
             };
         }

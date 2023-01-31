@@ -252,7 +252,7 @@ namespace Atomex.Client.Desktop.ViewModels
             Content = WertViewModel;
         }
 
-        private static string? GetAssemblyFileVersion()
+        public static string? GetAssemblyFileVersion()
         {
             var assembly = System.Reflection.Assembly.GetExecutingAssembly();
             var fileVersion = FileVersionInfo.GetVersionInfo(assembly.Location);

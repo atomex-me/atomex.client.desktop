@@ -31,6 +31,7 @@
     <StyleInclude Source="/Styles/RadioButtonStyle.axaml"/>
     <StyleInclude Source="/Controls/IconButton.axaml"/>
     <StyleInclude Source="/Controls/CopyButton.axaml"/>
+    <StyleInclude Source="/Controls/CopyButtonWithText.axaml"/>
     <StyleInclude Source="/Controls/LinkButton.axaml"/>
     <StyleInclude Source="/Controls/SortButton.axaml"/>
     <StyleInclude Source="/Controls/WalletCurrency.axaml"/>

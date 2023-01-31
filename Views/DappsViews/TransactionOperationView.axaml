@@ -3,247 +3,116 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             xmlns:controls="clr-namespace:Atomex.Client.Desktop.Controls"
              xmlns:converters="clr-namespace:Atomex.Client.Desktop.Converters"
              xmlns:atomex="clr-namespace:Atomex;assembly=Atomex.Client.Core"
-             xmlns:svg="clr-namespace:Avalonia.Svg.Skia;assembly=Avalonia.Svg.Skia"
              xmlns:dappsViewModels="clr-namespace:Atomex.Client.Desktop.ViewModels.DappsViewModels"
+             xmlns:asyncImageLoader="clr-namespace:AsyncImageLoader;assembly=AsyncImageLoader.Avalonia"
+             xmlns:services="clr-namespace:Atomex.Client.Desktop.Services"
+             xmlns:controls="clr-namespace:Atomex.Client.Desktop.Controls"
              x:Class="Atomex.Client.Desktop.Views.DappsViews.TransactionOperationView">
 
     <Design.DataContext>
         <dappsViewModels:TransactionContentViewModel />
     </Design.DataContext>
-    
-    <Grid ColumnDefinitions="*,Auto"
-          RowDefinitions="Auto,28,28,28,28,Auto,*,Auto">
-        <StackPanel Grid.Column="0"
-                    Grid.Row="0"
-                    Margin="0 24 0 13"
-                    Orientation="Horizontal">
-            <TextBlock VerticalAlignment="Center"
-                       Foreground="{DynamicResource DefaultForegroundBrush}"
-                       FontSize="16"
-                       HorizontalAlignment="Left"
-                       Text="Operation #" />
-            <TextBlock VerticalAlignment="Center"
-                       Foreground="{DynamicResource DefaultForegroundBrush}"
-                       FontSize="16"
-                       HorizontalAlignment="Left"
-                       Text="{Binding Id}" />
-        </StackPanel>
 
-        <TextBlock Grid.Column="0"
-                   Grid.Row="1"
-                   Foreground="{DynamicResource SecondaryForegroundBrush}"
-                   FontSize="16"
-                   HorizontalAlignment="Left"
-                   Text="From address" />
-        <StackPanel Grid.Column="1"
-                    Grid.Row="1"
-                    HorizontalAlignment="Right"
-                    Orientation="Horizontal">
-            <svg:Svg HorizontalAlignment="Center"
-                     Width="18"
-                     Height="18"
-                     Path="/Resources/Icons/tezos-disabled.svg" />
-            <TextBlock Margin="6 0 0 0"
-                       Foreground="{DynamicResource DefaultForegroundBrush}"
-                       FontSize="16"
-                       VerticalAlignment="Center"
-                       Text="{Binding Operation.Source,
-                                                   Converter={x:Static converters:StringConverters.ToShortenedAddress}}" />
+    <UserControl.Resources>
+        <converters:AmountToStringInBracketsConverter x:Key="AmountToStringInBracketsConverter" />
+        <converters:StringsConcatConverter x:Key="StringsConcatConverter" />
+    </UserControl.Resources>
 
-            <controls:CopyButton ToolText="Copy from address"
-                                 DoneToolText="Copied!"
-                                 Margin="6 0 0 0"
-                                 Command="{Binding $parent[ListBox].DataContext.CopyCommand}"
-                                 CommandParameter="{Binding Operation.Source}" />
-        </StackPanel>
-
-        <TextBlock Grid.Column="0"
-                   Grid.Row="2"
-                   Foreground="{DynamicResource SecondaryForegroundBrush}"
-                   FontSize="16"
-                   HorizontalAlignment="Left"
-                   Text="To address" />
-        <StackPanel Grid.Column="1"
-                    Grid.Row="2"
-                    HorizontalAlignment="Right"
-                    Orientation="Horizontal">
-            <svg:Svg HorizontalAlignment="Center"
-                     Width="18"
-                     Height="18"
-                     Path="/Resources/Icons/tezos-disabled.svg" />
-            <TextBlock Margin="6 0 0 0"
-                       Foreground="{DynamicResource DefaultForegroundBrush}"
-                       FontSize="16"
-                       VerticalAlignment="Center"
-                       Text="{Binding  Operation.Destination,
-                                                   Converter={x:Static converters:StringConverters.ToShortenedAddress}}" />
-
-            <controls:CopyButton ToolText="Copy to address"
-                                 DoneToolText="Copied!"
-                                 Margin="6 0 0 0"
-                                 Command="{Binding $parent[ListBox].DataContext.CopyCommand}"
-                                 CommandParameter="{Binding Operation.Destination}" />
-        </StackPanel>
-
-        <TextBlock Grid.Column="0"
-                   Grid.Row="3"
-                   Foreground="{DynamicResource SecondaryForegroundBrush}"
-                   FontSize="16"
-                   HorizontalAlignment="Left"
-                   Text="Amount" />
-
-        <StackPanel Grid.Column="1"
-                    Grid.Row="3"
-                    HorizontalAlignment="Right"
-                    Orientation="Horizontal">
-            <TextBlock Foreground="{DynamicResource DefaultForegroundBrush}"
-                       FontSize="16"
-                       VerticalAlignment="Center"
-                       HorizontalAlignment="Right"
-                       Text="{Binding AmountInTez}" />
-            <TextBlock Foreground="{DynamicResource DefaultForegroundBrush}"
-                       FontSize="16"
-                       VerticalAlignment="Center"
-                       Margin="4 0 0 0"
-                       HorizontalAlignment="Right"
-                       Text="{x:Static atomex:TezosConfig.Xtz}" />
-            <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
-                       FontSize="16"
-                       VerticalAlignment="Center"
-                       Margin="4 0"
-                       HorizontalAlignment="Right"
-                       Text="/" />
-            <TextBlock HorizontalAlignment="Right"
-                       VerticalAlignment="Center"
-                       Foreground="{DynamicResource DefaultForegroundBrush}"
-                       FontSize="16">
-                <TextBlock.Text>
-                    <MultiBinding
-                        Converter="{StaticResource AmountToStringConverter}">
-                        <Binding Path="AmountInBase" Mode="OneWay" />
-                        <Binding Path="BaseCurrencyFormat" Mode="OneWay" />
-                    </MultiBinding>
-                </TextBlock.Text>
-            </TextBlock>
-        </StackPanel>
-
-        <TextBlock Grid.Column="0"
-                   Grid.Row="4"
-                   Foreground="{DynamicResource SecondaryForegroundBrush}"
-                   FontSize="16"
-                   HorizontalAlignment="Left"
-                   Text="Fee" />
-
-        <StackPanel Grid.Column="1"
-                    Grid.Row="4"
-                    HorizontalAlignment="Right"
-                    Orientation="Horizontal">
-            <TextBlock Foreground="{DynamicResource DefaultForegroundBrush}"
-                       FontSize="16"
-                       VerticalAlignment="Center"
-                       HorizontalAlignment="Right"
-                       Text="{Binding FeeInTez}" />
-            <TextBlock Foreground="{DynamicResource DefaultForegroundBrush}"
-                       FontSize="16"
-                       VerticalAlignment="Center"
-                       Margin="4 0 0 0"
-                       HorizontalAlignment="Right"
-                       Text="{x:Static atomex:TezosConfig.Xtz}" />
-            <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
-                       FontSize="16"
-                       VerticalAlignment="Center"
-                       Margin="4 0"
-                       HorizontalAlignment="Right"
-                       Text="/" />
-            <TextBlock HorizontalAlignment="Right"
-                       VerticalAlignment="Center"
-                       Foreground="{DynamicResource DefaultForegroundBrush}"
-                       FontSize="16">
-                <TextBlock.Text>
-                    <MultiBinding
-                        Converter="{StaticResource AmountToStringConverter}">
-                        <Binding Path="FeeInBase" Mode="OneWay" />
-                        <Binding Path="BaseCurrencyFormat" Mode="OneWay" />
-                    </MultiBinding>
-                </TextBlock.Text>
-            </TextBlock>
-        </StackPanel>
-
-        <StackPanel Grid.Column="0"
-                    Grid.Row="5"
-                    Orientation="Horizontal">
-            <controls:LinkButton Underlined="True"
-                                 Classes="Dashed"
-                                 HorizontalAlignment="Left"
-                                 VerticalAlignment="Center"
-                                 FontSize="16"
-                                 Foreground="{DynamicResource SecondaryForegroundBrush}"
-                                 Command="{Binding OnOpenDetailsCommand}"
-                                 Content="Display extra operation details" />
-
-            <Panel Margin="8 0 0 0"
-                   Classes.Rotated="{Binding IsDetailsOpened}"
-                   Classes.NotRotated="{Binding !IsDetailsOpened}">
-                <Panel.Styles>
-                    <Style Selector="Panel">
-                        <Setter Property="Transitions">
-                            <Transitions>
-                                <TransformOperationsTransition
-                                    Property="RenderTransform"
-                                    Duration="0:0:.075" />
-                            </Transitions>
-                        </Setter>
-                    </Style>
-                    <Style Selector="Panel.Rotated">
-                        <Setter Property="RenderTransform" Value="rotate(180deg)" />
-                    </Style>
-                    <Style Selector="Panel.NotRotated">
-                        <Setter Property="RenderTransform" Value="none" />
-                    </Style>
-                </Panel.Styles>
-
-                <svg:Svg Width="14"
-                         Height="14"
-                         VerticalAlignment="Center"
-                         Path="/Resources/Icons/arrow-sort-desc.svg" />
-            </Panel>
-        </StackPanel>
-
-        <Border Grid.Row="6"
+    <Grid ColumnDefinitions="Auto,*"
+          RowDefinitions="*,Auto"
+          Height="64">
+        <Border Grid.Row="0"
                 Grid.Column="0"
-                Grid.ColumnSpan="2"
-                Margin="0 24 0 0"
-                Padding="16 8"
-                BorderThickness="1"
-                IsVisible="{Binding IsDetailsOpened}"
-                CornerRadius="{DynamicResource AtomexCornerRadius}"
-                BorderBrush="{DynamicResource LightDefaultOpacity20}">
-            <Grid ColumnDefinitions="*,1">
-                <TextBlock Grid.Column="0"
-                           Grid.ColumnSpan="2"
-                           Foreground="{DynamicResource DefaultForegroundBrush}"
-                           FontSize="16"
-                           TextWrapping="WrapWithOverflow"
-                           Text="{Binding JsonStringOperation}" />
-
-                <controls:CopyButton Grid.Column="1"
-                                     VerticalAlignment="Top"
-                                     HorizontalAlignment="Right"
-                                     ToolText="Copy operation content"
-                                     DoneToolText="Copied!"
-                                     Command="{Binding $parent[ListBox].DataContext.CopyCommand}"
-                                     CommandParameter="{Binding JsonStringOperation}" />
-            </Grid>
+                Width="40"
+                Height="40"
+                VerticalAlignment="Center"
+                HorizontalAlignment="Center"
+                ClipToBounds="True"
+                CornerRadius="40"
+                Margin="16 0"
+                Classes.IsImageLoading="{Binding #DestinationPreview.IsLoading}"
+                Classes.ImageNotLoaded="{Binding #DestinationPreview.CurrentImage,
+                                            Converter={x:Static ObjectConverters.IsNull}}">
+            <asyncImageLoader:AdvancedImage Name="DestinationPreview"
+                                            StretchDirection="Both"
+                                            Stretch="UniformToFill"
+                                            Source="{Binding DestinationIcon}"
+                                            Loader="{x:Static services:FileCacheImageLoader.Instance}" />
         </Border>
 
-        <Border Grid.Row="7"
+        <WrapPanel Grid.Row="0"
+                   Grid.Column="1"
+                   Orientation="Vertical"
+                   VerticalAlignment="Center">
+            <StackPanel Orientation="Horizontal"
+                        Classes.OperationWithTezos="{Binding Operation.Amount,
+                        Converter={x:Static converters:NumericConverters.NotZero}}">
+                <StackPanel.Styles>
+                    <Style Selector="StackPanel.OperationWithTezos">
+                        <Setter Property="Margin" Value="0 0 0 2" />
+                    </Style>
+                </StackPanel.Styles>
+                <TextBlock VerticalAlignment="Center"
+                           Foreground="{DynamicResource DefaultForegroundBrush}"
+                           FontSize="13"
+                           Text="{Binding Entrypoint}" />
+
+                <controls:LinkButton Underlined="True"
+                                     Classes="SolidHover"
+                                     Content="{Binding DestinationAlias}"
+                                     FontSize="13"
+                                     Margin="0 2 0 0"
+                                     Command="{Binding OpenDestinationInExplorer}">
+                    <controls:LinkButton.ToolText>
+                        <MultiBinding Converter="{StaticResource StringsConcatConverter}">
+                            <Binding Path="ExplorerUri" />
+                            <Binding Path="Operation.Destination" />
+                        </MultiBinding>
+                    </controls:LinkButton.ToolText>
+                </controls:LinkButton>
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal"
+                        Margin="0 2 0 0"
+                        IsVisible="{Binding Operation.Amount,
+                        Converter={x:Static converters:NumericConverters.NotZero}}">
+                <TextBlock VerticalAlignment="Center"
+                           Foreground="{DynamicResource SecondaryForegroundBrush}"
+                           FontSize="13"
+                           Margin="0 0 2 0">
+                    <TextBlock.Text>
+                        <MultiBinding Converter="{StaticResource AmountToStringConverter}">
+                            <Binding Path="AmountInTez" />
+                            <Binding Path="TezosFormat" />
+                        </MultiBinding>
+                    </TextBlock.Text>
+                </TextBlock>
+                <TextBlock VerticalAlignment="Center"
+                           Foreground="{DynamicResource SecondaryForegroundBrush}"
+                           FontSize="13"
+                           Margin="0 0 2 0"
+                           Text="{x:Static atomex:TezosConfig.Xtz}" />
+                <TextBlock HorizontalAlignment="Right"
+                           VerticalAlignment="Center"
+                           Foreground="{DynamicResource SecondaryForegroundBrush}"
+                           FontSize="13">
+                    <TextBlock.Text>
+                        <MultiBinding
+                            Converter="{StaticResource AmountToStringInBracketsConverter}">
+                            <Binding Path="AmountInBase" Mode="OneWay" />
+                            <Binding Path="BaseCurrencyFormat" Mode="OneWay" />
+                        </MultiBinding>
+                    </TextBlock.Text>
+                </TextBlock>
+            </StackPanel>
+        </WrapPanel>
+
+        <Border Grid.Row="1"
                 Grid.Column="0"
                 Grid.ColumnSpan="2"
-                Margin="0 24 0 0"
                 Height="1"
-                Background="{DynamicResource LightDefaultOpacity10}" />
+                Background="{DynamicResource GrayBlue2}" />
     </Grid>
 </UserControl>
