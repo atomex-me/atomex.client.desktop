@@ -469,7 +469,7 @@ namespace Atomex.Client.Desktop.ViewModels
                 if (FromViewModel.CurrencyViewModel == null || ToViewModel.CurrencyViewModel == null)
                     return;
 
-                var swapParams = await Atomex.ViewModels.Helpers
+                var swapParams = await Task.Run(() => Atomex.ViewModels.Helpers
                     .EstimateSwapParamsAsync(
                         from: FromCurrencyViewModelItem?.FromSource,
                         fromAmount: EstimatedMaxFromAmount,
@@ -479,7 +479,7 @@ namespace Atomex.Client.Desktop.ViewModels
                         account: _app.Account,
                         marketDataRepository: _app.MarketDataRepository,
                         symbolsProvider: _app.SymbolsProvider,
-                        quotesProvider: _app.QuotesProvider);
+                        quotesProvider: _app.QuotesProvider));
 
                 if (swapParams == null)
                     return;
@@ -681,7 +681,7 @@ namespace Atomex.Client.Desktop.ViewModels
             try
             {
                 // estimate max payment amount and max fee
-                var swapParams = await Atomex.ViewModels.Helpers
+                var swapParams = await Task.Run(() => Atomex.ViewModels.Helpers
                     .EstimateSwapParamsAsync(
                         from: FromCurrencyViewModelItem?.FromSource,
                         fromAmount: FromViewModel.Amount,
@@ -691,7 +691,7 @@ namespace Atomex.Client.Desktop.ViewModels
                         account: _app.Account,
                         marketDataRepository: _app.MarketDataRepository,
                         symbolsProvider: _app.SymbolsProvider,
-                        quotesProvider: _app.QuotesProvider);
+                        quotesProvider: _app.QuotesProvider));
 
                 await Dispatcher.UIThread.InvokeAsync(() =>
                 {
