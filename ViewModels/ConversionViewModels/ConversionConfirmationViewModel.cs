@@ -17,6 +17,7 @@ using Atomex.Common;
 using Atomex.Core;
 using Atomex.ViewModels;
 using Atomex.Wallet.Abstract;
+using Atomex.Blockchain.Bitcoin;
 
 namespace Atomex.Client.Desktop.ViewModels
 {
@@ -209,7 +210,11 @@ namespace Atomex.Client.Desktop.ViewModels
                     MakerNetworkFee = EstimatedMakerNetworkFee,
 
                     FromAddress = FromSource is FromAddress fromAddress ? fromAddress.Address : null,
-                    FromOutputs = FromSource is FromOutputs fromOutputs ? fromOutputs.Outputs.ToList() : null,
+                    FromOutputs = FromSource is FromOutputs fromOutputs
+                        ? fromOutputs.Outputs
+                            .Select(o => new BitcoinTxPoint { Hash = o.TxId, Index = o.Index })
+                            .ToList()
+                        : null,
 
                     // for Bitcoin based currencies ToAddress must be Atomex wallet's address!
                     ToAddress = isToBitcoinBased
