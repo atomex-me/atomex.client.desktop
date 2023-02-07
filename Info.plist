@@ -1,28 +1,39 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <plist version="1.0">
-  <dict>
-    <key>CFBundleIconFile</key>
-    <string>logo.icns</string>
-    <key>CFBundleIdentifier</key>
-    <string>com.atomex.osx</string>
-    <key>CFBundleName</key>
-    <string>Atomex</string>
-    <key>CFBundleVersion</key>
-    <string>${VER}</string>
-    <key>CFBundleShortVersionString</key>
-    <string>${VER}</string>
-    <key>LSMinimumSystemVersion</key>
-    <string>10.12</string>
-    <key>CFBundleExecutable</key>
-    <string>Atomex.Client.Desktop</string>
-    <key>CFBundleInfoDictionaryVersion</key>
-    <string>6.0</string>
-    <key>CFBundlePackageType</key>
-    <string>APPL</string>
-    <key>NSHighResolutionCapable</key>
-    <true />
-    <key>NSRequiresAquaSystemAppearance</key>
-    <false />
-  </dict>
+    <dict>
+        <key>CFBundleIconFile</key>
+        <string>logo.icns</string>
+        <key>CFBundleIdentifier</key>
+        <string>com.atomex.osx</string>
+        <key>CFBundleName</key>
+        <string>Atomex</string>
+        <key>CFBundleVersion</key>
+        <string>${VER}</string>
+        <key>CFBundleShortVersionString</key>
+        <string>${VER}</string>
+        <key>LSMinimumSystemVersion</key>
+        <string>10.12</string>
+        <key>CFBundleExecutable</key>
+        <string>Atomex.Client.Desktop</string>
+        <key>CFBundleInfoDictionaryVersion</key>
+        <string>6.0</string>
+        <key>CFBundlePackageType</key>
+        <string>APPL</string>
+        <key>NSHighResolutionCapable</key>
+        <true/>
+        <key>NSRequiresAquaSystemAppearance</key>
+        <false/>
+        <key>CFBundleURLTypes</key>
+        <array>
+            <dict>
+                <key>CFBundleURLName</key>
+                <string>Atomex deeplink</string>
+                <key>CFBundleURLSchemes</key>
+                <array>
+                    <string>atomex</string>
+                </array>
+            </dict>
+        </array>
+    </dict>
 </plist>
 

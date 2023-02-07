@@ -116,7 +116,7 @@
                                                          VerticalAlignment="Center"
                                                          HorizontalAlignment="Left"
                                                          Content="{Binding Name}"
-                                                         ToolText="{Binding PermissionInfo.Website}"
+                                                         ToolText="{Binding PermissionInfo.AppMetadata.AppUrl}"
                                                          Command="{Binding OpenDappSiteCommand}">
                                     </controls:LinkButton>
                                 </StackPanel>
