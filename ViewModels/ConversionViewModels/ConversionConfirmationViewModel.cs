@@ -175,7 +175,7 @@ namespace Atomex.Client.Desktop.ViewModels
                 if (price == 0)
                     return new Error(Errors.NoLiquidity, Resources.CvNoLiquidity);
 
-                var qty = AmountHelper.AmountToSellQty(side, Amount, price, baseCurrency.DigitsMultiplier);
+                var qty = AmountHelper.AmountToSellQty(side, Amount, price, baseCurrency.Precision);
 
                 if (qty < symbol.MinimumQty)
                 {
@@ -183,7 +183,7 @@ namespace Atomex.Client.Desktop.ViewModels
                         side: side,
                         qty: symbol.MinimumQty,
                         price: price,
-                        digitsMultiplier: FromCurrencyViewModel.Currency.DigitsMultiplier);
+                        precision: FromCurrencyViewModel.Currency.Precision);
 
                     var message = string.Format(
                         provider: CultureInfo.InvariantCulture,
@@ -349,21 +349,21 @@ namespace Atomex.Client.Desktop.ViewModels
             var btc = DesignTime.TestNetCurrencies.Get<BitcoinConfig>("BTC");
             var ltc = DesignTime.TestNetCurrencies.Get<LitecoinConfig>("LTC");
 
-            FromCurrencyViewModel     = CurrencyViewModelCreator.CreateOrGet(btc, subscribeToUpdates: false);
-            ToCurrencyViewModel       = CurrencyViewModelCreator.CreateOrGet(ltc, subscribeToUpdates: false);
+            FromCurrencyViewModel = CurrencyViewModelCreator.CreateOrGet(btc, subscribeToUpdates: false);
+            ToCurrencyViewModel   = CurrencyViewModelCreator.CreateOrGet(ltc, subscribeToUpdates: false);
 
-            FromSource                = new FromAddress("13V2gzjUL9DiHZLy1WFk9q6pZ3yBsb4TzP");
-            ToAddress                 = "13V2gzjUL9DiHZLy1WFk9q6pZ3yBsb4TzP";
+            FromSource            = new FromAddress("13V2gzjUL9DiHZLy1WFk9q6pZ3yBsb4TzP");
+            ToAddress             = "13V2gzjUL9DiHZLy1WFk9q6pZ3yBsb4TzP";
 
-            BaseCurrencyCode          = "LTC";
-            QuoteCurrencyCode         = "BTC";
-            PriceFormat               = $"F{FromCurrencyViewModel.Currency.Digits}";
-            EstimatedPrice            = 0.003m;
+            BaseCurrencyCode      = "LTC";
+            QuoteCurrencyCode     = "BTC";
+            PriceFormat           = $"F{FromCurrencyViewModel.Currency.Decimals}";
+            EstimatedPrice        = 0.003m;
 
-            Amount                    = 0.00001234m;
-            AmountInBase              = 10.23m;
-            TargetAmount              = Amount / EstimatedPrice;
-            TargetAmountInBase        = AmountInBase;
+            Amount                = 0.00001234m;
+            AmountInBase          = 10.23m;
+            TargetAmount          = Amount / EstimatedPrice;
+            TargetAmountInBase    = AmountInBase;
 
             EstimatedTotalNetworkFeeInBase = 23.43m;
         }

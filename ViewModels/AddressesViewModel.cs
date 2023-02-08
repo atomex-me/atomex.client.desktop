@@ -10,6 +10,7 @@ using Avalonia.Controls;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using Serilog;
+
 using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.ViewModels.Abstract;
 using Atomex.Common;
@@ -19,6 +20,7 @@ using Atomex.Wallet;
 using Atomex.Wallet.Tezos;
 using Atomex.Blockchain;
 using Atomex.Blockchain.Tezos.Common;
+using System.Numerics;
 
 namespace Atomex.Client.Desktop.ViewModels
 {
@@ -84,7 +86,7 @@ namespace Atomex.Client.Desktop.ViewModels
         private readonly IAtomexApp _app;
         private CurrencyConfig _currency;
         private readonly string? _tokenContract;
-        private readonly decimal _tokenId;
+        private readonly BigInteger _tokenId;
 
         public bool HasTokens => _currency.Name == TezosConfig.Xtz && _tokenContract != null;
         [Reactive] public ObservableCollection<AddressViewModel> Addresses { get; set; }
@@ -103,12 +105,12 @@ namespace Atomex.Client.Desktop.ViewModels
             IAtomexApp app,
             CurrencyConfig currency,
             string? tokenContract = null,
-            decimal tokenId = 0)
+            BigInteger? tokenId = null)
         {
             _app = app ?? throw new ArgumentNullException(nameof(app));
             _currency = currency ?? throw new ArgumentNullException(nameof(currency));
             _tokenContract = tokenContract;
-            _tokenId = tokenId;
+            _tokenId = tokenId ?? BigInteger.Zero;
 
             this.WhenAnyValue(vm => vm.CurrentSortField, vm => vm.CurrentSortDirection)
                 .WhereAllNotNull()
@@ -138,28 +140,24 @@ namespace Atomex.Client.Desktop.ViewModels
 
                 var addressesViewModels = addresses.Select(a =>
                 {
-                    var path = a.KeyType == CurrencyConfig.StandardKey && Currencies.IsTezosBased(_currency.Name)
-                        ? $"m/44'/{_currency.Bip44Code}'/{a.KeyIndex.Account}'/{a.KeyIndex.Chain}'"
-                        : $"m/44'/{_currency.Bip44Code}'/{a.KeyIndex.Account}'/{a.KeyIndex.Chain}/{a.KeyIndex.Index}";
-
                     return new AddressViewModel
                     {
-                        WalletAddress = a,
-                        Path = path,
-                        HasTokens = HasTokens,
-                        Balance = $"{a.Balance.ToString(CultureInfo.InvariantCulture)} {_currency.Name}",
+                        WalletAddress      = a,
+                        Path               = a.KeyPath,
+                        HasTokens          = HasTokens,
+                        Balance            = $"{a.Balance.ToDecimal(_currency.Decimals).ToString(CultureInfo.InvariantCulture)} {_currency.Name}",
                         AddressExplorerUri = $"{_currency.AddressExplorerUri}{a.Address}",
-                        CopyToClipboard = address => App.Clipboard.SetTextAsync(address),
-                        OpenInExplorer = OpenInExplorer,
-                        UpdateAddress = UpdateAddress,
-                        ExportKey = ExportKey
+                        CopyToClipboard    = address => App.Clipboard.SetTextAsync(address),
+                        OpenInExplorer     = OpenInExplorer,
+                        UpdateAddress      = UpdateAddress,
+                        ExportKey          = ExportKey
                     };
                 }).ToList();
 
                 // token balances
                 if (HasTokens)
                 {
-                    var tezosAccount = account as TezosAccount;
+                    var tezosAccount = (TezosAccount)account;
 
                     (await tezosAccount
                         .LocalStorage
@@ -171,6 +169,7 @@ namespace Atomex.Client.Desktop.ViewModels
                         {
                             var addressViewModel = addressesViewModels
                                 .FirstOrDefault(a => a.Address == addressWithTokens.Address);
+
                             if (addressViewModel == null)
                                 return;
 
@@ -342,18 +341,18 @@ namespace Atomex.Client.Desktop.ViewModels
                             var walletAddress = await _app.Account
                                 .GetAddressAsync(_currency.Name, address);
 
-                            var hdWallet = _app.Account.Wallet as HdWallet;
+                            var hdWallet = (HdWallet)_app.Account.Wallet;
 
                             using var privateKey = hdWallet.KeyStorage.GetPrivateKey(
                                 currency: _currency,
-                                keyIndex: walletAddress.KeyIndex,
+                                keyPath: walletAddress.KeyPath,
                                 keyType: walletAddress.KeyType);
 
                             var unsecuredPrivateKey = privateKey.ToUnsecuredBytes();
 
                             if (Currencies.IsBitcoinBased(_currency.Name))
                             {
-                                var btcBasedConfig = _currency as BitcoinBasedConfig;
+                                var btcBasedConfig = (BitcoinBasedConfig)_currency;
 
                                 var wif = new NBitcoin.Key(unsecuredPrivateKey)
                                     .GetWif(btcBasedConfig.Network)

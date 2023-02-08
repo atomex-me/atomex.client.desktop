@@ -30,9 +30,9 @@ namespace Atomex.Client.Desktop.ViewModels
                     currencyConfig: purchasedCurrency,
                     subscribeToUpdates: false);
 
-                var fromAmount = AmountHelper.QtyToSellAmount(swap.Side, swap.Qty, swap.Price, soldCurrency.DigitsMultiplier);
+                var fromAmount = AmountHelper.QtyToSellAmount(swap.Side, swap.Qty, swap.Price, soldCurrency.Precision);
                 var toAmount = AmountHelper.QtyToSellAmount(swap.Side.Opposite(), swap.Qty, swap.Price,
-                    purchasedCurrency.DigitsMultiplier);
+                    purchasedCurrency.Precision);
 
                 var quoteCurrency = swap.Symbol.QuoteCurrency() == swap.SoldCurrency
                     ? soldCurrency
@@ -70,7 +70,7 @@ namespace Atomex.Client.Desktop.ViewModels
                     ToAmountFormat        = toCurrencyViewModel.CurrencyFormat,
 
                     Price                 = swap.Price,
-                    PriceFormat           = $"F{quoteCurrency.Digits}",
+                    PriceFormat           = $"F{quoteCurrency.Decimals}",
 
                     Details               = detailsViewModel
                 };

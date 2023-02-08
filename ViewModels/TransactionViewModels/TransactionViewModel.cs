@@ -124,7 +124,7 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
                 type: tx.Type,
                 amount: Amount,
                 netAmount: netAmount,
-                amountDigits: currencyConfig.Digits,
+                amountDigits: currencyConfig.Decimals,
                 currencyCode: currencyConfig.Name);
 
             Direction = Amount switch

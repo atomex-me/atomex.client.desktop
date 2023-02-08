@@ -7,11 +7,7 @@ using System.Reactive;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
-using Atomex.Blockchain.Tezos;
-using Atomex.Client.Common;
-using Atomex.Client.Desktop.ViewModels.Abstract;
-using Atomex.Client.Desktop.ViewModels.SendViewModels;
-using Atomex.Wallet;
+
 using Avalonia.Controls;
 using Beacon.Sdk;
 using Beacon.Sdk.Beacon;
@@ -19,24 +15,26 @@ using Beacon.Sdk.Beacon.Error;
 using Beacon.Sdk.Beacon.Operation;
 using Beacon.Sdk.Beacon.Permission;
 using Beacon.Sdk.Beacon.Sign;
+using Beacon.Sdk.BeaconClients;
+using Beacon.Sdk.BeaconClients.Abstract;
 using Beacon.Sdk.Core.Domain.Entities;
 using Netezos.Encoding;
-using Netezos.Keys;
 using Netezos.Forging.Models;
+using Netezos.Keys;
 using Newtonsoft.Json.Linq;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using Serilog;
-using Atomex.Blockchain.Tezos.Internal;
-using Atomex.Wallet.Tezos;
-using Atomex.Wallets.Tezos;
-using Beacon.Sdk.BeaconClients;
-using Beacon.Sdk.BeaconClients.Abstract;
 using Serilog.Extensions.Logging;
 using Constants = Beacon.Sdk.Constants;
-using Network = Atomex.Core.Network;
-using Hex = Atomex.Common.Hex;
 
+using Atomex.Blockchain.Tezos;
+using Atomex.Blockchain.Tezos.Internal;
+using Atomex.Client.Common;
+using Atomex.Client.Desktop.ViewModels.Abstract;
+using Atomex.Client.Desktop.ViewModels.SendViewModels;
+using Atomex.Wallet;
+using Hex = Atomex.Common.Hex;
 
 namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
 {
@@ -257,9 +255,9 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
                         .Account
                         .GetAddressAsync(Tezos.Name, ConnectDappViewModel.AddressToConnect);
 
-                    var securedPublicKey = AtomexApp.Account.Wallet.GetPublicKey(
+                    var securedPublicKey = _atomexApp.Account.Wallet.GetPublicKey(
                         Tezos,
-                        addressToConnect.KeyIndex,
+                        addressToConnect.KeyPath,
                         addressToConnect.KeyType);
 
                     var publicKey = securedPublicKey.ToUnsecuredBytes(); 
@@ -354,9 +352,9 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
 
                     if (!revealed)
                     {
-                        var securedPublicKey = AtomexApp.Account.Wallet.GetPublicKey(
+                        var securedPublicKey = _atomexApp.Account.Wallet.GetPublicKey(
                             Tezos,
-                            connectedWalletAddress.KeyIndex,
+                            connectedWalletAddress.KeyPath,
                             connectedWalletAddress.KeyType);
 
                         var publicKey = securedPublicKey.ToUnsecuredBytes();
@@ -478,7 +476,7 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
 
                             using var securePrivateKey = keyStorage.GetPrivateKey(
                                 currency: Tezos,
-                                keyIndex: connectedWalletAddress.KeyIndex,
+                                keyPath: connectedWalletAddress.KeyPath,
                                 keyType: connectedWalletAddress.KeyType);
 
                             var privateKey = securePrivateKey.ToUnsecuredBytes();
@@ -573,7 +571,7 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
 
                             using var privateKey = hdWallet!.KeyStorage.GetPrivateKey(
                                 currency: Tezos,
-                                keyIndex: connectedWalletAddress.KeyIndex,
+                                keyPath: connectedWalletAddress.KeyPath,
                                 keyType: connectedWalletAddress.KeyType);
 
                             var signedMessage = TezosSigner.SignHash(

@@ -8,11 +8,11 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
         public BitcoinBasedTransactionViewModel(
             BitcoinTransaction tx,
             BitcoinBasedConfig bitcoinBasedConfig)
-            : base(tx, bitcoinBasedConfig, tx.Amount / bitcoinBasedConfig.DigitsMultiplier,
+            : base(tx, bitcoinBasedConfig, tx.Amount / bitcoinBasedConfig.Precision,
                 GetFee(tx, bitcoinBasedConfig))
         {
             Fee = tx.Fees != null
-                ? tx.Fees.Value / bitcoinBasedConfig.DigitsMultiplier
+                ? tx.Fees.Value / bitcoinBasedConfig.Precision
                 : 0; // todo: N/A
         }
 
@@ -22,7 +22,7 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
         {
             return tx.Fees != null
                 ? tx.Type.HasFlag(TransactionType.Output)
-                    ? tx.Fees.Value / bitcoinBasedConfig.DigitsMultiplier
+                    ? tx.Fees.Value / bitcoinBasedConfig.Precision
                     : 0
                 : 0;
         }

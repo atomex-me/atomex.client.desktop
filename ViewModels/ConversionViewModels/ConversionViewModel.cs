@@ -489,7 +489,7 @@ namespace Atomex.Client.Desktop.ViewModels
                 //}
 
                 FromViewModel.Amount = Math.Min(swapParams.Amount, EstimatedMaxFromAmount)
-                    .TruncateDecimal(FromViewModel.CurrencyViewModel!.Currency.Digits);
+                    .TruncateDecimal(FromViewModel.CurrencyViewModel!.Currency.Decimals);
             }
             catch (Exception e)
             {
@@ -1045,7 +1045,7 @@ namespace Atomex.Client.Desktop.ViewModels
                     side: side,
                     amount: FromViewModel.Amount,
                     price: price,
-                    digitsMultiplier: baseCurrency.DigitsMultiplier);
+                    precision: baseCurrency.Precision);
 
                 if (qty < symbol.MinimumQty)
                 {
@@ -1053,7 +1053,7 @@ namespace Atomex.Client.Desktop.ViewModels
                         side: side,
                         qty: symbol.MinimumQty,
                         price: price,
-                        digitsMultiplier: FromViewModel.CurrencyViewModel.Currency.DigitsMultiplier);
+                        precision: FromViewModel.CurrencyViewModel.Currency.Precision);
 
                     var message = string.Format(
                         provider: CultureInfo.CurrentCulture,

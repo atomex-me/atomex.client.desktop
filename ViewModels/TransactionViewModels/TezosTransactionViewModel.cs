@@ -64,13 +64,13 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
             var result = 0m;
 
             if (tx.Type.HasFlag(TransactionType.Input))
-                result += tx.Amount / tezosConfig.DigitsMultiplier;
+                result += tx.Amount / tezosConfig.Precision;
 
             var includeFee = tezosConfig.Name == tezosConfig.FeeCurrencyName;
             var fee = includeFee ? tx.Fee : 0;
 
             if (tx.Type.HasFlag(TransactionType.Output))
-                result += -(tx.Amount + fee) / tezosConfig.DigitsMultiplier;
+                result += -(tx.Amount + fee) / tezosConfig.Precision;
 
             tx.InternalTxs?.ForEach(t => result += GetAmount(t, tezosConfig));
 
