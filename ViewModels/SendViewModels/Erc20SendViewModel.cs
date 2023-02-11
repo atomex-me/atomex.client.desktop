@@ -175,7 +175,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             });
         }
 
-        protected override Task<Error> Send(CancellationToken cancellationToken = default)
+        protected override Task<Error?> Send(CancellationToken cancellationToken = default)
         {
             var account = _app.Account.GetCurrencyAccount<Erc20Account>(Currency.Name);
 

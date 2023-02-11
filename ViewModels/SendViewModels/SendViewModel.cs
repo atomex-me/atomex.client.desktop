@@ -16,10 +16,9 @@ using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.Properties;
 using Atomex.Client.Desktop.ViewModels.Abstract;
 using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
+using Atomex.Common;
 using Atomex.Core;
 using Atomex.MarketData.Abstract;
-using Atomex.ViewModels;
-using Atomex.Common;
 
 namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 {
@@ -94,7 +93,6 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             (_selectToCommand = ReactiveCommand.Create(ToClick));
 
         protected abstract void FromClick();
-
         protected abstract void ToClick();
 
         private ReactiveCommand<Unit, Unit> _nextCommand;
@@ -143,7 +141,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     if (error != null)
                     { 
                         App.DialogService.Show(MessageViewModel.Error(
-                            text: error.Message,
+                            text: error.Value.Message,
                             backAction: () => App.DialogService.Show(this)));
                         
                         return;   
@@ -338,7 +336,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
         protected abstract Task OnMaxClick();
 
-        protected virtual void OnQuotesUpdatedEventHandler(object sender, EventArgs args)
+        protected virtual void OnQuotesUpdatedEventHandler(object? sender, EventArgs args)
         {
             if (sender is not IQuotesProvider quotesProvider)
                 return;
@@ -352,7 +350,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             });
         }
 
-        protected abstract Task<Error> Send(CancellationToken cancellationToken = default);
+        protected abstract Task<Error?> Send(CancellationToken cancellationToken = default);
         
         public void Dispose()
         {

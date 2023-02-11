@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Linq;
+using System.Numerics;
 using System.Reactive;
 using System.Threading.Tasks;
 
@@ -11,6 +12,8 @@ using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using Serilog;
 
+using Atomex.Blockchain;
+using Atomex.Blockchain.Tezos.Common;
 using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.ViewModels.Abstract;
 using Atomex.Common;
@@ -18,13 +21,11 @@ using Atomex.Core;
 using Atomex.Cryptography;
 using Atomex.Wallet;
 using Atomex.Wallet.Tezos;
-using Atomex.Blockchain;
-using Atomex.Blockchain.Tezos.Common;
-using System.Numerics;
+using Atomex.ViewModels;
 
 namespace Atomex.Client.Desktop.ViewModels
 {
-    public class AddressViewModel : ViewModelBase
+    public class AddressViewModel : ViewModelBase, IWalletAddressViewModel
     {
         public WalletAddress WalletAddress { get; set; }
         public string Address => WalletAddress.Address;
@@ -180,49 +181,11 @@ namespace Atomex.Client.Desktop.ViewModels
                 switch (CurrentSortField)
                 {
                     case AddressesSortField.ByPath when CurrentSortDirection == SortDirection.Desc:
-                        addressesViewModels.Sort((a2, a1) =>
-                        {
-                            var typeResult = a1.WalletAddress.KeyType.CompareTo(a2.WalletAddress.KeyType);
-
-                            if (typeResult != 0)
-                                return typeResult;
-
-                            var accountResult =
-                                a1.WalletAddress.KeyIndex.Account.CompareTo(a2.WalletAddress.KeyIndex.Account);
-
-                            if (accountResult != 0)
-                                return accountResult;
-
-                            var chainResult =
-                                a1.WalletAddress.KeyIndex.Chain.CompareTo(a2.WalletAddress.KeyIndex.Chain);
-
-                            return chainResult != 0
-                                ? chainResult
-                                : a1.WalletAddress.KeyIndex.Index.CompareTo(a2.WalletAddress.KeyIndex.Index);
-                        });
+                        addressesViewModels.Sort(new KeyPathDescending<AddressViewModel>());
                         Addresses = new ObservableCollection<AddressViewModel>(addressesViewModels);
                         break;
                     case AddressesSortField.ByPath when CurrentSortDirection == SortDirection.Asc:
-                        addressesViewModels.Sort((a1, a2) =>
-                        {
-                            var typeResult = a1.WalletAddress.KeyType.CompareTo(a2.WalletAddress.KeyType);
-
-                            if (typeResult != 0)
-                                return typeResult;
-
-                            var accountResult =
-                                a1.WalletAddress.KeyIndex.Account.CompareTo(a2.WalletAddress.KeyIndex.Account);
-
-                            if (accountResult != 0)
-                                return accountResult;
-
-                            var chainResult =
-                                a1.WalletAddress.KeyIndex.Chain.CompareTo(a2.WalletAddress.KeyIndex.Chain);
-
-                            return chainResult != 0
-                                ? chainResult
-                                : a1.WalletAddress.KeyIndex.Index.CompareTo(a2.WalletAddress.KeyIndex.Index);
-                        });
+                        addressesViewModels.Sort(new KeyPathAscending<AddressViewModel>());
                         Addresses = new ObservableCollection<AddressViewModel>(addressesViewModels);
                         break;
                     case AddressesSortField.ByBalance when CurrentSortDirection == SortDirection.Desc:

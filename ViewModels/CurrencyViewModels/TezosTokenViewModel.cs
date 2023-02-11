@@ -23,7 +23,7 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
 {
     public class TezosTokenViewModel : ViewModelBase, IAssetViewModel, IDisposable
     {
-        private const int MaxBalanceDecimals = AddressesHelper.MaxTokenCurrencyFormatDecimals;
+        private const int MaxBalanceDecimals = CurrencyConfig.MaxPrecision;
 
         public bool CanExchange => AtomexApp
             ?.Account
@@ -124,7 +124,9 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
         {
             var tokenQuote = quotesProvider.GetQuote(TokenBalance.Symbol, BaseCurrencyCode);
             var xtzQuote = quotesProvider.GetQuote(TezosConfig.Xtz, BaseCurrencyCode);
-            if (tokenQuote == null || xtzQuote == null) return;
+
+            if (tokenQuote == null || xtzQuote == null)
+                return;
 
             CurrentQuote = tokenQuote.Bid.SafeMultiply(xtzQuote.Bid);
             TotalAmountInBase = TotalAmount.SafeMultiply(CurrentQuote);

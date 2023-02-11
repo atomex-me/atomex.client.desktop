@@ -9,6 +9,7 @@ using Avalonia.Controls;
 using ReactiveUI;
 using Serilog;
 
+using Atomex.Blockchain.Bitcoin;
 using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.Properties;
 using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
@@ -17,7 +18,6 @@ using Atomex.Common;
 using Atomex.Core;
 using Atomex.ViewModels;
 using Atomex.Wallet.Abstract;
-using Atomex.Blockchain.Bitcoin;
 
 namespace Atomex.Client.Desktop.ViewModels
 {
@@ -105,17 +105,17 @@ namespace Atomex.Client.Desktop.ViewModels
 
                 if (error != null)
                 {
-                    if (error.Code == Errors.PriceHasChanged)
+                    if (error.Value.Code == Errors.PriceHasChanged)
                     {
                         App.DialogService.Show(MessageViewModel.Message(
                             title: Resources.SvFailed,
-                            text: error.Description,
+                            text: error.Value.Message,
                             backAction: () => App.DialogService.Show(this)));
                     }
                     else
                     {
                         App.DialogService.Show(MessageViewModel.Error(
-                            text: error.Description,
+                            text: error.Value.Message,
                             backAction: () => App.DialogService.Show(this)));
                     }
 

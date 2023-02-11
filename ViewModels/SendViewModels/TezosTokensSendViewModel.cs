@@ -1,14 +1,18 @@
 using System;
 using System.Linq;
+using System.Numerics;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+
 using Avalonia.Controls;
 using Avalonia.Threading;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using Serilog;
+
+using Atomex.Blockchain.Ethereum;
 using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.Properties;
 using Atomex.Client.Desktop.ViewModels.Abstract;
@@ -19,12 +23,13 @@ using Atomex.ViewModels;
 using Atomex.Wallet.Abstract;
 using Atomex.Wallet.Tezos;
 using Atomex.Common;
+using Atomex.Blockchain.Tezos;
 
 namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 {
     public class TezosTokensSendViewModel : ViewModelBase
     {
-        public static readonly string DefaultCurrencyFormat = $"F{AddressesHelper.MaxTokenCurrencyFormatDecimals}";
+        public static readonly string DefaultCurrencyFormat = $"F{CurrencyConfig.MaxPrecision}";
         public const string DefaultBaseCurrencyCode = "USD";
         public const string DefaultBaseCurrencyFormat = "$0.00";
 
@@ -73,7 +78,6 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             int tokenId,
             string tokenType,
             string tokenPreviewUrl,
-            string? balanceFormat = null,
             string? from = null,
             bool showToSelectDialog = true)
         {
@@ -143,7 +147,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                         CanSend = To != null &&
                                   Amount > 0 &&
                                   (string.IsNullOrEmpty(Warning) ||
-                                   (Warning != null && WarningType != MessageType.Error));
+                                  (Warning != null && WarningType != MessageType.Error));
                     }
                     else
                     {
@@ -213,14 +217,12 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         }
 
         private ReactiveCommand<Unit, Unit>? _backCommand;
-
         public ReactiveCommand<Unit, Unit> BackCommand => _backCommand ??= (_backCommand = ReactiveCommand.Create(() =>
         {
             App.DialogService.Close();
         }));
 
         private ReactiveCommand<Unit, Unit>? _nextCommand;
-
         public ReactiveCommand<Unit, Unit> NextCommand =>
             _nextCommand ??= ReactiveCommand.CreateFromTask(OnNextCommand);
 
@@ -228,17 +230,14 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         public ReactiveCommand<Unit, Unit> MaxCommand => _maxCommand ??= ReactiveCommand.Create(OnMaxClick);
 
         private ReactiveCommand<Unit, Unit>? _undoConfirmStageCommand;
-
         public ReactiveCommand<Unit, Unit> UndoConfirmStageCommand => _undoConfirmStageCommand ??=
             (_undoConfirmStageCommand = ReactiveCommand.Create(() => { ConfirmStage = false; }));
 
         private ReactiveCommand<Unit, Unit>? _selectFromCommand;
-
         public ReactiveCommand<Unit, Unit> SelectFromCommand => _selectFromCommand ??=
             (_selectFromCommand = ReactiveCommand.Create(FromClick));
 
         private ReactiveCommand<Unit, Unit>? _selectToCommand;
-
         public ReactiveCommand<Unit, Unit> SelectToCommand => _selectToCommand ??=
             (_selectToCommand = ReactiveCommand.Create(ToClick));
 
@@ -337,7 +336,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 return;
             }
 
-            if (xtzAddress.AvailableBalance() < Fee)
+            if (xtzAddress.Balance < Fee)
             {
                 Warning = "Insufficient funds for fee!";
                 return;
@@ -501,7 +500,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
                     Fee = Math.Min(Fee, tezosConfig.GetMaximumFee());
 
-                    if (xtzAddress.AvailableBalance() < Fee)
+                    if (xtzAddress.Balance < Fee)
                     {
                         Warning = string.Format(Resources.CvInsufficientChainFunds, "XTZ");
                         WarningToolTip = "";
@@ -584,15 +583,17 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             IAccount account,
             string address,
             string tokenContract,
-            decimal tokenId,
-            string tokenType)
+            BigInteger tokenId,
+            string tokenType,
+            CancellationToken cancellationToken = default)
         {
             var tezosAccount = account
                 .GetCurrencyAccount<TezosAccount>(TezosConfig.Xtz);
 
             return await tezosAccount
                 .LocalStorage
-                .GetTokenAddressAsync(tokenType, tokenContract, tokenId, address);
+                .GetTokenAddressAsync(tokenType, tokenContract, tokenId, address, cancellationToken)
+                .ConfigureAwait(false);
         }
 
         private async void UpdateCurrencyCode()
@@ -611,7 +612,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             {
                 CurrencyCode = tokenAddress.TokenBalance.Symbol;
                 CurrencyFormat =
-                    $"F{Math.Min(tokenAddress.TokenBalance.Decimals, AddressesHelper.MaxTokenCurrencyFormatDecimals)}";
+                    $"F{Math.Min(tokenAddress.TokenBalance.Decimals, CurrencyConfig.MaxPrecision)}";
             }
             else
             {
@@ -628,18 +629,20 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 }
             }
 
-            SelectedFromBalance = tokenAddress?.AvailableBalance() ?? 0;
+            SelectedFromBalance = tokenAddress?.Balance ?? 0;
             this.RaisePropertyChanged(nameof(Amount));
         }
 
-        private async Task<Error> Send(CancellationToken cancellationToken = default)
+        private async Task<Error?> Send(CancellationToken cancellationToken = default)
         {
             var tokenAddress = await GetTokenAddressAsync(
-                account: App.AtomexApp.Account,
-                address: From,
-                tokenContract: TokenContract,
-                tokenId: TokenId,
-                tokenType: _tokenType);
+                    account: App.AtomexApp.Account,
+                    address: From,
+                    tokenContract: TokenContract,
+                    tokenId: TokenId,
+                    tokenType: _tokenType,
+                    cancellationToken: cancellationToken)
+                .ConfigureAwait(false);
 
             var currencyName = App.AtomexApp.Account.Currencies
                 .FirstOrDefault(c => c is TezosTokenConfig tokenConfig &&
@@ -652,13 +655,15 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 tokenContract: TokenContract,
                 tokenId: TokenId);
 
-            var (_, error) = await tokenAccount.SendAsync(
-                from: tokenAddress.Address,
-                to: To,
-                amount: Amount,
-                fee: Fee,
-                useDefaultFee: UseDefaultFee,
-                cancellationToken: cancellationToken);
+            var (_, error) = await tokenAccount
+                .SendAsync(
+                    from: tokenAddress.Address,
+                    to: To,
+                    amount: Amount,
+                    fee: Fee,
+                    useDefaultFee: UseDefaultFee,
+                    cancellationToken: cancellationToken)
+                .ConfigureAwait(false);
 
             return error;
         }

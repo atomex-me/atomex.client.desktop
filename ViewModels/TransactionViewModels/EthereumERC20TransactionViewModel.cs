@@ -1,5 +1,6 @@
 ﻿using System;
 
+using Atomex.Blockchain;
 using Atomex.Blockchain.Abstract;
 using Atomex.Blockchain.Ethereum;
 using Atomex.EthereumTokens;
@@ -54,13 +55,13 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
             
             if (tx.Type.HasFlag(TransactionType.SwapRedeem) ||
                 tx.Type.HasFlag(TransactionType.SwapRefund))
-                result += erc20Config.TokenDigitsToTokens(tx.Amount);
+                result += tx.Amount.FromTokens(erc20Config.Decimals);
             else
             {
                 if (tx.Type.HasFlag(TransactionType.Input))
-                    result += erc20Config.TokenDigitsToTokens(tx.Amount);
+                    result += tx.Amount.FromTokens(erc20Config.Decimals);
                 if (tx.Type.HasFlag(TransactionType.Output))
-                    result += -erc20Config.TokenDigitsToTokens(tx.Amount);
+                    result += -tx.Amount.FromTokens(erc20Config.Decimals);
             }
 
             tx.InternalTransactions?.ForEach(t => result += GetAmount(t, erc20Config));

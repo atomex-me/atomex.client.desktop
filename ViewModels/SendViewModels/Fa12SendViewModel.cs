@@ -11,11 +11,11 @@ using Atomex.Blockchain.Abstract;
 using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.Properties;
 using Atomex.Client.Desktop.ViewModels.Abstract;
+using Atomex.Common;
 using Atomex.Core;
 using Atomex.MarketData.Abstract;
 using Atomex.TezosTokens;
 using Atomex.Wallet.Tezos;
-using Atomex.Common;
 
 namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 {
@@ -99,8 +99,8 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
                 if (maxAmountEstimation.Error != null)
                 {
-                    Warning = maxAmountEstimation.Error.Message;
-                    WarningToolTip = maxAmountEstimation.Error.Details;
+                    Warning = maxAmountEstimation.Error.Value.Message;
+                    WarningToolTip = maxAmountEstimation.ErrorHint;
                     WarningType = MessageType.Error;
                     return;
                 }
@@ -143,8 +143,8 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
                     if (maxAmountEstimation.Error != null)
                     {
-                        Warning = maxAmountEstimation.Error.Message;
-                        WarningToolTip = maxAmountEstimation.Error.Details;
+                        Warning = maxAmountEstimation.Error.Value.Message;
+                        WarningToolTip = maxAmountEstimation.ErrorHint;
                         WarningType = MessageType.Error;
                         return;
                     }
@@ -189,8 +189,8 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
                 if (maxAmountEstimation.Error != null)
                 {
-                    Warning = maxAmountEstimation.Error.Message;
-                    WarningToolTip = maxAmountEstimation.Error.Details;
+                    Warning = maxAmountEstimation.Error.Value.Message;
+                    WarningToolTip = maxAmountEstimation.ErrorHint;
                     WarningType = MessageType.Error;
                     Amount = 0;
                     return;
@@ -213,7 +213,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             }
         }
 
-        protected override void OnQuotesUpdatedEventHandler(object sender, EventArgs args)
+        protected override void OnQuotesUpdatedEventHandler(object? sender, EventArgs args)
         {
             if (sender is not IQuotesProvider quotesProvider)
                 return;
@@ -228,19 +228,22 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             });
         }
 
-        protected override async Task<Error> Send(CancellationToken cancellationToken = default)
+        protected override async Task<Error?> Send(CancellationToken cancellationToken = default)
         {
             var tokenConfig = (Fa12Config)Currency;
             var tokenContract = tokenConfig.TokenContractAddress;
             const int tokenId = 0;
             const string? tokenType = "FA12";
 
-            var tokenAddress = await TezosTokensSendViewModel.GetTokenAddressAsync(
-                account: _app.Account,
-                address: From,
-                tokenContract: tokenContract,
-                tokenId: tokenId,
-                tokenType: tokenType);
+            var tokenAddress = await TezosTokensSendViewModel
+                .GetTokenAddressAsync(
+                    account: _app.Account,
+                    address: From,
+                    tokenContract: tokenContract,
+                    tokenId: tokenId,
+                    tokenType: tokenType,
+                    cancellationToken: cancellationToken)
+                .ConfigureAwait(false);
 
             var currencyName = _app.Account.Currencies
                 .FirstOrDefault(c => c is Fa12Config fa12 && fa12.TokenContractAddress == tokenContract)

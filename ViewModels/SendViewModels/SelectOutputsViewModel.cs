@@ -5,17 +5,19 @@ using System.Globalization;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
-using System.Threading.Tasks;
 using System.Windows.Input;
+
 using Avalonia.Controls;
 using NBitcoin;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using Network = NBitcoin.Network;
+
 using Atomex.Blockchain.Bitcoin;
 using Atomex.Client.Desktop.Common;
 using Atomex.Common;
 using Atomex.Core;
+using Atomex.ViewModels;
 using Atomex.Wallet.BitcoinBased;
 
 namespace Atomex.Client.Desktop.ViewModels.SendViewModels
@@ -91,69 +93,27 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     vm => vm.SearchPattern)
                 .SubscribeInMainThread(value =>
                 {
-                    var (item1, item2, item3) = value;
+                    var (sortByDate, sortIsAscending, searchPattern) = value;
 
                     if (Outputs == null) return;
 
                     var outputViewModels = new ObservableCollection<OutputViewModel>(
                         InitialOutputs!
-                            .Where(output => output.Address.ToLower().Contains(item3?.ToLower() ?? string.Empty)));
+                            .Where(output => output.Address.ToLower().Contains(searchPattern?.ToLower() ?? string.Empty)));
 
-                    if (item1)
+                    if (sortByDate)
                     {
                         var outputsList = outputViewModels.ToList();
-                        if (item2)
-                        {
-                            outputsList.Sort((a1, a2) =>
-                            {
-                                var typeResult = a1.WalletAddress.KeyType.CompareTo(a2.WalletAddress.KeyType);
 
-                                if (typeResult != 0)
-                                    return typeResult;
-
-                                var accountResult =
-                                    a1.WalletAddress.KeyIndex.Account.CompareTo(a2.WalletAddress.KeyIndex.Account);
-
-                                if (accountResult != 0)
-                                    return accountResult;
-
-                                var chainResult =
-                                    a1.WalletAddress.KeyIndex.Chain.CompareTo(a2.WalletAddress.KeyIndex.Chain);
-
-                                return chainResult != 0
-                                    ? chainResult
-                                    : a1.WalletAddress.KeyIndex.Index.CompareTo(a2.WalletAddress.KeyIndex.Index);
-                            });
-                        }
-                        else
-                        {
-                            outputsList.Sort((a2, a1) =>
-                            {
-                                var typeResult = a1.WalletAddress.KeyType.CompareTo(a2.WalletAddress.KeyType);
-
-                                if (typeResult != 0)
-                                    return typeResult;
-
-                                var accountResult =
-                                    a1.WalletAddress.KeyIndex.Account.CompareTo(a2.WalletAddress.KeyIndex.Account);
-
-                                if (accountResult != 0)
-                                    return accountResult;
-
-                                var chainResult =
-                                    a1.WalletAddress.KeyIndex.Chain.CompareTo(a2.WalletAddress.KeyIndex.Chain);
-
-                                return chainResult != 0
-                                    ? chainResult
-                                    : a1.WalletAddress.KeyIndex.Index.CompareTo(a2.WalletAddress.KeyIndex.Index);
-                            });
-                        }
-
+                        outputsList.Sort(sortIsAscending
+                            ? new KeyPathAscending<OutputViewModel>()
+                            : new KeyPathDescending<OutputViewModel>());
+ 
                         Outputs = new ObservableCollection<OutputViewModel>(outputsList);
                     }
                     else
                     {
-                        Outputs = new ObservableCollection<OutputViewModel>(item2
+                        Outputs = new ObservableCollection<OutputViewModel>(sortIsAscending
                             ? outputViewModels.OrderBy(output => output.Balance)
                             : outputViewModels.OrderByDescending(output => output.Balance));
                     }
@@ -213,32 +173,26 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             }));
 
         private ReactiveCommand<Unit, Unit> _selectAllCommand;
-
         public ReactiveCommand<Unit, Unit> SelectAllCommand => _selectAllCommand ??=
             (_selectAllCommand = ReactiveCommand.Create(() => { _checkedFromList = false; }));
 
         private ReactiveCommand<Unit, Unit> _closeCommand;
-
         public ReactiveCommand<Unit, Unit> CloseCommand => _closeCommand ??=
             (_closeCommand = ReactiveCommand.Create(() => { App.DialogService.Close(); }));
 
         private ReactiveCommand<Unit, Unit> _backCommand;
-
         public ReactiveCommand<Unit, Unit> BackCommand => _backCommand ??=
             (_backCommand = ReactiveCommand.Create(() => { BackAction?.Invoke(); }));
 
         private ReactiveCommand<Unit, Unit> _changeSortTypeCommand;
-
         public ReactiveCommand<Unit, Unit> ChangeSortTypeCommand => _changeSortTypeCommand ??=
             (_changeSortTypeCommand = ReactiveCommand.Create(() => { SortByDate = !SortByDate; }));
 
         private ReactiveCommand<Unit, Unit> _changeSortDirectionCommand;
-
         public ReactiveCommand<Unit, Unit> ChangeSortDirectionCommand => _changeSortDirectionCommand ??=
             (_changeSortDirectionCommand = ReactiveCommand.Create(() => { SortIsAscending = !SortIsAscending; }));
 
         private ReactiveCommand<Unit, Unit> _confirmCommand;
-
         public ReactiveCommand<Unit, Unit> ConfirmCommand => _confirmCommand ??=
             (_confirmCommand =
                 ReactiveCommand.Create(() =>
@@ -249,9 +203,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     );
                 }));
 
-
         private ICommand _copyAddressCommand;
-
         public ICommand CopyAddressCommand =>
             _copyAddressCommand ??= (_copyAddressCommand = ReactiveCommand.Create((OutputViewModel output) =>
             {
@@ -303,7 +255,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         }
     }
 
-    public class OutputViewModel : ViewModelBase
+    public class OutputViewModel : ViewModelBase, IWalletAddressViewModel
     {
         public const string DefaultCopyButtonToolTip = "Copy address to clipboard";
         public const string CopiedButtonToolTip = "Successfully copied!";

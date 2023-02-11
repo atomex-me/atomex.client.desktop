@@ -11,13 +11,14 @@ using ReactiveUI.Fody.Helpers;
 using Serilog;
 
 using Atomex.Blockchain.Abstract;
+using Atomex.Blockchain.Tezos;
 using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.Properties;
 using Atomex.Client.Desktop.ViewModels.Abstract;
+using Atomex.Common;
 using Atomex.Core;
 using Atomex.Wallet.Abstract;
 using Atomex.Wallet.Tezos;
-using Atomex.Common;
 
 namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 {
@@ -53,7 +54,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 ConfirmAction = walletAddressViewModel =>
                 {
                     From = walletAddressViewModel.Address;
-                    SelectedFromBalance = walletAddressViewModel.AvailableBalance;
+                    SelectedFromBalance = walletAddressViewModel.AvailableBalance.ToTez();
                     App.DialogService.Show(SelectToViewModel);
                 }
             };
@@ -112,7 +113,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             selectFromViewModel!.ConfirmAction = walletAddressViewModel =>
             {
                 From = walletAddressViewModel.Address;
-                SelectedFromBalance = walletAddressViewModel.AvailableBalance;
+                SelectedFromBalance = walletAddressViewModel.AvailableBalance.ToTez();
                 App.DialogService.Show(this);
             };
             
@@ -141,7 +142,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                         reserve: false);
 
                 if (UseDefaultFee && maxAmountEstimation.Fee > 0)
-                    Fee = maxAmountEstimation.Fee;
+                    Fee = maxAmountEstimation.Fee.ToTez();
 
                 CheckAmountCommand?.Execute(maxAmountEstimation).Subscribe();
             }
@@ -191,12 +192,12 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                         reserve: false);
 
                 if (UseDefaultFee && maxAmountEstimation.Fee > 0)
-                    Fee = maxAmountEstimation.Fee;
+                    Fee = maxAmountEstimation.Fee.ToTez();
 
                 if (maxAmountEstimation.Error != null)
                 {
-                    Warning = maxAmountEstimation.Error.Message;
-                    WarningToolTip = maxAmountEstimation.Error.Details;
+                    Warning = maxAmountEstimation.Error.Value.Message;
+                    WarningToolTip = maxAmountEstimation.ErrorHint;
                     WarningType = MessageType.Error;
                     Amount = 0;
                     return;
@@ -207,11 +208,11 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     .EstimateTransferFeeAsync(From);
 
                 var maxAmount = UseDefaultFee
-                    ? maxAmountEstimation.Amount
-                    : maxAmountEstimation.Amount + maxAmountEstimation.Fee - Fee;
+                    ? maxAmountEstimation.Amount.ToTez()
+                    : maxAmountEstimation.Amount.ToTez() + maxAmountEstimation.Fee.ToTez() - Fee;
 
                 RecommendedMaxAmount = HasActiveSwaps
-                    ? Math.Max(maxAmount - maxAmountEstimation.Reserved, 0)
+                    ? Math.Max(maxAmount - maxAmountEstimation.Reserved.ToTez(), 0)
                     : HasTokens
                         ? Math.Max(maxAmount - fa12TransferFee, 0)
                         : maxAmount;
@@ -234,13 +235,13 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         {
             if (maxAmountEstimation.Error != null)
             {
-                Warning = maxAmountEstimation.Error.Message;
-                WarningToolTip = maxAmountEstimation.Error.Details;
+                Warning = maxAmountEstimation.Error.Value.Message;
+                WarningToolTip = maxAmountEstimation.ErrorHint;
                 WarningType = MessageType.Error;
                 return;
             }
 
-            if (Amount + Fee > maxAmountEstimation.Amount + maxAmountEstimation.Fee)
+            if (Amount + Fee > maxAmountEstimation.Amount.ToTez() + maxAmountEstimation.Fee.ToTez())
             {
                 Warning = Resources.CvInsufficientFunds;
                 WarningToolTip = "";
@@ -248,7 +249,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 return;
             }
 
-            if (Fee < maxAmountEstimation.Fee)
+            if (Fee < maxAmountEstimation.Fee.ToTez())
             {
                 Warning = Resources.CvLowFees;
                 WarningToolTip = "";
@@ -261,11 +262,11 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 .EstimateTransferFeeAsync(From);
 
             var maxAmount = UseDefaultFee
-                ? maxAmountEstimation.Amount
-                : maxAmountEstimation.Amount + maxAmountEstimation.Fee - Fee;
+                ? maxAmountEstimation.Amount.ToTez()
+                : maxAmountEstimation.Amount.ToTez() + maxAmountEstimation.Fee.ToTez() - Fee;
 
             RecommendedMaxAmount = HasActiveSwaps
-                ? Math.Max(maxAmount - maxAmountEstimation.Reserved, 0)
+                ? Math.Max(maxAmount - maxAmountEstimation.Reserved.ToTez(), 0)
                 : HasTokens
                     ? Math.Max(maxAmount - fa12TransferFee, 0)
                     : maxAmount;
@@ -318,18 +319,27 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             }
         }
 
-        protected override async Task<Error> Send(CancellationToken cancellationToken = default)
+        protected override async Task<Error?> Send(CancellationToken cancellationToken = default)
         {
+            var xtzConfig = (TezosConfig)Currency;
+
             var account = _app.Account
                 .GetCurrencyAccount<TezosAccount>(Currency.Name);
 
+            var fee = UseDefaultFee
+                ? Blockchain.Tezos.Fee.FromNetwork(defaultValue: Fee.ToMicroTez())
+                : Blockchain.Tezos.Fee.FromValue(Fee.ToMicroTez());
+
             var (_, error) = await account
-                .SendAsync(
+                .SendTransactionAsync(
                     from: From,
                     to: To,
-                    amount: AmountToSend,
-                    fee: Fee,
-                    useDefaultFee: UseDefaultFee,
+                    amount: AmountToSend.ToMicroTez(),
+                    fee: fee,
+                    gasLimit: GasLimit.FromNetwork(defaultValue: (int)xtzConfig.GasLimit),
+                    storageLimit: StorageLimit.FromNetwork(defaultValue: (int)xtzConfig.StorageLimit),
+                    entrypoint: null,
+                    parameters: null,
                     cancellationToken: cancellationToken)
                 .ConfigureAwait(false);
 

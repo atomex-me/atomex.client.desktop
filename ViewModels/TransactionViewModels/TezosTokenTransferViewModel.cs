@@ -3,6 +3,7 @@ using System;
 using Atomex.Blockchain.Abstract;
 using Atomex.Blockchain.Tezos;
 using Atomex.Common;
+using Atomex.Core;
 using Atomex.ViewModels;
 using Avalonia.Controls;
 
@@ -10,7 +11,7 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
 {
     public class TezosTokenTransferViewModel : TransactionViewModelBase
     {
-        private const int MaxAmountDecimals = AddressesHelper.MaxTokenCurrencyFormatDecimals;
+        private const int MaxAmountDecimals = CurrencyConfig.MaxPrecision;
         public string From { get; set; }
         public string To { get; set; }
         public string CurrencyCode { get; set; }

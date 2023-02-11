@@ -13,6 +13,7 @@ using ReactiveUI.Fody.Helpers;
 using Serilog;
 
 using Atomex.Blockchain.Abstract;
+using Atomex.Blockchain.Ethereum;
 using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.Properties;
 using Atomex.Client.Desktop.ViewModels.Abstract;
@@ -96,7 +97,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 ConfirmAction = walletAddressViewModel =>
                 {
                     From = walletAddressViewModel.Address;
-                    SelectedFromBalance = walletAddressViewModel.AvailableBalance;
+                    SelectedFromBalance = walletAddressViewModel.AvailableBalance.WeiToEth();
                     App.DialogService.Show(SelectToViewModel);
                 }
             };
@@ -154,7 +155,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             selectFromViewModel!.ConfirmAction = walletAddressViewModel =>
             {
                 From = walletAddressViewModel.Address;
-                SelectedFromBalance = walletAddressViewModel.AvailableBalance;
+                SelectedFromBalance = walletAddressViewModel.AvailableBalance.WeiToEth();
                 App.DialogService.Show(this);
             };
             
@@ -282,8 +283,8 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         {
             if (maxAmountEstimation.Error != null)
             {
-                Warning = maxAmountEstimation.Error.Message;
-                WarningToolTip = maxAmountEstimation.Error.Details;
+                Warning = maxAmountEstimation.Error.Value.Message;
+                WarningToolTip = maxAmountEstimation.ErrorHint;
                 WarningType = MessageType.Error;
                 return;
             }
@@ -353,7 +354,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             }
         }
 
-        protected override void OnQuotesUpdatedEventHandler(object sender, EventArgs args)
+        protected override void OnQuotesUpdatedEventHandler(object? sender, EventArgs args)
         {
             if (sender is not IQuotesProvider quotesProvider)
                 return;
@@ -367,7 +368,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             });
         }
 
-        protected override Task<Error> Send(CancellationToken cancellationToken = default)
+        protected override Task<Error?> Send(CancellationToken cancellationToken = default)
         {
             var account = _app.Account
                 .GetCurrencyAccount<EthereumAccount>(Currency.Name);

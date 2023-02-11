@@ -253,7 +253,7 @@ namespace Atomex.Client.Desktop.ViewModels
                     var isBtcBased = Atomex.Currencies.IsBitcoinBased(i.CurrencyViewModel.Currency.Name);
                     UseRedeemAddress = !isBtcBased;
 
-                    if (item.SelectedAddress.KeyIndex != null) // is atomex address
+                    if (item.SelectedAddress.KeyPath != null) // is atomex address
                     {
                         RedeemFromAddress = ToAddress;
                         IsToAddressExtrenal = false;
@@ -621,7 +621,7 @@ namespace Atomex.Client.Desktop.ViewModels
         {
             var currencyName = currencyViewModel.Currency.Name;
 
-            var receivingAddresses = await AddressesHelper
+            var receivingAddresses = await AccountAddressesHelper
                 .GetReceivingAddressesAsync(
                     account: _app.Account,
                     currency: currencyViewModel.Currency)
@@ -708,8 +708,8 @@ namespace Atomex.Client.Desktop.ViewModels
                     if (swapParams.Error != null)
                     {
                         AmountValidationMessageType = MessageType.Error;
-                        AmountValidationMessage = swapParams.Error.Message;
-                        AmountValidationMessageToolTip = swapParams.Error.Details;
+                        AmountValidationMessage = swapParams.Error.Value.Message;
+                        AmountValidationMessageToolTip = swapParams.Error.Value.Details;
                     }
                     else
                     {
