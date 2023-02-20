@@ -191,8 +191,8 @@
             <DependentUpon>LinuxUpdateControls.axaml</DependentUpon>
             <SubType>Code</SubType>
         </Compile>
-        <Compile Update="Views\TransactionViews\EthereumERC20TransactionDetailsView.axaml.cs">
-            <DependentUpon>EthereumERC20TransactionDetailsView.axaml</DependentUpon>
+        <Compile Update="Views\TransactionViews\Erc20TransactionDetailsView.axaml.cs">
+            <DependentUpon>Erc20TransactionDetailsView.axaml</DependentUpon>
             <SubType>Code</SubType>
         </Compile>
         <Compile Update="Controls\IconButton.axaml.cs">

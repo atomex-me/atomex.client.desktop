@@ -1,12 +1,11 @@
-using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 
 namespace Atomex.Client.Desktop.Views.TransactionViews
 {
-    public class EthereumERC20TransactionDetailsView : UserControl
+    public class Erc20TransactionDetailsView : UserControl
     {
-        public EthereumERC20TransactionDetailsView()
+        public Erc20TransactionDetailsView()
         {
             InitializeComponent();
         }

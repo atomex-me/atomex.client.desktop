@@ -1,11 +1,7 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using Atomex.Blockchain.Abstract;
-using Atomex.Client.Desktop.ViewModels.TransactionViewModels;
+
 using Avalonia.Controls;
-using Avalonia.Controls.Templates;
 using Avalonia.Markup.Xaml.Templates;
 
 namespace Atomex.Client.Desktop.Services
@@ -24,9 +20,7 @@ namespace Atomex.Client.Desktop.Services
     public enum TxStateTemplate {
         PendingStateTemplate,
         ConfirmedStateTemplate,
-        UnconfirmedStateTemplate,
         FailedStateTemplate,
-        UnknownStateTemplate
     }
 
     public enum TxDetailsTemplate
@@ -36,7 +30,7 @@ namespace Atomex.Client.Desktop.Services
         TezosTransactionDetailsTemplate,
         TezosTokenTransferDetailsTemplate,
         EthereumTransactionDetailsTemplate,
-        EthereumERC20TransactionDetailsTemplate
+        Erc20TransactionDetailsTemplate
     }
 
     public enum TxDescriptionTemplate
@@ -89,7 +83,7 @@ namespace Atomex.Client.Desktop.Services
         {
             return Templates.TryGetValue(templateType.ToString(), out var template)
                 ? template
-                : Templates[TxStateTemplate.UnknownStateTemplate.ToString()];
+                : Templates[TxStateTemplate.PendingStateTemplate.ToString()];
         }
 
         public DataTemplate GetTxDetailsTemplate(TxDetailsTemplate templateType)

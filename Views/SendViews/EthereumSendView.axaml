@@ -240,15 +240,15 @@
         <!-- Classes="AnimationCollapsed" -->
         <!-- IsEnabled="{Binding !UseDefaultFee}" -->
 
-        <!-- gas price -->
+        <!-- max fee per gas -->
         <StackPanel Orientation="Horizontal"
                     HorizontalAlignment="Center"
                     IsVisible="{Binding !UseDefaultFee}"
                     Margin="0 12 0 0"
                     Height="50">
-          <Border Width="80"
-                  Margin="-80 0 0 0">
-            <TextBlock Text="Gas Price"
+          <Border Width="100"
+                  Margin="-100 0 0 0">
+            <TextBlock Text="Max gas price"
                        Margin="0 0 12 0"
                        Foreground="{DynamicResource SecondaryForegroundBrush}"
                        FontFamily="{DynamicResource DefaultMediumFontFamily}"
@@ -259,7 +259,7 @@
 
           <TextBox Width="440"
                    FontSize="16"
-                   Text="{Binding GasPrice, Converter={StaticResource StringToIntConverter}}"
+                   Text="{Binding MaxFeePerGas, Converter={StaticResource StringToIntConverter}}"
                    helpers:AmountTextBoxHelper.AmountInBase="{Binding GasPriceCode}"
                    Classes="AtomexTextBox AmountTextBox">
             <i:Interaction.Behaviors>
@@ -358,7 +358,7 @@
                     Foreground="{DynamicResource SecondaryForegroundBrush}"
                     Content="Use default fee"/>
 
-          <!-- gas price -->
+          <!-- max gas price -->
           <StackPanel Grid.Row="0"
                       Grid.Column="1"
                       HorizontalAlignment="Right"
@@ -366,7 +366,7 @@
             <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
                        LineHeight="20"
                        TextAlignment="Right"
-                       Text="Gas price:"/>
+                       Text="Max gas price:"/>
 
             <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
                        LineHeight="20"
@@ -412,7 +412,7 @@
             <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
                        LineHeight="20"
                        TextAlignment="Right"
-                       Text="Fee:"/>
+                       Text="Max fee:"/>
             <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
                        LineHeight="20"
                        Margin="3 0 0 0"
@@ -445,6 +445,8 @@
                     ConverterParameter=Confirmation}"
                   Width="440"
                   HorizontalAlignment="Center">
+
+        <!-- amount -->
         <Grid ColumnDefinitions="*,Auto,Auto,Auto">
           <TextBlock Grid.Column="0"
                      Text="Amount"
@@ -475,6 +477,7 @@
           </TextBlock>
         </Grid>
 
+        <!-- fee -->
         <Grid ColumnDefinitions="*,Auto,Auto,Auto"
               Margin="0 6 0 0">
           <TextBlock Grid.Column="0"
@@ -506,16 +509,17 @@
           </TextBlock>
         </Grid>
 
+        <!-- max gas price -->
         <Grid ColumnDefinitions="*,Auto,Auto"
               Margin="0 6 0 0">
           <TextBlock Grid.Column="0"
-                     Text="Gas price"
+                     Text="Max gas price"
                      Foreground="{DynamicResource SecondaryForegroundBrush}"
                      FontSize="13"/>
 
           <TextBlock Grid.Column="1"
                      Margin="3 0 0 0"
-                     Text="{Binding GasPrice}"
+                     Text="{Binding MaxFeePerGas}"
                      Foreground="{DynamicResource DefaultForegroundBrush}"
                      FontSize="13"/>
 
@@ -526,6 +530,7 @@
                      FontSize="13"/>
         </Grid>
 
+        <!-- gas limit -->
         <Grid ColumnDefinitions="*,Auto,Auto"
               Margin="0 6 0 0">
           <TextBlock Grid.Column="0"
@@ -550,6 +555,7 @@
                 Margin="0 18 0 18"
                 Background="{DynamicResource LightDefaultOpacity10}"/>
 
+        <!-- total -->
         <Grid ColumnDefinitions="*,Auto,Auto"
               Margin="0 6 0 0">
           <TextBlock Grid.Column="0"

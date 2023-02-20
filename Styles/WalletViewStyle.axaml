@@ -7,19 +7,6 @@
         xmlns:svg="clr-namespace:Avalonia.Svg.Skia;assembly=Avalonia.Svg.Skia">
 
     <Styles.Resources>
-        <DataTemplate x:Key="UnknownStateTemplate" DataType="viewModels:TransactionViewModel">
-            <StackPanel Orientation="Horizontal">
-                <svg:Svg Width="18"
-                         VerticalAlignment="Center"
-                         Path="/Resources/Icons/question-in-circle.svg" />
-                <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
-                           Margin="8 0 0 0"
-                           FontSize="13"
-                           LineHeight="16"
-                           VerticalAlignment="Center"
-                           Text="Unknown" />
-            </StackPanel>
-        </DataTemplate>
         <DataTemplate x:Key="PendingStateTemplate" DataType="viewModels:TransactionViewModel">
             <StackPanel Orientation="Horizontal">
                 <svg:Svg Width="18"
@@ -45,19 +32,6 @@
                            LineHeight="16"
                            VerticalAlignment="Center"
                            Text="Confirmed" />
-            </StackPanel>
-        </DataTemplate>
-        <DataTemplate x:Key="UnconfirmedStateTemplate" DataType="viewModels:TransactionViewModel">
-            <StackPanel Orientation="Horizontal">
-                <svg:Svg Width="18"
-                         VerticalAlignment="Center"
-                         Path="/Resources/Icons/exclamation-mark.svg" />
-                <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
-                           Margin="8 0 0 0"
-                           FontSize="13"
-                           LineHeight="16"
-                           VerticalAlignment="Center"
-                           Text="Unconfirmed" />
             </StackPanel>
         </DataTemplate>
         <DataTemplate x:Key="FailedStateTemplate" DataType="viewModels:TransactionViewModel">
@@ -130,10 +104,9 @@
                       DataType="viewModels:EthereumTransactionViewModel">
             <views:EthereumTransactionDetailsView />
         </DataTemplate>
-
-        <DataTemplate x:Key="EthereumERC20TransactionDetailsTemplate"
+        <DataTemplate x:Key="Erc20TransactionDetailsTemplate"
                       DataType="viewModels:Erc20TransactionViewModel">
-            <views:EthereumERC20TransactionDetailsView />
+            <views:Erc20TransactionDetailsView />
         </DataTemplate>
 
         <DataTemplate x:Key="BtcBasedDescriptionTemplate" DataType="viewModels:TransactionViewModel">
@@ -179,7 +152,6 @@
                 </StackPanel>
             </StackPanel>
         </DataTemplate>
-
 
         <DataTemplate x:Key="BeaconTransactionTemplate">
             <dappsViews:TransactionOperationView />

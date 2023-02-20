@@ -1,10 +1,11 @@
 ﻿using Avalonia.Controls;
 using Avalonia.Controls.Templates;
+using Avalonia.Markup.Xaml.Templates;
+
 using Atomex.Client.Desktop.Services;
 using Atomex.Client.Desktop.ViewModels;
 using Atomex.Client.Desktop.ViewModels.TransactionViewModels;
 using Atomex.EthereumTokens;
-using Avalonia.Markup.Xaml.Templates;
 
 namespace Atomex.Client.Desktop.Controls
 {
@@ -31,7 +32,7 @@ namespace Atomex.Client.Desktop.Controls
                 BitcoinBasedConfig =>
                     App.TemplateService.GetTxDetailsTemplate(TxDetailsTemplate.BitcoinBasedTransactionDetailsTemplate),
                 Erc20Config =>
-                    App.TemplateService.GetTxDetailsTemplate(TxDetailsTemplate.EthereumERC20TransactionDetailsTemplate),
+                    App.TemplateService.GetTxDetailsTemplate(TxDetailsTemplate.Erc20TransactionDetailsTemplate),
                 EthereumConfig =>
                     App.TemplateService.GetTxDetailsTemplate(TxDetailsTemplate.EthereumTransactionDetailsTemplate),
                 TezosConfig =>
