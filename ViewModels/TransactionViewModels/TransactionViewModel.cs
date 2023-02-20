@@ -7,25 +7,26 @@ using Serilog;
 
 using Atomex.Blockchain;
 using Atomex.Blockchain.Abstract;
-using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
+using Atomex.Blockchain.Ethereum;
 using Atomex.Core;
 
 namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
 {
     public class TransactionViewModelBase : ViewModelBase
     {
-        public event EventHandler<TransactionEventArgs> UpdateClicked;
-        public event EventHandler<TransactionEventArgs> RemoveClicked;
+        public event EventHandler<TransactionEventArgs>? UpdateClicked;
+        public event EventHandler<TransactionEventArgs>? RemoveClicked;
         public string TxExplorerUri => $"{Currency.TxExplorerUri}{Id}";
         public decimal Amount { get; set; }
         public string AmountFormat { get; set; }
         public string Description { get; set; }
-        public string Id { get; set; }
+        public string Id => Transaction.Id;
         public CurrencyConfig Currency { get; set; }
         public DateTime LocalTime => Time.ToLocalTime();
-        public TransactionStatus State { get; set; }
-        public DateTime Time { get; set; }
+        public TransactionStatus State => Transaction.Status;
+        public DateTime Time => Transaction.CreationTime?.UtcDateTime ?? DateTime.UtcNow;
         public ITransaction Transaction { get; set; }
+        public ITransactionMetadata TransactionMetadata { get; set; }
         public TransactionType Type { get; set; }
         public Action? OnClose { get; set; }
         public bool CanBeRemoved { get; set; }
@@ -45,7 +46,6 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
             });
 
         private ReactiveCommand<string, Unit>? _copyCommand;
-
         public ReactiveCommand<string, Unit> CopyCommand => _copyCommand ??= ReactiveCommand.Create<string>((s) =>
         {
             try
@@ -69,14 +69,6 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
         private ReactiveCommand<Unit, Unit>? _onCloseCommand;
         public ReactiveCommand<Unit, Unit> OnCloseCommand => _onCloseCommand ??= ReactiveCommand.Create(
             () => OnClose?.Invoke());
-
-        protected void DesignerMode()
-        {
-            var random = new Random();
-            Id = "1234567890abcdefgh1234567890abcdefgh";
-            Time = DateTime.UtcNow;
-            Amount = random.Next(-1000, 1000);
-        }
     }
 
     public class TransactionViewModel : TransactionViewModelBase
@@ -96,36 +88,29 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
 
         public TransactionViewModel(
             ITransaction tx,
-            CurrencyConfig currencyConfig,
+            ITransactionMetadata metadata,
+            CurrencyConfig config,
             decimal amount,
-            decimal fee)
+            decimal fee,
+            TransactionType type)
         {
             Transaction = tx ?? throw new ArgumentNullException(nameof(tx));
-            Id = Transaction.Id;
-            Currency = currencyConfig;
-            State = Transaction.Status;
-            Type = Transaction.Type;
+            TransactionMetadata = metadata;
+            Currency = config;
             Amount = amount;
-            FeeCode = currencyConfig.FeeCode;
-
-            var netAmount = amount + fee;
-
-            var currencyViewModel = CurrencyViewModelCreator.CreateOrGet(currencyConfig, false);
-
-            AmountFormat = currencyViewModel.CurrencyFormat;
-            CurrencyCode = currencyViewModel.CurrencyCode;
-            Time = tx.CreationTime ?? DateTime.UtcNow;
-            CanBeRemoved = tx.Status is TransactionStatus.Unknown or
-                TransactionStatus.Failed or
-                TransactionStatus.Pending or
-                TransactionStatus.Unconfirmed;
+            AmountFormat = config.Format;
+            Fee = fee;
+            FeeCode = config.FeeCode;
+            CurrencyCode = config.Name;
+            CanBeRemoved = tx.Status is TransactionStatus.Pending or TransactionStatus.Failed;
+            Type = type;
 
             Description = GetDescription(
-                type: tx.Type,
+                type: Type,
                 amount: Amount,
-                netAmount: netAmount,
-                amountDigits: currencyConfig.Decimals,
-                currencyCode: currencyConfig.Name);
+                fee: fee,
+                decimals: config.Decimals,
+                currencyCode: config.Name);
 
             Direction = Amount switch
             {
@@ -137,24 +122,21 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
         public static string GetDescription(
             TransactionType type,
             decimal amount,
-            decimal netAmount,
-            int amountDigits,
+            decimal fee,
+            int decimals,
             string currencyCode)
         {
             if (type.HasFlag(TransactionType.SwapPayment))
-                return $"Swap payment {Math.Abs(amount).ToString("0." + new string('#', amountDigits))} {currencyCode}";
+                return $"Swap payment {Math.Abs(amount).ToString("0." + new string('#', decimals))} {currencyCode}";
 
             if (type.HasFlag(TransactionType.SwapRefund))
-                return $"Swap refund {Math.Abs(netAmount).ToString("0." + new string('#', amountDigits))} {currencyCode}";
+                return $"Swap refund {Math.Abs(amount + fee).ToString("0." + new string('#', decimals))} {currencyCode}";
 
             if (type.HasFlag(TransactionType.SwapRedeem))
-                return $"Swap redeem {Math.Abs(netAmount).ToString("0." + new string('#', amountDigits))} {currencyCode}";
+                return $"Swap redeem {Math.Abs(amount + fee).ToString("0." + new string('#', decimals))} {currencyCode}";
 
             if (type.HasFlag(TransactionType.TokenApprove))
                 return "Token approve";
-
-            if (type.HasFlag(TransactionType.TokenCall))
-                return "Token call";
 
             if (type.HasFlag(TransactionType.TokenTransfer))
                 return "Token transfer";
@@ -164,9 +146,18 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
 
             return amount switch
             {
-                <= 0 => $"Sent {Math.Abs(netAmount).ToString("0." + new string('#', amountDigits))} {currencyCode}",
-                > 0 => $"Received {Math.Abs(netAmount).ToString("0." + new string('#', amountDigits))} {currencyCode}"
+                <= 0 => $"Sent {Math.Abs(amount + fee).ToString("0." + new string('#', decimals))} {currencyCode}",
+                > 0 => $"Received {Math.Abs(amount).ToString("0." + new string('#', decimals))} {currencyCode}"
             };
+        }
+
+        protected virtual void DesignerMode()
+        {
+            Transaction = new EthereumTransaction
+            {
+                Id = "0x014749a05f3b9cee4ca637601a04511468025b762f8340d14b9e96c06728312f"
+            };
+            Amount = new Random().Next(-1000, 1000);
         }
     }
 }

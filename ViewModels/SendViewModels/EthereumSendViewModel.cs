@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Globalization;
+using System.Numerics;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
@@ -34,10 +35,11 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         public string GasLimitCode => "GAS";
 
         public long GasLimit => EthConfig.GasLimit;
-        [Reactive] public long GasPrice { get; set; }
+        [Reactive] public long MaxFeePerGas { get; set; }
+        [Reactive] public long MaxPriorityFeePerGas { get; set; }
         [Reactive] private decimal TotalFee { get; set; }
         [ObservableAsProperty] public string TotalFeeString { get; set; }
-        protected override decimal FeeAmount => EthConfig.GetFeeInEth(GasLimit, GasPrice);
+        protected override decimal FeeAmount => EthConfig.GetFeeInEth(GasLimit, MaxFeePerGas);
         [Reactive] public bool HasTokens { get; set; }
         [Reactive] public bool HasActiveSwaps { get; set; }
         public EthereumConfig EthConfig => (EthereumConfig)Currency;
@@ -59,19 +61,19 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         {
             var updateGasPriceCommand = ReactiveCommand.CreateFromTask(UpdateGasPrice);
 
-            this.WhenAnyValue(vm => vm.GasPrice)
+            this.WhenAnyValue(vm => vm.MaxFeePerGas)
                 .SubscribeInMainThread(_ => Warning = string.Empty);
 
-            this.WhenAnyValue(vm => vm.GasPrice)
+            this.WhenAnyValue(vm => vm.MaxFeePerGas)
                 .Where(_ => !string.IsNullOrEmpty(From))
                 .Select(_ => Unit.Default)
                 .InvokeCommandInMainThread(updateGasPriceCommand);
 
-            this.WhenAnyValue(vm => vm.GasPrice)
+            this.WhenAnyValue(vm => vm.MaxFeePerGas)
                 .Select(_ => Unit.Default)
                 .Subscribe(_ => OnQuotesUpdatedEventHandler(_app.QuotesProvider, EventArgs.Empty));
 
-            this.WhenAnyValue(vm => vm.GasPrice)
+            this.WhenAnyValue(vm => vm.MaxFeePerGas)
                 .Where(_ => !string.IsNullOrEmpty(From))
                 .SubscribeInMainThread(_ => TotalFee = FeeAmount);
 
@@ -180,16 +182,22 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     from: From,
                     type: TransactionType.Output,
                     gasLimit: UseDefaultFee ? null : GasLimit,
-                    gasPrice: UseDefaultFee ? null : GasPrice,
+                    maxFeePerGas: UseDefaultFee ? null : MaxFeePerGas,
                     reserve: false);
 
                 var ethConfig = (EthereumConfig)Currency;
 
                 if (UseDefaultFee)
                 {
-                    GasPrice = maxAmountEstimation.Fee > 0
-                        ? decimal.ToInt64(ethConfig.GetGasPriceInGwei(maxAmountEstimation.Fee, GasLimit))
-                        : decimal.ToInt64(await ethConfig.GetGasPriceAsync());
+                    if (maxAmountEstimation.Fee > 0)
+                    {
+                        MaxFeePerGas = (long)ethConfig.GetGasPriceInGwei(maxAmountEstimation.Fee, GasLimit);
+                    } else
+                    {
+                        var (gasPrice, error) = await ethConfig.GetGasPriceAsync();
+
+                        MaxFeePerGas = (long)(gasPrice?.MaxFeePerGas ?? 0m);
+                    }
                 }
 
                 CheckAmountCommand?.Execute(maxAmountEstimation).Subscribe();
@@ -214,7 +222,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                         from: From,
                         type: TransactionType.Output,
                         gasLimit: GasLimit,
-                        gasPrice: GasPrice,
+                        maxFeePerGas: MaxFeePerGas,
                         reserve: false);
 
                     CheckAmountCommand?.Execute(maxAmountEstimation).Subscribe();
@@ -238,37 +246,41 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                         from: From,
                         type: TransactionType.Output,
                         gasLimit: UseDefaultFee ? null : GasLimit,
-                        gasPrice: UseDefaultFee ? null : GasPrice,
+                        maxFeePerGas: UseDefaultFee ? null : MaxFeePerGas,
                         reserve: false);
 
                 var ethConfig = (EthereumConfig)Currency;
 
                 if (UseDefaultFee && maxAmountEstimation.Fee > 0)
-                    GasPrice = decimal.ToInt64(ethConfig.GetGasPriceInGwei(maxAmountEstimation.Fee, GasLimit));
+                    MaxFeePerGas = decimal.ToInt64(ethConfig.GetGasPriceInGwei(maxAmountEstimation.Fee, GasLimit));
 
                 if (maxAmountEstimation.Error != null)
                 {
-                    Warning        = maxAmountEstimation.Error.Message;
-                    WarningToolTip = maxAmountEstimation.Error.Details;
+                    Warning        = maxAmountEstimation.Error.Value.Message;
+                    WarningToolTip = maxAmountEstimation.ErrorHint;
                     WarningType    = MessageType.Error;
                     Amount         = 0;
                     return;
                 }
 
                 var erc20Config = _app.Account.Currencies.Get<Erc20Config>("USDT");
-                var erc20TransferFee = erc20Config.GetFeeInEth(erc20Config.TransferGasLimit, GasPrice);
+                var erc20TransferFee = erc20Config
+                    .GetFeeInEth(erc20Config.TransferGasLimit, MaxFeePerGas)
+                    .EthToWei();
 
-                RecommendedMaxAmount = HasActiveSwaps
-                    ? Math.Max(maxAmountEstimation.Amount - maxAmountEstimation.Reserved, 0)
+                var recommendedMaxAmountInWei = HasActiveSwaps
+                    ? BigInteger.Max(maxAmountEstimation.Amount - maxAmountEstimation.Reserved, 0)
                     : HasTokens
-                        ? Math.Max(maxAmountEstimation.Amount - erc20TransferFee, 0)
+                        ? BigInteger.Max(maxAmountEstimation.Amount - erc20TransferFee, 0)
                         : maxAmountEstimation.Amount;
+
+                RecommendedMaxAmount = recommendedMaxAmountInWei.WeiToEth();
 
                 // force to use RecommendedMaxAmount in case when there are active swaps
                 Amount = maxAmountEstimation.Amount > 0
                     ? HasActiveSwaps
                         ? RecommendedMaxAmount
-                        : maxAmountEstimation.Amount
+                        : maxAmountEstimation.Amount.WeiToEth()
                     : 0;
 
                 CheckAmountCommand?.Execute(maxAmountEstimation).Subscribe();
@@ -289,7 +301,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 return;
             }
 
-            if (Amount > maxAmountEstimation.Amount)
+            if (Amount > maxAmountEstimation.Amount.WeiToEth())
             {
                 Warning = Resources.CvInsufficientFunds;
                 WarningToolTip = "";
@@ -298,13 +310,17 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             }
 
             var erc20Config = _app.Account.Currencies.Get<Erc20Config>("USDT");
-            var erc20TransferFee = erc20Config.GetFeeInEth(erc20Config.TransferGasLimit, GasPrice);
+            var erc20TransferFee = erc20Config
+                .GetFeeInEth(erc20Config.TransferGasLimit, MaxFeePerGas)
+                .EthToWei();
 
-            RecommendedMaxAmount = HasActiveSwaps
-                ? Math.Max(maxAmountEstimation.Amount - maxAmountEstimation.Reserved, 0)
+            var recommendedMaxAmountInWei = HasActiveSwaps
+                ? BigInteger.Max(maxAmountEstimation.Amount - maxAmountEstimation.Reserved, 0)
                 : HasTokens
-                    ? Math.Max(maxAmountEstimation.Amount - erc20TransferFee, 0)
+                    ? BigInteger.Max(maxAmountEstimation.Amount - erc20TransferFee, 0)
                     : maxAmountEstimation.Amount;
+
+            RecommendedMaxAmount = recommendedMaxAmountInWei.WeiToEth();
 
             if (HasActiveSwaps && Amount > RecommendedMaxAmount)
             {
@@ -368,19 +384,24 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             });
         }
 
-        protected override Task<Error?> Send(CancellationToken cancellationToken = default)
+        protected override async Task<Error?> Send(CancellationToken cancellationToken = default)
         {
             var account = _app.Account
                 .GetCurrencyAccount<EthereumAccount>(Currency.Name);
 
-            return account.SendAsync(
-                from: From,
-                to: To,
-                amount: AmountToSend,
-                gasLimit: GasLimit,
-                gasPrice: GasPrice,
-                useDefaultFee: UseDefaultFee,
-                cancellationToken: cancellationToken);
+            var (_, error) = await account
+                .SendAsync(
+                    from: From,
+                    to: To,
+                    amount: AmountToSend.EthToWei(),
+                    gasLimit: GasLimit,
+                    maxFeePerGas: MaxFeePerGas,
+                    maxPriorityFeePerGas: MaxPriorityFeePerGas,
+                    useDefaultFee: UseDefaultFee,
+                    cancellationToken: cancellationToken)
+                .ConfigureAwait(false);
+
+            return error;
         }
     }
 }

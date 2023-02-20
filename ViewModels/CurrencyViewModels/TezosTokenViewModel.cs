@@ -4,20 +4,21 @@ using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
+
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using Serilog;
+
+using Atomex.Blockchain;
 using Atomex.Blockchain.Tezos;
+using Atomex.Blockchain.Tezos.Tzkt;
 using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.ViewModels.SendViewModels;
 using Atomex.Core;
 using Atomex.MarketData.Abstract;
 using Atomex.TezosTokens;
-using Atomex.ViewModels;
 using Atomex.Wallet;
 using Atomex.Wallet.Tezos;
-using Atomex.Blockchain.Tezos.Tzkt;
-using Atomex.Blockchain;
 
 namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
 {
@@ -53,7 +54,6 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
         public string IconPath => string.Empty;
         public string DisabledIconPath => string.Empty;
         public string PreviewUrl => ThumbsApi.GetTokenPreviewUrl(Contract.Address, TokenBalance.TokenId);
-
         public string CurrencyName => TokenBalance.Symbol;
         public string CurrencyCode => TokenBalance.Symbol;
         public string CurrencyDescription => TokenBalance.Name;
@@ -147,7 +147,8 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
                 .ToList();
 
             var tokenBalance = 0m;
-            addresses.ForEach(a => { tokenBalance += a.TokenBalance.GetTokenBalance(); });
+
+            addresses.ForEach(a => { tokenBalance += a.TokenBalance.ToDecimalBalance(); });
 
             TotalAmount = tokenBalance;
         }

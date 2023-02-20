@@ -18,7 +18,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 {
     public class Fa12WalletViewModel : WalletViewModel
     {
-        public Fa12Config Currency => CurrencyViewModel.Currency as Fa12Config;
+        public Fa12Config Currency => (Fa12Config)CurrencyViewModel.Currency;
 
         public Fa12WalletViewModel()
         {
@@ -68,6 +68,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             await LoadTransactionsSemaphore.WaitAsync();
 
             Log.Debug("LoadTransactionsAsync for FA12 {@currency}.", Currency.Name);
+
             try
             {
                 if (_app.Account == null)
@@ -75,27 +76,29 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
                 IsTransactionsLoading = true;
 
-                var transactions = (await _app.Account
-                    .GetCurrencyAccount<Fa12Account>(Currency.Name)
-                    .LocalStorage
-                    .GetTokenTransfersAsync(Currency.TokenContractAddress, offset: 0, limit: int.MaxValue)
-                    .ConfigureAwait(false))
-                    .ToList();
+                var transactions = await Task.Run(async () =>
+                {
+                    return (await _app.Account
+                        .GetCurrencyAccount<Fa12Account>(Currency.Name)
+                        .LocalStorage
+                        .GetTokenTransfersWithMetadataAsync(Currency.TokenContractAddress, offset: 0, limit: int.MaxValue)
+                        .ConfigureAwait(false))
+                        .ToList();
+                });
 
                 await Dispatcher.UIThread.InvokeAsync(() =>
-                    {
-                        var selectedTransactionId = SelectedTransaction?.Id;
+                {
+                    var selectedTransactionId = SelectedTransaction?.Id;
 
-                        Transactions = SortTransactions(
-                            transactions
-                                .Select(t => new TezosTokenTransferViewModel(t, Currency))
-                                .ToList()
-                                .ForEachDo(t => t.OnClose = () => ShowRightPopupContent?.Invoke(null)));
+                    Transactions = SortTransactions(
+                        transactions
+                            .Select(t => new TezosTokenTransferViewModel(t.Transfer, t.Metadata, Currency))
+                            .ToList()
+                            .ForEachDo(t => t.OnClose = () => ShowRightPopupContent?.Invoke(null)));
 
-                        if (selectedTransactionId != null)
-                            SelectedTransaction = Transactions.FirstOrDefault(t => t.Id == selectedTransactionId);
-                    }
-                );
+                    if (selectedTransactionId != null)
+                        SelectedTransaction = Transactions.FirstOrDefault(t => t.Id == selectedTransactionId);
+                });
             }
             catch (OperationCanceledException)
             {

@@ -2,9 +2,10 @@
 
 using Avalonia.Controls;
 
+using Atomex.Blockchain;
 using Atomex.Blockchain.Abstract;
 using Atomex.Blockchain.Ethereum;
-using Atomex.ViewModels;
+using Atomex.Common;
 
 namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
 {
@@ -18,7 +19,6 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
         public string GasString => GasLimit == 0
             ? "0 / 0"
             : $"{GasUsed} / {GasLimit} ({GasUsed / GasLimit * 100:0.#}%)";
-        public bool IsInternal { get; set; }
         public string FromExplorerUri => $"{Currency.AddressExplorerUri}{From}";
         public string ToExplorerUri => $"{Currency.AddressExplorerUri}{To}";
         public string Alias { get; set; }
@@ -31,16 +31,22 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
 #endif
         }
 
-        public EthereumTransactionViewModel(EthereumTransaction tx, EthereumConfig ethereumConfig)
-            : base(tx, ethereumConfig, GetAmount(tx), GetFee(tx))
+        public EthereumTransactionViewModel(
+            EthereumTransaction tx,
+            TransactionMetadata metadata,
+            EthereumConfig config)
+            : base(tx: tx,
+                metadata: metadata,
+                config: config,
+                amount: GetAmount(metadata),
+                fee: GetFee(metadata),
+                type: metadata?.Type ?? TransactionType.Unknown)
         {
-            From       = tx.From;
-            To         = tx.To;
-            GasPrice   = EthereumHelper.WeiToGwei(tx.GasPrice);
-            GasLimit   = (decimal)tx.GasLimit;
-            GasUsed    = (decimal)tx.GasUsed;
-            Fee        = EthereumHelper.WeiToEth(tx.GasUsed * tx.GasPrice);
-            IsInternal = tx.IsInternal;
+            From     = tx.From;
+            To       = tx.To;
+            GasPrice = EthereumHelper.WeiToGwei(tx.GasPrice);
+            GasLimit = (decimal)tx.GasLimit;
+            GasUsed  = (decimal)tx.GasUsed;
 
             Alias = Amount switch
             {
@@ -49,39 +55,97 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
             };
         }
 
-        private static decimal GetAmount(EthereumTransaction tx)
+        public EthereumTransactionViewModel(
+            EthereumTransaction tx,
+            TransactionMetadata metadata,
+            int internalIndex,
+            EthereumConfig config)
+            : base(tx: tx,
+                metadata: metadata,
+                config: config,
+                amount: GetInternalAmount(metadata, internalIndex),
+                fee: GetInternalFee(metadata, internalIndex),
+                type: GetType(metadata, internalIndex))
         {
-            var result = 0m;
+            if (metadata == null)
+                return; // todo: start resolving
 
-            if (tx.Type.HasFlag(TransactionType.Input))
-                result += EthereumHelper.WeiToEth(tx.Amount);
+            if (internalIndex < 0 || internalIndex >= metadata.Internals.Count)
+                throw new ArgumentOutOfRangeException(nameof(internalIndex));
 
-            if (tx.Type.HasFlag(TransactionType.Output))
-                result += -EthereumHelper.WeiToEth(tx.Amount + tx.GasUsed * tx.GasPrice);
+            if (tx.InternalTransactions == null)
+                throw new ArgumentException("InternalTransactions is null or empty", nameof(tx));
 
-            tx.InternalTransactions?.ForEach(t => result += GetAmount(t));
+            if (internalIndex < 0 || internalIndex >= tx.InternalTransactions.Count)
+                throw new ArgumentOutOfRangeException(nameof(internalIndex));
 
-            return result;
+            From = tx.InternalTransactions[internalIndex].From;
+            To = tx.InternalTransactions[internalIndex].To;
+            GasPrice = EthereumHelper.WeiToGwei(tx.GasPrice);
+            GasLimit = (decimal)tx.InternalTransactions[internalIndex].GasLimit;
+            GasUsed = (decimal)tx.InternalTransactions[internalIndex].GasUsed;
+
+            Alias = Amount switch
+            {
+                <= 0 => To.TruncateAddress(),
+                > 0 => From.TruncateAddress()
+            };
         }
 
-        private static decimal GetFee(EthereumTransaction tx)
+        private static decimal GetAmount(TransactionMetadata metadata)
         {
-            var result = 0m;
+            return metadata?.Amount.WeiToEth() ?? 0m;
+        }
 
-            if (tx.Type.HasFlag(TransactionType.Output))
-                result += EthereumHelper.WeiToEth(tx.GasUsed * tx.GasPrice);
+        private static decimal GetInternalAmount(TransactionMetadata metadata, int internalIndex)
+        {
+            if (metadata == null)
+                return 0;
 
-            tx.InternalTransactions?.ForEach(t => result += GetFee(t));
+            if (internalIndex < 0 || internalIndex >= metadata.Internals.Count)
+                throw new ArgumentOutOfRangeException(nameof(internalIndex));
 
-            return result;
+            return metadata.Internals[internalIndex].Amount.WeiToEth();
+        }
+
+        private static decimal GetFee(TransactionMetadata metadata)
+        {
+            return metadata != null
+                ? EthereumHelper.WeiToEth(metadata.Fee)
+                : 0;
+        }
+
+        private static decimal GetInternalFee(TransactionMetadata metadata, int internalIndex)
+        {
+            if (metadata == null)
+                return 0;
+
+            if (internalIndex < 0 || internalIndex >= metadata.Internals.Count)
+                throw new ArgumentOutOfRangeException(nameof(internalIndex));
+
+            return EthereumHelper.WeiToEth(metadata.Internals[internalIndex].Fee);
+        }
+
+        private static TransactionType GetType(TransactionMetadata metadata, int internalIndex)
+        {
+            if (metadata == null)
+                return 0;
+
+            if (internalIndex < 0 || internalIndex >= metadata.Internals.Count)
+                throw new ArgumentOutOfRangeException(nameof(internalIndex));
+
+            return metadata.Internals[internalIndex].Type;
         }
 
         private void DesignerMode()
         {
-            Id = "0x1234567890abcdefgh1234567890abcdefgh";
+            Transaction = new EthereumTransaction
+            {
+                Id = "0x1234567890abcdefgh1234567890abcdefgh",
+                CreationTime = DateTime.UtcNow
+            };
             From = "0x1234567890abcdefgh1234567890abcdefgh";
             To = "0x1234567890abcdefgh1234567890abcdefgh";
-            Time = DateTime.UtcNow;
         }
     }
 }

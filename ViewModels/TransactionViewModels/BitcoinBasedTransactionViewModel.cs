@@ -1,4 +1,5 @@
-﻿using Atomex.Blockchain.Abstract;
+﻿using Atomex.Blockchain;
+using Atomex.Blockchain.Abstract;
 using Atomex.Blockchain.Bitcoin;
 
 namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
@@ -7,24 +8,29 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
     {
         public BitcoinBasedTransactionViewModel(
             BitcoinTransaction tx,
-            BitcoinBasedConfig bitcoinBasedConfig)
-            : base(tx, bitcoinBasedConfig, tx.Amount / bitcoinBasedConfig.Precision,
-                GetFee(tx, bitcoinBasedConfig))
+            TransactionMetadata metadata,
+            BitcoinBasedConfig config)
+            : base(tx: tx,
+                  metadata: metadata,
+                  config: config,
+                  amount: GetAmount(metadata, config),
+                  fee: GetFee(metadata, config),
+                  type: metadata?.Type ?? TransactionType.Unknown)
         {
-            Fee = tx.Fees != null
-                ? tx.Fees.Value / bitcoinBasedConfig.Precision
-                : 0; // todo: N/A
+        }
+
+        private static decimal GetAmount(
+            TransactionMetadata metadata,
+            BitcoinBasedConfig config)
+        {
+            return metadata != null ? config.SatoshiToCoin(metadata.Amount) : 0;
         }
 
         private static decimal GetFee(
-            BitcoinTransaction tx,
-            BitcoinBasedConfig bitcoinBasedConfig)
+            TransactionMetadata metadata,
+            BitcoinBasedConfig config)
         {
-            return tx.Fees != null
-                ? tx.Type.HasFlag(TransactionType.Output)
-                    ? tx.Fees.Value / bitcoinBasedConfig.Precision
-                    : 0
-                : 0;
+            return metadata != null ? config.SatoshiToCoin(metadata.Fee) : 0;
         }
     }
 }

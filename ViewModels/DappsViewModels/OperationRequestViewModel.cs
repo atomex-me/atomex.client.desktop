@@ -41,7 +41,6 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
         protected abstract void OnQuotesUpdatedEventHandler(object? sender, EventArgs args);
 
         private ReactiveCommand<Unit, Unit>? _onOpenDetailsCommand;
-
         public ReactiveCommand<Unit, Unit> OnOpenDetailsCommand =>
             _onOpenDetailsCommand ??= ReactiveCommand.Create(() => { IsDetailsOpened = !IsDetailsOpened; });
 
@@ -121,17 +120,14 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
         public Func<Task> OnReject { get; set; }
 
         private ReactiveCommand<Unit, Unit>? _onConfirmCommand;
-
         public ReactiveCommand<Unit, Unit> OnConfirmCommand =>
             _onConfirmCommand ??= ReactiveCommand.CreateFromTask(async () => await OnConfirm());
 
         private ReactiveCommand<Unit, Unit>? _onRejectCommand;
-
         public ReactiveCommand<Unit, Unit> OnRejectCommand =>
             _onRejectCommand ??= ReactiveCommand.CreateFromTask(async () => await OnReject());
 
         private ReactiveCommand<string, Unit>? _copyCommand;
-
         public ReactiveCommand<string, Unit> CopyCommand => _copyCommand ??= ReactiveCommand.Create<string>(data =>
         {
             try

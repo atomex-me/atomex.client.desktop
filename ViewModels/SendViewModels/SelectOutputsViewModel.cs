@@ -68,7 +68,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 .SubscribeInMainThread(async outputViewModels =>
                 {
                     var addresses = (await Account
-                            .GetAddressesAsync())
+                        .GetAddressesAsync())
                         .Where(address => outputViewModels.FirstOrDefault(o => o.Address == address.Address) != null)
                         .ToList();
 
@@ -160,12 +160,13 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         private bool _checkedFromList;
 
         private ReactiveCommand<Unit, Unit> _outputCheckCommand;
-
         public ReactiveCommand<Unit, Unit> OutputCheckCommand => _outputCheckCommand ??=
             (_outputCheckCommand = ReactiveCommand.Create(() =>
             {
                 _checkedFromList = true;
+
                 var selectionResult = Outputs.Aggregate(true, (result, output) => result && output.IsSelected);
+
                 if (SelectAll != selectionResult)
                     SelectAll = selectionResult;
 
@@ -221,25 +222,27 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
             var outputs = new List<BitcoinTxOutput>
             {
-                new BitcoinTxOutput(
-                    coin: new Coin(
+                new BitcoinTxOutput()
+                {
+                    Coin = new Coin(
                         fromTxHash: new uint256("19aa2187cda7610590d09dfab41ed4720f8570d7414b71b3dc677e237f72d4a1"),
                         fromOutputIndex: 123u,
                         amount: amount,
                         scriptPubKey: script),
-                    confirmations: 5,
-                    spentTxPoint: null,
-                    spentConfirmations: 0),
+                    Currency = "BTC",
+                    IsConfirmed = true
+                },
 
-                new BitcoinTxOutput(
-                    coin: new Coin(
+                new BitcoinTxOutput()
+                {
+                    Coin = new Coin(
                         fromTxHash: new uint256("19aa2187cda7610590d09dfab41ed4720f8570d7414b71b3dc677e237f72d4a1"),
                         fromOutputIndex: 0u,
                         amount: amount,
                         scriptPubKey: script),
-                    confirmations: 4,
-                    spentTxPoint: null,
-                    spentConfirmations: 0)
+                    Currency = "BTC",
+                    IsConfirmed = true
+                }
             };
 
             var btcCurrencyConfig = DesignTime.TestNetCurrencies

@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Input;
 
+using Avalonia.Controls;
 using ReactiveUI;
 
 using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
-using Avalonia.Controls;
 using Atomex.Client.Desktop.Common;
 
 namespace Atomex.Client.Desktop.ViewModels

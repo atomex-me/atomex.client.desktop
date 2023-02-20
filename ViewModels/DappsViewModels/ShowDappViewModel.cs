@@ -1,12 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Reactive;
-using System.Threading.Tasks;
-using Atomex.Client.Desktop.Common;
+
 using Avalonia.Controls;
 using Beacon.Sdk.Beacon.Permission;
 using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
 
 namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
 {
@@ -20,7 +18,6 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
         public Action OnDisconnect { get; set; }
 
         private ReactiveCommand<Unit, Unit>? _onDisconnectCommand;
-
         public ReactiveCommand<Unit, Unit> OnDisconnectCommand =>
             _onDisconnectCommand ??= ReactiveCommand.Create(() => OnDisconnect?.Invoke());
 

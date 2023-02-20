@@ -65,6 +65,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             Action<string>? setWertCurrency = null)
         {
             _app = app ?? throw new ArgumentNullException(nameof(app));
+
             ShowRightPopupContent = showRightPopupContent
                 ?? throw new ArgumentNullException(nameof(showRightPopupContent));
             
@@ -103,7 +104,9 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                         Dispatcher.UIThread.InvokeAsync(async () =>
                         {
                             ShowRightPopupContent?.Invoke(null);
+
                             await Task.Delay(WalletMainViewModel.DelayBeforeSwitchingSwapDetailsMs);
+
                             ShowRightPopupContent?.Invoke(selectedTransaction);
                         });
                     }
@@ -212,9 +215,13 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
                 IsTransactionsLoading = true;
 
-                var transactions = (await _app.Account
-                    .GetTransactionsAsync(Currency.Name))
-                    .ToList();
+                var transactions = await Task.Run(async () =>
+                {
+                    return (await _app.Account
+                        .GetTransactionsWithMetadataAsync(Currency.Name)
+                        .ConfigureAwait(false))
+                        .ToList();
+                });
 
                 await Dispatcher.UIThread.InvokeAsync(() =>
                 {
@@ -222,14 +229,20 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
                     Transactions = SortTransactions(
                         transactions
-                            .Select(t => TransactionViewModelCreator.CreateViewModel(t, Currency))
-                            .ToList()
-                            .ForEachDo(t =>
+                            .Select(t =>
                             {
-                                t.UpdateClicked += UpdateTransactionEventHandler;
-                                t.RemoveClicked += RemoveTransactionEventHandler;
-                                t.OnClose = () => ShowRightPopupContent?.Invoke(null);
-                            }));
+                                var vms = TransactionViewModelCreator.CreateViewModels(t.Tx, t.Metadata, Currency);
+
+                                foreach (var vm in vms)
+                                {
+                                    vm.UpdateClicked += UpdateTransactionEventHandler;
+                                    vm.RemoveClicked += RemoveTransactionEventHandler;
+                                    vm.OnClose = () => ShowRightPopupContent?.Invoke(null);
+                                }
+
+                                return vms;
+                            })
+                            .Aggregate(new List<TransactionViewModelBase>(), (l, vms) => l.AddRangeEx(vms)));
 
                     if (selectedTransactionId != null)
                         SelectedTransaction = Transactions.FirstOrDefault(t => t.Id == selectedTransactionId);
@@ -311,10 +324,12 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             {
                 var scanner = new WalletScanner(_app.Account);
 
-                await scanner.ScanAsync(
-                    currency: Currency.Name,
-                    skipUsed: true,
-                    cancellationToken: _cancellation.Token);
+                await Task.Run(async () => await scanner
+                    .UpdateBalanceAsync(
+                        currency: Currency.Name,
+                        skipUsed: true,
+                        cancellationToken: _cancellation.Token), 
+                    _cancellation.Token);
 
                 await LoadTransactionsAsync();
             }
@@ -374,24 +389,24 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             var transactions = new List<TransactionViewModelBase>
             {
                 new BitcoinBasedTransactionViewModel(
-                    new BitcoinBasedTransaction("BTC", Transaction.Create(Network.TestNet)),
+                    new BitcoinTransaction("BTC", Transaction.Create(Network.TestNet)),
+                    new TransactionMetadata(),
                     DesignTime.TestNetCurrencies.Get<BitcoinConfig>("BTC"))
                 {
                     Description = "Sent 0.00124 BTC",
                     Amount = -0.00124m,
                     AmountFormat = CurrencyViewModel.CurrencyFormat,
-                    CurrencyCode = CurrencyViewModel.CurrencyCode,
-                    Time = DateTime.Now,
+                    CurrencyCode = CurrencyViewModel.CurrencyCode
                 },
                 new BitcoinBasedTransactionViewModel(
-                    new BitcoinBasedTransaction("BTC", Transaction.Create(Network.TestNet)),
+                    new BitcoinTransaction("BTC", Transaction.Create(Network.TestNet)),
+                    new TransactionMetadata(),
                     DesignTime.TestNetCurrencies.Get<BitcoinConfig>("BTC"))
                 {
                     Description = "Received 1.00666 BTC",
                     Amount = 1.00666m,
                     AmountFormat = CurrencyViewModel.CurrencyFormat,
-                    CurrencyCode = CurrencyViewModel.CurrencyCode,
-                    Time = DateTime.Now,
+                    CurrencyCode = CurrencyViewModel.CurrencyCode
                 }
             };
 

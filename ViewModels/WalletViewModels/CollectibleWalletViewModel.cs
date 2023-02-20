@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Reactive;
-using Atomex.Client.Desktop.ViewModels.SendViewModels;
+
 using ReactiveUI;
 
+using Atomex.Client.Desktop.ViewModels.SendViewModels;
 
 namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 {

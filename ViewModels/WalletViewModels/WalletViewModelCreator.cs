@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+
 using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
 using Atomex.Core;
 using Atomex.EthereumTokens;

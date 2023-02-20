@@ -21,7 +21,6 @@ using Beacon.Sdk.Core.Domain.Entities;
 using Netezos.Encoding;
 using Netezos.Forging.Models;
 using Netezos.Keys;
-using Newtonsoft.Json.Linq;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using Serilog;
@@ -35,6 +34,8 @@ using Atomex.Client.Desktop.ViewModels.Abstract;
 using Atomex.Client.Desktop.ViewModels.SendViewModels;
 using Atomex.Wallet;
 using Hex = Atomex.Common.Hex;
+using Atomex.Core;
+using Netezos.Forging;
 
 namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
 {
@@ -47,7 +48,6 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
         public Action<PermissionInfo> OnDappClick { get; set; }
 
         private ReactiveCommand<Unit, Unit>? _openDappSiteCommand;
-
         public ReactiveCommand<Unit, Unit> OpenDappSiteCommand =>
             _openDappSiteCommand ??= ReactiveCommand.Create(() =>
             {
@@ -56,17 +56,14 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
             });
 
         private ReactiveCommand<Unit, Unit>? _disconnectCommand;
-
         public ReactiveCommand<Unit, Unit> DisconnectCommand =>
             _disconnectCommand ??= ReactiveCommand.Create(() => OnDisconnect?.Invoke(PermissionInfo));
 
         private ReactiveCommand<Unit, Unit>? _dappClickCommand;
-
         public ReactiveCommand<Unit, Unit> DappClickCommand =>
             _dappClickCommand ??= ReactiveCommand.Create(() => OnDappClick?.Invoke(PermissionInfo));
 
         private ReactiveCommand<Unit, Unit>? _copyCommand;
-
         public ReactiveCommand<Unit, Unit> CopyCommand => _copyCommand ??= ReactiveCommand.Create(() =>
         {
             try
@@ -99,6 +96,7 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
         public DappsViewModel(IAtomexApp atomexApp)
         {
             _atomexApp = atomexApp ?? throw new ArgumentNullException(nameof(atomexApp));
+
             if (_atomexApp.Account == null)
                 return;
 
@@ -130,7 +128,9 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
                     .Create<IWalletBeaconClient>(beaconOptions, new SerilogLoggerProvider(Log.Logger));
                 _beaconWalletClient.OnBeaconMessageReceived += OnBeaconWalletClientMessageReceived;
                 _beaconWalletClient.OnConnectedClientsListChanged += OnDappsListChanged;
+
                 await _beaconWalletClient.InitAsync();
+
                 _beaconWalletClient.Connect();
 
                 GetAllDapps();
@@ -213,411 +213,453 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
                 return;
 
             var pairingRequest = _beaconWalletClient.GetPairingRequest(qrCodeString);
+
             await _beaconWalletClient.AddPeerAsync(pairingRequest);
+
             App.DialogService.Close();
         }
 
         private async void OnBeaconWalletClientMessageReceived(object? sender, BeaconMessageEventArgs e)
         {
             var message = e.Request;
-            if (message == null) return;
 
-            var permissions = _beaconWalletClient
+            if (message == null)
+                return;
+
+            var permissions = await _beaconWalletClient
                 .PermissionInfoRepository
-                .TryReadBySenderIdAsync(message.SenderId)
-                .Result;
+                .TryReadBySenderIdAsync(message.SenderId);
 
             Log.Debug("{@Sender}: message with type {@Type}, from {@SenderId} received",
                 "Beacon", message.Type, message.SenderId);
-
-            var connectedWalletAddress = await _atomexApp
-                .Account
-                .GetAddressAsync(Tezos.Name, permissions?.Address ?? string.Empty);
 
             switch (message.Type)
             {
                 case BeaconMessageType.permission_request:
                 {
-                    if (message is not PermissionRequest permissionRequest)
-                        return;
-
-                    if (!string.Equals(permissionRequest.Network.Type.ToString(), _atomexApp.Account.Network.ToString(),
-                            StringComparison.CurrentCultureIgnoreCase))
-                    {
-                        await _beaconWalletClient.SendResponseAsync(
-                            receiverId: message.SenderId,
-                            response: new NetworkNotSupportedBeaconError(permissionRequest.Id,
-                                _beaconWalletClient.SenderId));
-                        return;
-                    }
-
-                    var addressToConnect = await _atomexApp
-                        .Account
-                        .GetAddressAsync(Tezos.Name, ConnectDappViewModel.AddressToConnect);
-
-                    var securedPublicKey = _atomexApp.Account.Wallet.GetPublicKey(
-                        Tezos,
-                        addressToConnect.KeyPath,
-                        addressToConnect.KeyType);
-
-                    var publicKey = securedPublicKey.ToUnsecuredBytes(); 
-
-                    var response = new PermissionResponse(
-                        id: permissionRequest.Id,
-                        senderId: _beaconWalletClient.SenderId,
-                        appMetadata: _beaconWalletClient.Metadata,
-                        network: permissionRequest.Network,
-                        scopes: permissionRequest.Scopes,
-                        publicKey: PubKey.FromBytes(publicKey).ToString(),
-                        version: permissionRequest.Version);
-
-                    var permissionRequestViewModel = new PermissionRequestViewModel
-                    {
-                        DappName = permissionRequest.AppMetadata.Name,
-                        Address = addressToConnect.Address,
-                        Permissions = permissionRequest.Scopes,
-                        OnReject = async () =>
-                        {
-                            await _beaconWalletClient.SendResponseAsync(
-                                receiverId: message.SenderId,
-                                response: new BeaconAbortedError(permissionRequest.Id, _beaconWalletClient.SenderId));
-                            await _beaconWalletClient.RemovePeerAsync(
-                                message.SenderId);
-
-                            App.DialogService.Close();
-                            Log.Information(
-                                "{@Sender}: Rejected permissions [{@PermissionsList}] to dapp {@Dapp} with address {@Address}",
-                                "Beacon",
-                                permissionRequest.Scopes.Aggregate(string.Empty,
-                                    (res, scope) => res + $"{scope}, "),
-                                permissionRequest.AppMetadata.Name, addressToConnect.Address);
-                        },
-                        OnAllow = async () =>
-                        {
-                            await _beaconWalletClient.SendResponseAsync(
-                                receiverId: message.SenderId,
-                                response);
-
-                            App.DialogService.Close();
-                            Log.Information(
-                                "{@Sender}: Issued permissions [{@PermissionsList}] to dapp {@Dapp} with address {@Address}",
-                                "Beacon",
-                                permissionRequest.Scopes.Aggregate(string.Empty,
-                                    (res, scope) => res + $"{scope}, "),
-                                permissionRequest.AppMetadata.Name, addressToConnect.Address);
-                        }
-                    };
-
-                    App.DialogService.Show(permissionRequestViewModel);
+                    await PermissionRequestHandler(message);
                     break;
                 }
                 case BeaconMessageType.operation_request:
                 {
-                    if (message is not OperationRequest operationRequest)
-                        return;
-
-                    var permissionInfo = _beaconWalletClient
-                        .PermissionInfoRepository
-                        .TryReadBySenderIdAsync(operationRequest.SenderId)
-                        .Result;
-
-                    if (permissionInfo == null)
-                    {
-                        await _beaconWalletClient.SendResponseAsync(
-                            receiverId: message.SenderId,
-                            response: new BeaconAbortedError(operationRequest.Id, _beaconWalletClient.SenderId));
-
-                        return;
-                    }
-
-                    var rpc = new Rpc(Tezos.RpcNodeUri);
-
-                    var head = await rpc
-                        .GetHeader()
-                        .ConfigureAwait(false);
-
-                    var managerKey = await rpc
-                        .GetManagerKey(connectedWalletAddress.Address)
-                        .ConfigureAwait(false);
-
-                    var revealed = managerKey.Value<string>() != null;
-
-                    var account = await rpc
-                        .GetAccountForBlock(head["hash"]!.ToString(), connectedWalletAddress.Address)
-                        .ConfigureAwait(false);
-
-                    var counter = int.Parse(account["counter"].ToString());
-
-                    var operations = new List<ManagerOperationContent>();
-
-                    if (!revealed)
-                    {
-                        var securedPublicKey = _atomexApp.Account.Wallet.GetPublicKey(
-                            Tezos,
-                            connectedWalletAddress.KeyPath,
-                            connectedWalletAddress.KeyType);
-
-                        var publicKey = securedPublicKey.ToUnsecuredBytes();
-
-                        operations.Add(new RevealContent
-                        {
-                            Counter = ++counter,
-                            Fee = 0,
-                            GasLimit = 1_000_000,
-                            Source = connectedWalletAddress.Address,
-                            PublicKey = PubKey.FromBytes(publicKey).ToString(),
-                            StorageLimit = 0
-                        });
-                    }
-
-                    operations.AddRange(operationRequest.OperationDetails.Select(o =>
-                    {
-                        if (!long.TryParse(o.Amount, out var amount))
-                            amount = 0;
-
-                        var txContent = new TransactionContent
-                        {
-                            Source = connectedWalletAddress.Address,
-                            Destination = o.Destination,
-                            Amount = amount,
-                            Counter = ++counter,
-                            Fee = 0,
-                            GasLimit = 500_000,
-                            StorageLimit = 5000,
-                        };
-
-                        if (o.Parameters == null) return txContent;
-
-                        try
-                        {
-                            txContent.Parameters = new Parameters
-                            {
-                                Entrypoint = o.Parameters?["entrypoint"]!.ToString(),
-                                Value = Micheline.FromJson(o.Parameters?["value"]!.ToString())
-                            };
-                        }
-                        catch (Exception ex)
-                        {
-                            Log.Error(ex, "Exception during parsing Beacon operation params");
-                        }
-
-                        return txContent;
-                    }));
-
-                    var error = await TezosOperationFiller
-                        .AutoFillAsync(
-                            operations,
-                            head["hash"]!.ToString(),
-                            head["chain_id"]!.ToString(),
-                            Tezos)
-                        .ConfigureAwait(false);
-
-                    if (error != null)
-                    {
-                        await _beaconWalletClient.SendResponseAsync(
-                            receiverId: message.SenderId,
-                            response: new TransactionInvalidBeaconError(operationRequest.Id,
-                                _beaconWalletClient.SenderId));
-
-                        Log.Error("{@Sender}: error during AutoFill transaction, {@Msg}", "Beacon", error.Message);
-                        return;
-                    }
-
-                    var forgedOperations = await TezosForge.ForgeAsync(
-                        operations: operations,
-                        branch: head["hash"]!.ToString());
-
-                    var operationsViewModel = new ObservableCollection<BaseBeaconOperationViewModel>();
-
-                    foreach (var item in operations.Select((value, idx) => new { idx, value }))
-                    {
-                        var operation = item.value;
-                        var index = item.idx;
-
-                        switch (operation)
-                        {
-                            case TransactionContent transactionOperation:
-                                operationsViewModel.Add(new TransactionContentViewModel
-                                {
-                                    Id = index + 1,
-                                    Operation = transactionOperation,
-                                    QuotesProvider = _atomexApp.QuotesProvider,
-                                });
-                                break;
-                            case RevealContent revealOperation:
-                                operationsViewModel.Add(new RevealContentViewModel
-                                {
-                                    Id = index + 1,
-                                    Operation = revealOperation,
-                                    QuotesProvider = _atomexApp.QuotesProvider,
-                                });
-                                break;
-                        }
-                    }
-
-                    var operationRequestViewModel = new OperationRequestViewModel
-                    {
-                        DappName = permissionInfo.AppMetadata.Name,
-                        DappLogo = permissionInfo.AppMetadata.Icon,
-                        Operations = operationsViewModel,
-                        OnReject = async () =>
-                        {
-                            await _beaconWalletClient.SendResponseAsync(
-                                receiverId: message.SenderId,
-                                response: new BeaconAbortedError(operationRequest.Id, _beaconWalletClient.SenderId));
-
-                            App.DialogService.Close();
-                        },
-
-                        OnConfirm = async () =>
-                        {
-                            var wallet = (HdWallet)_atomexApp.Account.Wallet;
-                            var keyStorage = wallet.KeyStorage;
-
-                            using var securePrivateKey = keyStorage.GetPrivateKey(
-                                currency: Tezos,
-                                keyPath: connectedWalletAddress.KeyPath,
-                                keyType: connectedWalletAddress.KeyType);
-
-                            var privateKey = securePrivateKey.ToUnsecuredBytes();
-
-                            var signedMessage = TezosSigner.SignHash(
-                                data: forgedOperations,
-                                privateKey: privateKey,
-                                watermark: Watermark.Generic,
-                                isExtendedKey: privateKey.Length == 64);
-
-                            if (signedMessage == null)
-                            {
-                                Log.Error("Beacon transaction signing error");
-
-                                await _beaconWalletClient.SendResponseAsync(
-                                    receiverId: message.SenderId,
-                                    response: new TransactionInvalidBeaconError(operationRequest.Id,
-                                        _beaconWalletClient.SenderId));
-
-                                return;
-                            }
-
-                            string? operationId = null;
-
-                            try
-                            {
-                                var injectedOperation = await rpc
-                                    .InjectOperations(signedMessage.SignedBytes)
-                                    .ConfigureAwait(false);
-
-                                operationId = injectedOperation.ToString();
-                            }
-                            catch (Exception ex)
-                            {
-                                Log.Error("Beacon transaction broadcast error {@Description}", ex.Message);
-
-                                await _beaconWalletClient.SendResponseAsync(
-                                    receiverId: message.SenderId,
-                                    response: new BroadcastBeaconError(operationRequest.Id,
-                                        _beaconWalletClient.SenderId));
-
-                                return;
-                            }
-
-                            var response = new OperationResponse(
-                                id: operationRequest.Id,
-                                senderId: _beaconWalletClient.SenderId,
-                                transactionHash: operationId,
-                                operationRequest.Version);
-                            await _beaconWalletClient.SendResponseAsync(
-                                receiverId: message.SenderId,
-                                response);
-
-                            App.DialogService.Close();
-                            Log.Information("{@Sender}: operation done with transaction hash: {@Hash}",
-                                "Beacon",
-                                operationId);
-                        }
-                    };
-
-                    App.DialogService.Show(operationRequestViewModel);
+                    await OperationRequestHandler(message, permissions?.Address);
                     break;
                 }
                 case BeaconMessageType.sign_payload_request:
                 {
-                    if (message is not SignPayloadRequest signRequest)
-                        return;
-
-                    byte[] dataToSign;
-
-                    try
-                    {
-                        dataToSign = Hex.FromString(signRequest.Payload);
-                    }
-                    catch (Exception)
-                    {
-                        // data is not in HEX format
-                        dataToSign = Encoding.UTF8.GetBytes(signRequest.Payload);
-                    }
-
-                    var permissionInfo = await _beaconWalletClient
-                        .PermissionInfoRepository
-                        .TryReadBySenderIdAsync(message.SenderId);
-
-                    var signatureRequestViewModel = new SignatureRequestViewModel
-                    {
-                        DappName = permissionInfo!.AppMetadata.Name,
-                        Payload = signRequest.Payload,
-                        OnSign = async () =>
-                        {
-                            var hdWallet = _atomexApp.Account.Wallet as HdWallet;
-
-                            using var privateKey = hdWallet!.KeyStorage.GetPrivateKey(
-                                currency: Tezos,
-                                keyPath: connectedWalletAddress.KeyPath,
-                                keyType: connectedWalletAddress.KeyType);
-
-                            var signedMessage = TezosSigner.SignHash(
-                                data: dataToSign,
-                                privateKey: privateKey.ToUnsecuredBytes(),
-                                watermark: null,
-                                isExtendedKey: privateKey.Length == 64);
-
-                            var response = new SignPayloadResponse(
-                                signature: signedMessage.EncodedSignature,
-                                version: signRequest.Version,
-                                id: signRequest.Id,
-                                senderId: _beaconWalletClient.SenderId);
-
-                            await _beaconWalletClient.SendResponseAsync(
-                                receiverId: message.SenderId, response);
-
-                            App.DialogService.Close();
-
-                            Log.Information(
-                                "{@Sender}: signed payload for {@Dapp} with signature: {@Signature}",
-                                "Beacon",
-                                permissionInfo.AppMetadata.Name,
-                                signedMessage.EncodedSignature);
-                        },
-                        OnReject = async () =>
-                        {
-                            await _beaconWalletClient.SendResponseAsync(
-                                receiverId: message.SenderId,
-                                response: new BeaconAbortedError(signRequest.Id, _beaconWalletClient.SenderId));
-
-                            App.DialogService.Close();
-
-                            Log.Information(
-                                "{@Sender}: user Aborted signing payload from {@Dapp}",
-                                "Beacon",
-                                permissionInfo.AppMetadata.Name);
-                        }
-                    };
-
-                    App.DialogService.Show(signatureRequestViewModel);
+                    await SignPayloadRequestHandler(message, permissions?.Address);
                     break;
                 }
             }
         }
 
+        private async Task PermissionRequestHandler(BaseBeaconMessage message)
+        {
+            if (message is not PermissionRequest permissionRequest)
+                return;
+
+            if (!string.Equals(permissionRequest.Network.Type.ToString(), _atomexApp.Account.Network.ToString(),
+                    StringComparison.CurrentCultureIgnoreCase))
+            {
+                await _beaconWalletClient.SendResponseAsync(
+                    receiverId: message.SenderId,
+                    response: new NetworkNotSupportedBeaconError(permissionRequest.Id,
+                        _beaconWalletClient.SenderId));
+                return;
+            }
+
+            var addressToConnect = await _atomexApp
+                .Account
+                .GetAddressAsync(Tezos.Name, ConnectDappViewModel.AddressToConnect);
+
+            var securedPublicKey = _atomexApp.Account.Wallet.GetPublicKey(
+                Tezos,
+                addressToConnect.KeyPath,
+                addressToConnect.KeyType);
+
+            var publicKey = securedPublicKey.ToUnsecuredBytes();
+
+            var response = new PermissionResponse(
+                id: permissionRequest.Id,
+                senderId: _beaconWalletClient.SenderId,
+                appMetadata: _beaconWalletClient.Metadata,
+                network: permissionRequest.Network,
+                scopes: permissionRequest.Scopes,
+                publicKey: PubKey.FromBytes(publicKey).ToString(),
+                version: permissionRequest.Version);
+
+            var permissionRequestViewModel = new PermissionRequestViewModel
+            {
+                DappName = permissionRequest.AppMetadata.Name,
+                Address = addressToConnect.Address,
+                Permissions = permissionRequest.Scopes,
+                OnReject = async () =>
+                {
+                    await _beaconWalletClient.SendResponseAsync(
+                        receiverId: message.SenderId,
+                        response: new BeaconAbortedError(permissionRequest.Id, _beaconWalletClient.SenderId));
+
+                    await _beaconWalletClient.RemovePeerAsync(
+                        message.SenderId);
+
+                    App.DialogService.Close();
+
+                    Log.Information(
+                        "{@Sender}: Rejected permissions [{@PermissionsList}] to dapp {@Dapp} with address {@Address}",
+                        "Beacon",
+                        permissionRequest.Scopes.Aggregate(string.Empty,
+                            (res, scope) => res + $"{scope}, "),
+                        permissionRequest.AppMetadata.Name, addressToConnect.Address);
+                },
+                OnAllow = async () =>
+                {
+                    await _beaconWalletClient.SendResponseAsync(
+                        receiverId: message.SenderId,
+                        response);
+
+                    App.DialogService.Close();
+
+                    Log.Information(
+                        "{@Sender}: Issued permissions [{@PermissionsList}] to dapp {@Dapp} with address {@Address}",
+                        "Beacon",
+                        permissionRequest.Scopes.Aggregate(string.Empty,
+                            (res, scope) => res + $"{scope}, "),
+                        permissionRequest.AppMetadata.Name, addressToConnect.Address);
+                }
+            };
+
+            App.DialogService.Show(permissionRequestViewModel);
+        }
+
+        private async Task OperationRequestHandler(BaseBeaconMessage message, string? address)
+        {
+            if (message is not OperationRequest operationRequest)
+                return;
+
+            var permissionInfo = _beaconWalletClient
+                .PermissionInfoRepository
+                .TryReadBySenderIdAsync(operationRequest.SenderId)
+                .Result;
+
+            if (permissionInfo == null)
+            {
+                await _beaconWalletClient.SendResponseAsync(
+                    receiverId: message.SenderId,
+                    response: new BeaconAbortedError(operationRequest.Id, _beaconWalletClient.SenderId));
+
+                return;
+            }
+
+            var connectedWalletAddress = await _atomexApp
+                .Account
+                .GetAddressAsync(Tezos.Name, address ?? string.Empty);
+
+            var rpc = new TezosRpc(Tezos.GetRpcSettings());
+
+            var head = await rpc
+                .GetHeaderAsync()
+                .ConfigureAwait(false);
+
+            var managerKey = await rpc
+                .GetManagerKeyAsync(connectedWalletAddress.Address)
+                .ConfigureAwait(false);
+
+            var revealed = managerKey != null;
+
+            var account = await rpc
+                .GetAccountAsync(connectedWalletAddress.Address, head.Hash)
+                .ConfigureAwait(false);
+
+            var counter = int.Parse(account.Counter);
+
+            var operations = new List<TezosOperationParameters>();
+
+            if (!revealed)
+            {
+                var securedPublicKey = _atomexApp.Account.Wallet.GetPublicKey(
+                    Tezos,
+                    connectedWalletAddress.KeyPath,
+                    connectedWalletAddress.KeyType);
+
+                var publicKey = securedPublicKey.ToUnsecuredBytes();
+
+                operations.Add(new TezosOperationParameters
+                {
+                    Content = new RevealContent
+                    {
+                        Counter = ++counter,
+                        Fee = 0,
+                        GasLimit = 1_000_000,
+                        Source = connectedWalletAddress.Address,
+                        PublicKey = PubKey.FromBytes(publicKey).ToString(),
+                        StorageLimit = 0
+                    },
+                    Fee = Fee.FromNetwork(defaultValue: 0),
+                    From = connectedWalletAddress.Address,
+                    GasLimit = GasLimit.FromNetwork(defaultValue: 1_000_000),
+                    StorageLimit = StorageLimit.FromNetwork(defaultValue: 0)
+                });
+            }
+
+            operations.AddRange(operationRequest.OperationDetails.Select(o =>
+            {
+                if (!long.TryParse(o.Amount, out var amount))
+                    amount = 0;
+
+                var txContent = new TransactionContent
+                {
+                    Source = connectedWalletAddress.Address,
+                    Destination = o.Destination,
+                    Amount = amount,
+                    Counter = ++counter,
+                    Fee = 0,
+                    GasLimit = 500_000,
+                    StorageLimit = 5000,
+                };
+
+                if (o.Parameters != null)
+                {
+                    try
+                    {
+                        txContent.Parameters = new Parameters
+                        {
+                            Entrypoint = o.Parameters?["entrypoint"]!.ToString(),
+                            Value = Micheline.FromJson(o.Parameters?["value"]!.ToString())
+                        };
+                    }
+                    catch (Exception ex)
+                    {
+                        Log.Error(ex, "Exception during parsing Beacon operation params");
+                    }
+                }
+
+                return new TezosOperationParameters
+                {
+                    Content = txContent,
+                    Fee = Fee.FromNetwork(defaultValue: 0),
+                    GasLimit = GasLimit.FromNetwork(defaultValue: 500_000),
+                    StorageLimit = StorageLimit.FromNetwork(defaultValue: 5000),
+                    From = connectedWalletAddress.Address
+                };
+            }));
+
+            var (isSuccess, error) = await TezosOperationFiller
+                .AutoFillAsync(
+                    rpc: rpc,
+                    operations,
+                    head.Hash,
+                    Tezos.GetFillOperationSettings())
+                .ConfigureAwait(false);
+
+            if (error != null)
+            {
+                await _beaconWalletClient.SendResponseAsync(
+                    receiverId: message.SenderId,
+                    response: new TransactionInvalidBeaconError(operationRequest.Id,
+                        _beaconWalletClient.SenderId));
+
+                Log.Error("{@Sender}: error during AutoFill transaction, {@Msg}", "Beacon", error.Value.Message);
+                return;
+            }
+
+            var forgedOperations = await new LocalForge()
+                .ForgeOperationGroupAsync(
+                    head.Hash,
+                    operations.Select(p => p.Content));
+
+            var operationsViewModel = new ObservableCollection<BaseBeaconOperationViewModel>();
+
+            foreach (var item in operations.Select((value, idx) => new { idx, value }))
+            {
+                var operation = item.value;
+                var index = item.idx;
+
+                switch (operation.Content)
+                {
+                    case TransactionContent transactionOperation:
+                        operationsViewModel.Add(new TransactionContentViewModel
+                        {
+                            Id = index + 1,
+                            Operation = transactionOperation,
+                            QuotesProvider = _atomexApp.QuotesProvider,
+                        });
+                        break;
+                    case RevealContent revealOperation:
+                        operationsViewModel.Add(new RevealContentViewModel
+                        {
+                            Id = index + 1,
+                            Operation = revealOperation,
+                            QuotesProvider = _atomexApp.QuotesProvider,
+                        });
+                        break;
+                }
+            }
+
+            var operationRequestViewModel = new OperationRequestViewModel
+            {
+                DappName = permissionInfo.AppMetadata.Name,
+                DappLogo = permissionInfo.AppMetadata.Icon,
+                Operations = operationsViewModel,
+                OnReject = async () =>
+                {
+                    await _beaconWalletClient.SendResponseAsync(
+                        receiverId: message.SenderId,
+                        response: new BeaconAbortedError(operationRequest.Id, _beaconWalletClient.SenderId));
+
+                    App.DialogService.Close();
+                },
+
+                OnConfirm = async () =>
+                {
+                    var wallet = (HdWallet)_atomexApp.Account.Wallet;
+                    var keyStorage = wallet.KeyStorage;
+
+                    using var securePrivateKey = keyStorage.GetPrivateKey(
+                        currency: Tezos,
+                        keyPath: connectedWalletAddress.KeyPath,
+                        keyType: connectedWalletAddress.KeyType);
+
+                    var privateKey = securePrivateKey.ToUnsecuredBytes();
+
+                    var signedMessage = TezosSigner.SignHash(
+                        data: forgedOperations,
+                        privateKey: privateKey,
+                        watermark: Watermark.Generic,
+                        isExtendedKey: privateKey.Length == 64);
+
+                    if (signedMessage == null)
+                    {
+                        Log.Error("Beacon transaction signing error");
+
+                        await _beaconWalletClient.SendResponseAsync(
+                            receiverId: message.SenderId,
+                            response: new TransactionInvalidBeaconError(operationRequest.Id,
+                                _beaconWalletClient.SenderId));
+
+                        return;
+                    }
+
+                    string? operationId = null;
+
+                    try
+                    {
+                        var injectedOperation = await rpc
+                            .InjectOperationsAsync(signedMessage.SignedBytes)
+                            .ConfigureAwait(false);
+
+                        operationId = injectedOperation.ToString();
+                    }
+                    catch (Exception ex)
+                    {
+                        Log.Error("Beacon transaction broadcast error {@Description}", ex.Message);
+
+                        await _beaconWalletClient.SendResponseAsync(
+                            receiverId: message.SenderId,
+                            response: new BroadcastBeaconError(operationRequest.Id,
+                                _beaconWalletClient.SenderId));
+
+                        return;
+                    }
+
+                    var response = new OperationResponse(
+                        id: operationRequest.Id,
+                        senderId: _beaconWalletClient.SenderId,
+                        transactionHash: operationId,
+                        operationRequest.Version);
+
+                    await _beaconWalletClient.SendResponseAsync(
+                        receiverId: message.SenderId,
+                        response);
+
+                    App.DialogService.Close();
+
+                    Log.Information("{@Sender}: operation done with transaction hash: {@Hash}",
+                        "Beacon",
+                        operationId);
+                }
+            };
+
+            App.DialogService.Show(operationRequestViewModel);
+        }
+
+        private async Task SignPayloadRequestHandler(BaseBeaconMessage message, string? address)
+        {
+            if (message is not SignPayloadRequest signRequest)
+                return;
+
+            byte[] dataToSign;
+
+            try
+            {
+                dataToSign = Hex.FromString(signRequest.Payload);
+            }
+            catch (Exception)
+            {
+                // data is not in HEX format
+                dataToSign = Encoding.UTF8.GetBytes(signRequest.Payload);
+            }
+
+            var connectedWalletAddress = await _atomexApp
+                .Account
+                .GetAddressAsync(Tezos.Name, address ?? string.Empty);
+
+            var permissionInfo = await _beaconWalletClient
+                .PermissionInfoRepository
+                .TryReadBySenderIdAsync(message.SenderId);
+
+            var signatureRequestViewModel = new SignatureRequestViewModel
+            {
+                DappName = permissionInfo!.AppMetadata.Name,
+                Payload = signRequest.Payload,
+                OnSign = async () =>
+                {
+                    var hdWallet = _atomexApp.Account.Wallet as HdWallet;
+
+                    using var privateKey = hdWallet!.KeyStorage.GetPrivateKey(
+                        currency: Tezos,
+                        keyPath: connectedWalletAddress.KeyPath,
+                        keyType: connectedWalletAddress.KeyType);
+
+                    var signedMessage = TezosSigner.SignHash(
+                        data: dataToSign,
+                        privateKey: privateKey.ToUnsecuredBytes(),
+                        watermark: null,
+                        isExtendedKey: privateKey.Length == 64);
+
+                    var response = new SignPayloadResponse(
+                        signature: signedMessage.EncodedSignature,
+                        version: signRequest.Version,
+                        id: signRequest.Id,
+                        senderId: _beaconWalletClient.SenderId);
+
+                    await _beaconWalletClient.SendResponseAsync(
+                        receiverId: message.SenderId, response);
+
+                    App.DialogService.Close();
+
+                    Log.Information(
+                        "{@Sender}: signed payload for {@Dapp} with signature: {@Signature}",
+                        "Beacon",
+                        permissionInfo.AppMetadata.Name,
+                        signedMessage.EncodedSignature);
+                },
+                OnReject = async () =>
+                {
+                    await _beaconWalletClient.SendResponseAsync(
+                        receiverId: message.SenderId,
+                        response: new BeaconAbortedError(signRequest.Id, _beaconWalletClient.SenderId));
+
+                    App.DialogService.Close();
+
+                    Log.Information(
+                        "{@Sender}: user Aborted signing payload from {@Dapp}",
+                        "Beacon",
+                        permissionInfo.AppMetadata.Name);
+                }
+            };
+
+            App.DialogService.Show(signatureRequestViewModel);
+        }
 
         private void OnAtomexClientChangedEventHandler(object? sender, AtomexClientChangedEventArgs args)
         {

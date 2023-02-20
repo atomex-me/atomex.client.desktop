@@ -8,7 +8,7 @@ using ReactiveUI.Fody.Helpers;
 
 using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
-using Atomex.ViewModels;
+using Atomex.Common;
 
 namespace Atomex.Client.Desktop.ViewModels
 {

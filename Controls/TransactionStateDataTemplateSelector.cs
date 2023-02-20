@@ -1,10 +1,12 @@
 ﻿using System;
-using Atomex.Blockchain.Abstract;
+
 using Avalonia.Controls;
 using Avalonia.Controls.Templates;
+using Avalonia.Markup.Xaml.Templates;
+
+using Atomex.Blockchain.Abstract;
 using Atomex.Client.Desktop.Services;
 using Atomex.Client.Desktop.ViewModels.TransactionViewModels;
-using Avalonia.Markup.Xaml.Templates;
 
 namespace Atomex.Client.Desktop.Controls
 {
@@ -28,12 +30,8 @@ namespace Atomex.Client.Desktop.Controls
                     .PendingStateTemplate),
                 TransactionStatus.Confirmed => App.TemplateService.GetTxStateTemplate(TxStateTemplate
                     .ConfirmedStateTemplate),
-                TransactionStatus.Unconfirmed => App.TemplateService.GetTxStateTemplate(TxStateTemplate
-                    .UnconfirmedStateTemplate),
                 TransactionStatus.Failed => App.TemplateService.GetTxStateTemplate(TxStateTemplate
                     .FailedStateTemplate),
-                TransactionStatus.Unknown => App.TemplateService.GetTxStateTemplate(TxStateTemplate
-                    .UnknownStateTemplate),
                 _ => throw new ArgumentOutOfRangeException()
             };
         }

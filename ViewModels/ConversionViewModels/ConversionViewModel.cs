@@ -48,7 +48,6 @@ namespace Atomex.Client.Desktop.ViewModels
                     .GetSymbols(_app.Account.Network);
             }
         }
-
         private ICurrencies Currencies
         {
             get
@@ -77,13 +76,11 @@ namespace Atomex.Client.Desktop.ViewModels
         [Reactive] public MessageType AmountValidationMessageType { get; set; }
         [ObservableAsProperty] public bool IsAmountValidationWarning { get; }
         [ObservableAsProperty] public bool IsAmountValidationError { get; }
-
         [Reactive] public string Message { get; set; }
         [Reactive] public string MessageToolTip { get; set; }
         [Reactive] public MessageType MessageType { get; set; }
         [ObservableAsProperty] public bool IsWarning { get; }
         [ObservableAsProperty] public bool IsError { get; }
-
         [Reactive] public string? BaseCurrencyCode { get; set; }
         [Reactive] public string? QuoteCurrencyCode { get; set; }
         [Reactive] public string? PriceFormat { get; set; }
@@ -112,7 +109,6 @@ namespace Atomex.Client.Desktop.ViewModels
         [Reactive] public bool IsInsufficientFunds { get; set; }
         [Reactive] public bool IsToAddressExtrenal { get; set; }
         [Reactive] public bool IsRedeemFromAddressWithMaxBalance { get; set; }
-
         [Reactive] public string ExternalAddressWarning { get; set; }
         [Reactive] public string ExternalAddressWarningToolTip { get; set; }
         [Reactive] public string RedeemFromAddressNote { get; set; }

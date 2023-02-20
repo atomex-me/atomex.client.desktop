@@ -359,7 +359,8 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
         protected override async Task<Error?> Send(CancellationToken cancellationToken = default)
         {
-            var (_, error) = await Account.SendAsync(
+            var (_, error) = await Account
+                .SendAsync(
                     from: Outputs,
                     to: To,
                     amount: AmountToSend,

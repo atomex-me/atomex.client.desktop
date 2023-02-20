@@ -65,14 +65,20 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
                 var selectedTransactionId = SelectedTransaction?.Id;
 
-                Transactions = SortTransactions(
-                    new ObservableCollection<TransactionViewModelBase>((await tezosAccount
+                var transactions = await Task.Run(async () =>
+                {
+                    return (await tezosAccount
                         .LocalStorage
-                        .GetTokenTransfersAsync(tokenViewModel.Contract.Address,
+                        .GetTokenTransfersWithMetadataAsync(tokenViewModel.Contract.Address,
                             offset: 0,
                             limit: int.MaxValue))
-                        .Where(token => token.Token.TokenId == tokenViewModel.TokenBalance.TokenId)
-                        .Select(t => new TezosTokenTransferViewModel(t, tezosConfig))
+                        .Where(t => t.Transfer.Token.TokenId == tokenViewModel.TokenBalance.TokenId)
+                        .ToList();
+                });
+
+                Transactions = SortTransactions(
+                    new ObservableCollection<TransactionViewModelBase>(transactions
+                        .Select(t => new TezosTokenTransferViewModel(t.Transfer, t.Metadata, tezosConfig))
                         .ToList()
                         .ForEachDo(t => t.OnClose = () => ShowRightPopupContent?.Invoke(null))));
 

@@ -1,10 +1,10 @@
-using System;
-using Atomex.Blockchain.Abstract;
 using Avalonia.Controls;
 using Avalonia.Controls.Templates;
+using Avalonia.Markup.Xaml.Templates;
+
+using Atomex.Blockchain.Abstract;
 using Atomex.Client.Desktop.Services;
 using Atomex.Client.Desktop.ViewModels.TransactionViewModels;
-using Avalonia.Markup.Xaml.Templates;
 
 namespace Atomex.Client.Desktop.Controls
 {
@@ -34,16 +34,13 @@ namespace Atomex.Client.Desktop.Controls
             if (tx.Type.HasFlag(TransactionType.TokenApprove))
                 return App.TemplateService.GetTxTypeTemplate(TxTypeTemplate.TokenApproveTypeTemplate);
 
-            if (tx.Type.HasFlag(TransactionType.TokenCall))
-                return App.TemplateService.GetTxTypeTemplate(TxTypeTemplate.TokenApproveTypeTemplate);
-
             if (tx.Type.HasFlag(TransactionType.ContractCall))
                 return App.TemplateService.GetTxTypeTemplate(TxTypeTemplate.TokenApproveTypeTemplate);
 
-            if (tx.Amount <= 0) //tx.Type.HasFlag(BlockchainTransactionType.Output))
+            if (tx.Amount <= 0)
                 return App.TemplateService.GetTxTypeTemplate(TxTypeTemplate.SentTypeTemplate);
 
-            if (tx.Amount > 0) //tx.Type.HasFlag(BlockchainTransactionType.Input))
+            if (tx.Amount > 0)
                 return App.TemplateService.GetTxTypeTemplate(TxTypeTemplate.ReceivedTypeTemplate);
 
             return App.TemplateService.GetTxTypeTemplate(TxTypeTemplate.UnknownTypeTemplate);

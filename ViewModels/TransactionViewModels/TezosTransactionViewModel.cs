@@ -1,8 +1,13 @@
 ﻿using System;
+using System.Linq;
+
+using Avalonia.Controls;
+
+using Atomex.Blockchain;
 using Atomex.Blockchain.Abstract;
 using Atomex.Blockchain.Tezos;
-using Atomex.ViewModels;
-using Avalonia.Controls;
+using Atomex.Blockchain.Tezos.Tzkt.Operations;
+using Atomex.Common;
 
 namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
 {
@@ -15,13 +20,11 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
         public string GasString => GasLimit == 0
             ? "0 / 0"
             : $"{GasUsed} / {GasLimit} ({GasUsed / GasLimit * 100:0.#}%)";
-
         private decimal StorageLimit { get; set; }
         private decimal StorageUsed { get; set; }
         public string StorageString => StorageLimit == 0
             ? "0 / 0"
             : $"{StorageUsed} / {StorageLimit} ({StorageUsed / StorageLimit * 100:0.#}%)";
-
         public string FromExplorerUri => $"{Currency.AddressExplorerUri}{From}";
         public string ToExplorerUri => $"{Currency.AddressExplorerUri}{To}";
         public string Alias { get; set; }
@@ -34,67 +37,102 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
 #endif
         }
 
-        public TezosTransactionViewModel(TezosOperation tx, TezosConfig tezosConfig)
-            : base(tx, tezosConfig, GetAmount(tx, tezosConfig), GetFee(tx))
+        public TezosTransactionViewModel(
+            TezosOperation tx,
+            TransactionMetadata metadata,
+            int internalIndex,
+            TezosConfig config)
+            : base(tx: tx,
+                  metadata: metadata,
+                  config: config,
+                  amount: GetAmount(metadata, internalIndex),
+                  fee: GetFee(metadata, internalIndex),
+                  type: GetType(metadata, internalIndex))
         {
-            From = tx.From;
-            To = tx.To;
-            GasLimit = tx.GasLimit;
-            GasUsed = tx.GasUsed;
-            StorageLimit = tx.StorageLimit;
-            StorageUsed = tx.StorageUsed;
-            Fee = tx.Fee; //TezosConfig.MtzToTz(tx.Fee);
+            if (metadata == null)
+                return;
 
-            if (!string.IsNullOrEmpty(tx.Alias))
+            if (internalIndex < 0 || internalIndex >= metadata.Internals.Count)
+                throw new ArgumentOutOfRangeException(nameof(internalIndex));
+
+            if (internalIndex < 0 || internalIndex >= tx.Operations.Count())
+                throw new ArgumentOutOfRangeException(nameof(internalIndex));
+
+            var operation = tx.Operations.ToList()[internalIndex];
+
+            if (operation is TransactionOperation op)
             {
-                Alias = tx.Alias;
+                From = op.Sender.Address;
+                To = op.Target.Address;
+                GasLimit = op.GasLimit;
+                GasUsed = op.GasUsed;
+                StorageLimit= op.StorageLimit;
+                StorageUsed = op.StorageUsed;
+                
+                if (!string.IsNullOrEmpty(op.Target.Name))
+                {
+                    Alias = op.Target.Name;
+                }
+                else
+                {
+                    Alias = Amount switch
+                    {
+                        <= 0 => op.Target.Address.TruncateAddress(),
+                        > 0 => op.Sender.Address.TruncateAddress()
+                    };
+                }
             }
             else
             {
-                Alias = Amount switch
-                {
-                    <= 0 => tx.To.TruncateAddress(),
-                    > 0 => tx.From.TruncateAddress()
-                };
+                // delegations, reveals and others
             }
         }
 
-        private static decimal GetAmount(TezosOperation tx, TezosConfig tezosConfig)
+        private static decimal GetAmount(
+            TransactionMetadata metadata,
+            int internalIndex)
         {
-            var result = 0m;
+            if (metadata == null)
+                return 0;
 
-            if (tx.Type.HasFlag(TransactionType.Input))
-                result += tx.Amount / tezosConfig.Precision;
+            if (internalIndex < 0 || internalIndex >= metadata.Internals.Count)
+                throw new ArgumentOutOfRangeException(nameof(internalIndex));
 
-            var includeFee = tezosConfig.Name == tezosConfig.FeeCurrencyName;
-            var fee = includeFee ? tx.Fee : 0;
-
-            if (tx.Type.HasFlag(TransactionType.Output))
-                result += -(tx.Amount + fee) / tezosConfig.Precision;
-
-            tx.InternalTxs?.ForEach(t => result += GetAmount(t, tezosConfig));
-
-            return result;
+            return metadata.Internals[internalIndex].Amount.ToTez();
         }
 
-        private static decimal GetFee(TezosOperation tx)
+        private static decimal GetFee(
+            TransactionMetadata metadata,
+            int internalIndex)
         {
-            var result = 0m;
+            if (metadata == null)
+                return 0;
 
-            if (tx.Type.HasFlag(TransactionType.Output))
-                result += tx.Fee; //TezosConfig.MtzToTz(tx.Fee);
+            if (internalIndex < 0 || internalIndex >= metadata.Internals.Count)
+                throw new ArgumentOutOfRangeException(nameof(internalIndex));
 
-            tx.InternalTxs?.ForEach(t => result += GetFee(t));
+            return metadata.Internals[internalIndex].Fee.ToTez();
+        }
 
-            return result;
+        private static TransactionType GetType(
+            TransactionMetadata metadata,
+            int internalIndex)
+        {
+            if (metadata == null)
+                return 0;
+
+            if (internalIndex < 0 || internalIndex >= metadata.Internals.Count)
+                throw new ArgumentOutOfRangeException(nameof(internalIndex));
+
+            return metadata.Internals[internalIndex].Type;
         }
 
         private void DesignerMode()
         {
-            Id = "1234567890abcdefgh1234567890abcdefgh";
+            //Id = "1234567890abcdefgh1234567890abcdefgh";
             From = "1234567890abcdefgh1234567890abcdefgh";
             To = "1234567890abcdefgh1234567890abcdefgh";
-            Time = DateTime.UtcNow;
+            //Time = DateTime.UtcNow;
             Description = "Exchange refund 0.030001 XTZ";
             CurrencyCode = TezosConfig.Xtz;
         }

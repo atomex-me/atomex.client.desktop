@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Linq;
 using System.Reactive;
-using Atomex.Client.Desktop.Common;
+
 using Avalonia.Collections;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
+
+using Atomex.Client.Desktop.Common;
 
 namespace Atomex.Client.Desktop.ViewModels.CreateWalletViewModels
 {
@@ -47,7 +49,6 @@ namespace Atomex.Client.Desktop.ViewModels.CreateWalletViewModels
         }
 
         private ReactiveCommand<string, Unit>? _addWordCommand;
-
         public ReactiveCommand<string, Unit> AddWordCommand => _addWordCommand ??= _addWordCommand =
             ReactiveCommand.Create<string>(word =>
             {
@@ -57,7 +58,6 @@ namespace Atomex.Client.Desktop.ViewModels.CreateWalletViewModels
             });
 
         private ReactiveCommand<string, Unit>? _removeWordCommand;
-
         public ReactiveCommand<string, Unit> RemoveWordCommand => _removeWordCommand ??= _removeWordCommand =
             ReactiveCommand.Create<string>(word =>
             {

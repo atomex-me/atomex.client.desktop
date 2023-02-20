@@ -1,18 +1,21 @@
+using System;
+using System.Linq;
+using System.Reactive.Linq;
+using System.Threading.Tasks;
+
+using Avalonia.Media;
+using Avalonia.Threading;
+using ReactiveUI;
+using ReactiveUI.Fody.Helpers;
+using Serilog;
+
+using Atomex.Blockchain;
 using Atomex.Client.Desktop.Common;
 using Atomex.Core;
 using Atomex.MarketData.Abstract;
 using Atomex.TezosTokens;
 using Atomex.Wallet;
 using Atomex.Wallet.Abstract;
-using Avalonia.Media;
-using Avalonia.Threading;
-using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
-using Serilog;
-using System;
-using System.Linq;
-using System.Reactive.Linq;
-using System.Threading.Tasks;
 
 namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
 {
@@ -71,9 +74,9 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
 
             await Dispatcher.UIThread.InvokeAsync(() =>
             {
-                TotalAmount = balance.Confirmed;
-                AvailableAmount = balance.Confirmed; // todo: use unconfirmed income for Bitcoin based currencies?
-                UnconfirmedAmount = balance.UnconfirmedIncome + balance.UnconfirmedOutcome;
+                TotalAmount = balance.Confirmed.FromTokens(Currency.Decimals);
+                AvailableAmount = balance.Confirmed.FromTokens(Currency.Decimals); // todo: use unconfirmed income for Bitcoin based currencies?
+                UnconfirmedAmount = (balance.UnconfirmedIncome + balance.UnconfirmedOutcome).FromTokens(Currency.Decimals);
 
                 UpdateQuotesInBaseCurrency(_quotesProvider);
 

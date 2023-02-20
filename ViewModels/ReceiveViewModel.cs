@@ -1,4 +1,4 @@
-using Serilog;
+
 using System;
 using System.Drawing.Imaging;
 using System.IO;
@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
+
 using Color = System.Drawing.Color;
 using Avalonia.Controls;
 using Avalonia.Media.Imaging;
@@ -13,6 +14,8 @@ using Avalonia.Threading;
 using QRCoder;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
+using Serilog;
+
 using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.ViewModels.SendViewModels;
 using Atomex.Core;
@@ -141,12 +144,12 @@ namespace Atomex.Client.Desktop.ViewModels
             {
                 Address = "tz3bvNMQ95vfAYtG8193ymshqjSvmxiCUuR5",
                 HasActivity = true,
-                AvailableBalance = 123.456789m,
+                AvailableBalance = 123456789,
                 CurrencyFormat = Currency.Format,
                 CurrencyCode = Currency.DisplayedName,
                 IsFreeAddress = false,
                 ShowTokenBalance = true,
-                TokenBalance = 100.00000000m,
+                TokenBalance = 10000000000,
                 TokenFormat = "F8",
                 TokenCode = "HEH"
             };

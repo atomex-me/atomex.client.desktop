@@ -4,12 +4,14 @@ using System.Globalization;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
+
+using ReactiveUI;
+using ReactiveUI.Fody.Helpers;
+
+using Atomex.Common;
 using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
 using Atomex.Client.Desktop.ViewModels.TransactionViewModels;
-using Atomex.ViewModels;
-using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
 
 namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 {
@@ -54,7 +56,6 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         }
 
         private ReactiveCommand<TezosTokenViewModel, Unit>? _onCollectibleClickCommand;
-
         public ReactiveCommand<TezosTokenViewModel, Unit> OnCollectibleClickCommand => _onCollectibleClickCommand ??=
             ReactiveCommand.Create<TezosTokenViewModel>(tezosTokenViewModel =>
                 ShowTezosCollectible?.Invoke(tezosTokenViewModel));

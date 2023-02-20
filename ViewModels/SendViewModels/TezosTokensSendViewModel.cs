@@ -12,18 +12,17 @@ using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using Serilog;
 
-using Atomex.Blockchain.Ethereum;
+using Atomex.Blockchain;
+using Atomex.Blockchain.Tezos;
 using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.Properties;
 using Atomex.Client.Desktop.ViewModels.Abstract;
+using Atomex.Common;
 using Atomex.Core;
 using Atomex.MarketData.Abstract;
 using Atomex.TezosTokens;
-using Atomex.ViewModels;
 using Atomex.Wallet.Abstract;
 using Atomex.Wallet.Tezos;
-using Atomex.Common;
-using Atomex.Blockchain.Tezos;
 
 namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 {
@@ -60,7 +59,6 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         [Reactive] public bool ConfirmStage { get; set; }
         [Reactive] public bool CanSend { get; set; }
         [ObservableAsProperty] public bool IsSending { get; }
-
         public SelectAddressViewModel SelectFromViewModel { get; set; }
         public SelectAddressViewModel SelectToViewModel { get; set; }
 
@@ -162,12 +160,9 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             CurrencyCode = string.Empty;
             FeeCurrencyCode = TezosConfig.Xtz;
             BaseCurrencyCode = DefaultBaseCurrencyCode;
-
             FeeCurrencyFormat = tezosConfig.FeeFormat;
             BaseCurrencyFormat = DefaultBaseCurrencyFormat;
-
             TokenContract = tokenContract;
-
             TokenId = tokenId;
             _tokenType = tokenType;
             TokenPreviewUrl = tokenPreviewUrl;
@@ -320,7 +315,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 return;
             }
 
-            if (Amount > fromTokenAddress.Balance)
+            if (Amount > fromTokenAddress.Balance.FromTokens(fromTokenAddress.TokenBalance.Decimals))
             {
                 Warning = $"Insufficient token funds on address {fromTokenAddress.Address}! " +
                           $"Please use Max button to find out how many tokens you can send!";
@@ -336,7 +331,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 return;
             }
 
-            if (xtzAddress.Balance < Fee)
+            if (xtzAddress.Balance.ToTez() < Fee)
             {
                 Warning = "Insufficient funds for fee!";
                 return;
@@ -351,7 +346,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     if (error != null)
                     {
                         App.DialogService.Show(MessageViewModel.Error(
-                            text: error.Message,
+                            text: error.Value.Message,
                             backAction: () => App.DialogService.Show(this)));
 
                         return;
@@ -416,7 +411,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     return;
                 }
 
-                if (Amount > fromTokenAddress.Balance)
+                if (Amount > fromTokenAddress.Balance.FromTokens(fromTokenAddress.TokenBalance.Decimals))
                 {
                     Warning = Resources.CvInsufficientFunds;
                     WarningToolTip = Resources.CvBigAmount;
@@ -498,9 +493,9 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                         return;
                     }
 
-                    Fee = Math.Min(Fee, tezosConfig.GetMaximumFee());
+                    //Fee = Math.Min(Fee, tezosConfig.GetMaximumFee());
 
-                    if (xtzAddress.Balance < Fee)
+                    if (xtzAddress.Balance.ToTez() < Fee)
                     {
                         Warning = string.Format(Resources.CvInsufficientChainFunds, "XTZ");
                         WarningToolTip = "";
@@ -554,7 +549,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     return;
                 }
 
-                Amount = fromTokenAddress.Balance;
+                Amount = fromTokenAddress.Balance.FromTokens(fromTokenAddress.TokenBalance.Decimals);
             }
             catch (Exception e)
             {
@@ -611,8 +606,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             if (tokenAddress?.TokenBalance?.Symbol != null)
             {
                 CurrencyCode = tokenAddress.TokenBalance.Symbol;
-                CurrencyFormat =
-                    $"F{Math.Min(tokenAddress.TokenBalance.Decimals, CurrencyConfig.MaxPrecision)}";
+                CurrencyFormat = $"F{Math.Min(tokenAddress.TokenBalance.Decimals, CurrencyConfig.MaxPrecision)}";
             }
             else
             {
@@ -629,7 +623,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 }
             }
 
-            SelectedFromBalance = tokenAddress?.Balance ?? 0;
+            SelectedFromBalance = tokenAddress?.Balance.FromTokens(tokenAddress.TokenBalance.Decimals) ?? 0;
             this.RaisePropertyChanged(nameof(Amount));
         }
 
@@ -659,8 +653,8 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 .SendAsync(
                     from: tokenAddress.Address,
                     to: To,
-                    amount: Amount,
-                    fee: Fee,
+                    amount: Amount.ToTokens(tokenAddress.TokenBalance.Decimals),
+                    fee: Fee.ToMicroTez(),
                     useDefaultFee: UseDefaultFee,
                     cancellationToken: cancellationToken)
                 .ConfigureAwait(false);

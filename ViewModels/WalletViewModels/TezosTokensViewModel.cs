@@ -12,6 +12,8 @@ using DynamicData;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using Serilog;
+
+using Atomex.Blockchain.Tezos.Tzkt;
 using Atomex.Client.Common;
 using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.ViewModels.Abstract;
@@ -20,7 +22,6 @@ using Atomex.Core;
 using Atomex.MarketData.Abstract;
 using Atomex.Wallet;
 using Atomex.Wallet.Tezos;
-using Atomex.Blockchain.Tezos.Tzkt;
 
 namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 {
@@ -35,7 +36,6 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         [Reactive] public string SearchPattern { get; set; }
         [Reactive] public ObservableCollection<TezosTokenViewModel> Tokens { get; set; }
         public ObservableCollection<TezosTokenViewModel> InitialTokens { get; set; }
-
 
         public TezosTokensViewModel(IAtomexApp app,
             Action<TezosTokenViewModel> showTezosToken,
@@ -118,7 +118,6 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             return tokens.OrderByDescending(token => token.CanExchange)
                 .ThenByDescending(token => token.TotalAmountInBase);
         }
-
 
         private ReactiveCommand<TezosTokenViewModel, Unit>? _setTokenCommand;
         private ReactiveCommand<TezosTokenViewModel, Unit> SetTokenCommand => _setTokenCommand ??=

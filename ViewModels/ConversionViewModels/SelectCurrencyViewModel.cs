@@ -281,24 +281,26 @@ namespace Atomex.Client.Desktop.ViewModels.ConversionViewModels
                     {
                         var outputs = new List<BitcoinTxOutput>
                         {
-                            new BitcoinTxOutput(
-                                coin: new Coin(
+                            new BitcoinTxOutput
+                            {
+                                Coin = new Coin(
                                     fromTxHash: new uint256("19aa2187cda7610590d09dfab41ed4720f8570d7414b71b3dc677e237f72d4a1"),
                                     fromOutputIndex: 0u,
                                     amount: Money.Satoshis(1234567),
                                     scriptPubKey: BitcoinAddress.Create("muRDku2ZwNTz2msCZCHSUhDD5o6NxGsoXM", Network.TestNet).ScriptPubKey),
-                                confirmations: 10,
-                                spentTxPoint: null,
-                                spentConfirmations: 0),
-                            new BitcoinTxOutput(
-                                coin: new Coin(
+                                Currency = "BTC",
+                                IsConfirmed = true,
+                            },
+                            new BitcoinTxOutput
+                            {
+                                Coin = new Coin(
                                     fromTxHash: new uint256("d70fa62762775362e767737e56cab7e8a094eafa8f96b935530d6450be1cfbce"),
                                     fromOutputIndex: 0u,
                                     amount: Money.Satoshis(100120000),
                                     scriptPubKey: BitcoinAddress.Create("mg8DcFTnNAJRHEZ248nVjeJuEjTsHn4vrZ", Network.TestNet).ScriptPubKey),
-                                confirmations: 5,
-                                spentTxPoint: null,
-                                spentConfirmations: 0)
+                                Currency = "BTC",
+                                IsConfirmed = true,
+                            }
                         };
 
                         return new SelectCurrencyWithOutputsViewModelItem(
@@ -311,7 +313,7 @@ namespace Atomex.Client.Desktop.ViewModels.ConversionViewModels
                         var address = new WalletAddress
                         {
                             Address = "0xE9C251cbB4881f9e056e40135E7d3EA9A7d037df",
-                            Balance = 1.2m
+                            Balance = 120000000
                         };
 
                         return new SelectCurrencyWithAddressViewModelItem(

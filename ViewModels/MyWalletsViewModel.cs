@@ -58,8 +58,8 @@ namespace Atomex.Client.Desktop.ViewModels
 
         private void OnSelectWallet(WalletInfo info)
         {
-            IAccount account = null;
-            ILocalStorage localStorage = null;
+            IAccount? account = null;
+            ILocalStorage? localStorage = null;
 
             var unlockViewModel = new UnlockViewModel(
                 walletName: info.Name,
@@ -68,19 +68,19 @@ namespace Atomex.Client.Desktop.ViewModels
                     var wallet = HdWallet.LoadFromFile(info.Path, password);
 
                     localStorage = new LiteDbCachedLocalStorage(
-                        pathToDb: Path.Combine(Path.GetDirectoryName(wallet.PathToWallet), Account.DefaultDataFileName),
-                        password: password,
-                        currencies: _app.CurrenciesProvider.GetCurrencies(wallet.Network),
-                        network: wallet.Network,
-                        migrationComplete: actionType =>
-                        {
-                            _doAfterAtomexClientChanged = actionType switch
-                            {
-                                MigrationActionType.XtzTransactionsDeleted => TezosTransactionsDeleted,
-                                MigrationActionType.XtzTokensDataDeleted => OnTezosTokensDataDeleted,
-                                _ => null
-                            };
-                        });
+                        pathToDb: Path.Combine(Path.GetDirectoryName(wallet.PathToWallet)!, Account.DefaultDataFileName),
+                        password: password);
+                        //currencies: _app.CurrenciesProvider.GetCurrencies(wallet.Network),
+                        //network: wallet.Network,
+                        //migrationComplete: actionType =>
+                        //{
+                        //    _doAfterAtomexClientChanged = actionType switch
+                        //    {
+                        //        MigrationActionType.XtzTransactionsDeleted => TezosTransactionsDeleted,
+                        //        MigrationActionType.XtzTokensDataDeleted => OnTezosTokensDataDeleted,
+                        //        _ => null
+                        //    };
+                        //});
 
                     account = new Account(
                         wallet: wallet,

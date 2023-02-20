@@ -11,13 +11,14 @@ using Avalonia.Threading;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using Serilog;
+
+using Atomex.Blockchain.Tezos.Tzkt;
 using Atomex.Client.Common;
 using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
-using Atomex.ViewModels;
+using Atomex.Common;
 using Atomex.Wallet;
 using Atomex.Wallet.Tezos;
-using Atomex.Blockchain.Tezos.Tzkt;
 
 namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 {
@@ -41,7 +42,6 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         public decimal TotalAmountInBase => 0;
 
         private ReactiveCommand<Unit, Unit>? _onCollectionClickCommand;
-
         public ReactiveCommand<Unit, Unit> OnCollectionClickCommand => _onCollectionClickCommand ??=
             ReactiveCommand.Create(() => { OnCollectibleClick?.Invoke(Tokens); });
 

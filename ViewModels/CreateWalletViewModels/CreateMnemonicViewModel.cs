@@ -73,7 +73,6 @@ namespace Atomex.Client.Desktop.ViewModels.CreateWalletViewModels
         }
 
         private ICommand? _mnemonicCommand;
-
         public ICommand MnemonicCommand => _mnemonicCommand ??= _mnemonicCommand = ReactiveCommand.Create(() =>
         {
             var entropy = Rand.SecureRandomBytes(_entropyLength / 8);

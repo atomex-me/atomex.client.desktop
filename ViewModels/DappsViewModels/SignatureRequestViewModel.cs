@@ -1,10 +1,12 @@
 using System;
 using System.Reactive;
 using System.Threading.Tasks;
-using Atomex.Client.Desktop.Common;
+
 using Avalonia.Controls;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
+
+using Atomex.Client.Desktop.Common;
 
 namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
 {
@@ -35,12 +37,10 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
         }
 
         private ReactiveCommand<Unit, Unit>? _onSignCommand;
-
         public ReactiveCommand<Unit, Unit> OnSignCommand =>
             _onSignCommand ??= ReactiveCommand.CreateFromTask(async () => await OnSign());
 
         private ReactiveCommand<Unit, Unit>? _onRejectCommand;
-
         public ReactiveCommand<Unit, Unit> OnRejectCommand =>
             _onRejectCommand ??= ReactiveCommand.CreateFromTask(async () => await OnReject());
 

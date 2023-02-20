@@ -2,11 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Reactive;
 using System.Threading.Tasks;
-using Atomex.Client.Desktop.Common;
+
 using Avalonia.Controls;
 using Beacon.Sdk.Beacon.Permission;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
+
+using Atomex.Client.Desktop.Common;
 
 namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
 {
@@ -42,12 +44,10 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
         public Func<Task> OnReject { get; set; }
 
         private ReactiveCommand<Unit, Unit>? _onAllowCommand;
-
         public ReactiveCommand<Unit, Unit> OnAllowCommand =>
             _onAllowCommand ??= ReactiveCommand.CreateFromTask(async () => await OnAllow());
 
         private ReactiveCommand<Unit, Unit>? _onRejectCommand;
-
         public ReactiveCommand<Unit, Unit> OnRejectCommand =>
             _onRejectCommand ??= ReactiveCommand.CreateFromTask(async () => await OnReject());
 

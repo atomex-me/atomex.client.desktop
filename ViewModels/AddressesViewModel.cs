@@ -37,10 +37,8 @@ namespace Atomex.Client.Desktop.ViewModels
         public Action<string> OpenInExplorer { get; set; }
         public Action<string> ExportKey { get; set; }
         public Func<string, Task>? UpdateAddress { get; set; }
-
         public string Balance { get; set; }
         public TokenBalance? TokenBalance { get; set; }
-
         public string TokenBalanceString =>
             $"{TokenBalance?.GetTokenBalance() ?? 0} {TokenBalance?.Symbol ?? string.Empty}";
 
@@ -263,7 +261,7 @@ namespace Atomex.Client.Desktop.ViewModels
             try
             {
                 var updateTask = new WalletScanner(_app.Account)
-                    .ScanAddressAsync(_currency.Name, address);
+                    .UpdateBalanceAsync(_currency.Name, address);
 
                 await Task.WhenAll(Task.Delay(Constants.MinimalAddressUpdateTimeMs), updateTask);
 

@@ -7,7 +7,9 @@ using Avalonia.Controls;
 using Avalonia.Threading;
 using Serilog;
 
+using Atomex.Blockchain;
 using Atomex.Blockchain.Abstract;
+using Atomex.Blockchain.Tezos;
 using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.Properties;
 using Atomex.Client.Desktop.ViewModels.Abstract;
@@ -41,7 +43,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 ConfirmAction = walletAddressViewModel =>
                 {
                     From = walletAddressViewModel.Address;
-                    SelectedFromBalance = walletAddressViewModel.Balance;
+                    SelectedFromBalance = walletAddressViewModel.Balance.FromTokens(walletAddressViewModel.WalletAddress.TokenBalance.Decimals);
 
                     App.DialogService.Show(SelectToViewModel);
                 }
@@ -67,7 +69,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             selectFromViewModel!.ConfirmAction = walletAddressViewModel =>
             {
                 From = walletAddressViewModel.Address;
-                SelectedFromBalance = walletAddressViewModel.Balance;
+                SelectedFromBalance = walletAddressViewModel.Balance.FromTokens(walletAddressViewModel.WalletAddress.TokenBalance.Decimals);
                 App.DialogService.Show(this);
             };
             
@@ -95,7 +97,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                         reserve: false);
 
                 if (UseDefaultFee && maxAmountEstimation.Fee > 0)
-                    Fee = maxAmountEstimation.Fee;
+                    Fee = maxAmountEstimation.Fee.ToTez();
 
                 if (maxAmountEstimation.Error != null)
                 {
@@ -105,7 +107,9 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     return;
                 }
 
-                if (Amount > maxAmountEstimation.Amount)
+                var from = await account.GetAddressAsync(From);
+
+                if (Amount > maxAmountEstimation.Amount.FromTokens(from?.TokenBalance?.Decimals ?? 0))
                 {
                     Warning = Resources.CvInsufficientFunds;
                     WarningToolTip = "";
@@ -113,7 +117,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     return;
                 }
 
-                if (Fee < maxAmountEstimation.Fee)
+                if (Fee < maxAmountEstimation.Fee.ToTez())
                 {
                     Warning = Resources.CvLowFees;
                     WarningToolTip = "";
@@ -149,7 +153,9 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                         return;
                     }
 
-                    if (Amount > maxAmountEstimation.Amount)
+                    var from = await account.GetAddressAsync(From);
+
+                    if (Amount > maxAmountEstimation.Amount.FromTokens(from?.TokenBalance?.Decimals ?? 0))
                     {
                         Warning = Resources.CvInsufficientFunds;
                         WarningToolTip = "";
@@ -157,7 +163,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                         return;
                     }
 
-                    if (Fee < maxAmountEstimation.Fee)
+                    if (Fee < maxAmountEstimation.Fee.ToTez())
                     {
                         Warning = Resources.CvLowFees;
                         WarningToolTip = "";
@@ -185,7 +191,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                         reserve: false);
 
                 if (UseDefaultFee && maxAmountEstimation.Fee > 0)
-                    Fee = maxAmountEstimation.Fee;
+                    Fee = maxAmountEstimation.Fee.ToTez();
 
                 if (maxAmountEstimation.Error != null)
                 {
@@ -196,11 +202,13 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     return;
                 }
 
+                var from = await account.GetAddressAsync(From);
+
                 Amount = maxAmountEstimation.Amount > 0
-                    ? maxAmountEstimation.Amount
+                    ? maxAmountEstimation.Amount.FromTokens(from?.TokenBalance?.Decimals ?? 0)
                     : 0;
 
-                if (Fee < maxAmountEstimation.Fee)
+                if (Fee < maxAmountEstimation.Fee.ToTez())
                 {
                     Warning = Resources.CvLowFees;
                     WarningToolTip = "";
@@ -258,8 +266,8 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 .SendAsync(
                     from: tokenAddress.Address,
                     to: To,
-                    amount: AmountToSend,
-                    fee: Fee,
+                    amount: AmountToSend.ToTokens(tokenAddress.TokenBalance.Decimals),
+                    fee: Fee.ToMicroTez(),
                     useDefaultFee: UseDefaultFee,
                     cancellationToken: cancellationToken)
                 .ConfigureAwait(false);
