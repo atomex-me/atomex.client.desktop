@@ -9,6 +9,7 @@ using System.Windows.Input;
 
 using ReactiveUI;
 
+using Atomex.Blockchain;
 using Atomex.Client.Desktop.Api;
 using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
@@ -125,7 +126,7 @@ namespace Atomex.Client.Desktop.ViewModels
                     {
                         Address          = g.Key,
                         HasActivity      = address?.HasActivity ?? hasTokens,
-                        AvailableBalance = address?.AvailableBalance() ?? 0,
+                        AvailableBalance = address?.AvailableBalance().FromTokens(Currency.Decimals) ?? 0,
                         CurrencyFormat   = Currency.Format,
                         CurrencyCode     = Currency.DisplayedName,
                         IsFreeAddress    = isFreeAddress,

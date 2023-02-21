@@ -43,7 +43,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 ConfirmAction = walletAddressViewModel =>
                 {
                     From = walletAddressViewModel.Address;
-                    SelectedFromBalance = walletAddressViewModel.Balance.FromTokens(walletAddressViewModel.WalletAddress.TokenBalance.Decimals);
+                    SelectedFromBalance = walletAddressViewModel.Balance;
 
                     App.DialogService.Show(SelectToViewModel);
                 }
@@ -69,7 +69,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             selectFromViewModel!.ConfirmAction = walletAddressViewModel =>
             {
                 From = walletAddressViewModel.Address;
-                SelectedFromBalance = walletAddressViewModel.Balance.FromTokens(walletAddressViewModel.WalletAddress.TokenBalance.Decimals);
+                SelectedFromBalance = walletAddressViewModel.Balance;
                 App.DialogService.Show(this);
             };
             
