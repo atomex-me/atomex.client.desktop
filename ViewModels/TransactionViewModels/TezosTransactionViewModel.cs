@@ -39,7 +39,7 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
 
         public TezosTransactionViewModel(
             TezosOperation tx,
-            TransactionMetadata metadata,
+            TransactionMetadata? metadata,
             int internalIndex,
             TezosConfig config)
             : base(tx: tx,
@@ -89,7 +89,7 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
         }
 
         private static decimal GetAmount(
-            TransactionMetadata metadata,
+            TransactionMetadata? metadata,
             int internalIndex)
         {
             if (metadata == null)
@@ -102,7 +102,7 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
         }
 
         private static decimal GetFee(
-            TransactionMetadata metadata,
+            TransactionMetadata? metadata,
             int internalIndex)
         {
             if (metadata == null)
@@ -115,7 +115,7 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
         }
 
         private static TransactionType GetType(
-            TransactionMetadata metadata,
+            TransactionMetadata? metadata,
             int internalIndex)
         {
             if (metadata == null)

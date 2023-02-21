@@ -21,35 +21,32 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
             CurrencyConfig config)
         {
             if (config is BitcoinBasedConfig btcConfig &&
-                tx is BitcoinTransaction btcTx &&
-                metadata is TransactionMetadata btcMetadata)
+                tx is BitcoinTransaction btcTx)
             {
                 return new List<TransactionViewModel>
                 {
                     new BitcoinBasedTransactionViewModel(
                         tx: btcTx,
-                        metadata: btcMetadata,
+                        metadata: metadata as TransactionMetadata,
                         config: btcConfig)
                 };
             }
             else if (config is Erc20Config erc20Config &&
-                tx is Erc20Transaction erc20Tx &&
-                metadata is TransactionMetadata erc20Metadata)
+                tx is Erc20Transaction erc20Tx)
             {
                 return erc20Tx.Transfers.Select((t, i) =>
                     new Erc20TransactionViewModel(
                         tx: erc20Tx,
-                        metadata: erc20Metadata,
+                        metadata: metadata as TransactionMetadata,
                         transferIndex: i,
                         config: erc20Config));
             }
             else if (config is EthereumConfig ethConfig &&
-                tx is EthereumTransaction ethTx &&
-                metadata is TransactionMetadata ethMetadata)
+                tx is EthereumTransaction ethTx)
             {
                 var txViewModel = new EthereumTransactionViewModel(
                     tx: ethTx,
-                    metadata: ethMetadata,
+                    metadata: metadata as TransactionMetadata,
                     config: ethConfig);
 
                 if (ethTx.InternalTransactions != null && ethTx.InternalTransactions.Any())
@@ -59,7 +56,7 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
                         {
                             return new EthereumTransactionViewModel(
                                 tx: ethTx,
-                                metadata: ethMetadata,
+                                metadata: metadata as TransactionMetadata,
                                 internalIndex: i,
                                 config: ethConfig);
                         })
@@ -71,12 +68,11 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
                 }
             }
             else if (config is TezosConfig xtzConfig &&
-                tx is TezosOperation xtzTx &&
-                metadata is TransactionMetadata xtzMetadata)
+                tx is TezosOperation xtzTx)
             {
                 return xtzTx.Operations.Select((t, i) => new TezosTransactionViewModel(
                     tx: xtzTx,
-                    metadata: xtzMetadata,
+                    metadata: metadata as TransactionMetadata,
                     internalIndex: i,
                     config: xtzConfig));
             }

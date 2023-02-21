@@ -130,7 +130,8 @@ namespace Atomex.Client.Desktop.ViewModels.CreateWalletViewModels
 
                     var localStorage = new LiteDbCachedLocalStorage(
                         pathToDb: Path.Combine(Path.GetDirectoryName(_wallet.PathToWallet), Account.DefaultDataFileName),
-                        password: PasswordVM.SecurePass);
+                        password: PasswordVM.SecurePass,
+                        network: _wallet.Network);
 
                     var account = new Account(
                         wallet: _wallet,

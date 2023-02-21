@@ -78,7 +78,7 @@ namespace Atomex.Client.Desktop
                 bitfinexQuotesProvider, tezToolsQuotesProvider);
 
             // init Atomex client app
-            AtomexApp = new AtomexApp()
+            AtomexApp = new AtomexApp(logger: LoggerFactory.CreateLogger("AtomexApp"))
                 .UseCurrenciesProvider(currenciesProvider)
                 .UseSymbolsProvider(symbolsProvider)
                 .UseCurrenciesUpdater(new CurrenciesUpdater(currenciesProvider))

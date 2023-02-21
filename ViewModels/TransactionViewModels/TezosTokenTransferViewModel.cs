@@ -31,7 +31,7 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
 
         public TezosTokenTransferViewModel(
             TezosTokenTransfer tx,
-            TransactionMetadata metadata,
+            TransactionMetadata? metadata,
             TezosConfig config)
         {
             Currency = config ?? throw new ArgumentNullException(nameof(config));

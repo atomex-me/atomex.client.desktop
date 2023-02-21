@@ -28,7 +28,7 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
 
         public Erc20TransactionViewModel(
             Erc20Transaction tx,
-            TransactionMetadata metadata,
+            TransactionMetadata? metadata,
             int transferIndex,
             Erc20Config config)
             : base(tx: tx, 
@@ -49,7 +49,7 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
         }
 
         private static decimal GetAmount(
-            TransactionMetadata metadata,
+            TransactionMetadata? metadata,
             int transferIndex,
             Erc20Config config)
         {
@@ -63,7 +63,7 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
         }
 
         private static TransactionType GetType(
-            TransactionMetadata metadata,
+            TransactionMetadata? metadata,
             int transferIndex)
         {
             if (metadata == null)

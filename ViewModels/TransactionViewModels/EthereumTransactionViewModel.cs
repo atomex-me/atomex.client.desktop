@@ -33,7 +33,7 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
 
         public EthereumTransactionViewModel(
             EthereumTransaction tx,
-            TransactionMetadata metadata,
+            TransactionMetadata? metadata,
             EthereumConfig config)
             : base(tx: tx,
                 metadata: metadata,
@@ -57,7 +57,7 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
 
         public EthereumTransactionViewModel(
             EthereumTransaction tx,
-            TransactionMetadata metadata,
+            TransactionMetadata? metadata,
             int internalIndex,
             EthereumConfig config)
             : base(tx: tx,
@@ -92,12 +92,12 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
             };
         }
 
-        private static decimal GetAmount(TransactionMetadata metadata)
+        private static decimal GetAmount(TransactionMetadata? metadata)
         {
             return metadata?.Amount.WeiToEth() ?? 0m;
         }
 
-        private static decimal GetInternalAmount(TransactionMetadata metadata, int internalIndex)
+        private static decimal GetInternalAmount(TransactionMetadata? metadata, int internalIndex)
         {
             if (metadata == null)
                 return 0;
@@ -108,14 +108,14 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
             return metadata.Internals[internalIndex].Amount.WeiToEth();
         }
 
-        private static decimal GetFee(TransactionMetadata metadata)
+        private static decimal GetFee(TransactionMetadata? metadata)
         {
             return metadata != null
                 ? EthereumHelper.WeiToEth(metadata.Fee)
                 : 0;
         }
 
-        private static decimal GetInternalFee(TransactionMetadata metadata, int internalIndex)
+        private static decimal GetInternalFee(TransactionMetadata? metadata, int internalIndex)
         {
             if (metadata == null)
                 return 0;
@@ -126,7 +126,7 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
             return EthereumHelper.WeiToEth(metadata.Internals[internalIndex].Fee);
         }
 
-        private static TransactionType GetType(TransactionMetadata metadata, int internalIndex)
+        private static TransactionType GetType(TransactionMetadata? metadata, int internalIndex)
         {
             if (metadata == null)
                 return 0;

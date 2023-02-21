@@ -12,7 +12,6 @@ using Atomex.Client.Desktop.Common;
 using Atomex.Common;
 using Atomex.Core;
 using Atomex.LiteDb;
-using Atomex.Services;
 using Atomex.Wallet;
 using Atomex.Wallet.Abstract;
 
@@ -67,9 +66,17 @@ namespace Atomex.Client.Desktop.ViewModels
                 {
                     var wallet = HdWallet.LoadFromFile(info.Path, password);
 
+                    var pathToDb = Path.Combine(Path.GetDirectoryName(wallet.PathToWallet)!, Account.DefaultDataFileName);
+
+                    var migrationResult = LiteDbMigrationManager.Migrate(
+                        pathToDb: pathToDb,
+                        sessionPassword: SessionPasswordHelper.GetSessionPassword(password),
+                        network: wallet.Network);
+
                     localStorage = new LiteDbCachedLocalStorage(
-                        pathToDb: Path.Combine(Path.GetDirectoryName(wallet.PathToWallet)!, Account.DefaultDataFileName),
-                        password: password);
+                        pathToDb: pathToDb,
+                        password: password,
+                        network: wallet.Network);
                         //currencies: _app.CurrenciesProvider.GetCurrencies(wallet.Network),
                         //network: wallet.Network,
                         //migrationComplete: actionType =>
@@ -115,6 +122,7 @@ namespace Atomex.Client.Desktop.ViewModels
         private void TezosTransactionsDeleted()
         {
             var xtzCurrencies = new[] { "XTZ", "TZBTC", "KUSD", "USDT_XTZ" };
+
             var restoreDialogViewModel = new RestoreDialogViewModel(_app);
             restoreDialogViewModel.ScanCurrenciesAsync(xtzCurrencies);
         }

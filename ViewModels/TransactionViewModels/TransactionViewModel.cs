@@ -26,7 +26,7 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
         public TransactionStatus State => Transaction.Status;
         public DateTime Time => Transaction.CreationTime?.UtcDateTime ?? DateTime.UtcNow;
         public ITransaction Transaction { get; set; }
-        public ITransactionMetadata TransactionMetadata { get; set; }
+        public ITransactionMetadata? TransactionMetadata { get; set; }
         public TransactionType Type { get; set; }
         public Action? OnClose { get; set; }
         public bool CanBeRemoved { get; set; }
@@ -88,7 +88,7 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
 
         public TransactionViewModel(
             ITransaction tx,
-            ITransactionMetadata metadata,
+            ITransactionMetadata? metadata,
             CurrencyConfig config,
             decimal amount,
             decimal fee,
