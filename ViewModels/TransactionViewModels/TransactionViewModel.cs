@@ -3,6 +3,7 @@ using System.Reactive;
 
 using Avalonia.Controls;
 using ReactiveUI;
+using ReactiveUI.Fody.Helpers;
 using Serilog;
 
 using Atomex.Blockchain;
@@ -17,19 +18,19 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
         public event EventHandler<TransactionEventArgs>? UpdateClicked;
         public event EventHandler<TransactionEventArgs>? RemoveClicked;
         public string TxExplorerUri => $"{Currency.TxExplorerUri}{Id}";
-        public decimal Amount { get; set; }
-        public string AmountFormat { get; set; }
-        public string Description { get; set; }
-        public string Id => Transaction.Id;
+        public ITransaction Transaction { get; set; }
+        public ITransactionMetadata? TransactionMetadata { get; set; }
         public CurrencyConfig Currency { get; set; }
+        [Reactive] public decimal Amount { get; set; }
+        [Reactive] public string AmountFormat { get; set; }
+        [Reactive] public string Description { get; set; }
+        public string Id => Transaction.Id;
         public DateTime LocalTime => Time.ToLocalTime();
         public TransactionStatus State => Transaction.Status;
         public DateTime Time => Transaction.CreationTime?.UtcDateTime ?? DateTime.UtcNow;
-        public ITransaction Transaction { get; set; }
-        public ITransactionMetadata? TransactionMetadata { get; set; }
-        public TransactionType Type { get; set; }
+        [Reactive] public TransactionType Type { get; set; }
         public Action? OnClose { get; set; }
-        public bool CanBeRemoved { get; set; }
+        [Reactive] public bool CanBeRemoved { get; set; }
 
         private ReactiveCommand<Unit, Unit>? _openTxInExplorerCommand;
         public ReactiveCommand<Unit, Unit> OpenTxInExplorerCommand => _openTxInExplorerCommand ??=
@@ -73,10 +74,10 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
 
     public class TransactionViewModel : TransactionViewModelBase
     {
-        public string CurrencyCode { get; set; }
-        public string FeeCode { get; set; }
-        public decimal Fee { get; set; }
-        public string Direction { get; set; }
+        [Reactive] public string CurrencyCode { get; set; }
+        [Reactive] public string FeeCode { get; set; }
+        [Reactive] public decimal Fee { get; set; }
+        [Reactive] public string Direction { get; set; }
 
         public TransactionViewModel()
         {
@@ -87,6 +88,17 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
         }
 
         public TransactionViewModel(
+            ITransaction tx,
+            ITransactionMetadata? metadata,
+            CurrencyConfig config,
+            decimal amount,
+            decimal fee,
+            TransactionType type)
+        {
+            Update(tx, metadata, config, amount, fee, type);
+        }
+
+        public void Update(
             ITransaction tx,
             ITransactionMetadata? metadata,
             CurrencyConfig config,

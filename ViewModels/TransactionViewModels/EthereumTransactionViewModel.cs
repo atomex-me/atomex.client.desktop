@@ -35,7 +35,8 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
             EthereumTransaction tx,
             TransactionMetadata? metadata,
             EthereumConfig config)
-            : base(tx: tx,
+            : base(
+                tx: tx,
                 metadata: metadata,
                 config: config,
                 amount: GetAmount(metadata),
@@ -60,7 +61,8 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
             TransactionMetadata? metadata,
             int internalIndex,
             EthereumConfig config)
-            : base(tx: tx,
+            : base(
+                tx: tx,
                 metadata: metadata,
                 config: config,
                 amount: GetInternalAmount(metadata, internalIndex),

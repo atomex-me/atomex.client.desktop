@@ -126,7 +126,8 @@
                                            SelectedTransaction="{Binding SelectedTransaction}"
                                            CurrentSortField="{Binding CurrentSortField}"
                                            CurrentSortDirection="{Binding CurrentSortDirection}"
-                                           SetSortTypeCommand="{Binding SetSortTypeCommand}" />
+                                           SetSortTypeCommand="{Binding SetSortTypeCommand}"
+                                           ReachEndOfScrollCommand="{Binding ReachEndOfScroll}"/>
             </TabItem>
             <TabItem Margin="16 0 "
                      Classes="WalletTabItem">

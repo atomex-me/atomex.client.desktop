@@ -42,12 +42,13 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
             TransactionMetadata? metadata,
             int internalIndex,
             TezosConfig config)
-            : base(tx: tx,
-                  metadata: metadata,
-                  config: config,
-                  amount: GetAmount(metadata, internalIndex),
-                  fee: GetFee(metadata, internalIndex),
-                  type: GetType(metadata, internalIndex))
+            : base(
+                tx: tx,
+                metadata: metadata,
+                config: config,
+                amount: GetAmount(metadata, internalIndex),
+                fee: GetFee(metadata, internalIndex),
+                type: GetType(metadata, internalIndex))
         {
             if (metadata == null)
                 return;

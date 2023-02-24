@@ -31,6 +31,8 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
     public class WalletViewModel : ViewModelBase, IWalletViewModel
     {
         protected readonly IAtomexApp _app;
+        private int _transactionsLoaded;
+
         [Reactive] public ObservableCollection<TransactionViewModelBase> Transactions { get; set; }
         [Reactive] public TransactionViewModelBase? SelectedTransaction { get; set; }
         private TransactionViewModelBase? PreviousSelectedTransaction { get; set; }
@@ -134,20 +136,20 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             _app.LocalStorage.TransactionsChanged += OnTransactionsChangedEventHandler;
         }
 
-        protected virtual async void OnBalanceChangedEventHandler(object? sender, BalanceChangedEventArgs args)
+        protected virtual void OnBalanceChangedEventHandler(object? sender, BalanceChangedEventArgs args)
         {
-            try
-            {
-                if (!args.Currencies.Contains(Currency.Name))
-                    return;
+            //try
+            //{
+            //    if (!args.Currencies.Contains(Currency.Name))
+            //        return;
 
-                // update transactions list
-                await LoadTransactionsAsync();
-            }
-            catch (Exception e)
-            {
-                Log.Error(e, "Account balance updated event handler error");
-            }
+            //    // update transactions list
+            //    await LoadTransactionsAsync();
+            //}
+            //catch (Exception e)
+            //{
+            //    Log.Error(e, "Account balance updated event handler error");
+            //}
         }
 
         private async void OnTransactionsChangedEventHandler(object? sender, TransactionsChangedEventArgs args)
@@ -162,7 +164,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             }
             catch (Exception e)
             {
-                Log.Error(e, "Account unconfirmed transaction added event handler error");
+                Log.Error(e, "Account transactions changed event handler error");
             }
         }
 
@@ -223,6 +225,8 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                         .ToList();
                 });
 
+                var vmsToUpdate = new List<TransactionViewModel>();
+
                 await Dispatcher.UIThread.InvokeAsync(() =>
                 {
                     var selectedTransactionId = SelectedTransaction?.Id;
@@ -231,13 +235,19 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                         transactions
                             .Select(t =>
                             {
-                                var vms = TransactionViewModelCreator.CreateViewModels(t.Tx, t.Metadata, Currency);
+                                var vms = TransactionViewModelCreator.CreateViewModels(
+                                    tx: t.Tx,
+                                    metadata: t.Metadata,
+                                    config: Currency);
 
                                 foreach (var vm in vms)
                                 {
                                     vm.UpdateClicked += UpdateTransactionEventHandler;
                                     vm.RemoveClicked += RemoveTransactionEventHandler;
                                     vm.OnClose = () => ShowRightPopupContent?.Invoke(null);
+
+                                    if (vm.TransactionMetadata == null)
+                                        vmsToUpdate.Add(vm);
                                 }
 
                                 return vms;
@@ -295,6 +305,13 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                     CurrentSortDirection = CurrentSortDirection == SortDirection.Asc
                         ? SortDirection.Desc
                         : SortDirection.Asc;
+            });
+
+        private ReactiveCommand<Unit, Unit>? _reachEndOfScroll;
+        public ReactiveCommand<Unit, Unit> ReachEndOfScroll =>
+            _reachEndOfScroll ??= ReactiveCommand.Create(() =>
+            {
+
             });
 
         protected virtual void OnSendClick()

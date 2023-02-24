@@ -31,7 +31,8 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
             TransactionMetadata? metadata,
             int transferIndex,
             Erc20Config config)
-            : base(tx: tx, 
+            : base(
+                tx: tx, 
                 metadata: metadata,
                 config: config,
                 amount: GetAmount(metadata, transferIndex, config),

@@ -10,12 +10,13 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
             BitcoinTransaction tx,
             TransactionMetadata? metadata,
             BitcoinBasedConfig config)
-            : base(tx: tx,
-                  metadata: metadata,
-                  config: config,
-                  amount: GetAmount(metadata, config),
-                  fee: GetFee(metadata, config),
-                  type: metadata?.Type ?? TransactionType.Unknown)
+            : base(
+                tx: tx,
+                metadata: metadata,
+                config: config,
+                amount: GetAmount(metadata, config),
+                fee: GetFee(metadata, config),
+                type: metadata?.Type ?? TransactionType.Unknown)
         {
         }
 

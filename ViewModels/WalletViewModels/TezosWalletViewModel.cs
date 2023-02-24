@@ -292,7 +292,6 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             });
 
         private ReactiveCommand<Unit, Unit>? _manageCollectiblesCommand;
-
         public ReactiveCommand<Unit, Unit> ManageCollectiblesCommand =>
             _manageCollectiblesCommand ??= _manageCollectiblesCommand = ReactiveCommand.Create(() =>
             {
