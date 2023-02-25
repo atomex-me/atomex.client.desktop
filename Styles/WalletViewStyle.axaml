@@ -113,7 +113,7 @@
             <TextBlock Foreground="{DynamicResource DefaultForegroundBrush}"
                        VerticalAlignment="Center"
                        FontSize="16"
-                       Text="{Binding Description}" />
+                       Text="{Binding Description}"/>
         </DataTemplate>
 
         <DataTemplate x:Key="EthAdditionalDescriptionTemplate" DataType="viewModels:EthereumTransactionViewModel">
@@ -122,15 +122,14 @@
                            VerticalAlignment="Center"
                            FontSize="16"
                            LineHeight="24"
-                           Text="{Binding Description}" />
+                           Text="{Binding Description}"/>
                 <StackPanel Orientation="Horizontal">
                     <TextBlock Text="{Binding Direction}"
                                FontSize="13"
-                               Foreground="{DynamicResource SecondaryForegroundBrush}" />
+                               Foreground="{DynamicResource SecondaryForegroundBrush}"/>
                     <TextBlock Text="{Binding Alias}"
                                FontSize="13"
-                               Foreground="{DynamicResource SecondaryForegroundBrush}" />
-
+                               Foreground="{DynamicResource SecondaryForegroundBrush}"/>
                 </StackPanel>
             </StackPanel>
         </DataTemplate>
@@ -141,14 +140,14 @@
                            VerticalAlignment="Center"
                            FontSize="16"
                            LineHeight="24"
-                           Text="{Binding Description}" />
+                           Text="{Binding Description}"/>
                 <StackPanel Orientation="Horizontal">
                     <TextBlock Text="{Binding Direction}"
                                FontSize="13"
-                               Foreground="{DynamicResource SecondaryForegroundBrush}" />
+                               Foreground="{DynamicResource SecondaryForegroundBrush}"/>
                     <TextBlock Text="{Binding Alias}"
                                FontSize="13"
-                               Foreground="{DynamicResource SecondaryForegroundBrush}" />
+                               Foreground="{DynamicResource SecondaryForegroundBrush}"/>
                 </StackPanel>
             </StackPanel>
         </DataTemplate>
@@ -162,7 +161,22 @@
         </DataTemplate>
     </Styles.Resources>
 
-    <Style Selector="controls|RoundedButton.WalletMenuButton">
+  <Style Selector="Border.Loading">
+    <Style.Animations>
+      <Animation Duration="0:0:1"
+                 PlaybackDirection="Alternate"
+                 RepeatCount="INFINITE">
+        <KeyFrame Cue="0%">
+          <Setter Property="Opacity" Value="0.3"/>
+        </KeyFrame>
+        <KeyFrame Cue="100%">
+          <Setter Property="Opacity" Value="1.0"/>
+        </KeyFrame>
+      </Animation>
+    </Style.Animations>
+  </Style>
+
+  <Style Selector="controls|RoundedButton.WalletMenuButton">
         <Setter Property="FontFamily" Value="{DynamicResource DefaultFontFamily}" />
         <Setter Property="FontSize" Value="12" />
         <Setter Property="Width" Value="90" />
@@ -174,7 +188,6 @@
         <Setter Property="BorderBrush" Value="{DynamicResource CheckboxCheckedBrush}" />
         <Setter Property="Background" Value="{DynamicResource CheckboxCheckedBrush}" />
     </Style>
-
 
     <Style Selector="TabControl.WalletTabControl">
         <Setter Property="Margin" Value="0" />

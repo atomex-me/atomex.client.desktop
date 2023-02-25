@@ -1,6 +1,7 @@
 using System;
 
 using Avalonia.Controls;
+using ReactiveUI.Fody.Helpers;
 
 using Atomex.Blockchain;
 using Atomex.Blockchain.Abstract;
@@ -18,8 +19,8 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
         public string TxHash => Id.Split("/")[0];
         public string FromExplorerUri => $"{Currency.AddressExplorerUri}{From}";
         public string ToExplorerUri => $"{Currency.AddressExplorerUri}{To}";      
-        public string Alias { get; set; }
-        public string Direction { get; set; }
+        [Reactive] public string Alias { get; set; }
+        [Reactive] public string Direction { get; set; }
 
         public TezosTokenTransferViewModel()
         {
@@ -53,6 +54,27 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
 
             Alias = tx.GetAlias(Type);
             Direction = Amount <= 0 ? "to " : "from ";
+        }
+
+        public override void UpdateMetadata(ITransactionMetadata metadata, CurrencyConfig config)
+        {
+            var tx = (TezosTokenTransfer)Transaction;
+
+            TransactionMetadata = metadata;
+            Amount = metadata != null ? metadata.Amount.FromTokens(tx.Token.Decimals) : 0;
+            Type = metadata?.Type ?? TransactionType.Unknown;
+
+            Description = TransactionViewModel.GetDescription(
+                type: Type,
+                amount: Amount,
+                fee: 0,
+                decimals: tx.Token.Decimals,
+                currencyCode: tx.Token.Symbol);
+
+            Alias = tx.GetAlias(Type);
+            Direction = Amount <= 0 ? "to " : "from ";
+
+            IsReady = metadata != null;
         }
 
         private void DesignerMode()

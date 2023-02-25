@@ -13,24 +13,27 @@ using Atomex.Core;
 
 namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
 {
-    public class TransactionViewModelBase : ViewModelBase
+    public abstract class TransactionViewModelBase : ViewModelBase
     {
         public event EventHandler<TransactionEventArgs>? UpdateClicked;
         public event EventHandler<TransactionEventArgs>? RemoveClicked;
         public string TxExplorerUri => $"{Currency.TxExplorerUri}{Id}";
         public ITransaction Transaction { get; set; }
-        public ITransactionMetadata? TransactionMetadata { get; set; }
         public CurrencyConfig Currency { get; set; }
+        public string Id => Transaction.Id;
+        public TransactionStatus State => Transaction.Status;
+        public DateTime Time => Transaction.CreationTime?.UtcDateTime ?? DateTime.UtcNow;
+        public DateTime LocalTime => Time.ToLocalTime();
+
+        [Reactive] public ITransactionMetadata? TransactionMetadata { get; set; }
         [Reactive] public decimal Amount { get; set; }
         [Reactive] public string AmountFormat { get; set; }
         [Reactive] public string Description { get; set; }
-        public string Id => Transaction.Id;
-        public DateTime LocalTime => Time.ToLocalTime();
-        public TransactionStatus State => Transaction.Status;
-        public DateTime Time => Transaction.CreationTime?.UtcDateTime ?? DateTime.UtcNow;
-        [Reactive] public TransactionType Type { get; set; }
-        public Action? OnClose { get; set; }
+        [Reactive] public TransactionType Type { get; set; }   
         [Reactive] public bool CanBeRemoved { get; set; }
+        [Reactive] public bool IsReady { get; set; }
+
+        public Action? OnClose { get; set; }
 
         private ReactiveCommand<Unit, Unit>? _openTxInExplorerCommand;
         public ReactiveCommand<Unit, Unit> OpenTxInExplorerCommand => _openTxInExplorerCommand ??=
@@ -70,9 +73,11 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
         private ReactiveCommand<Unit, Unit>? _onCloseCommand;
         public ReactiveCommand<Unit, Unit> OnCloseCommand => _onCloseCommand ??= ReactiveCommand.Create(
             () => OnClose?.Invoke());
+
+        public abstract void UpdateMetadata(ITransactionMetadata metadata, CurrencyConfig config);
     }
 
-    public class TransactionViewModel : TransactionViewModelBase
+    public abstract class TransactionViewModel : TransactionViewModelBase
     {
         [Reactive] public string CurrencyCode { get; set; }
         [Reactive] public string FeeCode { get; set; }
@@ -95,40 +100,26 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
             decimal fee,
             TransactionType type)
         {
-            Update(tx, metadata, config, amount, fee, type);
-        }
-
-        public void Update(
-            ITransaction tx,
-            ITransactionMetadata? metadata,
-            CurrencyConfig config,
-            decimal amount,
-            decimal fee,
-            TransactionType type)
-        {
             Transaction = tx ?? throw new ArgumentNullException(nameof(tx));
-            TransactionMetadata = metadata;
             Currency = config;
-            Amount = amount;
             AmountFormat = config.Format;
-            Fee = fee;
             FeeCode = config.FeeCode;
             CurrencyCode = config.Name;
             CanBeRemoved = tx.Status is TransactionStatus.Pending or TransactionStatus.Failed;
-            Type = type;
 
+            TransactionMetadata = metadata;
+            Amount = amount;
+            Fee = fee;
+            Type = type;
             Description = GetDescription(
                 type: Type,
                 amount: Amount,
                 fee: fee,
                 decimals: config.Decimals,
                 currencyCode: config.Name);
+            Direction = Amount <= 0 ? "to " : "from ";
 
-            Direction = Amount switch
-            {
-                <= 0 => "to ",
-                > 0 => "from "
-            };
+            IsReady = metadata != null;
         }
 
         public static string GetDescription(

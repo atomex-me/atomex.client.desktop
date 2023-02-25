@@ -6,6 +6,7 @@ using Atomex.Blockchain;
 using Atomex.Blockchain.Abstract;
 using Atomex.Blockchain.Ethereum;
 using Atomex.Common;
+using Atomex.Core;
 
 namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
 {
@@ -22,6 +23,7 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
         public string FromExplorerUri => $"{Currency.AddressExplorerUri}{From}";
         public string ToExplorerUri => $"{Currency.AddressExplorerUri}{To}";
         public string Alias { get; set; }
+        public int? InternalIndex { get; set; }
 
         public EthereumTransactionViewModel()
         {
@@ -43,17 +45,13 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
                 fee: GetFee(metadata),
                 type: metadata?.Type ?? TransactionType.Unknown)
         {
-            From     = tx.From;
-            To       = tx.To;
-            GasPrice = EthereumHelper.WeiToGwei(tx.GasPrice);
-            GasLimit = (decimal)tx.GasLimit;
-            GasUsed  = (decimal)tx.GasUsed;
-
-            Alias = Amount switch
-            {
-                <= 0 => tx.To.TruncateAddress(),
-                > 0 => tx.From.TruncateAddress()
-            };
+            From          = tx.From;
+            To            = tx.To;
+            GasPrice      = EthereumHelper.WeiToGwei(tx.GasPrice);
+            GasLimit      = (decimal)tx.GasLimit;
+            GasUsed       = (decimal)tx.GasUsed;
+            InternalIndex = null;
+            Alias         = Amount <= 0 ? To.TruncateAddress() : From.TruncateAddress();
         }
 
         public EthereumTransactionViewModel(
@@ -67,13 +65,9 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
                 config: config,
                 amount: GetInternalAmount(metadata, internalIndex),
                 fee: GetInternalFee(metadata, internalIndex),
-                type: GetType(metadata, internalIndex))
+                type: GetInternalType(metadata, internalIndex))
         {
-            if (metadata == null)
-                return; // todo: start resolving
-
-            if (internalIndex < 0 || internalIndex >= metadata.Internals.Count)
-                throw new ArgumentOutOfRangeException(nameof(internalIndex));
+            InternalIndex = internalIndex;
 
             if (tx.InternalTransactions == null)
                 throw new ArgumentException("InternalTransactions is null or empty", nameof(tx));
@@ -81,17 +75,42 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
             if (internalIndex < 0 || internalIndex >= tx.InternalTransactions.Count)
                 throw new ArgumentOutOfRangeException(nameof(internalIndex));
 
-            From = tx.InternalTransactions[internalIndex].From;
-            To = tx.InternalTransactions[internalIndex].To;
+            From     = tx.InternalTransactions[internalIndex].From;
+            To       = tx.InternalTransactions[internalIndex].To;
             GasPrice = EthereumHelper.WeiToGwei(tx.GasPrice);
             GasLimit = (decimal)tx.InternalTransactions[internalIndex].GasLimit;
-            GasUsed = (decimal)tx.InternalTransactions[internalIndex].GasUsed;
+            GasUsed  = (decimal)tx.InternalTransactions[internalIndex].GasUsed;
+            Alias    = Amount <= 0 ? To.TruncateAddress() : From.TruncateAddress();
+        }
 
-            Alias = Amount switch
+        public override void UpdateMetadata(ITransactionMetadata metadata, CurrencyConfig config)
+        {
+            TransactionMetadata = metadata;
+
+            if (InternalIndex == null)
             {
-                <= 0 => To.TruncateAddress(),
-                > 0 => From.TruncateAddress()
-            };
+                Amount = GetAmount((TransactionMetadata)metadata);
+                Fee    = GetFee((TransactionMetadata)metadata);
+                Type   = metadata?.Type ?? TransactionType.Unknown;
+
+            }
+            else
+            {
+                Amount = GetInternalAmount((TransactionMetadata)metadata, InternalIndex.Value);
+                Fee    = GetInternalFee((TransactionMetadata)metadata, InternalIndex.Value);
+                Type   = GetInternalType((TransactionMetadata)metadata, InternalIndex.Value);
+            }
+
+            Alias = Amount <= 0 ? To.TruncateAddress() : From.TruncateAddress();
+            Description = GetDescription(
+                type: Type,
+                amount: Amount,
+                fee: Fee,
+                decimals: config.Decimals,
+                currencyCode: config.Name);
+            Direction = Amount <= 0 ? "to " : "from ";
+
+            IsReady = metadata != null;
         }
 
         private static decimal GetAmount(TransactionMetadata? metadata)
@@ -128,7 +147,7 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
             return EthereumHelper.WeiToEth(metadata.Internals[internalIndex].Fee);
         }
 
-        private static TransactionType GetType(TransactionMetadata? metadata, int internalIndex)
+        private static TransactionType GetInternalType(TransactionMetadata? metadata, int internalIndex)
         {
             if (metadata == null)
                 return 0;

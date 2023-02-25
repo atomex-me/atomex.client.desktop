@@ -19,6 +19,7 @@ using Beacon.Sdk.BeaconClients;
 using Beacon.Sdk.BeaconClients.Abstract;
 using Beacon.Sdk.Core.Domain.Entities;
 using Netezos.Encoding;
+using Netezos.Forging;
 using Netezos.Forging.Models;
 using Netezos.Keys;
 using ReactiveUI;
@@ -34,8 +35,6 @@ using Atomex.Client.Desktop.ViewModels.Abstract;
 using Atomex.Client.Desktop.ViewModels.SendViewModels;
 using Atomex.Wallet;
 using Hex = Atomex.Common.Hex;
-using Atomex.Core;
-using Netezos.Forging;
 
 namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
 {
@@ -665,8 +664,10 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
         {
             if (args.AtomexClient != null && _atomexApp.Account != null)
                 return;
+                
+            if (_beaconWalletClient.Connected)
+                _beaconWalletClient.Disconnect();
 
-            _beaconWalletClient.Disconnect();
             _atomexApp.AtomexClientChanged -= OnAtomexClientChangedEventHandler;
             _beaconWalletClient.OnBeaconMessageReceived -= OnBeaconWalletClientMessageReceived;
             _beaconWalletClient.OnConnectedClientsListChanged -= OnDappsListChanged;

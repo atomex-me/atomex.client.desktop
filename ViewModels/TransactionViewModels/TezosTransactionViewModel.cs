@@ -2,12 +2,14 @@
 using System.Linq;
 
 using Avalonia.Controls;
+using ReactiveUI.Fody.Helpers;
 
 using Atomex.Blockchain;
 using Atomex.Blockchain.Abstract;
 using Atomex.Blockchain.Tezos;
 using Atomex.Blockchain.Tezos.Tzkt.Operations;
 using Atomex.Common;
+using Atomex.Core;
 
 namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
 {
@@ -27,7 +29,8 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
             : $"{StorageUsed} / {StorageLimit} ({StorageUsed / StorageLimit * 100:0.#}%)";
         public string FromExplorerUri => $"{Currency.AddressExplorerUri}{From}";
         public string ToExplorerUri => $"{Currency.AddressExplorerUri}{To}";
-        public string Alias { get; set; }
+        [Reactive] public string Alias { get; set; }
+        public int InternalIndex { get; set; }
 
         public TezosTransactionViewModel()
         {
@@ -50,13 +53,9 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
                 fee: GetFee(metadata, internalIndex),
                 type: GetType(metadata, internalIndex))
         {
-            if (metadata == null)
-                return;
+            InternalIndex = internalIndex;
 
-            if (internalIndex < 0 || internalIndex >= metadata.Internals.Count)
-                throw new ArgumentOutOfRangeException(nameof(internalIndex));
-
-            if (internalIndex < 0 || internalIndex >= tx.Operations.Count())
+            if (internalIndex < 0 || internalIndex >= tx.Operations.Count)
                 throw new ArgumentOutOfRangeException(nameof(internalIndex));
 
             var operation = tx.Operations.ToList()[internalIndex];
@@ -87,6 +86,42 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
             {
                 // delegations, reveals and others
             }
+        }
+
+        public override void UpdateMetadata(ITransactionMetadata metadata, CurrencyConfig config)
+        {
+            TransactionMetadata = metadata;
+            Amount = GetAmount((TransactionMetadata)metadata, InternalIndex);
+            Fee = GetFee((TransactionMetadata)metadata, InternalIndex);
+            Type = GetType((TransactionMetadata)metadata, InternalIndex);
+            Description = GetDescription(
+                type: Type,
+                amount: Amount,
+                fee: Fee,
+                decimals: config.Decimals,
+                currencyCode: config.Name);
+            Direction = Amount <= 0 ? "to " : "from ";
+
+            var tezosOperation = (TezosOperation)Transaction;
+            var operation = tezosOperation.Operations.ToList()[InternalIndex];
+
+            if (operation is TransactionOperation op)
+            {
+                if (!string.IsNullOrEmpty(op.Target.Name))
+                {
+                    Alias = op.Target.Name;
+                }
+                else
+                {
+                    Alias = Amount switch
+                    {
+                        <= 0 => op.Target.Address.TruncateAddress(),
+                        > 0 => op.Sender.Address.TruncateAddress()
+                    };
+                }
+            }
+
+            IsReady = metadata != null;
         }
 
         private static decimal GetAmount(

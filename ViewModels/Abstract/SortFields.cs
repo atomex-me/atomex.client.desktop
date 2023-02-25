@@ -15,10 +15,4 @@ namespace Atomex.Client.Desktop.ViewModels.Abstract
         ByStatus,
         ByTime
     }
-    
-    public enum SortDirection
-    {
-        Asc,
-        Desc
-    }
 }

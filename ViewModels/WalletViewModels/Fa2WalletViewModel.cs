@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -12,7 +13,6 @@ using Atomex.Common;
 using Atomex.Core;
 using Atomex.TezosTokens;
 using Atomex.Wallet.Tezos;
-using Atomex.Wallet;
 
 namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 {
@@ -37,76 +37,110 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         {
         }
 
-        protected override void SubscribeToServices()
-        {
-            _app.LocalStorage.BalanceChanged += OnBalanceChangedEventHandler;
-        }
+        //protected override void SubscribeToServices()
+        //{
+        //    _app.LocalStorage.BalanceChanged += OnBalanceChangedEventHandler;
+        //}
 
-        protected override async void OnBalanceChangedEventHandler(object? sender, BalanceChangedEventArgs args)
-        {
-            try
-            {
-                var tezosTokenConfig = (TezosTokenConfig)Currency;
+        //protected override async void OnBalanceChangedEventHandler(object? sender, BalanceChangedEventArgs args)
+        //{
+            //try
+            //{
+            //    var tezosTokenConfig = (TezosTokenConfig)Currency;
 
-                var isTokenUpdate = args is TokenBalanceChangedEventArgs eventArgs &&
-                    eventArgs.Tokens.Contains((tezosTokenConfig.TokenContractAddress, tezosTokenConfig.TokenId));
+            //    var isTokenUpdate = args is TokenBalanceChangedEventArgs eventArgs &&
+            //        eventArgs.Tokens.Contains((tezosTokenConfig.TokenContractAddress, tezosTokenConfig.TokenId));
 
-                if (!isTokenUpdate)
-                    return;
+            //    if (!isTokenUpdate)
+            //        return;
 
-                // update transactions list
-                await LoadTransactionsAsync();
-            }
-            catch (Exception e)
-            {
-                Log.Error(e, "Account balance updated event handler error");
-            }
-        }
+            //    // update transactions list
+            //    await LoadTransactionsAsync();
+            //}
+            //catch (Exception e)
+            //{
+            //    Log.Error(e, "Account balance updated event handler error");
+            //}
+        //}
 
-        protected sealed override async Task LoadTransactionsAsync()
+        protected sealed override async Task LoadTransactionsAsync(bool reset)
         {
             await LoadTransactionsSemaphore.WaitAsync();
 
-            Log.Debug("LoadTransactionsAsync for FA2 {@currency}.", Currency.Name);
+            Log.Debug("LoadTransactionsAsync for FA2 {@currency}", Currency.Name);
 
             try
             {
                 if (_app.Account == null)
                     return;
 
-                IsTransactionsLoading = true;
+                _isTransactionsLoading = true;
 
-                var transactions = await Task.Run(async () =>
+                if (reset)
+                {
+                    // reset exists transactions
+                    await Dispatcher.UIThread.InvokeAsync(() =>
+                    {
+                        Transactions.Clear();
+                        _transactionsLoaded = 0;
+                    });
+                }
+
+                var newTransactions = await Task.Run(async () =>
                 {
                     return (await _app.Account
-                    .GetCurrencyAccount<Fa2Account>(Currency.Name)
-                    .LocalStorage
-                    .GetTokenTransfersWithMetadataAsync(Currency.TokenContractAddress, offset: 0, limit: int.MaxValue)
-                    .ConfigureAwait(false))
-                    .ToList();
+                        .GetCurrencyAccount<Fa2Account>(Currency.Name)
+                        .LocalStorage
+                        .GetTokenTransfersWithMetadataAsync(
+                            contractAddress: Currency.TokenContractAddress,
+                            offset: _transactionsLoaded,
+                            limit: TRANSACTIONS_LOAD_LIMIT,
+                            sort: CurrentSortDirection != null ? CurrentSortDirection.Value : SortDirection.Desc)
+                        .ConfigureAwait(false))
+                        .ToList();
                 });
+
+                _transactionsLoaded += newTransactions.Count;
+
+                var vmsToUpdate = new List<TransactionViewModelBase>();
 
                 await Dispatcher.UIThread.InvokeAsync(() =>
                 {
                     var selectedTransactionId = SelectedTransaction?.Id;
 
-                    Transactions = SortTransactions(
-                        transactions
-                            .Select(t => new TezosTokenTransferViewModel(t.Transfer, t.Metadata, Currency))
-                            .ToList()
-                            .ForEachDo(t => t.OnClose = () => ShowRightPopupContent?.Invoke(null)));
+                    var transactionViewModels = newTransactions
+                        .Select(t =>
+                        {
+                            var vm = new TezosTokenTransferViewModel(t.Transfer, t.Metadata, Currency);
+
+                            if (vm.TransactionMetadata == null)
+                                vmsToUpdate.Add(vm);
+
+                            return vm;
+                        })
+                        .ToList()
+                        .ForEachDo(t => t.OnClose = () => ShowRightPopupContent?.Invoke(null));
+
+                    Transactions.AddRange(transactionViewModels);
 
                     if (selectedTransactionId != null)
                         SelectedTransaction = Transactions.FirstOrDefault(t => t.Id == selectedTransactionId);
                 });
+
+                // resolve view models
+                if (vmsToUpdate.Any())
+                {
+                    await ResolveTransactionsMetadataAsync(vmsToUpdate)
+                        .ConfigureAwait(false);
+                }
             }
             catch (OperationCanceledException)
             {
-                Log.Debug("LoadTransactionsAsync canceled.");
+                Log.Debug("LoadTransactionsAsync canceled for {@currency}", Currency?.Name);
             }
             catch (Exception e)
             {
-                Log.Error(e, "LoadTransactionsAsync error for {@currency}.", Currency?.Name);
+                Log.Error(e, "LoadTransactionsAsync error for {@currency}", Currency?.Name);
             }
             finally
             {

@@ -1,8 +1,10 @@
 ﻿using Avalonia.Controls;
 using Avalonia.Controls.Templates;
+
+using Avalonia.Markup.Xaml.Templates;
+
 using Atomex.Client.Desktop.Services;
 using Atomex.Client.Desktop.ViewModels.TransactionViewModels;
-using Avalonia.Markup.Xaml.Templates;
 
 namespace Atomex.Client.Desktop.Controls
 {
@@ -12,7 +14,7 @@ namespace Atomex.Client.Desktop.Controls
 
         public IControl Build(object data)
         {
-            return GetTemplate(data)?.Build(data) ?? new TextBlock {Text = "Transaction Template Not Found"};
+            return GetTemplate(data)?.Build(data) ?? new TextBlock { Text = "Transaction Template Not Found" };
         }
 
         private static DataTemplate? GetTemplate(object data)
@@ -22,13 +24,10 @@ namespace Atomex.Client.Desktop.Controls
 
             return tx.Currency switch
             {
-                BitcoinBasedConfig => App.TemplateService.GetTxDescriptionTemplate(TxDescriptionTemplate
-                    .BtcBasedDescriptionTemplate),
-                TezosConfig => App.TemplateService.GetTxDescriptionTemplate(TxDescriptionTemplate
-                    .XtzAdditionalDescriptionTemplate),
-                EthereumConfig => App.TemplateService.GetTxDescriptionTemplate(TxDescriptionTemplate
-                    .EthAdditionalDescriptionTemplate),
-                _ => App.TemplateService.GetTxDescriptionTemplate(TxDescriptionTemplate.BtcBasedDescriptionTemplate)
+                BitcoinBasedConfig => App.TemplateService.GetTxDescriptionTemplate(TxDescriptionTemplate.BtcBasedDescriptionTemplate),
+                TezosConfig        => App.TemplateService.GetTxDescriptionTemplate(TxDescriptionTemplate.XtzAdditionalDescriptionTemplate),
+                EthereumConfig     => App.TemplateService.GetTxDescriptionTemplate(TxDescriptionTemplate.EthAdditionalDescriptionTemplate),
+                _                  => App.TemplateService.GetTxDescriptionTemplate(TxDescriptionTemplate.BtcBasedDescriptionTemplate)
             };
         }
 

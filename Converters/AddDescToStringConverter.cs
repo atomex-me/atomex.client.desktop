@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Globalization;
-using Atomex.Client.Desktop.ViewModels.Abstract;
+
 using Avalonia.Data.Converters;
-using Atomex.Client.Desktop.ViewModels.WalletViewModels;
+
+using Atomex.Common;
 
 namespace Atomex.Client.Desktop.Converters
 {

@@ -69,7 +69,7 @@
                                  ExchangeCommand="{Binding ExchangeCommand}"
                                  BuyCommand="{Binding BuyCommand}"
                                  UpdateCommand="{Binding UpdateCommand}" />
-
+      
         <TabControl Grid.Row="1"
                     Grid.Column="0"
                     Grid.ColumnSpan="2"
@@ -87,9 +87,8 @@
                 <controls:TransactionsList Margin="0 16 0 0"
                                            Transactions="{Binding Transactions}"
                                            SelectedTransaction="{Binding SelectedTransaction}"
-                                           CurrentSortField="{Binding CurrentSortField}"
-                                           CurrentSortDirection="{Binding CurrentSortDirection}"
                                            SetSortTypeCommand="{Binding SetSortTypeCommand}"
+                                           CurrentSortDirection="{Binding CurrentSortDirection}"
                                            ReachEndOfScrollCommand="{Binding ReachEndOfScroll}"/>
             </TabItem>
             <!-- <TabItem Margin="16 0" -->

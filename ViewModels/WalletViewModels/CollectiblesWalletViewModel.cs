@@ -24,6 +24,8 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         [Reactive] public string SearchPattern { get; set; }
         public TransactionViewModelBase? SelectedTransaction { get; set; }
 
+        public CollectiblesWalletViewModel() { }
+
         public CollectiblesWalletViewModel(Action<TezosTokenViewModel> showTezosCollectible)
         {
             ShowTezosCollectible =

@@ -17,6 +17,7 @@ using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.ViewModels.Abstract;
 using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
 using Atomex.Client.Desktop.ViewModels.DappsViewModels;
+using Atomex.Common;
 using Atomex.Core;
 using Atomex.Wallet;
 using Atomex.Wallet.Tezos;
@@ -44,7 +45,8 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         {
         }
 
-        public TezosWalletViewModel(IAtomexApp app,
+        public TezosWalletViewModel(
+            IAtomexApp app,
             Action<CurrencyConfig> setConversionTab,
             Action<string>? setWertCurrency,
             Action<ViewModelBase?> showRightPopupContent,
@@ -62,7 +64,8 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                 .WhereAllNotNull()
                 .SubscribeInMainThread(_ => SortDelegations(Delegations));
 
-            DelegateCommand.Merge(UndelegateCommand)
+            DelegateCommand
+                .Merge(UndelegateCommand)
                 .SubscribeInMainThread(_ => DelegationAddressPopupOpened = null);
 
             UpdateTokensCommand
@@ -116,7 +119,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                     return;
 
                 // update transactions list
-                await LoadTransactionsAsync();
+                //await LoadTransactionsAsync();
 
                 // update delegation info
                 await LoadDelegationInfoAsync();
@@ -203,6 +206,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                 {
                     CanDelegate = balance.Confirmed > 0;
                     HasDelegations = delegations.Count > 0;
+
                     SortDelegations(delegations);
                 },
                 DispatcherPriority.Background);
@@ -364,9 +368,10 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         protected override void DesignerMode()
         {
             base.DesignerMode();
+
             SelectedTabIndex = 3;
 
-            TezosTokensViewModel = new TezosTokensViewModel(_app, x => { }, x => { });
+            TezosTokensViewModel = new TezosTokensViewModel();
 
             Delegations = new ObservableCollection<Delegation>()
             {

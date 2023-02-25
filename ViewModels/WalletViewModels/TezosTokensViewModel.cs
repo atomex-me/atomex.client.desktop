@@ -37,6 +37,14 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         [Reactive] public ObservableCollection<TezosTokenViewModel> Tokens { get; set; }
         public ObservableCollection<TezosTokenViewModel> InitialTokens { get; set; }
 
+        public TezosTokensViewModel()
+        {
+#if DEBUG
+            if (Design.IsDesignMode)
+                DesignerMode();
+#endif
+        }
+
         public TezosTokensViewModel(IAtomexApp app,
             Action<TezosTokenViewModel> showTezosToken,
             Action<CurrencyConfig> setConversionTab)
@@ -168,13 +176,6 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             }, DispatcherPriority.Background);
         }
 
-        public TezosTokensViewModel()
-        {
-#if DEBUG
-            if (Design.IsDesignMode)
-                DesignerMode();
-#endif
-        }
 #if DEBUG
         private void DesignerMode()
         {

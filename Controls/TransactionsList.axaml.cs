@@ -13,6 +13,7 @@ using Avalonia.VisualTree;
 
 using Atomex.Client.Desktop.ViewModels.Abstract;
 using Atomex.Client.Desktop.ViewModels.TransactionViewModels;
+using Atomex.Common;
 
 namespace Atomex.Client.Desktop.Controls
 {
@@ -57,8 +58,10 @@ namespace Atomex.Client.Desktop.Controls
         }
 
         public static readonly DirectProperty<TransactionsList, ICommand> SetSortTypeCommandProperty =
-            AvaloniaProperty.RegisterDirect<TransactionsList, ICommand>(nameof(SetSortTypeCommand),
-                control => control.SetSortTypeCommand, (control, command) => control.SetSortTypeCommand = command);
+            AvaloniaProperty.RegisterDirect<TransactionsList, ICommand>(
+                nameof(SetSortTypeCommand),
+                control => control.SetSortTypeCommand,
+                (control, command) => control.SetSortTypeCommand = command);
 
         private ICommand _setSortTypeCommandCommand;
         public ICommand SetSortTypeCommand

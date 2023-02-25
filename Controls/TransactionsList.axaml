@@ -3,7 +3,8 @@
         xmlns:controls="clr-namespace:Atomex.Client.Desktop.Controls"
         xmlns:converters="clr-namespace:Atomex.Client.Desktop.Converters"
         xmlns:vm="clr-namespace:Atomex.Client.Desktop.ViewModels.TransactionViewModels"
-        xmlns:abstract="clr-namespace:Atomex.Client.Desktop.ViewModels.Abstract">
+        xmlns:abstract="clr-namespace:Atomex.Client.Desktop.ViewModels.Abstract"
+        xmlns:common="clr-namespace:Atomex.Common;assembly=Atomex.Client.Core">
 
     <Design.PreviewWith>
         <Border Padding="40 100" Background="#122B50">
@@ -14,10 +15,10 @@
     </Design.PreviewWith>
 
     <Styles.Resources>
-        <converters:AmountToStringConverter x:Key="AmountToStringConverter" />
-        <converters:DateTimeToTxTimeConverter x:Key="DateTimeToTxTimeConverter" />
-        <converters:ShowBuyButton x:Key="ShowBuyButton" />
-        <converters:PercentConverter x:Key="PercentConverter" />
+        <converters:AmountToStringConverter x:Key="AmountToStringConverter"/>
+        <converters:DateTimeToTxTimeConverter x:Key="DateTimeToTxTimeConverter"/>
+        <converters:ShowBuyButton x:Key="ShowBuyButton"/>
+        <converters:PercentConverter x:Key="PercentConverter"/>
     </Styles.Resources>
 
     <Style Selector="controls|TransactionsList">
@@ -42,68 +43,28 @@
                                         Classes="EmptyBtnWithContent">
                                     <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
                                                FontSize="13"
-                                               Text="Description" />
+                                               Text="Description"/>
                                 </Button>
-
-                                <controls:SortButton Grid.Column="1"
-                                                     Title="Amount"
-                                                     Command="{TemplateBinding SetSortTypeCommand}"
-                                                     CommandParameter="{x:Static abstract:TxSortField.ByAmount}">
-                                    <controls:SortButton.SortIsAsc>
-                                        <MultiBinding Converter="{x:Static BoolConverters.And}">
-                                            <Binding RelativeSource="{RelativeSource TemplatedParent}"
-                                                     Path="CurrentSortDirection"
-                                                     Converter="{x:Static converters:EnumToStringEqualConverter.Instance}"
-                                                     ConverterParameter="{x:Static abstract:SortDirection.Asc}" />
-                                            <Binding RelativeSource="{RelativeSource TemplatedParent}"
-                                                     Path="CurrentSortField"
-                                                     Converter="{x:Static converters:EnumToStringEqualConverter.Instance}"
-                                                     ConverterParameter="{x:Static abstract:TxSortField.ByAmount}" />
-                                        </MultiBinding>
-                                    </controls:SortButton.SortIsAsc>
-                                    <controls:SortButton.SortIsDesc>
-                                        <MultiBinding Converter="{x:Static BoolConverters.And}">
-                                            <Binding RelativeSource="{RelativeSource TemplatedParent}"
-                                                     Path="CurrentSortDirection"
-                                                     Converter="{x:Static converters:EnumToStringEqualConverter.Instance}"
-                                                     ConverterParameter="{x:Static abstract:SortDirection.Desc}" />
-                                            <Binding RelativeSource="{RelativeSource TemplatedParent}"
-                                                     Path="CurrentSortField"
-                                                     Converter="{x:Static converters:EnumToStringEqualConverter.Instance}"
-                                                     ConverterParameter="{x:Static abstract:TxSortField.ByAmount}" />
-                                        </MultiBinding>
-                                    </controls:SortButton.SortIsDesc>
-                                </controls:SortButton>
-
-                                <controls:SortButton Grid.Column="2"
-                                                     Title="Status"
-                                                     Command="{TemplateBinding SetSortTypeCommand}"
-                                                     CommandParameter="{x:Static abstract:TxSortField.ByStatus}">
-                                    <controls:SortButton.SortIsAsc>
-                                        <MultiBinding Converter="{x:Static BoolConverters.And}">
-                                            <Binding RelativeSource="{RelativeSource TemplatedParent}"
-                                                     Path="CurrentSortDirection"
-                                                     Converter="{x:Static converters:EnumToStringEqualConverter.Instance}"
-                                                     ConverterParameter="{x:Static abstract:SortDirection.Asc}" />
-                                            <Binding RelativeSource="{RelativeSource TemplatedParent}"
-                                                     Path="CurrentSortField"
-                                                     Converter="{x:Static converters:EnumToStringEqualConverter.Instance}"
-                                                     ConverterParameter="{x:Static abstract:TxSortField.ByStatus}" />
-                                        </MultiBinding>
-                                    </controls:SortButton.SortIsAsc>
-                                    <controls:SortButton.SortIsDesc>
-                                        <MultiBinding Converter="{x:Static BoolConverters.And}">
-                                            <Binding RelativeSource="{RelativeSource TemplatedParent}"
-                                                     Path="CurrentSortDirection"
-                                                     Converter="{x:Static converters:EnumToStringEqualConverter.Instance}"
-                                                     ConverterParameter="{x:Static abstract:SortDirection.Desc}" />
-                                            <Binding RelativeSource="{RelativeSource TemplatedParent}"
-                                                     Path="CurrentSortField"
-                                                     Converter="{x:Static converters:EnumToStringEqualConverter.Instance}"
-                                                     ConverterParameter="{x:Static abstract:TxSortField.ByStatus}" />
-                                        </MultiBinding>
-                                    </controls:SortButton.SortIsDesc>
-                                </controls:SortButton>
+                                <Button Grid.Column="1"
+                                        Padding="0"
+                                        VerticalAlignment="Stretch"
+                                        VerticalContentAlignment="Center"
+                                        IsEnabled="False"
+                                        Classes="EmptyBtnWithContent">
+                                  <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
+                                             FontSize="13"
+                                             Text="Amount"/>
+                                </Button>
+                                <Button Grid.Column="2"
+                                        Padding="0"
+                                        VerticalAlignment="Stretch"
+                                        VerticalContentAlignment="Center"
+                                        IsEnabled="False"
+                                        Classes="EmptyBtnWithContent">
+                                  <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
+                                             FontSize="13"
+                                             Text="Status"/>
+                                </Button>
                                 <controls:SortButton Grid.Column="3"
                                                      Title="Time"
                                                      Command="{TemplateBinding SetSortTypeCommand}"
@@ -113,7 +74,7 @@
                                             <Binding RelativeSource="{RelativeSource TemplatedParent}"
                                                      Path="CurrentSortDirection"
                                                      Converter="{x:Static converters:EnumToStringEqualConverter.Instance}"
-                                                     ConverterParameter="{x:Static abstract:SortDirection.Asc}" />
+                                                     ConverterParameter="{x:Static common:SortDirection.Asc}" />
                                             <Binding RelativeSource="{RelativeSource TemplatedParent}"
                                                      Path="CurrentSortField"
                                                      Converter="{x:Static converters:EnumToStringEqualConverter.Instance}"
@@ -125,7 +86,7 @@
                                             <Binding RelativeSource="{RelativeSource TemplatedParent}"
                                                      Path="CurrentSortDirection"
                                                      Converter="{x:Static converters:EnumToStringEqualConverter.Instance}"
-                                                     ConverterParameter="{x:Static abstract:SortDirection.Desc}" />
+                                                     ConverterParameter="{x:Static common:SortDirection.Desc}" />
                                             <Binding RelativeSource="{RelativeSource TemplatedParent}"
                                                      Path="CurrentSortField"
                                                      Converter="{x:Static converters:EnumToStringEqualConverter.Instance}"
@@ -145,20 +106,20 @@
                                  SelectionMode="Single">
                             <ListBox.Styles>
                                 <Style Selector="ListBoxItem">
-                                    <Setter Property="Padding" Value="0" />
-                                    <Setter Property="Height" Value="62" />
-                                    <Setter Property="VerticalContentAlignment" Value="Stretch" />
-                                    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-                                    <Setter Property="Cursor" Value="Hand" />
-                                    <Setter Property="BorderThickness" Value="0 0 0 1" />
-                                    <Setter Property="BorderBrush" Value="{DynamicResource LightDefaultOpacity10}" />
+                                    <Setter Property="Padding" Value="0"/>
+                                    <Setter Property="Height" Value="62"/>
+                                    <Setter Property="VerticalContentAlignment" Value="Stretch"/>
+                                    <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                                    <Setter Property="Cursor" Value="Hand"/>
+                                    <Setter Property="BorderThickness" Value="0 0 0 1"/>
+                                    <Setter Property="BorderBrush" Value="{DynamicResource LightDefaultOpacity10}"/>
                                 </Style>
                                 <Style Selector="ListBoxItem:selected /template/ ContentPresenter">
-                                    <Setter Property="Background" Value="{DynamicResource LightDefaultOpacity6}" />
-                                    <Setter Property="CornerRadius" Value="6" />
+                                    <Setter Property="Background" Value="{DynamicResource LightDefaultOpacity6}"/>
+                                    <Setter Property="CornerRadius" Value="6"/>
                                 </Style>
                                 <Style Selector="ListBoxItem:not(:selected) /template/ ContentPresenter">
-                                    <Setter Property="Background" Value="{DynamicResource AlmostTransparentBrush}" />
+                                    <Setter Property="Background" Value="{DynamicResource AlmostTransparentBrush}"/>
                                 </Style>
                             </ListBox.Styles>
 
@@ -167,29 +128,37 @@
                                     <Border Padding="12 0">
                                         <Grid ColumnDefinitions="7*,5.5*,3*,4.5*"
                                               VerticalAlignment="Stretch">
-
                                             <ContentControl Grid.Column="0"
                                                             VerticalAlignment="Center"
-                                                            Content="{Binding}">
+                                                            Content="{Binding}"
+                                                            IsVisible="{Binding IsReady}">
                                                 <ContentControl.ContentTemplate>
-                                                    <controls:TransactionDescriptionDataTemplateSelector />
+                                                    <controls:TransactionDescriptionDataTemplateSelector/>
                                                 </ContentControl.ContentTemplate>
                                             </ContentControl>
 
+                                            <Border Grid.Column="0"
+                                                    IsVisible="{Binding !IsReady}"
+                                                    HorizontalAlignment="Left"
+                                                    Background="{DynamicResource DefaultBackgroundColor}"
+                                                    CornerRadius="5"
+                                                    Width="200"
+                                                    Height="20"
+                                                    Classes="Loading"/>
+
                                             <StackPanel Grid.Column="1"
-                                                        Orientation="Horizontal">
+                                                        Orientation="Horizontal"
+                                                        IsVisible="{Binding IsReady}">
                                                 <TextBlock VerticalAlignment="Center"
                                                            FontSize="16"
                                                            Classes="AmountListBoxItem"
-                                                           Classes.PositiveAmount="{Binding Amount,
-                                                           Converter={x:Static converters:NumericConverters.GreaterThanZero}}">
+                                                           Classes.PositiveAmount="{Binding Amount, Converter={x:Static converters:NumericConverters.GreaterThanZero}}">
                                                     <TextBlock.Text>
-                                                        <MultiBinding
-                                                            Converter="{StaticResource AmountToStringConverter}">
-                                                            <Binding Path="Amount" Mode="OneWay" />
-                                                            <Binding Path="AmountFormat" Mode="OneWay" />
+                                                        <MultiBinding Converter="{StaticResource AmountToStringConverter}">
+                                                            <Binding Path="Amount" Mode="OneWay"/>
+                                                            <Binding Path="AmountFormat" Mode="OneWay"/>
                                                             <Binding Path="Amount" Mode="OneWay"
-                                                                     Converter="{x:Static converters:NumericConverters.GreaterThanZero}" />
+                                                                     Converter="{x:Static converters:NumericConverters.GreaterThanZero}"/>
                                                         </MultiBinding>
                                                     </TextBlock.Text>
                                                 </TextBlock>
@@ -197,23 +166,52 @@
                                                            FontSize="16"
                                                            Margin="4 0 0 0"
                                                            Classes="AmountListBoxItem"
-                                                           Classes.PositiveAmount="{Binding Amount,
-                                                           Converter={x:Static converters:NumericConverters.GreaterThanZero}}"
-                                                           Text="{Binding CurrencyCode}" />
+                                                           Classes.PositiveAmount="{Binding Amount, Converter={x:Static converters:NumericConverters.GreaterThanZero}}"
+                                                           Text="{Binding CurrencyCode}"/>
                                             </StackPanel>
 
-                                            <ContentControl Grid.Column="2" Content="{Binding}">
+                                            <Border Grid.Column="1"
+                                                    IsVisible="{Binding !IsReady}"
+                                                    HorizontalAlignment="Left"
+                                                    Height="20"
+                                                    Width="100"
+                                                    Background="{DynamicResource DefaultBackgroundColor}"
+                                                    CornerRadius="5"
+                                                    Classes="Loading"/>
+
+                                            <ContentControl Grid.Column="2"
+                                                            Content="{Binding}"
+                                                            IsVisible="{Binding IsReady}">
                                                 <ContentControl.ContentTemplate>
-                                                    <controls:TransactionStateDataTemplateSelector />
+                                                    <controls:TransactionStateDataTemplateSelector/>
                                                 </ContentControl.ContentTemplate>
                                             </ContentControl>
 
+                                            <Border Grid.Column="2"
+                                                    IsVisible="{Binding !IsReady}"
+                                                    HorizontalAlignment="Left"
+                                                    Height="20"
+                                                    Width="100"
+                                                    Background="{DynamicResource DefaultBackgroundColor}"
+                                                    CornerRadius="5"
+                                                    Classes="Loading"/>
+
                                             <TextBlock Grid.Column="3"
+                                                       IsVisible="{Binding IsReady}"
                                                        Foreground="{DynamicResource SecondaryForegroundBrush}"
                                                        VerticalAlignment="Center"
                                                        FontSize="13"
                                                        LineHeight="16"
-                                                       Text="{Binding LocalTime, Converter={StaticResource DateTimeToTxTimeConverter}}" />
+                                                       Text="{Binding LocalTime, Converter={StaticResource DateTimeToTxTimeConverter}}"/>
+
+                                            <Border Grid.Column="3"
+                                                    IsVisible="{Binding !IsReady}"
+                                                    HorizontalAlignment="Left"
+                                                    Height="20"
+                                                    Width="100"
+                                                    Background="{DynamicResource DefaultBackgroundColor}"
+                                                    CornerRadius="5"
+                                                    Classes="Loading"/>
                                         </Grid>
                                     </Border>
                                 </DataTemplate>

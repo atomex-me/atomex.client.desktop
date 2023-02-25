@@ -32,17 +32,19 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
                 };
             }
             else if (config is Erc20Config erc20Config &&
-                tx is Erc20Transaction erc20Tx)
+                     tx is Erc20Transaction erc20Tx)
             {
-                return erc20Tx.Transfers.Select((t, i) =>
-                    new Erc20TransactionViewModel(
-                        tx: erc20Tx,
-                        metadata: metadata as TransactionMetadata,
-                        transferIndex: i,
-                        config: erc20Config));
+                return erc20Tx.Transfers
+                    .Select((t, i) =>
+                        new Erc20TransactionViewModel(
+                            tx: erc20Tx,
+                            metadata: metadata as TransactionMetadata,
+                            transferIndex: i,
+                            config: erc20Config))
+                    .ToList();
             }
             else if (config is EthereumConfig ethConfig &&
-                tx is EthereumTransaction ethTx)
+                     tx is EthereumTransaction ethTx)
             {
                 var txViewModel = new EthereumTransactionViewModel(
                     tx: ethTx,
@@ -68,13 +70,15 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
                 }
             }
             else if (config is TezosConfig xtzConfig &&
-                tx is TezosOperation xtzTx)
+                     tx is TezosOperation xtzTx)
             {
-                return xtzTx.Operations.Select((t, i) => new TezosTransactionViewModel(
-                    tx: xtzTx,
-                    metadata: metadata as TransactionMetadata,
-                    internalIndex: i,
-                    config: xtzConfig));
+                return xtzTx.Operations
+                    .Select((t, i) => new TezosTransactionViewModel(
+                        tx: xtzTx,
+                        metadata: metadata as TransactionMetadata,
+                        internalIndex: i,
+                        config: xtzConfig))
+                    .ToList();
             }
 
             throw new ArgumentOutOfRangeException(nameof(config), "Not supported transaction type");
