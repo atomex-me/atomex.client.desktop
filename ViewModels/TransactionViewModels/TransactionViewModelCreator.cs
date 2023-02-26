@@ -15,7 +15,7 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
 {
     public static class TransactionViewModelCreator
     {
-        public static IEnumerable<TransactionViewModel> CreateViewModels(
+        public static List<TransactionViewModel> CreateViewModels(
             ITransaction tx,
             ITransactionMetadata metadata,
             CurrencyConfig config)
@@ -41,6 +41,7 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
                             metadata: metadata as TransactionMetadata,
                             transferIndex: i,
                             config: erc20Config))
+                    .Cast<TransactionViewModel>()
                     .ToList();
             }
             else if (config is EthereumConfig ethConfig &&
@@ -51,23 +52,24 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
                     metadata: metadata as TransactionMetadata,
                     config: ethConfig);
 
-                if (ethTx.InternalTransactions != null && ethTx.InternalTransactions.Any())
-                {
-                    var internalsViewModels = ethTx.InternalTransactions
-                        .Select((t, i) =>
-                        {
-                            return new EthereumTransactionViewModel(
-                                tx: ethTx,
-                                metadata: metadata as TransactionMetadata,
-                                internalIndex: i,
-                                config: ethConfig);
-                        })
-                        .ToList();
+                if (ethTx.InternalTransactions == null || !ethTx.InternalTransactions.Any())
+                    return new List<TransactionViewModel> { txViewModel };
 
-                    internalsViewModels.Add(txViewModel);
+                var internalsViewModels = ethTx.InternalTransactions
+                    .Select((t, i) =>
+                    {
+                        return new EthereumTransactionViewModel(
+                            tx: ethTx,
+                            metadata: metadata as TransactionMetadata,
+                            internalIndex: i,
+                            config: ethConfig);
+                    })
+                    .Cast<TransactionViewModel>()
+                    .ToList();
 
-                    return internalsViewModels;
-                }
+                internalsViewModels.Add(txViewModel);
+
+                return internalsViewModels;
             }
             else if (config is TezosConfig xtzConfig &&
                      tx is TezosOperation xtzTx)
@@ -78,6 +80,7 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
                         metadata: metadata as TransactionMetadata,
                         internalIndex: i,
                         config: xtzConfig))
+                    .Cast<TransactionViewModel>()
                     .ToList();
             }
 

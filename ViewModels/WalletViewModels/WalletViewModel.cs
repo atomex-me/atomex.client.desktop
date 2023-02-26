@@ -70,6 +70,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             Action<string>? setWertCurrency = null)
         {
             _app = app ?? throw new ArgumentNullException(nameof(app));
+            //_app.LocalStorage.RemoveTransactionsMetadataAsync("BTC").WaitForResult();
 
             ShowRightPopupContent = showRightPopupContent
                 ?? throw new ArgumentNullException(nameof(showRightPopupContent));
@@ -233,14 +234,27 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                                     metadata: t.Metadata,
                                     config: Currency);
 
-                            foreach (var vm in vms)
+                            for (var i = vms.Count - 1; i >= 0; i--)
                             {
+                                var vm = vms[i];
+
+                                if (vm.TransactionMetadata != null)
+                                {
+                                    if (!vm.Type.HasFlag(TransactionType.Input) &&
+                                        !vm.Type.HasFlag(TransactionType.Output))
+                                    {
+                                        // remove transactions view models for non-users addresses
+                                        vms.RemoveAt(i);
+                                    }
+                                }
+                                else
+                                {
+                                    vmsToUpdate.Insert(0, vm); // insert with safe order
+                                }
+
                                 vm.UpdateClicked += UpdateTransactionEventHandler;
                                 vm.RemoveClicked += RemoveTransactionEventHandler;
                                 vm.OnClose = () => ShowRightPopupContent?.Invoke(null);
-
-                                if (vm.TransactionMetadata == null)
-                                    vmsToUpdate.Add(vm);
                             }
 
                             return vms;
@@ -378,7 +392,8 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             {
                 var txId = $"{args.Transaction.Id}:{args.Transaction.Currency}";
 
-                var isRemoved = await _app.LocalStorage
+                var isRemoved = await _app
+                    .LocalStorage
                     .RemoveTransactionByIdAsync(txId);
 
                 if (!isRemoved)
@@ -386,10 +401,10 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
                 ShowRightPopupContent?.Invoke(null);
 
-                var vmToRemove = Transactions.FirstOrDefault(t => t.Id == args.Transaction.Id);
+                var vmsToRemove = Transactions.Where(t => t.Id == args.Transaction.Id);
 
-                if (vmToRemove != null)
-                    Transactions.Remove(vmToRemove);
+                if (vmsToRemove != null)
+                    Transactions.RemoveRange(vmsToRemove);
             }
             catch (Exception e)
             {
@@ -423,16 +438,23 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                     .ConfigureAwait(false);
             });
 
-            await Task.Delay(1000);
-
             // update view models in UI thread
             await Dispatcher.UIThread.InvokeAsync(() =>
             {
                 foreach (var vm in viewModels)
+                {
                     if (resolved.TryGetValue(vm.Transaction.Id, out var metadata))
+                    {
                         vm.UpdateMetadata(metadata, Currency);
 
-                
+                        if (!vm.Type.HasFlag(TransactionType.Input) &&
+                            !vm.Type.HasFlag(TransactionType.Output))
+                        {
+                            // remove transactions view models for non-users addresses
+                            Transactions.Remove(vm);
+                        }
+                    }
+                }
             });
         }
 

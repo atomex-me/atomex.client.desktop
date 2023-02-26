@@ -133,10 +133,10 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
                 return $"Swap payment {Math.Abs(amount).ToString("0." + new string('#', decimals))} {currencyCode}";
 
             if (type.HasFlag(TransactionType.SwapRefund))
-                return $"Swap refund {Math.Abs(amount + fee).ToString("0." + new string('#', decimals))} {currencyCode}";
+                return $"Swap refund {Math.Abs(amount - fee).ToString("0." + new string('#', decimals))} {currencyCode}";
 
             if (type.HasFlag(TransactionType.SwapRedeem))
-                return $"Swap redeem {Math.Abs(amount + fee).ToString("0." + new string('#', decimals))} {currencyCode}";
+                return $"Swap redeem {Math.Abs(amount - fee).ToString("0." + new string('#', decimals))} {currencyCode}";
 
             if (type.HasFlag(TransactionType.TokenApprove))
                 return "Token approve";
@@ -149,7 +149,7 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
 
             return amount switch
             {
-                <= 0 => $"Sent {Math.Abs(amount + fee).ToString("0." + new string('#', decimals))} {currencyCode}",
+                <= 0 => $"Sent {Math.Abs(amount - fee).ToString("0." + new string('#', decimals))} {currencyCode}",
                 > 0 => $"Received {Math.Abs(amount).ToString("0." + new string('#', decimals))} {currencyCode}"
             };
         }
