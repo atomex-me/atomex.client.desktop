@@ -26,13 +26,12 @@ using Atomex.Client.Desktop.ViewModels.TransactionViewModels;
 using Atomex.Common;
 using Atomex.Core;
 using Atomex.Wallet;
-using Atomex.Wallet.Abstract;
 
 namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 {
     public class WalletViewModel : ViewModelBase, IWalletViewModel
     {
-        protected const int TRANSACTIONS_LOAD_LIMIT = 20;
+        protected const int TRANSACTIONS_LOADING_LIMIT = 20;
 
         protected readonly IAtomexApp _app;
         protected int _transactionsLoaded;
@@ -53,6 +52,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         public CurrencyConfig Currency => CurrencyViewModel.Currency;
 
         protected CancellationTokenSource _cancellation;
+        protected readonly SemaphoreSlim LoadTransactionsSemaphore = new(1, 1);
 
         public WalletViewModel()
         {
@@ -64,28 +64,29 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
         public WalletViewModel(
             IAtomexApp app,
+            CurrencyConfig currency,
             Action<ViewModelBase?> showRightPopupContent,
-            CurrencyConfig? currency = null,
             Action<CurrencyConfig>? setConversionTab = null,
             Action<string>? setWertCurrency = null)
         {
             _app = app ?? throw new ArgumentNullException(nameof(app));
+
+            // DEBUG!
+            //_app.LocalStorage.RemoveTransactionsMetadataAsync("ETH").WaitForResult();
             //_app.LocalStorage.RemoveTransactionsMetadataAsync("BTC").WaitForResult();
+            //_app.LocalStorage.RemoveTransactionsMetadataAsync("LTC").WaitForResult();
+            //_app.LocalStorage.RemoveTransactionsMetadataAsync("XTZ").WaitForResult();
+
+            CurrencyViewModel = CurrencyViewModelCreator.CreateOrGet(currency);
+            Header = CurrencyViewModel.Header;
+
+            LoadAddresses();
 
             ShowRightPopupContent = showRightPopupContent
                 ?? throw new ArgumentNullException(nameof(showRightPopupContent));
             
             SetConversionTab = setConversionTab;
             SetWertCurrency = setWertCurrency;
-
-            if (currency != null)
-            {
-                CurrencyViewModel = CurrencyViewModelCreator.CreateOrGet(currency);
-                Header = CurrencyViewModel.Header;
-                
-                //LoadAddresses();
-                //_ = LoadTransactionsAsync();
-            }
 
             this.WhenAnyValue(vm => vm.CurrentSortDirection)
                 .WhereNotNull()
@@ -139,39 +140,114 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
         protected virtual void SubscribeToServices()
         {
-            _app.LocalStorage.BalanceChanged += OnBalanceChangedEventHandler;
             _app.LocalStorage.TransactionsChanged += OnTransactionsChangedEventHandler;
         }
 
-        protected virtual void OnBalanceChangedEventHandler(object? sender, BalanceChangedEventArgs args)
+        protected virtual bool FilterTransactions(TransactionsChangedEventArgs args, out IEnumerable<ITransaction>? txs)
         {
-            //try
-            //{
-            //    if (!args.Currencies.Contains(Currency.Name))
-            //        return;
+            if (Currency.Name == args.Currency)
+            {
+                txs = args.Transactions;
+                return true;
+            }
 
-            //    // update transactions list
-            //    await LoadTransactionsAsync();
-            //}
-            //catch (Exception e)
-            //{
-            //    Log.Error(e, "Account balance updated event handler error");
-            //}
+            txs = null;
+            return false;
         }
 
-        private async void OnTransactionsChangedEventHandler(object? sender, TransactionsChangedEventArgs args)
+        protected virtual async void OnTransactionsChangedEventHandler(object? sender, TransactionsChangedEventArgs args)
         {
+            if (!FilterTransactions(args, out var txs))
+                return;
+
+            if (txs == null || !txs.Any())
+                return;
+
+            if (!Transactions.Any())
+            {
+                await LoadTransactionsAsync(reset: true)
+                    .ConfigureAwait(false);
+
+                return;
+            }
+
             try
             {
-                if (Currency.Name != args.Currency)
-                    return;
+                await LoadTransactionsSemaphore.WaitAsync();
 
-                // update transactions list
-                //await LoadTransactionsAsync();
+                var viewModelsToInsert = new List<TransactionViewModelBase>();
+                var viewModelsToUpdate = new List<TransactionViewModelBase>();
+
+                await Dispatcher.UIThread.InvokeAsync(() =>
+                {
+                    foreach (var tx in txs!)
+                    {
+                        var existIndex = Transactions.FindIndex(t => t.Id == tx.Id);
+
+                        // replace view models with the same transaction id
+                        if (existIndex >= 0)
+                        {
+                            // remove all view models with the same transaction id
+                            while (existIndex < Transactions.Count && Transactions[existIndex].Transaction.Id == tx.Id)
+                                Transactions.RemoveAt(existIndex);
+
+                            // insert new view models
+                            var viewModels = TransactionToViewModels(tx, metadata: null, Currency);
+
+                            Transactions.InsertRange(existIndex, viewModels);
+
+                            viewModelsToUpdate.AddRange(viewModels);
+                        }
+                        else // add only new transactions to the top of the Transactions table
+                        {
+                            var isNewTx = !Transactions.Any() || tx.CreationTime > Transactions[0].Transaction.CreationTime;
+
+                            if (isNewTx && CurrentSortDirection == SortDirection.Desc)
+                            {
+                                var viewModels = TransactionToViewModels(tx, metadata: null, Currency);
+
+                                var inserted = false;
+
+                                for (var i = 0; i < viewModelsToInsert.Count; i++)
+                                {
+                                    if (viewModelsToInsert[i].Transaction.CreationTime < tx.CreationTime)
+                                    {
+                                        viewModelsToInsert.InsertRange(i, viewModels);
+                                        inserted = true;
+                                        break;
+                                    }
+                                }
+
+                                if (!inserted)
+                                    viewModelsToInsert.AddRange(viewModels);
+
+                                _transactionsLoaded++;
+                            }
+                        }
+                    }
+
+                    // insert & update new view models if any
+                    if (viewModelsToInsert.Any())
+                    {
+                        Transactions.InsertRange(0, viewModelsToInsert);
+                        viewModelsToUpdate.InsertRange(0, viewModelsToInsert);
+                    }
+                });
+
+                // resolve view models
+                if (viewModelsToUpdate.Any())
+                {
+                    await ResolveTransactionsMetadataAsync(viewModelsToUpdate)
+                        .ConfigureAwait(false);
+                }
             }
             catch (Exception e)
             {
-                Log.Error(e, "Account transactions changed event handler error");
+                Log.Error(e, "Account transactions changed event handler error for currency {@currency}", Currency.Name);
+            }
+            finally
+            {
+                LoadTransactionsSemaphore.Release();
             }
         }
 
@@ -180,7 +256,20 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             AddressesViewModel = new AddressesViewModel(_app, CurrencyViewModel.Currency);
         }
 
-        protected readonly SemaphoreSlim LoadTransactionsSemaphore = new(1, 1);
+        protected virtual Task<List<(ITransaction Tx, ITransactionMetadata Metadata)>> LoadTransactionsWithMetadataAsync()
+        {
+            return Task.Run(async () =>
+            {
+                return (await _app.Account
+                    .GetTransactionsWithMetadataAsync(
+                        currency: Currency.Name,
+                        offset: _transactionsLoaded,
+                        limit: TRANSACTIONS_LOADING_LIMIT,
+                        sort: CurrentSortDirection != null ? CurrentSortDirection.Value : SortDirection.Desc)
+                    .ConfigureAwait(false))
+                    .ToList();
+            });
+        }
 
         protected virtual async Task LoadTransactionsAsync(bool reset)
         {
@@ -205,57 +294,23 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                     });
                 }
 
-                var newTransactions = await Task.Run(async () =>
-                {
-                    return (await _app.Account
-                        .GetTransactionsWithMetadataAsync(
-                            currency: Currency.Name,
-                            offset: _transactionsLoaded,
-                            limit: TRANSACTIONS_LOAD_LIMIT,
-                            sort: CurrentSortDirection != null ? CurrentSortDirection.Value : SortDirection.Desc)
-                        .ConfigureAwait(false))
-                        .ToList();
-                });
+                var transactions = await LoadTransactionsWithMetadataAsync();
 
-                _transactionsLoaded += newTransactions.Count;
+                _transactionsLoaded += transactions.Count;
 
-                var vmsToUpdate = new List<TransactionViewModel>();
+                var viewModelsToUpdate = new List<TransactionViewModelBase>();
 
                 await Dispatcher.UIThread.InvokeAsync(() =>
                 {
                     var selectedTransactionId = SelectedTransaction?.Id;
 
-                    var transactionViewModels = newTransactions
+                    var transactionViewModels = transactions
                         .Select(t =>
                         {
-                            var vms = TransactionViewModelCreator
-                                .CreateViewModels(
-                                    tx: t.Tx,
-                                    metadata: t.Metadata,
-                                    config: Currency);
+                            var vms = TransactionToViewModels(t.Tx, t.Metadata, Currency);
 
-                            for (var i = vms.Count - 1; i >= 0; i--)
-                            {
-                                var vm = vms[i];
-
-                                if (vm.TransactionMetadata != null)
-                                {
-                                    if (!vm.Type.HasFlag(TransactionType.Input) &&
-                                        !vm.Type.HasFlag(TransactionType.Output))
-                                    {
-                                        // remove transactions view models for non-users addresses
-                                        vms.RemoveAt(i);
-                                    }
-                                }
-                                else
-                                {
-                                    vmsToUpdate.Insert(0, vm); // insert with safe order
-                                }
-
-                                vm.UpdateClicked += UpdateTransactionEventHandler;
-                                vm.RemoveClicked += RemoveTransactionEventHandler;
-                                vm.OnClose = () => ShowRightPopupContent?.Invoke(null);
-                            }
+                            if (t.Metadata == null)
+                                viewModelsToUpdate.AddRange(vms);
 
                             return vms;
                         })
@@ -268,25 +323,56 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                 });
 
                 // resolve view models
-                if (vmsToUpdate.Any())
+                if (viewModelsToUpdate.Any())
                 {
-                    await ResolveTransactionsMetadataAsync(vmsToUpdate)
+                    await ResolveTransactionsMetadataAsync(viewModelsToUpdate)
                         .ConfigureAwait(false);
                 }
             }
             catch (OperationCanceledException)
             {
-                Log.Debug("LoadTransactionsAsync canceled for {@currency}", Currency?.Name);
+                Log.Debug("LoadTransactionsAsync canceled for {@currency}", Currency.Name);
             }
             catch (Exception e)
             {
-                Log.Error(e, "LoadTransactionAsync error for {@currency}", Currency?.Name);
+                Log.Error(e, "LoadTransactionAsync error for {@currency}", Currency.Name);
             }
 
             finally
             {
                 LoadTransactionsSemaphore.Release();
             }
+        }
+
+        private List<TransactionViewModelBase> TransactionToViewModels(
+            ITransaction tx,
+            ITransactionMetadata? metadata,
+            CurrencyConfig currency)
+        {
+            var vms = TransactionViewModelCreator
+                .CreateViewModels(
+                    tx: tx,
+                    metadata: metadata,
+                    config: currency);
+
+            for (var i = vms.Count - 1; i >= 0; i--)
+            {
+                var vm = vms[i];
+
+                if (vm.TransactionMetadata != null &&
+                    !vm.Type.HasFlag(TransactionType.Input) &&
+                    !vm.Type.HasFlag(TransactionType.Output))
+                {
+                    // remove transactions view models for non-users addresses
+                    vms.RemoveAt(i);
+                }
+
+                vm.UpdateClicked += UpdateTransactionEventHandler;
+                vm.RemoveClicked += RemoveTransactionEventHandler;
+                vm.OnClose = () => ShowRightPopupContent?.Invoke(null);
+            }
+
+            return vms;
         }
 
         private ReactiveCommand<Unit, Unit>? _sendCommand;
@@ -353,14 +439,14 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                 {
                     var scanner = new WalletScanner(_app.Account);
 
-                    await scanner.UpdateBalanceAsync(
-                        currency: Currency.Name,
-                        skipUsed: true,
-                        cancellationToken: _cancellation.Token);
+                    await scanner
+                        .UpdateBalanceAsync(
+                            currency: Currency.Name,
+                            skipUsed: true,
+                            cancellationToken: _cancellation.Token)
+                        .ConfigureAwait(false);
 
                 }, _cancellation.Token);
-
-                //await LoadTransactionsAsync();
             }
             catch (OperationCanceledException)
             {
@@ -397,11 +483,12 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                     .RemoveTransactionByIdAsync(txId);
 
                 if (!isRemoved)
-                    return;
+                    return; // todo: error?
 
                 ShowRightPopupContent?.Invoke(null);
 
-                var vmsToRemove = Transactions.Where(t => t.Id == args.Transaction.Id);
+                var vmsToRemove = Transactions
+                    .Where(t => t.Id == args.Transaction.Id);
 
                 if (vmsToRemove != null)
                     Transactions.RemoveRange(vmsToRemove);

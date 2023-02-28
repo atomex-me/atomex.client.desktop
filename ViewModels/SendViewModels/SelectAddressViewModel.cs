@@ -59,14 +59,13 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     vm => vm.SearchPattern)
                 .SubscribeInMainThread(value =>
                 {
+                    if (MyAddresses == null)
+                        return;
+
                     var (sortByDate, sortByAscending, searchPattern) = value;
 
-                    if (MyAddresses == null) return;
-
                     var myAddresses = new ObservableCollection<WalletAddressViewModel>(
-                        InitialMyAddresses
-                            .Where(addressViewModel => addressViewModel.WalletAddress.Address.ToLower()
-                                .Contains(searchPattern?.ToLower() ?? string.Empty)));
+                        InitialMyAddresses.Where(addressViewModel => addressViewModel.WalletAddress.Address.ToLower().Contains(searchPattern?.ToLower() ?? string.Empty)));
 
                     if (sortByDate)
                     {
@@ -90,10 +89,9 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 .Select(value =>
                 {
                     var (address, searchPattern) = value;
+
                     if (SelectAddressMode == SelectAddressMode.SendFrom)
-                    {
                         return address != null;
-                    }
 
                     return currency.IsValidAddress(address?.Address ?? searchPattern);
                 })
@@ -104,9 +102,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 .Select(searchPattern =>
                 {
                     if (SelectAddressMode != SelectAddressMode.SendFrom && !string.IsNullOrEmpty(searchPattern))
-                    {
                         return MyAddresses!.Count == 0 && currency.IsValidAddress(searchPattern);
-                    }
 
                     return false;
                 })
@@ -157,7 +153,8 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             }
             else
             {
-                SelectedAddress = MyAddresses.FirstOrDefault(vm => vm.IsFreeAddress) ?? MyAddresses.FirstOrDefault();
+                SelectedAddress = MyAddresses.FirstOrDefault(vm => vm.IsFreeAddress) ??
+                                  MyAddresses.FirstOrDefault();
             }
 
             return SelectedAddress;

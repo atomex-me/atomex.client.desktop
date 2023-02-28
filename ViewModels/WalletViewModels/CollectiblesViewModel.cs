@@ -99,14 +99,17 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                         .ThenBy(c => c.Name)));
 
             DisabledCollectibles = _app.Account.UserData.DisabledCollectibles ?? Array.Empty<string>();
+
             _ = ReloadTokenContractsAsync();
         }
 
         private void OnAtomexClientChanged(object? sender, AtomexClientChangedEventArgs args)
         {
-            if (_app.Account != null) return;
+            if (_app.Account != null)
+                return;
 
             _app.AtomexClientChanged -= OnAtomexClientChanged;
+
             Contracts?.Clear();
         }
 
@@ -161,6 +164,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                 });
 
             InitialCollectibles = new ObservableCollection<Collectible>(collectibles);
+
             Collectibles = new ObservableCollection<Collectible>(collectibles
                 .Where(collectible => !DisabledCollectibles.Contains(collectible.Tokens.First().Contract.Address))
                 .OrderByDescending(collectible => collectible.TotalAmount != 0)

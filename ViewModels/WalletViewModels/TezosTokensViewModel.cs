@@ -45,7 +45,8 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 #endif
         }
 
-        public TezosTokensViewModel(IAtomexApp app,
+        public TezosTokensViewModel(
+            IAtomexApp app,
             Action<TezosTokenViewModel> showTezosToken,
             Action<CurrencyConfig> setConversionTab)
         {
@@ -108,9 +109,9 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         private async Task ReloadTokenContractsAsync()
         {
             var contracts = (await _app.Account
-                    .GetCurrencyAccount<TezosAccount>(TezosConfig.Xtz)
-                    .LocalStorage
-                    .GetTokenContractsAsync())
+                .GetCurrencyAccount<TezosAccount>(TezosConfig.Xtz)
+                .LocalStorage
+                .GetTokenContractsAsync())
                 .ToList();
 
             Contracts = new ObservableCollection<TokenContract>(contracts);
@@ -134,13 +135,15 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
         private void OnAtomexClientChanged(object? sender, AtomexClientChangedEventArgs args)
         {
-            if (_app.Account != null) return;
+            if (_app.Account != null)
+                return;
 
             _app.AtomexClientChanged -= OnAtomexClientChanged;
+
             Contracts?.Clear();
         }
 
-        private async void OnBalanceChangedEventHandler(object sender, BalanceChangedEventArgs args)
+        private async void OnBalanceChangedEventHandler(object? sender, BalanceChangedEventArgs args)
         {
             try
             {
@@ -158,7 +161,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             }
         }
 
-        private async void OnQuotesUpdatedEventHandler(object sender, EventArgs args)
+        private async void OnQuotesUpdatedEventHandler(object? sender, EventArgs args)
         {
             if (sender is not IQuotesProvider)
                 return;

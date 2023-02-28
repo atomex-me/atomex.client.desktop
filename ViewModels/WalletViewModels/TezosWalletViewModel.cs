@@ -53,7 +53,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             Action<TezosTokenViewModel> showTezosToken,
             Action<IEnumerable<TezosTokenViewModel>> showTezosCollection,
             CurrencyConfig currency)
-            : base(app, showRightPopupContent, currency, setConversionTab, setWertCurrency)
+            : base(app, currency, showRightPopupContent, setConversionTab, setWertCurrency)
         {
             Tezos = currency as TezosConfig;
             Delegations = new ObservableCollection<Delegation>();
@@ -111,15 +111,19 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             };
         }
 
-        protected override async void OnBalanceChangedEventHandler(object? sender, BalanceChangedEventArgs args)
+        protected override void SubscribeToServices()
+        {
+            base.SubscribeToServices();
+
+            _app.LocalStorage.BalanceChanged += OnBalanceChangedEventHandler;
+        }
+
+        protected async void OnBalanceChangedEventHandler(object? sender, BalanceChangedEventArgs args)
         {
             try
             {
                 if (!args.Currencies.Contains(Currency.Name))
                     return;
-
-                // update transactions list
-                //await LoadTransactionsAsync();
 
                 // update delegation info
                 await LoadDelegationInfoAsync();
@@ -147,7 +151,9 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                 var tzktApi = Tezos.GetTzktApi();
 
                 var rpc = new TezosRpc(Tezos.GetRpcSettings());
-                var head = await rpc.GetHeaderAsync(); //await tzktApi.GetHeaderAsync();
+                var head = await rpc
+                    .GetHeaderAsync()
+                    .ConfigureAwait(false); //await tzktApi.GetHeaderAsync();
 
                 var currentCycle = _app.Account.Network == Network.MainNet
                     ? Math.Floor((head.Level - 1) / 4096m)

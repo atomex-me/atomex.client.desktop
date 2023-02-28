@@ -5,20 +5,21 @@ using System.Threading;
 using System.Threading.Tasks;
 
 using Avalonia.Controls;
-using Avalonia.Threading;
 using Serilog;
 
-using Atomex.Client.Desktop.ViewModels.TransactionViewModels;
+using Atomex.Blockchain.Abstract;
+using Atomex.Blockchain.Tezos;
 using Atomex.Common;
 using Atomex.Core;
 using Atomex.TezosTokens;
 using Atomex.Wallet.Tezos;
+using Atomex.Wallet;
 
 namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 {
     public class Fa2WalletViewModel : WalletViewModel
     {
-        public Fa2Config Currency => (Fa2Config)CurrencyViewModel.Currency;
+        public new Fa2Config Currency => (Fa2Config)CurrencyViewModel.Currency;
 
         public Fa2WalletViewModel()
         {
@@ -33,119 +34,50 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             Action<CurrencyConfig> setConversionTab,
             Action<string>? setWertCurrency,
             Action<ViewModelBase?> showRightPopupContent,
-            CurrencyConfig currency) : base(app, showRightPopupContent, currency, setConversionTab, setWertCurrency)
+            CurrencyConfig currency) : base(app, currency, showRightPopupContent, setConversionTab, setWertCurrency)
         {
         }
 
-        //protected override void SubscribeToServices()
-        //{
-        //    _app.LocalStorage.BalanceChanged += OnBalanceChangedEventHandler;
-        //}
-
-        //protected override async void OnBalanceChangedEventHandler(object? sender, BalanceChangedEventArgs args)
-        //{
-            //try
-            //{
-            //    var tezosTokenConfig = (TezosTokenConfig)Currency;
-
-            //    var isTokenUpdate = args is TokenBalanceChangedEventArgs eventArgs &&
-            //        eventArgs.Tokens.Contains((tezosTokenConfig.TokenContractAddress, tezosTokenConfig.TokenId));
-
-            //    if (!isTokenUpdate)
-            //        return;
-
-            //    // update transactions list
-            //    await LoadTransactionsAsync();
-            //}
-            //catch (Exception e)
-            //{
-            //    Log.Error(e, "Account balance updated event handler error");
-            //}
-        //}
-
-        protected sealed override async Task LoadTransactionsAsync(bool reset)
+        protected override bool FilterTransactions(TransactionsChangedEventArgs args, out IEnumerable<ITransaction>? txs)
         {
-            await LoadTransactionsSemaphore.WaitAsync();
-
-            Log.Debug("LoadTransactionsAsync for FA2 {@currency}", Currency.Name);
-
-            try
+            if (Currencies.IsTezosToken(args.Currency))
             {
-                if (_app.Account == null)
-                    return;
+                var tezosTokenConfig = (TezosTokenConfig)Currency;
 
-                _isTransactionsLoading = true;
-
-                if (reset)
-                {
-                    // reset exists transactions
-                    await Dispatcher.UIThread.InvokeAsync(() =>
+                txs = args.Transactions
+                    .Where(t =>
                     {
-                        Transactions.Clear();
-                        _transactionsLoaded = 0;
-                    });
-                }
+                        if (t is not TezosTokenTransfer tokenTransfer)
+                            return false;
 
-                var newTransactions = await Task.Run(async () =>
-                {
-                    return (await _app.Account
-                        .GetCurrencyAccount<Fa2Account>(Currency.Name)
-                        .LocalStorage
-                        .GetTokenTransfersWithMetadataAsync(
-                            contractAddress: Currency.TokenContractAddress,
-                            offset: _transactionsLoaded,
-                            limit: TRANSACTIONS_LOAD_LIMIT,
-                            sort: CurrentSortDirection != null ? CurrentSortDirection.Value : SortDirection.Desc)
-                        .ConfigureAwait(false))
-                        .ToList();
-                });
+                        return tokenTransfer?.Token?.Contract == tezosTokenConfig.TokenContractAddress &&
+                               tokenTransfer?.Token?.TokenId == tezosTokenConfig.TokenId;
+                    })
+                    .ToList();
 
-                _transactionsLoaded += newTransactions.Count;
-
-                var vmsToUpdate = new List<TransactionViewModelBase>();
-
-                await Dispatcher.UIThread.InvokeAsync(() =>
-                {
-                    var selectedTransactionId = SelectedTransaction?.Id;
-
-                    var transactionViewModels = newTransactions
-                        .Select(t =>
-                        {
-                            var vm = new TezosTokenTransferViewModel(t.Transfer, t.Metadata, Currency);
-
-                            if (vm.TransactionMetadata == null)
-                                vmsToUpdate.Add(vm);
-
-                            return vm;
-                        })
-                        .ToList()
-                        .ForEachDo(t => t.OnClose = () => ShowRightPopupContent?.Invoke(null));
-
-                    Transactions.AddRange(transactionViewModels);
-
-                    if (selectedTransactionId != null)
-                        SelectedTransaction = Transactions.FirstOrDefault(t => t.Id == selectedTransactionId);
-                });
-
-                // resolve view models
-                if (vmsToUpdate.Any())
-                {
-                    await ResolveTransactionsMetadataAsync(vmsToUpdate)
-                        .ConfigureAwait(false);
-                }
+                return true;
             }
-            catch (OperationCanceledException)
+
+            txs = null;
+            return false;
+        }
+
+        protected override Task<List<(ITransaction Tx, ITransactionMetadata Metadata)>> LoadTransactionsWithMetadataAsync()
+        {
+            return Task.Run(async () =>
             {
-                Log.Debug("LoadTransactionsAsync canceled for {@currency}", Currency?.Name);
-            }
-            catch (Exception e)
-            {
-                Log.Error(e, "LoadTransactionsAsync error for {@currency}", Currency?.Name);
-            }
-            finally
-            {
-                LoadTransactionsSemaphore.Release();
-            }
+                return (await _app.Account
+                    .GetCurrencyAccount<Fa2Account>(Currency.Name)
+                    .LocalStorage
+                    .GetTokenTransfersWithMetadataAsync(
+                        contractAddress: Currency.TokenContractAddress,
+                        offset: _transactionsLoaded,
+                        limit: TRANSACTIONS_LOADING_LIMIT,
+                        sort: CurrentSortDirection != null ? CurrentSortDirection.Value : SortDirection.Desc)
+                    .ConfigureAwait(false))
+                    .Cast<(ITransaction, ITransactionMetadata)>()
+                    .ToList();
+            });
         }
 
         protected override void OnReceiveClick()
@@ -167,9 +99,13 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
             try
             {
-                await _app.Account
-                    .GetCurrencyAccount<Fa2Account>(Currency.Name)
-                    .UpdateBalanceAsync(_cancellation.Token);
+                await Task.Run(async () =>
+                {
+                    await _app.Account
+                        .GetCurrencyAccount<Fa2Account>(Currency.Name)
+                        .UpdateBalanceAsync(_cancellation.Token)
+                        .ConfigureAwait(false);
+                });
             }
             catch (OperationCanceledException)
             {

@@ -97,7 +97,6 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
             Description = GetDescription(
                 type: Type,
                 amount: Amount,
-                fee: Fee,
                 decimals: config.Decimals,
                 currencyCode: config.Name);
             Direction = Amount <= 0 ? "to " : "from ";

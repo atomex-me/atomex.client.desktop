@@ -7,7 +7,6 @@ using ReactiveUI;
 
 using Atomex.Client.Desktop.Common;
 using Atomex.Common;
-using Atomex.Services;
 using Atomex.Wallet.Abstract;
 
 namespace Atomex.Client.Desktop.ViewModels
@@ -109,7 +108,11 @@ namespace Atomex.Client.Desktop.ViewModels
                 platformType: PlatformHelper.GetClientType(),
                 account.DefaultAuthMessageSigner());
 
-            AtomexApp.ChangeAtomexClient(atomexClient, account, localStorage, restart: true);
+            AtomexApp.ChangeAtomexClient(
+                atomexClient,
+                account,
+                localStorage,
+                restart: true);
         }
         
         private void OnAccountRestored(IAccount account, ILocalStorage localStorage)
@@ -122,7 +125,11 @@ namespace Atomex.Client.Desktop.ViewModels
 
             MainWindowVM.AccountRestored = true;
 
-            AtomexApp.ChangeAtomexClient(atomexClient, account, localStorage, restart: true);
+            AtomexApp.ChangeAtomexClient(
+                atomexClient,
+                account,
+                localStorage,
+                restart: true);
         }
 
         private void DesignerMode()

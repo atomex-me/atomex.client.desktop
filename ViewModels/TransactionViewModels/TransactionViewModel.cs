@@ -22,7 +22,7 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
         public CurrencyConfig Currency { get; set; }
         public string Id => Transaction.Id;
         public TransactionStatus State => Transaction.Status;
-        public DateTime Time => Transaction.CreationTime?.UtcDateTime ?? DateTime.UtcNow;
+        public DateTime Time => Transaction.CreationTime?.UtcDateTime ?? Transaction.BlockTime?.UtcDateTime ?? DateTime.UtcNow;
         public DateTime LocalTime => Time.ToLocalTime();
 
         [Reactive] public ITransactionMetadata? TransactionMetadata { get; set; }
@@ -114,18 +114,15 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
             Description = GetDescription(
                 type: Type,
                 amount: Amount,
-                fee: fee,
                 decimals: config.Decimals,
                 currencyCode: config.Name);
             Direction = Amount <= 0 ? "to " : "from ";
-
             IsReady = metadata != null;
         }
 
         public static string GetDescription(
             TransactionType type,
             decimal amount,
-            decimal fee,
             int decimals,
             string currencyCode)
         {
@@ -133,10 +130,10 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
                 return $"Swap payment {Math.Abs(amount).ToString("0." + new string('#', decimals))} {currencyCode}";
 
             if (type.HasFlag(TransactionType.SwapRefund))
-                return $"Swap refund {Math.Abs(amount - fee).ToString("0." + new string('#', decimals))} {currencyCode}";
+                return $"Swap refund {Math.Abs(amount).ToString("0." + new string('#', decimals))} {currencyCode}";
 
             if (type.HasFlag(TransactionType.SwapRedeem))
-                return $"Swap redeem {Math.Abs(amount - fee).ToString("0." + new string('#', decimals))} {currencyCode}";
+                return $"Swap redeem {Math.Abs(amount).ToString("0." + new string('#', decimals))} {currencyCode}";
 
             if (type.HasFlag(TransactionType.TokenApprove))
                 return "Token approve";
@@ -149,7 +146,7 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
 
             return amount switch
             {
-                <= 0 => $"Sent {Math.Abs(amount - fee).ToString("0." + new string('#', decimals))} {currencyCode}",
+                <= 0 => $"Sent {Math.Abs(amount).ToString("0." + new string('#', decimals))} {currencyCode}",
                 > 0 => $"Received {Math.Abs(amount).ToString("0." + new string('#', decimals))} {currencyCode}"
             };
         }

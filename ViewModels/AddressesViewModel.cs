@@ -29,7 +29,7 @@ namespace Atomex.Client.Desktop.ViewModels
     {
         public WalletAddress WalletAddress { get; set; }
         public string Address => WalletAddress.Address;
-        public string Type => KeyTypeToString(WalletAddress.KeyType);
+        public string Type { get; set; }
         public string AddressExplorerUri { get; set; }
         public string Path { get; set; }
         public bool HasTokens { get; set; }
@@ -51,19 +51,13 @@ namespace Atomex.Client.Desktop.ViewModels
                 .ToPropertyExInMainThread(this, vm => vm.IsUpdating);
         }
 
-        private static string KeyTypeToString(int keyType) =>
-            keyType switch
-            {
-                CurrencyConfig.StandardKey => "Standard",
-                TezosConfig.Bip32Ed25519Key => "Atomex",
-                _ => throw new NotSupportedException($"Key type {keyType} not supported.")
-            };
-
         private ReactiveCommand<Unit, Unit>? _updateAddressCommand;
         public ReactiveCommand<Unit, Unit> UpdateAddressCommand => _updateAddressCommand ??=
             ReactiveCommand.CreateFromTask(async () =>
             {
-                if (UpdateAddress == null) return;
+                if (UpdateAddress == null)
+                    return;
+
                 await UpdateAddress(Address);
             });
 
@@ -143,6 +137,7 @@ namespace Atomex.Client.Desktop.ViewModels
                     {
                         WalletAddress      = a,
                         Path               = a.KeyPath,
+                        Type               = KeyTypeToString(a.KeyType, a.Currency),
                         HasTokens          = HasTokens,
                         Balance            = $"{a.Balance.ToDecimal(_currency.Decimals).ToString(CultureInfo.InvariantCulture)} {_currency.Name}",
                         AddressExplorerUri = $"{_currency.AddressExplorerUri}{a.Address}",
@@ -213,9 +208,18 @@ namespace Atomex.Client.Desktop.ViewModels
             }
             catch (Exception e)
             {
-                Log.Error(e, "Error while load addresses.");
+                Log.Error(e, "Error while load addresses");
             }
         }
+
+        private static string KeyTypeToString(int keyType, string currency) =>
+            keyType switch
+            {
+                CurrencyConfig.StandardKey => "Standard",
+                TezosConfig.Bip32Ed25519Key when Currencies.IsTezosBased(currency) => "Atomex",
+                BitcoinBasedConfig.SegwitKey when Currencies.IsBitcoinBased(currency) => "SegWit",
+                _ => throw new NotSupportedException($"Key type {keyType} not supported")
+            };
 
         private ReactiveCommand<AddressesSortField, Unit>? _setSortTypeCommand;
         public ReactiveCommand<AddressesSortField, Unit> SetSortTypeCommand =>
@@ -260,8 +264,12 @@ namespace Atomex.Client.Desktop.ViewModels
         {
             try
             {
-                var updateTask = new WalletScanner(_app.Account)
-                    .UpdateBalanceAsync(_currency.Name, address);
+                var updateTask = Task.Run(async () =>
+                {
+                    await new WalletScanner(_app.Account)
+                        .UpdateBalanceAsync(_currency.Name, address)
+                        .ConfigureAwait(false);
+                });
 
                 await Task.WhenAll(Task.Delay(Constants.MinimalAddressUpdateTimeMs), updateTask);
 
@@ -271,8 +279,12 @@ namespace Atomex.Client.Desktop.ViewModels
                     var tezosAccount = _app.Account
                         .GetCurrencyAccount<TezosAccount>(TezosConfig.Xtz);
 
-                    await new TezosTokensWalletScanner(tezosAccount)
-                        .UpdateBalanceAsync(address, _tokenContract, (int)_tokenId);
+                    await Task.Run(async () =>
+                    {
+                        await new TezosTokensWalletScanner(tezosAccount)
+                            .UpdateBalanceAsync(address, _tokenContract, (int)_tokenId)
+                            .ConfigureAwait(false);
+                    });
                  }
 
                 _ = ReloadAddresses();

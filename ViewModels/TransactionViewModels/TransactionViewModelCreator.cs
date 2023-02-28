@@ -15,45 +15,49 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
 {
     public static class TransactionViewModelCreator
     {
-        public static List<TransactionViewModel> CreateViewModels(
+        public static List<TransactionViewModelBase> CreateViewModels(
             ITransaction tx,
-            ITransactionMetadata metadata,
+            ITransactionMetadata? metadata,
             CurrencyConfig config)
         {
-            if (config is BitcoinBasedConfig btcConfig &&
-                tx is BitcoinTransaction btcTx)
+            if (Currencies.IsBitcoinBased(config.Name))
             {
-                return new List<TransactionViewModel>
+                return new List<TransactionViewModelBase>
                 {
                     new BitcoinBasedTransactionViewModel(
-                        tx: btcTx,
+                        tx: (BitcoinTransaction)tx,
                         metadata: metadata as TransactionMetadata,
-                        config: btcConfig)
+                        config: (BitcoinBasedConfig)config)
                 };
             }
-            else if (config is Erc20Config erc20Config &&
-                     tx is Erc20Transaction erc20Tx)
+            else if (Currencies.IsEthereumToken(config.Name))
             {
+                var erc20Tx = (Erc20Transaction)tx;
+
                 return erc20Tx.Transfers
                     .Select((t, i) =>
                         new Erc20TransactionViewModel(
                             tx: erc20Tx,
                             metadata: metadata as TransactionMetadata,
                             transferIndex: i,
-                            config: erc20Config))
-                    .Cast<TransactionViewModel>()
+                            config: (Erc20Config)config))
+                    .Cast<TransactionViewModelBase>()
                     .ToList();
             }
-            else if (config is EthereumConfig ethConfig &&
-                     tx is EthereumTransaction ethTx)
+            else if (config.Name == EthereumHelper.Eth)
             {
+                var ethTx = (EthereumTransaction)tx;
+
                 var txViewModel = new EthereumTransactionViewModel(
                     tx: ethTx,
                     metadata: metadata as TransactionMetadata,
-                    config: ethConfig);
+                    config: (EthereumConfig)config);
 
                 if (ethTx.InternalTransactions == null || !ethTx.InternalTransactions.Any())
-                    return new List<TransactionViewModel> { txViewModel };
+                    return new List<TransactionViewModelBase>
+                    {
+                        txViewModel
+                    };
 
                 var internalsViewModels = ethTx.InternalTransactions
                     .Select((t, i) =>
@@ -62,25 +66,36 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
                             tx: ethTx,
                             metadata: metadata as TransactionMetadata,
                             internalIndex: i,
-                            config: ethConfig);
+                            config: (EthereumConfig)config);
                     })
-                    .Cast<TransactionViewModel>()
+                    .Cast<TransactionViewModelBase>()
                     .ToList();
 
                 internalsViewModels.Add(txViewModel);
 
                 return internalsViewModels;
             }
-            else if (config is TezosConfig xtzConfig &&
-                     tx is TezosOperation xtzTx)
+            else if (Currencies.IsTezosBased(config.Name) && tx is TezosTokenTransfer tokenTranfer)
             {
+                return new List<TransactionViewModelBase>
+                {
+                    new TezosTokenTransferViewModel(
+                        tokenTranfer,
+                        metadata as TransactionMetadata,
+                        (TezosConfig)config)
+                };
+            }
+            else if (config.Name == TezosHelper.Xtz)
+            {
+                var xtzTx = (TezosOperation)tx;
+
                 return xtzTx.Operations
                     .Select((t, i) => new TezosTransactionViewModel(
                         tx: xtzTx,
                         metadata: metadata as TransactionMetadata,
                         internalIndex: i,
-                        config: xtzConfig))
-                    .Cast<TransactionViewModel>()
+                        config: (TezosConfig)config))
+                    .Cast<TransactionViewModelBase>()
                     .ToList();
             }
 

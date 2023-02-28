@@ -208,6 +208,7 @@ namespace Atomex.Client.Desktop.ViewModels
                         nextAction: () =>
                         {
                             _userIgnoreActiveSwaps = true;
+
                             if (withAppUpdate)
                             {
                                 OnUpdateClick();
@@ -224,7 +225,11 @@ namespace Atomex.Client.Desktop.ViewModels
 
                 _ = Dispatcher.UIThread.InvokeAsync(() => { App.DialogService.Close(); });
 
-                _app.ChangeAtomexClient(atomexClient: null, account: null, localStorage: null);
+                _app.ChangeAtomexClient(
+                    atomexClient: null,
+                    account: null,
+                    localStorage: null);
+
                 _userIgnoreActiveSwaps = false;
 
                 ShowStart();

@@ -48,7 +48,6 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
             Description = TransactionViewModel.GetDescription(
                 type: Type,
                 amount: Amount,
-                fee: 0,
                 decimals: tx.Token.Decimals,
                 currencyCode: tx.Token.Symbol);
 
@@ -67,13 +66,11 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
             Description = TransactionViewModel.GetDescription(
                 type: Type,
                 amount: Amount,
-                fee: 0,
                 decimals: tx.Token.Decimals,
                 currencyCode: tx.Token.Symbol);
 
             Alias = tx.GetAlias(Type);
             Direction = Amount <= 0 ? "to " : "from ";
-
             IsReady = metadata != null;
         }
 
