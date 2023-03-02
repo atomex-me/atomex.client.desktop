@@ -253,7 +253,9 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
         protected virtual void LoadAddresses()
         {
-            AddressesViewModel = new AddressesViewModel(_app, CurrencyViewModel.Currency);
+            AddressesViewModel = new AddressesViewModel(
+                app: _app,
+                currency: CurrencyViewModel.Currency);
         }
 
         protected virtual Task<List<(ITransaction Tx, ITransactionMetadata Metadata)>> LoadTransactionsWithMetadataAsync()
@@ -480,7 +482,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
                 var isRemoved = await _app
                     .LocalStorage
-                    .RemoveTransactionByIdAsync(txId);
+                    .RemoveTransactionByIdAsync(txId, args.Transaction.Currency);
 
                 if (!isRemoved)
                     return; // todo: error?

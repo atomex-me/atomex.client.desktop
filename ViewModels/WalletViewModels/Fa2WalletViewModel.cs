@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Avalonia.Controls;
 using Serilog;
 
+using Atomex.Blockchain;
 using Atomex.Blockchain.Abstract;
 using Atomex.Blockchain.Tezos;
 using Atomex.Common;
@@ -34,7 +35,8 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             Action<CurrencyConfig> setConversionTab,
             Action<string>? setWertCurrency,
             Action<ViewModelBase?> showRightPopupContent,
-            CurrencyConfig currency) : base(app, currency, showRightPopupContent, setConversionTab, setWertCurrency)
+            CurrencyConfig currency)
+            : base(app, currency, showRightPopupContent, setConversionTab, setWertCurrency)
         {
         }
 
@@ -69,8 +71,9 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                 return (await _app.Account
                     .GetCurrencyAccount<Fa2Account>(Currency.Name)
                     .LocalStorage
-                    .GetTokenTransfersWithMetadataAsync(
-                        contractAddress: Currency.TokenContractAddress,
+                    .GetTransactionsWithMetadataAsync<TezosTokenTransfer, TransactionMetadata>(
+                        currency: TezosHelper.Fa2,
+                        tokenContract: Currency.TokenContractAddress,
                         offset: _transactionsLoaded,
                         limit: TRANSACTIONS_LOADING_LIMIT,
                         sort: CurrentSortDirection != null ? CurrentSortDirection.Value : SortDirection.Desc)
@@ -88,7 +91,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                 app: _app,
                 currency: tezosConfig,
                 tokenContract: Currency.TokenContractAddress,
-                tokenType: "FA2");
+                tokenType: TezosHelper.Fa2);
 
             App.DialogService.Show(receiveViewModel);
         }
@@ -127,6 +130,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             AddressesViewModel = new AddressesViewModel(
                 app: _app,
                 currency: tezosConfig,
+                tokenType: TezosHelper.Fa2,
                 tokenContract: Currency.TokenContractAddress);
         }
 

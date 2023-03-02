@@ -587,7 +587,12 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
             return await tezosAccount
                 .LocalStorage
-                .GetTokenAddressAsync(tokenType, tokenContract, tokenId, address, cancellationToken)
+                .GetWalletAddressAsync(
+                    currency: tokenType,
+                    address: address,
+                    tokenContract: tokenContract,
+                    tokenId: tokenId,
+                    cancellationToken: cancellationToken)
                 .ConfigureAwait(false);
         }
 

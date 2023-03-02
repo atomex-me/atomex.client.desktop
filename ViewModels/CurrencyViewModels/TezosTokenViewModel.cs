@@ -140,7 +140,8 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
 
             var tokenWalletAddresses = await tezosAccount
                 .LocalStorage
-                .GetTokenAddressesByContractAsync(Contract.Address);
+                .GetAddressesAsync(currency: Contract.Type, tokenContract: Contract.Address)
+                .ConfigureAwait(false);
 
             var addresses = tokenWalletAddresses
                 .Where(walletAddress => walletAddress.TokenBalance.TokenId == TokenBalance.TokenId)

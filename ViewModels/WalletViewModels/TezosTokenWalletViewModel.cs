@@ -10,6 +10,7 @@ using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using Serilog;
 
+using Atomex.Blockchain;
 using Atomex.Blockchain.Abstract;
 using Atomex.Blockchain.Tezos;
 using Atomex.Client.Desktop.Common;
@@ -89,12 +90,13 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                 return (await _app.Account
                     .GetCurrencyAccount<TezosAccount>(TezosConfig.Xtz)
                     .LocalStorage
-                    .GetTokenTransfersWithMetadataAsync(
-                        contractAddress: TokenViewModel.Contract.Address,
+                    .GetTransactionsWithMetadataAsync<TezosTokenTransfer, TransactionMetadata>(
+                        currency: TokenViewModel.Contract.Type,
+                        tokenContract: TokenViewModel.Contract.Address,
                         offset: _transactionsLoaded,
                         limit: TRANSACTIONS_LOADING_LIMIT,
                         sort: CurrentSortDirection != null ? CurrentSortDirection.Value : SortDirection.Desc))
-                    .Where(t => t.Transfer.Token.TokenId == TokenViewModel.TokenBalance.TokenId)
+                    .Where(t => t.Item1.Token.TokenId == TokenViewModel.TokenBalance.TokenId)
                     .Cast<(ITransaction, ITransactionMetadata)>()
                     .ToList();
             });
@@ -134,6 +136,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             AddressesViewModel = new AddressesViewModel(
                 app: _app,
                 currency: tezosConfig,
+                tokenType: TokenViewModel.Contract.Type,
                 tokenContract: TokenViewModel.Contract.Address,
                 tokenId: TokenViewModel.TokenBalance.TokenId);
         }

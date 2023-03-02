@@ -19,9 +19,9 @@ using Atomex.Client.Desktop.ViewModels.Abstract;
 using Atomex.Common;
 using Atomex.Core;
 using Atomex.Cryptography;
+using Atomex.ViewModels;
 using Atomex.Wallet;
 using Atomex.Wallet.Tezos;
-using Atomex.ViewModels;
 
 namespace Atomex.Client.Desktop.ViewModels
 {
@@ -78,6 +78,7 @@ namespace Atomex.Client.Desktop.ViewModels
     {
         private readonly IAtomexApp _app;
         private CurrencyConfig _currency;
+        private readonly string _tokenType;
         private readonly string? _tokenContract;
         private readonly BigInteger _tokenId;
 
@@ -97,13 +98,15 @@ namespace Atomex.Client.Desktop.ViewModels
         public AddressesViewModel(
             IAtomexApp app,
             CurrencyConfig currency,
+            string tokenType = null,
             string? tokenContract = null,
             BigInteger? tokenId = null)
         {
-            _app = app ?? throw new ArgumentNullException(nameof(app));
-            _currency = currency ?? throw new ArgumentNullException(nameof(currency));
+            _app           = app ?? throw new ArgumentNullException(nameof(app));
+            _currency      = currency ?? throw new ArgumentNullException(nameof(currency));
+            _tokenType     = tokenType ?? throw new ArgumentNullException(nameof(tokenType));
             _tokenContract = tokenContract;
-            _tokenId = tokenId ?? BigInteger.Zero;
+            _tokenId       = tokenId ?? BigInteger.Zero;
 
             this.WhenAnyValue(vm => vm.CurrentSortField, vm => vm.CurrentSortDirection)
                 .WhereAllNotNull()
@@ -155,9 +158,8 @@ namespace Atomex.Client.Desktop.ViewModels
 
                     (await tezosAccount
                         .LocalStorage
-                        .GetTokenAddressesByContractAsync(_tokenContract))
-                        .Where(w => w.TokenBalance.TokenId == _tokenId)
-                        .Where(w => w.Balance != 0)
+                        .GetAddressesAsync(currency: _tokenType, tokenContract: _tokenContract))
+                        .Where(w => w.TokenBalance.TokenId == _tokenId && w.Balance != 0)
                         .ToList()
                         .ForEachDo(addressWithTokens =>
                         {
@@ -306,8 +308,7 @@ namespace Atomex.Client.Desktop.ViewModels
             {
                 App.DialogService.Show(MessageViewModel.Message(
                         title: "Warning",
-                        text:
-                        "Copying the private key to the clipboard may result in the loss of all your coins in the wallet. Are you sure you want to copy the private key?",
+                        text: "Copying the private key to the clipboard may result in the loss of all your coins in the wallet. Are you sure you want to copy the private key?",
                         nextTitle: "Copy",
                         nextAction: async () =>
                         {
@@ -362,7 +363,8 @@ namespace Atomex.Client.Desktop.ViewModels
             }
         }
         
-        public void Dispose() => _app.LocalStorage.BalanceChanged -= OnBalanceChangedEventHandler;
+        public void Dispose() =>
+            _app.LocalStorage.BalanceChanged -= OnBalanceChangedEventHandler;
 
         private void DesignerMode()
         {

@@ -26,7 +26,7 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
 
             var tokenWalletAddresses = await tezosAccount
                 .LocalStorage
-                .GetTokenAddressesByContractAsync(contract.Address);
+                .GetAddressesAsync(currency: contract.Type, tokenContract: contract.Address);
 
             var tokenGroups = tokenWalletAddresses
                 .Where(walletAddress => isNft ? walletAddress.TokenBalance.IsNft : !walletAddress.TokenBalance.IsNft)
