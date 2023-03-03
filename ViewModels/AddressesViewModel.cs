@@ -78,11 +78,11 @@ namespace Atomex.Client.Desktop.ViewModels
     {
         private readonly IAtomexApp _app;
         private CurrencyConfig _currency;
-        private readonly string _tokenType;
+        private readonly string? _tokenType;
         private readonly string? _tokenContract;
         private readonly BigInteger _tokenId;
 
-        public bool HasTokens => _currency.Name == TezosConfig.Xtz && _tokenContract != null;
+        public bool HasTokens => _tokenContract != null;
         [Reactive] public ObservableCollection<AddressViewModel> Addresses { get; set; }
         [Reactive] public AddressesSortField? CurrentSortField { get; set; }
         [Reactive] public SortDirection? CurrentSortDirection { get; set; }
@@ -98,13 +98,13 @@ namespace Atomex.Client.Desktop.ViewModels
         public AddressesViewModel(
             IAtomexApp app,
             CurrencyConfig currency,
-            string tokenType = null,
+            string? tokenType = null,
             string? tokenContract = null,
             BigInteger? tokenId = null)
         {
             _app           = app ?? throw new ArgumentNullException(nameof(app));
             _currency      = currency ?? throw new ArgumentNullException(nameof(currency));
-            _tokenType     = tokenType ?? throw new ArgumentNullException(nameof(tokenType));
+            _tokenType     = tokenType;
             _tokenContract = tokenContract;
             _tokenId       = tokenId ?? BigInteger.Zero;
 
@@ -134,29 +134,28 @@ namespace Atomex.Client.Desktop.ViewModels
                     .GetAddressesAsync())
                     .ToList();
 
-                var addressesViewModels = addresses.Select(a =>
-                {
-                    return new AddressViewModel
+                var addressesViewModels = addresses
+                    .Select(a =>
                     {
-                        WalletAddress      = a,
-                        Path               = a.KeyPath,
-                        Type               = KeyTypeToString(a.KeyType, a.Currency),
-                        HasTokens          = HasTokens,
-                        Balance            = $"{a.Balance.ToDecimal(_currency.Decimals).ToString(CultureInfo.InvariantCulture)} {_currency.Name}",
-                        AddressExplorerUri = $"{_currency.AddressExplorerUri}{a.Address}",
-                        CopyToClipboard    = address => App.Clipboard.SetTextAsync(address),
-                        OpenInExplorer     = OpenInExplorer,
-                        UpdateAddress      = UpdateAddress,
-                        ExportKey          = ExportKey
-                    };
-                }).ToList();
+                        return new AddressViewModel
+                        {
+                            WalletAddress      = a,
+                            Path               = a.KeyPath,
+                            Type               = KeyTypeToString(a.KeyType, a.Currency),
+                            HasTokens          = HasTokens,
+                            Balance            = $"{a.Balance.ToDecimal(_currency.Decimals).ToString(CultureInfo.InvariantCulture)} {_currency.Name}",
+                            AddressExplorerUri = $"{_currency.AddressExplorerUri}{a.Address}",
+                            CopyToClipboard    = address => App.Clipboard.SetTextAsync(address),
+                            OpenInExplorer     = OpenInExplorer,
+                            UpdateAddress      = UpdateAddress,
+                            ExportKey          = ExportKey
+                        };
+                    }).ToList();
 
                 // token balances
                 if (HasTokens)
                 {
-                    var tezosAccount = (TezosAccount)account;
-
-                    (await tezosAccount
+                    (await _app
                         .LocalStorage
                         .GetAddressesAsync(currency: _tokenType, tokenContract: _tokenContract))
                         .Where(w => w.TokenBalance.TokenId == _tokenId && w.Balance != 0)
@@ -238,7 +237,7 @@ namespace Atomex.Client.Desktop.ViewModels
         private async void OnBalanceChangedEventHandler(object? sender, BalanceChangedEventArgs args)
         {
             var needReload = _tokenContract == null
-                ? args.Currencies.Contains(_currency.Name)
+                ? args.Currency == _currency.Name
                 : args is TokenBalanceChangedEventArgs eventArg && eventArg.Tokens.Contains((_tokenContract, _tokenId));
 
             if (needReload)

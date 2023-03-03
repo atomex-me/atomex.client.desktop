@@ -242,7 +242,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             var tokenConfig = (Fa2Config)Currency;
             var tokenContract = tokenConfig.TokenContractAddress;
             var tokenId = tokenConfig.TokenId;
-            const string? tokenType = "FA2";
+            const string? tokenType = TezosHelper.Fa2;
 
             var tokenAddress = await TezosTokensSendViewModel
                 .GetTokenAddressAsync(
@@ -257,7 +257,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
             var currencyName = _app.Account.Currencies
                 .FirstOrDefault(c => c is Fa2Config fa2 && fa2.TokenContractAddress == tokenContract && fa2.TokenId == tokenId)
-                ?.Name ?? "FA2";
+                ?.Name ?? TezosHelper.Fa2;
 
             var tokenAccount = _app.Account.GetTezosTokenAccount<Fa2Account>(
                 currency: currencyName,

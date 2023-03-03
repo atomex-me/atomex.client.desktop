@@ -71,12 +71,6 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         {
             _app = app ?? throw new ArgumentNullException(nameof(app));
 
-            // DEBUG!
-            //_app.LocalStorage.RemoveTransactionsMetadataAsync("ETH").WaitForResult();
-            //_app.LocalStorage.RemoveTransactionsMetadataAsync("BTC").WaitForResult();
-            //_app.LocalStorage.RemoveTransactionsMetadataAsync("LTC").WaitForResult();
-            //_app.LocalStorage.RemoveTransactionsMetadataAsync("XTZ").WaitForResult();
-
             CurrencyViewModel = CurrencyViewModelCreator.CreateOrGet(currency);
             Header = CurrencyViewModel.Header;
 
@@ -258,11 +252,12 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                 currency: CurrencyViewModel.Currency);
         }
 
-        protected virtual Task<List<(ITransaction Tx, ITransactionMetadata Metadata)>> LoadTransactionsWithMetadataAsync()
+        protected virtual Task<List<TransactionInfo<ITransaction, ITransactionMetadata>>> LoadTransactionsWithMetadataAsync()
         {
             return Task.Run(async () =>
             {
-                return (await _app.Account
+                return (await _app
+                    .Account
                     .GetTransactionsWithMetadataAsync(
                         currency: Currency.Name,
                         offset: _transactionsLoaded,
@@ -478,11 +473,9 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
             try
             {
-                var txId = $"{args.Transaction.Id}:{args.Transaction.Currency}";
-
                 var isRemoved = await _app
                     .LocalStorage
-                    .RemoveTransactionByIdAsync(txId, args.Transaction.Currency);
+                    .RemoveTransactionByIdAsync(args.Transaction.Id, args.Transaction.Currency);
 
                 if (!isRemoved)
                     return; // todo: error?
@@ -512,7 +505,8 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                 {
                     if (!resolved.TryGetValue(vm.Transaction.Id, out var metadata))
                     {
-                        metadata = await _app.Account
+                        metadata = await _app
+                            .Account
                             .ResolveTransactionMetadataAsync(vm.Transaction)
                             .ConfigureAwait(false);
 
@@ -520,7 +514,8 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                     }
                 }
 
-                await _app.LocalStorage
+                await _app
+                    .LocalStorage
                     .UpsertTransactionsMetadataAsync(
                         resolved.Values,
                         notifyIfNewOrChanged: false)

@@ -122,7 +122,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         {
             try
             {
-                if (!args.Currencies.Contains(Currency.Name))
+                if (args.Currency != Currency.Name)
                     return;
 
                 // update delegation info

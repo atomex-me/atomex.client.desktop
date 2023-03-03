@@ -31,8 +31,8 @@ namespace Atomex.Client.Desktop.ViewModels
         [Reactive] public WalletAddressViewModel SelectedAddress { get; set; }
         [Reactive] public bool IsCopied { get; set; }
         [Reactive] public IBitmap QrCode { get; private set; }
-        public string TokenContract { get; private set; }
-        public string TokenType { get; private set; }
+        public string? TokenContract { get; private set; }
+        public string? TokenType { get; private set; }
         public string TitleText => $"Your receiving {Currency.DisplayedName} address";
         public string MyAddressesText => $"My {Currency.DisplayedName} addresses";
         public SelectAddressViewModel SelectAddressViewModel { get; set; }
@@ -50,8 +50,8 @@ namespace Atomex.Client.Desktop.ViewModels
         public ReceiveViewModel(
             IAtomexApp app,
             CurrencyConfig currency,
-            string tokenContract = null,
-            string tokenType = null)
+            string? tokenContract = null,
+            string? tokenType = null)
         {
             var createQrCodeCommand = ReactiveCommand.CreateFromTask(CreateQrCodeAsync);
 
@@ -109,7 +109,6 @@ namespace Atomex.Client.Desktop.ViewModels
         }
 
         private ReactiveCommand<Unit, Unit> _copyCommand;
-
         public ReactiveCommand<Unit, Unit> CopyCommand => _copyCommand ??= ReactiveCommand.CreateFromTask(async () =>
         {
             try
@@ -126,13 +125,11 @@ namespace Atomex.Client.Desktop.ViewModels
         });
 
         private ReactiveCommand<Unit, Unit> _selectAddressCommand;
-
         public ReactiveCommand<Unit, Unit> SelectAddressCommand =>
             _selectAddressCommand ??= ReactiveCommand.Create(() => { App.DialogService.Show(SelectAddressViewModel); });
 
 
         private ReactiveCommand<Unit, Unit> _backCommand;
-
         public ReactiveCommand<Unit, Unit> BackCommand =>
             _backCommand ??= ReactiveCommand.Create(() => { OnBack?.Invoke(); });
 

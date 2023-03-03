@@ -9,11 +9,11 @@ using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using Serilog;
 
+using Atomex.Abstract;
 using Atomex.Blockchain;
 using Atomex.Client.Desktop.Common;
 using Atomex.Core;
 using Atomex.MarketData.Abstract;
-using Atomex.TezosTokens;
 using Atomex.Wallet;
 using Atomex.Wallet.Abstract;
 
@@ -105,12 +105,12 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
         {
             try
             {
-                var needReload = args.Currencies.Any()
-                    ? args.Currencies.Contains(Currency.Name)
-                    : args is TokenBalanceChangedEventArgs eventArgs && _account.Currencies.FirstOrDefault(c =>
-                        c is TezosTokenConfig tc &&
+                var needReload = args is TokenBalanceChangedEventArgs eventArgs
+                    ? _account.Currencies.FirstOrDefault(c =>
+                        c is ITokenConfig tc &&
                         eventArgs.Tokens.Contains((tc.TokenContractAddress, tc.TokenId)) &&
-                        tc.Name == Currency.Name) != null;
+                        c.Name == Currency.Name) != null
+                    : args.Currency == Currency.Name;
 
                 if (needReload)
                 {

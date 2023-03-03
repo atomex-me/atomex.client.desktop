@@ -42,19 +42,12 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
         protected override bool FilterTransactions(TransactionsChangedEventArgs args, out IEnumerable<ITransaction>? txs)
         {
-            if (Currencies.IsTezosToken(args.Currency))
+            if (args.Currency == TezosHelper.Fa2)
             {
-                var tezosTokenConfig = (TezosTokenConfig)Currency;
-
                 txs = args.Transactions
-                    .Where(t =>
-                    {
-                        if (t is not TezosTokenTransfer tokenTransfer)
-                            return false;
-
-                        return tokenTransfer?.Token?.Contract == tezosTokenConfig.TokenContractAddress &&
-                               tokenTransfer?.Token?.TokenId == tezosTokenConfig.TokenId;
-                    })
+                    .Cast<TezosTokenTransfer>()
+                    .Where(t => t.Token?.Contract == Currency.TokenContractAddress &&
+                                t.Token?.TokenId == Currency.TokenId)
                     .ToList();
 
                 return true;
@@ -64,21 +57,21 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             return false;
         }
 
-        protected override Task<List<(ITransaction Tx, ITransactionMetadata Metadata)>> LoadTransactionsWithMetadataAsync()
+        protected override Task<List<TransactionInfo<ITransaction, ITransactionMetadata>>> LoadTransactionsWithMetadataAsync()
         {
             return Task.Run(async () =>
             {
-                return (await _app.Account
-                    .GetCurrencyAccount<Fa2Account>(Currency.Name)
+                return (await _app
                     .LocalStorage
-                    .GetTransactionsWithMetadataAsync<TezosTokenTransfer, TransactionMetadata>(
+                    .GetTransactionsWithMetadataAsync(
                         currency: TezosHelper.Fa2,
+                        transactionType: typeof(TezosTokenTransfer),
+                        metadataType: typeof(TransactionMetadata),
                         tokenContract: Currency.TokenContractAddress,
                         offset: _transactionsLoaded,
                         limit: TRANSACTIONS_LOADING_LIMIT,
                         sort: CurrentSortDirection != null ? CurrentSortDirection.Value : SortDirection.Desc)
                     .ConfigureAwait(false))
-                    .Cast<(ITransaction, ITransactionMetadata)>()
                     .ToList();
             });
         }
@@ -131,7 +124,8 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                 app: _app,
                 currency: tezosConfig,
                 tokenType: TezosHelper.Fa2,
-                tokenContract: Currency.TokenContractAddress);
+                tokenContract: Currency.TokenContractAddress,
+                tokenId: Currency.TokenId);
         }
 
 #if DEBUG

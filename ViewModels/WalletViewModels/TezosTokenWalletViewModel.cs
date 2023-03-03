@@ -83,21 +83,21 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             return false;
         }
 
-        protected override Task<List<(ITransaction Tx, ITransactionMetadata Metadata)>> LoadTransactionsWithMetadataAsync()
+        protected override Task<List<TransactionInfo<ITransaction, ITransactionMetadata>>> LoadTransactionsWithMetadataAsync()
         {
             return Task.Run(async () =>
             {
-                return (await _app.Account
-                    .GetCurrencyAccount<TezosAccount>(TezosConfig.Xtz)
+                return (await _app
                     .LocalStorage
-                    .GetTransactionsWithMetadataAsync<TezosTokenTransfer, TransactionMetadata>(
+                    .GetTransactionsWithMetadataAsync(
                         currency: TokenViewModel.Contract.Type,
+                        transactionType: typeof(TezosTokenTransfer),
+                        metadataType: typeof(TransactionMetadata),
                         tokenContract: TokenViewModel.Contract.Address,
                         offset: _transactionsLoaded,
                         limit: TRANSACTIONS_LOADING_LIMIT,
                         sort: CurrentSortDirection != null ? CurrentSortDirection.Value : SortDirection.Desc))
-                    .Where(t => t.Item1.Token.TokenId == TokenViewModel.TokenBalance.TokenId)
-                    .Cast<(ITransaction, ITransactionMetadata)>()
+                    .Where(t => t.Tx is TezosTokenTransfer transfer && transfer.Token.TokenId == TokenViewModel.TokenBalance.TokenId)
                     .ToList();
             });
         }
