@@ -286,7 +286,7 @@ namespace Atomex.Client.Desktop.ViewModels
                             .UpdateBalanceAsync(address, _tokenContract, (int)_tokenId)
                             .ConfigureAwait(false);
                     });
-                 }
+                }
 
                 _ = ReloadAddresses();
             }
