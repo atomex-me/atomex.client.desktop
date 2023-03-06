@@ -255,11 +255,13 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     cancellationToken: cancellationToken)
                 .ConfigureAwait(false);
 
-            var currencyName = _app.Account.Currencies
+            var currencyName = _app
+                .Account
+                .Currencies
                 .FirstOrDefault(c => c is Fa2Config fa2 && fa2.TokenContractAddress == tokenContract && fa2.TokenId == tokenId)
                 ?.Name ?? TezosHelper.Fa2;
 
-            var tokenAccount = _app.Account.GetTezosTokenAccount<Fa2Account>(
+            var tokenAccount = _app.Account.GetCurrencyAccount<Fa2Account>(
                 currency: currencyName,
                 tokenContract: tokenContract,
                 tokenId: tokenId);

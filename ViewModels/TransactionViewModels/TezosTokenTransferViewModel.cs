@@ -53,6 +53,7 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
 
             Alias = tx.GetAlias(Type);
             Direction = Amount <= 0 ? "to " : "from ";
+            IsReady = metadata != null;
         }
 
         public override void UpdateMetadata(ITransactionMetadata metadata, CurrencyConfig config)

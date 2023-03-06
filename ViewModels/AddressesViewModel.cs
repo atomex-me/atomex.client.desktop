@@ -40,7 +40,7 @@ namespace Atomex.Client.Desktop.ViewModels
         public string Balance { get; set; }
         public TokenBalance? TokenBalance { get; set; }
         public string TokenBalanceString =>
-            $"{TokenBalance?.GetTokenBalance() ?? 0} {TokenBalance?.Symbol ?? string.Empty}";
+            $"{TokenBalance?.ToDecimalBalance() ?? 0} {TokenBalance?.Symbol ?? string.Empty}";
 
         [ObservableAsProperty] public bool IsUpdating { get; }
 

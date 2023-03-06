@@ -225,7 +225,8 @@ namespace Atomex.Client.Desktop.ViewModels
                         : RedeemFromAddress
                 };
 
-                await _app.Account
+                await _app
+                    .LocalStorage
                     .UpsertOrderAsync(order);
 
                 //await order
@@ -259,7 +260,9 @@ namespace Atomex.Client.Desktop.ViewModels
                 {
                     await Task.Delay(SwapCheckInterval);
 
-                    var currentOrder = _app.Account.GetOrderById(order.ClientOrderId);
+                    var currentOrder = _app
+                        .LocalStorage
+                        .GetOrderById(order.ClientOrderId);
 
                     if (currentOrder == null)
                         continue;
@@ -269,7 +272,8 @@ namespace Atomex.Client.Desktop.ViewModels
 
                     if (currentOrder.Status == OrderStatus.PartiallyFilled || currentOrder.Status == OrderStatus.Filled)
                     {
-                        var swap = (await _app.Account
+                        var swap = (await _app
+                            .LocalStorage
                             .GetSwapsAsync())
                             .FirstOrDefault(s => s.OrderId == currentOrder.Id);
 
@@ -296,12 +300,12 @@ namespace Atomex.Client.Desktop.ViewModels
             }
         }
 
-        private string GetSwapContract(string currency)
+        private string? GetSwapContract(string currency)
         {
-            if (currency == "ETH" || Currencies.IsEthereumToken(currency))
+            if (currency == "ETH" || Currencies.IsPresetEthereumToken(currency))
                 return _app.Account.Currencies.Get<EthereumConfig>(currency).SwapContractAddress;
 
-            if (currency == "XTZ" || Currencies.IsTezosToken(currency))
+            if (currency == "XTZ" || Currencies.IsPresetTezosToken(currency))
                 return _app.Account.Currencies.Get<TezosConfig>(currency).SwapContractAddress;
 
             return null;
@@ -311,7 +315,8 @@ namespace Atomex.Client.Desktop.ViewModels
         {
             if (FromSource is FromAddress fromAddress)
             {
-                var walletAddress = await _app.Account
+                var walletAddress = await _app
+                    .Account
                     .GetAddressAsync(FromCurrencyViewModel.Currency.Name, fromAddress.Address);
 
                 return new WalletAddress[] { walletAddress };

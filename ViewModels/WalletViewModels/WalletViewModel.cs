@@ -311,9 +311,14 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
                             return vms;
                         })
-                        .Aggregate(new List<TransactionViewModelBase>(), (l, vms) => l.AddRangeEx(vms));
+                        .ToList();
 
-                    Transactions.AddRange(transactionViewModels);
+                    var transactionsViewModels = new List<TransactionViewModelBase>();
+
+                    foreach (var vms in transactionViewModels)
+                        transactionsViewModels.AddRange(vms);
+
+                    Transactions.AddRange(transactionsViewModels);
 
                     if (selectedTransactionId != null)
                         SelectedTransaction = Transactions.FirstOrDefault(t => t.Id == selectedTransactionId);

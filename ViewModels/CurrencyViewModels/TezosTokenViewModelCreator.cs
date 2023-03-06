@@ -50,10 +50,8 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
                     .Select(w => w.TokenBalance)
                     .Aggregate(new TokenBalance { ParsedBalance = 0 }, (result, tb) =>
                     {
-                        result.ParsedBalance = result.ParsedBalance != null
-                            ? result.ParsedBalance + tb.GetTokenBalance()
-                            : BigInteger.Zero;
-                        result.Balance       = result.ParsedBalance.Value.ToString();
+                        result.ParsedBalance = result.ParsedBalance + tb.GetTokenBalance();
+                        result.Balance       = result.ParsedBalance!.Value.ToString();
                         result.ArtifactUri   ??= tb.ArtifactUri;
                         result.Contract      ??= tb.Contract;
                         result.ContractAlias ??= tb.ContractAlias;

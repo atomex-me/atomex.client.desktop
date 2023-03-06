@@ -465,7 +465,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     }
 
                     var tokenAccount = _app.Account
-                        .GetTezosTokenAccount<TezosTokenAccount>(fromTokenAddress.Currency, TokenContract, TokenId);
+                        .GetCurrencyAccount<TezosTokenAccount>(fromTokenAddress.Currency, TokenContract, TokenId);
 
                     var (estimatedFee, isEnougth) = await tokenAccount
                         .EstimateTransferFeeAsync(From);
@@ -649,7 +649,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                                      tokenConfig.TokenId == TokenId)
                 ?.Name ?? _tokenType;
 
-            var tokenAccount = App.AtomexApp.Account.GetTezosTokenAccount<TezosTokenAccount>(
+            var tokenAccount = App.AtomexApp.Account.GetCurrencyAccount<TezosTokenAccount>(
                 currency: currencyName,
                 tokenContract: TokenContract,
                 tokenId: TokenId);

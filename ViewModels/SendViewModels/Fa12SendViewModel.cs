@@ -257,7 +257,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 .FirstOrDefault(c => c is Fa12Config fa12 && fa12.TokenContractAddress == tokenContract)
                 ?.Name ?? "FA12";
 
-            var tokenAccount = _app.Account.GetTezosTokenAccount<Fa12Account>(
+            var tokenAccount = _app.Account.GetCurrencyAccount<Fa12Account>(
                 currency: currencyName,
                 tokenContract: tokenContract,
                 tokenId: tokenId);

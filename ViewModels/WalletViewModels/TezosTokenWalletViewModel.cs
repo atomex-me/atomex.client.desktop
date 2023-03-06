@@ -63,7 +63,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
         protected override bool FilterTransactions(TransactionsChangedEventArgs args, out IEnumerable<ITransaction>? txs)
         {
-            if (Currencies.IsTezosToken(args.Currency))
+            if (Currencies.IsTezosTokenStandard(args.Currency))
             {
                 txs = args.Transactions
                     .Where(t =>
