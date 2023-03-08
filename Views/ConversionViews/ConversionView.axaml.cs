@@ -1,36 +1,69 @@
+using System;
+using System.Reactive.Disposables;
+using System.Reactive.Linq;
+
+using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
-using Avalonia.Threading;
+using Avalonia.Media;
 
 using Atomex.Client.Desktop.ViewModels;
-using Avalonia.Media;
 
 namespace Atomex.Client.Desktop.Views
 {
     public class ConversionView : UserControl
     {
+        private readonly CompositeDisposable _disposables = new();
+        private CompositeDisposable? _scrollViewerDisposables;
+        private double _verticalHeightMax = 0.0;
+
         public ConversionView()
         {
             InitializeComponent();
-            
-            var dgConversions = this.FindControl<DataGrid>("DgConversions");
 
-            dgConversions.CellPointerPressed += (sender, args) =>
-            {
-                var cellIndex = args.Row.GetIndex();
-                Dispatcher.UIThread.InvokeAsync(() =>
+            var listBoxSwaps = this.FindControl<ListBox>("ListBoxSwaps");
+
+            listBoxSwaps?.GetObservable(ListBox.ScrollProperty)
+                .OfType<ScrollViewer>()
+                .Take(1)
+                .Subscribe(sv =>
                 {
-                    if (DataContext is ConversionViewModel viewModel)
-                        viewModel.SetSwapSelectedIndex(cellIndex);
-                });
-            };
-            
-#if DEBUG
-            if (!Design.IsDesignMode) return;
+                    _scrollViewerDisposables?.Dispose();
+                    _scrollViewerDisposables = new CompositeDisposable();
 
-            var designGrid = this.FindControl<Grid>("DesignGrid");
-            designGrid.Background = new SolidColorBrush(Color.FromRgb(0x0F, 0x21, 0x39));
+                    sv.GetObservable(ScrollViewer.VerticalScrollBarMaximumProperty)
+                        .Subscribe(newMax => _verticalHeightMax = newMax)
+                        .DisposeWith(_scrollViewerDisposables);
+
+                    sv.GetObservable(ScrollViewer.OffsetProperty)
+                        .Subscribe(offset =>
+                        {
+                            //if (offset.Y <= double.Epsilon)
+                            //{
+                            //    Console.WriteLine("At Top");
+                            //}
+
+                            var delta = Math.Abs(_verticalHeightMax - offset.Y);
+
+                            if (delta <= double.Epsilon)
+                            {
+                                //Console.WriteLine("At Bottom");
+                                var viewModel = DataContext as ConversionViewModel;
+
+                                viewModel?.ReachEndOfScroll();
+                            }
+                        })
+                        .DisposeWith(_disposables);
+
+                })
+                .DisposeWith(_disposables);
+
+#if DEBUG
+            if (Design.IsDesignMode)
+            {
+                var designGrid = this.FindControl<Grid>("DesignGrid");
+                designGrid.Background = new SolidColorBrush(Color.FromRgb(0x0F, 0x21, 0x39));
+            }
 #endif
         }
 

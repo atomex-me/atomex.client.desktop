@@ -162,9 +162,10 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             BaseCurrencyCode = DefaultBaseCurrencyCode;
             FeeCurrencyFormat = tezosConfig.FeeFormat;
             BaseCurrencyFormat = DefaultBaseCurrencyFormat;
+
+            _tokenType = tokenType;
             TokenContract = tokenContract;
             TokenId = tokenId;
-            _tokenType = tokenType;
             TokenPreviewUrl = tokenPreviewUrl;
 
             if (from != null)
@@ -388,7 +389,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     WarningType = MessageType.Error;
                 }
 
-                if (TokenContract == null || !tezosConfig.IsValidAddress(TokenContract))
+                if (TokenContract == null || !tezosConfig.IsValidAddress(TokenContract) || _tokenType == null)
                 {
                     Warning = Resources.SvInvalidTokenContract;
                     WarningToolTip = "";
@@ -439,7 +440,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     WarningType = MessageType.Error;
                 }
 
-                if (TokenContract == null || !tezosConfig.IsValidAddress(TokenContract))
+                if (TokenContract == null || !tezosConfig.IsValidAddress(TokenContract) || _tokenType == null)
                 {
                     Warning = Resources.SvInvalidTokenContract;
                     WarningToolTip = "";

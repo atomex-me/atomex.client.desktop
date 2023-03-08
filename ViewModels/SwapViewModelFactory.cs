@@ -1,6 +1,5 @@
 ﻿using System;
 
-using Avalonia.Media;
 using Serilog;
 
 using Atomex.Abstract;
@@ -12,10 +11,28 @@ namespace Atomex.Client.Desktop.ViewModels
 {
     public static class SwapViewModelFactory
     {
-        public static SwapViewModel? CreateSwapViewModel(
+        public static SwapViewModel CreateSwapViewModel(
             Swap swap,
             ICurrencies currencies,
             Action? onCloseSwap = null)
+        {
+            var swapViewModel = new SwapViewModel
+            {
+                Details = new SwapDetailsViewModel
+                {
+                    OnClose = onCloseSwap
+                }
+            };
+
+            Update(
+                swapViewModel: swapViewModel,
+                swap: swap,
+                currencies: currencies);
+
+            return swapViewModel;
+        }
+
+        public static void Update(SwapViewModel swapViewModel, Swap swap, ICurrencies currencies)
         {
             try
             {
@@ -40,46 +57,32 @@ namespace Atomex.Client.Desktop.ViewModels
 
                 var compactState = CompactStateBySwap(swap);
 
-                var detailsViewModel = new SwapDetailsViewModel
-                {
-                    DetailingInfo         = Atomex.ViewModels.Helpers.GetSwapDetailingInfo(swap, currencies),
-                    CompactState          = compactState,
-                    SwapId                = swap.Id.ToString(),
-                    Price                 = swap.Price,
-                    TimeStamp             = swap.TimeStamp.ToLocalTime(),
-                    FromCurrencyViewModel = fromCurrencyViewModel,
-                    ToCurrencyViewModel   = toCurrencyViewModel,
-                    FromAmount            = fromAmount,
-                    ToAmount              = toAmount,
-                    OnClose               = onCloseSwap
-                };
+                swapViewModel.Details.DetailingInfo = Atomex.ViewModels.Helpers.GetSwapDetailingInfo(swap, currencies);
+                swapViewModel.Details.CompactState = compactState;
+                swapViewModel.Details.SwapId = swap.Id.ToString();
+                swapViewModel.Details.Price = swap.Price;
+                swapViewModel.Details.TimeStamp = swap.TimeStamp.ToLocalTime();
+                swapViewModel.Details.FromCurrencyViewModel = fromCurrencyViewModel;
+                swapViewModel.Details.ToCurrencyViewModel = toCurrencyViewModel;
+                swapViewModel.Details.FromAmount = fromAmount;
+                swapViewModel.Details.ToAmount = toAmount;
 
-                return new SwapViewModel
-                {
-                    Id                    = swap.Id.ToString(),
-                    CompactState          = compactState,
-                    Mode                  = ModeBySwap(swap),
-                    Time                  = swap.TimeStamp,
-
-                    FromCurrencyViewModel = fromCurrencyViewModel,
-                    FromAmount            = fromAmount,
-                    FromAmountFormat      = fromCurrencyViewModel.CurrencyFormat,
-
-                    ToCurrencyViewModel   = toCurrencyViewModel,
-                    ToAmount              = toAmount,
-                    ToAmountFormat        = toCurrencyViewModel.CurrencyFormat,
-
-                    Price                 = swap.Price,
-                    PriceFormat           = $"F{quoteCurrency.Decimals}",
-
-                    Details               = detailsViewModel
-                };
+                swapViewModel.Id = swap.Id.ToString();
+                swapViewModel.CompactState = compactState;
+                swapViewModel.Mode = ModeBySwap(swap);
+                swapViewModel.Time = swap.TimeStamp;
+                swapViewModel.FromCurrencyViewModel = fromCurrencyViewModel;
+                swapViewModel.FromAmount = fromAmount;
+                swapViewModel.FromAmountFormat = fromCurrencyViewModel.CurrencyFormat;
+                swapViewModel.ToCurrencyViewModel = toCurrencyViewModel;
+                swapViewModel.ToAmount = toAmount;
+                swapViewModel.ToAmountFormat = toCurrencyViewModel.CurrencyFormat;
+                swapViewModel.Price = swap.Price;
+                swapViewModel.PriceFormat = $"F{quoteCurrency.Decimals}";
             }
             catch (Exception e)
             {
-                Log.Error(e, $"Error while create SwapViewModel for {swap.Symbol} swap with id {swap.Id}");
-
-                return null;
+                Log.Error(e, $"Error while update SwapViewModel for {swap.Symbol} swap with id {swap.Id}");
             }
         }
 

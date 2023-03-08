@@ -36,6 +36,8 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         protected readonly IAtomexApp _app;
         protected int _transactionsLoaded;
         protected bool _isTransactionsLoading;
+        protected CancellationTokenSource _cancellation;
+        protected readonly SemaphoreSlim _loadTransactionsSemaphore = new(1, 1);
 
         [Reactive] public ObservableRangeCollection<TransactionViewModelBase> Transactions { get; set; }
         [Reactive] public TransactionViewModelBase? SelectedTransaction { get; set; }
@@ -50,9 +52,6 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         protected Action<ViewModelBase?> ShowRightPopupContent { get; }
         public string Header { get; set; }
         public CurrencyConfig Currency => CurrencyViewModel.Currency;
-
-        protected CancellationTokenSource _cancellation;
-        protected readonly SemaphoreSlim LoadTransactionsSemaphore = new(1, 1);
 
         public WalletViewModel()
         {
@@ -88,7 +87,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                 .Subscribe(sortDirection =>
                 {
                     // update transaction for new sort direction
-                    _ = LoadTransactionsAsync(reset: true);
+                    _ = LoadMoreTransactionsAsync(reset: true);
                 });
 
             this.WhenAnyValue(vm => vm.SelectedTransaction)
@@ -159,7 +158,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
             if (!Transactions.Any())
             {
-                await LoadTransactionsAsync(reset: true)
+                await LoadMoreTransactionsAsync(reset: true)
                     .ConfigureAwait(false);
 
                 return;
@@ -167,7 +166,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
             try
             {
-                await LoadTransactionsSemaphore.WaitAsync();
+                await _loadTransactionsSemaphore.WaitAsync();
 
                 var viewModelsToInsert = new List<TransactionViewModelBase>();
                 var viewModelsToUpdate = new List<TransactionViewModelBase>();
@@ -241,7 +240,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             }
             finally
             {
-                LoadTransactionsSemaphore.Release();
+                _loadTransactionsSemaphore.Release();
             }
         }
 
@@ -268,11 +267,11 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             });
         }
 
-        protected virtual async Task LoadTransactionsAsync(bool reset)
+        protected virtual async Task LoadMoreTransactionsAsync(bool reset)
         {
-            await LoadTransactionsSemaphore.WaitAsync();
+            await _loadTransactionsSemaphore.WaitAsync();
 
-            Log.Debug("LoadTransactionsAsync for {@currency}", Currency.Name);
+            Log.Debug("LoadMoreTransactionsAsync for {@currency}", Currency.Name);
 
             try
             {
@@ -299,7 +298,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
                 await Dispatcher.UIThread.InvokeAsync(() =>
                 {
-                    var selectedTransactionId = SelectedTransaction?.Id;
+                    //var selectedTransactionId = SelectedTransaction?.Id;
 
                     var transactionViewModels = transactions
                         .Select(t =>
@@ -320,8 +319,8 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
                     Transactions.AddRange(transactionsViewModels);
 
-                    if (selectedTransactionId != null)
-                        SelectedTransaction = Transactions.FirstOrDefault(t => t.Id == selectedTransactionId);
+                    //if (selectedTransactionId != null)
+                    //    SelectedTransaction = Transactions.FirstOrDefault(t => t.Id == selectedTransactionId);
                 });
 
                 // resolve view models
@@ -339,10 +338,9 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             {
                 Log.Error(e, "LoadTransactionAsync error for {@currency}", Currency.Name);
             }
-
             finally
             {
-                LoadTransactionsSemaphore.Release();
+                _loadTransactionsSemaphore.Release();
             }
         }
 
@@ -463,7 +461,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
         protected virtual void OnReachEndOfScroll()
         {
-            _ = LoadTransactionsAsync(reset: false);
+            _ = LoadMoreTransactionsAsync(reset: false);
         }
 
         private void UpdateTransactionEventHandler(object? sender, TransactionEventArgs args)

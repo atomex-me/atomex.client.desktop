@@ -53,7 +53,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                 .SubscribeInMainThread(tokenViewModel =>
                 {
                     LoadAddresses();
-                    _ = LoadTransactionsAsync(reset: true);
+                    _ = LoadMoreTransactionsAsync(reset: true);
                 });
             
             this.WhenAnyValue(vm => vm.TokenViewModel)
@@ -119,7 +119,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
         protected override void OnReachEndOfScroll()
         {
-            _ = LoadTransactionsAsync(reset: false);
+            _ = LoadMoreTransactionsAsync(reset: false);
         }
 
         protected override void LoadAddresses()

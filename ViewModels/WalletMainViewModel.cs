@@ -11,7 +11,6 @@ using ReactiveUI.Fody.Helpers;
 using Atomex.Client.Common;
 using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.ViewModels.TransactionViewModels;
-using Atomex.Client.Desktop.ViewModels.WalletViewModels;
 using Atomex.Core;
 using Atomex.MarketData.Abstract;
 using Atomex.Client.Abstract;
@@ -177,7 +176,7 @@ namespace Atomex.Client.Desktop.ViewModels
             {
                 case null:
                     RightPopupOpened = false;
-                    ConversionViewModel.DGSelectedIndex = -1;
+                    ConversionViewModel.SelectedSwapIndex = -1;
 
                     _ = Dispatcher.UIThread.InvokeAsync(async () =>
                     {
