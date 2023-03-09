@@ -66,26 +66,57 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
                 To = op.Target.Address;
                 GasLimit = op.GasLimit;
                 GasUsed = op.GasUsed;
-                StorageLimit= op.StorageLimit;
+                StorageLimit = op.StorageLimit;
                 StorageUsed = op.StorageUsed;
-                
+
                 if (!string.IsNullOrEmpty(op.Target.Name))
                 {
                     Alias = op.Target.Name;
                 }
                 else
                 {
-                    Alias = Amount switch
-                    {
-                        <= 0 => op.Target.Address.TruncateAddress(),
-                        > 0 => op.Sender.Address.TruncateAddress()
-                    };
+                    Alias = Amount <= 0
+                        ? op.Target.Address.TruncateAddress()
+                        : op.Sender.Address.TruncateAddress();
                 }
             }
-            else
+            else if (operation is DelegationOperation delegation)
             {
-                // delegations, reveals and others
+                From = delegation.Sender.Address;
+                To = delegation.NewDelegate?.Address;
+                GasLimit = delegation.GasLimit;
+                GasUsed = delegation.GasUsed;
+                StorageLimit = delegation.StorageLimit;
+                
+                if (delegation.NewDelegate?.Address != null)
+                {
+                    Direction = "to ";
+                    Description = "Delegate";
+
+                    if (!string.IsNullOrEmpty(delegation.NewDelegate?.Name))
+                    {
+                        Alias = delegation.NewDelegate?.Name;
+                    }
+                    else
+                    {
+                        Alias = delegation.NewDelegate.Address;
+                    }
+                }
+                else
+                {
+                    Direction = "from ";
+                    Description = "Undelegate";
+                    Alias = From;
+                }
             }
+            else if (operation is RevealOperation reveal)
+            {
+                Direction = "from";
+                From = reveal.Sender.Address;
+                Description = "Reveal public key";
+            }
+
+            // others
         }
 
         public override void UpdateMetadata(ITransactionMetadata metadata, CurrencyConfig config)
@@ -94,30 +125,35 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
             Amount = GetAmount((TransactionMetadata)metadata, InternalIndex);
             Fee = GetFee((TransactionMetadata)metadata, InternalIndex);
             Type = GetType((TransactionMetadata)metadata, InternalIndex);
-            Description = GetDescription(
-                type: Type,
-                amount: Amount,
-                decimals: config.Decimals,
-                currencyCode: config.Name);
-            Direction = Amount <= 0 ? "to " : "from ";
 
             var tezosOperation = (TezosOperation)Transaction;
             var operation = tezosOperation.Operations.ToList()[InternalIndex];
 
             if (operation is TransactionOperation op)
             {
+                Description = GetDescription(
+                    type: Type,
+                    amount: Amount,
+                    decimals: config.Decimals,
+                    currencyCode: config.Name);
+                Direction = Amount <= 0 ? "to " : "from ";
+
                 if (!string.IsNullOrEmpty(op.Target.Name))
                 {
                     Alias = op.Target.Name;
                 }
                 else
                 {
-                    Alias = Amount switch
-                    {
-                        <= 0 => op.Target.Address.TruncateAddress(),
-                        > 0 => op.Sender.Address.TruncateAddress()
-                    };
+                    Alias = Amount <= 0
+                        ? op.Target.Address.TruncateAddress()
+                        : op.Sender.Address.TruncateAddress();
                 }
+            }
+            else if (operation is DelegationOperation delegation)
+            {
+            }
+            else if (operation is RevealOperation reveal)
+            {
             }
 
             IsReady = metadata != null;

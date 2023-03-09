@@ -37,7 +37,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         protected int _transactionsLoaded;
         protected bool _isTransactionsLoading;
         protected CancellationTokenSource _cancellation;
-        protected readonly SemaphoreSlim _loadTransactionsSemaphore = new(1, 1);
+        protected readonly SemaphoreSlim _transactionsSync = new(1, 1);
 
         [Reactive] public ObservableRangeCollection<TransactionViewModelBase> Transactions { get; set; }
         [Reactive] public TransactionViewModelBase? SelectedTransaction { get; set; }
@@ -166,7 +166,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
             try
             {
-                await _loadTransactionsSemaphore.WaitAsync();
+                await _transactionsSync.WaitAsync();
 
                 var viewModelsToInsert = new List<TransactionViewModelBase>();
                 var viewModelsToUpdate = new List<TransactionViewModelBase>();
@@ -240,7 +240,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             }
             finally
             {
-                _loadTransactionsSemaphore.Release();
+                _transactionsSync.Release();
             }
         }
 
@@ -269,7 +269,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
         protected virtual async Task LoadMoreTransactionsAsync(bool reset)
         {
-            await _loadTransactionsSemaphore.WaitAsync();
+            await _transactionsSync.WaitAsync();
 
             Log.Debug("LoadMoreTransactionsAsync for {@currency}", Currency.Name);
 
@@ -340,7 +340,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             }
             finally
             {
-                _loadTransactionsSemaphore.Release();
+                _transactionsSync.Release();
             }
         }
 
@@ -476,6 +476,8 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
             try
             {
+                await _transactionsSync.WaitAsync();
+
                 var isRemoved = await _app
                     .LocalStorage
                     .RemoveTransactionByIdAsync(args.Transaction.Id, args.Transaction.Currency);
@@ -494,6 +496,10 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             catch (Exception e)
             {
                 Log.Error(e, "Transaction remove error");
+            }
+            finally
+            {
+                _transactionsSync.Release();
             }
         }
 

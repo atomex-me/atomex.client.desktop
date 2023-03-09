@@ -473,13 +473,13 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
                     if (!isEnougth)
                     {
-                        Warning = string.Format(Resources.SvInsufficientChainFundsWithDetails, "XTZ", estimatedFee);
+                        Warning = string.Format(Resources.SvInsufficientChainFundsWithDetails, "XTZ", estimatedFee.ToTez());
                         WarningToolTip = "";
                         WarningType = MessageType.Error;
                         return;
                     }
 
-                    Fee = estimatedFee;
+                    Fee = estimatedFee.ToTez();
                 }
                 else
                 {

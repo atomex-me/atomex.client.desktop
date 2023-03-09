@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reactive;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 using Avalonia.Controls;
@@ -29,11 +30,13 @@ using Serilog.Extensions.Logging;
 using Constants = Beacon.Sdk.Constants;
 
 using Atomex.Blockchain.Tezos;
-using Atomex.Blockchain.Tezos.Internal;
+using Atomex.Blockchain.Tezos.Common;
+using Atomex.Common;
 using Atomex.Client.Common;
 using Atomex.Client.Desktop.ViewModels.Abstract;
 using Atomex.Client.Desktop.ViewModels.SendViewModels;
-using Atomex.Wallet;
+using Atomex.Cryptography;
+using Atomex.Wallet.Tezos;
 using Hex = Atomex.Common.Hex;
 
 namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
@@ -510,23 +513,30 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
 
                 OnConfirm = async () =>
                 {
-                    var wallet = (HdWallet)_atomexApp.Account.Wallet;
-                    var keyStorage = wallet.KeyStorage;
+                    //var wallet = (HdWallet)_atomexApp.Account.Wallet;
+                    //var keyStorage = wallet.KeyStorage;
 
-                    using var securePrivateKey = keyStorage.GetPrivateKey(
-                        currency: Tezos,
-                        keyPath: connectedWalletAddress.KeyPath,
-                        keyType: connectedWalletAddress.KeyType);
+                    //using var securePrivateKey = keyStorage.GetPrivateKey(
+                    //    currency: Tezos,
+                    //    keyPath: connectedWalletAddress.KeyPath,
+                    //    keyType: connectedWalletAddress.KeyType);
 
-                    var privateKey = securePrivateKey.ToUnsecuredBytes();
+                    //var privateKey = securePrivateKey.ToUnsecuredBytes();
 
-                    var signedMessage = TezosSigner.SignHash(
-                        data: forgedOperations,
-                        privateKey: privateKey,
-                        watermark: Watermark.Generic,
-                        isExtendedKey: privateKey.Length == 64);
+                    //var signedMessage = TezosSigner.SignHash(
+                    //    data: forgedOperations,
+                    //    privateKey: privateKey,
+                    //    watermark: Watermark.Generic,
+                    //    isExtendedKey: privateKey.Length == 64);
+                    var tezosAccount = _atomexApp.Account
+                        .GetCurrencyAccount<TezosAccount>(TezosHelper.Xtz);
 
-                    if (signedMessage == null)
+                    var (signature, signError) = await tezosAccount.SignAsync(
+                        from: connectedWalletAddress.Address,
+                        forgedOperations,
+                        prefix: Watermark.Generic);
+
+                    if (signError != null)
                     {
                         Log.Error("Beacon transaction signing error");
 
@@ -542,11 +552,13 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
 
                     try
                     {
-                        var injectedOperation = await rpc
-                            .InjectOperationsAsync(signedMessage.SignedBytes)
+                        var signedBytesInHex = forgedOperations.ToHexString() + signature.ToHexString();
+
+                        var injectedOperationResponse = await rpc
+                            .InjectOperationsAsync(signedBytesInHex)
                             .ConfigureAwait(false);
 
-                        operationId = injectedOperation.ToString();
+                        operationId = JsonSerializer.Deserialize<string>(injectedOperationResponse);
                     }
                     catch (Exception ex)
                     {
@@ -612,21 +624,17 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
                 Payload = signRequest.Payload,
                 OnSign = async () =>
                 {
-                    var hdWallet = _atomexApp.Account.Wallet as HdWallet;
+                    var tezosAccount = _atomexApp.Account.GetCurrencyAccount<TezosAccount>(TezosHelper.Xtz);
 
-                    using var privateKey = hdWallet!.KeyStorage.GetPrivateKey(
-                        currency: Tezos,
-                        keyPath: connectedWalletAddress.KeyPath,
-                        keyType: connectedWalletAddress.KeyType);
+                    var (signature, signError) = await tezosAccount.SignAsync(
+                        from: connectedWalletAddress.Address,
+                        forgedOperations: dataToSign,
+                        prefix: null);
 
-                    var signedMessage = TezosSigner.SignHash(
-                        data: dataToSign,
-                        privateKey: privateKey.ToUnsecuredBytes(),
-                        watermark: null,
-                        isExtendedKey: privateKey.Length == 64);
+                    var encodedSignature = Base58Check.Encode(signature, TezosPrefix.Edsig);
 
                     var response = new SignPayloadResponse(
-                        signature: signedMessage.EncodedSignature,
+                        signature: encodedSignature,
                         version: signRequest.Version,
                         id: signRequest.Id,
                         senderId: _beaconWalletClient.SenderId);
@@ -640,7 +648,7 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
                         "{@Sender}: signed payload for {@Dapp} with signature: {@Signature}",
                         "Beacon",
                         permissionInfo.AppMetadata.Name,
-                        signedMessage.EncodedSignature);
+                        encodedSignature);
                 },
                 OnReject = async () =>
                 {

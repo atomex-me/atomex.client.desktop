@@ -214,7 +214,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 RecommendedMaxAmount = HasActiveSwaps
                     ? Math.Max(maxAmount - maxAmountEstimation.Reserved.ToTez(), 0)
                     : HasTokens
-                        ? Math.Max(maxAmount - fa12TransferFee, 0)
+                        ? Math.Max(maxAmount - fa12TransferFee.ToTez(), 0)
                         : maxAmount;
 
                 Amount = maxAmount > 0
@@ -268,7 +268,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             RecommendedMaxAmount = HasActiveSwaps
                 ? Math.Max(maxAmount - maxAmountEstimation.Reserved.ToTez(), 0)
                 : HasTokens
-                    ? Math.Max(maxAmount - fa12TransferFee, 0)
+                    ? Math.Max(maxAmount - fa12TransferFee.ToTez(), 0)
                     : maxAmount;
 
             if (HasActiveSwaps && Amount > RecommendedMaxAmount)

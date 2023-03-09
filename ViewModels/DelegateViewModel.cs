@@ -174,7 +174,9 @@ namespace Atomex.Client.Desktop.ViewModels
                 return;
             }
 
-            var totalFee = tx.TotalFee();
+            var totalFee = tx
+                .TotalFee()
+                .ToTez();
 
             var messageViewModel = MessageViewModel.Message(
                 title: "Confirm undelegating",
@@ -194,10 +196,9 @@ namespace Atomex.Client.Desktop.ViewModels
             try
             {
                 var (result, error) = await tezosAccount
-                    .SendTransactionAsync(
+                    .DelegateAsync(
                         from: DelegateAddress,
-                        to: SelectedBaker?.Address,
-                        amount: 0,
+                        @delegate: SelectedBaker?.Address,
                         fee: Blockchain.Tezos.Fee.FromNetwork(defaultValue: fee.ToMicroTez()),
                         gasLimit: GasLimit.FromNetwork((int)_tezosConfig.GasLimit),
                         storageLimit: StorageLimit.FromNetwork((int)_tezosConfig.StorageLimit),
@@ -450,7 +451,9 @@ namespace Atomex.Client.Desktop.ViewModels
             if (!tx.IsAutoFilled)
                 return new Error(Errors.TransactionCreationError, "Autofill transaction failed");
 
-            var totalFee = tx.TotalFee();
+            var totalFee = tx
+                .TotalFee()
+                .ToTez();
 
             if (UseDefaultFee)
             {
