@@ -63,6 +63,7 @@ namespace Atomex.Client.Desktop
             var bitfinexQuotesProvider = new BitfinexQuotesProvider(
                 currencies: currenciesProvider
                     .GetCurrencies(Network.MainNet)
+                    .GetOrderedPreset()
                     .Select(c => c.Name),
                 baseCurrency: QuotesProvider.Usd,
                 log: LoggerFactory.CreateLogger<BitfinexQuotesProvider>());

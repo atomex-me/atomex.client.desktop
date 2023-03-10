@@ -14,6 +14,7 @@ using Atomex.Client.Common;
 using Atomex.Client.Desktop.Controls;
 using Atomex.Client.Desktop.Properties;
 using Atomex.Wallet;
+using Atomex.LiteDb;
 
 namespace Atomex.Client.Desktop.ViewModels
 {
@@ -90,7 +91,16 @@ namespace Atomex.Client.Desktop.ViewModels
                             OnRestored = () => AccountRestored = false
                         };
 
-                        restoreViewModel.ScanCurrenciesAsync();
+                        _ = restoreViewModel.ScanAsync(new LiteDbMigrationResult
+                        {
+                            new LiteDbMigrationChange { Currency = "BTC", EntityType = MigrationEntityType.Addresses },
+                            new LiteDbMigrationChange { Currency = "LTC", EntityType = MigrationEntityType.Addresses },
+                            new LiteDbMigrationChange { Currency = "XTZ", EntityType = MigrationEntityType.Addresses },
+                            new LiteDbMigrationChange { Currency = "ETH", EntityType = MigrationEntityType.Addresses },
+                            new LiteDbMigrationChange { Currency = "ERC20", EntityType = MigrationEntityType.Addresses },
+                            new LiteDbMigrationChange { Currency = "FA12", EntityType = MigrationEntityType.Addresses },
+                            new LiteDbMigrationChange { Currency = "FA2", EntityType = MigrationEntityType.Addresses },
+                        });
                     }
                 }
 

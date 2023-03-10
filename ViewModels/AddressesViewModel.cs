@@ -282,7 +282,7 @@ namespace Atomex.Client.Desktop.ViewModels
 
                     await Task.Run(async () =>
                     {
-                        await new TezosTokensWalletScanner(tezosAccount)
+                        await new TezosTokensWalletScanner(tezosAccount, _tokenType)
                             .UpdateBalanceAsync(address, _tokenContract, (int)_tokenId)
                             .ConfigureAwait(false);
                     });

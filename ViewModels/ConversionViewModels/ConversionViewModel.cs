@@ -809,7 +809,9 @@ namespace Atomex.Client.Desktop.ViewModels
             _app.MarketDataRepository.QuotesUpdated += OnQuotesUpdatedEventHandler;
             _app.SwapManager.SwapUpdated += OnSwapEventHandler;
 
-            FromCurrencies = _app.Account.Currencies
+            FromCurrencies = _app.Account
+                .Currencies
+                .GetOrderedPreset()
                 .Where(c => c.IsSwapAvailable)
                 .Select(CurrencyViewModelCreator.CreateOrGet)
                 .ToList();

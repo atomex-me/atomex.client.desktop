@@ -105,12 +105,14 @@ namespace Atomex.Client.Desktop.ViewModels
             App.AtomexClientChanged += OnAtomexClientChangedEventHandler;
         }
 
-        private void OnAtomexClientChangedEventHandler(object sender, AtomexClientChangedEventArgs e)
+        private void OnAtomexClientChangedEventHandler(object? sender, AtomexClientChangedEventArgs e)
         {
             if (e.AtomexClient is null || App.Account == null)
                 return;
 
-            AllCurrencies = App.Account?.Currencies
+            AllCurrencies = App.Account
+                ?.Currencies
+                .GetOrderedPreset()
                 .Select(c =>
                 {
                     var vm = CurrencyViewModelCreator.CreateOrGet(c);
@@ -129,7 +131,7 @@ namespace Atomex.Client.Desktop.ViewModels
             OnAmountUpdatedEventHandler(this, EventArgs.Empty);
         }
 
-        private void OnAmountUpdatedEventHandler(object sender, EventArgs args)
+        private void OnAmountUpdatedEventHandler(object? sender, EventArgs args)
         {
             // update total portfolio value
             PortfolioValue = ChoosenCurrencies.Sum(c => c.TotalAmountInBase);

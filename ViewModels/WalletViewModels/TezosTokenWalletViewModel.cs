@@ -152,7 +152,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                     var tezosAccount = _app.Account
                         .GetCurrencyAccount<TezosAccount>(TezosConfig.Xtz);
 
-                    var tezosTokensScanner = new TezosTokensWalletScanner(tezosAccount);
+                    var tezosTokensScanner = new TezosTokensWalletScanner(tezosAccount, TokenViewModel!.Contract.Type);
 
                     await tezosTokensScanner
                         .UpdateBalanceAsync(

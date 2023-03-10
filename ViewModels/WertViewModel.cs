@@ -66,7 +66,7 @@ namespace Atomex.Client.Desktop.ViewModels
             App.AtomexClientChanged += OnAtomexClientChangedEventHandler;
         }
 
-        private void OnAtomexClientChangedEventHandler(object sender, AtomexClientChangedEventArgs e)
+        private void OnAtomexClientChangedEventHandler(object? sender, AtomexClientChangedEventArgs e)
         {
             var wertApi = new WertApi(App);
 

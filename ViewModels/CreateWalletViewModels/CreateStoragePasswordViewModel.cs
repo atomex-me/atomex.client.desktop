@@ -124,12 +124,14 @@ namespace Atomex.Client.Desktop.ViewModels.CreateWalletViewModels
 
                     if (!saved)
                     {
-                        Warning = "Can't save wallet file to file system. Try to use different wallet name.";
+                        Warning = "Can't save wallet file to file system. Try to use different wallet name";
                         throw new IOException(Warning);
                     }
 
+                    var pathToDb = Path.Combine(Path.GetDirectoryName(_wallet.PathToWallet)!, Account.DefaultDataFileName);
+
                     var localStorage = new LiteDbCachedLocalStorage(
-                        pathToDb: Path.Combine(Path.GetDirectoryName(_wallet.PathToWallet), Account.DefaultDataFileName),
+                        pathToDb: pathToDb,
                         password: PasswordVM.SecurePass,
                         network: _wallet.Network);
 

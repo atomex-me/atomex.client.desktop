@@ -43,13 +43,15 @@ namespace Atomex.Client.Desktop.ViewModels
             App.AtomexClientChanged += OnAtomexClientChangedEventHandler;
         }
 
-        private void OnAtomexClientChangedEventHandler(object sender, AtomexClientChangedEventArgs e)
+        private void OnAtomexClientChangedEventHandler(object? sender, AtomexClientChangedEventArgs e)
         {
             var walletsViewModels = new List<IWalletViewModel>();
 
             if (e.AtomexClient != null && App?.Account != null)
             {
-                var wallets = App.Account.Currencies
+                var wallets = App.Account
+                    .Currencies
+                    .GetOrderedPreset()
                     .Select(currency => WalletViewModelCreator.CreateViewModel(
                         app: App,
                         setConversionTab: SetConversionTab,

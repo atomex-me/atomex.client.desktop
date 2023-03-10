@@ -14,6 +14,7 @@ using Atomex.Core;
 using Atomex.LiteDb;
 using Atomex.Wallet;
 using Atomex.Wallet.Abstract;
+using Serilog;
 
 namespace Atomex.Client.Desktop.ViewModels
 {
@@ -21,7 +22,7 @@ namespace Atomex.Client.Desktop.ViewModels
     {
         private readonly IAtomexApp _app;
         private readonly Action<ViewModelBase> _showContent;
-        private Action? _doAfterAtomexClientChanged;
+        private LiteDbMigrationResult? _migrationResult;
 
         public IEnumerable<WalletInfo> Wallets { get; set; }
         [Reactive] public WalletInfo? SelectedWallet { get; set; }
@@ -68,7 +69,7 @@ namespace Atomex.Client.Desktop.ViewModels
 
                     var pathToDb = Path.Combine(Path.GetDirectoryName(wallet.PathToWallet)!, Account.DefaultDataFileName);
 
-                    var migrationResult = LiteDbMigrationManager.Migrate(
+                    _migrationResult = LiteDbMigrationManager.Migrate(
                         pathToDb: pathToDb,
                         sessionPassword: SessionPasswordHelper.GetSessionPassword(password),
                         network: wallet.Network);
@@ -119,20 +120,6 @@ namespace Atomex.Client.Desktop.ViewModels
             _showContent?.Invoke(unlockViewModel);
         }
 
-        private void TezosTransactionsDeleted()
-        {
-            var xtzCurrencies = new[] { "XTZ", "TZBTC", "KUSD", "USDT_XTZ" };
-
-            var restoreDialogViewModel = new RestoreDialogViewModel(_app);
-            restoreDialogViewModel.ScanCurrenciesAsync(xtzCurrencies);
-        }
-
-        private void OnTezosTokensDataDeleted()
-        {
-            var restoreDialogViewModel = new RestoreDialogViewModel(_app);
-            restoreDialogViewModel.ScanTezosTokens();
-        }
-
         private void OnAtomexClientChangedEventHandler(object? sender, AtomexClientChangedEventArgs args)
         {
             if (_app != null && _app?.AtomexClient == null)
@@ -141,7 +128,25 @@ namespace Atomex.Client.Desktop.ViewModels
                 return;
             }
 
-            _doAfterAtomexClientChanged?.Invoke();
+            DoAfterMigrations();
+        }
+
+        private async void DoAfterMigrations()
+        {
+            if (_migrationResult == null)
+                return; // nothing to do
+
+            try
+            {
+                var restoreDialogViewModel = new RestoreDialogViewModel(_app);
+
+                await restoreDialogViewModel
+                    .ScanAsync(_migrationResult);
+            }
+            catch (Exception e)
+            {
+                Log.Error(e, "DoAfterMigrations error");
+            }
         }
 
         private void DesignerMode()
