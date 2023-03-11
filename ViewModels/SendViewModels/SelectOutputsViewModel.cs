@@ -99,7 +99,8 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
                     var outputViewModels = new ObservableCollection<OutputViewModel>(
                         InitialOutputs!
-                            .Where(output => output.Address.ToLower().Contains(searchPattern?.ToLower() ?? string.Empty)));
+                            .Where(output => output.Address.ToLower().Contains(searchPattern?.ToLower() ?? string.Empty))
+                            .ToList());
 
                     if (sortByDate)
                     {
@@ -201,6 +202,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     ConfirmAction?.Invoke(Outputs
                         .Where(o => o.IsSelected)
                         .Select(o => o.Output)
+                        .ToList()
                     );
                 }));
 

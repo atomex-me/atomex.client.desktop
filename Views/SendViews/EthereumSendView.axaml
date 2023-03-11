@@ -233,7 +233,7 @@
                                  Classes="Dashed"
                                  HorizontalAlignment="Left"
                                  Command="{Binding MaxCommand}"
-                                 Content="max" />
+                                 Content="max"/>
           </Grid>
         </StackPanel>
 
@@ -259,11 +259,73 @@
 
           <TextBox Width="440"
                    FontSize="16"
-                   Text="{Binding MaxFeePerGas, Converter={StaticResource StringToIntConverter}}"
+                   Text="{Binding MaxFeePerGas, Converter={StaticResource StringToDecimalConverter}}"
                    helpers:AmountTextBoxHelper.AmountInBase="{Binding GasPriceCode}"
                    Classes="AtomexTextBox AmountTextBox">
             <i:Interaction.Behaviors>
-              <behaviors:AmountBehavior Format="F0" NumericType="x:Int32"/>
+              <behaviors:AmountBehavior Format="{Binding CurrencyFormat}"/>
+            </i:Interaction.Behaviors>
+          </TextBox>
+        </StackPanel>
+
+        <!-- base fee per gas -->
+        <StackPanel Orientation="Horizontal"
+                    Margin="0 8 0 0"
+                    Width="440"
+                    HorizontalAlignment="Center"
+                    IsVisible="{Binding !UseDefaultFee}">
+          <TextBlock Text="Base fee per gas:"
+                     VerticalAlignment="Center"
+                     FontSize="13"
+                     LineHeight="16"
+                     FontFamily="{DynamicResource DefaultLightFontFamily}"
+                     Foreground="{DynamicResource SecondaryForegroundBrush}"/>
+          <TextBlock Margin="5 0 0 0"
+                     Text="{Binding BaseFeePerGas}"
+                     VerticalAlignment="Center"
+                     FontSize="13"
+                     LineHeight="16"
+                     FontFamily="{DynamicResource DefaultLightFontFamily}"
+                     Foreground="{DynamicResource SecondaryForegroundBrush}"/>
+          <TextBlock VerticalAlignment="Center"
+                     FontSize="13"
+                     LineHeight="16"
+                     Margin="4 0 0 0"
+                     Text="{Binding GasPriceCode}"
+                     Foreground="{DynamicResource SecondaryForegroundBrush}"/>
+
+          <controls:IconButton Classes="Question WithToolTipContent"
+                               VerticalAlignment="Center"
+                               Margin="4 0 0 0">
+            <TextBlock TextWrapping="Wrap"
+                       Text="Base fee is a minumum fee per gas by protocol"/>
+          </controls:IconButton>
+        </StackPanel>
+
+        <!-- priority fee per gas -->
+        <StackPanel Orientation="Horizontal"
+                    HorizontalAlignment="Center"
+                    IsVisible="{Binding !UseDefaultFee}"
+                    Margin="0 12 0 0"
+                    Height="50">
+          <Border Width="120"
+                  Margin="-120 0 0 0">
+            <TextBlock Text="Priority gas price"
+                       Margin="0 0 12 0"
+                       Foreground="{DynamicResource SecondaryForegroundBrush}"
+                       FontFamily="{DynamicResource DefaultMediumFontFamily}"
+                       FontSize="13"
+                       VerticalAlignment="Center"
+                       HorizontalAlignment="Right"/>
+          </Border>
+
+          <TextBox Width="440"
+                   FontSize="16"
+                   Text="{Binding MaxPriorityFeePerGas, Converter={StaticResource StringToDecimalConverter}}"
+                   helpers:AmountTextBoxHelper.AmountInBase="{Binding GasPriceCode}"
+                   Classes="AtomexTextBox AmountTextBox">
+            <i:Interaction.Behaviors>
+              <behaviors:AmountBehavior Format="{Binding CurrencyFormat}"/>
             </i:Interaction.Behaviors>
           </TextBox>
         </StackPanel>
@@ -342,14 +404,11 @@
         </StackPanel>
 
         <Grid ColumnDefinitions="*,Auto"
-              RowDefinitions="Auto,Auto,Auto"
               Margin="0 12 0 0"
               Width="440">
 
           <!-- use default fee -->
-          <CheckBox Grid.Row="0"
-                    Grid.Column="0"
-                    Grid.RowSpan="3"
+          <CheckBox Grid.Column="0"
                     Padding="12 0 0 0"
                     VerticalAlignment="Top"
                     IsChecked="{Binding UseDefaultFee, Mode=TwoWay}"
@@ -359,81 +418,131 @@
                     Content="Use default fee"/>
 
           <!-- max gas price -->
-          <StackPanel Grid.Row="0"
-                      Grid.Column="1"
-                      HorizontalAlignment="Right"
-                      Orientation="Horizontal">
-            <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
-                       LineHeight="20"
-                       TextAlignment="Right"
-                       Text="Max gas price:"/>
+          <StackPanel Grid.Column="1"
+                      Orientation="Vertical">
+            <StackPanel HorizontalAlignment="Right"
+                        Orientation="Horizontal"
+                        IsVisible="{Binding UseDefaultFee}">
+              <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
+                         LineHeight="20"
+                         TextAlignment="Right"
+                         Text="Max gas price:"/>
 
-            <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
-                       LineHeight="20"
-                       Margin="3 0 0 0"
-                       TextAlignment="Right"
-                       Text="{Binding GasPrice}"/>
+              <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
+                         LineHeight="20"
+                         Margin="3 0 0 0"
+                         TextAlignment="Right"
+                         Text="{Binding MaxFeePerGas}"/>
 
-            <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
-                       LineHeight="20"
-                       Margin="3 0 0 0"
-                       TextAlignment="Right"
-                       Text="{Binding GasPriceCode}"/>
-          </StackPanel>
+              <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
+                         LineHeight="20"
+                         Margin="3 0 0 0"
+                         TextAlignment="Right"
+                         Text="{Binding GasPriceCode}"/>
+            </StackPanel>
 
-          <!-- gas limit -->
-          <StackPanel Grid.Row="1"
-                      Grid.Column="1"
-                      HorizontalAlignment="Right"
-                      Orientation="Horizontal">
-            <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
-                       LineHeight="20"
-                       TextAlignment="Right"
-                       Text="Gas limit:"/>
+            <!-- priority gas price -->
+            <StackPanel HorizontalAlignment="Right"
+                        Orientation="Horizontal"
+                        IsVisible="{Binding UseDefaultFee}">
+              <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
+                         LineHeight="20"
+                         TextAlignment="Right"
+                         Text="Priority gas price:"/>
 
-            <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
-                       LineHeight="20"
-                       Margin="3 0 0 0"
-                       Text="{Binding GasLimit}"
-                       TextAlignment="Right"/>
+              <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
+                         LineHeight="20"
+                         Margin="3 0 0 0"
+                         TextAlignment="Right"
+                         Text="{Binding MaxPriorityFeePerGas}"/>
 
-            <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
-                       LineHeight="20"
-                       Margin="3 0 0 0"
-                       TextAlignment="Right"
-                       Text="{Binding GasLimitCode}"/>
-          </StackPanel>
+              <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
+                         LineHeight="20"
+                         Margin="3 0 0 0"
+                         TextAlignment="Right"
+                         Text="{Binding GasPriceCode}"/>
+            </StackPanel>
 
-          <!-- fee -->
-          <StackPanel Grid.Row="2"
-                      Grid.Column="1"
-                      HorizontalAlignment="Right"
-                      Orientation="Horizontal">
-            <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
-                       LineHeight="20"
-                       TextAlignment="Right"
-                       Text="Max fee:"/>
-            <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
-                       LineHeight="20"
-                       Margin="3 0 0 0"
-                       TextAlignment="Right"
-                       Text="{Binding TotalFeeString}"/>
-            <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
-                       LineHeight="20"
-                       Margin="3 0 0 0"
-                       TextAlignment="Right"
-                       Text="{Binding FeeCurrencyCode}"/>
-            <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
-                       LineHeight="20"
-                       Margin="3 0 0 0"
-                       TextAlignment="Right">
-              <TextBlock.Text>
-                <MultiBinding Converter="{StaticResource AmountToStringInBracketsConverter}">
-                  <Binding Path="FeeInBase" Mode="OneWay"/>
-                  <Binding Path="BaseCurrencyFormat" Mode="OneWay"/>
-                </MultiBinding>
-              </TextBlock.Text>
-            </TextBlock>
+            <!-- gas limit -->
+            <StackPanel HorizontalAlignment="Right"
+                        Orientation="Horizontal">
+              <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
+                         LineHeight="20"
+                         TextAlignment="Right"
+                         Text="Gas limit:"/>
+
+              <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
+                         LineHeight="20"
+                         Margin="3 0 0 0"
+                         Text="{Binding GasLimit}"
+                         TextAlignment="Right"/>
+
+              <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
+                         LineHeight="20"
+                         Margin="3 0 0 0"
+                         TextAlignment="Right"
+                         Text="{Binding GasLimitCode}"/>
+            </StackPanel>
+
+            <!-- max fee -->
+            <StackPanel HorizontalAlignment="Right"
+                        Orientation="Horizontal">
+              <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
+                         LineHeight="20"
+                         TextAlignment="Right"
+                         Text="Max fee:"/>
+              <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
+                         LineHeight="20"
+                         Margin="3 0 0 0"
+                         TextAlignment="Right"
+                         Text="{Binding TotalFeeString}"/>
+              <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
+                         LineHeight="20"
+                         Margin="3 0 0 0"
+                         TextAlignment="Right"
+                         Text="{Binding FeeCurrencyCode}"/>
+              <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
+                         LineHeight="20"
+                         Margin="3 0 0 0"
+                         TextAlignment="Right">
+                <TextBlock.Text>
+                  <MultiBinding Converter="{StaticResource AmountToStringInBracketsConverter}">
+                    <Binding Path="FeeInBase" Mode="OneWay"/>
+                    <Binding Path="BaseCurrencyFormat" Mode="OneWay"/>
+                  </MultiBinding>
+                </TextBlock.Text>
+              </TextBlock>
+            </StackPanel>
+
+            <!-- estimated fee -->
+            <StackPanel HorizontalAlignment="Right"
+                        Orientation="Horizontal">
+              <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
+                         LineHeight="20"
+                         TextAlignment="Right"
+                         Text="Estimated fee:"/>
+              <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
+                         LineHeight="20"
+                         Margin="3 0 0 0"
+                         TextAlignment="Right"
+                         Text="{Binding EstimatedFeeString}"/>
+              <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
+                         LineHeight="20"
+                         Margin="3 0 0 0"
+                         TextAlignment="Right"
+                         Text="{Binding FeeCurrencyCode}"/>
+              <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
+                         LineHeight="20"
+                         Margin="3 0 0 0"
+                         TextAlignment="Right">
+                <TextBlock.Text>
+                  <MultiBinding Converter="{StaticResource AmountToStringInBracketsConverter}">
+                    <Binding Path="EstimatedFeeInBase" Mode="OneWay"/>
+                    <Binding Path="BaseCurrencyFormat" Mode="OneWay"/>
+                  </MultiBinding>
+                </TextBlock.Text>
+              </TextBlock>
+            </StackPanel>
           </StackPanel>
         </Grid>
       </StackPanel>
@@ -477,11 +586,43 @@
           </TextBlock>
         </Grid>
 
-        <!-- fee -->
+        <!-- estimated fee -->
         <Grid ColumnDefinitions="*,Auto,Auto,Auto"
               Margin="0 6 0 0">
           <TextBlock Grid.Column="0"
-                     Text="Fee"
+                     Text="Estimated fee"
+                     Foreground="{DynamicResource SecondaryForegroundBrush}"
+                     FontSize="13"/>
+
+          <TextBlock Grid.Column="1"
+                     Text="{Binding EstimatedFeeString}"
+                     Foreground="{DynamicResource DefaultForegroundBrush}"
+                     FontSize="13"/>
+
+          <TextBlock Grid.Column="2"
+                     Margin="3 0 0 0"
+                     Text="{Binding TotalFeeCurrencyCode}"
+                     Foreground="{DynamicResource DefaultForegroundBrush}"
+                     FontSize="13"/>
+
+          <TextBlock Grid.Column="3"
+                     Foreground="{DynamicResource DefaultForegroundBrush}"
+                     FontSize="13"
+                     Margin="3 0 0 0">
+            <TextBlock.Text>
+              <MultiBinding Converter="{StaticResource AmountToStringInBracketsConverter}">
+                <Binding Path="EstimatedFeeInBase" Mode="OneWay"/>
+                <Binding Path="BaseCurrencyFormat" Mode="OneWay"/>
+              </MultiBinding>
+            </TextBlock.Text>
+          </TextBlock>
+        </Grid>
+        
+        <!-- max fee -->
+        <Grid ColumnDefinitions="*,Auto,Auto,Auto"
+              Margin="0 6 0 0">
+          <TextBlock Grid.Column="0"
+                     Text="Max fee"
                      Foreground="{DynamicResource SecondaryForegroundBrush}"
                      FontSize="13"/>
 
@@ -492,7 +633,7 @@
 
           <TextBlock Grid.Column="2"
                      Margin="3 0 0 0"
-                     Text="{Binding  TotalFeeCurrencyCode}"
+                     Text="{Binding TotalFeeCurrencyCode}"
                      Foreground="{DynamicResource DefaultForegroundBrush}"
                      FontSize="13"/>
 
@@ -520,6 +661,27 @@
           <TextBlock Grid.Column="1"
                      Margin="3 0 0 0"
                      Text="{Binding MaxFeePerGas}"
+                     Foreground="{DynamicResource DefaultForegroundBrush}"
+                     FontSize="13"/>
+
+          <TextBlock Grid.Column="2"
+                     Margin="3 0 0 0"
+                     Text="{Binding GasPriceCode}"
+                     Foreground="{DynamicResource DefaultForegroundBrush}"
+                     FontSize="13"/>
+        </Grid>
+        
+        <!-- priority gas price -->
+        <Grid ColumnDefinitions="*,Auto,Auto"
+              Margin="0 6 0 0">
+          <TextBlock Grid.Column="0"
+                     Text="Priority gas price"
+                     Foreground="{DynamicResource SecondaryForegroundBrush}"
+                     FontSize="13"/>
+
+          <TextBlock Grid.Column="1"
+                     Margin="3 0 0 0"
+                     Text="{Binding MaxPriorityFeePerGas}"
                      Foreground="{DynamicResource DefaultForegroundBrush}"
                      FontSize="13"/>
 

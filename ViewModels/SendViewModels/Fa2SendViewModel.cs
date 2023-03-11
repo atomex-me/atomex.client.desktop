@@ -37,7 +37,11 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             CurrencyConfig currency)
             : base(app, currency)
         {
-            SelectFromViewModel = new SelectAddressViewModel(_app.Account, Currency, SelectAddressMode.SendFrom)
+            SelectFromViewModel = new SelectAddressViewModel(
+                _app.Account,
+                _app.LocalStorage,
+                Currency,
+                SelectAddressMode.SendFrom)
             {
                 BackAction = () => { App.DialogService.Show(this); },
                 ConfirmAction = walletAddressViewModel =>
@@ -51,6 +55,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
             SelectToViewModel = new SelectAddressViewModel(
                 _app.Account,
+                _app.LocalStorage,
                 _app.Account.Currencies.Get<TezosConfig>(TezosConfig.Xtz))
             {
                 BackAction = () => { App.DialogService.Show(SelectFromViewModel); },

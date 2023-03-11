@@ -82,10 +82,9 @@ namespace Atomex.Client.Desktop.ViewModels
                 .SubscribeInMainThread(searchPattern =>
                 {
                     var filteredCurrencies = InitialChoosenCurrencies
-                        .Where(c => c.Currency.Name.ToLower()
-                                        .Contains(searchPattern?.ToLower() ?? string.Empty) ||
-                                    c.Currency.Description.ToLower()
-                                        .Contains(searchPattern?.ToLower() ?? string.Empty));
+                        .Where(c => c.Currency.Name.ToLower().Contains(searchPattern?.ToLower() ?? string.Empty) ||
+                                    c.Currency.Description.ToLower().Contains(searchPattern?.ToLower() ?? string.Empty))
+                        .ToList();
                     
                     ChoosenCurrencies = new List<CurrencyViewModel>(filteredCurrencies);
                 });
@@ -307,7 +306,8 @@ namespace Atomex.Client.Desktop.ViewModels
                             .ToArray();
                         
                         var currencies = AllCurrencies
-                            .Where(c => !disabledCurrencies.Contains(c.CurrencyCode));
+                            .Where(c => !disabledCurrencies.Contains(c.CurrencyCode))
+                            .ToList();
 
                         ChoosenCurrencies = new List<CurrencyViewModel>(currencies);
                         InitialChoosenCurrencies = new List<CurrencyViewModel>(ChoosenCurrencies);

@@ -235,7 +235,6 @@
                                 </StackPanel>
                                 
                                 <controls:CopyButton Margin="20 0 9 0"
-
                                                      ToolText="Copy address to clipboard"
                                                      DoneToolText="Copied!"
                                                      Command="{Binding $parent[ListBox].DataContext.CopyAddressCommand}"

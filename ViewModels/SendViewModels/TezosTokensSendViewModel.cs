@@ -179,12 +179,14 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             UseDefaultFee = true;
 
             SelectFromViewModel = new SelectAddressViewModel(
-                _app.Account,
-                tezosConfig,
-                SelectAddressMode.SendFrom,
-                from,
-                tokenId,
-                tokenContract)
+                account: _app.Account,
+                localStorage: _app.LocalStorage,
+                currency: tezosConfig,
+                mode: SelectAddressMode.SendFrom,
+                selectedAddress: from,
+                selectedTokenId: tokenId,
+                tokenType: _tokenType,
+                tokenContract: tokenContract)
             {
                 BackAction = () => { App.DialogService.Show(this); },
                 ConfirmAction = walletAddressViewModel =>
@@ -195,7 +197,10 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 }
             };
 
-            SelectToViewModel = new SelectAddressViewModel(_app.Account, tezosConfig)
+            SelectToViewModel = new SelectAddressViewModel(
+                _app.Account,
+                _app.LocalStorage,
+                tezosConfig)
             {
                 BackAction = () => { App.DialogService.Show(SelectFromViewModel); },
                 ConfirmAction = walletAddressViewModel =>

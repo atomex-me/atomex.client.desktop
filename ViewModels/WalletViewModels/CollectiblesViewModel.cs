@@ -96,7 +96,8 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                         })
                         .Where(c => !DisabledCollectibles!.Contains(c.ContractAddress))
                         .OrderByDescending(c => c.TotalAmount != 0)
-                        .ThenBy(c => c.Name)));
+                        .ThenBy(c => c.Name)
+                        .ToList()));
 
             DisabledCollectibles = _app.Account.UserData.DisabledCollectibles ?? Array.Empty<string>();
 
@@ -157,10 +158,12 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                         .Select(g => g)
                         .OrderByDescending(token => token.TotalAmount != 0)
                         .ThenBy(token => token.TokenBalance.Name)
+                        .ToList()
                     ),
                     OnCollectibleClick = tokens => ShowTezosCollection.Invoke(tokens
                         .OrderByDescending(token => token.TotalAmount != 0)
-                        .ThenBy(token => token.TokenBalance.Name))
+                        .ThenBy(token => token.TokenBalance.Name)
+                        .ToList())
                 });
 
             InitialCollectibles = new ObservableCollection<Collectible>(collectibles);
@@ -168,7 +171,8 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             Collectibles = new ObservableCollection<Collectible>(collectibles
                 .Where(collectible => !DisabledCollectibles.Contains(collectible.Tokens.First().Contract.Address))
                 .OrderByDescending(collectible => collectible.TotalAmount != 0)
-                .ThenBy(collectible => collectible.Name));
+                .ThenBy(collectible => collectible.Name)
+                .ToList());
         }
 
         public CollectiblesViewModel()

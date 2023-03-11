@@ -47,10 +47,12 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
         public SelectAddressViewModel(
             IAccount account,
+            ILocalStorage localStorage,
             CurrencyConfig currency,
             SelectAddressMode mode = SelectAddressMode.ReceiveTo,
             string? selectedAddress = null,
             int selectedTokenId = 0,
+            string? tokenType = null,
             string? tokenContract = null)
         {
             this.WhenAnyValue(
@@ -65,7 +67,9 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     var (sortByDate, sortByAscending, searchPattern) = value;
 
                     var myAddresses = new ObservableCollection<WalletAddressViewModel>(
-                        InitialMyAddresses.Where(addressViewModel => addressViewModel.WalletAddress.Address.ToLower().Contains(searchPattern?.ToLower() ?? string.Empty)));
+                        InitialMyAddresses
+                            .Where(addressViewModel => addressViewModel.WalletAddress.Address.ToLower().Contains(searchPattern?.ToLower() ?? string.Empty))
+                            .ToList());
 
                     if (sortByDate)
                     {
@@ -110,12 +114,15 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
             Currency = currency;
             SelectAddressMode = mode;
+
             var onlyAddressesWithBalances = SelectAddressMode is SelectAddressMode.SendFrom;
 
             var addresses = AccountAddressesHelper
                 .GetReceivingAddressesAsync(
                     account: account,
+                    localStorage: localStorage,
                     currency: currency,
+                    tokenType: tokenType,
                     tokenContract: tokenContract,
                     tokenId: selectedTokenId)
                 .WaitForResult()

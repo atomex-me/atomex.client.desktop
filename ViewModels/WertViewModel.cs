@@ -74,7 +74,8 @@ namespace Atomex.Client.Desktop.ViewModels
                 ? new ObservableCollection<WertCurrencyViewModel>(
                     App.Account.Currencies
                         .Where(currency => CurrenciesToBuy.Contains(currency.Name))
-                        .Select(currency => new WertCurrencyViewModel(currency, App, wertApi)))
+                        .Select(currency => new WertCurrencyViewModel(currency, App, wertApi))
+                        .ToList())
                 : new ObservableCollection<WertCurrencyViewModel>();
 
             Selected = Wallets.FirstOrDefault();

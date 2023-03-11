@@ -18,11 +18,11 @@ using Atomex.Blockchain.Ethereum;
 using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.Properties;
 using Atomex.Client.Desktop.ViewModels.Abstract;
+using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
 using Atomex.Common;
 using Atomex.Core;
 using Atomex.EthereumTokens;
 using Atomex.MarketData.Abstract;
-using Atomex.Wallet.Abstract;
 using Atomex.Wallet.Ethereum;
 
 namespace Atomex.Client.Desktop.ViewModels.SendViewModels
@@ -35,16 +35,20 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         public string GasLimitCode => "GAS";
 
         public long GasLimit => EthConfig.GasLimit;
-        [Reactive] public long MaxFeePerGas { get; set; }
-        [Reactive] public long MaxPriorityFeePerGas { get; set; }
-        [Reactive] private decimal TotalFee { get; set; }
+        [Reactive] public decimal MaxFeePerGas { get; set; }
+        [Reactive] public decimal MaxPriorityFeePerGas { get; set; }
+        [Reactive] public decimal BaseFeePerGas { get; set; }
+        [Reactive] public decimal TotalFee { get; set; }
         [ObservableAsProperty] public string TotalFeeString { get; set; }
+        [ObservableAsProperty] public decimal EstimatedFee { get; }
+        [Reactive] public decimal EstimatedFeeInBase { get; set; }
+        [ObservableAsProperty] public string EstimatedFeeString { get; set; }
         protected override decimal FeeAmount => EthConfig.GetFeeInEth(GasLimit, MaxFeePerGas);
         [Reactive] public bool HasTokens { get; set; }
         [Reactive] public bool HasActiveSwaps { get; set; }
         public EthereumConfig EthConfig => (EthereumConfig)Currency;
 
-        private ReactiveCommand<MaxAmountEstimation, MaxAmountEstimation> CheckAmountCommand;
+        private ReactiveCommand<EthereumMaxAmountEstimation, EthereumMaxAmountEstimation> CheckAmountCommand;
 
         public EthereumSendViewModel()
         {
@@ -64,12 +68,14 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             this.WhenAnyValue(vm => vm.MaxFeePerGas)
                 .SubscribeInMainThread(_ => Warning = string.Empty);
 
-            this.WhenAnyValue(vm => vm.MaxFeePerGas)
+            this.WhenAnyValue(
+                    vm => vm.MaxFeePerGas)
                 .Where(_ => !string.IsNullOrEmpty(From))
                 .Select(_ => Unit.Default)
                 .InvokeCommandInMainThread(updateGasPriceCommand);
 
-            this.WhenAnyValue(vm => vm.MaxFeePerGas)
+            this.WhenAnyValue(
+                    vm => vm.MaxFeePerGas)
                 .Select(_ => Unit.Default)
                 .Subscribe(_ => OnQuotesUpdatedEventHandler(_app.QuotesProvider, EventArgs.Empty));
 
@@ -88,12 +94,27 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 .Select(totalAmount => totalAmount.ToString(CurrencyFormat, CultureInfo.CurrentCulture))
                 .ToPropertyExInMainThread(this, vm => vm.TotalAmountString);
 
-            CheckAmountCommand = ReactiveCommand.Create<MaxAmountEstimation, MaxAmountEstimation>(estimation => estimation);
+            this.WhenAnyValue(
+                    vm => vm.BaseFeePerGas,
+                    vm => vm.MaxPriorityFeePerGas,
+                    (baseFeePerGas, maxPriorityFeePerGas) => EthConfig.GetFeeInEth(GasLimit, baseFeePerGas + maxPriorityFeePerGas))
+                .Select(estimatedFee => estimatedFee)
+                .ToPropertyExInMainThread(this, vm => vm.EstimatedFee);
+
+            this.WhenAnyValue(vm => vm.EstimatedFee)
+                .Select(totalFee => totalFee.ToString(TotalFeeCurrencyFormat, CultureInfo.CurrentCulture))
+                .ToPropertyExInMainThread(this, vm => vm.EstimatedFeeString);
+
+            CheckAmountCommand = ReactiveCommand.Create<EthereumMaxAmountEstimation, EthereumMaxAmountEstimation>(estimation => estimation);
 
             CheckAmountCommand.Throttle(TimeSpan.FromMilliseconds(1))
                 .SubscribeInMainThread(estimation => CheckAmount(estimation));
 
-            SelectFromViewModel = new SelectAddressViewModel(_app.Account, Currency, SelectAddressMode.SendFrom)
+            SelectFromViewModel = new SelectAddressViewModel(
+                _app.Account,
+                _app.LocalStorage,
+                Currency,
+                SelectAddressMode.SendFrom)
             {
                 BackAction = () => { App.DialogService.Show(this); },
                 ConfirmAction = walletAddressViewModel =>
@@ -104,7 +125,10 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 }
             };
 
-            SelectToViewModel = new SelectAddressViewModel(_app.Account, Currency)
+            SelectToViewModel = new SelectAddressViewModel(
+                _app.Account,
+                _app.LocalStorage,
+                Currency)
             {
                 BackAction = () => { App.DialogService.Show(SelectFromViewModel); },
                 ConfirmAction = walletAddressViewModel =>
@@ -178,7 +202,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 var account = _app.Account
                     .GetCurrencyAccount<EthereumAccount>(Currency.Name);
 
-                var maxAmountEstimation = await account.EstimateMaxAmountToSendAsync(
+                var maxAmountEstimation = (EthereumMaxAmountEstimation)await account.EstimateMaxAmountToSendAsync(
                     from: From,
                     type: TransactionType.Output,
                     gasLimit: UseDefaultFee ? null : GasLimit,
@@ -187,17 +211,20 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
                 var ethConfig = (EthereumConfig)Currency;
 
-                if (UseDefaultFee)
-                {
-                    if (maxAmountEstimation.Fee > 0)
-                    {
-                        MaxFeePerGas = (long)ethConfig.GetGasPriceInGwei(maxAmountEstimation.Fee, GasLimit);
-                    } else
-                    {
-                        var (gasPrice, error) = await ethConfig.GetGasPriceAsync();
+                var gasPrice = maxAmountEstimation.GasPrice;
 
-                        MaxFeePerGas = (long)(gasPrice?.MaxFeePerGas ?? 0m);
+                if (gasPrice == null)
+                    (gasPrice, _) = await ethConfig.GetGasPriceAsync();
+
+                if (gasPrice != null)
+                {
+                    if (UseDefaultFee)
+                    {
+                        MaxFeePerGas = gasPrice.MaxFeePerGas;
+                        MaxPriorityFeePerGas = gasPrice.MaxPriorityFeePerGas;
                     }
+
+                    BaseFeePerGas = gasPrice.SuggestBaseFee;
                 }
 
                 CheckAmountCommand?.Execute(maxAmountEstimation).Subscribe();
@@ -218,7 +245,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                         .GetCurrencyAccount<EthereumAccount>(Currency.Name);
 
                     // estimate max amount with new GasPrice
-                    var maxAmountEstimation = await account.EstimateMaxAmountToSendAsync(
+                    var maxAmountEstimation = (EthereumMaxAmountEstimation)await account.EstimateMaxAmountToSendAsync(
                         from: From,
                         type: TransactionType.Output,
                         gasLimit: GasLimit,
@@ -241,7 +268,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 var account = _app.Account
                     .GetCurrencyAccount<EthereumAccount>(Currency.Name);
 
-                var maxAmountEstimation = await account
+                var maxAmountEstimation = (EthereumMaxAmountEstimation)await account
                     .EstimateMaxAmountToSendAsync(
                         from: From,
                         type: TransactionType.Output,
@@ -251,8 +278,21 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
                 var ethConfig = (EthereumConfig)Currency;
 
-                if (UseDefaultFee && maxAmountEstimation.Fee > 0)
-                    MaxFeePerGas = decimal.ToInt64(ethConfig.GetGasPriceInGwei(maxAmountEstimation.Fee, GasLimit));
+                var gasPrice = maxAmountEstimation.GasPrice;
+
+                //if (gasPrice == null)
+                //    (gasPrice, _) = await ethConfig.GetGasPriceAsync();
+
+                if (gasPrice != null)
+                {
+                    if (UseDefaultFee)
+                    {
+                        MaxFeePerGas = gasPrice.MaxFeePerGas;
+                        MaxPriorityFeePerGas = gasPrice.MaxPriorityFeePerGas;
+                    }
+
+                    BaseFeePerGas = gasPrice.SuggestBaseFee;
+                }
 
                 if (maxAmountEstimation.Error != null)
                 {
@@ -291,7 +331,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             }
         }
 
-        private void CheckAmount(MaxAmountEstimation maxAmountEstimation)
+        private void CheckAmount(EthereumMaxAmountEstimation maxAmountEstimation)
         {
             if (maxAmountEstimation.Error != null)
             {
@@ -381,6 +421,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             {
                 AmountInBase = Amount.SafeMultiply(quote?.Bid ?? 0m);
                 FeeInBase = FeeAmount.SafeMultiply(quote?.Bid ?? 0m);
+                EstimatedFeeInBase = EstimatedFee.SafeMultiply(quote?.Bid ?? 0m);
             });
         }
 
@@ -403,5 +444,58 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
             return error;
         }
+
+#if DEBUG
+        protected override void DesignerMode()
+        {
+            var fromCurrencies = DesignTime.TestNetCurrencies
+                .Select(c => CurrencyViewModelCreator.CreateOrGet(c, subscribeToUpdates: false))
+                .ToList();
+
+            Currency = fromCurrencies.FirstOrDefault(c => c.CurrencyName == "ETH")!.Currency;
+            CurrencyViewModel = fromCurrencies.FirstOrDefault(c => c.CurrencyName == "ETH")!;
+            To = "0xE9C251cbB4881f9e056e40135E7d3EA9A7d037df ";
+            Amount = 0.00001234m;
+            AmountInBase = 10.23m;
+            Fee = 0.0001m;
+            FeeInBase = 8.43m;
+
+            Warning = "Insufficient funds";
+            WarningToolTip = "";
+            WarningType = MessageType.Error;
+
+            RecommendedMaxAmountWarning = "We recommend to send no more than 0.073 ETH";
+            RecommendedMaxAmountWarningToolTip = "You have tokens that require ETH. Sending this will not leave enough ETH to send or exchange your tokens. We recommend to send no more than 0.073 ETH";
+            RecommendedMaxAmountWarningType = MessageType.Warning;
+
+            Stage = SendStage.Confirmation;
+            SendRecommendedAmountMenu = string.Format(Resources.SendRecommendedAmountMenu, 0.073, "ETH");
+            SendEnteredAmountMenu = string.Format(Resources.SendEnteredAmountMenu, 0.073, "ETH");
+
+            UseDefaultFee = false;
+
+            this.WhenAnyValue(vm => vm.TotalFee)
+                .Select(totalFee => totalFee.ToString(TotalFeeCurrencyFormat, CultureInfo.CurrentCulture))
+                .ToPropertyExInMainThread(this, vm => vm.TotalFeeString);
+
+            TotalFee = 0.0001m;
+
+            this.WhenAnyValue(
+                    vm => vm.BaseFeePerGas,
+                    vm => vm.MaxPriorityFeePerGas,
+                    (baseFeePerGas, maxPriorityFeePerGas) => EthConfig.GetFeeInEth(GasLimit, baseFeePerGas + maxPriorityFeePerGas))
+                .Select(estimatedFee => estimatedFee)
+                .ToPropertyExInMainThread(this, vm => vm.EstimatedFee);
+
+            this.WhenAnyValue(vm => vm.EstimatedFee)
+                .Select(totalFee => totalFee.ToString(TotalFeeCurrencyFormat, CultureInfo.CurrentCulture))
+                .ToPropertyExInMainThread(this, vm => vm.EstimatedFeeString);
+
+            BaseFeePerGas = 9.2m;
+            MaxFeePerGas = 10;
+            MaxPriorityFeePerGas = 1;
+            EstimatedFeeInBase = 7;
+        }
+#endif
     }
 }

@@ -46,7 +46,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 var account = _app.Account
                     .GetCurrencyAccount<Erc20Account>(Currency.Name);
 
-                var maxAmountEstimation = await account.EstimateMaxAmountToSendAsync(
+                var maxAmountEstimation = (EthereumMaxAmountEstimation)await account.EstimateMaxAmountToSendAsync(
                     from: From,
                     type: TransactionType.Output,
                     gasLimit: UseDefaultFee ? null : GasLimit,
@@ -54,19 +54,20 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     reserve: false);
 
                 var erc20Config = (Erc20Config)Currency;
+                var gasPrice = maxAmountEstimation.GasPrice;
 
-                if (UseDefaultFee)
+                if (gasPrice == null)
+                    (gasPrice, _) = await erc20Config.GetGasPriceAsync();
+
+                if (gasPrice != null)
                 {
-                    if (maxAmountEstimation.Fee > 0)
+                    if (UseDefaultFee)
                     {
-                        MaxFeePerGas = (long)erc20Config.GetGasPriceInGwei(maxAmountEstimation.Fee, GasLimit);
+                        MaxFeePerGas = gasPrice.MaxFeePerGas;
+                        MaxPriorityFeePerGas = gasPrice.MaxPriorityFeePerGas;
                     }
-                    else
-                    {
-                        var (gasPrice, error) = await erc20Config.GetGasPriceAsync();
 
-                        MaxFeePerGas = (long)(gasPrice?.MaxFeePerGas ?? 0m);
-                    }
+                    BaseFeePerGas = gasPrice.SuggestBaseFee;
                 }
 
                 if (maxAmountEstimation.Error != null)
@@ -138,7 +139,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 var account = _app.Account
                     .GetCurrencyAccount<Erc20Account>(Currency.Name);
 
-                var maxAmountEstimation = await account
+                var maxAmountEstimation = (EthereumMaxAmountEstimation)await account
                     .EstimateMaxAmountToSendAsync(
                         from: From,
                         type: TransactionType.Output,
@@ -148,8 +149,24 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
                 var erc20Config = (Erc20Config)Currency;
 
-                if (UseDefaultFee && maxAmountEstimation.Fee > 0)
-                    MaxFeePerGas = decimal.ToInt64(erc20Config.GetGasPriceInGwei(maxAmountEstimation.Fee, GasLimit));
+                var gasPrice = maxAmountEstimation.GasPrice;
+
+                //if (gasPrice == null)
+                //    (gasPrice, _) = await ethConfig.GetGasPriceAsync();
+
+                if (gasPrice != null)
+                {
+                    if (UseDefaultFee)
+                    {
+                        MaxFeePerGas = gasPrice.MaxFeePerGas;
+                        MaxPriorityFeePerGas = gasPrice.MaxPriorityFeePerGas;
+                    }
+
+                    BaseFeePerGas = gasPrice.SuggestBaseFee;
+                }
+
+                //if (UseDefaultFee && maxAmountEstimation.Fee > 0)
+                //    MaxFeePerGas = erc20Config.GetGasPriceInGwei(maxAmountEstimation.Fee, GasLimit);
 
                 if (maxAmountEstimation.Error != null)
                 {
@@ -182,6 +199,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             {
                 AmountInBase = Amount.SafeMultiply(quote?.Bid ?? 0m);
                 FeeInBase = FeeAmount.SafeMultiply(ethQuote?.Bid ?? 0m);
+                EstimatedFeeInBase = EstimatedFee.SafeMultiply(quote?.Bid ?? 0m);
             });
         }
 

@@ -11,6 +11,7 @@ using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using Network = NBitcoin.Network;
 
+using Atomex.Blockchain;
 using Atomex.Blockchain.Bitcoin;
 using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.ViewModels.Abstract;
@@ -18,7 +19,6 @@ using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
 using Atomex.Client.Desktop.ViewModels.SendViewModels;
 using Atomex.Common;
 using Atomex.Core;
-using Atomex.ViewModels;
 using Atomex.Wallet.Abstract;
 using Atomex.Wallet.BitcoinBased;
 
@@ -123,7 +123,9 @@ namespace Atomex.Client.Desktop.ViewModels.ConversionViewModels
                         return $"receiving to new address {address.Address.TruncateAddress()}";
 
                     var prefix = _type == SelectCurrencyType.From ? "from" : "to";
-                    var balanceString = address.Balance.ToString(CurrencyViewModel.CurrencyFormat);
+                    var balanceString = address.Balance
+                        .FromTokens(CurrencyViewModel.Currency.Decimals)
+                        .ToString(CurrencyViewModel.CurrencyFormat);
 
                     return $"{prefix} {address.Address.TruncateAddress()} ({balanceString} {CurrencyViewModel.Currency.DisplayedName})";
                 })
@@ -192,6 +194,7 @@ namespace Atomex.Client.Desktop.ViewModels.ConversionViewModels
             {
                 var selectAddressViewModel = new SelectAddressViewModel(
                     account: _account,
+                    localStorage: _localStorage,
                     currency: currency,
                     mode: Type == SelectCurrencyType.From ? SelectAddressMode.SendFrom : SelectAddressMode.ReceiveTo,
                     selectedAddress: itemWithAddress.SelectedAddress?.Address)
@@ -225,14 +228,17 @@ namespace Atomex.Client.Desktop.ViewModels.ConversionViewModels
         });
 
         private readonly IAccount _account;
+        private readonly ILocalStorage _localStorage;
 
         public SelectCurrencyViewModel(
             IAccount account,
+            ILocalStorage localStorage,
             SelectCurrencyType type,
             IEnumerable<SelectCurrencyViewModelItem> currencies,
             SelectCurrencyViewModelItem? selected = null)
         {
             _account = account ?? throw new ArgumentNullException(nameof(account));
+            _localStorage = localStorage ?? throw new ArgumentNullException(nameof(localStorage));
 
             Type = type;
             Currencies = new ObservableCollection<SelectCurrencyViewModelItem>(currencies);

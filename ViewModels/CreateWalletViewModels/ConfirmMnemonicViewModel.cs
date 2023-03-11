@@ -53,7 +53,8 @@ namespace Atomex.Client.Desktop.ViewModels.CreateWalletViewModels
             ReactiveCommand.Create<string>(word =>
             {
                 RandomizedMnemonicWords = new AvaloniaList<string>(RandomizedMnemonicWords
-                    .Where(w => w != word));
+                    .Where(w => w != word)
+                    .ToList());
                 ConfirmedMnemonicWords.Add(word);
             });
 
@@ -62,7 +63,8 @@ namespace Atomex.Client.Desktop.ViewModels.CreateWalletViewModels
             ReactiveCommand.Create<string>(word =>
             {
                 ConfirmedMnemonicWords = new AvaloniaList<string>(ConfirmedMnemonicWords
-                    .Where(w => w != word));
+                    .Where(w => w != word)
+                    .ToList());
                 RandomizedMnemonicWords.Add(word);
             });
     }

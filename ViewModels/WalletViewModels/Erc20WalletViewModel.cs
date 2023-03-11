@@ -40,6 +40,19 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         {
         }
 
+        protected override void LoadAddresses()
+        {
+            var ethereumConfig = _app.Account
+                .Currencies
+                .Get<EthereumConfig>(EthereumHelper.Eth);
+
+            AddressesViewModel = new AddressesViewModel(
+                app: _app,
+                currency: ethereumConfig,
+                tokenType: EthereumHelper.Erc20,
+                tokenContract: Currency.TokenContractAddress);
+        }
+
         protected override bool FilterTransactions(TransactionsChangedEventArgs args, out IEnumerable<ITransaction>? txs)
         {
             if (args.Currency == EthereumHelper.Erc20)

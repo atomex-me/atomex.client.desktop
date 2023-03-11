@@ -358,7 +358,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         }
 
 #if DEBUG
-        protected void DesignerMode()
+        protected virtual void DesignerMode()
         {
             var fromCurrencies = DesignTime.TestNetCurrencies
                 .Select(c => CurrencyViewModelCreator.CreateOrGet(c, subscribeToUpdates: false))

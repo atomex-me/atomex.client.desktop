@@ -48,7 +48,11 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             CheckAmountCommand.Throttle(TimeSpan.FromMilliseconds(1))
                 .SubscribeInMainThread(estimation => CheckAmount(estimation));
 
-            SelectFromViewModel = new SelectAddressViewModel(_app.Account, Currency, SelectAddressMode.SendFrom)
+            SelectFromViewModel = new SelectAddressViewModel(
+                _app.Account,
+                _app.LocalStorage,
+                Currency,
+                SelectAddressMode.SendFrom)
             {
                 BackAction = () => { App.DialogService.Show(this); },
                 ConfirmAction = walletAddressViewModel =>
@@ -59,7 +63,10 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 }
             };
 
-            SelectToViewModel = new SelectAddressViewModel(_app.Account, Currency)
+            SelectToViewModel = new SelectAddressViewModel(
+                _app.Account,
+                _app.LocalStorage,
+                Currency)
             {
                 BackAction = () => { App.DialogService.Show(SelectFromViewModel); },
                 ConfirmAction = walletAddressViewModel =>
@@ -97,7 +104,8 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             var activeSwaps = (await _app.Account
                 .GetSwapsAsync()
                 .ConfigureAwait(false))
-                .Where(s => s.IsActive && (s.SoldCurrency == Currency.Name || s.PurchasedCurrency == Currency.Name));
+                .Where(s => s.IsActive && (s.SoldCurrency == Currency.Name || s.PurchasedCurrency == Currency.Name))
+                .ToList();
 
             await Dispatcher.UIThread.InvokeAsync(() =>
             {

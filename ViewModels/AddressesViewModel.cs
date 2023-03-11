@@ -274,16 +274,16 @@ namespace Atomex.Client.Desktop.ViewModels
 
                 await Task.WhenAll(Task.Delay(Constants.MinimalAddressUpdateTimeMs), updateTask);
 
-                if (_currency.Name == TezosConfig.Xtz && _tokenContract != null)
+                if (_tokenContract != null) // is token
                 {
-                    // update tezos token balance
-                    var tezosAccount = _app.Account
-                        .GetCurrencyAccount<TezosAccount>(TezosConfig.Xtz);
+                    var tokenAccount = _app.Account
+                        .GetCurrencyAccount(_tokenType, _tokenContract, _tokenId);
 
+                    // update token balance
                     await Task.Run(async () =>
                     {
-                        await new TezosTokensWalletScanner(tezosAccount, _tokenType)
-                            .UpdateBalanceAsync(address, _tokenContract, (int)_tokenId)
+                        await tokenAccount
+                            .UpdateBalanceAsync(address)
                             .ConfigureAwait(false);
                     });
                 }

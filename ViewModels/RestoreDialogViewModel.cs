@@ -71,7 +71,9 @@ namespace Atomex.Client.Desktop.ViewModels
             {
                 var walletScanner = new WalletScanner(_app.Account);
 
-                var primaryCurrencies = changesGroupsByCurrency.Where(c => !c.IsToken);
+                var primaryCurrencies = changesGroupsByCurrency
+                    .Where(c => !c.IsToken)
+                    .ToList();
 
                 await Task.Run(async () =>
                 {
@@ -96,7 +98,9 @@ namespace Atomex.Client.Desktop.ViewModels
                 },
                 cancellation.Token);
 
-                var tokenCurrencies = changesGroupsByCurrency.Where(c => c.IsToken);
+                var tokenCurrencies = changesGroupsByCurrency
+                    .Where(c => c.IsToken)
+                    .ToList();
 
                 await Task.Run(async () =>
                 {

@@ -56,7 +56,8 @@ namespace Atomex.Client.Desktop.ViewModels
                     {
                         OnAssetsChanged?.Invoke(InitialAssets
                             .Where(a => a.IsSelected)
-                            .Select(assetWithSelection => assetWithSelection.Asset.CurrencyCode));
+                            .Select(assetWithSelection => assetWithSelection.Asset.CurrencyCode)
+                            .ToList());
                     });
 
                     InitialAssets = new ObservableCollection<AssetWithSelection>(AvailableAssets);
@@ -80,8 +81,9 @@ namespace Atomex.Client.Desktop.ViewModels
                 {
                     var filteredAssets = InitialAssets
                         .Where(a => a.Asset is { CurrencyCode: { }, CurrencyDescription: { } })
-                        .Where(c => c.Asset.CurrencyCode.ToLower().Contains(searchPattern.ToLower())
-                                    || c.Asset.CurrencyDescription.ToLower().Contains(searchPattern.ToLower()));
+                        .Where(c => c.Asset.CurrencyCode.ToLower().Contains(searchPattern.ToLower()) ||
+                                    c.Asset.CurrencyDescription.ToLower().Contains(searchPattern.ToLower()))
+                        .ToList();
 
                     AvailableAssets = new ObservableCollection<AssetWithSelection>(filteredAssets);
                 });

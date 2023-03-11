@@ -41,7 +41,8 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             this.WhenAnyValue(vm => vm.SearchPattern)
                 .WhereNotNull()
                 .SubscribeInMainThread(searchPattern =>
-                    Tokens = new ObservableCollection<TezosTokenViewModel>(InitialTokens.Where(token =>
+                    Tokens = new ObservableCollection<TezosTokenViewModel>(InitialTokens
+                        .Where(token =>
                         {
                             if (token.TokenBalance.Name != null)
                             {
@@ -54,7 +55,8 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                                 .Contains(searchPattern.ToLower());
                         })
                         .OrderByDescending(token => token.TotalAmount != 0)
-                        .ThenBy(token => token.TokenBalance.Name)));
+                        .ThenBy(token => token.TokenBalance.Name)
+                        .ToList()));
         }
 
         private ReactiveCommand<TezosTokenViewModel, Unit>? _onCollectibleClickCommand;

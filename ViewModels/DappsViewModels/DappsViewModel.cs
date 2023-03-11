@@ -81,7 +81,7 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
 
     public class DappsViewModel : ViewModelBase
     {
-        private readonly IAtomexApp _atomexApp;
+        private readonly IAtomexApp _app;
         private IWalletBeaconClient _beaconWalletClient;
 
         [Reactive] public ObservableCollection<DappViewModel> Dapps { get; set; }
@@ -95,14 +95,14 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
                 DesignerMode();
         }
 
-        public DappsViewModel(IAtomexApp atomexApp)
+        public DappsViewModel(IAtomexApp app)
         {
-            _atomexApp = atomexApp ?? throw new ArgumentNullException(nameof(atomexApp));
+            _app = app ?? throw new ArgumentNullException(nameof(app));
 
-            if (_atomexApp.Account == null)
+            if (_app.Account == null)
                 return;
 
-            var pathToDb = $"{Path.GetDirectoryName(_atomexApp.Account.Wallet.PathToWallet)}/beacon.db";
+            var pathToDb = $"{Path.GetDirectoryName(_app.Account.Wallet.PathToWallet)}/beacon.db";
             var beaconOptions = new BeaconOptions
             {
                 AppName = "Atomex desktop",
@@ -115,8 +115,8 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
                     : $"Filename={pathToDb}; Mode=Exclusive;"
             };
 
-            _atomexApp.AtomexClientChanged += OnAtomexClientChangedEventHandler;
-            Tezos = (TezosConfig)_atomexApp.Account.Currencies.GetByName(TezosConfig.Xtz);
+            _app.AtomexClientChanged += OnAtomexClientChangedEventHandler;
+            Tezos = (TezosConfig)_app.Account.Currencies.GetByName(TezosConfig.Xtz);
 
             ConnectDappViewModel = new ConnectDappViewModel
             {
@@ -144,7 +144,11 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
 
         public void CreateAddresses()
         {
-            SelectAddressViewModel = new SelectAddressViewModel(_atomexApp.Account, Tezos, SelectAddressMode.Connect)
+            SelectAddressViewModel = new SelectAddressViewModel(
+                _app.Account,
+                _app.LocalStorage,
+                Tezos,
+                SelectAddressMode.Connect)
             {
                 BackAction = () => { App.DialogService.Close(); },
                 ConfirmAction = walletAddressViewModel =>
@@ -211,7 +215,7 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
 
         private async Task Connect(string qrCodeString)
         {
-            if (_atomexApp.Account == null)
+            if (_app.Account == null)
                 return;
 
             var pairingRequest = _beaconWalletClient.GetPairingRequest(qrCodeString);
@@ -260,7 +264,7 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
             if (message is not PermissionRequest permissionRequest)
                 return;
 
-            if (!string.Equals(permissionRequest.Network.Type.ToString(), _atomexApp.Account.Network.ToString(),
+            if (!string.Equals(permissionRequest.Network.Type.ToString(), _app.Account.Network.ToString(),
                     StringComparison.CurrentCultureIgnoreCase))
             {
                 await _beaconWalletClient.SendResponseAsync(
@@ -270,11 +274,11 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
                 return;
             }
 
-            var addressToConnect = await _atomexApp
+            var addressToConnect = await _app
                 .Account
                 .GetAddressAsync(Tezos.Name, ConnectDappViewModel.AddressToConnect);
 
-            var securedPublicKey = _atomexApp.Account.Wallet.GetPublicKey(
+            var securedPublicKey = _app.Account.Wallet.GetPublicKey(
                 Tezos,
                 addressToConnect.KeyPath,
                 addressToConnect.KeyType);
@@ -352,7 +356,7 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
                 return;
             }
 
-            var connectedWalletAddress = await _atomexApp
+            var connectedWalletAddress = await _app
                 .Account
                 .GetAddressAsync(Tezos.Name, address ?? string.Empty);
 
@@ -378,7 +382,7 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
 
             if (!revealed)
             {
-                var securedPublicKey = _atomexApp.Account.Wallet.GetPublicKey(
+                var securedPublicKey = _app.Account.Wallet.GetPublicKey(
                     Tezos,
                     connectedWalletAddress.KeyPath,
                     connectedWalletAddress.KeyType);
@@ -483,7 +487,7 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
                         {
                             Id = index + 1,
                             Operation = transactionOperation,
-                            QuotesProvider = _atomexApp.QuotesProvider,
+                            QuotesProvider = _app.QuotesProvider,
                         });
                         break;
                     case RevealContent revealOperation:
@@ -491,7 +495,7 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
                         {
                             Id = index + 1,
                             Operation = revealOperation,
-                            QuotesProvider = _atomexApp.QuotesProvider,
+                            QuotesProvider = _app.QuotesProvider,
                         });
                         break;
                 }
@@ -528,7 +532,7 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
                     //    privateKey: privateKey,
                     //    watermark: Watermark.Generic,
                     //    isExtendedKey: privateKey.Length == 64);
-                    var tezosAccount = _atomexApp.Account
+                    var tezosAccount = _app.Account
                         .GetCurrencyAccount<TezosAccount>(TezosHelper.Xtz);
 
                     var (signature, signError) = await tezosAccount.SignAsync(
@@ -610,7 +614,7 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
                 dataToSign = Encoding.UTF8.GetBytes(signRequest.Payload);
             }
 
-            var connectedWalletAddress = await _atomexApp
+            var connectedWalletAddress = await _app
                 .Account
                 .GetAddressAsync(Tezos.Name, address ?? string.Empty);
 
@@ -624,7 +628,7 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
                 Payload = signRequest.Payload,
                 OnSign = async () =>
                 {
-                    var tezosAccount = _atomexApp.Account.GetCurrencyAccount<TezosAccount>(TezosHelper.Xtz);
+                    var tezosAccount = _app.Account.GetCurrencyAccount<TezosAccount>(TezosHelper.Xtz);
 
                     var (signature, signError) = await tezosAccount.SignAsync(
                         from: connectedWalletAddress.Address,
@@ -670,13 +674,13 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
 
         private void OnAtomexClientChangedEventHandler(object? sender, AtomexClientChangedEventArgs args)
         {
-            if (args.AtomexClient != null && _atomexApp.Account != null)
+            if (args.AtomexClient != null && _app.Account != null)
                 return;
                 
             if (_beaconWalletClient.Connected)
                 _beaconWalletClient.Disconnect();
 
-            _atomexApp.AtomexClientChanged -= OnAtomexClientChangedEventHandler;
+            _app.AtomexClientChanged -= OnAtomexClientChangedEventHandler;
             _beaconWalletClient.OnBeaconMessageReceived -= OnBeaconWalletClientMessageReceived;
             _beaconWalletClient.OnConnectedClientsListChanged -= OnDappsListChanged;
         }

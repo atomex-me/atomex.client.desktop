@@ -146,6 +146,7 @@ namespace Atomex.Client.Desktop.ViewModels
                 {
                     var selectCurrencyViewModel = new SelectCurrencyViewModel(
                         account: _app.Account,
+                        localStorage: _app.LocalStorage,
                         type: SelectCurrencyType.From,
                         currencies: await CreateFromCurrencyViewModelItemsAsync(FromCurrencies!),
                         selected: FromCurrencyViewModelItem)
@@ -174,6 +175,7 @@ namespace Atomex.Client.Desktop.ViewModels
                 {
                     var selectCurrencyViewModel = new SelectCurrencyViewModel(
                         account: _app.Account,
+                        localStorage: _app.LocalStorage,
                         type: SelectCurrencyType.To,
                         currencies: await CreateToCurrencyViewModelItemsAsync(ToCurrencies!),
                         selected: ToCurrencyViewModelItem)
@@ -529,6 +531,7 @@ namespace Atomex.Client.Desktop.ViewModels
 
             var selectAddressViewModel = new SelectAddressViewModel(
                 account: _app.Account,
+                localStorage: _app.LocalStorage,
                 currency: feeCurrency,
                 mode: SelectAddressMode.ChangeRedeemAddress,
                 selectedAddress: RedeemFromAddress)
@@ -618,6 +621,7 @@ namespace Atomex.Client.Desktop.ViewModels
             var receivingAddresses = await AccountAddressesHelper
                 .GetReceivingAddressesAsync(
                     account: _app.Account,
+                    localStorage: _app.LocalStorage,
                     currency: currencyViewModel.Currency)
                 .ConfigureAwait(false);
 

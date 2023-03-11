@@ -298,8 +298,6 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
                 await Dispatcher.UIThread.InvokeAsync(() =>
                 {
-                    //var selectedTransactionId = SelectedTransaction?.Id;
-
                     var transactionViewModels = transactions
                         .Select(t =>
                         {
@@ -318,9 +316,6 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                         transactionsViewModels.AddRange(vms);
 
                     Transactions.AddRange(transactionsViewModels);
-
-                    //if (selectedTransactionId != null)
-                    //    SelectedTransaction = Transactions.FirstOrDefault(t => t.Id == selectedTransactionId);
                 });
 
                 // resolve view models
@@ -488,7 +483,8 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                 ShowRightPopupContent?.Invoke(null);
 
                 var vmsToRemove = Transactions
-                    .Where(t => t.Id == args.Transaction.Id);
+                    .Where(t => t.Id == args.Transaction.Id)
+                    .ToList();
 
                 if (vmsToRemove != null)
                     Transactions.RemoveRange(vmsToRemove);

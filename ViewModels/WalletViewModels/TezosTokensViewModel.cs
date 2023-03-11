@@ -85,7 +85,8 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             this.WhenAnyValue(vm => vm.SearchPattern)
                 .WhereNotNull()
                 .SubscribeInMainThread(searchPattern =>
-                    Tokens = new ObservableCollection<TezosTokenViewModel>(InitialTokens.Where(token =>
+                    Tokens = new ObservableCollection<TezosTokenViewModel>(InitialTokens
+                        .Where(token =>
                         {
                             if (token.TokenBalance.Name != null && token.TokenBalance.Symbol != null)
                             {
@@ -98,7 +99,8 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                         })
                         .Where(token => !DisabledTokens!.Contains(token.TokenBalance.Symbol))
                         .OrderByDescending(token => token.CanExchange)
-                        .ThenByDescending(token => token.TotalAmountInBase)));
+                        .ThenByDescending(token => token.TotalAmountInBase)
+                        .ToList()));
 
             DisabledTokens = _app.Account.UserData.DisabledTokens ?? Array.Empty<string>();
             HideLowBalances = _app.Account.UserData.HideTokensWithLowBalance ?? false;
@@ -174,7 +176,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                 Tokens = new ObservableCollection<TezosTokenViewModel>(tezosTokenViewModels
                     .Where(token => !DisabledTokens.Contains(token.TokenBalance.Symbol))
                     .Where(token => !HideLowBalances || token.TotalAmountInBase > Constants.MinBalanceForTokensUsd)
-                );
+                    .ToList());
 
             }, DispatcherPriority.Background);
         }

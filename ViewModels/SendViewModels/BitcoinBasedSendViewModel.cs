@@ -103,7 +103,10 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 Config = Config,
             };
 
-            SelectToViewModel = new SelectAddressViewModel(_app.Account, Currency)
+            SelectToViewModel = new SelectAddressViewModel(
+                _app.Account,
+                _app.LocalStorage,
+                Currency)
             {
                 BackAction = () => { App.DialogService.Show(SelectFromViewModel); },
                 ConfirmAction = walletAddressViewModel =>

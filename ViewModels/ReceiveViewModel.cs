@@ -67,7 +67,10 @@ namespace Atomex.Client.Desktop.ViewModels
             TokenType = tokenType;
             Currency = currency;
 
-            SelectAddressViewModel = new SelectAddressViewModel(app.Account, Currency)
+            SelectAddressViewModel = new SelectAddressViewModel(
+                app.Account,
+                app.LocalStorage,
+                Currency)
             {
                 BackAction = () => { App.DialogService.Show(this); },
                 ConfirmAction = walletAddressViewModel =>
