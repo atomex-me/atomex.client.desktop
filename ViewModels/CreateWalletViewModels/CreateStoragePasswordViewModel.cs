@@ -9,9 +9,16 @@ using Atomex.Client.Desktop.Properties;
 using Atomex.Common;
 using Atomex.Wallet;
 using Atomex.LiteDb;
+using Atomex.Wallet.Abstract;
 
 namespace Atomex.Client.Desktop.ViewModels.CreateWalletViewModels
 {
+    public class WalletStorageInfo
+    {
+        public IAccount Account { get; set; }
+        public ILocalStorage LocalStorage { get; set; }
+    }
+
     public class CreateStoragePasswordViewModel : StepViewModel
     {
         private readonly IAtomexApp _app;
@@ -116,7 +123,7 @@ namespace Atomex.Client.Desktop.ViewModels.CreateWalletViewModels
             {
                 RaiseProgressBarShow();
 
-                var (account, localStorage) = await Task.Run(async () =>
+                var walletStorageInfo = await Task.Run(async () =>
                 {
                     await _wallet.EncryptAsync(PasswordVM.SecurePass);
 
@@ -144,10 +151,10 @@ namespace Atomex.Client.Desktop.ViewModels.CreateWalletViewModels
                     PasswordConfirmationVM.StringPass = string.Empty;
                     PasswordScore = 0;
 
-                    return (account, localStorage);
+                    return new WalletStorageInfo { Account = account, LocalStorage = localStorage };
                 });
 
-                RaiseOnNext((account, localStorage));
+                RaiseOnNext(walletStorageInfo);
             }
             catch (Exception e)
             {

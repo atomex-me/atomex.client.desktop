@@ -34,7 +34,6 @@ namespace Atomex.Client.Desktop.ViewModels
         }
 
         private ViewModelBase _content;
-
         public ViewModelBase Content
         {
             get => _content;
@@ -72,7 +71,6 @@ namespace Atomex.Client.Desktop.ViewModels
         private readonly IAtomexApp _app;
         private IMainView MainView { get; set; }
 
-
         private bool _hasAccount;
         public bool HasAccount
         {
@@ -80,6 +78,7 @@ namespace Atomex.Client.Desktop.ViewModels
             set
             {
                 _hasAccount = value;
+
                 if (_hasAccount)
                 {
                     ShowContent(WalletMainViewModel);
@@ -93,13 +92,15 @@ namespace Atomex.Client.Desktop.ViewModels
 
                         _ = restoreViewModel.ScanAsync(new LiteDbMigrationResult
                         {
-                            new LiteDbMigrationChange { Currency = "BTC", EntityType = MigrationEntityType.Addresses },
-                            new LiteDbMigrationChange { Currency = "LTC", EntityType = MigrationEntityType.Addresses },
-                            new LiteDbMigrationChange { Currency = "XTZ", EntityType = MigrationEntityType.Addresses },
-                            new LiteDbMigrationChange { Currency = "ETH", EntityType = MigrationEntityType.Addresses },
-                            new LiteDbMigrationChange { Currency = "ERC20", EntityType = MigrationEntityType.Addresses },
-                            new LiteDbMigrationChange { Currency = "FA12", EntityType = MigrationEntityType.Addresses },
-                            new LiteDbMigrationChange { Currency = "FA2", EntityType = MigrationEntityType.Addresses },
+                            { MigrationEntityType.Addresses, "BTC"},
+                            { MigrationEntityType.Addresses, "LTC"},
+                            { MigrationEntityType.Addresses, "ETH"},
+                            { MigrationEntityType.Addresses, "USDT" },
+                            { MigrationEntityType.Addresses, "WBTC" },
+                            { MigrationEntityType.Addresses, "TBTC" },
+                            { MigrationEntityType.Addresses, "XTZ"},
+                            { MigrationEntityType.Addresses, "FA12"},
+                            { MigrationEntityType.Addresses, "FA2"}
                         });
                     }
                 }
@@ -166,7 +167,7 @@ namespace Atomex.Client.Desktop.ViewModels
             _app.AtomexClientChanged += OnAtomexClientChangedEventHandler;
         }
 
-        private void OnAtomexClientChangedEventHandler(object sender, AtomexClientChangedEventArgs args)
+        private void OnAtomexClientChangedEventHandler(object? sender, AtomexClientChangedEventArgs args)
         {
             if (_app?.Account == null)
             {

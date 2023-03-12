@@ -22,6 +22,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
     public class Erc20SendViewModel : EthereumSendViewModel
     {
         public override string TotalFeeCurrencyCode => Currency.FeeCurrencyName;
+        public override long GasLimit => ((Erc20Config)Currency).TransferGasLimit;
 
         public Erc20SendViewModel()
             : base()
@@ -199,7 +200,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             {
                 AmountInBase = Amount.SafeMultiply(quote?.Bid ?? 0m);
                 FeeInBase = FeeAmount.SafeMultiply(ethQuote?.Bid ?? 0m);
-                EstimatedFeeInBase = EstimatedFee.SafeMultiply(quote?.Bid ?? 0m);
+                EstimatedFeeInBase = EstimatedFee.SafeMultiply(ethQuote?.Bid ?? 0m);
             });
         }
 

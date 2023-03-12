@@ -63,7 +63,6 @@ namespace Atomex.Client.Desktop.ViewModels
         [Reactive] public bool InProgress { get; set; }
 
         private int _step;
-
         public int Step
         {
             get => _step;
@@ -84,7 +83,6 @@ namespace Atomex.Client.Desktop.ViewModels
         }
 
         private int _currentViewIndex;
-
         private int CurrentViewIndex
         {
             get => _currentViewIndex;
@@ -151,9 +149,9 @@ namespace Atomex.Client.Desktop.ViewModels
                 {
                     if (Step == ViewIndexes.Length - 1)
                     {
-                        var (account, localStorage) = ((IAccount, ILocalStorage))arg;
+                        var walletStorageInfo = (WalletStorageInfo)arg;
 
-                        OnAccountCreated?.Invoke(account, localStorage);
+                        OnAccountCreated?.Invoke(walletStorageInfo.Account, walletStorageInfo.LocalStorage);
                         return;
                     }
 
@@ -173,13 +171,11 @@ namespace Atomex.Client.Desktop.ViewModels
         }
 
         private ICommand? _backCommand;
-
         public ICommand BackCommand =>
             _backCommand ??= ReactiveCommand.Create(() => { _viewModels[CurrentViewIndex].Back(); });
 
 
         private ICommand? _nextCommand;
-
         public ICommand NextCommand =>
             _nextCommand ??= ReactiveCommand.Create(() => { _viewModels[CurrentViewIndex].Next(); });
 

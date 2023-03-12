@@ -78,17 +78,6 @@ namespace Atomex.Client.Desktop.ViewModels
                         pathToDb: pathToDb,
                         password: password,
                         network: wallet.Network);
-                        //currencies: _app.CurrenciesProvider.GetCurrencies(wallet.Network),
-                        //network: wallet.Network,
-                        //migrationComplete: actionType =>
-                        //{
-                        //    _doAfterAtomexClientChanged = actionType switch
-                        //    {
-                        //        MigrationActionType.XtzTransactionsDeleted => TezosTransactionsDeleted,
-                        //        MigrationActionType.XtzTokensDataDeleted => OnTezosTokensDataDeleted,
-                        //        _ => null
-                        //    };
-                        //});
 
                     account = new Account(
                         wallet: wallet,

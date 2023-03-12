@@ -34,7 +34,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         public string GasPriceCode => "GWEI";
         public string GasLimitCode => "GAS";
 
-        public long GasLimit => EthConfig.GasLimit;
+        public virtual long GasLimit => EthConfig.GasLimit;
         [Reactive] public decimal MaxFeePerGas { get; set; }
         [Reactive] public decimal MaxPriorityFeePerGas { get; set; }
         [Reactive] public decimal BaseFeePerGas { get; set; }
@@ -102,8 +102,12 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 .ToPropertyExInMainThread(this, vm => vm.EstimatedFee);
 
             this.WhenAnyValue(vm => vm.EstimatedFee)
-                .Select(totalFee => totalFee.ToString(TotalFeeCurrencyFormat, CultureInfo.CurrentCulture))
+                .Select(estimatedFee => estimatedFee.ToString(TotalFeeCurrencyFormat, CultureInfo.CurrentCulture))
                 .ToPropertyExInMainThread(this, vm => vm.EstimatedFeeString);
+
+            this.WhenAnyValue(vm => vm.EstimatedFee)
+                .Select(_ => Unit.Default)
+                .Subscribe(_ => OnQuotesUpdatedEventHandler(_app.QuotesProvider, EventArgs.Empty));
 
             CheckAmountCommand = ReactiveCommand.Create<EthereumMaxAmountEstimation, EthereumMaxAmountEstimation>(estimation => estimation);
 

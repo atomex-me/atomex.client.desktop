@@ -9,6 +9,8 @@ using Atomex.Blockchain.Ethereum.Erc20;
 using Atomex.Common;
 using Atomex.Core;
 using Atomex.EthereumTokens;
+using Atomex.Blockchain.Tezos;
+using Atomex.Blockchain.Ethereum;
 
 namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
 {
@@ -16,6 +18,9 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
     {
         public string From { get; set; }
         public string To { get; set; }
+        public decimal GasPrice { get; set; }
+        private decimal GasLimit { get; set; }
+        private decimal GasUsed { get; set; }
         public string FromExplorerUri => $"{Currency.AddressExplorerUri}{From}";
         public string ToExplorerUri => $"{Currency.AddressExplorerUri}{To}";
         [Reactive] public string Alias { get; set; }
@@ -46,6 +51,9 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
             From = tx.Transfers[transferIndex].From;
             To = tx.Transfers[transferIndex].To;
             Alias = Amount <= 0 ? To.TruncateAddress() : From.TruncateAddress();
+            GasPrice = EthereumHelper.WeiToGwei(tx.GasPrice);
+            GasLimit = (decimal)tx.GasLimit;
+            GasUsed = (decimal)tx.GasUsed;
         }
 
         public override void UpdateMetadata(ITransactionMetadata metadata, CurrencyConfig config)
