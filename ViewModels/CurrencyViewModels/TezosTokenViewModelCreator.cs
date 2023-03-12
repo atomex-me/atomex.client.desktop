@@ -42,8 +42,21 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
             {
                 if (Instances.TryGetValue((contract.Address, tokenGroup.Key), out var cachedTokenViewModel))
                 {
-                    resultTokens.Add(cachedTokenViewModel);
-                    continue;
+                    var dbTokenBalance = tokenGroup.First().TokenBalance;
+
+                    // return cached if metadata don't changed
+                    if (dbTokenBalance?.ArtifactUri  == cachedTokenViewModel.TokenBalance.ArtifactUri &&
+                        dbTokenBalance?.DisplayUri   == cachedTokenViewModel.TokenBalance.DisplayUri &&
+                        dbTokenBalance?.ThumbnailUri == cachedTokenViewModel.TokenBalance.ThumbnailUri &&
+                        dbTokenBalance?.Name         == cachedTokenViewModel.TokenBalance.Name && 
+                        dbTokenBalance?.Description  == cachedTokenViewModel.TokenBalance.Description)
+                    {
+                        resultTokens.Add(cachedTokenViewModel);
+                        continue;
+                    }
+                    
+                    cachedTokenViewModel.Dispose();
+                    Instances.TryRemove((contract.Address, tokenGroup.Key), out _);
                 }
 
                 var tokenBalance = tokenGroup

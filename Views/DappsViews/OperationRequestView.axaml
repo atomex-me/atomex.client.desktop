@@ -4,16 +4,53 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:dappsViewModels="clr-namespace:Atomex.Client.Desktop.ViewModels.DappsViewModels"
              xmlns:controls="clr-namespace:Atomex.Client.Desktop.Controls"
-             mc:Ignorable="d" d:DesignWidth="700" d:DesignHeight="750"
+             mc:Ignorable="d" d:DesignWidth="700" d:DesignHeight="850"
              x:Class="Atomex.Client.Desktop.Views.DappsViews.OperationRequestView"
              xmlns:asyncImageLoader="clr-namespace:AsyncImageLoader;assembly=AsyncImageLoader.Avalonia"
              xmlns:svg="clr-namespace:Avalonia.Svg.Skia;assembly=Avalonia.Svg.Skia"
              xmlns:services="clr-namespace:Atomex.Client.Desktop.Services"
+             xmlns:converters="clr-namespace:Atomex.Client.Desktop.Converters"
+             xmlns:atomex="clr-namespace:Atomex;assembly=Atomex.Client.Core"
+             xmlns:helpers="clr-namespace:Atomex.Client.Desktop.Helpers"
+             xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
              Width="700">
     <Design.DataContext>
         <dappsViewModels:OperationRequestViewModel />
     </Design.DataContext>
-    
+
+    <UserControl.Resources>
+        <converters:AmountToStringConverter x:Key="AmountToStringConverter" />
+        <converters:StringToDecimalConverter x:Key="StringToDecimalConverter" />
+        <converters:StringToIntConverter x:Key="StringToIntConverter" />
+    </UserControl.Resources>
+
+    <UserControl.Styles>
+        <Style Selector="TextBox.SimpleTextBox">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Foreground" Value="{DynamicResource DefaultForegroundBrush}" />
+            <Setter Property="FontFamily" Value="{DynamicResource DefaultFontFamily}" />
+            <Setter Property="FontSize" Value="16" />
+            <Setter Property="Height" Value="40" />
+            <Setter Property="CaretBrush" Value="{DynamicResource DefaultForegroundBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource LightDefaultOpacity20}" />
+            <Setter Property="Padding" Value="12 0" />
+        </Style>
+        <Style Selector="TextBox.SimpleTextBox:pointerover">
+            <Setter Property="Foreground" Value="{DynamicResource DefaultForegroundBrush}" />
+        </Style>
+        <Style Selector="TextBox.SimpleTextBox:not(:pointerover)">
+            <Setter Property="Foreground" Value="{DynamicResource DefaultForegroundBrush}" />
+        </Style>
+        <Style Selector="TextBox.SimpleTextBox:focus /template/ Border#PART_BorderElement">
+            <Setter Property="BorderBrush" Value="{DynamicResource LightDefaultOpacity50}" />
+            <Setter Property="BorderThickness" Value="1" />
+        </Style>
+        <Style Selector="TextBox.SimpleTextBox:not(:focus) /template/ Border#PART_BorderElement">
+            <Setter Property="BorderBrush" Value="{TemplateBinding BorderBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+        </Style>
+    </UserControl.Styles>
+
     <Border Classes="ChildViewBorder"
             Padding="0 0 0 60">
         <StackPanel>
@@ -23,80 +60,599 @@
                            FontSize="22"
                            HorizontalAlignment="Center"
                            VerticalAlignment="Center"
-                           Text="Operation Request" />
+                           Text="Confirm operations" />
                 <Border Grid.Row="1"
                         Height="1"
                         Background="{DynamicResource LightDefaultOpacity10}" />
             </Grid>
 
-            <Grid ColumnDefinitions="130,*,130">
+            <Grid ColumnDefinitions="*,554,*">
                 <StackPanel Grid.Column="1"
-                            Margin="0 32 0 0">
-                    <Grid ColumnDefinitions="*,Auto,*">
-                        <StackPanel Grid.Column="1"
-                                    Orientation="Horizontal">
-                            <Border Width="40"
-                                    Height="40"
-                                    VerticalAlignment="Center"
-                                    HorizontalAlignment="Left"
-                                    ClipToBounds="True"
-                                    CornerRadius="20"
-                                    Classes.IsImageLoading="{Binding #DappPreviewImg.IsLoading}"
-                                    Classes.ImageNotLoaded="{Binding #DappPreviewImg.CurrentImage,
+                            Margin="0 23 0 0">
+                    <Border Width="52"
+                            Height="52"
+                            VerticalAlignment="Center"
+                            HorizontalAlignment="Center"
+                            ClipToBounds="True"
+                            CornerRadius="40"
+                            Classes.IsImageLoading="{Binding #DappPreviewImg.IsLoading}"
+                            Classes.ImageNotLoaded="{Binding #DappPreviewImg.CurrentImage,
                                             Converter={x:Static ObjectConverters.IsNull}}">
-                                <asyncImageLoader:AdvancedImage Name="DappPreviewImg"
-                                                                StretchDirection="Both"
-                                                                Stretch="UniformToFill"
-                                                                Source="{Binding DappLogo}"
-                                                                Loader="{x:Static services:FileCacheImageLoader.Instance}" />
-                            </Border>
-
-                            <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
-                                       Margin="12 0"
-                                       TextWrapping="Wrap"
-                                       VerticalAlignment="Center"
-                                       HorizontalAlignment="Center"
-                                       Text="• • •" />
-                            <svg:Svg Width="39"
-                                     Path="/Resources/Icons/atomex-logo-round-white.svg" />
-                        </StackPanel>
-                    </Grid>
+                        <asyncImageLoader:AdvancedImage Name="DappPreviewImg"
+                                                        StretchDirection="Both"
+                                                        Stretch="UniformToFill"
+                                                        Source="{Binding DappLogo}"
+                                                        Loader="{x:Static services:FileCacheImageLoader.Instance}" />
+                    </Border>
 
                     <TextBlock Foreground="{DynamicResource DefaultForegroundBrush}"
-                               Margin="0 16 0 0"
+                               Margin="0 10 0 0"
                                FontSize="16"
                                LineHeight="24"
                                HorizontalAlignment="Center"
                                Text="{Binding SubTitle}" />
 
-                    <Border Height="1"
-                            Margin="0 24 0 0"
-                            Background="{DynamicResource LightDefaultOpacity10}" />
-                    <ListBox Background="Transparent"
-                             Margin="0 0 -20 0"
-                             Items="{Binding Operations}"
-                             HorizontalAlignment="Stretch"
-                             MaxHeight="300"
-                             VirtualizationMode="None"
-                             VerticalAlignment="Stretch">
-                        <ListBox.Styles>
-                            <Style Selector="ListBoxItem">
-                                <Setter Property="Padding" Value="0 0 20 0" />
-                            </Style>
-                            <Style Selector="ListBoxItem:pointerover /template/ ContentPresenter">
-                                <Setter Property="Background" Value="Transparent" />
-                            </Style>
-                            <Style Selector="ListBoxItem:not(:pointerover) /template/ ContentPresenter">
-                                <Setter Property="Background" Value="Transparent" />
-                            </Style>
-                        </ListBox.Styles>
-                        <ListBox.ItemTemplate>
-                            <controls:BeaconOperationTemplateSelector />
-                        </ListBox.ItemTemplate>
-                    </ListBox>
+                    <Border BorderThickness="1"
+                            BorderBrush="{DynamicResource GrayBlue}"
+                            CornerRadius="8"
+                            Padding="8 9"
+                            Margin="0 10 0 0"
+                            HorizontalAlignment="Center">
+                        <StackPanel Orientation="Horizontal">
+                            <svg:Svg Width="24"
+                                     Path="/Resources/Icons/tezos.svg" />
 
-                    <Grid ColumnDefinitions="*,16,*"
+                            <TextBlock Foreground="{DynamicResource DefaultForegroundBrush}"
+                                       FontSize="16"
+                                       Margin="8 0"
+                                       VerticalAlignment="Center"
+                                       Text="{Binding ConnectedAddress.Address,
+                                       Converter={x:Static converters:StringConverters.ToShortenedAddress}}" />
+
+                            <TextBlock FontSize="16"
+                                       VerticalAlignment="Center"
+                                       Margin="8 0 3 0"
+                                       Foreground="{DynamicResource SecondaryForegroundBrush}">
+                                <TextBlock.Text>
+                                    <MultiBinding Converter="{StaticResource AmountToStringConverter}">
+                                        <Binding Path="ConnectedAddress.Balance" />
+                                        <Binding Path="TezosFormat" />
+                                    </MultiBinding>
+                                </TextBlock.Text>
+                            </TextBlock>
+
+                            <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
+                                       FontSize="16"
+                                       VerticalAlignment="Center"
+                                       Text="{x:Static atomex:TezosConfig.Xtz}" />
+                        </StackPanel>
+                    </Border>
+
+                    <Border BorderThickness="1"
+                            BorderBrush="{DynamicResource GrayBlue}"
+                            Background="{DynamicResource DarkGrayBlue}"
+                            CornerRadius="8"
+                            Margin="0 24 0 0">
+                        <Grid ColumnDefinitions="Auto,*"
+                              MinHeight="105"
+                              MaxHeight="200">
+                            <Panel Grid.Column="0"
+                                   Height="40"
+                                   Margin="16 0 0 0"
+                                   VerticalAlignment="Top">
+                                <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
+                                           FontSize="13"
+                                           VerticalAlignment="Center"
+                                           Text="Operations" />
+                            </Panel>
+
+                            <TabControl Grid.Column="0"
+                                        Grid.ColumnSpan="2"
+                                        Classes="WalletTabControl"
+                                        BorderBrush="{DynamicResource GrayBlue2}">
+                                <TabControl.Styles>
+                                    <Style
+                                        Selector="TabControl.WalletTabControl /template/ ItemsPresenter#PART_ItemsPresenter">
+                                        <Setter Property="HorizontalAlignment" Value="Right" />
+                                        <Setter Property="Height" Value="40" />
+                                    </Style>
+                                </TabControl.Styles>
+                                <TabItem Classes="WalletTabItem"
+                                         Height="40">
+                                    <TabItem.Header>
+                                        <TextBlock VerticalAlignment="Center"
+                                                   HorizontalAlignment="Center"
+                                                   FontSize="13"
+                                                   Text="Preview" />
+                                    </TabItem.Header>
+
+                                    <ListBox Background="Transparent"
+                                             Items="{Binding Operations}"
+                                             HorizontalAlignment="Stretch"
+                                             MaxHeight="300"
+                                             VirtualizationMode="None"
+                                             VerticalAlignment="Stretch">
+                                        <ListBox.Styles>
+                                            <Style Selector="ListBoxItem">
+                                                <Setter Property="Padding" Value="0" />
+                                            </Style>
+                                            <Style Selector="ListBoxItem:pointerover /template/ ContentPresenter">
+                                                <Setter Property="Background" Value="Transparent" />
+                                            </Style>
+                                            <Style Selector="ListBoxItem:not(:pointerover) /template/ ContentPresenter">
+                                                <Setter Property="Background" Value="Transparent" />
+                                            </Style>
+                                        </ListBox.Styles>
+                                        <ListBox.ItemTemplate>
+                                            <controls:BeaconOperationTemplateSelector />
+                                        </ListBox.ItemTemplate>
+                                    </ListBox>
+                                </TabItem>
+                                <TabItem Classes="WalletTabItem"
+                                         Height="40"
+                                         Margin="16 0">
+                                    <TabItem.Header>
+                                        <TextBlock VerticalAlignment="Center"
+                                                   HorizontalAlignment="Center"
+                                                   FontSize="13"
+                                                   Text="Raw" />
+                                    </TabItem.Header>
+
+                                    <Grid ColumnDefinitions="*, Auto">
+                                        <TextBox Grid.Column="0"
+                                                 Grid.ColumnSpan="2"
+                                                 Text="{Binding RawOperations}"
+                                                 Foreground="{DynamicResource DefaultForegroundBrush}"
+                                                 MaxHeight="159"
+                                                 FontSize="13"
+                                                 Background="Transparent"
+                                                 BorderThickness="0"
+                                                 Padding="16 12 0 0"
+                                                 IsReadOnly="True">
+                                            <TextBox.Styles>
+                                                <Style Selector="TextBox /template/ TextPresenter">
+                                                    <Setter Property="Margin" Value="0 0 16 0" />
+                                                </Style>
+                                            </TextBox.Styles>
+                                        </TextBox>
+
+                                        <controls:CopyButtonWithText Grid.Column="1"
+                                                                     Margin="0 10 8 0"
+                                                                     VerticalAlignment="Top"
+                                                                     Command="{Binding CopyCommand}"
+                                                                     CommandParameter="{Binding RawOperations}" />
+                                    </Grid>
+                                </TabItem>
+                                <TabItem Classes="WalletTabItem"
+                                         Height="40"
+                                         Margin="0 0 16 0">
+                                    <TabItem.Header>
+                                        <TextBlock VerticalAlignment="Center"
+                                                   FontSize="13"
+                                                   Text="Bytes" />
+                                    </TabItem.Header>
+
+                                    <Grid ColumnDefinitions="*, Auto">
+                                        <TextBox Grid.Column="0"
+                                                 Grid.ColumnSpan="2"
+                                                 Text="{Binding OperationsBytes}"
+                                                 Foreground="{DynamicResource DefaultForegroundBrush}"
+                                                 MaxHeight="159"
+                                                 FontSize="13"
+                                                 Background="Transparent"
+                                                 BorderThickness="0"
+                                                 TextWrapping="Wrap"
+                                                 Padding="16 12 0 0"
+                                                 IsReadOnly="True">
+                                            <TextBox.Styles>
+                                                <Style Selector="TextBox /template/ TextPresenter">
+                                                    <Setter Property="Margin" Value="0 0 16 0" />
+                                                </Style>
+                                            </TextBox.Styles>
+                                        </TextBox>
+
+                                        <controls:CopyButtonWithText Grid.Column="1"
+                                                                     Margin="0 10 8 0"
+                                                                     VerticalAlignment="Top"
+                                                                     Command="{Binding CopyCommand}"
+                                                                     CommandParameter="{Binding OperationsBytes}" />
+                                    </Grid>
+                                </TabItem>
+                            </TabControl>
+                        </Grid>
+                    </Border>
+
+                    <CheckBox Padding="12 0 0 0"
+                              Margin="0 12 0 0"
+                              Classes="Primary"
+                              IsChecked="{Binding UseDefaultFee, Mode=TwoWay}"
+                              FontSize="16"
+                              FontFamily="{DynamicResource DefaultLightFontFamily}"
+                              Foreground="{DynamicResource DefaultForegroundBrush}"
+                              Content="Use default fees" />
+
+                    <StackPanel IsVisible="{Binding UseDefaultFee}">
+                        <Button Classes="EmptyBtnWithContent"
+                                Padding="0"
+                                HorizontalAlignment="Left"
+                                Margin="0 16 0 0"
+                                Command="{Binding OpenDetailsCommand}">
+                            <StackPanel Orientation="Horizontal"
+                                        HorizontalAlignment="Left">
+                                <TextBlock TextTrimming="CharacterEllipsis"
+                                           Foreground="{DynamicResource SecondaryForegroundBrush}"
+                                           FontFamily="{DynamicResource DefaultFontFamily}"
+                                           FontSize="16"
+                                           VerticalAlignment="Center"
+                                           Text="Details" />
+
+                                <Panel Margin="8 0 0 0"
+                                       Classes="WithRotation"
+                                       Classes.Rotated="{Binding DetailsOpened}">
+                                    <svg:Svg Path="/Resources/Icons/arrow-sort-desc.svg"
+                                             HorizontalAlignment="Right"
+                                             VerticalAlignment="Center"
+                                             Width="16" />
+                                </Panel>
+                            </StackPanel>
+                        </Button>
+                        <StackPanel IsVisible="{Binding DetailsOpened}">
+                            <Grid ColumnDefinitions="*,Auto"
+                                  RowDefinitions="Auto,Auto,Auto,Auto">
+                                <TextBlock Grid.Column="0"
+                                           Grid.Row="0"
+                                           Margin="16 12 0 0"
+                                           Foreground="{DynamicResource SecondaryForegroundBrush}"
+                                           FontFamily="{DynamicResource DefaultFontFamily}"
+                                           FontSize="16"
+                                           VerticalAlignment="Center"
+                                           Text="Gas Limit" />
+
+                                <TextBlock Grid.Column="1"
+                                           Grid.Row="0"
+                                           Margin="0 8 0 0"
+                                           Foreground="{DynamicResource DefaultForegroundBrush}"
+                                           FontFamily="{DynamicResource DefaultFontFamily}"
+                                           FontSize="16"
+                                           HorizontalAlignment="Right"
+                                           VerticalAlignment="Center"
+                                           Text="{Binding TotalGasLimit}" />
+
+                                <TextBlock Grid.Column="0"
+                                           Grid.Row="1"
+                                           Margin="16 8 0 0"
+                                           Foreground="{DynamicResource SecondaryForegroundBrush}"
+                                           FontFamily="{DynamicResource DefaultFontFamily}"
+                                           FontSize="16"
+                                           VerticalAlignment="Center"
+                                           Text="Storage Limit" />
+
+                                <TextBlock Grid.Column="1"
+                                           Grid.Row="1"
+                                           Margin="0 8 0 0"
+                                           Foreground="{DynamicResource DefaultForegroundBrush}"
+                                           FontFamily="{DynamicResource DefaultFontFamily}"
+                                           FontSize="16"
+                                           HorizontalAlignment="Right"
+                                           VerticalAlignment="Center"
+                                           Text="{Binding TotalStorageLimit}" />
+
+                                <TextBlock Grid.Column="0"
+                                           Grid.Row="2"
+                                           Margin="16 8 0 0"
+                                           Foreground="{DynamicResource SecondaryForegroundBrush}"
+                                           FontFamily="{DynamicResource DefaultFontFamily}"
+                                           FontSize="16"
+                                           VerticalAlignment="Center"
+                                           Text="Gas Fee" />
+
+                                <StackPanel Grid.Column="1"
+                                            Grid.Row="2"
+                                            Margin="0 8 0 0"
+                                            HorizontalAlignment="Right"
+                                            Orientation="Horizontal">
+                                    <TextBlock FontSize="16"
+                                               VerticalAlignment="Center"
+                                               Foreground="{DynamicResource DefaultForegroundBrush}">
+                                        <TextBlock.Text>
+                                            <MultiBinding Converter="{StaticResource AmountToStringConverter}">
+                                                <Binding Path="TotalGasFee" />
+                                                <Binding Path="TezosFormat" />
+                                            </MultiBinding>
+                                        </TextBlock.Text>
+                                    </TextBlock>
+
+                                    <TextBlock Foreground="{DynamicResource DefaultForegroundBrush}"
+                                               FontSize="16"
+                                               Margin="3 0 6 0"
+                                               VerticalAlignment="Center"
+                                               Text="{x:Static atomex:TezosConfig.Xtz}" />
+
+                                    <TextBlock HorizontalAlignment="Right"
+                                               VerticalAlignment="Center"
+                                               Foreground="{DynamicResource SecondaryForegroundBrush}"
+                                               FontSize="16">
+                                        <TextBlock.Text>
+                                            <MultiBinding
+                                                Converter="{StaticResource AmountToStringConverter}">
+                                                <Binding Path="TotalGasFeeInBase" Mode="OneWay" />
+                                                <Binding Path="BaseCurrencyFormat" Mode="OneWay" />
+                                            </MultiBinding>
+                                        </TextBlock.Text>
+                                    </TextBlock>
+                                </StackPanel>
+
+                                <TextBlock Grid.Column="0"
+                                           Grid.Row="3"
+                                           Margin="16 8 0 0"
+                                           Foreground="{DynamicResource SecondaryForegroundBrush}"
+                                           FontFamily="{DynamicResource DefaultFontFamily}"
+                                           FontSize="16"
+                                           VerticalAlignment="Center"
+                                           Text="Storage Fee" />
+
+                                <StackPanel Grid.Column="1"
+                                            Grid.Row="3"
+                                            Margin="0 8 0 0"
+                                            HorizontalAlignment="Right"
+                                            Orientation="Horizontal">
+                                    <TextBlock FontSize="16"
+                                               VerticalAlignment="Center"
+                                               Foreground="{DynamicResource DefaultForegroundBrush}">
+                                        <TextBlock.Text>
+                                            <MultiBinding Converter="{StaticResource AmountToStringConverter}">
+                                                <Binding Path="TotalStorageFee" />
+                                                <Binding Path="TezosFormat" />
+                                            </MultiBinding>
+                                        </TextBlock.Text>
+                                    </TextBlock>
+
+                                    <TextBlock Foreground="{DynamicResource DefaultForegroundBrush}"
+                                               FontSize="16"
+                                               Margin="3 0 6 0"
+                                               VerticalAlignment="Center"
+                                               Text="{x:Static atomex:TezosConfig.Xtz}" />
+
+                                    <TextBlock HorizontalAlignment="Right"
+                                               VerticalAlignment="Center"
+                                               Foreground="{DynamicResource SecondaryForegroundBrush}"
+                                               FontSize="16">
+                                        <TextBlock.Text>
+                                            <MultiBinding
+                                                Converter="{StaticResource AmountToStringConverter}">
+                                                <Binding Path="TotalStorageFeeInBase" Mode="OneWay" />
+                                                <Binding Path="BaseCurrencyFormat" Mode="OneWay" />
+                                            </MultiBinding>
+                                        </TextBlock.Text>
+                                    </TextBlock>
+                                </StackPanel>
+                            </Grid>
+                        </StackPanel>
+                    </StackPanel>
+
+                    <Grid ColumnDefinitions="*,Auto"
+                          RowDefinitions="48,48,48,48"
+                          IsVisible="{Binding !UseDefaultFee}">
+                        <TextBlock Grid.Column="0"
+                                   Grid.Row="0"
+                                   Foreground="{DynamicResource SecondaryForegroundBrush}"
+                                   FontFamily="{DynamicResource DefaultFontFamily}"
+                                   FontSize="16"
+                                   VerticalAlignment="Center"
+                                   Text="Gas Limit" />
+
+                        <TextBlock Grid.Column="1"
+                                   Grid.Row="0"
+                                   Foreground="{DynamicResource DefaultForegroundBrush}"
+                                   FontFamily="{DynamicResource DefaultFontFamily}"
+                                   FontSize="16"
+                                   HorizontalAlignment="Right"
+                                   VerticalAlignment="Center"
+                                   Text="{Binding TotalGasLimit}" />
+
+                        <TextBlock Grid.Column="0"
+                                   Grid.Row="1"
+                                   Foreground="{DynamicResource SecondaryForegroundBrush}"
+                                   FontFamily="{DynamicResource DefaultFontFamily}"
+                                   FontSize="16"
+                                   VerticalAlignment="Center"
+                                   Text="Storage Limit" />
+
+                        <!-- <TextBox Grid.Column="1" -->
+                        <!--          Grid.Row="1" -->
+                        <!--          HorizontalAlignment="Right" -->
+                        <!--          VerticalContentAlignment="Center" -->
+                        <!--          VerticalAlignment="Center" -->
+                        <!--          Width="280" -->
+                        <!--          Classes="SimpleTextBox" -->
+                        <!--          Text="{Binding TotalStorageLimit, -->
+                        <!--          Converter={StaticResource StringToIntConverter}}"> -->
+                        <!--     <i:Interaction.Behaviors> -->
+                        <!--         <helpers:AmountBehavior Format="F0" NumericType="x:Int32" /> -->
+                        <!--     </i:Interaction.Behaviors> -->
+                        <!-- </TextBox> -->
+
+                        <TextBlock Grid.Column="1"
+                                   Grid.Row="1"
+                                   Foreground="{DynamicResource DefaultForegroundBrush}"
+                                   FontFamily="{DynamicResource DefaultFontFamily}"
+                                   FontSize="16"
+                                   HorizontalAlignment="Right"
+                                   VerticalAlignment="Center"
+                                   Text="{Binding TotalStorageLimit}" />
+
+                        <TextBlock Grid.Column="0"
+                                   Grid.Row="2"
+                                   Foreground="{DynamicResource SecondaryForegroundBrush}"
+                                   FontFamily="{DynamicResource DefaultFontFamily}"
+                                   FontSize="16"
+                                   VerticalAlignment="Center"
+                                   Text="Gas Fee" />
+
+                        <TextBox Grid.Column="1"
+                                 Grid.Row="2"
+                                 VerticalContentAlignment="Center"
+                                 VerticalAlignment="Center"
+                                 Width="280"
+                                 Classes="SimpleTextBox"
+                                 Text="{Binding TotalGasFee,
+                                 Converter={StaticResource StringToDecimalConverter}}">
+                            <TextBox.InnerRightContent>
+                                <TextBlock VerticalAlignment="Center"
+                                           Margin="0 0 12 0"
+                                           Foreground="{DynamicResource SecondaryForegroundBrush}"
+                                           FontSize="16">
+                                    <TextBlock.Text>
+                                        <MultiBinding
+                                            Converter="{StaticResource AmountToStringConverter}">
+                                            <Binding Path="TotalGasFeeInBase" Mode="OneWay" />
+                                            <Binding Path="BaseCurrencyFormat" Mode="OneWay" />
+                                        </MultiBinding>
+                                    </TextBlock.Text>
+                                </TextBlock>
+                            </TextBox.InnerRightContent>
+                            <i:Interaction.Behaviors>
+                                <helpers:AmountBehavior Format="{Binding TezosFormat}" />
+                            </i:Interaction.Behaviors>
+                        </TextBox>
+
+                        <TextBlock Grid.Column="0"
+                                   Grid.Row="3"
+                                   Foreground="{DynamicResource SecondaryForegroundBrush}"
+                                   FontFamily="{DynamicResource DefaultFontFamily}"
+                                   FontSize="16"
+                                   VerticalAlignment="Center"
+                                   Text="Storage Fee" />
+
+                        <StackPanel Grid.Column="1"
+                                    Grid.Row="3"
+                                    HorizontalAlignment="Right"
+                                    Orientation="Horizontal">
+                            <TextBlock FontSize="16"
+                                       VerticalAlignment="Center"
+                                       Foreground="{DynamicResource DefaultForegroundBrush}">
+                                <TextBlock.Text>
+                                    <MultiBinding Converter="{StaticResource AmountToStringConverter}">
+                                        <Binding Path="TotalStorageFee" />
+                                        <Binding Path="TezosFormat" />
+                                    </MultiBinding>
+                                </TextBlock.Text>
+                            </TextBlock>
+
+                            <TextBlock Foreground="{DynamicResource DefaultForegroundBrush}"
+                                       FontSize="16"
+                                       Margin="3 0 6 0"
+                                       VerticalAlignment="Center"
+                                       Text="{x:Static atomex:TezosConfig.Xtz}" />
+
+                            <TextBlock HorizontalAlignment="Right"
+                                       VerticalAlignment="Center"
+                                       Foreground="{DynamicResource SecondaryForegroundBrush}"
+                                       FontSize="16">
+                                <TextBlock.Text>
+                                    <MultiBinding
+                                        Converter="{StaticResource AmountToStringConverter}">
+                                        <Binding Path="TotalStorageFeeInBase" Mode="OneWay" />
+                                        <Binding Path="BaseCurrencyFormat" Mode="OneWay" />
+                                    </MultiBinding>
+                                </TextBlock.Text>
+                            </TextBlock>
+                        </StackPanel>
+                    </Grid>
+
+                    <Grid ColumnDefinitions="*,Auto"
                           Margin="0 16 0 0">
+                        <TextBlock Grid.Column="0"
+                                   Foreground="{DynamicResource SecondaryForegroundBrush}"
+                                   FontFamily="{DynamicResource DefaultFontFamily}"
+                                   FontSize="16"
+                                   VerticalAlignment="Center"
+                                   Text="Total Fees" />
+
+                        <StackPanel Grid.Column="1"
+                                    Orientation="Horizontal">
+                            <TextBlock FontSize="16"
+                                       VerticalAlignment="Center"
+                                       Foreground="{DynamicResource DefaultForegroundBrush}">
+                                <TextBlock.Text>
+                                    <MultiBinding Converter="{StaticResource AmountToStringConverter}">
+                                        <Binding Path="TotalFees" />
+                                        <Binding Path="TezosFormat" />
+                                    </MultiBinding>
+                                </TextBlock.Text>
+                            </TextBlock>
+
+                            <TextBlock Foreground="{DynamicResource DefaultForegroundBrush}"
+                                       FontSize="16"
+                                       Margin="3 0 6 0"
+                                       VerticalAlignment="Center"
+                                       Text="{x:Static atomex:TezosConfig.Xtz}" />
+
+                            <TextBlock HorizontalAlignment="Right"
+                                       VerticalAlignment="Center"
+                                       Foreground="{DynamicResource SecondaryForegroundBrush}"
+                                       FontSize="16">
+                                <TextBlock.Text>
+                                    <MultiBinding
+                                        Converter="{StaticResource AmountToStringConverter}">
+                                        <Binding Path="TotalFeesInBase" Mode="OneWay" />
+                                        <Binding Path="BaseCurrencyFormat" Mode="OneWay" />
+                                    </MultiBinding>
+                                </TextBlock.Text>
+                            </TextBlock>
+                        </StackPanel>
+                    </Grid>
+
+                    <Border Margin="0 16 0 0"
+                            Padding="14"
+                            Background="{DynamicResource DarkRedOpacity10}"
+                            CornerRadius="6"
+                            IsVisible="{Binding AutofillError}">
+                        <Grid ColumnDefinitions="Auto,*">
+                            <svg:Svg Grid.Column="0"
+                                     Width="18"
+                                     VerticalAlignment="Center"
+                                     Path="/Resources/Icons/warning-red.svg" />
+
+                            <TextBlock Grid.Column="1"
+                                       Margin="12 0 0 0"
+                                       Foreground="{DynamicResource DarkRed}"
+                                       FontFamily="{DynamicResource DefaultFontFamily}"
+                                       FontSize="13"
+                                       VerticalAlignment="Center"
+                                       TextWrapping="Wrap"
+                                       Text="Warning! Transaction with this parameters is likely to fail." />
+                        </Grid>
+                    </Border>
+                    
+                    <Border Margin="0 16 0 0"
+                            Padding="14"
+                            Background="{DynamicResource OrangeOpacity10}"
+                            CornerRadius="6">
+                        <Border.IsVisible>
+                            <MultiBinding Converter="{x:Static BoolConverters.And}">
+                                <Binding Path="!UseDefaultFee"  />
+                                <Binding Path="!AutofillError" />
+                            </MultiBinding>
+                        </Border.IsVisible>
+                        <Grid ColumnDefinitions="Auto,*">
+                            <svg:Svg Grid.Column="0"
+                                     Width="18"
+                                     VerticalAlignment="Center"
+                                     Path="/Resources/Icons/warning-orange.svg" />
+
+                            <TextBlock Grid.Column="1"
+                                       Margin="12 0 0 0"
+                                       Foreground="{DynamicResource Orange}"
+                                       FontFamily="{DynamicResource DefaultFontFamily}"
+                                       FontSize="13"
+                                       VerticalAlignment="Center"
+                                       TextWrapping="Wrap"
+                                       Text="Warning! Be careful with manual editing of gas fee parameter. It may result in transaction failing." />
+                        </Grid>
+                    </Border>
+
+                    <Grid ColumnDefinitions="*,16,*" Margin="0 24 0 0">
                         <controls:RoundedButton Grid.Column="0"
                                                 Classes="GrayButton"
                                                 Content="Reject"

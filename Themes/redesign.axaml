@@ -31,6 +31,9 @@
     <Color x:Key="Blue">#20439E</Color>
     <Color x:Key="LightBlue">#3964D3</Color>
     <Color x:Key="DarkBlue">#0F3088</Color>
+    <Color x:Key="GrayBlue">#1F3756</Color>
+    <Color x:Key="GrayBlue2">#112541</Color>
+    <Color x:Key="DarkGrayBlue">#0B1C33</Color>
     <Color x:Key="DefaultButtonMouseOverColor">#265590</Color>
     <Color x:Key="DefaultButtonPressedColor">#1c3f6b</Color>
     <Color x:Key="DefaultButtonBackgroundLightColor">#92aec7</Color>
@@ -45,11 +48,13 @@
     <Color x:Key="DefaultMenuItemMouseOverColor">#0f4d6d</Color>
     <Color x:Key="CriticalWarningColor">#ef6a41</Color>
     <Color x:Key="DarkRed">#E1457C</Color>
+    <Color x:Key="DarkRedOpacity10">#1AE1457C</Color>
     <Color x:Key="Emerald">#00C4B4</Color>
     <Color x:Key="LightEmerald">#46FEEF</Color>
     <Color x:Key="DarkEmerald">#008C81</Color>
     <Color x:Key="DeepBlue">#0D1421</Color>
     <Color x:Key="Orange">#FFA800</Color>
+    <Color x:Key="OrangeOpacity10">#1AFFA800</Color>
     <Color x:Key="BlueSky">#2988DF</Color>
 
     <Color x:Key="MahApps.Colors.Gray1">#FF333333</Color>

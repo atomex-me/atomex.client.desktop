@@ -377,8 +377,9 @@ namespace Atomex.Client.Desktop.ViewModels
             await Dispatcher.UIThread.InvokeAsync(() =>
             {
                 BakersList = bakers;
-                InitialBakersList = new List<BakerViewModel>(BakersList);
-
+                InitialBakersList = BakersList == null
+                    ? new List<BakerViewModel>()
+                    : new List<BakerViewModel>(BakersList);
             }, DispatcherPriority.Background);
         }
 

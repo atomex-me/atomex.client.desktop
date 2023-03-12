@@ -99,25 +99,6 @@
 
 
         <ComponentGroup Id='RegistryComponents'>
-            <!--            <Component Id="ApplicationDeeplink"-->
-            <!--                       Directory='TARGETDIR'-->
-            <!--                       Guid="*">-->
-            <!--                <RegistryKey Root="HKCR"-->
-            <!--                             Key="atomex"-->
-            <!--                             Action="createAndRemoveOnUninstall">-->
-            <!--                    <RegistryValue Type="string"-->
-            <!--                                   Name="URL Protocol"-->
-            <!--                                   Value="atomex"/>-->
-            <!--                    &lt;!&ndash;                    <RegistryKey Key="DefaultIcon">&ndash;&gt;-->
-            <!--                    &lt;!&ndash;                        <RegistryValue Type="string" Value="Atomex.Client.Desktop.exe"/>&ndash;&gt;-->
-            <!--                    &lt;!&ndash;                    </RegistryKey>&ndash;&gt;-->
-            <!--                    <RegistryKey Key="shell\open\command">-->
-            <!--                        <RegistryValue Type="string"-->
-            <!--                                       Value="&quot;[INSTALLDIR]Atomex.Client.Desktop.exe&quot; &quot;%1&quot;"/>-->
-            <!--                    </RegistryKey>-->
-            <!--                </RegistryKey>-->
-            <!--            </Component>-->
-
             <Component Id='ApplicationDeeplink'
                        Directory='TARGETDIR'
                        Guid='*'>
@@ -126,15 +107,11 @@
                         Key='atomex'>
                     <RegistryValue
                             Type='string'
-                            Value='Atomex desktop'/>
+                            Value='URL:Atomex Link'/>
                     <RegistryValue
                             Name='URL Protocol'
                             Type='string'
                             Value=''/>
-                    <!--                    <RegistryValue-->
-                    <!--                            Key='DefaultIcon'-->
-                    <!--                            Type='string'-->
-                    <!--                            Value='[#f_vmnetx.exe]'/>-->
                     <RegistryValue
                             Key='shell\open\command'
                             Type='string'
@@ -147,7 +124,7 @@
         <Feature Id="App" Title="$(var.Name)" Level="1">
             <ComponentGroupRef Id="App"/>
             <ComponentRef Id="ApplicationShortcut"/>
-        <ComponentRef Id="ApplicationShortcutDesktop"/>
+            <ComponentRef Id="ApplicationShortcutDesktop"/>
             <ComponentGroupRef Id='RegistryComponents'/>
         </Feature>
 

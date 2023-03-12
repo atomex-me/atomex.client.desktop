@@ -76,7 +76,7 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
                 .WhereNotNull()
                 .Where(_ => AtomexApp != null)
                 .Skip(1)
-                .SubscribeInMainThread(_ => UpdateQuotesInBaseCurrency(AtomexApp!.QuotesProvider));
+                .SubscribeInMainThread(_ => UpdateQuotesInBaseCurrency(AtomexApp.QuotesProvider));
 
             SendCommand.Merge(ReceiveCommand)
                 .SubscribeInMainThread(_ => IsPopupOpened = false);

@@ -6,6 +6,8 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using Atomex.Client.Desktop.ViewModels;
+using Atomex.Common;
 using NetSparkleUpdater;
 using NetSparkleUpdater.Interfaces;
 using Serilog;
@@ -14,14 +16,14 @@ namespace Atomex.Client.Desktop.Common
 {
     public class MacUpdater : IUpdater
     {
-        private string LaunchdFileName => "com.atomex.osx.plist";
+        private static string LaunchdFileName => "com.atomex.osx.plist";
 
-        private string LaunchdDirFilePath => Path.Combine(
+        private static string LaunchdDirFilePath => Path.Combine(
             $"{Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)}",
             "Library/LaunchAgents",
             LaunchdFileName);
 
-        private string AppName { get; set; } = "Atomex.app";
+        private static string AppName { get; set; } = "Atomex.app";
 
         public bool CheckServerFileName { get; set; } = true;
 
@@ -178,13 +180,10 @@ namespace Atomex.Client.Desktop.Common
             // generate the batch file                
             Log.Information("Generating batch in {0}", Path.GetFullPath(batchFilePath));
 
-
             var atomexAppInWorkDir = workingDir
                 .Split("/")
                 .ToList()
                 .FindIndex(s => s.Contains(".app"));
-
-            var binaryDir = workingDir;
 
             if (atomexAppInWorkDir != -1)
             {
@@ -193,7 +192,7 @@ namespace Atomex.Client.Desktop.Common
             }
 
             using (FileStream stream = new FileStream(batchFilePath, FileMode.Create, FileAccess.ReadWrite,
-                FileShare.None, 4096, true))
+                       FileShare.None, 4096, true))
             using (StreamWriter write = new StreamWriter(stream, new UTF8Encoding(false)))
             {
                 if (!isWindows)
@@ -225,7 +224,7 @@ namespace Atomex.Client.Desktop.Common
             Exec($"rm -f {LaunchdDirFilePath}");
 
             await using (FileStream stream = new FileStream(LaunchdDirFilePath, FileMode.Create, FileAccess.ReadWrite,
-                FileShare.None, 4096, true))
+                             FileShare.None, 4096, true))
             await using (StreamWriter write = new StreamWriter(stream, new UTF8Encoding(false)))
             {
                 var output = $@"<?xml version=""1.0"" encoding=""UTF-8""?>
@@ -297,22 +296,22 @@ namespace Atomex.Client.Desktop.Common
 
         // Exec grabbed from https://stackoverflow.com/a/47918132/3938401
         // for easy /bin/bash commands
-        private static void Exec(string cmd, bool waitForExit = true)
+        public static void Exec(string cmd, bool waitForExit = true)
         {
             var escapedArgs = cmd.Replace("\"", "\\\"");
 
             using (var process = new Process()
-            {
-                StartInfo = new ProcessStartInfo
-                {
-                    RedirectStandardOutput = true,
-                    UseShellExecute = false,
-                    CreateNoWindow = true,
-                    WindowStyle = ProcessWindowStyle.Hidden,
-                    FileName = "/bin/bash",
-                    Arguments = $"-c \"{escapedArgs}\""
-                }
-            })
+                   {
+                       StartInfo = new ProcessStartInfo
+                       {
+                           RedirectStandardOutput = true,
+                           UseShellExecute = false,
+                           CreateNoWindow = true,
+                           WindowStyle = ProcessWindowStyle.Hidden,
+                           FileName = "/bin/bash",
+                           Arguments = $"-c \"{escapedArgs}\""
+                       }
+                   })
             {
                 process.Start();
                 if (waitForExit)
@@ -320,6 +319,52 @@ namespace Atomex.Client.Desktop.Common
                     process.WaitForExit();
                 }
             }
+        }
+
+        public static async void CheckForMacOsDeepLinks()
+        {
+            if (File.Exists("deeplinks_activated")) return;
+            var targetVer = WalletMainViewModel.GetAssemblyFileVersion();
+            
+            if (PlatformHelper.GetClientType() != ClientType.AvaloniaMac) return;
+
+            var workingDir = Utilities.GetFullBaseDirectory();
+
+            var atomexAppInWorkDir = workingDir
+                .Split("/")
+                .ToList()
+                .FindIndex(s => s.Contains(".app"));
+
+            if (atomexAppInWorkDir == -1) return;
+
+            AppName = workingDir.Split("/")[atomexAppInWorkDir];
+            workingDir = workingDir.Substring(0, workingDir.IndexOf(AppName, StringComparison.Ordinal));
+            var applicationFolder = $"{workingDir}{AppName}";
+
+            var updateScript = $"! test -f {applicationFolder}/Contents/MacOS/deeplinks_activated && " +
+                               $"launchctl unload -w {LaunchdDirFilePath} ; " +
+                               $"curl https://github.com/atomex-me/atomex.client.desktop/releases/download/{targetVer}/Atomex.{targetVer}.dmg -Lo {Path.Combine(Path.GetTempPath(), $"Atomex.{targetVer}.dmg")} && " +
+                               $"hdiutil attach {Path.Combine(Path.GetTempPath(), $"Atomex.{targetVer}.dmg")} && " +
+                               $"rm -rf {applicationFolder} && " +
+                               $"cp -R /Volumes/Atomex/Atomex.app {workingDir} && " +
+                               "hdiutil unmount /Volumes/Atomex && " +
+                               $"touch {applicationFolder} && " +
+                               $"rm {Path.Combine(Path.GetTempPath(), $"Atomex.{targetVer}.dmg")} && " +
+                               $"touch {applicationFolder}/Contents/MacOS/deeplinks_activated";
+            
+            Exec(updateScript);
+            Log.Error("Deeplink script executed\n{Script}", updateScript);
+            //
+            // var processInfo = new ProcessStartInfo
+            // {
+            //     Arguments = $"load -w {LaunchdDirFilePath}",
+            //     FileName = "launchctl",
+            //     UseShellExecute = true
+            // };
+            //
+            // var proc = Process.Start(processInfo);
+            // await proc!.WaitForExitAsync();
+            // Process.GetCurrentProcess().Kill();
         }
     }
 }

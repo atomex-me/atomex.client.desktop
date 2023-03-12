@@ -78,7 +78,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             DappsViewModel = new DappsViewModel(_app);
             TezosTokensViewModel = new TezosTokensViewModel(_app, showTezosToken, setConversionTab);
             CollectiblesViewModel = new CollectiblesViewModel(_app, showTezosCollection);
-            
+
             CurrentDelegationSortField = DelegationSortField.ByBalance;
             CurrentDelegationSortDirection = SortDirection.Desc;
         }
@@ -252,13 +252,12 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                         ? SortDirection.Desc
                         : SortDirection.Asc;
             });
-        
+
         private ReactiveCommand<Unit, Unit>? _connectDappCommand;
         public ReactiveCommand<Unit, Unit> ConnectDappCommand =>
             _connectDappCommand ??= ReactiveCommand.Create(() =>
             {
-                DappsViewModel.CreateAddresses();
-                App.DialogService.Show(DappsViewModel.SelectAddressViewModel);
+                App.DialogService.Show(DappsViewModel.ConnectDappViewModel);
             });
 
         private ReactiveCommand<string, Unit>? _openDelegationPopupCommand;

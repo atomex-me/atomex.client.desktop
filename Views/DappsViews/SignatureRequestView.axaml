@@ -4,7 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:dappsViewModels="clr-namespace:Atomex.Client.Desktop.ViewModels.DappsViewModels"
              xmlns:controls="clr-namespace:Atomex.Client.Desktop.Controls"
-             mc:Ignorable="d" d:DesignWidth="700" d:DesignHeight="500"
+             mc:Ignorable="d" d:DesignWidth="700" d:DesignHeight="540"
              x:Class="Atomex.Client.Desktop.Views.DappsViews.SignatureRequestView"
              Width="700">
 
@@ -27,10 +27,11 @@
                         Background="{DynamicResource LightDefaultOpacity10}" />
             </Grid>
 
-            <Grid ColumnDefinitions="130,*,130">
+            <Grid ColumnDefinitions="*,440,*">
                 <StackPanel Grid.Column="1"
                             Margin="0 32 0 0">
-                    <StackPanel Orientation="Horizontal">
+                    <StackPanel Orientation="Horizontal"
+                                HorizontalAlignment="Center">
                         <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
                                    FontSize="16"
                                    LineHeight="24"
@@ -44,16 +45,58 @@
                                    HorizontalAlignment="Left"
                                    Text=" wants to sign the following data:" />
                     </StackPanel>
-                    <TextBox Margin="0 8 0 0"
-                             Padding="16 10 16 0"
-                             Text="{Binding Payload}"
-                             VerticalContentAlignment="Top"
-                             Classes="AtomexTextBox"
-                             FontSize="16"
-                             TextWrapping="Wrap"
-                             BorderThickness="0"
-                             IsReadOnly="True"
-                             Height="176" />
+
+                    <TabControl Classes="WalletTabControl">
+                        <TabControl.Styles>
+                            <Style
+                                Selector="TabControl.WalletTabControl /template/ ItemsPresenter#PART_ItemsPresenter">
+                                <Setter Property="HorizontalAlignment" Value="Right" />
+                                <Setter Property="Height" Value="50" />
+                            </Style>
+                        </TabControl.Styles>
+                        <TabItem Classes="WalletTabItem"
+                                 Height="50"
+                                 Width="220">
+                            <TabItem.Header>
+                                <TextBlock VerticalAlignment="Center"
+                                           HorizontalAlignment="Center"
+                                           FontSize="16"
+                                           Text="Raw" />
+                            </TabItem.Header>
+                            <TextBox Margin="0 8 0 0"
+                                     Padding="16 10 16 0"
+                                     Text="{Binding RawPayload}"
+                                     VerticalContentAlignment="Top"
+                                     Classes="AtomexTextBox"
+                                     FontSize="16"
+                                     TextWrapping="Wrap"
+                                     BorderThickness="0"
+                                     IsReadOnly="True"
+                                     Height="176" />
+
+                        </TabItem>
+                        <TabItem Classes="WalletTabItem"
+                                 Height="50"
+                                 Width="220">
+                            <TabItem.Header>
+                                <TextBlock VerticalAlignment="Center"
+                                           HorizontalAlignment="Center"
+                                           FontSize="16"
+                                           Text="Bytes" />
+                            </TabItem.Header>
+                            <TextBox Margin="0 8 0 0"
+                                     Padding="16 10 16 0"
+                                     Text="{Binding BytesPayload}"
+                                     VerticalContentAlignment="Top"
+                                     Classes="AtomexTextBox"
+                                     FontSize="16"
+                                     TextWrapping="Wrap"
+                                     BorderThickness="0"
+                                     IsReadOnly="True"
+                                     Height="176" />
+
+                        </TabItem>
+                    </TabControl>
                     <Grid ColumnDefinitions="*,16,*"
                           Margin="0 32 0 0">
                         <controls:RoundedButton Grid.Column="0"

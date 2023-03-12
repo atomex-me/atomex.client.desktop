@@ -99,7 +99,7 @@ notarize_file() { # $1: path to file to notarize, $2: identifier
 }
 
 # upload for notarization
-#notarize_file "$ZIP_PATH" "$identifier"
+notarize_file "$ZIP_PATH" "$identifier"
 
 # staple result
 echo "## Stapling $APP_NAME"
@@ -112,7 +112,7 @@ dmg_file_name=$(find "$DIST_FOLDER" -type f -name "*.dmg")
 #notarize_file "$dmg_file_name" "$identifier"
 
 echo "## Stapling $dmg_file_name"
-#xcrun stapler staple "$dmg_file_name"
+xcrun stapler staple "$dmg_file_name"
 
 export PUB_DATE=$(date -u +"%a, %d %b %Y %T GMT")
 export DESCRIPTION="Atomex release ${VER} ${PUB_DATE}"

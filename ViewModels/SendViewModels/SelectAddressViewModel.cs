@@ -10,6 +10,7 @@ using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
 using Atomex.Client.Desktop.Common;
+using Atomex.Client.Desktop.Dialogs;
 using Atomex.Client.Desktop.ViewModels.Abstract;
 using Atomex.Common;
 using Atomex.Core;
@@ -23,7 +24,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         public Action BackAction { get; set; }
     }
 
-    public class SelectAddressViewModel : NavigatableSelectAddress
+    public class SelectAddressViewModel : NavigatableSelectAddress, IDialogViewModel
     {
         public Action<WalletAddressViewModel> ConfirmAction { get; set; }
         public SelectAddressMode SelectAddressMode { get; set; }
@@ -36,6 +37,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         [Reactive] public WalletAddressViewModel? SelectedAddress { get; set; }
         [ObservableAsProperty] public bool CanConfirm { get; }
         [ObservableAsProperty] public bool ExternalWarning { get; }
+        public Action? OnClose { get; set; }
 
         public SelectAddressViewModel()
         {
@@ -135,7 +137,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             SelectedAddress = selectedAddress != null
                 ? MyAddresses.FirstOrDefault(vm =>
                     vm.Address == selectedAddress && vm.TokenId == selectedTokenId)
-                : SelectAddressMode == SelectAddressMode.SendFrom
+                : SelectAddressMode is SelectAddressMode.SendFrom or SelectAddressMode.Connect
                     ? SelectDefaultAddress()
                     : null;
         }

@@ -1,0 +1,66 @@
+﻿<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:svg="clr-namespace:Avalonia.Svg.Skia;assembly=Avalonia.Svg.Skia"
+        xmlns:controls="clr-namespace:Atomex.Client.Desktop.Controls">
+    <Design.PreviewWith>
+        <Border Padding="80 50" Background="#122B50">
+            <StackPanel>
+                <controls:CopyButtonWithText />
+            </StackPanel>
+        </Border>
+    </Design.PreviewWith>
+
+    <Style Selector="controls|CopyButtonWithText">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate>
+                    <Border CornerRadius="4"
+                            Padding="8 4"
+                            Height="25">
+
+                        <StackPanel Orientation="Horizontal">
+                            <svg:Svg HorizontalAlignment="Left" />
+
+                            <TextBlock Name="CopyText"
+                                       FontFamily="{DynamicResource DefaultFontFamily}"
+                                       Foreground="{DynamicResource DefaultForegroundBrush}"
+                                       HorizontalAlignment="Stretch"
+                                       VerticalAlignment="Center"
+                                       Margin="5 0 0 0"
+                                       FontSize="13"
+                                       Text="Copy"
+                                       IsVisible="{Binding !$parent[controls:CopyButtonWithText].IsCopied}" />
+
+                            <TextBlock Name="CopiedText"
+                                       FontFamily="{DynamicResource DefaultFontFamily}"
+                                       Foreground="{DynamicResource DefaultForegroundBrush}"
+                                       HorizontalAlignment="Stretch"
+                                       VerticalAlignment="Center"
+                                       Margin="5 0 0 0"
+                                       FontSize="13"
+                                       Text="Copied"
+                                       IsVisible="{Binding $parent[controls:CopyButtonWithText].IsCopied}" />
+                        </StackPanel>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style Selector="controls|CopyButtonWithText /template/ svg|Svg">
+        <Setter Property="Path" Value="/Resources/Icons/copy-light.svg" />
+        <Setter Property="Width" Value="18" />
+    </Style>
+    <Style Selector="controls|CopyButtonWithText[IsCopied=True] /template/ svg|Svg">
+        <Setter Property="Path" Value="/Resources/Icons/check-mark.svg" />
+    </Style>
+    <Style Selector="controls|CopyButtonWithText /template/ Border">
+        <Setter Property="Background" Value="{DynamicResource GrayBlue}" />
+    </Style>
+    <Style Selector="controls|CopyButtonWithText:pointerover /template/ Border">
+        <Setter Property="Background" Value="{DynamicResource BlueSky}" />
+    </Style>
+    <Style Selector="controls|CopyButtonWithText[IsCopied=True] /template/ Border">
+        <Setter Property="Background" Value="{DynamicResource Emerald}" />
+    </Style>
+</Styles>

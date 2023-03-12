@@ -6,8 +6,8 @@
         <UseAppHost>true</UseAppHost>
         <ApplicationIcon>Resources/Images/atomex_logo_256x256_ico.ico</ApplicationIcon>
 
-        <AssemblyVersion>1.2.42</AssemblyVersion>
-        <Version>1.2.42</Version>
+        <AssemblyVersion>1.2.63</AssemblyVersion>
+        <Version>1.2.63</Version>
     </PropertyGroup>
     <Choose>
         <When Condition=" '$(Configuration)' == 'Debug' ">
@@ -51,7 +51,7 @@
         <PackageReference Include="Serilog.Extensions.Logging" Version="3.1.0" />
         <PackageReference Include="ReactiveUI.Fody" Version="16.4.1" />
         <PackageReference Include="AsyncImageLoader.Avalonia" Version="2.4.0" />
-        <PackageReference Include="Beacon.Sdk" Version="1.0.9" />
+        <PackageReference Include="Beacon.Sdk" Version="1.0.19" />
     </ItemGroup>
     
     <ItemGroup>
@@ -226,6 +226,9 @@
         <Compile Update="Views\DappsViews\PermissionRequestView.axaml.cs">
           <DependentUpon>PermissionRequestView.axaml</DependentUpon>
           <SubType>Code</SubType>
+        </Compile>
+        <Compile Update="Controls\CopyButtonWithText.axaml.cs">
+          <DependentUpon>CopyButtonWithStyles.axaml</DependentUpon>
         </Compile>
     </ItemGroup>
     <ItemGroup>
