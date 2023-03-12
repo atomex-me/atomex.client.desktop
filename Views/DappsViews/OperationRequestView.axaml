@@ -106,7 +106,7 @@
                                        FontSize="16"
                                        Margin="8 0"
                                        VerticalAlignment="Center"
-                                       Text="{Binding ConnectedAddress.Address,
+                                       Text="{Binding ConnectedAddress,
                                        Converter={x:Static converters:StringConverters.ToShortenedAddress}}" />
 
                             <TextBlock FontSize="16"
@@ -115,7 +115,7 @@
                                        Foreground="{DynamicResource SecondaryForegroundBrush}">
                                 <TextBlock.Text>
                                     <MultiBinding Converter="{StaticResource AmountToStringConverter}">
-                                        <Binding Path="ConnectedAddress.Balance" />
+                                        <Binding Path="ConnectedAddressBalance" />
                                         <Binding Path="TezosFormat" />
                                     </MultiBinding>
                                 </TextBlock.Text>
@@ -271,6 +271,7 @@
                               Foreground="{DynamicResource DefaultForegroundBrush}"
                               Content="Use default fees" />
 
+                    <!-- use default fee-->
                     <StackPanel IsVisible="{Binding UseDefaultFee}">
                         <Button Classes="EmptyBtnWithContent"
                                 Padding="0"
@@ -430,6 +431,7 @@
                         </StackPanel>
                     </StackPanel>
 
+                    <!-- mannually fees -->
                     <Grid ColumnDefinitions="*,Auto"
                           RowDefinitions="48,48,48,48"
                           IsVisible="{Binding !UseDefaultFee}">
@@ -607,7 +609,7 @@
                             Padding="14"
                             Background="{DynamicResource DarkRedOpacity10}"
                             CornerRadius="6"
-                            IsVisible="{Binding AutofillError}">
+                            IsVisible="{Binding AutoFillError}">
                         <Grid ColumnDefinitions="Auto,*">
                             <svg:Svg Grid.Column="0"
                                      Width="18"

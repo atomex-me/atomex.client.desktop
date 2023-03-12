@@ -113,10 +113,7 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
                 AppUrl = "https://atomex.me",
                 IconUrl = "https://bcd-static-assets.fra1.digitaloceanspaces.com/dapps/atomex/atomex_logo.jpg",
                 KnownRelayServers = Constants.KnownRelayServers,
-
-                DatabaseConnectionString = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
-                    ? $"Filename={pathToDb}; Connection=Shared;"
-                    : $"Filename={pathToDb}; Mode=Exclusive;"
+                DatabaseConnectionString = $"Filename={pathToDb};Connection=direct;Upgrade=true"
             };
 
             _app.AtomexClientChanged += OnAtomexClientChangedEventHandler;
@@ -436,7 +433,7 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
                     Fee          = Fee.FromNetwork(defaultValue: 0),
                     From         = connectedWalletAddress.Address,
                     GasLimit     = GasLimit.FromNetwork(defaultValue: operationGasLimit),
-                    StorageLimit = StorageLimit.FromNetwork(defaultValue: 0)
+                    StorageLimit = StorageLimit.FromValue(0)
                 });
             }
 
@@ -479,7 +476,7 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
                         Content      = txContent,
                         Fee          = Fee.FromNetwork(defaultValue: 0),
                         GasLimit     = GasLimit.FromNetwork(defaultValue: operationGasLimit),
-                        StorageLimit = StorageLimit.FromNetwork(defaultValue: StorageLimitPerOperation),
+                        StorageLimit = StorageLimit.FromNetwork(defaultValue: StorageLimitPerOperation, useSafeValue: false),
                         From         = connectedWalletAddress.Address
                     });
                 }
@@ -498,7 +495,7 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
                         },
                         Fee          = Fee.FromNetwork(defaultValue: 0),
                         GasLimit     = GasLimit.FromNetwork(defaultValue: operationGasLimit),
-                        StorageLimit = StorageLimit.FromNetwork(defaultValue: StorageLimitPerOperation),
+                        StorageLimit = StorageLimit.FromNetwork(defaultValue: StorageLimitPerOperation, useSafeValue: false),
                         From         = connectedWalletAddress.Address
                     });
                 }

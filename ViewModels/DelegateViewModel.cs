@@ -201,7 +201,7 @@ namespace Atomex.Client.Desktop.ViewModels
                         @delegate: SelectedBaker?.Address,
                         fee: Blockchain.Tezos.Fee.FromNetwork(defaultValue: fee.ToMicroTez()),
                         gasLimit: GasLimit.FromNetwork((int)_tezosConfig.GasLimit),
-                        storageLimit: StorageLimit.FromNetwork((int)_tezosConfig.StorageLimit),
+                        storageLimit: StorageLimit.FromNetwork((int)_tezosConfig.StorageLimit, useSafeValue: true),
                         cancellationToken: cancellationToken)
                     .ConfigureAwait(false);
 
@@ -511,7 +511,7 @@ namespace Atomex.Client.Desktop.ViewModels
                                 From         = delegateAddress,
                                 Fee          = Blockchain.Tezos.Fee.FromNetwork(),
                                 GasLimit     = GasLimit.FromNetwork(defaultValue: (int)_tezosConfig.GasLimit),
-                                StorageLimit = StorageLimit.FromNetwork(defaultValue: (int)_tezosConfig.StorageLimit)
+                                StorageLimit = StorageLimit.FromNetwork(defaultValue: (int)_tezosConfig.StorageLimit, useSafeValue: true)
                             }
                         },
                         publicKey: securePublicKey.ToUnsecuredBytes(),

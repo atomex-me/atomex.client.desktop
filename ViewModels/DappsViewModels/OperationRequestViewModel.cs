@@ -243,7 +243,8 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
         public string DappName { get; set; }
         public string SubTitle => $"{DappName} requests to confirm operations";
         public string? DappLogo { get; set; }
-        public WalletAddress ConnectedAddress { get; set; }
+        public string ConnectedAddress { get; set; }
+        public decimal ConnectedAddressBalance { get; set; }
 
         public string TezosFormat =>
             DecimalExtensions.GetFormatWithPrecision((int)Math.Round(Math.Log10(TezosConfig.XtzDigitsMultiplier)));
@@ -273,6 +274,10 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
         [ObservableAsProperty] public bool IsSending { get; }
         [ObservableAsProperty] public bool IsRejecting { get; }
 
+        public OperationRequestViewModel()
+        {
+        }
+
         public OperationRequestViewModel(
             IEnumerable<TezosOperationParameters> operations,
             WalletAddress connectedAddress,
@@ -280,7 +285,8 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
             TezosConfig tezosConfig)
         {
             Tezos = tezosConfig;
-            ConnectedAddress = connectedAddress;
+            ConnectedAddress = connectedAddress.Address;
+            ConnectedAddressBalance = connectedAddress.Balance.ToTez();
             InitialOperations = operations;
             DefaultOperationGasLimit = operationGasLimit;
 
@@ -418,7 +424,8 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
                 return;
             }
 
-            var operations = InitialOperations.Select(op =>
+            var operations = InitialOperations
+                .Select(op =>
                 {
                     var operation = new TezosOperationParameters
                     {
@@ -426,7 +433,7 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
                         Fee          = UseDefaultFee ? Fee.FromNetwork() : op.Fee,
                         GasLimit     = UseDefaultFee ? GasLimit.FromNetwork(DefaultOperationGasLimit) : op.GasLimit,
                         StorageLimit = UseDefaultFee
-                            ? StorageLimit.FromNetwork(DappsViewModel.StorageLimitPerOperation)
+                            ? StorageLimit.FromNetwork(DappsViewModel.StorageLimitPerOperation, useSafeValue: false)
                             : op.StorageLimit,
                         Content = op.Content switch
                         {
@@ -496,6 +503,7 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
                 foreach (var op in operations)
                 {
                     op.Fee = Fee.FromValue(avgFee);
+                    op.Content.Fee = avgFee;
                 }
             }
 
@@ -512,6 +520,7 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
                 foreach (var op in operations)
                 {
                     op.Fee = Fee.FromValue(avgFee);
+                    op.Content.Fee = avgFee;
                 }
             }
 
@@ -649,11 +658,8 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
         {
             DappName = "objkt.com";
             DappLogo = "";
-            ConnectedAddress = new WalletAddress
-            {
-                Address = "tzhSFN6677KThcTkTai3P1acVQtrujkkvVd",
-                Balance = 3633123
-            };
+            ConnectedAddress = "tzhSFN6677KThcTkTai3P1acVQtrujkkvVd";
+            ConnectedAddressBalance = 0.363312m;
 
             DetailsOpened = true;
             // TotalFees = (decimal)0.222223121331233;

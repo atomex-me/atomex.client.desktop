@@ -345,7 +345,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     amount: AmountToSend.ToMicroTez(),
                     fee: fee,
                     gasLimit: GasLimit.FromNetwork(defaultValue: (int)xtzConfig.GasLimit),
-                    storageLimit: StorageLimit.FromNetwork(defaultValue: (int)xtzConfig.StorageLimit),
+                    storageLimit: StorageLimit.FromNetwork(defaultValue: (int)xtzConfig.StorageLimit, useSafeValue: true),
                     entrypoint: null,
                     parameters: null,
                     cancellationToken: cancellationToken)
