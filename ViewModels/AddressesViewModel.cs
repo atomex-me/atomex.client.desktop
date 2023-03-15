@@ -21,7 +21,6 @@ using Atomex.Core;
 using Atomex.Cryptography;
 using Atomex.ViewModels;
 using Atomex.Wallet;
-using Atomex.Wallet.Tezos;
 
 namespace Atomex.Client.Desktop.ViewModels
 {

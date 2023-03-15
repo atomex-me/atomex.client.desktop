@@ -38,7 +38,7 @@
       }
     },
     "TestNet": {
-      "DefaultClientType": "WebSocketAtomexClient",
+      "DefaultClientType": "WebSocketAtomexClientLegacy",
       "WebSocketAtomexClient": {
         "AuthTokenBaseUrl": "https://api.test.atomex.me/v1/",
         "Exchange": {

@@ -1,5 +1,10 @@
 ﻿using System;
+using System.Reactive.Linq;
 
+using ReactiveUI;
+using ReactiveUI.Fody.Helpers;
+
+using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
 
 namespace Atomex.Client.Desktop.ViewModels
@@ -23,8 +28,8 @@ namespace Atomex.Client.Desktop.ViewModels
     {
         public string Id { get; set; }
 
-        public SwapCompactState CompactState { get; set; }
-        public SwapMode Mode { get; set; }
+        [Reactive] public SwapCompactState CompactState { get; set; }
+        [Reactive] public SwapMode Mode { get; set; }
         public DateTime Time { get; set; }
         public DateTime LocalTime => Time.ToLocalTime();
 
@@ -41,22 +46,23 @@ namespace Atomex.Client.Desktop.ViewModels
         public decimal Price { get; set; }
         public string PriceFormat { get; set; }
 
-        public SwapDetailsViewModel Details { get; set; }
-        
-        public string State
+        [Reactive] public SwapDetailsViewModel Details { get; set; }
+
+        public SwapViewModel()
         {
-            get
-            {
-                return CompactState switch
+            this.WhenAnyValue(vm => vm.CompactState)
+                .Select(s => s switch
                 {
-                    SwapCompactState.Canceled   => "Canceled",
+                    SwapCompactState.Canceled => "Canceled",
                     SwapCompactState.InProgress => "In Progress",
-                    SwapCompactState.Completed  => "Completed",
-                    SwapCompactState.Refunded   => "Refunded",
-                    SwapCompactState.Unsettled  => "Unsettled",
+                    SwapCompactState.Completed => "Completed",
+                    SwapCompactState.Refunded => "Refunded",
+                    SwapCompactState.Unsettled => "Unsettled",
                     _ => throw new ArgumentOutOfRangeException(),
-                };
-            }
+                })
+                .ToPropertyExInMainThread(this, vm => vm.State);
         }
+
+        [ObservableAsProperty] public string State { get; }
     }
 }

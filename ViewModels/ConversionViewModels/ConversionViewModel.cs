@@ -878,6 +878,7 @@ namespace Atomex.Client.Desktop.ViewModels
                 UpdateRewardForRedeemInBase();
                 UpdateEstimatedMakerNetworkFeeInBase();
                 UpdateTotalNetworkFeeInBase();
+
             }, DispatcherPriority.Background);
         }
 
@@ -957,7 +958,7 @@ namespace Atomex.Client.Desktop.ViewModels
                     }
                     else
                     {
-                        var isNewSwap = !Swaps.Any() || args.Swap.TimeStamp > Swaps[0].Time;
+                        var isNewSwap = !Swaps.Any() || args.Swap.TimeStamp.ToUniversalTime() > Swaps[0].Time.ToUniversalTime();
 
                         if (isNewSwap && CurrentSortDirection == SortDirection.Desc)
                         {

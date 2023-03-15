@@ -39,15 +39,6 @@ namespace Atomex.Client.Desktop.Services
         XtzAdditionalDescriptionTemplate,
         EthAdditionalDescriptionTemplate,
     }
-
-    public enum SwapStateTemplate
-    {
-        SwapCanceledTemplate,
-        SwapInProgressTemplate,
-        SwapCompletedTemplate,
-        SwapRefundTemplate,
-        SwapUnsettledTemplate
-    }
     
     public enum BeaconOperationTemplate
     {
@@ -68,7 +59,6 @@ namespace Atomex.Client.Desktop.Services
             LoadTemplates(typeof(TxTypeTemplate));
             LoadTemplates(typeof(TxStateTemplate));
             LoadTemplates(typeof(TxDetailsTemplate));
-            LoadTemplates(typeof(SwapStateTemplate));
             LoadTemplates(typeof(TxDescriptionTemplate));
             LoadTemplates(typeof(BeaconOperationTemplate));
         }
@@ -93,14 +83,7 @@ namespace Atomex.Client.Desktop.Services
                 ? template
                 : Templates[TxDetailsTemplate.TransactionDetailsTemplate.ToString()];
         }
-        
-        public DataTemplate GetSwapStateTemplate(SwapStateTemplate templateType)
-        {
-            return Templates.TryGetValue(templateType.ToString(), out var template)
-                ? template
-                : Templates[SwapStateTemplate.SwapUnsettledTemplate.ToString()];
-        }
-        
+
         public DataTemplate GetTxDescriptionTemplate(TxDescriptionTemplate templateType)
         {
             return Templates.TryGetValue(templateType.ToString(), out var template)

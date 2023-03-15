@@ -40,6 +40,7 @@
   <UserControl.Resources>
     <converters:AmountToStringConverter x:Key="AmountToStringConverter"/>
     <converters:DateTimeToTxTimeConverter x:Key="DateTimeToTxTimeConverter"/>
+    <converters:CompactStateToBoolConverter x:Key="CompactStateToBoolConverter"/>
   </UserControl.Resources>
 
   <Grid Name="DesignGrid"
@@ -700,11 +701,12 @@
                          VerticalAlignment="Center"/>
             </StackPanel>
 
-            <styles:TypeTest Grid.Column="1">
-              <styles:TypeTest.DataTemplate>
-                <controls:SwapStateDataTemplateSelector/>
-              </styles:TypeTest.DataTemplate>
-            </styles:TypeTest>
+            <UserControl Grid.Column="1"
+                         Classes.SwapCanceled="{Binding CompactState, Converter={StaticResource CompactStateToBoolConverter}, ConverterParameter=Canceled}"
+                         Classes.SwapInProgress="{Binding CompactState, Converter={StaticResource CompactStateToBoolConverter}, ConverterParameter=InProgress}"
+                         Classes.SwapCompleted="{Binding CompactState, Converter={StaticResource CompactStateToBoolConverter}, ConverterParameter=Completed}"
+                         Classes.SwapRefund="{Binding CompactState, Converter={StaticResource CompactStateToBoolConverter}, ConverterParameter=Refunded}"
+                         Classes.SwapUnsettled="{Binding CompactState, Converter={StaticResource CompactStateToBoolConverter}, ConverterParameter=Unsettled}"/>
 
             <TextBlock Grid.Column="2"
                        Text="{Binding LocalTime, Converter={StaticResource DateTimeToTxTimeConverter}}"
@@ -717,106 +719,5 @@
         </DataTemplate>
       </ListBox.ItemTemplate>
     </ListBox>
-      
-    <!-- swaps -->
-    <!--<DataGrid x:Name="DgConversions"
-              Margin="48 16 48 7"
-              Background="Transparent"
-              AutoGenerateColumns="False"
-              IsReadOnly="True"
-              Cursor="Hand"
-              RowDetailsVisibilityMode="VisibleWhenSelected"
-              SelectionMode="Single"
-              SelectedIndex="{Binding SelectedSwapIndex, Mode=OneWay}"
-              Items="{Binding Swaps}"
-              Grid.Column="0"
-              Grid.Row="4"
-              VerticalScrollBarVisibility="Visible"
-              Classes="RedesignGrid NoCloseRightPopup">
-        <DataGrid.Columns>
-            <DataGridTemplateColumn Header="From - To"
-                                    CanUserSort="False"
-                                    Width="*">
-                <DataGridTemplateColumn.CellTemplate>
-                    <DataTemplate DataType="{x:Type vm:SwapViewModel}">
-                        <StackPanel Orientation="Horizontal"
-                                    Margin="10 0 10 0">
-                            <svg:Svg Width="28"
-                                      VerticalAlignment="Center"
-                                      Path="{Binding FromCurrencyViewModel.IconPath}"/>
-
-                            <StackPanel Orientation="Horizontal"
-                                        Margin="9 0 0 0"
-                                        MinWidth="150">
-                                <TextBlock Margin="0 12 0 12"
-                                           FontFamily="{DynamicResource DefaultLightFontFamily}"
-                                           FontSize="16"
-                                           Foreground="{DynamicResource DefaultForegroundBrush}"
-                                           VerticalAlignment="Center">
-                                    <TextBlock.Text>
-                                        <MultiBinding Converter="{StaticResource AmountToStringConverter}">
-                                            <Binding Path="FromAmount" Mode="OneWay"/>
-                                            <Binding Path="FromAmountFormat" Mode="OneWay"/>
-                                        </MultiBinding>
-                                    </TextBlock.Text>
-                                </TextBlock>
-                                <TextBlock Margin="6 0 0 0"
-                                            Text="{Binding FromCurrencyViewModel.CurrencyName}"
-                                            FontFamily="{DynamicResource DefaultLightFontFamily}"
-                                            FontSize="16"
-                                            Foreground="{DynamicResource DefaultForegroundBrush}"
-                                            VerticalAlignment="Center"/>
-                            </StackPanel>
-
-                            <Path Margin="30 0 30 0"
-                                  Width="12"
-                                  Height="12"
-                                  Stretch="Fill"
-                                  Data="{DynamicResource SwapArrows}"
-                                  Fill="{DynamicResource LightDefaultOpacity50}"/>
-
-                            <svg:Svg Width="28"
-                                      VerticalAlignment="Center"
-                                      Path="{Binding ToCurrencyViewModel.IconPath}"/>
-
-                            <TextBlock Margin="9 0 0 0"
-                                        FontFamily="{DynamicResource DefaultLightFontFamily}"
-                                        FontSize="16"
-                                        Foreground="{DynamicResource DefaultForegroundBrush}"
-                                        VerticalAlignment="Center">
-                                <TextBlock.Text>
-                                    <MultiBinding Converter="{StaticResource AmountToStringConverter}">
-                                        <Binding Path="ToAmount" Mode="OneWay"/>
-                                        <Binding Path="ToAmountFormat" Mode="OneWay"/>
-                                    </MultiBinding>
-                                </TextBlock.Text>
-                            </TextBlock>
-                            <TextBlock Margin="6 0 0 0"
-                                        Text="{Binding ToCurrencyViewModel.CurrencyName}"
-                                        FontFamily="{DynamicResource DefaultLightFontFamily}"
-                                        FontSize="16"
-                                        Foreground="{DynamicResource DefaultForegroundBrush}"
-                                        VerticalAlignment="Center"/>
-                        </StackPanel>
-                    </DataTemplate>
-                </DataGridTemplateColumn.CellTemplate>
-            </DataGridTemplateColumn>
-            <DataGridTemplateColumn Header="Status"
-                                    MinWidth="82">
-                <DataGridTemplateColumn.CellTemplate>
-                    <DataTemplate>
-                        <styles:TypeTest>
-                            <styles:TypeTest.DataTemplate>
-                                <controls:SwapStateDataTemplateSelector/>
-                            </styles:TypeTest.DataTemplate>
-                        </styles:TypeTest>
-                    </DataTemplate>
-                </DataGridTemplateColumn.CellTemplate>
-            </DataGridTemplateColumn>
-            <DataGridTextColumn Header="Time"
-                                MinWidth="158"
-                                Binding="{Binding LocalTime, Converter={StaticResource DateTimeToTxTimeConverter}}"/>
-        </DataGrid.Columns>
-    </DataGrid>-->
   </Grid>
 </UserControl>

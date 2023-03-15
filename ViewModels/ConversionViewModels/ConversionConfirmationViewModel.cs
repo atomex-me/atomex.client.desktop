@@ -146,10 +146,6 @@ namespace Atomex.Client.Desktop.ViewModels
 
                 var fromWallets = await GetFromAddressesAsync();
 
-                foreach (var fromWallet in fromWallets)
-                    if (fromWallet.Currency != FromCurrencyViewModel.Currency.Name)
-                        fromWallet.Currency = FromCurrencyViewModel.Currency.Name;
-
                 // check balances
                 var errors = await BalanceChecker.CheckBalancesAsync(_app.Account, fromWallets);
 
@@ -238,6 +234,10 @@ namespace Atomex.Client.Desktop.ViewModels
 
                 if (fromWalletsWithProofs == null)
                     return new Error(Errors.SwapError, "Can't create proofs for used wallets");
+
+                foreach (var fromWalletWithProof in fromWalletsWithProofs)
+                    if (fromWalletWithProof.Currency != FromCurrencyViewModel.Currency.Name)
+                        fromWalletWithProof.Currency = FromCurrencyViewModel.Currency.Name;
 
                 atomexClient.OrderSendAsync(new V1.Entities.Order
                 {
