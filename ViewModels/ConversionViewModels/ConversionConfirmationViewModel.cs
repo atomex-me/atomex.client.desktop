@@ -9,6 +9,7 @@ using Avalonia.Controls;
 using ReactiveUI;
 using Serilog;
 
+using Atomex.Blockchain.Bitcoin;
 using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.Properties;
 using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
@@ -104,17 +105,17 @@ namespace Atomex.Client.Desktop.ViewModels
 
                 if (error != null)
                 {
-                    if (error.Code == Errors.PriceHasChanged)
+                    if (error.Value.Code == Errors.PriceHasChanged)
                     {
                         App.DialogService.Show(MessageViewModel.Message(
                             title: Resources.SvFailed,
-                            text: error.Description,
+                            text: error.Value.Message,
                             backAction: () => App.DialogService.Show(this)));
                     }
                     else
                     {
                         App.DialogService.Show(MessageViewModel.Error(
-                            text: error.Description,
+                            text: error.Value.Message,
                             backAction: () => App.DialogService.Show(this)));
                     }
 
@@ -145,10 +146,6 @@ namespace Atomex.Client.Desktop.ViewModels
 
                 var fromWallets = await GetFromAddressesAsync();
 
-                foreach (var fromWallet in fromWallets)
-                    if (fromWallet.Currency != FromCurrencyViewModel.Currency.Name)
-                        fromWallet.Currency = FromCurrencyViewModel.Currency.Name;
-
                 // check balances
                 var errors = await BalanceChecker.CheckBalancesAsync(_app.Account, fromWallets);
 
@@ -165,7 +162,7 @@ namespace Atomex.Client.Desktop.ViewModels
                     .GetSymbols(_app.Account.Network)
                     .SymbolByCurrencies(FromCurrencyViewModel.Currency, ToCurrencyViewModel.Currency);
 
-                var baseCurrency = _app.Account.Currencies.GetByName(symbol.Base);
+                var baseCurrency = account.Currencies.GetByName(symbol.Base);
                 var side         = symbol.OrderSideForBuyCurrency(ToCurrencyViewModel.Currency);
                 var atomexClient = _app.AtomexClient;
                 var price        = EstimatedPrice;
@@ -174,7 +171,7 @@ namespace Atomex.Client.Desktop.ViewModels
                 if (price == 0)
                     return new Error(Errors.NoLiquidity, Resources.CvNoLiquidity);
 
-                var qty = AmountHelper.AmountToSellQty(side, Amount, price, baseCurrency.DigitsMultiplier);
+                var qty = AmountHelper.AmountToSellQty(side, Amount, price, baseCurrency.Precision);
 
                 if (qty < symbol.MinimumQty)
                 {
@@ -182,7 +179,7 @@ namespace Atomex.Client.Desktop.ViewModels
                         side: side,
                         qty: symbol.MinimumQty,
                         price: price,
-                        digitsMultiplier: FromCurrencyViewModel.Currency.DigitsMultiplier);
+                        precision: FromCurrencyViewModel.Currency.Precision);
 
                     var message = string.Format(
                         provider: CultureInfo.InvariantCulture,
@@ -197,20 +194,23 @@ namespace Atomex.Client.Desktop.ViewModels
 
                 var order = new Order
                 {
-                    ClientOrderId     = Guid.NewGuid().ToByteArray().ToHexString(0, 16),
-                    Status            = OrderStatus.Pending,
-                    Symbol            = symbol.Name,
-                    TimeStamp         = DateTime.UtcNow,
-                    Price             = orderPrice,
-                    Qty               = qty,
-                    LeaveQty          = qty,
-                    Side              = side,
-                    Type              = OrderType.FillOrKill,
-                    FromWallets       = fromWallets.ToList(),
-                    MakerNetworkFee   = EstimatedMakerNetworkFee,
+                    ClientOrderId   = Guid.NewGuid().ToByteArray().ToHexString(0, 16),
+                    Status          = OrderStatus.Pending,
+                    Symbol          = symbol.Name,
+                    TimeStamp       = DateTime.UtcNow,
+                    Price           = orderPrice,
+                    Qty             = qty,
+                    LeaveQty        = qty,
+                    Side            = side,
+                    Type            = OrderType.FillOrKill,
+                    MakerNetworkFee = EstimatedMakerNetworkFee,
 
                     FromAddress = FromSource is FromAddress fromAddress ? fromAddress.Address : null,
-                    FromOutputs = FromSource is FromOutputs fromOutputs ? fromOutputs.Outputs.ToList() : null,
+                    FromOutputs = FromSource is FromOutputs fromOutputs
+                        ? fromOutputs.Outputs
+                            .Select(o => new BitcoinTxPoint { Hash = o.TxId, Index = o.Index })
+                            .ToList()
+                        : null,
 
                     // for Bitcoin based currencies ToAddress must be Atomex wallet's address!
                     ToAddress = isToBitcoinBased
@@ -221,32 +221,35 @@ namespace Atomex.Client.Desktop.ViewModels
                         : RedeemFromAddress
                 };
 
-                await order
-                    .CreateProofOfPossessionAsync(account);
-
-                await _app.Account
+                await _app
+                    .LocalStorage
                     .UpsertOrderAsync(order);
+
+                //await order
+                //    .CreateProofOfPossessionAsync(account);
+                var fromWalletsWithProofs = await fromWallets
+                    .CreateProofOfPossessionAsync(
+                        timeStamp: order.TimeStamp,
+                        account: account);
+
+                if (fromWalletsWithProofs == null)
+                    return new Error(Errors.SwapError, "Can't create proofs for used wallets");
+
+                foreach (var fromWalletWithProof in fromWalletsWithProofs)
+                    if (fromWalletWithProof.Currency != FromCurrencyViewModel.Currency.Name)
+                        fromWalletWithProof.Currency = FromCurrencyViewModel.Currency.Name;
 
                 atomexClient.OrderSendAsync(new V1.Entities.Order
                 {
-                    ClientOrderId = order.ClientOrderId,
-                    Symbol        = order.Symbol,
-                    TimeStamp     = order.TimeStamp,
-                    Price         = order.Price,
-                    Qty           = order.Qty,
-                    Side          = order.Side,
-                    Type          = order.Type,
-                    FromWallets   = order.FromWallets
-                        .Select(w => new V1.Entities.WalletAddress
-                        {
-                            Address           = w.Address,
-                            Currency          = w.Currency,
-                            Nonce             = w.Nonce,
-                            ProofOfPossession = w.ProofOfPossession,
-                            PublicKey         = w.PublicKey,
-                        })
-                        .ToList(),
-                    BaseCurrencyContract = GetSwapContract(order.Symbol.BaseCurrency()),
+                    ClientOrderId         = order.ClientOrderId,
+                    Symbol                = order.Symbol,
+                    TimeStamp             = order.TimeStamp,
+                    Price                 = order.Price,
+                    Qty                   = order.Qty,
+                    Side                  = order.Side,
+                    Type                  = order.Type,
+                    FromWallets           = fromWalletsWithProofs.ToList(),
+                    BaseCurrencyContract  = GetSwapContract(order.Symbol.BaseCurrency()),
                     QuoteCurrencyContract = GetSwapContract(order.Symbol.QuoteCurrency())
                 });
 
@@ -257,7 +260,9 @@ namespace Atomex.Client.Desktop.ViewModels
                 {
                     await Task.Delay(SwapCheckInterval);
 
-                    var currentOrder = _app.Account.GetOrderById(order.ClientOrderId);
+                    var currentOrder = _app
+                        .LocalStorage
+                        .GetOrderById(order.ClientOrderId);
 
                     if (currentOrder == null)
                         continue;
@@ -267,7 +272,8 @@ namespace Atomex.Client.Desktop.ViewModels
 
                     if (currentOrder.Status == OrderStatus.PartiallyFilled || currentOrder.Status == OrderStatus.Filled)
                     {
-                        var swap = (await _app.Account
+                        var swap = (await _app
+                            .LocalStorage
                             .GetSwapsAsync())
                             .FirstOrDefault(s => s.OrderId == currentOrder.Id);
 
@@ -294,12 +300,12 @@ namespace Atomex.Client.Desktop.ViewModels
             }
         }
 
-        private string GetSwapContract(string currency)
+        private string? GetSwapContract(string currency)
         {
-            if (currency == "ETH" || Currencies.IsEthereumToken(currency))
+            if (currency == "ETH" || Currencies.IsPresetEthereumToken(currency))
                 return _app.Account.Currencies.Get<EthereumConfig>(currency).SwapContractAddress;
 
-            if (currency == "XTZ" || Currencies.IsTezosToken(currency))
+            if (currency == "XTZ" || Currencies.IsPresetTezosToken(currency))
                 return _app.Account.Currencies.Get<TezosConfig>(currency).SwapContractAddress;
 
             return null;
@@ -309,7 +315,8 @@ namespace Atomex.Client.Desktop.ViewModels
         {
             if (FromSource is FromAddress fromAddress)
             {
-                var walletAddress = await _app.Account
+                var walletAddress = await _app
+                    .Account
                     .GetAddressAsync(FromCurrencyViewModel.Currency.Name, fromAddress.Address);
 
                 return new WalletAddress[] { walletAddress };
@@ -322,7 +329,6 @@ namespace Atomex.Client.Desktop.ViewModels
                     .Select(o => o.DestinationAddress(config.Network))
                     .Distinct()
                     .Select(async a => await _app.Account.GetAddressAsync(FromCurrencyViewModel.Currency.Name, a)));
-  
             }
 
             throw new NotSupportedException("Not supported type of From field");
@@ -348,21 +354,21 @@ namespace Atomex.Client.Desktop.ViewModels
             var btc = DesignTime.TestNetCurrencies.Get<BitcoinConfig>("BTC");
             var ltc = DesignTime.TestNetCurrencies.Get<LitecoinConfig>("LTC");
 
-            FromCurrencyViewModel     = CurrencyViewModelCreator.CreateOrGet(btc, subscribeToUpdates: false);
-            ToCurrencyViewModel       = CurrencyViewModelCreator.CreateOrGet(ltc, subscribeToUpdates: false);
+            FromCurrencyViewModel = CurrencyViewModelCreator.CreateOrGet(btc, subscribeToUpdates: false);
+            ToCurrencyViewModel   = CurrencyViewModelCreator.CreateOrGet(ltc, subscribeToUpdates: false);
 
-            FromSource                = new FromAddress("13V2gzjUL9DiHZLy1WFk9q6pZ3yBsb4TzP");
-            ToAddress                 = "13V2gzjUL9DiHZLy1WFk9q6pZ3yBsb4TzP";
+            FromSource            = new FromAddress("13V2gzjUL9DiHZLy1WFk9q6pZ3yBsb4TzP");
+            ToAddress             = "13V2gzjUL9DiHZLy1WFk9q6pZ3yBsb4TzP";
 
-            BaseCurrencyCode          = "LTC";
-            QuoteCurrencyCode         = "BTC";
-            PriceFormat               = $"F{FromCurrencyViewModel.Currency.Digits}";
-            EstimatedPrice            = 0.003m;
+            BaseCurrencyCode      = "LTC";
+            QuoteCurrencyCode     = "BTC";
+            PriceFormat           = $"F{FromCurrencyViewModel.Currency.Decimals}";
+            EstimatedPrice        = 0.003m;
 
-            Amount                    = 0.00001234m;
-            AmountInBase              = 10.23m;
-            TargetAmount              = Amount / EstimatedPrice;
-            TargetAmountInBase        = AmountInBase;
+            Amount                = 0.00001234m;
+            AmountInBase          = 10.23m;
+            TargetAmount          = Amount / EstimatedPrice;
+            TargetAmountInBase    = AmountInBase;
 
             EstimatedTotalNetworkFeeInBase = 23.43m;
         }

@@ -4,12 +4,14 @@ using System.Globalization;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
+
+using ReactiveUI;
+using ReactiveUI.Fody.Helpers;
+
+using Atomex.Common;
 using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
 using Atomex.Client.Desktop.ViewModels.TransactionViewModels;
-using Atomex.ViewModels;
-using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
 
 namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 {
@@ -21,6 +23,8 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         public ObservableCollection<TezosTokenViewModel> InitialTokens { get; set; }
         [Reactive] public string SearchPattern { get; set; }
         public TransactionViewModelBase? SelectedTransaction { get; set; }
+
+        public CollectiblesWalletViewModel() { }
 
         public CollectiblesWalletViewModel(Action<TezosTokenViewModel> showTezosCollectible)
         {
@@ -37,7 +41,8 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             this.WhenAnyValue(vm => vm.SearchPattern)
                 .WhereNotNull()
                 .SubscribeInMainThread(searchPattern =>
-                    Tokens = new ObservableCollection<TezosTokenViewModel>(InitialTokens.Where(token =>
+                    Tokens = new ObservableCollection<TezosTokenViewModel>(InitialTokens
+                        .Where(token =>
                         {
                             if (token.TokenBalance.Name != null)
                             {
@@ -50,11 +55,11 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                                 .Contains(searchPattern.ToLower());
                         })
                         .OrderByDescending(token => token.TotalAmount != 0)
-                        .ThenBy(token => token.TokenBalance.Name)));
+                        .ThenBy(token => token.TokenBalance.Name)
+                        .ToList()));
         }
 
         private ReactiveCommand<TezosTokenViewModel, Unit>? _onCollectibleClickCommand;
-
         public ReactiveCommand<TezosTokenViewModel, Unit> OnCollectibleClickCommand => _onCollectibleClickCommand ??=
             ReactiveCommand.Create<TezosTokenViewModel>(tezosTokenViewModel =>
                 ShowTezosCollectible?.Invoke(tezosTokenViewModel));

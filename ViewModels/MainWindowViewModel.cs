@@ -12,6 +12,7 @@ using Atomex.Client.Common;
 using Atomex.Client.Desktop.Controls;
 using Atomex.Client.Desktop.Properties;
 using Atomex.Wallet;
+using Atomex.LiteDb;
 
 namespace Atomex.Client.Desktop.ViewModels
 {
@@ -31,7 +32,6 @@ namespace Atomex.Client.Desktop.ViewModels
         }
 
         private ViewModelBase _content;
-
         public ViewModelBase Content
         {
             get => _content;
@@ -66,18 +66,17 @@ namespace Atomex.Client.Desktop.ViewModels
             ShowStart();
         }
 
-        private IAtomexApp _app;
+        private readonly IAtomexApp _app;
         private IMainView MainView { get; set; }
 
-
         private bool _hasAccount;
-
         public bool HasAccount
         {
             get => _hasAccount;
             set
             {
                 _hasAccount = value;
+
                 if (_hasAccount)
                 {
                     ShowContent(WalletMainViewModel);
@@ -89,7 +88,18 @@ namespace Atomex.Client.Desktop.ViewModels
                             OnRestored = () => AccountRestored = false
                         };
 
-                        restoreViewModel.ScanCurrenciesAsync();
+                        _ = restoreViewModel.ScanAsync(new LiteDbMigrationResult
+                        {
+                            { MigrationEntityType.Addresses, "BTC"},
+                            { MigrationEntityType.Addresses, "LTC"},
+                            { MigrationEntityType.Addresses, "ETH"},
+                            { MigrationEntityType.Addresses, "USDT" },
+                            { MigrationEntityType.Addresses, "WBTC" },
+                            { MigrationEntityType.Addresses, "TBTC" },
+                            { MigrationEntityType.Addresses, "XTZ"},
+                            { MigrationEntityType.Addresses, "FA12"},
+                            { MigrationEntityType.Addresses, "FA2"}
+                        });
                     }
                 }
                 else
@@ -103,13 +113,13 @@ namespace Atomex.Client.Desktop.ViewModels
         }
 
         private string? _startupData;
-
         public string? StartupData
         {
             get => _startupData;
             set
             {
                 _startupData = value;
+
                 if (!string.IsNullOrEmpty(_startupData) && HasAccount)
                 {
                     App.ConnectTezosDapp?.Invoke(_startupData);
@@ -179,7 +189,7 @@ namespace Atomex.Client.Desktop.ViewModels
             _app.AtomexClientChanged += OnAtomexClientChangedEventHandler;
         }
 
-        private void OnAtomexClientChangedEventHandler(object sender, AtomexClientChangedEventArgs args)
+        private void OnAtomexClientChangedEventHandler(object? sender, AtomexClientChangedEventArgs args)
         {
             if (_app?.Account == null)
             {
@@ -214,9 +224,8 @@ namespace Atomex.Client.Desktop.ViewModels
         private ICommand _signOutCommand;
         public ICommand SignOutCommand => _signOutCommand ??= ReactiveCommand.Create(() => SignOut());
 
-        private bool _userIgnoreActiveSwaps { get; set; }
-
-        private UnlockViewModel _unlockViewModel { get; set; }
+        private bool _userIgnoreActiveSwaps;
+        private UnlockViewModel _unlockViewModel;
 
         private async Task SignOut(bool withAppUpdate = false)
         {
@@ -232,6 +241,7 @@ namespace Atomex.Client.Desktop.ViewModels
                         nextAction: () =>
                         {
                             _userIgnoreActiveSwaps = true;
+
                             if (withAppUpdate)
                             {
                                 OnUpdateClick();
@@ -248,7 +258,11 @@ namespace Atomex.Client.Desktop.ViewModels
 
                 _ = Dispatcher.UIThread.InvokeAsync(() => { App.DialogService.Close(); });
 
-                _app.ChangeAtomexClient(atomexClient: null, account: null);
+                _app.ChangeAtomexClient(
+                    atomexClient: null,
+                    account: null,
+                    localStorage: null);
+
                 _userIgnoreActiveSwaps = false;
 
                 ShowStart();
@@ -295,10 +309,7 @@ namespace Atomex.Client.Desktop.ViewModels
                 walletName: accountName,
                 unlockAction: password =>
                 {
-                    var _ = Account.LoadFromFile(
-                        pathToAccount: pathToAccount,
-                        password: password,
-                        currenciesProvider: _app.CurrenciesProvider);
+                    var _ = HdWallet.LoadFromFile(pathToAccount, password);
                 },
                 goBack: async () => await SignOut(),
                 onUnlock: async () =>
@@ -359,12 +370,18 @@ namespace Atomex.Client.Desktop.ViewModels
                     else
                     {
                         await Task.Delay(delayInterval);
-                        if (!_hasAccount) return;
+
+                        if (!_hasAccount)
+                            return;
                     }
 
-                    if (AccountRestored || Content is UnlockViewModel) continue;
+                    if (AccountRestored || Content is UnlockViewModel)
+                        continue;
+
                     var messages = await Atomex.ViewModels.Helpers.GetUserMessages(userId);
-                    if (messages == null) continue;
+
+                    if (messages == null)
+                        continue;
 
                     foreach (var message in messages.Where(message => !message.IsReaded))
                     {

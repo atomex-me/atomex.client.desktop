@@ -1,30 +1,60 @@
-﻿using Atomex.Blockchain.Abstract;
-using Atomex.Blockchain.BitcoinBased;
+﻿using Atomex.Blockchain;
+using Atomex.Blockchain.Abstract;
+using Atomex.Blockchain.Bitcoin;
+using Atomex.Core;
 
 namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
 {
     public class BitcoinBasedTransactionViewModel : TransactionViewModel
     {
         public BitcoinBasedTransactionViewModel(
-            IBitcoinBasedTransaction tx,
-            BitcoinBasedConfig bitcoinBasedConfig)
-            : base(tx, bitcoinBasedConfig, tx.Amount / bitcoinBasedConfig.DigitsMultiplier,
-                GetFee(tx, bitcoinBasedConfig))
+            BitcoinTransaction tx,
+            TransactionMetadata? metadata,
+            BitcoinBasedConfig config)
+            : base(
+                tx: tx,
+                metadata: metadata,
+                config: config,
+                amount: GetAmount(metadata, config),
+                fee: GetFee(metadata, config),
+                type: GetType(metadata))
         {
-            Fee = tx.Fees != null
-                ? tx.Fees.Value / bitcoinBasedConfig.DigitsMultiplier
-                : 0; // todo: N/A
+        }
+
+        public override void UpdateMetadata(ITransactionMetadata metadata, CurrencyConfig config)
+        {
+            TransactionMetadata = metadata;
+            Amount = GetAmount((TransactionMetadata)metadata, (BitcoinBasedConfig)config);
+            Fee = GetFee((TransactionMetadata)metadata, (BitcoinBasedConfig)config);
+            Type = GetType((TransactionMetadata)metadata);
+            Description = GetDescription(
+                type: Type,
+                amount: Amount,
+                decimals: config.Decimals,
+                currencyCode: config.Name);
+            Direction = Amount <= 0 ? "to " : "from ";
+
+            IsReady = metadata != null;
+        }
+
+        private static decimal GetAmount(
+            TransactionMetadata? metadata,
+            BitcoinBasedConfig config)
+        {
+            return metadata != null ? config.SatoshiToCoin(metadata.Amount) : 0;
         }
 
         private static decimal GetFee(
-            IBitcoinBasedTransaction tx,
-            BitcoinBasedConfig bitcoinBasedConfig)
+            TransactionMetadata? metadata,
+            BitcoinBasedConfig config)
         {
-            return tx.Fees != null
-                ? tx.Type.HasFlag(BlockchainTransactionType.Output)
-                    ? tx.Fees.Value / bitcoinBasedConfig.DigitsMultiplier
-                    : 0
-                : 0;
+            return metadata != null ? config.SatoshiToCoin(metadata.Fee) : 0;
+        }
+
+        private static TransactionType GetType(
+            TransactionMetadata? metadata)
+        {
+            return metadata?.Type ?? TransactionType.Unknown;
         }
     }
 }

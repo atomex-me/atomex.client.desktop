@@ -6,20 +6,23 @@ using Avalonia.Controls;
 using Avalonia.Threading;
 using Serilog;
 
+using Atomex.Blockchain;
 using Atomex.Blockchain.Abstract;
 using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.Properties;
 using Atomex.Client.Desktop.ViewModels.Abstract;
+using Atomex.Common;
 using Atomex.Core;
+using Atomex.EthereumTokens;
 using Atomex.MarketData.Abstract;
 using Atomex.Wallet.Ethereum;
-using Atomex.Common;
 
 namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 {
     public class Erc20SendViewModel : EthereumSendViewModel
     {
         public override string TotalFeeCurrencyCode => Currency.FeeCurrencyName;
+        public override long GasLimit => ((Erc20Config)Currency).TransferGasLimit;
 
         public Erc20SendViewModel()
             : base()
@@ -44,30 +47,39 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 var account = _app.Account
                     .GetCurrencyAccount<Erc20Account>(Currency.Name);
 
-                var maxAmountEstimation = await account.EstimateMaxAmountToSendAsync(
+                var maxAmountEstimation = (EthereumMaxAmountEstimation)await account.EstimateMaxAmountToSendAsync(
                     from: From,
-                    type: BlockchainTransactionType.Output,
+                    type: TransactionType.Output,
                     gasLimit: UseDefaultFee ? null : GasLimit,
-                    gasPrice: UseDefaultFee ? null : GasPrice,
+                    maxFeePerGas: UseDefaultFee ? null : MaxFeePerGas,
                     reserve: false);
 
-                if (UseDefaultFee) {
-                    if (maxAmountEstimation.Fee > 0) {
-                        GasPrice = decimal.ToInt32(Currency.GetFeePriceFromFeeAmount(maxAmountEstimation.Fee, GasLimit));
-                    } else {
-                        GasPrice = decimal.ToInt32(await Currency.GetDefaultFeePriceAsync());
+                var erc20Config = (Erc20Config)Currency;
+                var gasPrice = maxAmountEstimation.GasPrice;
+
+                if (gasPrice == null)
+                    (gasPrice, _) = await erc20Config.GetGasPriceAsync();
+
+                if (gasPrice != null)
+                {
+                    if (UseDefaultFee)
+                    {
+                        MaxFeePerGas = gasPrice.MaxFeePerGas;
+                        MaxPriorityFeePerGas = gasPrice.MaxPriorityFeePerGas;
                     }
+
+                    BaseFeePerGas = gasPrice.SuggestBaseFee;
                 }
 
                 if (maxAmountEstimation.Error != null)
                 {
-                    Warning = maxAmountEstimation.Error.Description;
-                    WarningToolTip = maxAmountEstimation.Error.Details;
+                    Warning = maxAmountEstimation.Error.Value.Message;
+                    WarningToolTip = maxAmountEstimation.ErrorHint;
                     WarningType = MessageType.Error;
                     return;
                 }
 
-                if (Amount > maxAmountEstimation.Amount)
+                if (Amount > maxAmountEstimation.Amount.FromTokens(erc20Config.Decimals))
                 {
                     Warning = Resources.CvInsufficientFunds;
                     WarningToolTip = "";
@@ -92,20 +104,22 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     // estimate max amount with new GasPrice
                     var maxAmountEstimation = await account.EstimateMaxAmountToSendAsync(
                         from: From,
-                        type: BlockchainTransactionType.Output,
+                        type: TransactionType.Output,
                         gasLimit: GasLimit,
-                        gasPrice: GasPrice,
+                        maxFeePerGas: MaxFeePerGas,
                         reserve: false);
 
                     if (maxAmountEstimation.Error != null)
                     {
-                        Warning = maxAmountEstimation.Error.Description;
-                        WarningToolTip = maxAmountEstimation.Error.Details;
+                        Warning = maxAmountEstimation.Error.Value.Message;
+                        WarningToolTip = maxAmountEstimation.ErrorHint;
                         WarningType = MessageType.Error;
                         return;
                     }
 
-                    if (Amount > maxAmountEstimation.Amount)
+                    var erc20Config = (Erc20Config)Currency;
+
+                    if (Amount > maxAmountEstimation.Amount.FromTokens(erc20Config.Decimals))
                     {
                         Warning = Resources.CvInsufficientFunds;
                         WarningToolTip = "";
@@ -126,28 +140,46 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 var account = _app.Account
                     .GetCurrencyAccount<Erc20Account>(Currency.Name);
 
-                var maxAmountEstimation = await account
+                var maxAmountEstimation = (EthereumMaxAmountEstimation)await account
                     .EstimateMaxAmountToSendAsync(
                         from: From,
-                        type: BlockchainTransactionType.Output,
+                        type: TransactionType.Output,
                         gasLimit: UseDefaultFee ? null : GasLimit,
-                        gasPrice: UseDefaultFee ? null : GasPrice,
+                        maxFeePerGas: UseDefaultFee ? null : MaxFeePerGas,
                         reserve: false);
 
-                if (UseDefaultFee && maxAmountEstimation.Fee > 0)
-                    GasPrice = decimal.ToInt32(Currency.GetFeePriceFromFeeAmount(maxAmountEstimation.Fee, GasLimit));
+                var erc20Config = (Erc20Config)Currency;
+
+                var gasPrice = maxAmountEstimation.GasPrice;
+
+                //if (gasPrice == null)
+                //    (gasPrice, _) = await ethConfig.GetGasPriceAsync();
+
+                if (gasPrice != null)
+                {
+                    if (UseDefaultFee)
+                    {
+                        MaxFeePerGas = gasPrice.MaxFeePerGas;
+                        MaxPriorityFeePerGas = gasPrice.MaxPriorityFeePerGas;
+                    }
+
+                    BaseFeePerGas = gasPrice.SuggestBaseFee;
+                }
+
+                //if (UseDefaultFee && maxAmountEstimation.Fee > 0)
+                //    MaxFeePerGas = erc20Config.GetGasPriceInGwei(maxAmountEstimation.Fee, GasLimit);
 
                 if (maxAmountEstimation.Error != null)
                 {
-                    Warning = maxAmountEstimation.Error.Description;
-                    WarningToolTip = maxAmountEstimation.Error.Details;
+                    Warning = maxAmountEstimation.Error.Value.Message;
+                    WarningToolTip = maxAmountEstimation.ErrorHint;
                     WarningType = MessageType.Error;
                     Amount = 0;
                     return;
                 }
 
                 Amount = maxAmountEstimation.Amount > 0
-                    ? maxAmountEstimation.Amount
+                    ? maxAmountEstimation.Amount.FromTokens(erc20Config.Decimals)
                     : 0;
             }
             catch (Exception e)
@@ -156,7 +188,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             }
         }
 
-        protected override void OnQuotesUpdatedEventHandler(object sender, EventArgs args)
+        protected override void OnQuotesUpdatedEventHandler(object? sender, EventArgs args)
         {
             if (sender is not IQuotesProvider quotesProvider)
                 return;
@@ -168,21 +200,29 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             {
                 AmountInBase = Amount.SafeMultiply(quote?.Bid ?? 0m);
                 FeeInBase = FeeAmount.SafeMultiply(ethQuote?.Bid ?? 0m);
+                EstimatedFeeInBase = EstimatedFee.SafeMultiply(ethQuote?.Bid ?? 0m);
             });
         }
 
-        protected override Task<Error> Send(CancellationToken cancellationToken = default)
+        protected override async Task<Error?> Send(CancellationToken cancellationToken = default)
         {
             var account = _app.Account.GetCurrencyAccount<Erc20Account>(Currency.Name);
 
-            return account.SendAsync(
-                from: From,
-                to: To,
-                amount: AmountToSend,
-                gasLimit: GasLimit,
-                gasPrice: GasPrice,
-                useDefaultFee: UseDefaultFee,
-                cancellationToken: cancellationToken);
+            var erc20Config = (Erc20Config)Currency;
+
+            var (_, error) = await account
+                .SendAsync(
+                    from: From,
+                    to: To,
+                    amount: AmountToSend.ToTokens(erc20Config.Decimals),
+                    gasLimit: GasLimit,
+                    maxFeePerGas: MaxFeePerGas,
+                    maxPriorityFeePerGas: MaxPriorityFeePerGas,
+                    useDefaultFee: UseDefaultFee,
+                    cancellationToken: cancellationToken)
+                .ConfigureAwait(false);
+
+            return error;
         }
     }
 }

@@ -11,14 +11,14 @@ using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using Network = NBitcoin.Network;
 
-using Atomex.Blockchain.BitcoinBased;
+using Atomex.Blockchain;
+using Atomex.Blockchain.Bitcoin;
 using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.ViewModels.Abstract;
 using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
 using Atomex.Client.Desktop.ViewModels.SendViewModels;
 using Atomex.Common;
 using Atomex.Core;
-using Atomex.ViewModels;
 using Atomex.Wallet.Abstract;
 using Atomex.Wallet.BitcoinBased;
 
@@ -39,8 +39,8 @@ namespace Atomex.Client.Desktop.ViewModels.ConversionViewModels
 
     public class SelectCurrencyWithOutputsViewModelItem : SelectCurrencyViewModelItem
     {
-        public IEnumerable<BitcoinBasedTxOutput> AvailableOutputs { get; set; }
-        [Reactive] public IEnumerable<BitcoinBasedTxOutput> SelectedOutputs { get; set; }
+        public IEnumerable<BitcoinTxOutput> AvailableOutputs { get; set; }
+        [Reactive] public IEnumerable<BitcoinTxOutput> SelectedOutputs { get; set; }
         public override string? ShortAddressDescription => $"{SelectedOutputs?.Count() ?? 0} outputs";
         public override IFromSource? FromSource => SelectedOutputs != null
             ? new FromOutputs(SelectedOutputs)
@@ -48,8 +48,8 @@ namespace Atomex.Client.Desktop.ViewModels.ConversionViewModels
 
         public SelectCurrencyWithOutputsViewModelItem(
             CurrencyViewModel currencyViewModel,
-            IEnumerable<BitcoinBasedTxOutput> availableOutputs,
-            IEnumerable<BitcoinBasedTxOutput>? selectedOutputs = null)
+            IEnumerable<BitcoinTxOutput> availableOutputs,
+            IEnumerable<BitcoinTxOutput>? selectedOutputs = null)
             : base(currencyViewModel)
         {
             this.WhenAnyValue(vm => vm.SelectedOutputs)
@@ -74,7 +74,7 @@ namespace Atomex.Client.Desktop.ViewModels.ConversionViewModels
             if (source is not SelectCurrencyWithOutputsViewModelItem sourceWithOutputs)
                 return;
 
-            var selectedOutputs = new List<BitcoinBasedTxOutput>();
+            var selectedOutputs = new List<BitcoinTxOutput>();
 
             foreach (var output in sourceWithOutputs.SelectedOutputs)
             {
@@ -123,7 +123,9 @@ namespace Atomex.Client.Desktop.ViewModels.ConversionViewModels
                         return $"receiving to new address {address.Address.TruncateAddress()}";
 
                     var prefix = _type == SelectCurrencyType.From ? "from" : "to";
-                    var balanceString = address.Balance.ToString(CurrencyViewModel.CurrencyFormat);
+                    var balanceString = address.Balance
+                        .FromTokens(CurrencyViewModel.Currency.Decimals)
+                        .ToString(CurrencyViewModel.CurrencyFormat);
 
                     return $"{prefix} {address.Address.TruncateAddress()} ({balanceString} {CurrencyViewModel.Currency.DisplayedName})";
                 })
@@ -166,7 +168,7 @@ namespace Atomex.Client.Desktop.ViewModels.ConversionViewModels
 
                 var outputs = (await bitcoinBasedAccount
                     .GetAvailableOutputsAsync())
-                    .Cast<BitcoinBasedTxOutput>();
+                    .Cast<BitcoinTxOutput>();
 
                 var selectOutputsViewModel = new SelectOutputsViewModel(
                     outputs: outputs.Select(o => new OutputViewModel()
@@ -192,6 +194,7 @@ namespace Atomex.Client.Desktop.ViewModels.ConversionViewModels
             {
                 var selectAddressViewModel = new SelectAddressViewModel(
                     account: _account,
+                    localStorage: _localStorage,
                     currency: currency,
                     mode: Type == SelectCurrencyType.From ? SelectAddressMode.SendFrom : SelectAddressMode.ReceiveTo,
                     selectedAddress: itemWithAddress.SelectedAddress?.Address)
@@ -225,14 +228,17 @@ namespace Atomex.Client.Desktop.ViewModels.ConversionViewModels
         });
 
         private readonly IAccount _account;
+        private readonly ILocalStorage _localStorage;
 
         public SelectCurrencyViewModel(
             IAccount account,
+            ILocalStorage localStorage,
             SelectCurrencyType type,
             IEnumerable<SelectCurrencyViewModelItem> currencies,
             SelectCurrencyViewModelItem? selected = null)
         {
             _account = account ?? throw new ArgumentNullException(nameof(account));
+            _localStorage = localStorage ?? throw new ArgumentNullException(nameof(localStorage));
 
             Type = type;
             Currencies = new ObservableCollection<SelectCurrencyViewModelItem>(currencies);
@@ -279,22 +285,28 @@ namespace Atomex.Client.Desktop.ViewModels.ConversionViewModels
                 {
                     if (Atomex.Currencies.IsBitcoinBased(c.Name))
                     {
-                        var outputs = new List<BitcoinBasedTxOutput>
+                        var outputs = new List<BitcoinTxOutput>
                         {
-                            new BitcoinBasedTxOutput(
-                                coin: new Coin(
+                            new BitcoinTxOutput
+                            {
+                                Coin = new Coin(
                                     fromTxHash: new uint256("19aa2187cda7610590d09dfab41ed4720f8570d7414b71b3dc677e237f72d4a1"),
                                     fromOutputIndex: 0u,
                                     amount: Money.Satoshis(1234567),
                                     scriptPubKey: BitcoinAddress.Create("muRDku2ZwNTz2msCZCHSUhDD5o6NxGsoXM", Network.TestNet).ScriptPubKey),
-                                spentTxPoint: null),
-                            new BitcoinBasedTxOutput(
-                                coin: new Coin(
+                                Currency = "BTC",
+                                IsConfirmed = true,
+                            },
+                            new BitcoinTxOutput
+                            {
+                                Coin = new Coin(
                                     fromTxHash: new uint256("d70fa62762775362e767737e56cab7e8a094eafa8f96b935530d6450be1cfbce"),
                                     fromOutputIndex: 0u,
                                     amount: Money.Satoshis(100120000),
                                     scriptPubKey: BitcoinAddress.Create("mg8DcFTnNAJRHEZ248nVjeJuEjTsHn4vrZ", Network.TestNet).ScriptPubKey),
-                                spentTxPoint: null)
+                                Currency = "BTC",
+                                IsConfirmed = true,
+                            }
                         };
 
                         return new SelectCurrencyWithOutputsViewModelItem(
@@ -307,7 +319,7 @@ namespace Atomex.Client.Desktop.ViewModels.ConversionViewModels
                         var address = new WalletAddress
                         {
                             Address = "0xE9C251cbB4881f9e056e40135E7d3EA9A7d037df",
-                            Balance = 1.2m
+                            Balance = 120000000
                         };
 
                         return new SelectCurrencyWithAddressViewModelItem(

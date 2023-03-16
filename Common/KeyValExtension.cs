@@ -7,12 +7,17 @@ namespace Atomex.Client.Desktop.Common
     {
         public static T GetValueByKey<T>(IEnumerable<KeyValuePair<string, T>> collection, string value)
         {
-            return collection.Where(kv => kv.Key == value).ToList()[0].Value;
+            return collection
+                .Where(kv => kv.Key == value)
+                .ToList()
+                [0].Value;
         }
 
         public static string GetKeyByValue<T>(IEnumerable<KeyValuePair<string, T>> collection, T value)
         {
-            return collection.Where(kv => kv.Value.Equals(value)).ToList()[0].Key;
+            return collection.Where(kv => kv.Value.Equals(value))
+                .ToList()
+                [0].Key;
         }
     }
 }

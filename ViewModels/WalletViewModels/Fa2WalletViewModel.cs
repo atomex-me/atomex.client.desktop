@@ -1,13 +1,15 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
 using Avalonia.Controls;
-using Avalonia.Threading;
 using Serilog;
 
-using Atomex.Client.Desktop.ViewModels.TransactionViewModels;
+using Atomex.Blockchain;
+using Atomex.Blockchain.Abstract;
+using Atomex.Blockchain.Tezos;
 using Atomex.Common;
 using Atomex.Core;
 using Atomex.TezosTokens;
@@ -18,7 +20,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 {
     public class Fa2WalletViewModel : WalletViewModel
     {
-        public Fa2Config Currency => CurrencyViewModel.Currency as Fa2Config;
+        public new Fa2Config Currency => (Fa2Config)CurrencyViewModel.Currency;
 
         public Fa2WalletViewModel()
         {
@@ -33,82 +35,45 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             Action<CurrencyConfig> setConversionTab,
             Action<string>? setWertCurrency,
             Action<ViewModelBase?> showRightPopupContent,
-            CurrencyConfig currency) : base(app, showRightPopupContent, currency, setConversionTab, setWertCurrency)
+            CurrencyConfig currency)
+            : base(app, currency, showRightPopupContent, setConversionTab, setWertCurrency)
         {
         }
 
-        protected override void SubscribeToServices()
+        protected override bool FilterTransactions(TransactionsChangedEventArgs args, out IEnumerable<ITransaction>? txs)
         {
-            _app.Account.BalanceUpdated += OnBalanceUpdatedEventHandler;
-        }
-
-        protected virtual async void OnBalanceUpdatedEventHandler(object sender, CurrencyEventArgs args)
-        {
-            try
+            if (args.Currency == TezosHelper.Fa2)
             {
-                var tezosTokenConfig = (TezosTokenConfig)Currency;
-
-                if (!args.IsTokenUpdate ||
-                   args.TokenContract != null && (args.TokenContract != tezosTokenConfig.TokenContractAddress || args.TokenId != tezosTokenConfig.TokenId))
-                {
-                    return;
-                }
-
-                // update transactions list
-                await LoadTransactionsAsync();
-            }
-            catch (Exception e)
-            {
-                Log.Error(e, "Account balance updated event handler error");
-            }
-        }
-
-        protected sealed override async Task LoadTransactionsAsync()
-        {
-            await LoadTransactionsSemaphore.WaitAsync();
-
-            Log.Debug("LoadTransactionsAsync for FA2 {@currency}.", Currency.Name);
-            try
-            {
-                if (_app.Account == null)
-                    return;
-
-                IsTransactionsLoading = true;
-
-                var transactions = (await _app.Account
-                    .GetCurrencyAccount<Fa2Account>(Currency.Name)
-                    .DataRepository
-                    .GetTezosTokenTransfersAsync(Currency.TokenContractAddress, offset: 0, limit: int.MaxValue)
-                    .ConfigureAwait(false))
+                txs = args.Transactions
+                    .Cast<TezosTokenTransfer>()
+                    .Where(t => t.Token?.Contract == Currency.TokenContractAddress &&
+                                t.Token?.TokenId == Currency.TokenId)
                     .ToList();
 
-                await Dispatcher.UIThread.InvokeAsync(() =>
-                    {
-                        var selectedTransactionId = SelectedTransaction?.Id;
+                return true;
+            }
 
-                        Transactions = SortTransactions(
-                            transactions
-                                .Select(t => new TezosTokenTransferViewModel(t, Currency))
-                                .ToList()
-                                .ForEachDo(t => t.OnClose = () => ShowRightPopupContent?.Invoke(null)));
+            txs = null;
+            return false;
+        }
 
-                        if (selectedTransactionId != null)
-                            SelectedTransaction = Transactions.FirstOrDefault(t => t.Id == selectedTransactionId);
-                    }
-                );
-            }
-            catch (OperationCanceledException)
+        protected override Task<List<TransactionInfo<ITransaction, ITransactionMetadata>>> LoadTransactionsWithMetadataAsync()
+        {
+            return Task.Run(async () =>
             {
-                Log.Debug("LoadTransactionsAsync canceled.");
-            }
-            catch (Exception e)
-            {
-                Log.Error(e, "LoadTransactionsAsync error for {@currency}.", Currency?.Name);
-            }
-            finally
-            {
-                LoadTransactionsSemaphore.Release();
-            }
+                return (await _app
+                    .LocalStorage
+                    .GetTransactionsWithMetadataAsync(
+                        currency: TezosHelper.Fa2,
+                        transactionType: typeof(TezosTokenTransfer),
+                        metadataType: typeof(TransactionMetadata),
+                        tokenContract: Currency.TokenContractAddress,
+                        offset: _transactionsLoaded,
+                        limit: TRANSACTIONS_LOADING_LIMIT,
+                        sort: CurrentSortDirection != null ? CurrentSortDirection.Value : SortDirection.Desc)
+                    .ConfigureAwait(false))
+                    .ToList();
+            });
         }
 
         protected override void OnReceiveClick()
@@ -119,7 +84,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                 app: _app,
                 currency: tezosConfig,
                 tokenContract: Currency.TokenContractAddress,
-                tokenType: "FA2");
+                tokenType: TezosHelper.Fa2);
 
             App.DialogService.Show(receiveViewModel);
         }
@@ -130,9 +95,13 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
             try
             {
-                await _app.Account
-                    .GetCurrencyAccount<Fa2Account>(Currency.Name)
-                    .UpdateBalanceAsync(_cancellation.Token);
+                await Task.Run(async () =>
+                {
+                    await _app.Account
+                        .GetCurrencyAccount<Fa2Account>(Currency.Name)
+                        .UpdateBalanceAsync(_cancellation.Token)
+                        .ConfigureAwait(false);
+                });
             }
             catch (OperationCanceledException)
             {
@@ -154,7 +123,9 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             AddressesViewModel = new AddressesViewModel(
                 app: _app,
                 currency: tezosConfig,
-                tokenContract: Currency.TokenContractAddress);
+                tokenType: TezosHelper.Fa2,
+                tokenContract: Currency.TokenContractAddress,
+                tokenId: Currency.TokenId);
         }
 
 #if DEBUG

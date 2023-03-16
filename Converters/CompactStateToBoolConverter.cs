@@ -3,19 +3,21 @@ using System.Globalization;
 
 using Avalonia.Data.Converters;
 
-using Atomex.Common;
+using Atomex.Client.Desktop.ViewModels;
 
 namespace Atomex.Client.Desktop.Converters
 {
-    public class AddDescToStringConverter : IValueConverter
+    public class CompactStateToBoolConverter : IValueConverter
     {
         #region IValueConverter Members
 
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value is string val)
+            if (value is SwapCompactState compactState)
             {
-                return $"{val}/{SortDirection.Desc}";
+                var targetState = Enum.Parse<SwapCompactState>((string)parameter);
+
+                return compactState == targetState;
             }
 
             return value;

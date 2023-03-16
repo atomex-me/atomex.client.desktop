@@ -23,7 +23,6 @@
         <Setter Property="IsVisible" Value="False" />
     </Style>
     
-    
     <Style Selector="ListBox.ManageAssets ListBoxItem">
         <Setter Property="Cursor" Value="Arrow" />
     </Style>

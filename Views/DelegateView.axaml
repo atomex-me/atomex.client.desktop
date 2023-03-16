@@ -12,6 +12,7 @@
              xmlns:svg="clr-namespace:Avalonia.Svg.Skia;assembly=Avalonia.Svg.Skia"
              xmlns:asyncImageLoader="clr-namespace:AsyncImageLoader;assembly=AsyncImageLoader.Avalonia"
              xmlns:services="clr-namespace:Atomex.Client.Desktop.Services"
+             xmlns:common="clr-namespace:Atomex.Common;assembly=Atomex.Client.Core"
              Width="700">
     <Design.DataContext>
         <viewModels:DelegateViewModel />
@@ -108,7 +109,7 @@
                                 <MultiBinding Converter="{x:Static BoolConverters.And}">
                                     <Binding Path="CurrentSortDirection"
                                              Converter="{x:Static converters:EnumToStringEqualConverter.Instance}"
-                                             ConverterParameter="{x:Static abstract:SortDirection.Asc}" />
+                                             ConverterParameter="{x:Static common:SortDirection.Asc}" />
                                     <Binding Path="CurrentSortField"
                                              Converter="{x:Static converters:EnumToStringEqualConverter.Instance}"
                                              ConverterParameter="{x:Static abstract:DelegationSortField.ByValidator}" />
@@ -118,7 +119,7 @@
                                 <MultiBinding Converter="{x:Static BoolConverters.And}">
                                     <Binding Path="CurrentSortDirection"
                                              Converter="{x:Static converters:EnumToStringEqualConverter.Instance}"
-                                             ConverterParameter="{x:Static abstract:SortDirection.Desc}" />
+                                             ConverterParameter="{x:Static common:SortDirection.Desc}" />
                                     <Binding Path="CurrentSortField"
                                              Converter="{x:Static converters:EnumToStringEqualConverter.Instance}"
                                              ConverterParameter="{x:Static abstract:DelegationSortField.ByValidator}" />
@@ -134,7 +135,7 @@
                                 <MultiBinding Converter="{x:Static BoolConverters.And}">
                                     <Binding Path="CurrentSortDirection"
                                              Converter="{x:Static converters:EnumToStringEqualConverter.Instance}"
-                                             ConverterParameter="{x:Static abstract:SortDirection.Asc}" />
+                                             ConverterParameter="{x:Static common:SortDirection.Asc}" />
                                     <Binding Path="CurrentSortField"
                                              Converter="{x:Static converters:EnumToStringEqualConverter.Instance}"
                                              ConverterParameter="{x:Static abstract:DelegationSortField.ByMinTez}" />
@@ -144,7 +145,7 @@
                                 <MultiBinding Converter="{x:Static BoolConverters.And}">
                                     <Binding Path="CurrentSortDirection"
                                              Converter="{x:Static converters:EnumToStringEqualConverter.Instance}"
-                                             ConverterParameter="{x:Static abstract:SortDirection.Desc}" />
+                                             ConverterParameter="{x:Static common:SortDirection.Desc}" />
                                     <Binding Path="CurrentSortField"
                                              Converter="{x:Static converters:EnumToStringEqualConverter.Instance}"
                                              ConverterParameter="{x:Static abstract:DelegationSortField.ByMinTez}" />
@@ -160,7 +161,7 @@
                                 <MultiBinding Converter="{x:Static BoolConverters.And}">
                                     <Binding Path="CurrentSortDirection"
                                              Converter="{x:Static converters:EnumToStringEqualConverter.Instance}"
-                                             ConverterParameter="{x:Static abstract:SortDirection.Asc}" />
+                                             ConverterParameter="{x:Static common:SortDirection.Asc}" />
                                     <Binding Path="CurrentSortField"
                                              Converter="{x:Static converters:EnumToStringEqualConverter.Instance}"
                                              ConverterParameter="{x:Static abstract:DelegationSortField.ByRoi}" />
@@ -170,7 +171,7 @@
                                 <MultiBinding Converter="{x:Static BoolConverters.And}">
                                     <Binding Path="CurrentSortDirection"
                                              Converter="{x:Static converters:EnumToStringEqualConverter.Instance}"
-                                             ConverterParameter="{x:Static abstract:SortDirection.Desc}" />
+                                             ConverterParameter="{x:Static common:SortDirection.Desc}" />
                                     <Binding Path="CurrentSortField"
                                              Converter="{x:Static converters:EnumToStringEqualConverter.Instance}"
                                              ConverterParameter="{x:Static abstract:DelegationSortField.ByRoi}" />

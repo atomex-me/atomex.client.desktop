@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+
 using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
 using Atomex.Core;
 using Atomex.EthereumTokens;
@@ -20,14 +21,26 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         {
             return currency switch
             {
-                BitcoinBasedConfig _ or
-                    Erc20Config _ or
-                    EthereumConfig _ => new WalletViewModel(
+                BitcoinBasedConfig _ => new WalletViewModel(
                         app: app,
                         setConversionTab: setConversionTab,
                         setWertCurrency: setWertCurrency,
                         showRightPopupContent: showRightPopupContent,
                         currency: currency),
+
+                Erc20Config _ => new Erc20WalletViewModel(
+                    app: app,
+                    setConversionTab: setConversionTab,
+                    setWertCurrency: setWertCurrency,
+                    showRightPopupContent: showRightPopupContent,
+                    currency: currency),
+
+                EthereumConfig _ => new WalletViewModel(
+                    app: app,
+                    setConversionTab: setConversionTab,
+                    setWertCurrency: setWertCurrency,
+                    showRightPopupContent: showRightPopupContent,
+                    currency: currency),
 
                 Fa12Config _ => new Fa12WalletViewModel(
                     app: app,
@@ -52,7 +65,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                     showTezosCollection: showTezosCollection,
                     currency: currency),
 
-                _ => throw new NotSupportedException($"Can't create wallet view model for {currency.Name}. This currency is not supported."),
+                _ => throw new NotSupportedException($"Can't create wallet view model for {currency.Name}. This currency is not supported"),
             };
         }
     }

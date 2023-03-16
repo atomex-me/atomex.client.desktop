@@ -6,17 +6,9 @@ using System.Net;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
-using Atomex.Blockchain.Tezos.Internal;
-using Atomex.Client.Desktop.Common;
-using Atomex.Client.Desktop.Dialogs;
-using Atomex.Client.Desktop.Helpers;
-using Atomex.Common;
-using Atomex.Core;
-using Atomex.MarketData.Abstract;
-using Atomex.ViewModels;
-using Atomex.Wallet.Tezos;
-using Atomex.Wallets.Tezos;
+
 using Avalonia.Controls;
+using Netezos.Forging;
 using Netezos.Forging.Models;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -24,6 +16,13 @@ using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using Serilog;
 using DecimalExtensions = Atomex.Common.DecimalExtensions;
+
+using Atomex.Blockchain.Tezos;
+using Atomex.Client.Desktop.Common;
+using Atomex.Client.Desktop.Dialogs;
+using Atomex.Core;
+using Atomex.Common;
+using Atomex.MarketData.Abstract;
 
 namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
 {
@@ -51,7 +50,6 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
         protected abstract void OnQuotesUpdatedEventHandler(object? sender, EventArgs args);
 
         private ReactiveCommand<Unit, Unit>? _onOpenDetailsCommand;
-
         public ReactiveCommand<Unit, Unit> OnOpenDetailsCommand =>
             _onOpenDetailsCommand ??= ReactiveCommand.Create(() => { IsDetailsOpened = !IsDetailsOpened; });
 
@@ -66,12 +64,10 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
     {
         [Reactive] public TransactionContent Operation { get; set; }
         public override string JsonStringOperation => JsonConvert.SerializeObject(Operation, Formatting.Indented);
-
         public string TezosFormat =>
             DecimalExtensions.GetFormatWithPrecision((int)Math.Round(Math.Log10(TezosConfig.XtzDigitsMultiplier)));
-
-        public decimal AmountInTez => TezosConfig.MtzToTz(Convert.ToDecimal(Operation.Amount));
-        public decimal FeeInTez => TezosConfig.MtzToTz(Convert.ToDecimal(Operation.Fee));
+        public decimal AmountInTez => Operation.Amount.ToTez();
+        public decimal FeeInTez => Operation.Fee.ToTez();
         public string DestinationIcon => $"https://services.tzkt.io/v1/avatars/{Operation.Destination}";
         [Reactive] public string? DestinationAlias { get; set; }
         [Reactive] public decimal AmountInBase { get; set; }
@@ -163,7 +159,7 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
     {
         public RevealContent Operation { get; set; }
         public override string JsonStringOperation => JsonConvert.SerializeObject(Operation, Formatting.Indented);
-        public decimal FeeInTez => TezosConfig.MtzToTz(Convert.ToDecimal(Operation.Fee));
+        public decimal FeeInTez => Operation.Fee.ToTez();
         [Reactive] public decimal FeeInBase { get; set; }
 
         protected override void OnQuotesUpdatedEventHandler(object? sender, EventArgs args)
@@ -181,7 +177,7 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
     {
         [Reactive] public DelegationContent Operation { get; set; }
         public override string JsonStringOperation => JsonConvert.SerializeObject(Operation, Formatting.Indented);
-        public decimal FeeInTez => TezosConfig.MtzToTz(Convert.ToDecimal(Operation.Fee));
+        public decimal FeeInTez => Operation.Fee.ToTez();
         public string BakerIcon => $"https://services.tzkt.io/v1/avatars/{Operation.Delegate}";
         [Reactive] public string BakerAlias { get; set; }
         [Reactive] public decimal FeeInBase { get; set; }
@@ -235,7 +231,9 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
                 return;
 
             var xtzQuote = quotesProvider.GetQuote(TezosConfig.Xtz, BaseCurrencyCode);
+
             FeeInBase = FeeInTez.SafeMultiply(xtzQuote?.Bid ?? 0);
+
             Log.Debug("Quotes updated for beacon DelegationContent operation {Id}", Id);
         }
     }
@@ -245,13 +243,14 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
         public string DappName { get; set; }
         public string SubTitle => $"{DappName} requests to confirm operations";
         public string? DappLogo { get; set; }
-        public WalletAddress ConnectedAddress { get; set; }
+        public string ConnectedAddress { get; set; }
+        public decimal ConnectedAddressBalance { get; set; }
 
         public string TezosFormat =>
             DecimalExtensions.GetFormatWithPrecision((int)Math.Round(Math.Log10(TezosConfig.XtzDigitsMultiplier)));
 
         [Reactive] public IEnumerable<BaseBeaconOperationViewModel>? Operations { get; set; }
-        private IEnumerable<ManagerOperationContent> InitialOperations { get; set; }
+        private IEnumerable<TezosOperationParameters> InitialOperations { get; set; }
         [Reactive] private byte[]? ForgedOperations { get; set; }
         [Reactive] private string? RawOperations { get; set; }
         [ObservableAsProperty] public string OperationsBytes { get; set; }
@@ -264,7 +263,7 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
         [Reactive] public decimal TotalStorageFee { get; set; }
         [Reactive] public decimal TotalStorageFeeInBase { get; set; }
         [Reactive] public bool UseDefaultFee { get; set; }
-        [Reactive] public bool AutofillError { get; set; }
+        [Reactive] public bool AutoFillError { get; set; }
         [Reactive] public bool DetailsOpened { get; set; }
         [Reactive] public IQuotesProvider? QuotesProvider { get; init; }
         private static string BaseCurrencyCode => "USD";
@@ -275,14 +274,19 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
         [ObservableAsProperty] public bool IsSending { get; }
         [ObservableAsProperty] public bool IsRejecting { get; }
 
+        public OperationRequestViewModel()
+        {
+        }
+
         public OperationRequestViewModel(
-            IEnumerable<ManagerOperationContent> operations,
+            IEnumerable<TezosOperationParameters> operations,
             WalletAddress connectedAddress,
             int operationGasLimit,
             TezosConfig tezosConfig)
         {
             Tezos = tezosConfig;
-            ConnectedAddress = connectedAddress;
+            ConnectedAddress = connectedAddress.Address;
+            ConnectedAddressBalance = connectedAddress.Balance.ToTez();
             InitialOperations = operations;
             DefaultOperationGasLimit = operationGasLimit;
 
@@ -349,7 +353,7 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
                             return;
 
                         ByteCost = byteCost;
-                        TotalStorageFee = TezosConfig.MtzToTz(Convert.ToDecimal(byteCost)) * TotalStorageLimit;
+                        TotalStorageFee = byteCost.ToTez() * TotalStorageLimit;
                     }
                     catch (Exception ex)
                     {
@@ -373,19 +377,19 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
                 .SubscribeInMainThread(totalStorageLimit =>
                 {
                     if (ByteCost != null)
-                        TotalStorageFee = TezosConfig.MtzToTz(Convert.ToDecimal(ByteCost)) * totalStorageLimit;
+                        TotalStorageFee = ByteCost.Value.ToTez() * totalStorageLimit;
                 });
 
             this.WhenAnyValue(vm => vm.UseDefaultFee)
                 .WhereNotNull()
                 .Where(useDefaultFee => useDefaultFee)
-                .SubscribeInMainThread(_ => { AutofillOperations(); });
+                .SubscribeInMainThread(_ => { AutoFillOperations(); });
 
             this.WhenAnyValue(vm => vm.TotalGasFee, vm => vm.TotalStorageLimit)
                 .WhereAllNotNull()
                 .Throttle(TimeSpan.FromMilliseconds(250))
                 .Where(_ => !UseDefaultFee)
-                .SubscribeInMainThread(_ => { AutofillOperations(); });
+                .SubscribeInMainThread(_ => { AutoFillOperations(); });
 
             this.WhenAnyValue(vm => vm.ForgedOperations)
                 .WhereNotNull()
@@ -400,62 +404,80 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
 #endif
         }
 
-        private async void AutofillOperations()
+        private async void AutoFillOperations()
         {
-            AutofillError = false;
+            AutoFillError = false;
 
-            var rpc = new Rpc(Tezos.RpcNodeUri);
-            JObject head;
+            var rpc = new TezosRpc(Tezos.GetRpcSettings());
+
+            TezosRpcHeader head;
+
             try
             {
                 head = await rpc
-                    .GetHeader()
+                    .GetHeaderAsync()
                     .ConfigureAwait(false);
             }
             catch (Exception ex)
             {
-                Log.Error(ex, "Error during querying rpc, {Message}", ex.Message);
+                Log.Error(ex, "Error during querying rpc header, {Message}", ex.Message);
                 return;
             }
 
-            var operations = InitialOperations.Select(op => op switch
+            var operations = InitialOperations
+                .Select(op =>
                 {
-                    TransactionContent txContent => new TransactionContent
+                    var operation = new TezosOperationParameters
                     {
-                        Amount = txContent.Amount,
-                        Destination = txContent.Destination,
-                        Parameters = txContent.Parameters,
-                        Source = txContent.Source,
-                        Fee = UseDefaultFee ? 0 : txContent.Fee,
-                        Counter = txContent.Counter,
-                        GasLimit = UseDefaultFee ? DefaultOperationGasLimit : txContent.GasLimit,
+                        From         = op.From,
+                        Fee          = UseDefaultFee ? Fee.FromNetwork() : op.Fee,
+                        GasLimit     = UseDefaultFee ? GasLimit.FromNetwork(DefaultOperationGasLimit) : op.GasLimit,
                         StorageLimit = UseDefaultFee
-                            ? DappsViewModel.StorageLimitPerOperation
-                            : txContent.StorageLimit
-                    },
-                    RevealContent revealContent => new RevealContent
-                    {
-                        PublicKey = revealContent.PublicKey,
-                        Source = revealContent.Source,
-                        Fee = UseDefaultFee ? 0 : revealContent.Fee,
-                        Counter = revealContent.Counter,
-                        GasLimit = UseDefaultFee ? DefaultOperationGasLimit : revealContent.GasLimit,
-                        StorageLimit = UseDefaultFee
-                            ? DappsViewModel.StorageLimitPerOperation
-                            : revealContent.StorageLimit
-                    },
-                    DelegationContent delegateContent => new DelegationContent
-                    {
-                        Delegate = delegateContent.Delegate,
-                        Source = delegateContent.Source,
-                        Fee = UseDefaultFee ? 0 : delegateContent.Fee,
-                        Counter = delegateContent.Counter,
-                        GasLimit = UseDefaultFee ? DefaultOperationGasLimit : delegateContent.GasLimit,
-                        StorageLimit = UseDefaultFee
-                            ? DappsViewModel.StorageLimitPerOperation
-                            : delegateContent.StorageLimit
-                    },
-                    _ => op
+                            ? StorageLimit.FromNetwork(DappsViewModel.StorageLimitPerOperation, useSafeValue: false)
+                            : op.StorageLimit,
+                        Content = op.Content switch
+                        {
+                            TransactionContent txContent => new TransactionContent
+                            {
+                                Amount       = txContent.Amount,
+                                Destination  = txContent.Destination,
+                                Parameters   = txContent.Parameters,
+                                Source       = txContent.Source,
+                                Fee          = UseDefaultFee ? 0 : txContent.Fee,
+                                Counter      = txContent.Counter,
+                                GasLimit     = UseDefaultFee ? DefaultOperationGasLimit : txContent.GasLimit,
+                                StorageLimit = UseDefaultFee
+                                    ? DappsViewModel.StorageLimitPerOperation
+                                    : txContent.StorageLimit
+                            },
+                            RevealContent revealContent => new RevealContent
+                            {
+                                PublicKey    = revealContent.PublicKey,
+                                Source       = revealContent.Source,
+                                Fee          = UseDefaultFee ? 0 : revealContent.Fee,
+                                Counter      = revealContent.Counter,
+                                GasLimit     = UseDefaultFee ? DefaultOperationGasLimit : revealContent.GasLimit,
+                                StorageLimit = UseDefaultFee
+                                    ? DappsViewModel.StorageLimitPerOperation
+                                    : revealContent.StorageLimit
+                            },
+                            DelegationContent delegateContent => new DelegationContent
+                            {
+                                Delegate     = delegateContent.Delegate,
+                                Source       = delegateContent.Source,
+                                Fee          = UseDefaultFee ? 0 : delegateContent.Fee,
+                                Counter      = delegateContent.Counter,
+                                GasLimit     = UseDefaultFee ? DefaultOperationGasLimit : delegateContent.GasLimit,
+                                StorageLimit = UseDefaultFee
+                                    ? DappsViewModel.StorageLimitPerOperation
+                                    : delegateContent.StorageLimit
+                            },
+                            _ => op.Content
+                        }
+                    };
+
+                    return operation;
+
                 })
                 .ToList();
 
@@ -480,76 +502,80 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
             {
                 foreach (var op in operations)
                 {
-                    op.Fee = avgFee;
+                    op.Fee = Fee.FromValue(avgFee);
+                    op.Content.Fee = avgFee;
                 }
             }
 
-            var error = await TezosOperationFiller.AutoFillAsync(
+            var (isSuccess, error) = await TezosOperationFiller
+                .AutoFillAsync(
+                    rpc: rpc,
                     operations,
-                    head["hash"]!.ToString(),
-                    head["chain_id"]!.ToString(),
-                    Tezos)
+                    head.Hash,
+                    Tezos.GetFillOperationSettings())
                 .ConfigureAwait(false);
 
             if (!UseDefaultFee)
             {
                 foreach (var op in operations)
                 {
-                    op.Fee = avgFee;
+                    op.Fee = Fee.FromValue(avgFee);
+                    op.Content.Fee = avgFee;
                 }
             }
 
             if (error != null)
-                AutofillError = true;
+                AutoFillError = true;
 
-            var branch = head["hash"]!.ToString();
-
-            ForgedOperations = await TezosForge.ForgeAsync(
-                operations: operations,
-                branch: branch);
+            ForgedOperations = await new LocalForge()
+                .ForgeOperationGroupAsync(
+                    head.Hash,
+                    operations.Select(p => p.Content));
 
             var rawJObj = new JObject
             {
-                ["branch"] = branch,
+                ["branch"] = head.Hash,
                 ["contents"] = JArray.Parse(JsonConvert.SerializeObject(operations))
             };
 
             RawOperations = JsonConvert.SerializeObject(rawJObj, Formatting.Indented);
 
-            if (!UseDefaultFee && Operations != null) return;
+            if (!UseDefaultFee && Operations != null)
+                return;
 
             var operationsViewModel = new ObservableCollection<BaseBeaconOperationViewModel>();
+
             foreach (var item in operations.Select((value, idx) => new { idx, value }))
             {
                 var operation = item.value;
                 var index = item.idx;
 
-                switch (operation)
+                switch (operation.Content)
                 {
                     case TransactionContent transactionOperation:
                         operationsViewModel.Add(new TransactionContentViewModel
                         {
-                            Id = index + 1,
-                            Operation = transactionOperation,
+                            Id             = index + 1,
+                            Operation      = transactionOperation,
                             QuotesProvider = QuotesProvider,
-                            ExplorerUri = Tezos.AddressExplorerUri
+                            ExplorerUri    = Tezos.AddressExplorerUri
                         });
                         break;
                     case RevealContent revealOperation:
                         operationsViewModel.Add(new RevealContentViewModel
                         {
-                            Id = index + 1,
-                            Operation = revealOperation,
+                            Id             = index + 1,
+                            Operation      = revealOperation,
                             QuotesProvider = QuotesProvider,
                         });
                         break;
                     case DelegationContent delegationOperation:
                         operationsViewModel.Add(new DelegationContentViewModel
                         {
-                            Id = index + 1,
-                            Operation = delegationOperation,
+                            Id             = index + 1,
+                            Operation      = delegationOperation,
                             QuotesProvider = QuotesProvider,
-                            ExplorerUri = Tezos.AddressExplorerUri
+                            ExplorerUri    = Tezos.AddressExplorerUri
                         });
                         break;
                 }
@@ -574,9 +600,10 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
                 return;
 
             var xtzQuote = quotesProvider.GetQuote(TezosConfig.Xtz, BaseCurrencyCode);
-            TotalGasFeeInBase = TotalGasFee.SafeMultiply(xtzQuote?.Bid ?? 0);
+
+            TotalGasFeeInBase     = TotalGasFee.SafeMultiply(xtzQuote?.Bid ?? 0);
             TotalStorageFeeInBase = TotalStorageFee.SafeMultiply(xtzQuote?.Bid ?? 0);
-            TotalFeesInBase = TotalFees.SafeMultiply(xtzQuote?.Bid ?? 0);
+            TotalFeesInBase       = TotalFees.SafeMultiply(xtzQuote?.Bid ?? 0);
 
             Log.Debug("Quotes updated for Operation Request View");
         }
@@ -586,7 +613,6 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
         public Func<Task> OnReject { get; init; }
 
         private ReactiveCommand<Unit, Unit>? _onConfirmCommand;
-
         public ReactiveCommand<Unit, Unit> OnConfirmCommand =>
             _onConfirmCommand ??= ReactiveCommand.CreateFromTask(async () =>
             {
@@ -595,7 +621,6 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
             });
 
         private ReactiveCommand<Unit, Unit>? _onRejectCommand;
-
         public ReactiveCommand<Unit, Unit> OnRejectCommand =>
             _onRejectCommand ??= ReactiveCommand.CreateFromTask(async () => await OnReject());
 
@@ -605,7 +630,6 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
             _openDetailsCommand ??= ReactiveCommand.Create(() => { DetailsOpened = !DetailsOpened; });
 
         private ReactiveCommand<string, Unit>? _copyCommand;
-
         public ReactiveCommand<string, Unit> CopyCommand => _copyCommand ??= ReactiveCommand.Create<string>(data =>
         {
             try
@@ -634,11 +658,8 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
         {
             DappName = "objkt.com";
             DappLogo = "";
-            ConnectedAddress = new WalletAddress
-            {
-                Address = "tzhSFN6677KThcTkTai3P1acVQtrujkkvVd",
-                Balance = (decimal)0.991873633123
-            };
+            ConnectedAddress = "tzhSFN6677KThcTkTai3P1acVQtrujkkvVd";
+            ConnectedAddressBalance = 0.363312m;
 
             DetailsOpened = true;
             // TotalFees = (decimal)0.222223121331233;
@@ -650,7 +671,7 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
             TotalStorageFee = (decimal)0.022331231234;
 
             UseDefaultFee = false;
-            AutofillError = true;
+            AutoFillError = true;
 
             OperationsBytes =
                 "tz1dwWLbMrt2tz1dwWLbMrt2GJcKBK6mRwhpqt9XGGH6tCAWtz1dwWLbMrt2GJcKBK6mRwhpqt9XGtz1dwWLbMrt2tz1dwWLbMrt2GJcKBK6mRwhpqt9XGGH6tCAWtz1dwWLbMrt2GJcKBK6mRwhpqt9XGGH6tCAWtz1dwWLbMrt2GJcKBK6mRwhpqt9XGGH6tCAWtz1dwWLbMrt2GJcKBK6mRwhpqt9XGGH6tCAWtz1dwWLbMrt2GJcKBK6mRwhpqt9XGGH6tCAWhpqt9XGGH6tCAWtz1dwWLbMrt2tz1dwWLbMrt2GJcKBK6mRwhpqt9XGGH6tCAWtz1dwWLbMrt2GJcKBK6mRwhpqt9XGGH6tCAWtz1dwWLbMrt2GJcKBK6mRwhpqt9XGGH6tCAWtz1dwWLbMrt2GJcKBK6mRwhpqt9XGGH6tCAWtz1dwWLbMrt2GJcKBK6mRwhpqt9XGGH6tCAWhpqt9XGGH6tCAWtz1dwWLbMrt2tz1dwWLbMrt2GJcKBK6mRwhpqt9XGGH6tCAWtz1dwWLbMrt2GJcKtz1dwWLbMrt2tz1dwWLbMrt2GJcKBK6mRwhpqt9XGGH6tCAWtz1dwWLbMrt2GJcKBK6mRwhpqt9XGtz1dwWLbMrt2tz1dwWLbMrt2GJcKBK6mRwhpqt9XGGH6tCAWtz1dwWLbMrt2GJcKBK6mRwhpqt9XGGH6tCAWtz1dwWLbMrt2GJcKBK6mRwhpqt9XGGH6tCAWtz1dwWLbMrt2GJcKBK6mRwhpqt9XGGH6tCAWtz1dwWLbMrt2GJcKBK6mRwhpqt9XGGH6tCAWhpqt9XGGH6tCAWtz1dwWLbMrt2tz1dwWLbMrt2GJcKBK6mRwhpqt9XGGH6tCAWtz1dwWLbMrt2GJcKBK6mRwhpqt9XGGH6tCAWtz1dwWLbMrt2GJcKBK6mRwhpqt9XGGH6tCAWtz1dwWLbMrt2GJcKBK6mRwhpqt9XGGH6tCAWtz1dwWLbMrt2GJcKBK6mRwhpqt9XGGH6tCAWhpqt9XGGH6tCAWtz1dwWLbMrt2tz1dwWLbMrt2GJcKBK6mRwhpqt9XGGH6tCAWtz1dwWLbMrt2GJcK";

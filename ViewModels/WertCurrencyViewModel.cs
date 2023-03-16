@@ -9,6 +9,7 @@ using System.Windows.Input;
 
 using ReactiveUI;
 
+using Atomex.Blockchain;
 using Atomex.Client.Desktop.Api;
 using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
@@ -125,7 +126,7 @@ namespace Atomex.Client.Desktop.ViewModels
                     {
                         Address          = g.Key,
                         HasActivity      = address?.HasActivity ?? hasTokens,
-                        AvailableBalance = address?.AvailableBalance() ?? 0m,
+                        AvailableBalance = address?.AvailableBalance().FromTokens(Currency.Decimals) ?? 0,
                         CurrencyFormat   = Currency.Format,
                         CurrencyCode     = Currency.DisplayedName,
                         IsFreeAddress    = isFreeAddress,
@@ -372,34 +373,35 @@ namespace Atomex.Client.Desktop.ViewModels
 
         private async Task GetFromCurrencyRequest()
         {
-            var res = await _api.GetConvertRates(CurrencyViewModel.BaseCurrencyCode, Currency.Name, _fromAmount);
-            if (res != null && !res.HasError)
-            {
-                OldRates = false;
-                _toAmount = res.Value.Body.CommodityAmount;
-                EstimatedPrice = res.Value.Body.Ticker;
+            var (res, error) = await _api.GetConvertRates(CurrencyViewModel.BaseCurrencyCode, Currency.Name, _fromAmount);
 
-                OnPropertyChanged(nameof(ToAmountString));
-                ToAmountChangedFromKeyboard = false;
-            }
+            if (error != null || res == null)
+                return;
+
+            OldRates = false;
+            _toAmount = res.Body.CommodityAmount;
+            EstimatedPrice = res.Body.Ticker;
+
+            OnPropertyChanged(nameof(ToAmountString));
+            ToAmountChangedFromKeyboard = false;
         }
 
         private async Task GetToCurrencyRequest()
         {
-            var res = await _api.GetConvertRates(Currency.Name, CurrencyViewModel.BaseCurrencyCode, _toAmount);
-            if (res != null && !res.HasError)
-            {
-                OldRates = false;
-                _fromAmount = res.Value.Body.CurrencyAmount;
-                EstimatedPrice = res.Value.Body.Ticker;
+            var (res, error) = await _api.GetConvertRates(Currency.Name, CurrencyViewModel.BaseCurrencyCode, _toAmount);
 
-                OnPropertyChanged(nameof(FromAmountString));
-                FromAmountChangedFromKeyboard = false;
-            }
+            if (error != null || res == null)
+                return;
+
+            OldRates = false;
+            _fromAmount = res.Body.CurrencyAmount;
+            EstimatedPrice = res.Body.Ticker;
+
+            OnPropertyChanged(nameof(FromAmountString));
+            FromAmountChangedFromKeyboard = false;
         }
 
         private ICommand _buyCommand;
-
         public ICommand BuyCommand => _buyCommand ??= (_buyCommand = ReactiveCommand.Create(() =>
         {
             App.OpenBrowser(BuyUrl);

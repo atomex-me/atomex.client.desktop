@@ -4,16 +4,19 @@ using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
+
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using Serilog;
+
+using Atomex.Blockchain;
 using Atomex.Blockchain.Tezos;
+using Atomex.Blockchain.Tezos.Tzkt;
 using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.ViewModels.SendViewModels;
 using Atomex.Core;
 using Atomex.MarketData.Abstract;
 using Atomex.TezosTokens;
-using Atomex.ViewModels;
 using Atomex.Wallet;
 using Atomex.Wallet.Tezos;
 
@@ -21,7 +24,7 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
 {
     public class TezosTokenViewModel : ViewModelBase, IAssetViewModel, IDisposable
     {
-        private const int MaxBalanceDecimals = AddressesHelper.MaxTokenCurrencyFormatDecimals;
+        private const int MaxBalanceDecimals = CurrencyConfig.MaxPrecision;
 
         public bool CanExchange => AtomexApp
             ?.Account
@@ -51,7 +54,6 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
         public string IconPath => string.Empty;
         public string DisabledIconPath => string.Empty;
         public string PreviewUrl => ThumbsApi.GetTokenPreviewUrl(Contract.Address, TokenBalance.TokenId);
-
         public string CurrencyName => TokenBalance.Symbol;
         public string CurrencyCode => TokenBalance.Symbol;
         public string CurrencyDescription => TokenBalance.Name;
@@ -82,22 +84,23 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
 
         public void SubscribeToUpdates()
         {
-            AtomexApp.Account.BalanceUpdated += OnBalanceChangedEventHandler;
-            if (TokenBalance.IsNft) return;
+            AtomexApp.LocalStorage.BalanceChanged += OnBalanceChangedEventHandler;
+
+            if (TokenBalance.IsNft)
+                return;
+
             AtomexApp.QuotesProvider.QuotesUpdated += OnQuotesUpdatedEventHandler;
         }
 
-        private async void OnBalanceChangedEventHandler(object? sender, CurrencyEventArgs args)
-
+        private async void OnBalanceChangedEventHandler(object? sender, BalanceChangedEventArgs args)
         {
             try
             {
-                if (!args.IsTokenUpdate ||
-                    args.TokenContract != null && (args.TokenContract != TokenBalance.Contract ||
-                                                   args.TokenId != TokenBalance.TokenId))
-                {
+                var isTokenUpdate = args is TokenBalanceChangedEventArgs eventArgs &&
+                    eventArgs.Tokens.Contains((TokenBalance.Contract, TokenBalance.TokenId));
+
+                if (!isTokenUpdate)
                     return;
-                }
 
                 await UpdateAsync();
 
@@ -121,7 +124,9 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
         {
             var tokenQuote = quotesProvider.GetQuote(TokenBalance.Symbol, BaseCurrencyCode);
             var xtzQuote = quotesProvider.GetQuote(TezosConfig.Xtz, BaseCurrencyCode);
-            if (tokenQuote == null || xtzQuote == null) return;
+
+            if (tokenQuote == null || xtzQuote == null)
+                return;
 
             CurrentQuote = tokenQuote.Bid.SafeMultiply(xtzQuote.Bid);
             TotalAmountInBase = TotalAmount.SafeMultiply(CurrentQuote);
@@ -134,15 +139,17 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
             var tezosAccount = AtomexApp.Account.GetCurrencyAccount<TezosAccount>(TezosConfig.Xtz);
 
             var tokenWalletAddresses = await tezosAccount
-                .DataRepository
-                .GetTezosTokenAddressesByContractAsync(Contract.Address);
+                .LocalStorage
+                .GetAddressesAsync(currency: Contract.Type, tokenContract: Contract.Address)
+                .ConfigureAwait(false);
 
             var addresses = tokenWalletAddresses
                 .Where(walletAddress => walletAddress.TokenBalance.TokenId == TokenBalance.TokenId)
                 .ToList();
 
             var tokenBalance = 0m;
-            addresses.ForEach(a => { tokenBalance += a.TokenBalance.GetTokenBalance(); });
+
+            addresses.ForEach(a => { tokenBalance += a.TokenBalance.ToDecimalBalance(); });
 
             TotalAmount = tokenBalance;
         }
@@ -175,17 +182,14 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
             : null;
 
         private ReactiveCommand<Unit, Unit>? _sendCommand;
-
         public ReactiveCommand<Unit, Unit> SendCommand => _sendCommand ??= ReactiveCommand.Create(
             () => App.DialogService.Show(GetSendDialog().SelectFromViewModel));
 
         private ReactiveCommand<Unit, Unit>? _receiveCommand;
-
         public ReactiveCommand<Unit, Unit> ReceiveCommand => _receiveCommand ??= ReactiveCommand.Create(
             () => App.DialogService.Show(GetReceiveDialog()));
 
         private ReactiveCommand<Unit, Unit>? _exchangeCommand;
-
         public ReactiveCommand<Unit, Unit> ExchangeCommand => _exchangeCommand ??= ReactiveCommand.Create(() =>
         {
             var currency = AtomexApp.Account
@@ -201,12 +205,10 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
         public Action<TezosTokenViewModel> SendCallback;
 
         private ReactiveCommand<Unit, Unit>? _send;
-
         public ReactiveCommand<Unit, Unit> Send =>
             _send ??= ReactiveCommand.Create(() => { SendCallback?.Invoke(this); });
 
         private ReactiveCommand<Unit, Unit>? _openInBrowser;
-
         public ReactiveCommand<Unit, Unit> OpenInBrowser => _openInBrowser ??= ReactiveCommand.Create(() =>
         {
             var assetUrl = AssetUrl;
@@ -218,12 +220,10 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
         });
 
         private ReactiveCommand<Unit, Unit>? _openPopupCommand;
-
         private ReactiveCommand<Unit, Unit> OpenPopupCommand => _openPopupCommand ??=
             ReactiveCommand.Create(() => { IsPopupOpened = !IsPopupOpened; });
 
         private ReactiveCommand<string, Unit>? _openAddressInExplorerCommand;
-
         public ReactiveCommand<string, Unit> OpenAddressInExplorerCommand => _openAddressInExplorerCommand ??=
             ReactiveCommand.Create<string>((address) =>
             {
@@ -237,7 +237,6 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
             });
 
         private ReactiveCommand<string, Unit>? _copyAddressCommand;
-
         public ReactiveCommand<string, Unit> CopyAddressCommand => _copyAddressCommand ??=
             ReactiveCommand.Create<string>((s) =>
             {
@@ -253,8 +252,8 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
 
         public void Dispose()
         {
-            if (AtomexApp.Account != null)
-                AtomexApp.Account.BalanceUpdated -= OnBalanceChangedEventHandler;
+            if (AtomexApp.LocalStorage != null)
+                AtomexApp.LocalStorage.BalanceChanged -= OnBalanceChangedEventHandler;
 
             if (AtomexApp.QuotesProvider != null)
                 AtomexApp.QuotesProvider.QuotesUpdated -= OnQuotesUpdatedEventHandler;

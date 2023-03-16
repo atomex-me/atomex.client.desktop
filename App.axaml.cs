@@ -2,8 +2,8 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
@@ -11,19 +11,20 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
-using Atomex.Client.Desktop.Common;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
+
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Input.Platform;
 using Avalonia.Markup.Xaml;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
+using Avalonia.Threading;
 using Serilog;
 using Serilog.Core;
 using Serilog.Events;
 using Serilog.Formatting;
 using Serilog.Formatting.Display;
-using Sentry;
+
 using Atomex.Client.Desktop.Services;
 using Atomex.Client.Desktop.ViewModels;
 using Atomex.Client.Desktop.Views;
@@ -34,8 +35,6 @@ using Atomex.MarketData.Abstract;
 using Atomex.MarketData.Bitfinex;
 using Atomex.MarketData.TezTools;
 using Atomex.Services;
-using Avalonia.Threading;
-
 
 namespace Atomex.Client.Desktop
 {
@@ -76,6 +75,7 @@ namespace Atomex.Client.Desktop
                 var appAlreadyRunning = true;
 
                 using var tcpClient = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+
                 try
                 {
                     tcpClient.Connect(IPAddress.Loopback, atomexTcpPort);
@@ -109,6 +109,7 @@ namespace Atomex.Client.Desktop
                 var bitfinexQuotesProvider = new BitfinexQuotesProvider(
                     currencies: currenciesProvider
                         .GetCurrencies(Network.MainNet)
+                        .GetOrderedPreset()
                         .Select(c => c.Name),
                     baseCurrency: QuotesProvider.Usd,
                     log: LoggerFactory.CreateLogger<BitfinexQuotesProvider>());
@@ -121,7 +122,7 @@ namespace Atomex.Client.Desktop
                     bitfinexQuotesProvider, tezToolsQuotesProvider);
 
                 // init Atomex client app
-                AtomexApp = new AtomexApp()
+                AtomexApp = new AtomexApp(logger: LoggerFactory.CreateLogger("AtomexApp"))
                     .UseCurrenciesProvider(currenciesProvider)
                     .UseSymbolsProvider(symbolsProvider)
                     .UseCurrenciesUpdater(new CurrenciesUpdater(currenciesProvider))

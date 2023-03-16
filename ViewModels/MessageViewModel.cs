@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Windows.Input;
+
 using ReactiveUI;
 using Serilog;
+
 using Atomex.Client.Desktop.Properties;
 
 namespace Atomex.Client.Desktop.ViewModels
@@ -24,12 +26,10 @@ namespace Atomex.Client.Desktop.ViewModels
 
 
         private ICommand _backCommand;
-
         public ICommand BackCommand =>
             _backCommand ??= (_backCommand = ReactiveCommand.Create(() => { _backAction?.Invoke(); }));
 
         private ICommand _nextCommand;
-
         public ICommand NextCommand =>
             _nextCommand ??= (_nextCommand = ReactiveCommand.Create(() => { _nextAction?.Invoke(); }));
 
@@ -163,7 +163,6 @@ namespace Atomex.Client.Desktop.ViewModels
                 nextAction: nextAction);
 
         private ICommand _openTxInExplorerCommand;
-
         public ICommand OpenTxInExplorerCommand => _openTxInExplorerCommand ??= (_openTxInExplorerCommand =
             ReactiveCommand.Create(() =>
             {
@@ -174,7 +173,6 @@ namespace Atomex.Client.Desktop.ViewModels
             }));
 
         private ICommand _copyCommand;
-
         public ICommand CopyCommand => _copyCommand ??= (_copyCommand = ReactiveCommand.Create<string>((s) =>
         {
             try

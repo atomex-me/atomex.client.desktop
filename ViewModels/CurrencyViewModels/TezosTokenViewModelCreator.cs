@@ -2,18 +2,19 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Threading.Tasks;
 
-using Atomex.Blockchain.Tezos;
+using Atomex.Blockchain;
+using Atomex.Blockchain.Tezos.Tzkt;
 using Atomex.Core;
 using Atomex.Wallet.Tezos;
-
 
 namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
 {
     public static class TezosTokenViewModelCreator
     {
-        private static readonly ConcurrentDictionary<(string, decimal), TezosTokenViewModel> Instances = new();
+        private static readonly ConcurrentDictionary<(string, BigInteger), TezosTokenViewModel> Instances = new();
 
         public static async Task<IEnumerable<TezosTokenViewModel>> CreateOrGet(
             IAtomexApp atomexApp,
@@ -24,8 +25,8 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
             var tezosAccount = atomexApp.Account.GetCurrencyAccount<TezosAccount>(TezosConfig.Xtz);
 
             var tokenWalletAddresses = await tezosAccount
-                .DataRepository
-                .GetTezosTokenAddressesByContractAsync(contract.Address);
+                .LocalStorage
+                .GetAddressesAsync(currency: contract.Type, tokenContract: contract.Address);
 
             var tokenGroups = tokenWalletAddresses
                 .Where(walletAddress => isNft ? walletAddress.TokenBalance.IsNft : !walletAddress.TokenBalance.IsNft)
@@ -62,8 +63,8 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
                     .Select(w => w.TokenBalance)
                     .Aggregate(new TokenBalance { ParsedBalance = 0 }, (result, tb) =>
                     {
-                        result.ParsedBalance  += tb.GetTokenBalance();
-                        result.Balance         = result.ParsedBalance.ToString();
+                        result.ParsedBalance = result.ParsedBalance + tb.GetTokenBalance();
+                        result.Balance       = result.ParsedBalance!.Value.ToString();
                         result.ArtifactUri   ??= tb.ArtifactUri;
                         result.Contract      ??= tb.Contract;
                         result.ContractAlias ??= tb.ContractAlias;
@@ -84,11 +85,13 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
                     SetConversionTab = setConversionTab,
                     TezosConfig      = tezosAccount.Config,
                     TokenBalance     = tokenBalance,
-                    TotalAmount      = tokenBalance.GetTokenBalance(),
+                    TotalAmount      = tokenBalance.ToDecimalBalance(),
                     Contract         = contract,
                 };
+
                 if (!isNft)
                     tokenViewModel.UpdateQuotesInBaseCurrency(atomexApp.QuotesProvider);
+
                 tokenViewModel.SubscribeToUpdates();
 
                 Instances.TryAdd((contract.Address, tokenGroup.Key), tokenViewModel);

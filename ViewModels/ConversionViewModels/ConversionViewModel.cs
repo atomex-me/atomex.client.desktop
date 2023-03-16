@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Linq;
+using System.Reactive;
 using System.Reactive.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
 
@@ -14,7 +16,7 @@ using ReactiveUI.Fody.Helpers;
 using Serilog;
 
 using Atomex.Abstract;
-using Atomex.Blockchain.BitcoinBased;
+using Atomex.Blockchain.Bitcoin;
 using Atomex.Client.Common;
 using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.Properties;
@@ -34,7 +36,11 @@ namespace Atomex.Client.Desktop.ViewModels
 {
     public class ConversionViewModel : ViewModelBase
     {
+        protected const int SWAPS_LOADING_LIMIT = 20;
+
         private readonly IAtomexApp _app;
+        protected int _swapsLoaded;
+        protected readonly SemaphoreSlim _loadSwapsSemaphore = new(1, 1);
 
         private ISymbols Symbols
         {
@@ -48,7 +54,6 @@ namespace Atomex.Client.Desktop.ViewModels
                     .GetSymbols(_app.Account.Network);
             }
         }
-
         private ICurrencies Currencies
         {
             get
@@ -77,13 +82,11 @@ namespace Atomex.Client.Desktop.ViewModels
         [Reactive] public MessageType AmountValidationMessageType { get; set; }
         [ObservableAsProperty] public bool IsAmountValidationWarning { get; }
         [ObservableAsProperty] public bool IsAmountValidationError { get; }
-
         [Reactive] public string Message { get; set; }
         [Reactive] public string MessageToolTip { get; set; }
         [Reactive] public MessageType MessageType { get; set; }
         [ObservableAsProperty] public bool IsWarning { get; }
         [ObservableAsProperty] public bool IsError { get; }
-
         [Reactive] public string? BaseCurrencyCode { get; set; }
         [Reactive] public string? QuoteCurrencyCode { get; set; }
         [Reactive] public string? PriceFormat { get; set; }
@@ -107,35 +110,18 @@ namespace Atomex.Client.Desktop.ViewModels
         [Reactive] public decimal RewardForRedeemInBase { get; set; }
         [ObservableAsProperty] public bool HasRewardForRedeem { get; }
         [Reactive] public bool CanExchange { get; set; }
-        [Reactive] public ObservableCollection<SwapViewModel>? Swaps { get; set; }
+        [Reactive] public ObservableRangeCollection<SwapViewModel> Swaps { get; set; }
         [Reactive] public bool IsNoLiquidity { get; set; }
         [Reactive] public bool IsInsufficientFunds { get; set; }
         [Reactive] public bool IsToAddressExtrenal { get; set; }
         [Reactive] public bool IsRedeemFromAddressWithMaxBalance { get; set; }
-
         [Reactive] public string ExternalAddressWarning { get; set; }
         [Reactive] public string ExternalAddressWarningToolTip { get; set; }
         [Reactive] public string RedeemFromAddressNote { get; set; }
         [Reactive] public string RedeemFromAddressNoteToolTip { get; set; }
-        [Reactive] public int DGSelectedIndex { get; set; } // current selected swap in DataGrid
+        [Reactive] public int SelectedSwapIndex { get; set; } // current selected swap in DataGrid
+        [Reactive] public SortDirection? CurrentSortDirection { get; set; }
         public Action<ViewModelBase?> ShowRightPopupContent { get; set; }
-
-        public void SetSwapSelectedIndex(int cellIndex)
-        {
-            if (DGSelectedIndex != -1 && DGSelectedIndex != cellIndex)
-            {
-                _ = Dispatcher.UIThread.InvokeAsync(async () =>
-                {
-                    ShowRightPopupContent?.Invoke(null);
-                    await Task.Delay(WalletMainViewModel.DelayBeforeSwitchingSwapDetailsMs);
-                    DGSelectedIndex = cellIndex;
-                });
-            }
-            else
-            {
-                DGSelectedIndex = cellIndex;
-            }
-        }
 
 #if DEBUG
         public ConversionViewModel()
@@ -160,6 +146,7 @@ namespace Atomex.Client.Desktop.ViewModels
                 {
                     var selectCurrencyViewModel = new SelectCurrencyViewModel(
                         account: _app.Account,
+                        localStorage: _app.LocalStorage,
                         type: SelectCurrencyType.From,
                         currencies: await CreateFromCurrencyViewModelItemsAsync(FromCurrencies!),
                         selected: FromCurrencyViewModelItem)
@@ -188,6 +175,7 @@ namespace Atomex.Client.Desktop.ViewModels
                 {
                     var selectCurrencyViewModel = new SelectCurrencyViewModel(
                         account: _app.Account,
+                        localStorage: _app.LocalStorage,
                         type: SelectCurrencyType.To,
                         currencies: await CreateToCurrencyViewModelItemsAsync(ToCurrencies!),
                         selected: ToCurrencyViewModelItem)
@@ -253,7 +241,7 @@ namespace Atomex.Client.Desktop.ViewModels
                     var isBtcBased = Atomex.Currencies.IsBitcoinBased(i.CurrencyViewModel.Currency.Name);
                     UseRedeemAddress = !isBtcBased;
 
-                    if (item.SelectedAddress.KeyIndex != null) // is atomex address
+                    if (item.SelectedAddress.KeyPath != null) // is atomex address
                     {
                         RedeemFromAddress = ToAddress;
                         IsToAddressExtrenal = false;
@@ -441,7 +429,7 @@ namespace Atomex.Client.Desktop.ViewModels
                 .ToPropertyExInMainThread(this, vm => vm.IsError);
 
             this.WhenAnyValue(
-                    vm => vm.DGSelectedIndex,
+                    vm => vm.SelectedSwapIndex,
                     vm => vm.Swaps,
                     (selectedSwapIndex, _) => selectedSwapIndex)
                 .Throttle(TimeSpan.FromMilliseconds(1))
@@ -451,8 +439,18 @@ namespace Atomex.Client.Desktop.ViewModels
                 .SubscribeInMainThread(swapDetailsViewModel =>
                 {
                     ShowRightPopupContent?.Invoke(swapDetailsViewModel);
-                    this.RaisePropertyChanged(nameof(DGSelectedIndex));
                 });
+
+            this.WhenAnyValue(vm => vm.CurrentSortDirection)
+                .WhereNotNull()
+                .Subscribe(sortDirection =>
+                {
+                    _ = LoadMoreSwapsAsync(reset: true);
+                });
+
+            CurrentSortDirection = SortDirection.Desc;
+            SelectedSwapIndex = -1;
+            Swaps = new ObservableRangeCollection<SwapViewModel>();
 
             SubscribeToServices();
         }
@@ -469,7 +467,7 @@ namespace Atomex.Client.Desktop.ViewModels
                 if (FromViewModel.CurrencyViewModel == null || ToViewModel.CurrencyViewModel == null)
                     return;
 
-                var swapParams = await Atomex.ViewModels.Helpers
+                var swapParams = await Task.Run(() => Atomex.ViewModels.Helpers
                     .EstimateSwapParamsAsync(
                         from: FromCurrencyViewModelItem?.FromSource,
                         fromAmount: EstimatedMaxFromAmount,
@@ -479,7 +477,7 @@ namespace Atomex.Client.Desktop.ViewModels
                         account: _app.Account,
                         marketDataRepository: _app.MarketDataRepository,
                         symbolsProvider: _app.SymbolsProvider,
-                        quotesProvider: _app.QuotesProvider);
+                        quotesProvider: _app.QuotesProvider));
 
                 if (swapParams == null)
                     return;
@@ -489,7 +487,7 @@ namespace Atomex.Client.Desktop.ViewModels
                 //}
 
                 FromViewModel.Amount = Math.Min(swapParams.Amount, EstimatedMaxFromAmount)
-                    .TruncateDecimal(FromViewModel.CurrencyViewModel!.Currency.Digits);
+                    .TruncateDecimal(FromViewModel.CurrencyViewModel!.Currency.Decimals);
             }
             catch (Exception e)
             {
@@ -498,7 +496,6 @@ namespace Atomex.Client.Desktop.ViewModels
         }
 
         private ICommand _swapCurrenciesCommand;
-
         public ICommand SwapCurrenciesCommand => _swapCurrenciesCommand ??= ReactiveCommand.Create(async () =>
         {
             if (FromViewModel.CurrencyViewModel == null || ToViewModel.CurrencyViewModel == null)
@@ -516,7 +513,6 @@ namespace Atomex.Client.Desktop.ViewModels
         });
 
         private ICommand _changeRedeemAddress;
-
         public ICommand ChangeRedeemAddress => _changeRedeemAddress ??= ReactiveCommand.Create(async () =>
         {
             if (ToViewModel.CurrencyViewModel == null)
@@ -535,6 +531,7 @@ namespace Atomex.Client.Desktop.ViewModels
 
             var selectAddressViewModel = new SelectAddressViewModel(
                 account: _app.Account,
+                localStorage: _app.LocalStorage,
                 currency: feeCurrency,
                 mode: SelectAddressMode.ChangeRedeemAddress,
                 selectedAddress: RedeemFromAddress)
@@ -561,7 +558,7 @@ namespace Atomex.Client.Desktop.ViewModels
                         .GetCurrencyAccount<BitcoinBasedAccount>(currencyName)
                         .GetAvailableOutputsAsync()
                         .ConfigureAwait(false))
-                    .Cast<BitcoinBasedTxOutput>();
+                    .Cast<BitcoinTxOutput>();
 
                 var selectedOutputs = FromCurrencyViewModelItem?.CurrencyViewModel.Currency.Name == currencyName
                     ? (FromCurrencyViewModelItem as SelectCurrencyWithOutputsViewModelItem)?.SelectedOutputs
@@ -621,9 +618,10 @@ namespace Atomex.Client.Desktop.ViewModels
         {
             var currencyName = currencyViewModel.Currency.Name;
 
-            var receivingAddresses = await AddressesHelper
+            var receivingAddresses = await AccountAddressesHelper
                 .GetReceivingAddressesAsync(
                     account: _app.Account,
+                    localStorage: _app.LocalStorage,
                     currency: currencyViewModel.Currency)
                 .ConfigureAwait(false);
 
@@ -668,6 +666,20 @@ namespace Atomex.Client.Desktop.ViewModels
             }
         }
 
+        private ReactiveCommand<Unit, Unit>? _sortByTimeCommand;
+        public ReactiveCommand<Unit, Unit> SortByTimeCommand =>
+            _sortByTimeCommand ??= ReactiveCommand.Create<Unit>(sortField =>
+            {
+                CurrentSortDirection = CurrentSortDirection == SortDirection.Asc
+                    ? SortDirection.Desc
+                    : SortDirection.Asc;
+            });
+
+        public void ReachEndOfScroll()
+        {
+            _ = LoadMoreSwapsAsync(reset: false);
+        }
+
         private void SubscribeToServices()
         {
             _app.AtomexClientChanged += OnAtomexClientChangedEventHandler;
@@ -681,7 +693,7 @@ namespace Atomex.Client.Desktop.ViewModels
             try
             {
                 // estimate max payment amount and max fee
-                var swapParams = await Atomex.ViewModels.Helpers
+                var swapParams = await Task.Run(() => Atomex.ViewModels.Helpers
                     .EstimateSwapParamsAsync(
                         from: FromCurrencyViewModelItem?.FromSource,
                         fromAmount: FromViewModel.Amount,
@@ -691,7 +703,7 @@ namespace Atomex.Client.Desktop.ViewModels
                         account: _app.Account,
                         marketDataRepository: _app.MarketDataRepository,
                         symbolsProvider: _app.SymbolsProvider,
-                        quotesProvider: _app.QuotesProvider);
+                        quotesProvider: _app.QuotesProvider));
 
                 await Dispatcher.UIThread.InvokeAsync(() =>
                 {
@@ -708,8 +720,8 @@ namespace Atomex.Client.Desktop.ViewModels
                     if (swapParams.Error != null)
                     {
                         AmountValidationMessageType = MessageType.Error;
-                        AmountValidationMessage = swapParams.Error.Description;
-                        AmountValidationMessageToolTip = swapParams.Error.Details;
+                        AmountValidationMessage = swapParams.Error.Value.Message;
+                        AmountValidationMessageToolTip = swapParams.Error.Value.Details;
                     }
                     else
                     {
@@ -801,7 +813,9 @@ namespace Atomex.Client.Desktop.ViewModels
             _app.MarketDataRepository.QuotesUpdated += OnQuotesUpdatedEventHandler;
             _app.SwapManager.SwapUpdated += OnSwapEventHandler;
 
-            FromCurrencies = _app.Account.Currencies
+            FromCurrencies = _app.Account
+                .Currencies
+                .GetOrderedPreset()
                 .Where(c => c.IsSwapAvailable)
                 .Select(CurrencyViewModelCreator.CreateOrGet)
                 .ToList();
@@ -817,10 +831,10 @@ namespace Atomex.Client.Desktop.ViewModels
             FromCurrencyViewModelItem = null;
             ToCurrencyViewModelItem = null;
 
-            DGSelectedIndex = -1;
-            Swaps = null;
+            SelectedSwapIndex = -1;
+            Swaps.Clear();
 
-            OnSwapEventHandler(this, args: null);
+            _ = LoadMoreSwapsAsync(reset: true);
         }
 
         private void CheckAmountToFeeRatio()
@@ -864,6 +878,7 @@ namespace Atomex.Client.Desktop.ViewModels
                 UpdateRewardForRedeemInBase();
                 UpdateEstimatedMakerNetworkFeeInBase();
                 UpdateTotalNetworkFeeInBase();
+
             }, DispatcherPriority.Background);
         }
 
@@ -871,7 +886,7 @@ namespace Atomex.Client.Desktop.ViewModels
         {
             try
             {
-                var swapPriceEstimation = await Atomex.ViewModels.Helpers
+                var swapPriceEstimation = await Task.Run(async () => await Atomex.ViewModels.Helpers
                     .EstimateSwapPriceAsync(
                         amount: _amountType == AmountType.Sold
                             ? FromViewModel.Amount
@@ -881,7 +896,7 @@ namespace Atomex.Client.Desktop.ViewModels
                         toCurrency: ToViewModel.CurrencyViewModel?.Currency,
                         account: _app.Account,
                         marketDataRepository: _app.MarketDataRepository,
-                        symbolsProvider: _app.SymbolsProvider);
+                        symbolsProvider: _app.SymbolsProvider));
 
                 await Dispatcher.UIThread.InvokeAsync(() =>
                 {
@@ -927,12 +942,82 @@ namespace Atomex.Client.Desktop.ViewModels
             }
         }
 
-        private async void OnSwapEventHandler(object? sender, SwapEventArgs? args)
+        private async void OnSwapEventHandler(object? sender, SwapEventArgs args)
         {
+            await _loadSwapsSemaphore.WaitAsync();
+
             try
             {
-                var swaps = await _app.Account
-                    .GetSwapsAsync();
+                await Dispatcher.UIThread.InvokeAsync(async () =>
+                {
+                    var existSwapViewModel = Swaps.FirstOrDefault(s => s.Id == args.Swap.Id.ToString());
+
+                    if (existSwapViewModel != null)
+                    {
+                        SwapViewModelFactory.Update(existSwapViewModel, args.Swap, Currencies);
+                    }
+                    else
+                    {
+                        var isNewSwap = !Swaps.Any() || args.Swap.TimeStamp.ToUniversalTime() > Swaps[0].Time.ToUniversalTime();
+
+                        if (isNewSwap && CurrentSortDirection == SortDirection.Desc)
+                        {
+                            var newSwapViewModel = SwapViewModelFactory.CreateSwapViewModel(
+                                swap: args.Swap,
+                                currencies: Currencies,
+                                onCloseSwap: () => ShowRightPopupContent?.Invoke(null));
+
+                            Swaps.Insert(0, newSwapViewModel!);
+
+                            _swapsLoaded++;
+                        }
+                    }
+
+                }, DispatcherPriority.Background);
+            }
+            catch (Exception e)
+            {
+                Log.Error(e, "Swaps event handler error");
+            }
+            finally
+            {
+                _loadSwapsSemaphore.Release();
+            }
+        }
+
+        private async Task LoadMoreSwapsAsync(bool reset)
+        {
+            await _loadSwapsSemaphore.WaitAsync();
+
+            Log.Debug("LoadMoreSwapsAsync");
+
+            try
+            {
+                if (_app.Account == null)
+                    return;
+
+                if (reset)
+                {
+                    // reset exists transactions
+                    await Dispatcher.UIThread.InvokeAsync(() =>
+                    {
+                        Swaps.Clear();
+                        _swapsLoaded = 0;
+                    });
+                }
+
+                var swaps = await Task.Run(async () =>
+                {
+                    return await _app
+                        .LocalStorage
+                        .GetSwapsAsync(
+                            offset: _swapsLoaded,
+                            limit: SWAPS_LOADING_LIMIT,
+                            sort: CurrentSortDirection.Value)
+                        .ConfigureAwait(false);
+                });
+
+                _swapsLoaded += swaps.Count();
 
                 await Dispatcher.UIThread.InvokeAsync(async () =>
                 {
@@ -942,24 +1027,19 @@ namespace Atomex.Client.Desktop.ViewModels
                             currencies: Currencies,
                             onCloseSwap: () => ShowRightPopupContent?.Invoke(null)))
                         .WhereNotNull()
-                        .ToList()
-                        .SortList((s1, s2) =>
-                            s2!.Time.ToUniversalTime().CompareTo(s1!.Time.ToUniversalTime()));
-                    
-                    var previousSwapsCount = Swaps?.Count;
-                    Swaps = new ObservableCollection<SwapViewModel>(swapViewModels!);
+                        .ToList();
 
-                    if (previousSwapsCount != null && previousSwapsCount < swapViewModels?.Count)
-                    {
-                        ShowRightPopupContent?.Invoke(null);
-                        await Task.Delay(WalletMainViewModel.DelayBeforeSwitchingSwapDetailsMs);
-                        DGSelectedIndex = 0;
-                    }
+                    Swaps.AddRange(swapViewModels!);
+
                 }, DispatcherPriority.Background);
             }
             catch (Exception e)
             {
-                Log.Error(e, "Swaps update error");
+                Log.Error(e, "Swaps loading error");
+            }
+            finally
+            {
+                _loadSwapsSemaphore.Release();
             }
         }
 
@@ -1045,7 +1125,7 @@ namespace Atomex.Client.Desktop.ViewModels
                     side: side,
                     amount: FromViewModel.Amount,
                     price: price,
-                    digitsMultiplier: baseCurrency.DigitsMultiplier);
+                    precision: baseCurrency.Precision);
 
                 if (qty < symbol.MinimumQty)
                 {
@@ -1053,7 +1133,7 @@ namespace Atomex.Client.Desktop.ViewModels
                         side: side,
                         qty: symbol.MinimumQty,
                         price: price,
-                        digitsMultiplier: FromViewModel.CurrencyViewModel.Currency.DigitsMultiplier);
+                        precision: FromViewModel.CurrencyViewModel.Currency.Precision);
 
                     var message = string.Format(
                         provider: CultureInfo.CurrentCulture,
@@ -1129,7 +1209,7 @@ namespace Atomex.Client.Desktop.ViewModels
                 .ToPropertyExInMainThread(this, vm => vm.IsError);
 
             this.WhenAnyValue(
-                    vm => vm.DGSelectedIndex,
+                    vm => vm.SelectedSwapIndex,
                     vm => vm.Swaps,
                     (selectedSwapIndex, _) => selectedSwapIndex)
                 .Throttle(TimeSpan.FromMilliseconds(1))
@@ -1139,7 +1219,6 @@ namespace Atomex.Client.Desktop.ViewModels
                 .SubscribeInMainThread(swapDetailsViewModel =>
                 {
                     ShowRightPopupContent?.Invoke(swapDetailsViewModel);
-                    this.RaisePropertyChanged(nameof(DGSelectedIndex));
                 });
 
             var btc = DesignTime.TestNetCurrencies.Get<BitcoinConfig>("BTC");
@@ -1246,10 +1325,10 @@ namespace Atomex.Client.Desktop.ViewModels
                     DesignTime.TestNetCurrencies)!
             };
 
-            Swaps = new ObservableCollection<SwapViewModel>(swapViewModels);
+            Swaps = new ObservableRangeCollection<SwapViewModel>(swapViewModels);
 
             CanExchange = true;
-            DGSelectedIndex = 0; // -1;
+            SelectedSwapIndex = 0; // -1;
         }
 #endif
     }

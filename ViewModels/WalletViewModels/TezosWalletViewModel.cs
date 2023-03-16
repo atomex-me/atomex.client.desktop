@@ -6,21 +6,21 @@ using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+
 using Avalonia.Threading;
 using Serilog;
 using ReactiveUI;
+using ReactiveUI.Fody.Helpers;
+
 using Atomex.Blockchain.Tezos;
-using Atomex.Blockchain.Tezos.Internal;
-using Atomex.Blockchain.Tezos.Tzkt;
 using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.ViewModels.Abstract;
 using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
 using Atomex.Client.Desktop.ViewModels.DappsViewModels;
+using Atomex.Common;
 using Atomex.Core;
 using Atomex.Wallet;
 using Atomex.Wallet.Tezos;
-using ReactiveUI.Fody.Helpers;
-
 
 namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 {
@@ -45,14 +45,15 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         {
         }
 
-        public TezosWalletViewModel(IAtomexApp app,
+        public TezosWalletViewModel(
+            IAtomexApp app,
             Action<CurrencyConfig> setConversionTab,
             Action<string>? setWertCurrency,
             Action<ViewModelBase?> showRightPopupContent,
             Action<TezosTokenViewModel> showTezosToken,
             Action<IEnumerable<TezosTokenViewModel>> showTezosCollection,
             CurrencyConfig currency)
-            : base(app, showRightPopupContent, currency, setConversionTab, setWertCurrency)
+            : base(app, currency, showRightPopupContent, setConversionTab, setWertCurrency)
         {
             Tezos = currency as TezosConfig;
             Delegations = new ObservableCollection<Delegation>();
@@ -63,7 +64,8 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                 .WhereAllNotNull()
                 .SubscribeInMainThread(_ => SortDelegations(Delegations));
 
-            DelegateCommand.Merge(UndelegateCommand)
+            DelegateCommand
+                .Merge(UndelegateCommand)
                 .SubscribeInMainThread(_ => DelegationAddressPopupOpened = null);
 
             UpdateTokensCommand
@@ -109,14 +111,19 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             };
         }
 
-        protected override async void OnBalanceUpdatedEventHandler(object sender, CurrencyEventArgs args)
+        protected override void SubscribeToServices()
+        {
+            base.SubscribeToServices();
+
+            _app.LocalStorage.BalanceChanged += OnBalanceChangedEventHandler;
+        }
+
+        protected async void OnBalanceChangedEventHandler(object? sender, BalanceChangedEventArgs args)
         {
             try
             {
-                if (Currency.Name != args.Currency) return;
-
-                // update transactions list
-                await LoadTransactionsAsync();
+                if (args.Currency != Currency.Name)
+                    return;
 
                 // update delegation info
                 await LoadDelegationInfoAsync();
@@ -139,36 +146,37 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                     .GetUnspentAddressesAsync(Tezos.Name)
                     .ConfigureAwait(false);
 
-                var rpc = new Rpc(Tezos.RpcNodeUri);
-
                 var delegations = new List<Delegation>();
 
-                var tzktApi = new TzktApi(Tezos);
-                var head = await tzktApi.GetHeadLevelAsync();
-                var headLevel = head.Value;
+                var tzktApi = Tezos.GetTzktApi();
+
+                var rpc = new TezosRpc(Tezos.GetRpcSettings());
+                var head = await rpc
+                    .GetHeaderAsync()
+                    .ConfigureAwait(false); //await tzktApi.GetHeaderAsync();
 
                 var currentCycle = _app.Account.Network == Network.MainNet
-                    ? Math.Floor((headLevel - 1) / 4096)
-                    : Math.Floor((headLevel - 1) / 2048);
+                    ? Math.Floor((head.Level - 1) / 4096m)
+                    : Math.Floor((head.Level - 1) / 2048m);
 
                 foreach (var wa in addresses)
                 {
                     var accountData = await rpc
-                        .GetAccount(wa.Address)
+                        .GetAccountAsync(wa.Address)
                         .ConfigureAwait(false);
 
-                    var @delegate = accountData["delegate"]?.ToString();
+                    var @delegate = accountData.Delegate;
 
                     if (string.IsNullOrEmpty(@delegate))
                     {
                         delegations.Add(new Delegation
                         {
-                            Baker = null,
-                            Address = wa.Address,
-                            ExplorerUri = Tezos.BbUri,
-                            Balance = wa.Balance,
+                            Baker          = null,
+                            Address        = wa.Address,
+                            ExplorerUri    = Tezos.BbUri,
+                            Balance        = wa.Balance.ToTez(),
                             DelegationTime = null,
-                            Status = DelegationStatus.NotDelegated
+                            Status         = DelegationStatus.NotDelegated
                         });
 
                         continue;
@@ -178,35 +186,36 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                         .GetBaker(@delegate, _app.Account.Network)
                         .ConfigureAwait(false) ?? new BakerData { Address = @delegate };
 
-                    var account = await tzktApi.GetAccountByAddressAsync(wa.Address);
+                    var (account, error) = await tzktApi.GetAccountAsync(wa.Address);
 
-                    if (account.HasError)
+                    if (error != null || account == null)
                         continue;
 
                     var txCycle = _app.Account.Network == Network.MainNet
-                        ? Math.Floor((account.Value.DelegationLevel - 1) / 4096)
-                        : Math.Floor((account.Value.DelegationLevel - 1) / 2048);
+                        ? Math.Floor((account.DelegationLevel - 1) / 4096m)
+                        : Math.Floor((account.DelegationLevel - 1) / 2048m);
 
                     delegations.Add(new Delegation
                     {
-                        Baker = baker,
-                        Address = wa.Address,
-                        ExplorerUri = Tezos.BbUri,
-                        Balance = wa.Balance,
-                        DelegationTime = account.Value.DelegationTime,
-                        Status = currentCycle - txCycle < 2 ? DelegationStatus.Pending :
+                        Baker          = baker,
+                        Address        = wa.Address,
+                        ExplorerUri    = Tezos.BbUri,
+                        Balance        = wa.Balance.ToTez(),
+                        DelegationTime = DateTime.Parse(account.DelegationTime),
+                        Status         = currentCycle - txCycle < 2 ? DelegationStatus.Pending :
                             currentCycle - txCycle < 7 ? DelegationStatus.Confirmed :
                             DelegationStatus.Active
                     });
                 }
 
                 await Dispatcher.UIThread.InvokeAsync(() =>
-                    {
-                        CanDelegate = balance.Available > 0;
-                        HasDelegations = delegations.Count > 0;
-                        SortDelegations(delegations);
-                    },
-                    DispatcherPriority.Background);
+                {
+                    CanDelegate = balance.Confirmed > 0;
+                    HasDelegations = delegations.Count > 0;
+
+                    SortDelegations(delegations);
+                },
+                DispatcherPriority.Background);
             }
             catch (OperationCanceledException)
             {
@@ -219,25 +228,20 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         }
 
         private ReactiveCommand<string, Unit>? _delegateCommand;
-
         public ReactiveCommand<string, Unit> DelegateCommand =>
             _delegateCommand ??= _delegateCommand = ReactiveCommand.Create<string>(OnDelegateClick);
 
         private ReactiveCommand<string, Unit>? _undelegateCommand;
-
         public ReactiveCommand<string, Unit> UndelegateCommand =>
             _undelegateCommand ??= _undelegateCommand = ReactiveCommand.Create<string>(
-                undelegateAddress => _ = DelegateViewModel.Undelegate(undelegateAddress));
+                undelegateAddress => _ = DelegateViewModel.UndelegateAsync(undelegateAddress));
 
         private ReactiveCommand<string, Unit>? _openAddressInExplorerCommand;
-
         public ReactiveCommand<string, Unit> OpenAddressInExplorerCommand => _openAddressInExplorerCommand ??=
             _openAddressInExplorerCommand = ReactiveCommand.Create<string>(
                 address => App.OpenBrowser($"{Tezos?.BbUri}{address}"));
 
-
         private ReactiveCommand<DelegationSortField, Unit>? _setDelegationSortTypeCommand;
-
         public ReactiveCommand<DelegationSortField, Unit> SetDelegationSortTypeCommand =>
             _setDelegationSortTypeCommand ??= ReactiveCommand.Create<DelegationSortField>(sortField =>
             {
@@ -250,7 +254,6 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             });
 
         private ReactiveCommand<Unit, Unit>? _connectDappCommand;
-
         public ReactiveCommand<Unit, Unit> ConnectDappCommand =>
             _connectDappCommand ??= ReactiveCommand.Create(() =>
             {
@@ -258,14 +261,11 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             });
 
         private ReactiveCommand<string, Unit>? _openDelegationPopupCommand;
-
         public ReactiveCommand<string, Unit> OpenDelegationPopupCommand => _openDelegationPopupCommand ??=
             (_openDelegationPopupCommand = ReactiveCommand.Create<string>(
                 address => DelegationAddressPopupOpened = address));
 
-
         private ReactiveCommand<Unit, Unit>? _manageTokensCommand;
-
         public ReactiveCommand<Unit, Unit> ManageTokensCommand =>
             _manageTokensCommand ??= _manageTokensCommand = ReactiveCommand.Create(() =>
             {
@@ -301,7 +301,6 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             });
 
         private ReactiveCommand<Unit, Unit>? _manageCollectiblesCommand;
-
         public ReactiveCommand<Unit, Unit> ManageCollectiblesCommand =>
             _manageCollectiblesCommand ??= _manageCollectiblesCommand = ReactiveCommand.Create(() =>
             {
@@ -336,21 +335,25 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
 
         private ReactiveCommand<Unit, Unit>? _updateTokensCommand;
-
         public ReactiveCommand<Unit, Unit> UpdateTokensCommand => _updateTokensCommand ??=
             (_updateTokensCommand = ReactiveCommand.CreateFromTask(UpdateTokens));
 
         private async Task UpdateTokens()
         {
             _cancellation = new CancellationTokenSource();
+
             try
             {
                 var tezosAccount = _app.Account
                     .GetCurrencyAccount<TezosAccount>(TezosConfig.Xtz);
 
-                var tezosTokensScanner = new TezosTokensScanner(tezosAccount);
+                var fa12TokensScanner = new TezosTokensWalletScanner(tezosAccount, TezosHelper.Fa12);
+                var fa2TokensScanner = new TezosTokensWalletScanner(tezosAccount, TezosHelper.Fa2);
 
-                await tezosTokensScanner
+                await fa12TokensScanner
+                    .UpdateBalanceAsync(cancellationToken: _cancellation.Token);
+
+                await fa2TokensScanner
                     .UpdateBalanceAsync(cancellationToken: _cancellation.Token);
             }
             catch (OperationCanceledException)
@@ -374,9 +377,10 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         protected override void DesignerMode()
         {
             base.DesignerMode();
+
             SelectedTabIndex = 3;
 
-            TezosTokensViewModel = new TezosTokensViewModel(_app, x => { }, x => { });
+            TezosTokensViewModel = new TezosTokensViewModel();
 
             Delegations = new ObservableCollection<Delegation>()
             {

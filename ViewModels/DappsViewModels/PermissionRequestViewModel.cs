@@ -2,16 +2,18 @@ using System;
 using System.Collections.Generic;
 using System.Reactive;
 using System.Threading.Tasks;
+
+using Avalonia.Controls;
+using Beacon.Sdk.Beacon.Permission;
+using ReactiveUI;
+using ReactiveUI.Fody.Helpers;
+
 using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.Dialogs;
 using Atomex.Client.Desktop.ViewModels.Abstract;
 using Atomex.Client.Desktop.ViewModels.SendViewModels;
 using Atomex.ViewModels;
 using Atomex.Wallet.Abstract;
-using Avalonia.Controls;
-using Beacon.Sdk.Beacon.Permission;
-using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
 
 namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
 {
@@ -29,7 +31,11 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
         [ObservableAsProperty] public bool IsRejecting { get; }
         public Action? OnClose { get; set; }
 
-        public PermissionRequestViewModel(IAccount account, TezosConfig tezos, Action onClose)
+        public PermissionRequestViewModel(
+            IAccount account,
+            ILocalStorage localStorage,
+            TezosConfig tezos,
+            Action onClose)
         {
             OnAllowCommand
                 .IsExecuting
@@ -39,7 +45,7 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
                 .IsExecuting
                 .ToPropertyExInMainThread(this, vm => vm.IsRejecting);
 
-            SelectAddressViewModel = new SelectAddressViewModel(account, tezos, SelectAddressMode.Connect)
+            SelectAddressViewModel = new SelectAddressViewModel(account, localStorage, tezos, SelectAddressMode.Connect)
             {
                 BackAction = () => { App.DialogService.Show(this); },
                 ConfirmAction = _ => { App.DialogService.Show(this); },
@@ -57,20 +63,17 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
         public Func<Task> OnReject { get; init; }
 
         private ReactiveCommand<Unit, Unit>? _onAllowCommand;
-
         public ReactiveCommand<Unit, Unit> OnAllowCommand =>
             _onAllowCommand ??=
                 ReactiveCommand.CreateFromTask(async () => await OnAllow(SelectAddressViewModel.SelectedAddress!));
 
 
         private ReactiveCommand<Unit, Unit>? _onRejectCommand;
-
         public ReactiveCommand<Unit, Unit> OnRejectCommand =>
             _onRejectCommand ??= ReactiveCommand.CreateFromTask(async () => await OnReject());
 
 
         private ReactiveCommand<Unit, Unit>? _selectAddressCommand;
-
         public ReactiveCommand<Unit, Unit> SelectAddressCommand => _selectAddressCommand ??=
             ReactiveCommand.Create(() => { App.DialogService.Show(SelectAddressViewModel); });
 

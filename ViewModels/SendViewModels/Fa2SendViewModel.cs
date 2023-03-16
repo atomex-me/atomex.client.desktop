@@ -7,15 +7,17 @@ using Avalonia.Controls;
 using Avalonia.Threading;
 using Serilog;
 
+using Atomex.Blockchain;
 using Atomex.Blockchain.Abstract;
+using Atomex.Blockchain.Tezos;
 using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.Properties;
 using Atomex.Client.Desktop.ViewModels.Abstract;
+using Atomex.Common;
 using Atomex.Core;
 using Atomex.MarketData.Abstract;
 using Atomex.TezosTokens;
 using Atomex.Wallet.Tezos;
-using Atomex.Common;
 
 namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 {
@@ -35,7 +37,11 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             CurrencyConfig currency)
             : base(app, currency)
         {
-            SelectFromViewModel = new SelectAddressViewModel(_app.Account, Currency, SelectAddressMode.SendFrom)
+            SelectFromViewModel = new SelectAddressViewModel(
+                _app.Account,
+                _app.LocalStorage,
+                Currency,
+                SelectAddressMode.SendFrom)
             {
                 BackAction = () => { App.DialogService.Show(this); },
                 ConfirmAction = walletAddressViewModel =>
@@ -49,6 +55,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
             SelectToViewModel = new SelectAddressViewModel(
                 _app.Account,
+                _app.LocalStorage,
                 _app.Account.Currencies.Get<TezosConfig>(TezosConfig.Xtz))
             {
                 BackAction = () => { App.DialogService.Show(SelectFromViewModel); },
@@ -68,6 +75,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             {
                 From = walletAddressViewModel.Address;
                 SelectedFromBalance = walletAddressViewModel.Balance;
+
                 App.DialogService.Show(this);
             };
             
@@ -91,21 +99,23 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 var maxAmountEstimation = await account
                     .EstimateMaxAmountToSendAsync(
                         from: From,
-                        type: BlockchainTransactionType.Output,
+                        type: TransactionType.Output,
                         reserve: false);
 
                 if (UseDefaultFee && maxAmountEstimation.Fee > 0)
-                    Fee = maxAmountEstimation.Fee;
+                    Fee = maxAmountEstimation.Fee.ToTez();
 
                 if (maxAmountEstimation.Error != null)
                 {
-                    Warning = maxAmountEstimation.Error.Description;
-                    WarningToolTip = maxAmountEstimation.Error.Details;
+                    Warning = maxAmountEstimation.Error.Value.Message;
+                    WarningToolTip = maxAmountEstimation.ErrorHint;
                     WarningType = MessageType.Error;
                     return;
                 }
 
-                if (Amount > maxAmountEstimation.Amount)
+                var from = await account.GetAddressAsync(From);
+
+                if (Amount > maxAmountEstimation.Amount.FromTokens(from?.TokenBalance?.Decimals ?? 0))
                 {
                     Warning = Resources.CvInsufficientFunds;
                     WarningToolTip = "";
@@ -113,7 +123,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     return;
                 }
 
-                if (Fee < maxAmountEstimation.Fee)
+                if (Fee < maxAmountEstimation.Fee.ToTez())
                 {
                     Warning = Resources.CvLowFees;
                     WarningToolTip = "";
@@ -138,18 +148,20 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     var maxAmountEstimation = await account
                         .EstimateMaxAmountToSendAsync(
                             from: From,
-                            type: BlockchainTransactionType.Output,
+                            type: TransactionType.Output,
                             reserve: false);
 
                     if (maxAmountEstimation.Error != null)
                     {
-                        Warning = maxAmountEstimation.Error.Description;
-                        WarningToolTip = maxAmountEstimation.Error.Details;
+                        Warning = maxAmountEstimation.Error.Value.Message;
+                        WarningToolTip = maxAmountEstimation.ErrorHint;
                         WarningType = MessageType.Error;
                         return;
                     }
 
-                    if (Amount > maxAmountEstimation.Amount)
+                    var from = await account.GetAddressAsync(From);
+
+                    if (Amount > maxAmountEstimation.Amount.FromTokens(from?.TokenBalance?.Decimals ?? 0))
                     {
                         Warning = Resources.CvInsufficientFunds;
                         WarningToolTip = "";
@@ -157,7 +169,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                         return;
                     }
 
-                    if (Fee < maxAmountEstimation.Fee)
+                    if (Fee < maxAmountEstimation.Fee.ToTez())
                     {
                         Warning = Resources.CvLowFees;
                         WarningToolTip = "";
@@ -181,26 +193,28 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 var maxAmountEstimation = await account
                     .EstimateMaxAmountToSendAsync(
                         from: From,
-                        type: BlockchainTransactionType.Output,
+                        type: TransactionType.Output,
                         reserve: false);
 
                 if (UseDefaultFee && maxAmountEstimation.Fee > 0)
-                    Fee = maxAmountEstimation.Fee;
+                    Fee = maxAmountEstimation.Fee.ToTez();
 
                 if (maxAmountEstimation.Error != null)
                 {
-                    Warning = maxAmountEstimation.Error.Description;
-                    WarningToolTip = maxAmountEstimation.Error.Details;
+                    Warning = maxAmountEstimation.Error.Value.Message;
+                    WarningToolTip = maxAmountEstimation.ErrorHint;
                     WarningType = MessageType.Error;
                     Amount = 0;
                     return;
                 }
 
+                var from = await account.GetAddressAsync(From);
+
                 Amount = maxAmountEstimation.Amount > 0
-                    ? maxAmountEstimation.Amount
+                    ? maxAmountEstimation.Amount.FromTokens(from?.TokenBalance?.Decimals ?? 0)
                     : 0;
 
-                if (Fee < maxAmountEstimation.Fee)
+                if (Fee < maxAmountEstimation.Fee.ToTez())
                 {
                     Warning = Resources.CvLowFees;
                     WarningToolTip = "";
@@ -213,7 +227,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             }
         }
 
-        protected override void OnQuotesUpdatedEventHandler(object sender, EventArgs args)
+        protected override void OnQuotesUpdatedEventHandler(object? sender, EventArgs args)
         {
             if (sender is not IQuotesProvider quotesProvider)
                 return;
@@ -228,25 +242,31 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             });
         }
 
-        protected override async Task<Error> Send(CancellationToken cancellationToken = default)
+        protected override async Task<Error?> Send(CancellationToken cancellationToken = default)
         {
             var tokenConfig = (Fa2Config)Currency;
             var tokenContract = tokenConfig.TokenContractAddress;
             var tokenId = tokenConfig.TokenId;
-            const string? tokenType = "FA2";
+            const string? tokenType = TezosHelper.Fa2;
 
-            var tokenAddress = await TezosTokensSendViewModel.GetTokenAddressAsync(
-                account: _app.Account,
-                address: From,
-                tokenContract: tokenContract,
-                tokenId: tokenId,
-                tokenType: tokenType);
+            var tokenAddress = await TezosTokensSendViewModel
+                .GetTokenAddressAsync(
+                    account: _app.Account,
+                    address: From,
+                    tokenContract:
+                    tokenContract,
+                    tokenId: tokenId,
+                    tokenType: tokenType,
+                    cancellationToken: cancellationToken)
+                .ConfigureAwait(false);
 
-            var currencyName = _app.Account.Currencies
+            var currencyName = _app
+                .Account
+                .Currencies
                 .FirstOrDefault(c => c is Fa2Config fa2 && fa2.TokenContractAddress == tokenContract && fa2.TokenId == tokenId)
-                ?.Name ?? "FA2";
+                ?.Name ?? TezosHelper.Fa2;
 
-            var tokenAccount = _app.Account.GetTezosTokenAccount<Fa2Account>(
+            var tokenAccount = _app.Account.GetCurrencyAccount<Fa2Account>(
                 currency: currencyName,
                 tokenContract: tokenContract,
                 tokenId: tokenId);
@@ -255,8 +275,8 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 .SendAsync(
                     from: tokenAddress.Address,
                     to: To,
-                    amount: AmountToSend,
-                    fee: Fee,
+                    amount: AmountToSend.ToTokens(tokenAddress.TokenBalance.Decimals),
+                    fee: Fee.ToMicroTez(),
                     useDefaultFee: UseDefaultFee,
                     cancellationToken: cancellationToken)
                 .ConfigureAwait(false);

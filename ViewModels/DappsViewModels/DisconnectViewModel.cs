@@ -1,9 +1,11 @@
 using System;
 using System.Reactive;
 using System.Threading.Tasks;
-using Atomex.Client.Desktop.Common;
+
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
+
+using Atomex.Client.Desktop.Common;
 
 namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
 {
@@ -22,7 +24,6 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
         }
 
         private ReactiveCommand<Unit, Unit>? _onDisconnectCommand;
-
         public ReactiveCommand<Unit, Unit> OnDisconnectCommand =>
             _onDisconnectCommand ??= ReactiveCommand.CreateFromTask(async () =>
             {
@@ -31,7 +32,6 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
             });
 
         private ReactiveCommand<Unit, Unit>? _onCancelCommand;
-
         public ReactiveCommand<Unit, Unit> OnCancelCommand =>
             _onCancelCommand ??= ReactiveCommand.Create(() => { App.DialogService.Close(); });
     }

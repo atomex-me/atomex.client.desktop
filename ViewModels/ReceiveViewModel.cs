@@ -1,4 +1,4 @@
-using Serilog;
+
 using System;
 using System.Drawing.Imaging;
 using System.IO;
@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
+
 using Color = System.Drawing.Color;
 using Avalonia.Controls;
 using Avalonia.Media.Imaging;
@@ -13,6 +14,8 @@ using Avalonia.Threading;
 using QRCoder;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
+using Serilog;
+
 using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.ViewModels.SendViewModels;
 using Atomex.Core;
@@ -28,8 +31,8 @@ namespace Atomex.Client.Desktop.ViewModels
         [Reactive] public WalletAddressViewModel SelectedAddress { get; set; }
         [Reactive] public bool IsCopied { get; set; }
         [Reactive] public IBitmap QrCode { get; private set; }
-        public string TokenContract { get; private set; }
-        public string TokenType { get; private set; }
+        public string? TokenContract { get; private set; }
+        public string? TokenType { get; private set; }
         public string TitleText => $"Your receiving {Currency.DisplayedName} address";
         public string MyAddressesText => $"My {Currency.DisplayedName} addresses";
         public SelectAddressViewModel SelectAddressViewModel { get; set; }
@@ -47,8 +50,8 @@ namespace Atomex.Client.Desktop.ViewModels
         public ReceiveViewModel(
             IAtomexApp app,
             CurrencyConfig currency,
-            string tokenContract = null,
-            string tokenType = null)
+            string? tokenContract = null,
+            string? tokenType = null)
         {
             var createQrCodeCommand = ReactiveCommand.CreateFromTask(CreateQrCodeAsync);
 
@@ -64,7 +67,10 @@ namespace Atomex.Client.Desktop.ViewModels
             TokenType = tokenType;
             Currency = currency;
 
-            SelectAddressViewModel = new SelectAddressViewModel(app.Account, Currency)
+            SelectAddressViewModel = new SelectAddressViewModel(
+                app.Account,
+                app.LocalStorage,
+                Currency)
             {
                 BackAction = () => { App.DialogService.Show(this); },
                 ConfirmAction = walletAddressViewModel =>
@@ -106,7 +112,6 @@ namespace Atomex.Client.Desktop.ViewModels
         }
 
         private ReactiveCommand<Unit, Unit> _copyCommand;
-
         public ReactiveCommand<Unit, Unit> CopyCommand => _copyCommand ??= ReactiveCommand.CreateFromTask(async () =>
         {
             try
@@ -123,13 +128,11 @@ namespace Atomex.Client.Desktop.ViewModels
         });
 
         private ReactiveCommand<Unit, Unit> _selectAddressCommand;
-
         public ReactiveCommand<Unit, Unit> SelectAddressCommand =>
             _selectAddressCommand ??= ReactiveCommand.Create(() => { App.DialogService.Show(SelectAddressViewModel); });
 
 
         private ReactiveCommand<Unit, Unit> _backCommand;
-
         public ReactiveCommand<Unit, Unit> BackCommand =>
             _backCommand ??= ReactiveCommand.Create(() => { OnBack?.Invoke(); });
 
@@ -141,12 +144,12 @@ namespace Atomex.Client.Desktop.ViewModels
             {
                 Address = "tz3bvNMQ95vfAYtG8193ymshqjSvmxiCUuR5",
                 HasActivity = true,
-                AvailableBalance = 123.456789m,
+                AvailableBalance = 123456789,
                 CurrencyFormat = Currency.Format,
                 CurrencyCode = Currency.DisplayedName,
                 IsFreeAddress = false,
                 ShowTokenBalance = true,
-                TokenBalance = 100.00000000m,
+                TokenBalance = 10000000000,
                 TokenFormat = "F8",
                 TokenCode = "HEH"
             };

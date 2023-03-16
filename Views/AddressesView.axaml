@@ -8,7 +8,8 @@
              xmlns:converters="clr-namespace:Atomex.Client.Desktop.Converters"
              xmlns:controls="clr-namespace:Atomex.Client.Desktop.Controls"
              xmlns:views="clr-namespace:Atomex.Client.Desktop.Views"
-             xmlns:abstract="clr-namespace:Atomex.Client.Desktop.ViewModels.Abstract">
+             xmlns:abstract="clr-namespace:Atomex.Client.Desktop.ViewModels.Abstract"
+             xmlns:common="clr-namespace:Atomex.Common;assembly=Atomex.Client.Core">
 
     <Design.DataContext>
         <vm:AddressesViewModel />
@@ -47,7 +48,7 @@
                         <MultiBinding Converter="{x:Static BoolConverters.And}">
                             <Binding Path="CurrentSortDirection"
                                      Converter="{x:Static converters:EnumToStringEqualConverter.Instance}"
-                                     ConverterParameter="{x:Static abstract:SortDirection.Asc}" />
+                                     ConverterParameter="{x:Static common:SortDirection.Asc}" />
                             <Binding Path="CurrentSortField"
                                      Converter="{x:Static converters:EnumToStringEqualConverter.Instance}"
                                      ConverterParameter="{x:Static abstract:AddressesSortField.ByPath}" />
@@ -57,7 +58,7 @@
                         <MultiBinding Converter="{x:Static BoolConverters.And}">
                             <Binding Path="CurrentSortDirection"
                                      Converter="{x:Static converters:EnumToStringEqualConverter.Instance}"
-                                     ConverterParameter="{x:Static abstract:SortDirection.Desc}" />
+                                     ConverterParameter="{x:Static common:SortDirection.Desc}" />
                             <Binding Path="CurrentSortField"
                                      Converter="{x:Static converters:EnumToStringEqualConverter.Instance}"
                                      ConverterParameter="{x:Static abstract:AddressesSortField.ByPath}" />
@@ -86,7 +87,7 @@
                         <MultiBinding Converter="{x:Static BoolConverters.And}">
                             <Binding Path="CurrentSortDirection"
                                      Converter="{x:Static converters:EnumToStringEqualConverter.Instance}"
-                                     ConverterParameter="{x:Static abstract:SortDirection.Asc}" />
+                                     ConverterParameter="{x:Static common:SortDirection.Asc}" />
                             <Binding Path="CurrentSortField"
                                      Converter="{x:Static converters:EnumToStringEqualConverter.Instance}"
                                      ConverterParameter="{x:Static abstract:AddressesSortField.ByBalance}" />
@@ -96,7 +97,7 @@
                         <MultiBinding Converter="{x:Static BoolConverters.And}">
                             <Binding Path="CurrentSortDirection"
                                      Converter="{x:Static converters:EnumToStringEqualConverter.Instance}"
-                                     ConverterParameter="{x:Static abstract:SortDirection.Desc}" />
+                                     ConverterParameter="{x:Static common:SortDirection.Desc}" />
                             <Binding Path="CurrentSortField"
                                      Converter="{x:Static converters:EnumToStringEqualConverter.Instance}"
                                      ConverterParameter="{x:Static abstract:AddressesSortField.ByBalance}" />
@@ -112,7 +113,7 @@
                         <MultiBinding Converter="{x:Static BoolConverters.And}">
                             <Binding Path="CurrentSortDirection"
                                      Converter="{x:Static converters:EnumToStringEqualConverter.Instance}"
-                                     ConverterParameter="{x:Static abstract:SortDirection.Asc}" />
+                                     ConverterParameter="{x:Static common:SortDirection.Asc}" />
                             <Binding Path="CurrentSortField"
                                      Converter="{x:Static converters:EnumToStringEqualConverter.Instance}"
                                      ConverterParameter="{x:Static abstract:AddressesSortField.ByTokenBalance}" />
@@ -122,7 +123,7 @@
                         <MultiBinding Converter="{x:Static BoolConverters.And}">
                             <Binding Path="CurrentSortDirection"
                                      Converter="{x:Static converters:EnumToStringEqualConverter.Instance}"
-                                     ConverterParameter="{x:Static abstract:SortDirection.Desc}" />
+                                     ConverterParameter="{x:Static common:SortDirection.Desc}" />
                             <Binding Path="CurrentSortField"
                                      Converter="{x:Static converters:EnumToStringEqualConverter.Instance}"
                                      ConverterParameter="{x:Static abstract:AddressesSortField.ByTokenBalance}" />

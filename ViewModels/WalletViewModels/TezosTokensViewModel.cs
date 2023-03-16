@@ -5,12 +5,15 @@ using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
+
+using Avalonia.Controls;
 using Avalonia.Threading;
 using DynamicData;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using Serilog;
-using Atomex.Blockchain.Tezos;
+
+using Atomex.Blockchain.Tezos.Tzkt;
 using Atomex.Client.Common;
 using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.ViewModels.Abstract;
@@ -19,8 +22,6 @@ using Atomex.Core;
 using Atomex.MarketData.Abstract;
 using Atomex.Wallet;
 using Atomex.Wallet.Tezos;
-using Avalonia.Controls;
-
 
 namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 {
@@ -36,8 +37,16 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         [Reactive] public ObservableCollection<TezosTokenViewModel> Tokens { get; set; }
         public ObservableCollection<TezosTokenViewModel> InitialTokens { get; set; }
 
+        public TezosTokensViewModel()
+        {
+#if DEBUG
+            if (Design.IsDesignMode)
+                DesignerMode();
+#endif
+        }
 
-        public TezosTokensViewModel(IAtomexApp app,
+        public TezosTokensViewModel(
+            IAtomexApp app,
             Action<TezosTokenViewModel> showTezosToken,
             Action<CurrencyConfig> setConversionTab)
         {
@@ -46,7 +55,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             SetConversionTab = setConversionTab ?? throw new ArgumentNullException(nameof(setConversionTab));
 
             _app.AtomexClientChanged += OnAtomexClientChanged;
-            _app.Account.BalanceUpdated += OnBalanceUpdatedEventHandler;
+            _app.LocalStorage.BalanceChanged += OnBalanceChangedEventHandler;
             _app.QuotesProvider.QuotesUpdated += OnQuotesUpdatedEventHandler;
 
             this.WhenAnyValue(vm => vm.Contracts)
@@ -76,7 +85,8 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             this.WhenAnyValue(vm => vm.SearchPattern)
                 .WhereNotNull()
                 .SubscribeInMainThread(searchPattern =>
-                    Tokens = new ObservableCollection<TezosTokenViewModel>(InitialTokens.Where(token =>
+                    Tokens = new ObservableCollection<TezosTokenViewModel>(InitialTokens
+                        .Where(token =>
                         {
                             if (token.TokenBalance.Name != null && token.TokenBalance.Symbol != null)
                             {
@@ -89,7 +99,8 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                         })
                         .Where(token => !DisabledTokens!.Contains(token.TokenBalance.Symbol))
                         .OrderByDescending(token => token.CanExchange)
-                        .ThenByDescending(token => token.TotalAmountInBase)));
+                        .ThenByDescending(token => token.TotalAmountInBase)
+                        .ToList()));
 
             DisabledTokens = _app.Account.UserData.DisabledTokens ?? Array.Empty<string>();
             HideLowBalances = _app.Account.UserData.HideTokensWithLowBalance ?? false;
@@ -100,9 +111,9 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         private async Task ReloadTokenContractsAsync()
         {
             var contracts = (await _app.Account
-                    .GetCurrencyAccount<TezosAccount>(TezosConfig.Xtz)
-                    .DataRepository
-                    .GetTezosTokenContractsAsync())
+                .GetCurrencyAccount<TezosAccount>(TezosConfig.Xtz)
+                .LocalStorage
+                .GetTokenContractsAsync())
                 .ToList();
 
             Contracts = new ObservableCollection<TokenContract>(contracts);
@@ -119,32 +130,32 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                 .ThenByDescending(token => token.TotalAmountInBase);
         }
 
-
         private ReactiveCommand<TezosTokenViewModel, Unit>? _setTokenCommand;
-
         private ReactiveCommand<TezosTokenViewModel, Unit> SetTokenCommand => _setTokenCommand ??=
             ReactiveCommand.Create<TezosTokenViewModel>(
                 tezosTokenViewModel => ShowTezosToken.Invoke(tezosTokenViewModel));
 
-        private void OnAtomexClientChanged(object sender, AtomexClientChangedEventArgs args)
+        private void OnAtomexClientChanged(object? sender, AtomexClientChangedEventArgs args)
         {
-            if (_app.Account != null) return;
+            if (_app.Account != null)
+                return;
 
             _app.AtomexClientChanged -= OnAtomexClientChanged;
+
             Contracts?.Clear();
         }
 
-        private async void OnBalanceUpdatedEventHandler(object sender, CurrencyEventArgs args)
+        private async void OnBalanceChangedEventHandler(object? sender, BalanceChangedEventArgs args)
         {
             try
             {
-                if (args.IsTokenUpdate && (args.TokenContract == null || Contracts != null))
-                {
-                    await Dispatcher.UIThread.InvokeAsync(async () => { await ReloadTokenContractsAsync(); },
-                        DispatcherPriority.Background);
+                if (args is not TokenBalanceChangedEventArgs eventArgs)
+                    return;
 
-                    Log.Debug("Tezos tokens balances updated with contract {@Contract}", args.TokenContract);
-                }
+                await Dispatcher.UIThread.InvokeAsync(async () => { await ReloadTokenContractsAsync(); },
+                    DispatcherPriority.Background);
+
+                Log.Debug("Tezos tokens balances updated for contracts {@Contracts}", string.Join(',', eventArgs.Tokens.Select(p => p.Item1)));
             }
             catch (Exception e)
             {
@@ -152,9 +163,10 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             }
         }
 
-        private async void OnQuotesUpdatedEventHandler(object sender, EventArgs args)
+        private async void OnQuotesUpdatedEventHandler(object? sender, EventArgs args)
         {
-            if (sender is not IQuotesProvider) return;
+            if (sender is not IQuotesProvider)
+                return;
 
             await Dispatcher.UIThread.InvokeAsync(async () =>
             {
@@ -164,17 +176,11 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                 Tokens = new ObservableCollection<TezosTokenViewModel>(tezosTokenViewModels
                     .Where(token => !DisabledTokens.Contains(token.TokenBalance.Symbol))
                     .Where(token => !HideLowBalances || token.TotalAmountInBase > Constants.MinBalanceForTokensUsd)
-                );
+                    .ToList());
+
             }, DispatcherPriority.Background);
         }
 
-        public TezosTokensViewModel()
-        {
-#if DEBUG
-            if (Design.IsDesignMode)
-                DesignerMode();
-#endif
-        }
 #if DEBUG
         private void DesignerMode()
         {

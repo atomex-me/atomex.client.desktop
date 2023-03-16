@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Reactive;
-using Atomex.Client.Desktop.ViewModels.SendViewModels;
+
 using ReactiveUI;
 
+using Atomex.Client.Desktop.ViewModels.SendViewModels;
 
 namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 {
@@ -12,6 +13,8 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
         public string TokenExplorerUri =>
             $"{_tezosConfig.AddressExplorerUri}{TokenViewModel?.Contract.Address}/tokens/{TokenViewModel?.TokenBalance.TokenId}";
+
+        public CollectibleWalletViewModel() { }
 
         public CollectibleWalletViewModel(IAtomexApp app, Action<ViewModelBase?> showRightPopupContent)
             : base(app: app, showRightPopupContent)
@@ -38,7 +41,6 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         }
 
         private ReactiveCommand<string, Unit>? _openInExplorerCommand;
-
         public ReactiveCommand<string, Unit> OpenInExplorerCommand => _openInExplorerCommand ??=
             ReactiveCommand.Create<string>(address =>
             {

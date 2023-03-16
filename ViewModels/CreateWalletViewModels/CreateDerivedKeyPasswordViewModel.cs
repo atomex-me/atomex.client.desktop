@@ -14,7 +14,6 @@ namespace Atomex.Client.Desktop.ViewModels.CreateWalletViewModels
         }
 
         private PasswordControlViewModel _passwordVM;
-
         public PasswordControlViewModel PasswordVM
         {
             get => _passwordVM;
@@ -26,7 +25,6 @@ namespace Atomex.Client.Desktop.ViewModels.CreateWalletViewModels
         }
 
         private PasswordControlViewModel _passwordConfirmationVM;
-
         public PasswordControlViewModel PasswordConfirmationVM
         {
             get => _passwordConfirmationVM;
@@ -41,7 +39,6 @@ namespace Atomex.Client.Desktop.ViewModels.CreateWalletViewModels
         private StepData StepData { get; set; }
 
         private string _warning;
-
         public string Warning
         {
             get => _warning;
@@ -53,7 +50,6 @@ namespace Atomex.Client.Desktop.ViewModels.CreateWalletViewModels
         }
 
         private int _passwordScore;
-
         public int PasswordScore
         {
             get => _passwordScore;

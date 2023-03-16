@@ -82,10 +82,9 @@ namespace Atomex.Client.Desktop.ViewModels
                 .SubscribeInMainThread(searchPattern =>
                 {
                     var filteredCurrencies = InitialChoosenCurrencies
-                        .Where(c => c.Currency.Name.ToLower()
-                                        .Contains(searchPattern?.ToLower() ?? string.Empty) ||
-                                    c.Currency.Description.ToLower()
-                                        .Contains(searchPattern?.ToLower() ?? string.Empty));
+                        .Where(c => c.Currency.Name.ToLower().Contains(searchPattern?.ToLower() ?? string.Empty) ||
+                                    c.Currency.Description.ToLower().Contains(searchPattern?.ToLower() ?? string.Empty))
+                        .ToList();
                     
                     ChoosenCurrencies = new List<CurrencyViewModel>(filteredCurrencies);
                 });
@@ -105,12 +104,14 @@ namespace Atomex.Client.Desktop.ViewModels
             App.AtomexClientChanged += OnAtomexClientChangedEventHandler;
         }
 
-        private void OnAtomexClientChangedEventHandler(object sender, AtomexClientChangedEventArgs e)
+        private void OnAtomexClientChangedEventHandler(object? sender, AtomexClientChangedEventArgs e)
         {
             if (e.AtomexClient is null || App.Account == null)
                 return;
 
-            AllCurrencies = App.Account?.Currencies
+            AllCurrencies = App.Account
+                ?.Currencies
+                .GetOrderedPreset()
                 .Select(c =>
                 {
                     var vm = CurrencyViewModelCreator.CreateOrGet(c);
@@ -129,7 +130,7 @@ namespace Atomex.Client.Desktop.ViewModels
             OnAmountUpdatedEventHandler(this, EventArgs.Empty);
         }
 
-        private void OnAmountUpdatedEventHandler(object sender, EventArgs args)
+        private void OnAmountUpdatedEventHandler(object? sender, EventArgs args)
         {
             // update total portfolio value
             PortfolioValue = ChoosenCurrencies.Sum(c => c.TotalAmountInBase);
@@ -305,7 +306,8 @@ namespace Atomex.Client.Desktop.ViewModels
                             .ToArray();
                         
                         var currencies = AllCurrencies
-                            .Where(c => !disabledCurrencies.Contains(c.CurrencyCode));
+                            .Where(c => !disabledCurrencies.Contains(c.CurrencyCode))
+                            .ToList();
 
                         ChoosenCurrencies = new List<CurrencyViewModel>(currencies);
                         InitialChoosenCurrencies = new List<CurrencyViewModel>(ChoosenCurrencies);

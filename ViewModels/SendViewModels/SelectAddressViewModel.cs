@@ -4,16 +4,18 @@ using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Windows.Input;
+
 using Avalonia.Controls;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
+
+using Atomex.Client.Desktop.Common;
+using Atomex.Client.Desktop.Dialogs;
+using Atomex.Client.Desktop.ViewModels.Abstract;
 using Atomex.Common;
 using Atomex.Core;
 using Atomex.ViewModels;
 using Atomex.Wallet.Abstract;
-using Atomex.Client.Desktop.Common;
-using Atomex.Client.Desktop.Dialogs;
-using Atomex.Client.Desktop.ViewModels.Abstract;
 
 namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 {
@@ -47,10 +49,12 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
         public SelectAddressViewModel(
             IAccount account,
+            ILocalStorage localStorage,
             CurrencyConfig currency,
             SelectAddressMode mode = SelectAddressMode.ReceiveTo,
             string? selectedAddress = null,
             int selectedTokenId = 0,
+            string? tokenType = null,
             string? tokenContract = null)
         {
             this.WhenAnyValue(
@@ -59,64 +63,23 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     vm => vm.SearchPattern)
                 .SubscribeInMainThread(value =>
                 {
-                    var (sortByDate, sortByAscending, searchPattern) = value;
+                    if (MyAddresses == null)
+                        return;
 
-                    if (MyAddresses == null) return;
+                    var (sortByDate, sortByAscending, searchPattern) = value;
 
                     var myAddresses = new ObservableCollection<WalletAddressViewModel>(
                         InitialMyAddresses
-                            .Where(addressViewModel => addressViewModel.WalletAddress.Address.ToLower()
-                                .Contains(searchPattern?.ToLower() ?? string.Empty)));
+                            .Where(addressViewModel => addressViewModel.WalletAddress.Address.ToLower().Contains(searchPattern?.ToLower() ?? string.Empty))
+                            .ToList());
 
                     if (sortByDate)
                     {
                         var myAddressesList = myAddresses.ToList();
-                        if (sortByAscending)
-                        {
-                            myAddressesList.Sort((a1, a2) =>
-                            {
-                                var typeResult = a1.WalletAddress.KeyType.CompareTo(a2.WalletAddress.KeyType);
 
-                                if (typeResult != 0)
-                                    return typeResult;
-
-                                var accountResult =
-                                    a1.WalletAddress.KeyIndex.Account.CompareTo(a2.WalletAddress.KeyIndex.Account);
-
-                                if (accountResult != 0)
-                                    return accountResult;
-
-                                var chainResult =
-                                    a1.WalletAddress.KeyIndex.Chain.CompareTo(a2.WalletAddress.KeyIndex.Chain);
-
-                                return chainResult != 0
-                                    ? chainResult
-                                    : a1.WalletAddress.KeyIndex.Index.CompareTo(a2.WalletAddress.KeyIndex.Index);
-                            });
-                        }
-                        else
-                        {
-                            myAddressesList.Sort((a2, a1) =>
-                            {
-                                var typeResult = a1.WalletAddress.KeyType.CompareTo(a2.WalletAddress.KeyType);
-
-                                if (typeResult != 0)
-                                    return typeResult;
-
-                                var accountResult =
-                                    a1.WalletAddress.KeyIndex.Account.CompareTo(a2.WalletAddress.KeyIndex.Account);
-
-                                if (accountResult != 0)
-                                    return accountResult;
-
-                                var chainResult =
-                                    a1.WalletAddress.KeyIndex.Chain.CompareTo(a2.WalletAddress.KeyIndex.Chain);
-
-                                return chainResult != 0
-                                    ? chainResult
-                                    : a1.WalletAddress.KeyIndex.Index.CompareTo(a2.WalletAddress.KeyIndex.Index);
-                            });
-                        }
+                        myAddressesList.Sort(sortByAscending
+                            ? new KeyPathAscending<WalletAddressViewModel>()
+                            : new KeyPathDescending<WalletAddressViewModel>());
 
                         MyAddresses = new ObservableCollection<WalletAddressViewModel>(myAddressesList);
                     }
@@ -132,10 +95,9 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 .Select(value =>
                 {
                     var (address, searchPattern) = value;
+
                     if (SelectAddressMode == SelectAddressMode.SendFrom)
-                    {
                         return address != null;
-                    }
 
                     return currency.IsValidAddress(address?.Address ?? searchPattern);
                 })
@@ -146,9 +108,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 .Select(searchPattern =>
                 {
                     if (SelectAddressMode != SelectAddressMode.SendFrom && !string.IsNullOrEmpty(searchPattern))
-                    {
                         return MyAddresses!.Count == 0 && currency.IsValidAddress(searchPattern);
-                    }
 
                     return false;
                 })
@@ -156,12 +116,15 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
             Currency = currency;
             SelectAddressMode = mode;
+
             var onlyAddressesWithBalances = SelectAddressMode is SelectAddressMode.SendFrom;
 
-            var addresses = AddressesHelper
+            var addresses = AccountAddressesHelper
                 .GetReceivingAddressesAsync(
                     account: account,
+                    localStorage: localStorage,
                     currency: currency,
+                    tokenType: tokenType,
                     tokenContract: tokenContract,
                     tokenId: selectedTokenId)
                 .WaitForResult()
@@ -199,29 +162,26 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             }
             else
             {
-                SelectedAddress = MyAddresses.FirstOrDefault(vm => vm.IsFreeAddress) ?? MyAddresses.FirstOrDefault();
+                SelectedAddress = MyAddresses.FirstOrDefault(vm => vm.IsFreeAddress) ??
+                                  MyAddresses.FirstOrDefault();
             }
 
             return SelectedAddress;
         }
 
         private ReactiveCommand<Unit, Unit>? _backCommand;
-
         public ReactiveCommand<Unit, Unit> BackCommand => _backCommand ??=
             (_backCommand = ReactiveCommand.Create(() => { BackAction?.Invoke(); }));
 
         private ReactiveCommand<Unit, Unit>? _changeSortTypeCommand;
-
         public ReactiveCommand<Unit, Unit> ChangeSortTypeCommand => _changeSortTypeCommand ??=
             (_changeSortTypeCommand = ReactiveCommand.Create(() => { SortByDate = !SortByDate; }));
 
         private ReactiveCommand<Unit, Unit>? _changeSortDirectionCommand;
-
         public ReactiveCommand<Unit, Unit> ChangeSortDirectionCommand => _changeSortDirectionCommand ??=
             (_changeSortDirectionCommand = ReactiveCommand.Create(() => { SortIsAscending = !SortIsAscending; }));
 
         private ReactiveCommand<Unit, Unit>? _confirmCommand;
-
         public ReactiveCommand<Unit, Unit> ConfirmCommand => _confirmCommand ??=
             (_confirmCommand = ReactiveCommand.Create(() =>
             {

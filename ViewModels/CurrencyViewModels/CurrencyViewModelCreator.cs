@@ -33,7 +33,9 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
         public static CurrencyViewModel CreateOrGet(CurrencyConfig currencyConfig, bool subscribeToUpdates)
         {
             var parsed = Enum.TryParse(currencyConfig.Name, out Currencies currency);
-            if (!parsed) throw NotSupported(currencyConfig.Name);
+
+            if (!parsed)
+                throw NotSupported(currencyConfig.Name);
 
             if (subscribeToUpdates && Instances.TryGetValue(currency, out var cachedCurrencyViewModel))
                 return cachedCurrencyViewModel;
@@ -55,7 +57,7 @@ namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
 
             if (!subscribeToUpdates) return currencyViewModel;
 
-            currencyViewModel.SubscribeToUpdates(App.AtomexApp.Account);
+            currencyViewModel.SubscribeToUpdates(App.AtomexApp.Account, App.AtomexApp.LocalStorage);
             currencyViewModel.SubscribeToRatesProvider(App.AtomexApp.QuotesProvider);
             currencyViewModel.UpdateInBackgroundAsync();
             Instances.TryAdd(currency, currencyViewModel);

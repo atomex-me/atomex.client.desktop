@@ -6,12 +6,18 @@ using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+
+using Avalonia.Controls;
 using Avalonia.Threading;
 using NBitcoin;
 using ReactiveUI;
+using ReactiveUI.Fody.Helpers;
 using Serilog;
+using Network = NBitcoin.Network;
+
 using Atomex.Blockchain;
-using Atomex.Blockchain.BitcoinBased;
+using Atomex.Blockchain.Abstract;
+using Atomex.Blockchain.Bitcoin;
 using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.ViewModels.Abstract;
 using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
@@ -20,33 +26,32 @@ using Atomex.Client.Desktop.ViewModels.TransactionViewModels;
 using Atomex.Common;
 using Atomex.Core;
 using Atomex.Wallet;
-using Avalonia.Controls;
-using ReactiveUI.Fody.Helpers;
-using Network = NBitcoin.Network;
-using Atomex.TezosTokens;
 
 namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 {
     public class WalletViewModel : ViewModelBase, IWalletViewModel
     {
+        protected const int TRANSACTIONS_LOADING_LIMIT = 20;
+
         protected readonly IAtomexApp _app;
-        [Reactive] public ObservableCollection<TransactionViewModelBase> Transactions { get; set; }
+        protected int _transactionsLoaded;
+        protected bool _isTransactionsLoading;
+        protected CancellationTokenSource _cancellation;
+        protected readonly SemaphoreSlim _transactionsSync = new(1, 1);
+
+        [Reactive] public ObservableRangeCollection<TransactionViewModelBase> Transactions { get; set; }
         [Reactive] public TransactionViewModelBase? SelectedTransaction { get; set; }
         private TransactionViewModelBase? PreviousSelectedTransaction { get; set; }
         [Reactive] public CurrencyViewModel CurrencyViewModel { get; set; }
         [ObservableAsProperty] public bool IsBalanceUpdating { get; }
-        [Reactive] public TxSortField? CurrentSortField { get; set; }
         [Reactive] public SortDirection? CurrentSortDirection { get; set; }
         [Reactive] public int SelectedTabIndex { get; set; }
-        protected bool IsTransactionsLoading { get; set; }
         public AddressesViewModel AddressesViewModel { get; set; }
         protected Action<CurrencyConfig>? SetConversionTab { get; }
         private Action<string>? SetWertCurrency { get; }
         protected Action<ViewModelBase?> ShowRightPopupContent { get; }
         public string Header { get; set; }
         public CurrencyConfig Currency => CurrencyViewModel.Currency;
-
-        protected CancellationTokenSource _cancellation { get; set; }
 
         public WalletViewModel()
         {
@@ -58,40 +63,41 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
         public WalletViewModel(
             IAtomexApp app,
+            CurrencyConfig currency,
             Action<ViewModelBase?> showRightPopupContent,
-            CurrencyConfig? currency = null,
             Action<CurrencyConfig>? setConversionTab = null,
             Action<string>? setWertCurrency = null)
         {
             _app = app ?? throw new ArgumentNullException(nameof(app));
-            ShowRightPopupContent = showRightPopupContent ??
-                                    throw new ArgumentNullException(nameof(showRightPopupContent));
+
+            CurrencyViewModel = CurrencyViewModelCreator.CreateOrGet(currency);
+            Header = CurrencyViewModel.Header;
+
+            LoadAddresses();
+
+            ShowRightPopupContent = showRightPopupContent
+                ?? throw new ArgumentNullException(nameof(showRightPopupContent));
             
             SetConversionTab = setConversionTab;
             SetWertCurrency = setWertCurrency;
 
-            if (currency != null)
-            {
-                CurrencyViewModel = CurrencyViewModelCreator.CreateOrGet(currency);
-                Header = CurrencyViewModel.Header;
-                
-                LoadAddresses();
-                _ = LoadTransactionsAsync();
-            }
-
-            this.WhenAnyValue(vm => vm.CurrentSortField, vm => vm.CurrentSortDirection)
-                .WhereAllNotNull()
+            this.WhenAnyValue(vm => vm.CurrentSortDirection)
+                .WhereNotNull()
                 .Where(_ => Transactions != null)
-                .SubscribeInMainThread(_ => { Transactions = SortTransactions(Transactions); });
+                .Subscribe(sortDirection =>
+                {
+                    // update transaction for new sort direction
+                    _ = LoadMoreTransactionsAsync(reset: true);
+                });
 
             this.WhenAnyValue(vm => vm.SelectedTransaction)
                 .Skip(1)
                 .Throttle(TimeSpan.FromMilliseconds(1))
                 .SubscribeInMainThread(selectedTransaction =>
                 {
-                    if (IsTransactionsLoading && selectedTransaction == null)
+                    if (_isTransactionsLoading && selectedTransaction == null)
                     {
-                        IsTransactionsLoading = false;
+                        _isTransactionsLoading = false;
                         return;
                     }
 
@@ -101,7 +107,9 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                         Dispatcher.UIThread.InvokeAsync(async () =>
                         {
                             ShowRightPopupContent?.Invoke(null);
+
                             await Task.Delay(WalletMainViewModel.DelayBeforeSwitchingSwapDetailsMs);
+
                             ShowRightPopupContent?.Invoke(selectedTransaction);
                         });
                     }
@@ -117,134 +125,249 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                 .IsExecuting
                 .ToPropertyExInMainThread(this, vm => vm.IsBalanceUpdating);
 
-            CurrentSortField = TxSortField.ByTime;
             CurrentSortDirection = SortDirection.Desc;
+            Transactions = new ObservableRangeCollection<TransactionViewModelBase>();
 
             SubscribeToServices();
         }
 
         protected virtual void SubscribeToServices()
         {
-            _app.Account.BalanceUpdated += OnBalanceUpdatedEventHandler;
-            _app.Account.UnconfirmedTransactionAdded += OnUnconfirmedTransactionAdded;
+            _app.LocalStorage.TransactionsChanged += OnTransactionsChangedEventHandler;
         }
 
-        protected virtual async void OnBalanceUpdatedEventHandler(object sender, CurrencyEventArgs args)
+        protected virtual bool FilterTransactions(TransactionsChangedEventArgs args, out IEnumerable<ITransaction>? txs)
         {
+            if (Currency.Name == args.Currency)
+            {
+                txs = args.Transactions;
+                return true;
+            }
+
+            txs = null;
+            return false;
+        }
+
+        protected virtual async void OnTransactionsChangedEventHandler(object? sender, TransactionsChangedEventArgs args)
+        {
+            if (!FilterTransactions(args, out var txs))
+                return;
+
+            if (txs == null || !txs.Any())
+                return;
+
+            if (!Transactions.Any())
+            {
+                await LoadMoreTransactionsAsync(reset: true)
+                    .ConfigureAwait(false);
+
+                return;
+            }
+
             try
             {
-                if (args.Currency != Currency.Name)
-                    return;
+                await _transactionsSync.WaitAsync();
 
-                // update transactions list
-                await LoadTransactionsAsync();
+                var viewModelsToInsert = new List<TransactionViewModelBase>();
+                var viewModelsToUpdate = new List<TransactionViewModelBase>();
+
+                await Dispatcher.UIThread.InvokeAsync(() =>
+                {
+                    foreach (var tx in txs!)
+                    {
+                        var existIndex = Transactions.FindIndex(t => t.Id == tx.Id);
+
+                        // replace view models with the same transaction id
+                        if (existIndex >= 0)
+                        {
+                            // remove all view models with the same transaction id
+                            while (existIndex < Transactions.Count && Transactions[existIndex].Transaction.Id == tx.Id)
+                                Transactions.RemoveAt(existIndex);
+
+                            // insert new view models
+                            var viewModels = TransactionToViewModels(tx, metadata: null, Currency);
+
+                            Transactions.InsertRange(existIndex, viewModels);
+
+                            viewModelsToUpdate.AddRange(viewModels);
+                        }
+                        else // add only new transactions to the top of the Transactions table
+                        {
+                            var isNewTx = !Transactions.Any() || tx.CreationTime > Transactions[0].Transaction.CreationTime;
+
+                            if (isNewTx && CurrentSortDirection == SortDirection.Desc)
+                            {
+                                var viewModels = TransactionToViewModels(tx, metadata: null, Currency);
+
+                                var inserted = false;
+
+                                for (var i = 0; i < viewModelsToInsert.Count; i++)
+                                {
+                                    if (viewModelsToInsert[i].Transaction.CreationTime < tx.CreationTime)
+                                    {
+                                        viewModelsToInsert.InsertRange(i, viewModels);
+                                        inserted = true;
+                                        break;
+                                    }
+                                }
+
+                                if (!inserted)
+                                    viewModelsToInsert.AddRange(viewModels);
+
+                                _transactionsLoaded++;
+                            }
+                        }
+                    }
+
+                    // insert & update new view models if any
+                    if (viewModelsToInsert.Any())
+                    {
+                        Transactions.InsertRange(0, viewModelsToInsert);
+                        viewModelsToUpdate.InsertRange(0, viewModelsToInsert);
+                    }
+                });
+
+                // resolve view models
+                if (viewModelsToUpdate.Any())
+                {
+                    await ResolveTransactionsMetadataAsync(viewModelsToUpdate)
+                        .ConfigureAwait(false);
+                }
             }
             catch (Exception e)
             {
-                Log.Error(e, "Account balance updated event handler error");
+                Log.Error(e, "Account transactions changed event handler error for currency {@currency}", Currency.Name);
             }
-        }
-
-        private async void OnUnconfirmedTransactionAdded(object sender, TransactionEventArgs args)
-        {
-            try
+            finally
             {
-                if (Currency.Name != args.Transaction.Currency) return;
-
-                // update transactions list
-                await LoadTransactionsAsync();
-            }
-            catch (Exception e)
-            {
-                Log.Error(e, "Account unconfirmed transaction added event handler error");
+                _transactionsSync.Release();
             }
         }
 
         protected virtual void LoadAddresses()
         {
-            AddressesViewModel = new AddressesViewModel(_app, CurrencyViewModel.Currency);
+            AddressesViewModel = new AddressesViewModel(
+                app: _app,
+                currency: CurrencyViewModel.Currency);
         }
 
-        protected ObservableCollection<TransactionViewModelBase> SortTransactions(
-            IEnumerable<TransactionViewModelBase> transactions)
+        protected virtual Task<List<TransactionInfo<ITransaction, ITransactionMetadata>>> LoadTransactionsWithMetadataAsync()
         {
-            return CurrentSortField switch
+            return Task.Run(async () =>
             {
-                TxSortField.ByTime when CurrentSortDirection == SortDirection.Desc
-                    => new ObservableCollection<TransactionViewModelBase>(
-                        transactions.OrderByDescending(tx => tx.LocalTime)),
-                TxSortField.ByTime when CurrentSortDirection == SortDirection.Asc
-                    => new ObservableCollection<TransactionViewModelBase>(
-                        transactions.OrderBy(tx => tx.LocalTime)),
-
-                TxSortField.ByAmount when CurrentSortDirection == SortDirection.Desc
-                    => new ObservableCollection<TransactionViewModelBase>(
-                        transactions.OrderByDescending(tx => tx.Amount)),
-                TxSortField.ByAmount when CurrentSortDirection == SortDirection.Asc
-                    => new ObservableCollection<TransactionViewModelBase>(
-                        transactions.OrderBy(tx => tx.Amount)),
-
-                TxSortField.ByStatus when CurrentSortDirection == SortDirection.Desc
-                    => new ObservableCollection<TransactionViewModelBase>(
-                        transactions.OrderByDescending(tx => tx.State)),
-                TxSortField.ByStatus when CurrentSortDirection == SortDirection.Asc
-                    => new ObservableCollection<TransactionViewModelBase>(
-                        transactions.OrderBy(tx => tx.State)),
-                _ => Transactions
-            };
+                return (await _app
+                    .Account
+                    .GetTransactionsWithMetadataAsync(
+                        currency: Currency.Name,
+                        offset: _transactionsLoaded,
+                        limit: TRANSACTIONS_LOADING_LIMIT,
+                        sort: CurrentSortDirection != null ? CurrentSortDirection.Value : SortDirection.Desc)
+                    .ConfigureAwait(false))
+                    .ToList();
+            });
         }
 
-
-        protected readonly SemaphoreSlim LoadTransactionsSemaphore = new(1, 1);
-
-        protected virtual async Task LoadTransactionsAsync()
+        protected virtual async Task LoadMoreTransactionsAsync(bool reset)
         {
-            await LoadTransactionsSemaphore.WaitAsync();
+            await _transactionsSync.WaitAsync();
 
-            Log.Debug("LoadTransactionsAsync for {@currency}", Currency.Name);
+            Log.Debug("LoadMoreTransactionsAsync for {@currency}", Currency.Name);
+
             try
             {
                 if (_app.Account == null)
                     return;
 
-                IsTransactionsLoading = true;
+                _isTransactionsLoading = true;
 
-                var transactions = (await _app.Account
-                        .GetTransactionsAsync(Currency.Name))
-                    .ToList();
+                if (reset)
+                {
+                    // reset exists transactions
+                    await Dispatcher.UIThread.InvokeAsync(() =>
+                    {
+                        Transactions.Clear();
+                        _transactionsLoaded = 0;
+                    });
+                }
+
+                var transactions = await LoadTransactionsWithMetadataAsync();
+
+                _transactionsLoaded += transactions.Count;
+
+                var viewModelsToUpdate = new List<TransactionViewModelBase>();
 
                 await Dispatcher.UIThread.InvokeAsync(() =>
                 {
-                    var selectedTransactionId = SelectedTransaction?.Id;
+                    var transactionViewModels = transactions
+                        .Select(t =>
+                        {
+                            var vms = TransactionToViewModels(t.Tx, t.Metadata, Currency);
 
-                    Transactions = SortTransactions(
-                        transactions
-                            .Select(t => TransactionViewModelCreator.CreateViewModel(t, Currency))
-                            .ToList()
-                            .ForEachDo(t =>
-                            {
-                                t.UpdateClicked += UpdateTransactionEventHandler;
-                                t.RemoveClicked += RemoveTransactionEventHandler;
-                                t.OnClose = () => ShowRightPopupContent?.Invoke(null);
-                            }));
+                            if (t.Metadata == null)
+                                viewModelsToUpdate.AddRange(vms);
 
-                    if (selectedTransactionId != null)
-                        SelectedTransaction = Transactions.FirstOrDefault(t => t.Id == selectedTransactionId);
+                            return vms;
+                        })
+                        .ToList();
+
+                    var transactionsViewModels = new List<TransactionViewModelBase>();
+
+                    foreach (var vms in transactionViewModels)
+                        transactionsViewModels.AddRange(vms);
+
+                    Transactions.AddRange(transactionsViewModels);
                 });
+
+                // resolve view models
+                if (viewModelsToUpdate.Any())
+                {
+                    await ResolveTransactionsMetadataAsync(viewModelsToUpdate)
+                        .ConfigureAwait(false);
+                }
             }
             catch (OperationCanceledException)
             {
-                Log.Debug("LoadTransactionsAsync canceled.");
+                Log.Debug("LoadTransactionsAsync canceled for {@currency}", Currency.Name);
             }
             catch (Exception e)
             {
-                Log.Error(e, "LoadTransactionAsync error for {@currency}", Currency?.Name);
+                Log.Error(e, "LoadTransactionAsync error for {@currency}", Currency.Name);
             }
-
             finally
             {
-                LoadTransactionsSemaphore.Release();
+                _transactionsSync.Release();
             }
+        }
+
+        private List<TransactionViewModelBase> TransactionToViewModels(
+            ITransaction tx,
+            ITransactionMetadata? metadata,
+            CurrencyConfig currency)
+        {
+            var vms = TransactionViewModelCreator
+                .CreateViewModels(
+                    tx: tx,
+                    metadata: metadata,
+                    config: currency);
+
+            for (var i = vms.Count - 1; i >= 0; i--)
+            {
+                var vm = vms[i];
+
+                if (vm.TransactionMetadata != null &&
+                    !vm.Type.HasFlag(TransactionType.Input) &&
+                    !vm.Type.HasFlag(TransactionType.Output))
+                {
+                    // remove transactions view models for non-users addresses
+                    vms.RemoveAt(i);
+                }
+
+                vm.UpdateClicked += UpdateTransactionEventHandler;
+                vm.RemoveClicked += RemoveTransactionEventHandler;
+                vm.OnClose = () => ShowRightPopupContent?.Invoke(null);
+            }
+
+            return vms;
         }
 
         private ReactiveCommand<Unit, Unit>? _sendCommand;
@@ -254,37 +377,33 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         public ReactiveCommand<Unit, Unit> ReceiveCommand => _receiveCommand ??= ReactiveCommand.Create(OnReceiveClick);
 
         private ReactiveCommand<Unit, Unit>? _exchangeCommand;
-
         public ReactiveCommand<Unit, Unit> ExchangeCommand =>
             _exchangeCommand ??= ReactiveCommand.Create(OnConvertClick);
 
         private ReactiveCommand<Unit, Unit>? _updateCommand;
-
         public ReactiveCommand<Unit, Unit> UpdateCommand =>
             _updateCommand ??= ReactiveCommand.CreateFromTask(OnUpdateClick);
 
         private ReactiveCommand<Unit, Unit>? _cancelUpdateCommand;
-
         public ReactiveCommand<Unit, Unit> CancelUpdateCommand => _cancelUpdateCommand ??= ReactiveCommand.Create(
             () => _cancellation?.Cancel());
 
         private ReactiveCommand<Unit, Unit>? _buyCommand;
-
         public ReactiveCommand<Unit, Unit> BuyCommand => _buyCommand ??= ReactiveCommand.Create(
             () => SetWertCurrency?.Invoke(CurrencyViewModel.Header));
 
         private ReactiveCommand<TxSortField, Unit>? _setSortTypeCommand;
-
         public ReactiveCommand<TxSortField, Unit> SetSortTypeCommand =>
             _setSortTypeCommand ??= ReactiveCommand.Create<TxSortField>(sortField =>
             {
-                if (CurrentSortField != sortField)
-                    CurrentSortField = sortField;
-                else
-                    CurrentSortDirection = CurrentSortDirection == SortDirection.Asc
-                        ? SortDirection.Desc
-                        : SortDirection.Asc;
+                CurrentSortDirection = CurrentSortDirection == SortDirection.Asc
+                    ? SortDirection.Desc
+                    : SortDirection.Asc;
             });
+
+        private ReactiveCommand<Unit, Unit>? _reachEndOfScroll;
+        public ReactiveCommand<Unit, Unit> ReachEndOfScroll =>
+            _reachEndOfScroll ??= ReactiveCommand.Create(OnReachEndOfScroll);
 
         protected virtual void OnSendClick()
         {
@@ -311,14 +430,18 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 
             try
             {
-                var scanner = new HdWalletScanner(_app.Account);
+                await Task.Run(async () =>
+                {
+                    var scanner = new WalletScanner(_app.Account);
 
-                await scanner.ScanAsync(
-                    currency: Currency.Name,
-                    skipUsed: true,
-                    cancellationToken: _cancellation.Token);
+                    await scanner
+                        .UpdateBalanceAsync(
+                            currency: Currency.Name,
+                            skipUsed: true,
+                            cancellationToken: _cancellation.Token)
+                        .ConfigureAwait(false);
 
-                await LoadTransactionsAsync();
+                }, _cancellation.Token);
             }
             catch (OperationCanceledException)
             {
@@ -331,32 +454,97 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             }
         }
 
-        private void UpdateTransactionEventHandler(object sender, TransactionEventArgs args)
+        protected virtual void OnReachEndOfScroll()
+        {
+            _ = LoadMoreTransactionsAsync(reset: false);
+        }
+
+        private void UpdateTransactionEventHandler(object? sender, TransactionEventArgs args)
         {
             // todo:
         }
 
-        private async void RemoveTransactionEventHandler(object sender, TransactionEventArgs args)
+        private async void RemoveTransactionEventHandler(object? sender, TransactionEventArgs args)
         {
             if (_app.Account == null)
                 return;
 
             try
             {
-                var txId = $"{args.Transaction.Id}:{args.Transaction.Currency}";
+                await _transactionsSync.WaitAsync();
 
-                var isRemoved = await _app.Account
-                    .RemoveTransactionAsync(txId);
+                var isRemoved = await _app
+                    .LocalStorage
+                    .RemoveTransactionByIdAsync(args.Transaction.Id, args.Transaction.Currency);
 
-                if (!isRemoved) return;
+                if (!isRemoved)
+                    return; // todo: error?
 
                 ShowRightPopupContent?.Invoke(null);
-                await LoadTransactionsAsync();
+
+                var vmsToRemove = Transactions
+                    .Where(t => t.Id == args.Transaction.Id)
+                    .ToList();
+
+                if (vmsToRemove != null)
+                    Transactions.RemoveRange(vmsToRemove);
             }
             catch (Exception e)
             {
                 Log.Error(e, "Transaction remove error");
             }
+            finally
+            {
+                _transactionsSync.Release();
+            }
+        }
+
+        protected async Task ResolveTransactionsMetadataAsync(
+            IEnumerable<TransactionViewModelBase> viewModels)
+        {
+            var resolved = new Dictionary<string, ITransactionMetadata>();
+
+            await Task.Run(async () =>
+            {
+                foreach (var vm in viewModels)
+                {
+                    if (!resolved.TryGetValue(vm.Transaction.Id, out var metadata))
+                    {
+                        metadata = await _app
+                            .Account
+                            .ResolveTransactionMetadataAsync(vm.Transaction)
+                            .ConfigureAwait(false);
+
+                        resolved.Add(vm.Transaction.Id, metadata);
+                    }
+                }
+
+                await _app
+                    .LocalStorage
+                    .UpsertTransactionsMetadataAsync(
+                        resolved.Values,
+                        notifyIfNewOrChanged: false)
+                    .ConfigureAwait(false);
+            });
+
+            // update view models in UI thread
+            await Dispatcher.UIThread.InvokeAsync(() =>
+            {
+                foreach (var vm in viewModels)
+                {
+                    if (resolved.TryGetValue(vm.Transaction.Id, out var metadata))
+                    {
+                        vm.UpdateMetadata(metadata, Currency);
+
+                        if (!vm.Type.HasFlag(TransactionType.Input) &&
+                            !vm.Type.HasFlag(TransactionType.Output))
+                        {
+                            // remove transactions view models for non-users addresses
+                            Transactions.Remove(vm);
+                        }
+                    }
+                }
+            });
         }
 
         protected virtual void DesignerMode()
@@ -374,28 +562,28 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             var transactions = new List<TransactionViewModelBase>
             {
                 new BitcoinBasedTransactionViewModel(
-                    new BitcoinBasedTransaction("BTC", Transaction.Create(Network.TestNet)),
+                    new BitcoinTransaction("BTC", Transaction.Create(Network.TestNet)),
+                    null, //new TransactionMetadata(),
                     DesignTime.TestNetCurrencies.Get<BitcoinConfig>("BTC"))
                 {
                     Description = "Sent 0.00124 BTC",
                     Amount = -0.00124m,
                     AmountFormat = CurrencyViewModel.CurrencyFormat,
-                    CurrencyCode = CurrencyViewModel.CurrencyCode,
-                    Time = DateTime.Now,
+                    CurrencyCode = CurrencyViewModel.CurrencyCode
                 },
                 new BitcoinBasedTransactionViewModel(
-                    new BitcoinBasedTransaction("BTC", Transaction.Create(Network.TestNet)),
+                    new BitcoinTransaction("BTC", Transaction.Create(Network.TestNet)),
+                    new TransactionMetadata(),
                     DesignTime.TestNetCurrencies.Get<BitcoinConfig>("BTC"))
                 {
                     Description = "Received 1.00666 BTC",
                     Amount = 1.00666m,
                     AmountFormat = CurrencyViewModel.CurrencyFormat,
-                    CurrencyCode = CurrencyViewModel.CurrencyCode,
-                    Time = DateTime.Now,
+                    CurrencyCode = CurrencyViewModel.CurrencyCode
                 }
             };
 
-            Transactions = new ObservableCollection<TransactionViewModelBase>(
+            Transactions = new ObservableRangeCollection<TransactionViewModelBase>(
                 transactions.SortList((t1, t2) => t2.Time.CompareTo(t1.Time)));
         }
     }

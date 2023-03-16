@@ -5,18 +5,20 @@ using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
-using Atomex.Blockchain.Tezos;
-using Atomex.Client.Common;
-using Atomex.Client.Desktop.Common;
-using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
-using Atomex.ViewModels;
-using Atomex.Wallet;
-using Atomex.Wallet.Tezos;
+
 using Avalonia.Controls;
 using Avalonia.Threading;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using Serilog;
+
+using Atomex.Blockchain.Tezos.Tzkt;
+using Atomex.Client.Common;
+using Atomex.Client.Desktop.Common;
+using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
+using Atomex.Common;
+using Atomex.Wallet;
+using Atomex.Wallet.Tezos;
 
 namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 {
@@ -40,7 +42,6 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         public decimal TotalAmountInBase => 0;
 
         private ReactiveCommand<Unit, Unit>? _onCollectionClickCommand;
-
         public ReactiveCommand<Unit, Unit> OnCollectionClickCommand => _onCollectionClickCommand ??=
             ReactiveCommand.Create(() => { OnCollectibleClick?.Invoke(Tokens); });
 
@@ -63,7 +64,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             ShowTezosCollection = showTezosCollection ?? throw new ArgumentNullException(nameof(showTezosCollection));
 
             _app.AtomexClientChanged += OnAtomexClientChanged;
-            _app.Account.BalanceUpdated += OnBalanceUpdatedEventHandler;
+            _app.LocalStorage.BalanceChanged += OnBalanceChangedEventHandler;
 
             this.WhenAnyValue(vm => vm.DisabledCollectibles)
                 .WhereNotNull()
@@ -95,30 +96,34 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                         })
                         .Where(c => !DisabledCollectibles!.Contains(c.ContractAddress))
                         .OrderByDescending(c => c.TotalAmount != 0)
-                        .ThenBy(c => c.Name)));
+                        .ThenBy(c => c.Name)
+                        .ToList()));
 
             DisabledCollectibles = _app.Account.UserData.DisabledCollectibles ?? Array.Empty<string>();
+
             _ = ReloadTokenContractsAsync();
         }
 
-        private void OnAtomexClientChanged(object sender, AtomexClientChangedEventArgs args)
+        private void OnAtomexClientChanged(object? sender, AtomexClientChangedEventArgs args)
         {
-            if (_app.Account != null) return;
+            if (_app.Account != null)
+                return;
 
             _app.AtomexClientChanged -= OnAtomexClientChanged;
+
             Contracts?.Clear();
         }
 
-        private async void OnBalanceUpdatedEventHandler(object sender, CurrencyEventArgs args)
+        private async void OnBalanceChangedEventHandler(object? sender, BalanceChangedEventArgs args)
         {
             try
             {
-                if (args.IsTokenUpdate && (args.TokenContract == null || Contracts != null))
+                if (args is TokenBalanceChangedEventArgs eventArgs)
                 {
                     await Dispatcher.UIThread.InvokeAsync(async () => { await ReloadTokenContractsAsync(); },
                         DispatcherPriority.Background);
                     
-                    Log.Debug("Tezos collectibles balance updated with contract {@Contract}", args.TokenContract);
+                    Log.Debug("Tezos collectibles balance updated for contracts {@Contracts}", string.Join(',', eventArgs.Tokens.Select(t => t.Item1)));
                 }
             }
             catch (Exception e)
@@ -130,9 +135,9 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
         private async Task ReloadTokenContractsAsync()
         {
             var contracts = (await _app.Account
-                    .GetCurrencyAccount<TezosAccount>(TezosConfig.Xtz)
-                    .DataRepository
-                    .GetTezosTokenContractsAsync())
+                .GetCurrencyAccount<TezosAccount>(TezosConfig.Xtz)
+                .LocalStorage
+                .GetTokenContractsAsync())
                 .ToList();
 
             Contracts = new ObservableCollection<TokenContract>(contracts);
@@ -153,17 +158,21 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                         .Select(g => g)
                         .OrderByDescending(token => token.TotalAmount != 0)
                         .ThenBy(token => token.TokenBalance.Name)
+                        .ToList()
                     ),
                     OnCollectibleClick = tokens => ShowTezosCollection.Invoke(tokens
                         .OrderByDescending(token => token.TotalAmount != 0)
-                        .ThenBy(token => token.TokenBalance.Name))
+                        .ThenBy(token => token.TokenBalance.Name)
+                        .ToList())
                 });
 
             InitialCollectibles = new ObservableCollection<Collectible>(collectibles);
+
             Collectibles = new ObservableCollection<Collectible>(collectibles
                 .Where(collectible => !DisabledCollectibles.Contains(collectible.Tokens.First().Contract.Address))
                 .OrderByDescending(collectible => collectible.TotalAmount != 0)
-                .ThenBy(collectible => collectible.Name));
+                .ThenBy(collectible => collectible.Name)
+                .ToList());
         }
 
         public CollectiblesViewModel()

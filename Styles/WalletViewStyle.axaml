@@ -7,19 +7,6 @@
         xmlns:svg="clr-namespace:Avalonia.Svg.Skia;assembly=Avalonia.Svg.Skia">
 
     <Styles.Resources>
-        <DataTemplate x:Key="UnknownStateTemplate" DataType="viewModels:TransactionViewModel">
-            <StackPanel Orientation="Horizontal">
-                <svg:Svg Width="18"
-                         VerticalAlignment="Center"
-                         Path="/Resources/Icons/question-in-circle.svg" />
-                <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
-                           Margin="8 0 0 0"
-                           FontSize="13"
-                           LineHeight="16"
-                           VerticalAlignment="Center"
-                           Text="Unknown" />
-            </StackPanel>
-        </DataTemplate>
         <DataTemplate x:Key="PendingStateTemplate" DataType="viewModels:TransactionViewModel">
             <StackPanel Orientation="Horizontal">
                 <svg:Svg Width="18"
@@ -45,19 +32,6 @@
                            LineHeight="16"
                            VerticalAlignment="Center"
                            Text="Confirmed" />
-            </StackPanel>
-        </DataTemplate>
-        <DataTemplate x:Key="UnconfirmedStateTemplate" DataType="viewModels:TransactionViewModel">
-            <StackPanel Orientation="Horizontal">
-                <svg:Svg Width="18"
-                         VerticalAlignment="Center"
-                         Path="/Resources/Icons/exclamation-mark.svg" />
-                <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
-                           Margin="8 0 0 0"
-                           FontSize="13"
-                           LineHeight="16"
-                           VerticalAlignment="Center"
-                           Text="Unconfirmed" />
             </StackPanel>
         </DataTemplate>
         <DataTemplate x:Key="FailedStateTemplate" DataType="viewModels:TransactionViewModel">
@@ -130,17 +104,16 @@
                       DataType="viewModels:EthereumTransactionViewModel">
             <views:EthereumTransactionDetailsView />
         </DataTemplate>
-
-        <DataTemplate x:Key="EthereumERC20TransactionDetailsTemplate"
-                      DataType="viewModels:EthereumERC20TransactionViewModel">
-            <views:EthereumERC20TransactionDetailsView />
+        <DataTemplate x:Key="Erc20TransactionDetailsTemplate"
+                      DataType="viewModels:Erc20TransactionViewModel">
+            <views:Erc20TransactionDetailsView />
         </DataTemplate>
 
         <DataTemplate x:Key="BtcBasedDescriptionTemplate" DataType="viewModels:TransactionViewModel">
             <TextBlock Foreground="{DynamicResource DefaultForegroundBrush}"
                        VerticalAlignment="Center"
                        FontSize="16"
-                       Text="{Binding Description}" />
+                       Text="{Binding Description}"/>
         </DataTemplate>
 
         <DataTemplate x:Key="EthAdditionalDescriptionTemplate" DataType="viewModels:EthereumTransactionViewModel">
@@ -149,15 +122,14 @@
                            VerticalAlignment="Center"
                            FontSize="16"
                            LineHeight="24"
-                           Text="{Binding Description}" />
+                           Text="{Binding Description}"/>
                 <StackPanel Orientation="Horizontal">
                     <TextBlock Text="{Binding Direction}"
                                FontSize="13"
-                               Foreground="{DynamicResource SecondaryForegroundBrush}" />
+                               Foreground="{DynamicResource SecondaryForegroundBrush}"/>
                     <TextBlock Text="{Binding Alias}"
                                FontSize="13"
-                               Foreground="{DynamicResource SecondaryForegroundBrush}" />
-
+                               Foreground="{DynamicResource SecondaryForegroundBrush}"/>
                 </StackPanel>
             </StackPanel>
         </DataTemplate>
@@ -168,18 +140,17 @@
                            VerticalAlignment="Center"
                            FontSize="16"
                            LineHeight="24"
-                           Text="{Binding Description}" />
+                           Text="{Binding Description}"/>
                 <StackPanel Orientation="Horizontal">
                     <TextBlock Text="{Binding Direction}"
                                FontSize="13"
-                               Foreground="{DynamicResource SecondaryForegroundBrush}" />
+                               Foreground="{DynamicResource SecondaryForegroundBrush}"/>
                     <TextBlock Text="{Binding Alias}"
                                FontSize="13"
-                               Foreground="{DynamicResource SecondaryForegroundBrush}" />
+                               Foreground="{DynamicResource SecondaryForegroundBrush}"/>
                 </StackPanel>
             </StackPanel>
         </DataTemplate>
-
 
         <DataTemplate x:Key="BeaconTransactionTemplate">
             <dappsViews:TransactionOperationView />
@@ -194,7 +165,22 @@
         </DataTemplate>
     </Styles.Resources>
 
-    <Style Selector="controls|RoundedButton.WalletMenuButton">
+  <Style Selector="Border.Loading">
+    <Style.Animations>
+      <Animation Duration="0:0:1"
+                 PlaybackDirection="Alternate"
+                 RepeatCount="INFINITE">
+        <KeyFrame Cue="0%">
+          <Setter Property="Opacity" Value="0.3"/>
+        </KeyFrame>
+        <KeyFrame Cue="100%">
+          <Setter Property="Opacity" Value="1.0"/>
+        </KeyFrame>
+      </Animation>
+    </Style.Animations>
+  </Style>
+
+  <Style Selector="controls|RoundedButton.WalletMenuButton">
         <Setter Property="FontFamily" Value="{DynamicResource DefaultFontFamily}" />
         <Setter Property="FontSize" Value="12" />
         <Setter Property="Width" Value="90" />
@@ -206,7 +192,6 @@
         <Setter Property="BorderBrush" Value="{DynamicResource CheckboxCheckedBrush}" />
         <Setter Property="Background" Value="{DynamicResource CheckboxCheckedBrush}" />
     </Style>
-
 
     <Style Selector="TabControl.WalletTabControl">
         <Setter Property="Margin" Value="0" />

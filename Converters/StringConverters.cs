@@ -1,5 +1,6 @@
-﻿using Atomex.ViewModels;
-using Avalonia.Data.Converters;
+﻿using Avalonia.Data.Converters;
+
+using Atomex.Common;
 
 namespace Atomex.Client.Desktop.Converters
 {

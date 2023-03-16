@@ -1,10 +1,10 @@
-using System;
-using Atomex.Blockchain.Abstract;
 using Avalonia.Controls;
 using Avalonia.Controls.Templates;
+using Avalonia.Markup.Xaml.Templates;
+
+using Atomex.Blockchain.Abstract;
 using Atomex.Client.Desktop.Services;
 using Atomex.Client.Desktop.ViewModels.TransactionViewModels;
-using Avalonia.Markup.Xaml.Templates;
 
 namespace Atomex.Client.Desktop.Controls
 {
@@ -22,28 +22,25 @@ namespace Atomex.Client.Desktop.Controls
             if (data is not TransactionViewModelBase tx)
                 return null;
 
-            if (tx.Type.HasFlag(BlockchainTransactionType.SwapPayment))
+            if (tx.Type.HasFlag(TransactionType.SwapPayment))
                 return App.TemplateService.GetTxTypeTemplate(TxTypeTemplate.SwapPaymentTypeTemplate);
 
-            if (tx.Type.HasFlag(BlockchainTransactionType.SwapRefund))
+            if (tx.Type.HasFlag(TransactionType.SwapRefund))
                 return App.TemplateService.GetTxTypeTemplate(TxTypeTemplate.SwapRefundTypeTemplate);
 
-            if (tx.Type.HasFlag(BlockchainTransactionType.SwapRedeem))
+            if (tx.Type.HasFlag(TransactionType.SwapRedeem))
                 return App.TemplateService.GetTxTypeTemplate(TxTypeTemplate.SwapRedeemTypeTemplate);
 
-            if (tx.Type.HasFlag(BlockchainTransactionType.TokenApprove))
+            if (tx.Type.HasFlag(TransactionType.TokenApprove))
                 return App.TemplateService.GetTxTypeTemplate(TxTypeTemplate.TokenApproveTypeTemplate);
 
-            if (tx.Type.HasFlag(BlockchainTransactionType.TokenCall))
+            if (tx.Type.HasFlag(TransactionType.ContractCall))
                 return App.TemplateService.GetTxTypeTemplate(TxTypeTemplate.TokenApproveTypeTemplate);
 
-            if (tx.Type.HasFlag(BlockchainTransactionType.SwapCall))
-                return App.TemplateService.GetTxTypeTemplate(TxTypeTemplate.TokenApproveTypeTemplate);
-
-            if (tx.Amount <= 0) //tx.Type.HasFlag(BlockchainTransactionType.Output))
+            if (tx.Amount <= 0)
                 return App.TemplateService.GetTxTypeTemplate(TxTypeTemplate.SentTypeTemplate);
 
-            if (tx.Amount > 0) //tx.Type.HasFlag(BlockchainTransactionType.Input))
+            if (tx.Amount > 0)
                 return App.TemplateService.GetTxTypeTemplate(TxTypeTemplate.ReceivedTypeTemplate);
 
             return App.TemplateService.GetTxTypeTemplate(TxTypeTemplate.UnknownTypeTemplate);

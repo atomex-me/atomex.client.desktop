@@ -1,5 +1,6 @@
 using System;
 using System.Reactive;
+
 using Avalonia.Controls;
 using ReactiveUI;
 using Serilog;
@@ -41,7 +42,6 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         
         
         private ReactiveCommand<string, Unit>? _copyCommand;
-
         public ReactiveCommand<string, Unit> CopyCommand => _copyCommand ??= ReactiveCommand.Create<string>(data =>
         {
             try

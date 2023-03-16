@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Numerics;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Threading;
@@ -13,20 +14,19 @@ using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using Serilog;
 
-using Atomex.Blockchain.BitcoinBased;
+using Atomex.Blockchain.Bitcoin;
 using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.Properties;
 using Atomex.Client.Desktop.ViewModels.Abstract;
 using Atomex.Common;
 using Atomex.Core;
-using Atomex.ViewModels;
 using Atomex.Wallet.BitcoinBased;
 
 namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 {
     public class BitcoinBasedSendViewModel : SendViewModel
     {
-        [Reactive] private ObservableCollection<BitcoinBasedTxOutput> Outputs { get; set; }
+        [Reactive] private ObservableCollection<BitcoinTxOutput> Outputs { get; set; }
         [Reactive] public decimal FeeRate { get; set; }
 
         public string FeeRateFormat => "0.#";
@@ -82,9 +82,9 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
             var outputs = Account.GetAvailableOutputsAsync()
                 .WaitForResult()
-                .Select(output => (BitcoinBasedTxOutput)output);
+                .Select(output => (BitcoinTxOutput)output);
 
-            Outputs = new ObservableCollection<BitcoinBasedTxOutput>(outputs);
+            Outputs = new ObservableCollection<BitcoinTxOutput>(outputs);
 
             SelectFromViewModel = new SelectOutputsViewModel(outputs
                 .Select(o => new OutputViewModel
@@ -97,13 +97,16 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 BackAction = () => { App.DialogService.Show(this); },
                 ConfirmAction = ots =>
                 {
-                    Outputs = new ObservableCollection<BitcoinBasedTxOutput>(ots);
+                    Outputs = new ObservableCollection<BitcoinTxOutput>(ots);
                     App.DialogService.Show(SelectToViewModel);
                 },
                 Config = Config,
             };
 
-            SelectToViewModel = new SelectAddressViewModel(_app.Account, Currency)
+            SelectToViewModel = new SelectAddressViewModel(
+                _app.Account,
+                _app.LocalStorage,
+                Currency)
             {
                 BackAction = () => { App.DialogService.Show(SelectFromViewModel); },
                 ConfirmAction = walletAddressViewModel =>
@@ -120,7 +123,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 .WaitForResult()
                 .Select(o => new OutputViewModel()
                 {
-                    Output = (BitcoinBasedTxOutput)o,
+                    Output = (BitcoinTxOutput)o,
                     Config = Config,
                     IsSelected = Outputs.Any(output => output.TxId == o.TxId && output.Index == o.Index)
                 });
@@ -130,7 +133,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 BackAction = () => { App.DialogService.Show(this); },
                 ConfirmAction = ots =>
                 {
-                    Outputs = new ObservableCollection<BitcoinBasedTxOutput>(ots);
+                    Outputs = new ObservableCollection<BitcoinTxOutput>(ots);
                     App.DialogService.Show(this);
                 },
                 Config = Config,
@@ -287,23 +290,23 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
                     if (maxAmountEstimation.Error != null)
                     {
-                        Warning        = maxAmountEstimation.Error.Description;
-                        WarningToolTip = maxAmountEstimation.Error.Details;
+                        Warning        = maxAmountEstimation.Error.Value.Message;
+                        WarningToolTip = maxAmountEstimation.ErrorHint;
                         WarningType    = MessageType.Error;
                         Amount         = 0;
                         return;
                     }
 
                     if (maxAmountEstimation.Amount > 0)
-                        Amount = maxAmountEstimation.Amount;
+                        Amount = Config.SatoshiToCoin(maxAmountEstimation.Amount);
 
-                    Fee = maxAmountEstimation.Fee;
+                    Fee = Config.SatoshiToCoin(maxAmountEstimation.Fee);
                 }
                 else // manual fee
                 {
-                    var availableInSatoshi = Outputs.Sum(o => o.Value);
+                    var availableInSatoshi = Outputs.SumBigIntegers(o => o.Value);
                     var feeInSatoshi = Config.CoinToSatoshi(Fee);
-                    var maxAmountInSatoshi = Math.Max(availableInSatoshi - feeInSatoshi, 0);
+                    var maxAmountInSatoshi = BigInteger.Max(availableInSatoshi - feeInSatoshi, 0);
                     var maxAmount = Config.SatoshiToCoin(maxAmountInSatoshi);
 
                     if (string.IsNullOrEmpty(To) || !Config.IsValidAddress(To))
@@ -357,15 +360,19 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             }
         }
 
-        protected override Task<Error> Send(CancellationToken cancellationToken = default)
+        protected override async Task<Error?> Send(CancellationToken cancellationToken = default)
         {
-            return Account.SendAsync(
-                from: Outputs,
-                to: To,
-                amount: AmountToSend,
-                fee: Fee,
-                dustUsagePolicy: DustUsagePolicy.AddToFee,
-                cancellationToken: cancellationToken);
+            var (_, error) = await Account
+                .SendAsync(
+                    from: Outputs,
+                    to: To,
+                    amount: AmountToSend,
+                    fee: Fee,
+                    dustUsagePolicy: DustUsagePolicy.AddToFee,
+                    cancellationToken: cancellationToken)
+                .ConfigureAwait(false);
+
+            return error;
         }
 
 #if DEBUG
@@ -377,18 +384,21 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             var amount = new Money((decimal)0.0001, MoneyUnit.Satoshi);
             var script = BitcoinAddress.Create("muRDku2ZwNTz2msCZCHSUhDD5o6NxGsoXM", Network.TestNet).ScriptPubKey;
 
-            var outputs = new List<BitcoinBasedTxOutput>
+            var outputs = new List<BitcoinTxOutput>
             {
-                new BitcoinBasedTxOutput(
-                    coin: new Coin(
+                new BitcoinTxOutput
+                {
+                    Coin = new Coin(
                         fromTxHash: new uint256("19aa2187cda7610590d09dfab41ed4720f8570d7414b71b3dc677e237f72d4a1"),
                         fromOutputIndex: 0u,
                         amount: amount,
                         scriptPubKey: script),
-                    spentTxPoint: null)
+                    IsConfirmed = true,
+                    Currency = "BTC"
+                }
             };
 
-            Outputs = new ObservableCollection<BitcoinBasedTxOutput>(outputs);
+            Outputs = new ObservableCollection<BitcoinTxOutput>(outputs);
             Stage = SendStage.Edit;
             AmountInBase = 1233123.34m;
         }

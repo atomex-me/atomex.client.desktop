@@ -1,21 +1,30 @@
 using System;
 using System.IO;
 using System.Threading.Tasks;
+
 using ReactiveUI;
 using Serilog;
+
 using Atomex.Client.Desktop.Properties;
 using Atomex.Common;
 using Atomex.Wallet;
+using Atomex.LiteDb;
+using Atomex.Wallet.Abstract;
 
 namespace Atomex.Client.Desktop.ViewModels.CreateWalletViewModels
 {
+    public class WalletStorageInfo
+    {
+        public IAccount Account { get; set; }
+        public ILocalStorage LocalStorage { get; set; }
+    }
+
     public class CreateStoragePasswordViewModel : StepViewModel
     {
-        private IAtomexApp App { get; }
-        private HdWallet Wallet { get; set; }
+        private readonly IAtomexApp _app;
+        private HdWallet _wallet;
 
         private string _warning;
-
         public string Warning
         {
             get => _warning;
@@ -27,7 +36,6 @@ namespace Atomex.Client.Desktop.ViewModels.CreateWalletViewModels
         }
 
         private int _passwordScore;
-
         public int PasswordScore
         {
             get => _passwordScore;
@@ -39,7 +47,6 @@ namespace Atomex.Client.Desktop.ViewModels.CreateWalletViewModels
         }
 
         private PasswordControlViewModel _passwordVM;
-
         public PasswordControlViewModel PasswordVM
         {
             get => _passwordVM;
@@ -51,7 +58,6 @@ namespace Atomex.Client.Desktop.ViewModels.CreateWalletViewModels
         }
 
         private PasswordControlViewModel _passwordConfirmationVM;
-
         public PasswordControlViewModel PasswordConfirmationVM
         {
             get => _passwordConfirmationVM;
@@ -69,7 +75,7 @@ namespace Atomex.Client.Desktop.ViewModels.CreateWalletViewModels
         public CreateStoragePasswordViewModel(
             IAtomexApp app)
         {
-            App = app ?? throw new ArgumentNullException(nameof(app));
+            _app = app ?? throw new ArgumentNullException(nameof(app));
             PasswordVM = new PasswordControlViewModel(PasswordChanged, "Password...");
             PasswordConfirmationVM = new PasswordControlViewModel(PasswordChanged, "Password confirmation...");
         }
@@ -82,7 +88,7 @@ namespace Atomex.Client.Desktop.ViewModels.CreateWalletViewModels
 
         public override void Initialize(object o)
         {
-            Wallet = (HdWallet)o;
+            _wallet = (HdWallet)o;
         }
 
         public override void Back()
@@ -117,31 +123,38 @@ namespace Atomex.Client.Desktop.ViewModels.CreateWalletViewModels
             {
                 RaiseProgressBarShow();
 
-                var account = await Task.Run(async () =>
+                var walletStorageInfo = await Task.Run(async () =>
                 {
-                    await Wallet.EncryptAsync(PasswordVM.SecurePass);
+                    await _wallet.EncryptAsync(PasswordVM.SecurePass);
 
-                    var saved = Wallet.SaveToFile(Wallet.PathToWallet, PasswordVM.SecurePass);
+                    var saved = _wallet.SaveToFile(_wallet.PathToWallet, PasswordVM.SecurePass);
 
                     if (!saved)
                     {
-                        Warning = "Can't save wallet file to file system. Try to use different wallet name.";
+                        Warning = "Can't save wallet file to file system. Try to use different wallet name";
                         throw new IOException(Warning);
                     }
 
-                    var acc = new Account(
-                        Wallet,
-                        PasswordVM.SecurePass,
-                        App.CurrenciesProvider);
+                    var pathToDb = Path.Combine(Path.GetDirectoryName(_wallet.PathToWallet)!, Account.DefaultDataFileName);
+
+                    var localStorage = new LiteDbCachedLocalStorage(
+                        pathToDb: pathToDb,
+                        password: PasswordVM.SecurePass,
+                        network: _wallet.Network);
+
+                    var account = new Account(
+                        wallet: _wallet,
+                        localStorage: localStorage,
+                        currenciesProvider: _app.CurrenciesProvider);
 
                     PasswordVM.StringPass = string.Empty;
                     PasswordConfirmationVM.StringPass = string.Empty;
                     PasswordScore = 0;
 
-                    return acc;
+                    return new WalletStorageInfo { Account = account, LocalStorage = localStorage };
                 });
 
-                RaiseOnNext(account);
+                RaiseOnNext(walletStorageInfo);
             }
             catch (Exception e)
             {

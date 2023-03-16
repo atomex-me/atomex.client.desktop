@@ -1,25 +1,26 @@
 using System;
 
+using Avalonia.Controls;
+using ReactiveUI.Fody.Helpers;
+
+using Atomex.Blockchain;
 using Atomex.Blockchain.Abstract;
 using Atomex.Blockchain.Tezos;
-using Atomex.Common;
-using Atomex.ViewModels;
-using Avalonia.Controls;
+using Atomex.Core;
 
 namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
 {
     public class TezosTokenTransferViewModel : TransactionViewModelBase
     {
-        private const int MaxAmountDecimals = AddressesHelper.MaxTokenCurrencyFormatDecimals;
+        private const int MaxAmountDecimals = CurrencyConfig.MaxPrecision;
         public string From { get; set; }
         public string To { get; set; }
         public string CurrencyCode { get; set; }
         public string TxHash => Id.Split("/")[0];
         public string FromExplorerUri => $"{Currency.AddressExplorerUri}{From}";
-        public string ToExplorerUri => $"{Currency.AddressExplorerUri}{To}";
-        
-        public string Alias { get; set; }
-        public string Direction { get; set; }
+        public string ToExplorerUri => $"{Currency.AddressExplorerUri}{To}";      
+        [Reactive] public string Alias { get; set; }
+        [Reactive] public string Direction { get; set; }
 
         public TezosTokenTransferViewModel()
         {
@@ -29,52 +30,60 @@ namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
 #endif
         }
 
-        public TezosTokenTransferViewModel(TokenTransfer tx, TezosConfig tezosConfig)
+        public TezosTokenTransferViewModel(
+            TezosTokenTransfer tx,
+            TransactionMetadata? metadata,
+            TezosConfig config)
         {
-            Currency = tezosConfig ?? throw new ArgumentNullException(nameof(tezosConfig));
-
-            Transaction  = tx ?? throw new ArgumentNullException(nameof(tx));
-            Id           = tx.Id;
-            State        = tx.State;
-            Type         = tx.Type;
-            From         = tx.From;
-            To           = tx.To;
-            Amount       = GetAmount(tx);
+            Currency = config ?? throw new ArgumentNullException(nameof(config));
+            Transaction = tx ?? throw new ArgumentNullException(nameof(tx));
+            TransactionMetadata = metadata;
+            From = tx.From;
+            To = tx.To;
+            Amount = metadata != null ? metadata.Amount.FromTokens(tx.Token.Decimals) : 0;
             AmountFormat = $"F{Math.Min(tx.Token.Decimals, MaxAmountDecimals)}";
             CurrencyCode = tx.Token.Symbol;
-            Time         = tx.CreationTime ?? DateTime.UtcNow;
+            Type = metadata?.Type ?? TransactionType.Unknown;
 
             Description = TransactionViewModel.GetDescription(
-                type: tx.Type,
+                type: Type,
                 amount: Amount,
-                netAmount: Amount,
-                amountDigits: tx.Token.Decimals,
+                decimals: tx.Token.Decimals,
                 currencyCode: tx.Token.Symbol);
 
-            Alias = tx.GetAlias();
-            Direction = Amount <= 0 ? "to ": "from ";
+            Alias = tx.GetAlias(Type);
+            Direction = Amount <= 0 ? "to " : "from ";
+            IsReady = metadata != null;
         }
 
-        private static decimal GetAmount(TokenTransfer tx)
+        public override void UpdateMetadata(ITransactionMetadata metadata, CurrencyConfig config)
         {
-            if (tx.Amount.TryParseWithRound(tx.Token.Decimals, out var amount))
-            {
-                var sign = tx.Type.HasFlag(BlockchainTransactionType.Input)
-                    ? 1
-                    : -1;
+            var tx = (TezosTokenTransfer)Transaction;
 
-                return sign * amount;
-            }
+            TransactionMetadata = metadata;
+            Amount = metadata != null ? metadata.Amount.FromTokens(tx.Token.Decimals) : 0;
+            Type = metadata?.Type ?? TransactionType.Unknown;
 
-            return 0;
+            Description = TransactionViewModel.GetDescription(
+                type: Type,
+                amount: Amount,
+                decimals: tx.Token.Decimals,
+                currencyCode: tx.Token.Symbol);
+
+            Alias = tx.GetAlias(Type);
+            Direction = Amount <= 0 ? "to " : "from ";
+            IsReady = metadata != null;
         }
 
         private void DesignerMode()
         {
-            Id   = "1234567890abcdefgh1234567890abcdefgh";
+            Transaction = new TezosTokenTransfer
+            {
+                Id = "1234567890abcdefgh1234567890abcdefgh",
+                CreationTime = DateTime.UtcNow
+            };
             From = "1234567890abcdefgh1234567890abcdefgh";
-            To   = "1234567890abcdefgh1234567890abcdefgh";
-            Time = DateTime.UtcNow;
+            To = "1234567890abcdefgh1234567890abcdefgh";
         }
     }
 }
