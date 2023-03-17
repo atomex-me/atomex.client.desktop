@@ -225,8 +225,6 @@ namespace Atomex.Client.Desktop.ViewModels
                     .LocalStorage
                     .UpsertOrderAsync(order);
 
-                //await order
-                //    .CreateProofOfPossessionAsync(account);
                 var fromWalletsWithProofs = await fromWallets
                     .CreateProofOfPossessionAsync(
                         timeStamp: order.TimeStamp,
