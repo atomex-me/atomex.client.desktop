@@ -4,7 +4,7 @@
         xmlns:converters="clr-namespace:Atomex.Client.Desktop.Converters"
         xmlns:vm="clr-namespace:Atomex.Client.Desktop.ViewModels.TransactionViewModels"
         xmlns:abstract="clr-namespace:Atomex.Client.Desktop.ViewModels.Abstract"
-        xmlns:common="clr-namespace:Atomex.Common;assembly=Atomex.Client.Core">
+        xmlns:common="clr-namespace:Atomex.Common;assembly=Atomex.Common">
 
     <Design.PreviewWith>
         <Border Padding="40 100" Background="#122B50">

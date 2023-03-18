@@ -11,7 +11,7 @@
              xmlns:styles="clr-namespace:Atomex.Client.Desktop.Styles"
              xmlns:svg="clr-namespace:Avalonia.Svg.Skia;assembly=Avalonia.Svg.Skia"
              xmlns:abstract="clr-namespace:Atomex.Client.Desktop.ViewModels.Abstract"
-             xmlns:common="clr-namespace:Atomex.Common;assembly=Atomex.Client.Core">
+             xmlns:common="clr-namespace:Atomex.Common;assembly=Atomex.Common">
 
   <Design.DataContext>
     <vm:ConversionViewModel/>

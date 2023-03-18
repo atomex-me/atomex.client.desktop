@@ -9,7 +9,7 @@
              xmlns:controls="clr-namespace:Atomex.Client.Desktop.Controls"
              xmlns:views="clr-namespace:Atomex.Client.Desktop.Views"
              xmlns:abstract="clr-namespace:Atomex.Client.Desktop.ViewModels.Abstract"
-             xmlns:common="clr-namespace:Atomex.Common;assembly=Atomex.Client.Core">
+             xmlns:common="clr-namespace:Atomex.Common;assembly=Atomex.Common">
 
     <Design.DataContext>
         <vm:AddressesViewModel />

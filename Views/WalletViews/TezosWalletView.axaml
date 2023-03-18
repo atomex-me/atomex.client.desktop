@@ -15,7 +15,7 @@
              xmlns:asyncImageLoader="clr-namespace:AsyncImageLoader;assembly=AsyncImageLoader.Avalonia"
              xmlns:services="clr-namespace:Atomex.Client.Desktop.Services"
              xmlns:svg="clr-namespace:Avalonia.Svg.Skia;assembly=Avalonia.Svg.Skia"
-             xmlns:common="clr-namespace:Atomex.Common;assembly=Atomex.Client.Core">
+             xmlns:common="clr-namespace:Atomex.Common;assembly=Atomex.Common">
 
     <Design.DataContext>
         <vm:TezosWalletViewModel />
