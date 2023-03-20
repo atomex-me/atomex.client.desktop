@@ -633,8 +633,8 @@
                             CornerRadius="6">
                         <Border.IsVisible>
                             <MultiBinding Converter="{x:Static BoolConverters.And}">
-                                <Binding Path="!UseDefaultFee"  />
-                                <Binding Path="!AutofillError" />
+                                <Binding Path="!UseDefaultFee"/>
+                                <Binding Path="!AutoFillError"/>
                             </MultiBinding>
                         </Border.IsVisible>
                         <Grid ColumnDefinitions="Auto,*">
