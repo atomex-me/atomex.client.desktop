@@ -15,6 +15,7 @@ using Atomex.LiteDb;
 using Atomex.Wallet;
 using Atomex.Wallet.Abstract;
 using Serilog;
+using System.Threading.Tasks;
 
 namespace Atomex.Client.Desktop.ViewModels
 {
@@ -83,6 +84,26 @@ namespace Atomex.Client.Desktop.ViewModels
                         wallet: wallet,
                         localStorage: localStorage,
                         currenciesProvider: _app.CurrenciesProvider);
+
+                    // update balances
+                    _ = Task.Run(async () =>
+                    {
+                        var currencies = new string[] { "XTZ", "FA12", "FA2" };
+
+                        try
+                        {
+                            foreach (var currency in currencies)
+                            {
+                                await new WalletScanner(account)
+                                    .UpdateBalanceAsync(currency, skipUsed: true)
+                                    .ConfigureAwait(false);
+                            }
+                        }
+                        catch(Exception e)
+                        {
+                            Log.Error(e, "Error while update wallet balance on start");
+                        }
+                    });
                 },
                 goBack: () =>
                 {

@@ -417,9 +417,10 @@
                     Foreground="{DynamicResource SecondaryForegroundBrush}"
                     Content="Use default fee"/>
 
-          <!-- max gas price -->
           <StackPanel Grid.Column="1"
+                      Margin="0 7 0 0"
                       Orientation="Vertical">
+            <!-- max gas price -->
             <StackPanel HorizontalAlignment="Right"
                         Orientation="Horizontal"
                         IsVisible="{Binding UseDefaultFee}">

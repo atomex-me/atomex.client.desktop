@@ -472,7 +472,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             RecommendedMaxAmountWarningToolTip = "You have tokens that require ETH. Sending this will not leave enough ETH to send or exchange your tokens. We recommend to send no more than 0.073 ETH";
             RecommendedMaxAmountWarningType = MessageType.Warning;
 
-            Stage = SendStage.Confirmation;
+            Stage = SendStage.Edit;
             SendRecommendedAmountMenu = string.Format(Resources.SendRecommendedAmountMenu, 0.073, "ETH");
             SendEnteredAmountMenu = string.Format(Resources.SendEnteredAmountMenu, 0.073, "ETH");
 
