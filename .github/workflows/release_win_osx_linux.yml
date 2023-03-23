@@ -11,9 +11,9 @@ jobs:
     env:
       ACTIONS_ALLOW_UNSECURE_COMMANDS: true
     steps:
-      - uses: actions/checkout@master
+      - uses: actions/checkout@v3
         with:
-          submodules: true
+          submodules: 'recursive'
       - uses: GuillaumeFalourd/setup-windows10-sdk-action@v1
         with:
           sdk-version: 19041
@@ -56,9 +56,9 @@ jobs:
   build_linux:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@master
+      - uses: actions/checkout@v3
         with:
-          submodules: true
+          submodules: 'recursive'
           
       - name: Setup .NET Core
         uses: actions/setup-dotnet@v1
@@ -81,9 +81,9 @@ jobs:
     runs-on: macos-latest
     needs: [ build_win, build_linux ]
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
-          submodules: true
+          submodules: 'recursive'
       - uses: actions/setup-node@v2
         with:
           node-version: '14'
