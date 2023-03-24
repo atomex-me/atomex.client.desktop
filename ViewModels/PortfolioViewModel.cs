@@ -21,8 +21,8 @@ using Atomex.Client.Desktop.ViewModels.Abstract;
 using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
 using Atomex.Client.Desktop.ViewModels.SendViewModels;
 using Atomex.Common;
-using Atomex.Core;
 using Atomex.TezosTokens;
+using Atomex.Wallets.Abstract;
 
 namespace Atomex.Client.Desktop.ViewModels
 {

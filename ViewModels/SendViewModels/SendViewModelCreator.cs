@@ -1,8 +1,7 @@
 ﻿using System;
-
-using Atomex.Core;
 using Atomex.EthereumTokens;
 using Atomex.TezosTokens;
+using Atomex.Wallets.Abstract;
 
 namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 {

@@ -24,8 +24,8 @@ using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
 using Atomex.Client.Desktop.ViewModels.SendViewModels;
 using Atomex.Client.Desktop.ViewModels.TransactionViewModels;
 using Atomex.Common;
-using Atomex.Core;
 using Atomex.Wallet;
+using Atomex.Wallets.Abstract;
 
 namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 {

@@ -17,10 +17,11 @@ using Atomex.Blockchain.Tezos.Common;
 using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.ViewModels.Abstract;
 using Atomex.Common;
-using Atomex.Core;
 using Atomex.Cryptography;
 using Atomex.ViewModels;
 using Atomex.Wallet;
+using Atomex.Wallets;
+using Atomex.Wallets.Abstract;
 
 namespace Atomex.Client.Desktop.ViewModels
 {

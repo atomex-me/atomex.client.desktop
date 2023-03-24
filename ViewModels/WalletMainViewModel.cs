@@ -11,10 +11,10 @@ using ReactiveUI.Fody.Helpers;
 using Atomex.Client.Common;
 using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.ViewModels.TransactionViewModels;
-using Atomex.Core;
 using Atomex.MarketData.Abstract;
 using Atomex.Client.Abstract;
 using Atomex.Client.V1.Entities;
+using Atomex.Wallets.Abstract;
 
 namespace Atomex.Client.Desktop.ViewModels
 {

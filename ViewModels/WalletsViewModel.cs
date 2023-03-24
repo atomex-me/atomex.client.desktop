@@ -10,7 +10,7 @@ using Atomex.Client.Common;
 using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
 using Atomex.Client.Desktop.ViewModels.WalletViewModels;
-using Atomex.Core;
+using Atomex.Wallets.Abstract;
 
 namespace Atomex.Client.Desktop.ViewModels
 {

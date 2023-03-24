@@ -16,9 +16,9 @@ using Network = NBitcoin.Network;
 using Atomex.Blockchain.Bitcoin;
 using Atomex.Client.Desktop.Common;
 using Atomex.Common;
-using Atomex.Core;
 using Atomex.ViewModels;
 using Atomex.Wallet.BitcoinBased;
+using Atomex.Wallets;
 
 namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 {

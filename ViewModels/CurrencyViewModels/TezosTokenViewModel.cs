@@ -14,11 +14,11 @@ using Atomex.Blockchain.Tezos;
 using Atomex.Blockchain.Tezos.Tzkt;
 using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.ViewModels.SendViewModels;
-using Atomex.Core;
 using Atomex.MarketData.Abstract;
 using Atomex.TezosTokens;
 using Atomex.Wallet;
 using Atomex.Wallet.Tezos;
+using Atomex.Wallets.Abstract;
 
 namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
 {

@@ -18,8 +18,8 @@ using Serilog;
 
 using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.ViewModels.SendViewModels;
-using Atomex.Core;
 using Atomex.ViewModels;
+using Atomex.Wallets.Abstract;
 
 namespace Atomex.Client.Desktop.ViewModels
 {

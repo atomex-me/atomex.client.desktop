@@ -14,10 +14,10 @@ using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.Properties;
 using Atomex.Client.Desktop.ViewModels.Abstract;
 using Atomex.Common;
-using Atomex.Core;
 using Atomex.MarketData.Abstract;
 using Atomex.TezosTokens;
 using Atomex.Wallet.Tezos;
+using Atomex.Wallets.Abstract;
 
 namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 {

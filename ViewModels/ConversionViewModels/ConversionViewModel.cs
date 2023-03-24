@@ -31,6 +31,8 @@ using Atomex.MarketData.Common;
 using Atomex.Swaps;
 using Atomex.ViewModels;
 using Atomex.Wallet.BitcoinBased;
+using Atomex.Wallets;
+using Atomex.Wallets.Abstract;
 
 namespace Atomex.Client.Desktop.ViewModels
 {

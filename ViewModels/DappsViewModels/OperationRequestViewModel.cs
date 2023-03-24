@@ -20,9 +20,9 @@ using DecimalExtensions = Atomex.Common.DecimalExtensions;
 using Atomex.Blockchain.Tezos;
 using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.Dialogs;
-using Atomex.Core;
 using Atomex.Common;
 using Atomex.MarketData.Abstract;
+using Atomex.Wallets;
 
 namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
 {
@@ -64,8 +64,7 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
     {
         [Reactive] public TransactionContent Operation { get; set; }
         public override string JsonStringOperation => JsonConvert.SerializeObject(Operation, Formatting.Indented);
-        public string TezosFormat =>
-            DecimalExtensions.GetFormatWithPrecision((int)Math.Round(Math.Log10(TezosConfig.XtzDigitsMultiplier)));
+        public string TezosFormat => DecimalExtensions.GetFormatWithPrecision(TezosHelper.Decimals);
         public decimal AmountInTez => Operation.Amount.ToTez();
         public decimal FeeInTez => Operation.Fee.ToTez();
         public string DestinationIcon => $"https://services.tzkt.io/v1/avatars/{Operation.Destination}";
@@ -246,8 +245,7 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
         public string ConnectedAddress { get; set; }
         public decimal ConnectedAddressBalance { get; set; }
 
-        public string TezosFormat =>
-            DecimalExtensions.GetFormatWithPrecision((int)Math.Round(Math.Log10(TezosConfig.XtzDigitsMultiplier)));
+        public string TezosFormat => DecimalExtensions.GetFormatWithPrecision(TezosHelper.Decimals);
 
         [Reactive] public IEnumerable<BaseBeaconOperationViewModel>? Operations { get; set; }
         private IEnumerable<TezosOperationParameters> InitialOperations { get; set; }
@@ -496,7 +494,7 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
             //     }
             // }
 
-            var avgFee = Convert.ToInt64(TotalGasFee * TezosConfig.XtzDigitsMultiplier / operations.Count);
+            var avgFee = TotalGasFee.ToMicroTez() / operations.Count;
 
             if (!UseDefaultFee)
             {

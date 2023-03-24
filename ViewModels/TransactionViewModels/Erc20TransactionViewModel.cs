@@ -7,10 +7,10 @@ using Atomex.Blockchain;
 using Atomex.Blockchain.Abstract;
 using Atomex.Blockchain.Ethereum.Erc20;
 using Atomex.Common;
-using Atomex.Core;
 using Atomex.EthereumTokens;
 using Atomex.Blockchain.Tezos;
 using Atomex.Blockchain.Ethereum;
+using Atomex.Wallets.Abstract;
 
 namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
 {

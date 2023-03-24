@@ -18,6 +18,7 @@ using Atomex.Common;
 using Atomex.Core;
 using Atomex.ViewModels;
 using Atomex.Wallet.Abstract;
+using Atomex.Wallets;
 
 namespace Atomex.Client.Desktop.ViewModels
 {

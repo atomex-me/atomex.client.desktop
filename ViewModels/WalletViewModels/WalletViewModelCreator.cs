@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 
 using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
-using Atomex.Core;
 using Atomex.EthereumTokens;
 using Atomex.TezosTokens;
+using Atomex.Wallets.Abstract;
 
 namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 {

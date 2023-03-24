@@ -18,6 +18,8 @@ using Atomex.Core;
 using Atomex.Cryptography.Abstract;
 using Atomex.ViewModels;
 using Atomex.Wallet.Abstract;
+using Atomex.Wallets;
+using Atomex.Wallets.Abstract;
 
 namespace Atomex.Client.Desktop.ViewModels
 {
@@ -72,9 +74,7 @@ namespace Atomex.Client.Desktop.ViewModels
 
         private string GetUserId()
         {
-            using var servicePublicKey =
-                _app.Account.Wallet.GetServicePublicKey(_app.Account.UserData.AuthenticationKeyIndex);
-            var publicKey = servicePublicKey.ToUnsecuredBytes();
+            var publicKey = _app.Account.Wallet.GetServicePublicKey(_app.Account.UserData.AuthenticationKeyIndex);
 
             return HashAlgorithm.Sha256.Hash(publicKey).ToHexString();
         }

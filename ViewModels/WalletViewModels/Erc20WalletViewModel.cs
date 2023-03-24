@@ -11,10 +11,10 @@ using Atomex.Blockchain.Ethereum;
 using Atomex.Blockchain.Ethereum.Erc20;
 using Atomex.Blockchain.Tezos;
 using Atomex.Common;
-using Atomex.Core;
 using Atomex.EthereumTokens;
 using Atomex.Wallet;
 using Atomex.Wallet.Ethereum;
+using Atomex.Wallets.Abstract;
 
 namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
 {

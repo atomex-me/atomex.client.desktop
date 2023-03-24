@@ -40,69 +40,69 @@ namespace Atomex.Client.Desktop.Services
             // App.AtomexClientChanged += OnAtomexClientChangedEventHandler!;
         }
 
-        private void OnAtomexClientChangedEventHandler(object sender, AtomexClientChangedEventArgs args)
-        {
-            if (App?.Account == null)
-                return;
+        //private void OnAtomexClientChangedEventHandler(object sender, AtomexClientChangedEventArgs args)
+        //{
+        //    if (App?.Account == null)
+        //        return;
 
-            // App.Account.UserData.Notifications ??= new List<AtomexNotification>();
-            // NotificationsUpdated?.Invoke(this, new AtomexNotificationsEventArgs(App.Account.UserData.Notifications));
+        //    // App.Account.UserData.Notifications ??= new List<AtomexNotification>();
+        //    // NotificationsUpdated?.Invoke(this, new AtomexNotificationsEventArgs(App.Account.UserData.Notifications));
 
-            // todo: remove after Notifications layout will done;
-            // App.Account.BalanceUpdated += OnBalanceUpdatedEventHandler!;
-            // App.Account.UnconfirmedTransactionAdded += OnUnconfirmedTransactionAdded!;
-        }
+        //    // todo: remove after Notifications layout will done;
+        //    // App.Account.BalanceUpdated += OnBalanceUpdatedEventHandler!;
+        //    // App.Account.UnconfirmedTransactionAdded += OnUnconfirmedTransactionAdded!;
+        //}
 
-        private void OnBalanceUpdatedEventHandler(object sender, CurrencyEventArgs args)
-        {
-            try
-            {
-                Show("Information", $"{args.Currency} balance updated");
-            }
-            catch (Exception e)
-            {
-                Log.Error(e, "Notifications Service balance updated event handler error");
-            }
-        }
+        //private void OnBalanceUpdatedEventHandler(object sender, CurrencyEventArgs args)
+        //{
+        //    try
+        //    {
+        //        Show("Information", $"{args.Currency} balance updated");
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        Log.Error(e, "Notifications Service balance updated event handler error");
+        //    }
+        //}
 
-        private void OnUnconfirmedTransactionAdded(object sender, TransactionEventArgs args)
-        {
-            try
-            {
-                Show("Information", $"New unconfirmed transaction on {args.Transaction.Currency}");
-            }
-            catch (Exception e)
-            {
-                Log.Error(e, "Notifications Service unconfirmed transaction added event handler error");
-            }
-        }
+        //private void OnUnconfirmedTransactionAdded(object sender, TransactionEventArgs args)
+        //{
+        //    try
+        //    {
+        //        Show("Information", $"New unconfirmed transaction on {args.Transaction.Currency}");
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        Log.Error(e, "Notifications Service unconfirmed transaction added event handler error");
+        //    }
+        //}
 
-        private static void Show(string title, string message, NotificationType type = NotificationType.Information)
-        {
-            _ = Dispatcher.UIThread.InvokeAsync(() =>
-            {
-                // var atomexNotification = new AtomexNotification
-                // {
-                //     Id = Guid.NewGuid().ToString("N"),
-                //     Message = message,
-                //     IsRead = false,
-                //     Time = DateTime.Now,
-                //     AtomexNotificationType = AtomexNotificationType.Info
-                // };
+        //private static void Show(string title, string message, NotificationType type = NotificationType.Information)
+        //{
+        //    _ = Dispatcher.UIThread.InvokeAsync(() =>
+        //    {
+        //        // var atomexNotification = new AtomexNotification
+        //        // {
+        //        //     Id = Guid.NewGuid().ToString("N"),
+        //        //     Message = message,
+        //        //     IsRead = false,
+        //        //     Time = DateTime.Now,
+        //        //     AtomexNotificationType = AtomexNotificationType.Info
+        //        // };
 
-                // App.Account.UserData.Notifications ??= new List<AtomexNotification>();
-                // App.Account.UserData.Notifications.Add(atomexNotification);
+        //        // App.Account.UserData.Notifications ??= new List<AtomexNotification>();
+        //        // App.Account.UserData.Notifications.Add(atomexNotification);
 
-                // Save();
+        //        // Save();
 
-                Manager.Show(new Notification(
-                    title,
-                    message,
-                    type,
-                    TimeSpan.FromSeconds(DefaultNotificationDurationSeconds)
-                ));
-            });
-        }
+        //        Manager.Show(new Notification(
+        //            title,
+        //            message,
+        //            type,
+        //            TimeSpan.FromSeconds(DefaultNotificationDurationSeconds)
+        //        ));
+        //    });
+        //}
 
         private void Save()
         {
@@ -112,9 +112,12 @@ namespace Atomex.Client.Desktop.Services
 
         public void ReadAll()
         {
-            if (App.Account.UserData.Notifications == null) return;
+            if (App.Account.UserData.Notifications == null)
+                return;
 
-            App.Account.UserData.Notifications = App.Account.UserData.Notifications
+            App.Account.UserData.Notifications = App.Account
+                .UserData
+                .Notifications
                 .ForEachDo(notification => notification.IsRead = true)
                 .ToList();
 
@@ -123,8 +126,12 @@ namespace Atomex.Client.Desktop.Services
 
         public void ReadById(string id)
         {
-            if (App.Account.UserData.Notifications == null) return;
-            var changedNotificationIndex = App.Account.UserData.Notifications
+            if (App.Account.UserData.Notifications == null)
+                return;
+
+            var changedNotificationIndex = App.Account
+                .UserData
+                .Notifications
                 .FindIndex(n => n.Id == id);
             
             App.Account.UserData.Notifications[changedNotificationIndex].IsRead = true;

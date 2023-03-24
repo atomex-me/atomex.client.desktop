@@ -486,7 +486,7 @@ namespace Atomex.Client.Desktop.ViewModels
                     .GetAddressAsync(delegateAddress, cancellationToken)
                     .ConfigureAwait(false);
 
-                using var securePublicKey = _app.Account.Wallet.GetPublicKey(
+                var publicKey = _app.Account.Wallet.GetPublicKey(
                     currency: _tezosConfig,
                     keyPath: walletAddress.KeyPath,
                     keyType: walletAddress.KeyType);
@@ -514,7 +514,7 @@ namespace Atomex.Client.Desktop.ViewModels
                                 StorageLimit = StorageLimit.FromNetwork(defaultValue: (int)_tezosConfig.StorageLimit, useSafeValue: true)
                             }
                         },
-                        publicKey: securePublicKey.ToUnsecuredBytes(),
+                        publicKey: publicKey,
                         settings: _tezosConfig.GetFillOperationSettings(),
                         headOffset: 0,
                         cancellationToken: cancellationToken)

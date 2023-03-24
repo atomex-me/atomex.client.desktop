@@ -12,10 +12,10 @@ using Serilog;
 using Atomex.Abstract;
 using Atomex.Blockchain;
 using Atomex.Client.Desktop.Common;
-using Atomex.Core;
 using Atomex.MarketData.Abstract;
 using Atomex.Wallet;
 using Atomex.Wallet.Abstract;
+using Atomex.Wallets.Abstract;
 
 namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
 {

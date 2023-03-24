@@ -1,7 +1,7 @@
 ﻿using Avalonia.Media;
 
 using Atomex.Client.Desktop.Properties;
-using Atomex.Core;
+using Atomex.Wallets.Abstract;
 
 namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
 {

@@ -8,6 +8,7 @@ using Atomex.Client.Desktop.ViewModels.CurrencyViewModels;
 using Atomex.Common.Configuration;
 using Atomex.Core;
 using ReactiveUI;
+using Atomex.Wallets.Abstract;
 
 namespace Atomex.Client.Desktop.Common
 {

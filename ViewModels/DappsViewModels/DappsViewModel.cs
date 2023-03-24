@@ -4,7 +4,6 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Reactive;
-using System.Runtime.InteropServices;
 using System.Text.Json;
 using System.Threading.Tasks;
 using System.Web;
@@ -326,12 +325,10 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
                         .Account
                         .GetAddressAsync(Tezos.Name, selectedAddress.Address);
 
-                    var securedPublicKey = _app.Account.Wallet.GetPublicKey(
+                    var publicKey = _app.Account.Wallet.GetPublicKey(
                         Tezos,
                         addressToConnect.KeyPath,
                         addressToConnect.KeyType);
-
-                    var publicKey = securedPublicKey.ToUnsecuredBytes();
 
                     var response = new PermissionResponse(
                         id: permissionRequest.Id,
@@ -412,12 +409,10 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
 
             if (!revealed)
             {
-                var securedPublicKey = _app.Account.Wallet.GetPublicKey(
+                var publicKey = _app.Account.Wallet.GetPublicKey(
                     Tezos,
                     connectedWalletAddress.KeyPath,
                     connectedWalletAddress.KeyType);
-
-                var publicKey = securedPublicKey.ToUnsecuredBytes();
 
                 operations.Add(new TezosOperationParameters
                 {

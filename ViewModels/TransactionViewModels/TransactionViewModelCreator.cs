@@ -8,8 +8,8 @@ using Atomex.Blockchain.Bitcoin;
 using Atomex.Blockchain.Ethereum;
 using Atomex.Blockchain.Ethereum.Erc20;
 using Atomex.Blockchain.Tezos;
-using Atomex.Core;
 using Atomex.EthereumTokens;
+using Atomex.Wallets.Abstract;
 
 namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
 {

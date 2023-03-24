@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 
 using Atomex.Blockchain;
 using Atomex.Blockchain.Tezos.Tzkt;
-using Atomex.Core;
 using Atomex.Wallet.Tezos;
+using Atomex.Wallets.Abstract;
 
 namespace Atomex.Client.Desktop.ViewModels.CurrencyViewModels
 {

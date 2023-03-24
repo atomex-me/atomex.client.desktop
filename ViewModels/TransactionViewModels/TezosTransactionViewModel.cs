@@ -9,7 +9,7 @@ using Atomex.Blockchain.Abstract;
 using Atomex.Blockchain.Tezos;
 using Atomex.Blockchain.Tezos.Tzkt.Operations;
 using Atomex.Common;
-using Atomex.Core;
+using Atomex.Wallets.Abstract;
 
 namespace Atomex.Client.Desktop.ViewModels.TransactionViewModels
 {
