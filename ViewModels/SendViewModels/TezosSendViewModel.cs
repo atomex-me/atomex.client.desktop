@@ -45,7 +45,8 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         {
             CheckAmountCommand = ReactiveCommand.Create<MaxAmountEstimation, MaxAmountEstimation>(estimation => estimation);
 
-            CheckAmountCommand.Throttle(TimeSpan.FromMilliseconds(1))
+            CheckAmountCommand
+                .Throttle(TimeSpan.FromMilliseconds(1))
                 .SubscribeInMainThread(estimation => CheckAmount(estimation));
 
             SelectFromViewModel = new SelectAddressViewModel(
@@ -164,7 +165,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         {
             try
             {
-                if (!UseDefaultFee)
+                if (!UseDefaultFee) // manual fee
                 {
                     var account = _app.Account
                         .GetCurrencyAccount<TezosAccount>(Currency.Name);

@@ -1,10 +1,11 @@
 using System;
-using Atomex.Client.Desktop.Dialogs;
-using Atomex.Client.Desktop.Dialogs.ViewModels;
-using Atomex.Client.Desktop.ViewModels;
+
 using Avalonia.Threading;
 using DialogHost;
 
+using Atomex.Client.Desktop.Dialogs;
+using Atomex.Client.Desktop.Dialogs.ViewModels;
+using Atomex.Client.Desktop.ViewModels;
 
 namespace Atomex.Client.Desktop.Services
 {
@@ -24,9 +25,13 @@ namespace Atomex.Client.Desktop.Services
         public bool Close(bool closedByButton = false)
         {
             var result = _isDialogOpened;
-            if (!_isDialogOpened) return result;
+
+            if (!_isDialogOpened)
+                return result;
+
             Dispatcher.UIThread.InvokeAsync(() =>
                 DialogHost.DialogHost.GetDialogSession(MainDialogHostIdentifier)?.Close());
+
             _isDialogOpened = false;
             
             if (_dialogServiceViewModel.Content is IDialogViewModel dialogViewModel && closedByButton)
@@ -44,9 +49,12 @@ namespace Atomex.Client.Desktop.Services
 
         public void ShowPrevious()
         {
-            if (_isDialogOpened) return;
+            if (_isDialogOpened)
+                return;
+
             Dispatcher.UIThread.InvokeAsync(() =>
                 DialogHost.DialogHost.Show(_dialogServiceViewModel, MainDialogHostIdentifier, ClosingEventHandler));
+
             _isDialogOpened = true;
         }
 
@@ -72,6 +80,7 @@ namespace Atomex.Client.Desktop.Services
         public void LockWallet()
         {
             _walletLocked = true;
+
             if (_isDialogOpened)
                 _showAfterUnlock = Close();
         }
@@ -79,9 +88,12 @@ namespace Atomex.Client.Desktop.Services
         public void UnlockWallet()
         {
             _walletLocked = false;
-            if (!_showAfterUnlock) return;
+
+            if (!_showAfterUnlock)
+                return;
 
             ShowPrevious();
+
             _showAfterUnlock = false;
         }
     }

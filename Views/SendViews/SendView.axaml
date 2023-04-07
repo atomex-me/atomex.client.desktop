@@ -16,7 +16,7 @@
              Width="700">
 
     <Design.DataContext>
-        <vm:SendViewModel />
+        <vm:TezosSendViewModel />
     </Design.DataContext>
 
     <UserControl.Styles>
