@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Threading;
@@ -6,11 +7,11 @@ using System.Threading.Tasks;
 
 using Avalonia.Controls;
 using Avalonia.Threading;
+using Netezos.Forging.Models;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using Serilog;
 
-using Atomex.Blockchain.Abstract;
 using Atomex.Blockchain.Tezos;
 using Atomex.Client.Desktop.Common;
 using Atomex.Client.Desktop.Properties;
@@ -19,14 +20,32 @@ using Atomex.Common;
 using Atomex.Wallet.Abstract;
 using Atomex.Wallet.Tezos;
 using Atomex.Wallets.Abstract;
+using Netezos.Forging;
 
 namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 {
     public class TezosSendViewModel : SendViewModel
     {
+        private const int MinimumAmount = 1;
+        private const int MaxGasLimit = 1_000_000;
+        private const int MaxStorageLimit = 5000;
+
         [Reactive] public bool HasTokens { get; set; }
         [Reactive] public bool HasActiveSwaps { get; set; }
+        [Reactive] public long GasLimit { get; set; }
+        [Reactive] public long StorageLimit { get; set; }       
+        [Reactive] public string Entrypoint { get; set; }
+        [Reactive] public string Parameters { get; set; }
 
+        private class EstimatedFees
+        {
+            public decimal Fee { get; set; }
+            public long GasLimit { get; set; }
+            public long StorageLimit { get; set; }
+        }
+
+        private EstimatedFees? _estimatedFees;
+        private TezosConfig Config => (TezosConfig)Currency;
         private ReactiveCommand<MaxAmountEstimation, MaxAmountEstimation> CheckAmountCommand;
 
         public TezosSendViewModel()
@@ -136,22 +155,98 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             App.DialogService.Show(SelectToViewModel);
         }
 
+        private async Task<EstimatedFees?> EstimateFeesAsync(decimal amount, CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                Log.Debug("EstimateFeesAsync call");
+
+                if (From == null || To == null)
+                    return null;
+
+                var account = _app.Account
+                    .GetCurrencyAccount<TezosAccount>(Currency.Name);
+
+                var (request, error) = await account
+                    .FillOperationsAsync(new List<TezosOperationParameters>
+                    {
+                        new TezosOperationParameters
+                        {
+                            Content = new TransactionContent
+                            {
+                                Amount = amount != 0
+                                    ? amount.ToMicroTez()
+                                    : Parameters == null
+                                        ? MinimumAmount // required non zero amount for transfers
+                                        : 0,            // allow zero amount for contracts calls
+                                GasLimit = MaxGasLimit,
+                                StorageLimit = MaxStorageLimit,
+                                Destination = To,
+                                Source = From,
+                                Fee = 0
+                            },
+                            UseFeeFromNetwork = true,
+                            UseGasLimitFromNetwork = true,
+                            UseStorageLimitFromNetwork = true,
+                        }
+                    }, cancellationToken)
+                    .ConfigureAwait(false);
+
+                if (error != null || request == null || !request.IsAutoFilled)
+                    return null;
+
+                return new EstimatedFees
+                {
+                    Fee = request.TotalFee().ToTez() +
+                        (request.TotalStorageLimit() * Config.StorageFeeMultiplier).ToTez(),
+                    GasLimit = request.TotalGasLimit(),
+                    StorageLimit = request.TotalStorageLimit(),
+                };
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
         protected override async Task UpdateAmount()
         {
             try
             {
-                var account = _app.Account
-                    .GetCurrencyAccount<TezosAccount>(Currency.Name);
+                _estimatedFees = await EstimateFeesAsync(Amount);
 
-                var maxAmountEstimation = await account
+                if (UseDefaultFee)
+                {
+                    if (_estimatedFees == null)
+                    {
+                        Warning        = Resources.SvCantEstimateFees;
+                        WarningToolTip = "";
+                        WarningType    = MessageType.Warning;
+
+                        var isAllocated = await _app.Account
+                            .GetCurrencyAccount<TezosAccount>(TezosHelper.Xtz)
+                            .IsAllocatedDestinationAsync(To);
+
+                        StorageLimit = !isAllocated ? Config.ActivationStorage : 0;
+                        Fee = Config.Fee.ToTez() +
+                            (StorageLimit * Config.StorageFeeMultiplier).ToTez();
+                        GasLimit = Config.GasLimit;
+                    }
+                    else
+                    {
+                        Fee          = _estimatedFees.Fee;
+                        GasLimit     = _estimatedFees.GasLimit;
+                        StorageLimit = _estimatedFees.StorageLimit;
+                    }
+                }
+
+                var maxAmountEstimation = await _app
+                    .Account
+                    .GetCurrencyAccount<TezosAccount>(Currency.Name)
                     .EstimateMaxAmountToSendAsync(
                         from: From,
-                        to: To,
-                        type: TransactionType.Output,
+                        fee: Fee.ToMicroTez(),
                         reserve: false);
-
-                if (UseDefaultFee && maxAmountEstimation.Fee > 0)
-                    Fee = maxAmountEstimation.Fee.ToTez();
 
                 CheckAmountCommand?.Execute(maxAmountEstimation).Subscribe();
             }
@@ -167,14 +262,12 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
             {
                 if (!UseDefaultFee) // manual fee
                 {
-                    var account = _app.Account
-                        .GetCurrencyAccount<TezosAccount>(Currency.Name);
-
-                    var maxAmountEstimation = await account
+                    var maxAmountEstimation = await _app
+                        .Account
+                        .GetCurrencyAccount<TezosAccount>(Currency.Name)
                         .EstimateMaxAmountToSendAsync(
                             from: From,
-                            to: To,
-                            type: TransactionType.Output,
+                            fee: Fee.ToMicroTez(),
                             reserve: false);
 
                     CheckAmountCommand?.Execute(maxAmountEstimation).Subscribe();
@@ -190,35 +283,66 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         {
             try
             {
-                var account = _app.Account
-                    .GetCurrencyAccount<TezosAccount>(Currency.Name);
+                _estimatedFees = await EstimateFeesAsync(amount: 0);
 
-                var maxAmountEstimation = await account
+                if (_estimatedFees != null)
+                {
+                    var fromAddress = await _app.Account
+                        .GetAddressAsync(TezosHelper.Xtz, From);
+
+                    var sizeDiff = LocalForge.ForgeMicheNat(fromAddress.Balance).Length - LocalForge.ForgeMicheNat(1).Length;
+
+                    var feeDiff = Math.Max((long)(sizeDiff * Config.GetFillOperationSettings().MinimalNanotezPerByte), 0L);
+
+                    _estimatedFees.Fee += feeDiff.ToTez();
+
+                    if (UseDefaultFee)
+                    {
+                        Warning      = "";
+                        Fee          = _estimatedFees.Fee;
+                        GasLimit     = _estimatedFees.GasLimit;
+                        StorageLimit = _estimatedFees.StorageLimit;
+                    }
+                }
+                else if (UseDefaultFee)
+                {
+                    Warning        = Resources.SvCantEstimateFees;
+                    WarningToolTip = "";
+                    WarningType    = MessageType.Warning;
+
+                    var isAllocated = await _app.Account
+                        .GetCurrencyAccount<TezosAccount>(TezosHelper.Xtz)
+                        .IsAllocatedDestinationAsync(To);
+
+                    StorageLimit = !isAllocated ? Config.ActivationStorage : 0;
+                    Fee = Config.Fee.ToTez() +
+                        (StorageLimit * Config.StorageFeeMultiplier).ToTez();
+                    GasLimit = Config.GasLimit;
+                }
+
+                var maxAmountEstimation = await _app
+                    .Account
+                    .GetCurrencyAccount<TezosAccount>(Currency.Name)
                     .EstimateMaxAmountToSendAsync(
                         from: From,
-                        to: To,
-                        type: TransactionType.Output,
+                        fee: Fee.ToMicroTez(),
                         reserve: false);
-
-                if (UseDefaultFee && maxAmountEstimation.Fee > 0)
-                    Fee = maxAmountEstimation.Fee.ToTez();
 
                 if (maxAmountEstimation.Error != null)
                 {
-                    Warning = maxAmountEstimation.Error.Value.Message;
+                    Warning        = maxAmountEstimation.Error.Value.Message;
                     WarningToolTip = maxAmountEstimation.ErrorHint;
-                    WarningType = MessageType.Error;
+                    WarningType    = MessageType.Error;
                     Amount = 0;
                     return;
                 }
 
-                var (fa12TransferFee, _) = await _app.Account
+                var (fa12TransferFee, _) = await _app
+                    .Account
                     .GetCurrencyAccount<Fa12Account>("TZBTC")
                     .EstimateTransferFeeAsync(From);
 
-                var maxAmount = UseDefaultFee
-                    ? maxAmountEstimation.Amount.ToTez()
-                    : maxAmountEstimation.Amount.ToTez() + maxAmountEstimation.Fee.ToTez() - Fee;
+                var maxAmount = maxAmountEstimation.Amount.ToTez();
 
                 RecommendedMaxAmount = HasActiveSwaps
                     ? Math.Max(maxAmount - maxAmountEstimation.Reserved.ToTez(), 0)
@@ -244,35 +368,33 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
         {
             if (maxAmountEstimation.Error != null)
             {
-                Warning = maxAmountEstimation.Error.Value.Message;
+                Warning        = maxAmountEstimation.Error.Value.Message;
                 WarningToolTip = maxAmountEstimation.ErrorHint;
-                WarningType = MessageType.Error;
+                WarningType    = MessageType.Error;
                 return;
             }
 
-            if (Amount + Fee > maxAmountEstimation.Amount.ToTez() + maxAmountEstimation.Fee.ToTez())
+            if (_estimatedFees != null && Fee < _estimatedFees.Fee) // less than minimum estimated fee
             {
-                Warning = Resources.CvInsufficientFunds;
+                Warning        = Resources.CvLowFees;
                 WarningToolTip = "";
-                WarningType = MessageType.Error;
+                WarningType    = MessageType.Error;
                 return;
             }
 
-            if (Fee < maxAmountEstimation.Fee.ToTez())
+            var maxAmount = maxAmountEstimation.Amount.ToTez();
+
+            if (Amount > maxAmount)
             {
-                Warning = Resources.CvLowFees;
+                Warning        = Resources.CvInsufficientFunds;
                 WarningToolTip = "";
-                WarningType = MessageType.Error;
+                WarningType    = MessageType.Error;
                 return;
             }
 
             var (fa12TransferFee, _) = await _app.Account
                 .GetCurrencyAccount<Fa12Account>("TZBTC")
                 .EstimateTransferFeeAsync(From);
-
-            var maxAmount = UseDefaultFee
-                ? maxAmountEstimation.Amount.ToTez()
-                : maxAmountEstimation.Amount.ToTez() + maxAmountEstimation.Fee.ToTez() - Fee;
 
             RecommendedMaxAmount = HasActiveSwaps
                 ? Math.Max(maxAmount - maxAmountEstimation.Reserved.ToTez(), 0)
@@ -330,25 +452,19 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
         protected override async Task<Error?> Send(CancellationToken cancellationToken = default)
         {
-            var xtzConfig = (TezosConfig)Currency;
-
             var account = _app.Account
                 .GetCurrencyAccount<TezosAccount>(Currency.Name);
-
-            var fee = UseDefaultFee
-                ? Blockchain.Tezos.Fee.FromNetwork(defaultValue: Fee.ToMicroTez())
-                : Blockchain.Tezos.Fee.FromValue(Fee.ToMicroTez());
 
             var (_, error) = await account
                 .SendTransactionAsync(
                     from: From,
                     to: To,
                     amount: AmountToSend.ToMicroTez(),
-                    fee: fee,
-                    gasLimit: GasLimit.FromNetwork(defaultValue: (int)xtzConfig.GasLimit),
-                    storageLimit: StorageLimit.FromNetwork(defaultValue: (int)xtzConfig.StorageLimit, useSafeValue: true),
-                    entrypoint: null,
-                    parameters: null,
+                    fee: Blockchain.Tezos.Fee.FromValue(Fee.ToMicroTez()),
+                    gasLimit: Blockchain.Tezos.GasLimit.FromValue((int)GasLimit),
+                    storageLimit: Blockchain.Tezos.StorageLimit.FromValue((int)StorageLimit),
+                    entrypoint: Entrypoint,
+                    parameters: Parameters,
                     cancellationToken: cancellationToken)
                 .ConfigureAwait(false);
 

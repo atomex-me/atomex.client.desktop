@@ -427,12 +427,9 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
                 {
                     var operation = new TezosOperationParameters
                     {
-                        From         = op.From,
-                        Fee          = UseDefaultFee ? Fee.FromNetwork() : op.Fee,
-                        GasLimit     = UseDefaultFee ? GasLimit.FromNetwork(DefaultOperationGasLimit) : op.GasLimit,
-                        StorageLimit = UseDefaultFee
-                            ? StorageLimit.FromNetwork(DappsViewModel.StorageLimitPerOperation, useSafeValue: false)
-                            : op.StorageLimit,
+                        UseFeeFromNetwork          = UseDefaultFee,
+                        UseGasLimitFromNetwork     = UseDefaultFee,
+                        UseStorageLimitFromNetwork = UseDefaultFee,
                         Content = op.Content switch
                         {
                             TransactionContent txContent => new TransactionContent
@@ -499,10 +496,7 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
             if (!UseDefaultFee)
             {
                 foreach (var op in operations)
-                {
-                    op.Fee = Fee.FromValue(avgFee);
                     op.Content.Fee = avgFee;
-                }
             }
 
             var (isSuccess, error) = await TezosOperationFiller
@@ -516,10 +510,7 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
             if (!UseDefaultFee)
             {
                 foreach (var op in operations)
-                {
-                    op.Fee = Fee.FromValue(avgFee);
                     op.Content.Fee = avgFee;
-                }
             }
 
             if (error != null)

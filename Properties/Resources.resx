@@ -347,4 +347,7 @@ NOTE: Do not sign out or close the application until the swap is completed, othe
   <data name="CvRedeemFromAddressNoteToolTip" xml:space="preserve">
     <value>The redeem transaction will be sent from the address {0} if it has enough funds. Otherwise the transaction will be sent by an extrenal service for a fee</value>
   </data>
+  <data name="SvCantEstimateFees" xml:space="preserve">
+    <value>Can't estimate fees</value>
+  </data>
 </root>

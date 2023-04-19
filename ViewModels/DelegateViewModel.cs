@@ -508,10 +508,10 @@ namespace Atomex.Client.Desktop.ViewModels
                                     StorageLimit = (int)_tezosConfig.StorageLimit,
                                     Source       = delegateAddress
                                 },
-                                From         = delegateAddress,
-                                Fee          = Blockchain.Tezos.Fee.FromNetwork(),
-                                GasLimit     = GasLimit.FromNetwork(defaultValue: (int)_tezosConfig.GasLimit),
-                                StorageLimit = StorageLimit.FromNetwork(defaultValue: (int)_tezosConfig.StorageLimit, useSafeValue: true)
+                                UseFeeFromNetwork          = true,
+                                UseGasLimitFromNetwork     = true,
+                                UseStorageLimitFromNetwork = true,
+                                UseSafeStorageLimit        = true
                             }
                         },
                         publicKey: publicKey,

@@ -79,6 +79,9 @@
         <Compile Update="Views\ConversionViews\ConversionCurrencyView.axaml.cs">
             <DependentUpon>ConversionCurrencyView.axaml</DependentUpon>
         </Compile>
+        <Compile Update="Views\SendViews\TezosSendView.axaml.cs">
+          <DependentUpon>TezosSendView.axaml</DependentUpon>
+        </Compile>
         <Compile Update="Views\StartView.axaml.cs">
             <DependentUpon>StartView.axaml</DependentUpon>
         </Compile>

@@ -425,10 +425,8 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
                         PublicKey    = PubKey.FromBytes(publicKey).ToString(),
                         StorageLimit = 0
                     },
-                    Fee          = Fee.FromNetwork(defaultValue: 0),
-                    From         = connectedWalletAddress.Address,
-                    GasLimit     = GasLimit.FromNetwork(defaultValue: operationGasLimit),
-                    StorageLimit = StorageLimit.FromValue(0)
+                    UseFeeFromNetwork = true,
+                    UseGasLimitFromNetwork = true
                 });
             }
 
@@ -468,11 +466,10 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
 
                     operations.Add(new TezosOperationParameters
                     {
-                        Content      = txContent,
-                        Fee          = Fee.FromNetwork(defaultValue: 0),
-                        GasLimit     = GasLimit.FromNetwork(defaultValue: operationGasLimit),
-                        StorageLimit = StorageLimit.FromNetwork(defaultValue: StorageLimitPerOperation, useSafeValue: false),
-                        From         = connectedWalletAddress.Address
+                        Content                    = txContent,
+                        UseFeeFromNetwork          = true,
+                        UseGasLimitFromNetwork     = true,
+                        UseStorageLimitFromNetwork = true
                     });
                 }
                 else if (o is TezosDelegationOperation delegationOperation)
@@ -488,10 +485,9 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
                             StorageLimit = StorageLimitPerOperation,
                             Delegate     = delegationOperation.Delegate
                         },
-                        Fee          = Fee.FromNetwork(defaultValue: 0),
-                        GasLimit     = GasLimit.FromNetwork(defaultValue: operationGasLimit),
-                        StorageLimit = StorageLimit.FromNetwork(defaultValue: StorageLimitPerOperation, useSafeValue: false),
-                        From         = connectedWalletAddress.Address
+                        UseFeeFromNetwork          = true,
+                        UseGasLimitFromNetwork     = true,
+                        UseStorageLimitFromNetwork = true
                     });
                 }
             };
