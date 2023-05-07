@@ -77,8 +77,9 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
 
     public class DappsViewModel : ViewModelBase
     {
-        private const int GasLimitPerBlock = 5_200_000;
-        public const int StorageLimitPerOperation = 5000;
+        private const int MaxGasLimitPerBlock = 2_600_000;
+        private const int MaxGasLimitPerOperation = 1_040_000;
+        private const int StorageLimitPerOperation = 60000;
 
         private readonly IAtomexApp _app;
         private IWalletBeaconClient _beaconWalletClient;
@@ -402,10 +403,11 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
             var operations = new List<TezosOperationParameters>();
 
             var totalOperations = revealed
-                        ? operationRequest.OperationDetails.Count
-                        : operationRequest.OperationDetails.Count + 1;
+                ? operationRequest.OperationDetails.Count
+                : operationRequest.OperationDetails.Count + 1;
 
-            var operationGasLimit = Math.Min(GasLimitPerBlock / totalOperations, 500_000);
+            var operationGasLimit = Math.Min(MaxGasLimitPerBlock / totalOperations, MaxGasLimitPerOperation);
+            var operationStorageLimit = Math.Min(StorageLimitPerOperation / totalOperations, StorageLimitPerOperation);
 
             if (!revealed)
             {
@@ -445,7 +447,7 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
                         Counter      = ++counter,
                         Fee          = 0,
                         GasLimit     = operationGasLimit,
-                        StorageLimit = StorageLimitPerOperation,
+                        StorageLimit = operationStorageLimit,
                     };
 
                     if (transactionOperation.Parameters != null)
@@ -482,7 +484,7 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
                             Counter      = ++counter,
                             Fee          = 0,
                             GasLimit     = operationGasLimit,
-                            StorageLimit = StorageLimitPerOperation,
+                            StorageLimit = operationStorageLimit,
                             Delegate     = delegationOperation.Delegate
                         },
                         UseFeeFromNetwork          = true,
@@ -505,6 +507,7 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
                 operations,
                 connectedWalletAddress,
                 operationGasLimit,
+                operationStorageLimit,
                 Tezos)
             {
                 QuotesProvider = _app.QuotesProvider,

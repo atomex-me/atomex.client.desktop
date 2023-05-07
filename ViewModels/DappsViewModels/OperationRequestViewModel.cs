@@ -269,6 +269,7 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
         private int? ByteCost { get; set; }
         private TezosConfig Tezos { get; }
         private int DefaultOperationGasLimit { get; }
+        private int DefaultOperationStorageLimit { get; }
         [ObservableAsProperty] public bool IsSending { get; }
         [ObservableAsProperty] public bool IsRejecting { get; }
 
@@ -280,6 +281,7 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
             IEnumerable<TezosOperationParameters> operations,
             WalletAddress connectedAddress,
             int operationGasLimit,
+            int operationStorageLimit,
             TezosConfig tezosConfig)
         {
             Tezos = tezosConfig;
@@ -287,6 +289,7 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
             ConnectedAddressBalance = connectedAddress.Balance.ToTez();
             InitialOperations = operations;
             DefaultOperationGasLimit = operationGasLimit;
+            DefaultOperationStorageLimit = operationStorageLimit;
 
             OnConfirmCommand
                 .IsExecuting
@@ -442,7 +445,7 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
                                 Counter      = txContent.Counter,
                                 GasLimit     = UseDefaultFee ? DefaultOperationGasLimit : txContent.GasLimit,
                                 StorageLimit = UseDefaultFee
-                                    ? DappsViewModel.StorageLimitPerOperation
+                                    ? DefaultOperationStorageLimit
                                     : txContent.StorageLimit
                             },
                             RevealContent revealContent => new RevealContent
@@ -453,7 +456,7 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
                                 Counter      = revealContent.Counter,
                                 GasLimit     = UseDefaultFee ? DefaultOperationGasLimit : revealContent.GasLimit,
                                 StorageLimit = UseDefaultFee
-                                    ? DappsViewModel.StorageLimitPerOperation
+                                    ? DefaultOperationStorageLimit
                                     : revealContent.StorageLimit
                             },
                             DelegationContent delegateContent => new DelegationContent
@@ -464,7 +467,7 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
                                 Counter      = delegateContent.Counter,
                                 GasLimit     = UseDefaultFee ? DefaultOperationGasLimit : delegateContent.GasLimit,
                                 StorageLimit = UseDefaultFee
-                                    ? DappsViewModel.StorageLimitPerOperation
+                                    ? DefaultOperationStorageLimit
                                     : delegateContent.StorageLimit
                             },
                             _ => op.Content

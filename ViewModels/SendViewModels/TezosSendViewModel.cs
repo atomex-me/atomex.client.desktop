@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 using Avalonia.Controls;
 using Avalonia.Threading;
+using Netezos.Forging;
 using Netezos.Forging.Models;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
@@ -20,7 +21,6 @@ using Atomex.Common;
 using Atomex.Wallet.Abstract;
 using Atomex.Wallet.Tezos;
 using Atomex.Wallets.Abstract;
-using Netezos.Forging;
 
 namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 {
@@ -197,8 +197,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
 
                 return new EstimatedFees
                 {
-                    Fee = request.TotalFee().ToTez() +
-                        (request.TotalStorageLimit() * Config.StorageFeeMultiplier).ToTez(),
+                    Fee = request.TotalFee().ToTez(),
                     GasLimit = request.TotalGasLimit(),
                     StorageLimit = request.TotalStorageLimit(),
                 };
@@ -228,8 +227,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                             .IsAllocatedDestinationAsync(To);
 
                         StorageLimit = !isAllocated ? Config.ActivationStorage : 0;
-                        Fee = Config.Fee.ToTez() +
-                            (StorageLimit * Config.StorageFeeMultiplier).ToTez();
+                        Fee = Config.Fee.ToTez();
                         GasLimit = Config.GasLimit;
                     }
                     else
@@ -246,6 +244,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     .EstimateMaxAmountToSendAsync(
                         from: From,
                         fee: Fee.ToMicroTez(),
+                        storageLimit: StorageLimit,
                         reserve: false);
 
                 CheckAmountCommand?.Execute(maxAmountEstimation).Subscribe();
@@ -268,6 +267,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                         .EstimateMaxAmountToSendAsync(
                             from: From,
                             fee: Fee.ToMicroTez(),
+                            storageLimit: StorageLimit,
                             reserve: false);
 
                     CheckAmountCommand?.Execute(maxAmountEstimation).Subscribe();
@@ -315,8 +315,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                         .IsAllocatedDestinationAsync(To);
 
                     StorageLimit = !isAllocated ? Config.ActivationStorage : 0;
-                    Fee = Config.Fee.ToTez() +
-                        (StorageLimit * Config.StorageFeeMultiplier).ToTez();
+                    Fee = Config.Fee.ToTez();
                     GasLimit = Config.GasLimit;
                 }
 
@@ -326,6 +325,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                     .EstimateMaxAmountToSendAsync(
                         from: From,
                         fee: Fee.ToMicroTez(),
+                        storageLimit: StorageLimit,
                         reserve: false);
 
                 if (maxAmountEstimation.Error != null)
