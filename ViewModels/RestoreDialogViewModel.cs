@@ -3,11 +3,11 @@ using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
 using Serilog;
 
 using Atomex.Wallet;
-using Atomex.Wallet.Tezos;
 using Atomex.LiteDb;
 
 namespace Atomex.Client.Desktop.ViewModels
@@ -69,7 +69,7 @@ namespace Atomex.Client.Desktop.ViewModels
 
             try
             {
-                var walletScanner = new WalletScanner(_app.Account);
+                var walletScanner = new WalletScanner(_app.Account, App.LoggerFactory.CreateLogger<WalletScanner>());
 
                 var primaryCurrencies = changesGroupsByCurrency
                     .Where(c => !c.IsToken)

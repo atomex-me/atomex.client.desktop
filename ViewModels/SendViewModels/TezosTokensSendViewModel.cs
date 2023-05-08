@@ -458,7 +458,7 @@ namespace Atomex.Client.Desktop.ViewModels.SendViewModels
                 {
                     var fromTokenAddress = await GetTokenAddressAsync(
                         account: _app.Account,
-                        address: From!,
+                        address: From,
                         tokenContract: TokenContract,
                         tokenId: TokenId,
                         tokenType: _tokenType);

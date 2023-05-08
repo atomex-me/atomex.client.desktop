@@ -6,6 +6,7 @@ using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
 using Avalonia.Controls;
 using Avalonia.Threading;
@@ -432,7 +433,9 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
             {
                 await Task.Run(async () =>
                 {
-                    var scanner = new WalletScanner(_app.Account);
+                    var scanner = new WalletScanner(
+                        account: _app.Account,
+                        logger: App.LoggerFactory.CreateLogger<WalletScanner>());
 
                     await scanner
                         .UpdateBalanceAsync(

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
 using Avalonia.Controls;
 using Serilog;
@@ -99,7 +100,7 @@ namespace Atomex.Client.Desktop.ViewModels.WalletViewModels
                 {
                     await _app.Account
                         .GetCurrencyAccount<Fa2Account>(Currency.Name)
-                        .UpdateBalanceAsync(_cancellation.Token)
+                        .UpdateBalanceAsync(App.LoggerFactory.CreateLogger<Fa2Account>(), _cancellation.Token)
                         .ConfigureAwait(false);
                 });
             }

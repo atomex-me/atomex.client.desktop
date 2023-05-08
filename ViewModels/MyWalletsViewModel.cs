@@ -16,6 +16,7 @@ using Atomex.Wallet;
 using Atomex.Wallet.Abstract;
 using Serilog;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
 namespace Atomex.Client.Desktop.ViewModels
 {
@@ -94,7 +95,7 @@ namespace Atomex.Client.Desktop.ViewModels
                         {
                             foreach (var currency in currencies)
                             {
-                                await new WalletScanner(account)
+                                await new WalletScanner(account, App.LoggerFactory.CreateLogger<WalletScanner>())
                                     .UpdateBalanceAsync(currency, skipUsed: true)
                                     .ConfigureAwait(false);
                             }

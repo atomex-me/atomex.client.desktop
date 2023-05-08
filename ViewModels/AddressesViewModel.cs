@@ -6,6 +6,7 @@ using System.Linq;
 using System.Numerics;
 using System.Reactive;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
 using Avalonia.Controls;
 using ReactiveUI;
@@ -267,7 +268,7 @@ namespace Atomex.Client.Desktop.ViewModels
             {
                 var updateTask = Task.Run(async () =>
                 {
-                    await new WalletScanner(_app.Account)
+                    await new WalletScanner(_app.Account, App.LoggerFactory.CreateLogger<WalletScanner>())
                         .UpdateBalanceAsync(_currency.Name, address)
                         .ConfigureAwait(false);
                 });

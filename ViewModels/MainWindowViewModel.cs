@@ -1,13 +1,17 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using System.Reactive.Linq;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using System.Windows.Input;
+
 using Avalonia.Controls;
 using Avalonia.Threading;
 using ReactiveUI;
+using ReactiveUI.Fody.Helpers;
 using Serilog;
+
 using Atomex.Client.Common;
 using Atomex.Client.Desktop.Controls;
 using Atomex.Client.Desktop.Properties;
@@ -18,27 +22,35 @@ namespace Atomex.Client.Desktop.ViewModels
 {
     public sealed class MainWindowViewModel : ViewModelBase
     {
-        private void ShowContent(ViewModelBase content)
-        {
-            if (Content?.GetType() != content.GetType())
-            {
-                Content = content;
-            }
-        }
+        private bool _userIgnoreActiveSwaps;
+        private UnlockViewModel _unlockViewModel;
+        private readonly IAtomexApp _app;
+        private readonly IMainView _mainView;
+        private WalletMainViewModel _walletMainViewModel;
 
-        private void ShowStart()
-        {
-            ShowContent(new StartViewModel(ShowContent, ShowStart, _app, this));
-        }
+        public Action OnUpdateAction;
 
-        private ViewModelBase _content;
-        public ViewModelBase Content
-        {
-            get => _content;
-            set => this.RaiseAndSetIfChanged(ref _content, value);
-        }
+        [Reactive] public ViewModelBase Content { get; set; }
+        [Reactive] public bool HasAccount { get; set; }
+        public bool AccountRestored { get; set; }
+        [ObservableAsProperty] public bool UpdatesReady { get; }
+        [ObservableAsProperty] public bool IsDownloadingUpdate { get; }
+        public bool IsLinux { get; } = RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
+        [Reactive] public bool HasUpdates { get; set; }
+        [Reactive] public string UpdateVersion { get; set; }
+        [Reactive] public bool UpdateStarted { get; set; }
+        [Reactive] public string? StartupData { get; set; }
+        [Reactive] public int UpdateDownloadProgress { get; set; }
 
-        private WalletMainViewModel WalletMainViewModel;
+        #region Commands
+
+        private ICommand _updateCommand;
+        public ICommand UpdateCommand => _updateCommand ??= ReactiveCommand.Create(OnUpdateClick);
+
+        private ICommand _signOutCommand;
+        public ICommand SignOutCommand => _signOutCommand ??= ReactiveCommand.Create(() => SignOut());
+
+        #endregion Commands
 
         public MainWindowViewModel()
         {
@@ -48,140 +60,79 @@ namespace Atomex.Client.Desktop.ViewModels
 #endif
         }
 
-        public Action OnUpdateAction;
-
-        public MainWindowViewModel(IAtomexApp app, IMainView mainView = null)
+        public MainWindowViewModel(IAtomexApp app, IMainView? mainView = null)
         {
             _app = app ?? throw new ArgumentNullException(nameof(app));
-            WalletMainViewModel = new WalletMainViewModel(_app);
+            _walletMainViewModel = new WalletMainViewModel(_app);
+
+            this.WhenAnyValue(vm => vm.HasAccount)
+                .Subscribe(hasAccount =>
+                {
+                    if (hasAccount)
+                    {
+                        //_walletMainViewModel = new WalletMainViewModel(_app);
+
+                        ShowContent(_walletMainViewModel);
+
+                        if (AccountRestored)
+                        {
+                            var restoreViewModel = new RestoreDialogViewModel(_app)
+                            {
+                                OnRestored = () => AccountRestored = false
+                            };
+
+                            _ = restoreViewModel.ScanAsync(new LiteDbMigrationResult
+                            {
+                                { MigrationEntityType.Addresses, "BTC"},
+                                { MigrationEntityType.Addresses, "LTC"},
+                                { MigrationEntityType.Addresses, "ETH"},
+                                { MigrationEntityType.Addresses, "USDT" },
+                                { MigrationEntityType.Addresses, "WBTC" },
+                                { MigrationEntityType.Addresses, "TBTC" },
+                                { MigrationEntityType.Addresses, "XTZ"},
+                                { MigrationEntityType.Addresses, "FA12"},
+                                { MigrationEntityType.Addresses, "FA2"}
+                            });
+                        }
+                    }
+                    else
+                    {
+                        AccountRestored = false;
+                        StartupData = null;
+                    }
+                });
+
+            this.WhenAnyValue(vm => vm.UpdateDownloadProgress)
+                .Select(downloadProgress => HasUpdates && downloadProgress is > 0 and < 100)
+                .ToPropertyEx(this, vm => vm.IsDownloadingUpdate);
+
+            this.WhenAnyValue(vm => vm.UpdateDownloadProgress)
+                .Select(downloadProgress => HasUpdates && downloadProgress == 100)
+                .ToPropertyEx(this, vm => vm.UpdatesReady);
+
+            this.WhenAnyValue(vm => vm.StartupData)
+                .Subscribe(startupData =>
+                {
+                    if (!string.IsNullOrEmpty(startupData) && HasAccount)
+                    {
+                        App.ConnectTezosDapp?.Invoke(startupData);
+                    }
+                });
 
             SubscribeToServices();
 
             if (mainView != null)
             {
-                MainView = mainView;
-                MainView.Inactivity += InactivityHandler;
+                _mainView = mainView;
+                _mainView.Inactivity += InactivityHandler;
             }
 
             ShowStart();
         }
 
-        private readonly IAtomexApp _app;
-        private IMainView MainView { get; set; }
-
-        private bool _hasAccount;
-        public bool HasAccount
+        public void CloseDialog()
         {
-            get => _hasAccount;
-            set
-            {
-                _hasAccount = value;
-
-                if (_hasAccount)
-                {
-                    ShowContent(WalletMainViewModel);
-
-                    if (AccountRestored)
-                    {
-                        var restoreViewModel = new RestoreDialogViewModel(_app)
-                        {
-                            OnRestored = () => AccountRestored = false
-                        };
-
-                        _ = restoreViewModel.ScanAsync(new LiteDbMigrationResult
-                        {
-                            { MigrationEntityType.Addresses, "BTC"},
-                            { MigrationEntityType.Addresses, "LTC"},
-                            { MigrationEntityType.Addresses, "ETH"},
-                            { MigrationEntityType.Addresses, "USDT" },
-                            { MigrationEntityType.Addresses, "WBTC" },
-                            { MigrationEntityType.Addresses, "TBTC" },
-                            { MigrationEntityType.Addresses, "XTZ"},
-                            { MigrationEntityType.Addresses, "FA12"},
-                            { MigrationEntityType.Addresses, "FA2"}
-                        });
-                    }
-                }
-                else
-                {
-                    AccountRestored = false;
-                    StartupData = null;
-                }
-
-                this.RaisePropertyChanged(nameof(HasAccount));
-            }
-        }
-
-        private string? _startupData;
-        public string? StartupData
-        {
-            get => _startupData;
-            set
-            {
-                _startupData = value;
-
-                if (!string.IsNullOrEmpty(_startupData) && HasAccount)
-                {
-                    App.ConnectTezosDapp?.Invoke(_startupData);
-                }
-            }
-        }
-
-        public bool AccountRestored { get; set; }
-        public bool UpdatesReady => HasUpdates && UpdateDownloadProgress == 100;
-        public bool IsDownloadingUpdate => HasUpdates && UpdateDownloadProgress is > 0 and < 100;
-
-        private bool _hasUpdates;
-
-        public bool HasUpdates
-        {
-            get => _hasUpdates;
-            set
-            {
-                _hasUpdates = value;
-                OnPropertyChanged(nameof(HasUpdates));
-            }
-        }
-
-        private string _updateVersion;
-
-        public string UpdateVersion
-        {
-            get => _updateVersion;
-            set
-            {
-                _updateVersion = value;
-                OnPropertyChanged(nameof(UpdateVersion));
-            }
-        }
-
-        private bool _updateStarted;
-
-        public bool UpdateStarted
-        {
-            get => _updateStarted;
-            set
-            {
-                _updateStarted = value;
-                OnPropertyChanged(nameof(UpdateStarted));
-            }
-        }
-
-        private int _updateDownloadProgress;
-
-        public int UpdateDownloadProgress
-        {
-            get => _updateDownloadProgress;
-            set
-            {
-                if (_updateDownloadProgress != value)
-                {
-                    _updateDownloadProgress = value;
-                    OnPropertyChanged(nameof(UpdateDownloadProgress));
-                    OnPropertyChanged(nameof(IsDownloadingUpdate));
-                    OnPropertyChanged(nameof(UpdatesReady));
-                }
-            }
+            App.DialogService.Close(closedByButton: true);
         }
 
         private void SubscribeToServices()
@@ -194,7 +145,7 @@ namespace Atomex.Client.Desktop.ViewModels
             if (_app?.Account == null)
             {
                 HasAccount = false;
-                MainView?.StopInactivityControl();
+                _mainView?.StopInactivityControl();
 
                 return;
             }
@@ -202,15 +153,11 @@ namespace Atomex.Client.Desktop.ViewModels
             HasAccount = true;
 
             // auto sign out after timeout
-            if (MainView != null && _app.Account.UserData.AutoSignOut)
-                MainView.StartInactivityControl(TimeSpan.FromMinutes(_app.Account.UserData.PeriodOfInactivityInMin));
+            if (_mainView != null && _app.Account.UserData.AutoSignOut)
+                _mainView.StartInactivityControl(TimeSpan.FromMinutes(_app.Account.UserData.PeriodOfInactivityInMin));
 
             StartLookingForUserMessages(TimeSpan.FromSeconds(90));
         }
-
-
-        private ICommand _updateCommand;
-        public ICommand UpdateCommand => _updateCommand ??= ReactiveCommand.Create(OnUpdateClick);
 
         private async void OnUpdateClick()
         {
@@ -221,11 +168,18 @@ namespace Atomex.Client.Desktop.ViewModels
             UpdateStarted = true;
         }
 
-        private ICommand _signOutCommand;
-        public ICommand SignOutCommand => _signOutCommand ??= ReactiveCommand.Create(() => SignOut());
+        private void ShowContent(ViewModelBase content)
+        {
+            if (Content?.GetType() != content.GetType())
+            {
+                Content = content;
+            }
+        }
 
-        private bool _userIgnoreActiveSwaps;
-        private UnlockViewModel _unlockViewModel;
+        private void ShowStart()
+        {
+            ShowContent(new StartViewModel(ShowContent, ShowStart, _app, this));
+        }
 
         private async Task SignOut(bool withAppUpdate = false)
         {
@@ -283,7 +237,9 @@ namespace Atomex.Client.Desktop.ViewModels
 
         private async Task<bool> WhetherToCancelClosingAsync()
         {
-            if (_app.Account == null) return false;
+            if (_app.Account == null)
+                return false;
+
             if (!_app.Account.UserData.ShowActiveSwapWarning)
                 return false;
 
@@ -292,7 +248,7 @@ namespace Atomex.Client.Desktop.ViewModels
             return hasActiveSwaps;
         }
 
-        private void InactivityHandler(object sender, EventArgs args)
+        private void InactivityHandler(object? sender, EventArgs args)
         {
             if (_app?.Account == null)
                 return;
@@ -314,7 +270,7 @@ namespace Atomex.Client.Desktop.ViewModels
                 goBack: async () => await SignOut(),
                 onUnlock: async () =>
                 {
-                    ShowContent(WalletMainViewModel);
+                    ShowContent(_walletMainViewModel);
                     App.DialogService.UnlockWallet();
 
                     var userId = Atomex.ViewModels.Helpers.GetUserId(_app.Account);
@@ -342,13 +298,6 @@ namespace Atomex.Client.Desktop.ViewModels
             ShowContent(_unlockViewModel);
         }
 
-        public bool IsLinux { get; } = RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
-
-        public void CloseDialog()
-        {
-            App.DialogService.Close(closedByButton: true);
-        }
-
         private void DesignerMode()
         {
             HasAccount = true;
@@ -361,7 +310,7 @@ namespace Atomex.Client.Desktop.ViewModels
 
             _ = Task.Run(async () =>
             {
-                while (_hasAccount)
+                while (HasAccount)
                 {
                     if (firstRun)
                     {
@@ -371,7 +320,7 @@ namespace Atomex.Client.Desktop.ViewModels
                     {
                         await Task.Delay(delayInterval);
 
-                        if (!_hasAccount)
+                        if (!HasAccount)
                             return;
                     }
 

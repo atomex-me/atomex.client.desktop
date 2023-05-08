@@ -1,5 +1,6 @@
 ﻿{
   "Serilog": {
+    "Using": [ "Atomex.Client.Desktop" ],
     "MinimumLevel": {
       "Default": "Debug",
       "Override": {
@@ -7,10 +8,14 @@
         "System": "Debug"
       }
     },
+    "Enrich": [
+      "WithCaller"
+    ],
     "WriteTo": [
       {
         "Name": "Console",
         "Args": {
+          "outputTemplate": "[{Timestamp:HH:mm:ss}] [{Level:u3}] [{Class}] {Message:lj}{NewLine}{Exception}",
           "restrictedToMinimumLevel": "Debug"
         }
       }
