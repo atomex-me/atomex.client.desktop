@@ -49,12 +49,6 @@ namespace Atomex.Client.Desktop
 
         public override void OnFrameworkInitializationCompleted()
         {
-            if (ApplicationLifetime is not IClassicDesktopStyleApplicationLifetime desktop)
-            {
-                Environment.Exit(0);
-                return;
-            }
-
             // set invariant culture by default
             CultureInfo.CurrentCulture = CultureInfo.InvariantCulture;
             // configure loggers
@@ -69,67 +63,70 @@ namespace Atomex.Client.Desktop
                 Log.Information("Setting startup data from URLOpened {Url}", args.Urls[0]);
             };
 
-            if (SingleInstanceLoopbackService.TrySendArgsToOtherInstance(desktop.Args, LoggerFactory.CreateLogger<SingleInstanceLoopbackService>()))
+            if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
             {
-                // arguments passed successfully to another application instance, exit
-                Environment.Exit(0);
-                return;
+                if (SingleInstanceLoopbackService.TrySendArgsToOtherInstance(desktop.Args, LoggerFactory.CreateLogger<SingleInstanceLoopbackService>()))
+                {
+                    // arguments passed successfully to another application instance, exit
+                    Environment.Exit(0);
+                    return;
+                }
+
+                TemplateService = new TemplateService();
+                Clipboard = AvaloniaLocator.Current.GetService<IClipboard>();
+
+                var currenciesProvider = new CurrenciesProvider(CurrenciesConfigurationString);
+                var symbolsProvider = new SymbolsProvider(SymbolsConfiguration);
+
+                var bitfinexQuotesProvider = new BitfinexQuotesProvider(
+                    currencies: currenciesProvider
+                        .GetCurrencies(Network.MainNet)
+                        .GetOrderedPreset()
+                        .Select(c => c.Name),
+                    baseCurrency: QuotesProvider.Usd,
+                    log: LoggerFactory.CreateLogger<BitfinexQuotesProvider>());
+
+                var tezToolsQuotesProvider = new TezToolsQuotesProvider(
+                    log: LoggerFactory.CreateLogger<TezToolsQuotesProvider>());
+
+                var quotesProvider = new MultiSourceQuotesProvider(
+                    log: LoggerFactory.CreateLogger<MultiSourceQuotesProvider>(),
+                    bitfinexQuotesProvider,
+                    tezToolsQuotesProvider);
+
+                // init Atomex client app
+                AtomexApp = new AtomexApp(logger: LoggerFactory.CreateLogger("AtomexApp"))
+                    .UseCurrenciesProvider(currenciesProvider)
+                    .UseSymbolsProvider(symbolsProvider)
+                    .UseCurrenciesUpdater(new CurrenciesUpdater(currenciesProvider))
+                    .UseSymbolsUpdater(new SymbolsUpdater(symbolsProvider))
+                    .UseQuotesProvider(quotesProvider);
+
+                var mainWindow = new MainWindow();
+                DialogService = new DialogService();
+
+                NotificationsService = new NotificationsService(AtomexApp, mainWindow.NotificationManager);
+                MainWindowViewModel = new MainWindowViewModel(AtomexApp, mainWindow);
+                mainWindow.DataContext = MainWindowViewModel;
+                desktop.Exit += OnExit;
+
+                if (desktop.Args.Length != 0)
+                {
+                    MainWindowViewModel.StartupData = desktop.Args[0];
+                    Log.Information("Setting startup data from start args {Data}", desktop.Args[0]);
+                }
+
+                desktop.MainWindow = mainWindow;
+                AtomexApp.Start();
+
+                _singleInstanceLoopbackService = new SingleInstanceLoopbackService();
+                _singleInstanceLoopbackService.RunInBackground((receivedText) =>
+                {
+                    MainWindowViewModel.StartupData = receivedText;
+                    Log.Information("Received startup data from socket {Data}", receivedText);
+                    _ = Dispatcher.UIThread.InvokeAsync(() => { desktop.MainWindow.Activate(); });
+                });
             }
-
-            TemplateService = new TemplateService();
-            Clipboard = AvaloniaLocator.Current.GetService<IClipboard>();
-
-            var currenciesProvider = new CurrenciesProvider(CurrenciesConfigurationString);
-            var symbolsProvider = new SymbolsProvider(SymbolsConfiguration);
-
-            var bitfinexQuotesProvider = new BitfinexQuotesProvider(
-                currencies: currenciesProvider
-                    .GetCurrencies(Network.MainNet)
-                    .GetOrderedPreset()
-                    .Select(c => c.Name),
-                baseCurrency: QuotesProvider.Usd,
-                log: LoggerFactory.CreateLogger<BitfinexQuotesProvider>());
-
-            var tezToolsQuotesProvider = new TezToolsQuotesProvider(
-                log: LoggerFactory.CreateLogger<TezToolsQuotesProvider>());
-
-            var quotesProvider = new MultiSourceQuotesProvider(
-                log: LoggerFactory.CreateLogger<MultiSourceQuotesProvider>(),
-                bitfinexQuotesProvider,
-                tezToolsQuotesProvider);
-
-            // init Atomex client app
-            AtomexApp = new AtomexApp(logger: LoggerFactory.CreateLogger("AtomexApp"))
-                .UseCurrenciesProvider(currenciesProvider)
-                .UseSymbolsProvider(symbolsProvider)
-                .UseCurrenciesUpdater(new CurrenciesUpdater(currenciesProvider))
-                .UseSymbolsUpdater(new SymbolsUpdater(symbolsProvider))
-                .UseQuotesProvider(quotesProvider);
-
-            var mainWindow = new MainWindow();
-            DialogService = new DialogService();
-
-            NotificationsService = new NotificationsService(AtomexApp, mainWindow.NotificationManager);
-            MainWindowViewModel = new MainWindowViewModel(AtomexApp, mainWindow);
-            mainWindow.DataContext = MainWindowViewModel;
-            desktop.Exit += OnExit;
-
-            if (desktop.Args.Length != 0)
-            {
-                MainWindowViewModel.StartupData = desktop.Args[0];
-                Log.Information("Setting startup data from start args {Data}", desktop.Args[0]);
-            }
-
-            desktop.MainWindow = mainWindow;
-            AtomexApp.Start();
-
-            _singleInstanceLoopbackService = new SingleInstanceLoopbackService();
-            _singleInstanceLoopbackService.RunInBackground((receivedText) =>
-            {
-                MainWindowViewModel.StartupData = receivedText;
-                Log.Information("Received startup data from socket {Data}", receivedText);
-                _ = Dispatcher.UIThread.InvokeAsync(() => { desktop.MainWindow.Activate(); });
-            });
 
             base.OnFrameworkInitializationCompleted();
         }
