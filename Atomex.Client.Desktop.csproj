@@ -6,8 +6,8 @@
         <UseAppHost>true</UseAppHost>
         <ApplicationIcon>Resources/Images/atomex_logo_256x256_ico.ico</ApplicationIcon>
 
-        <AssemblyVersion>1.3.6</AssemblyVersion>
-        <Version>1.3.6</Version>
+        <AssemblyVersion>1.3.7</AssemblyVersion>
+        <Version>1.3.7</Version>
     </PropertyGroup>
     <Choose>
         <When Condition=" '$(Configuration)' == 'Debug' ">
@@ -37,7 +37,7 @@
         <PackageReference Include="Avalonia.ReactiveUI" Version="0.10.15" />
         <PackageReference Include="Avalonia.Xaml.Behaviors" Version="0.10.13.3" />
         <PackageReference Include="Avalonia.Svg.Skia" Version="0.10.13" />
-        <PackageReference Include="Beacon.Sdk" Version="1.0.24" />
+        <PackageReference Include="Beacon.Sdk" Version="1.0.25" />
         <PackageReference Include="DialogHost.Avalonia" Version="0.4.0" />
         <PackageReference Include="Deadpikle.AvaloniaProgressRing" Version="0.9.0" />
         <PackageReference Include="NetSparkleUpdater.SparkleUpdater" Version="2.0.7" />
