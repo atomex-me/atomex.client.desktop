@@ -18,10 +18,11 @@ namespace Atomex.Client.Desktop.Common
     {
         private static string LaunchdFileName => "com.atomex.osx.plist";
 
-        private static string LaunchdDirFilePath => Path.Combine(
+        private static string LaunchAgentsDirPath => Path.Combine(
             $"{Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)}",
-            "Library/LaunchAgents",
-            LaunchdFileName);
+            "Library/LaunchAgents");
+
+        private static string LaunchDaemonFilePath => Path.Combine(LaunchAgentsDirPath, LaunchdFileName);
 
         private static string AppName { get; set; } = "Atomex.app";
 
@@ -191,9 +192,9 @@ namespace Atomex.Client.Desktop.Common
                 workingDir = workingDir.Substring(0, workingDir.IndexOf(AppName, StringComparison.Ordinal));
             }
 
-            using (FileStream stream = new FileStream(batchFilePath, FileMode.Create, FileAccess.ReadWrite,
-                       FileShare.None, 4096, true))
-            using (StreamWriter write = new StreamWriter(stream, new UTF8Encoding(false)))
+            await using (var stream = new FileStream(batchFilePath, FileMode.Create, FileAccess.ReadWrite,
+                             FileShare.None, 4096, true))
+            await using (var write = new StreamWriter(stream, new UTF8Encoding(false)))
             {
                 if (!isWindows)
                 {
@@ -221,11 +222,21 @@ namespace Atomex.Client.Desktop.Common
                 }
             }
 
-            Exec($"rm -f {LaunchdDirFilePath}");
+            Exec($"rm -f {LaunchDaemonFilePath}");
+            
+            var launchAgentsDirPathExist = Directory.Exists(LaunchAgentsDirPath);
+            if(!launchAgentsDirPathExist)
+                Directory.CreateDirectory(LaunchAgentsDirPath);
 
-            await using (FileStream stream = new FileStream(LaunchdDirFilePath, FileMode.Create, FileAccess.ReadWrite,
-                             FileShare.None, 4096, true))
-            await using (StreamWriter write = new StreamWriter(stream, new UTF8Encoding(false)))
+            await using (var stream = new FileStream(
+                             LaunchDaemonFilePath,
+                             FileMode.Create,
+                             FileAccess.ReadWrite,
+                             FileShare.None,
+                             bufferSize: 4096,
+                             useAsync: true))
+
+            await using (var write = new StreamWriter(stream, new UTF8Encoding(false)))
             {
                 var output = $@"<?xml version=""1.0"" encoding=""UTF-8""?>
 <!DOCTYPE plist PUBLIC ""-//Apple//DTD PLIST 1.0//EN"" ""http://www.apple.com/DTDs/PropertyList-1.0.dtd"">
@@ -241,7 +252,7 @@ namespace Atomex.Client.Desktop.Common
         <array>
             <string>/bin/bash</string>
             <string>-c</string>
-            <string>/usr/bin/open ""{workingDir}{AppName}"";launchctl unload -w {LaunchdDirFilePath}</string>
+            <string>/usr/bin/open ""{workingDir}{AppName}"";launchctl unload -w {LaunchDaemonFilePath}</string>
         </array>
    </dict>
 </plist>
@@ -254,7 +265,7 @@ namespace Atomex.Client.Desktop.Common
 
             var processInfo = new ProcessStartInfo
             {
-                Arguments = $"load -w {LaunchdDirFilePath}",
+                Arguments = $"load -w {LaunchDaemonFilePath}",
                 FileName = "launchctl",
                 UseShellExecute = true
             };
@@ -325,7 +336,7 @@ namespace Atomex.Client.Desktop.Common
         {
             if (File.Exists("deeplinks_activated")) return;
             var targetVer = WalletMainViewModel.GetAssemblyFileVersion();
-            
+
             if (PlatformHelper.GetClientType() != ClientType.AvaloniaMac) return;
 
             var workingDir = Utilities.GetFullBaseDirectory();
@@ -342,7 +353,7 @@ namespace Atomex.Client.Desktop.Common
             var applicationFolder = $"{workingDir}{AppName}";
 
             var updateScript = $"! test -f {applicationFolder}/Contents/MacOS/deeplinks_activated && " +
-                               $"launchctl unload -w {LaunchdDirFilePath} ; " +
+                               $"launchctl unload -w {LaunchDaemonFilePath} ; " +
                                $"curl https://github.com/atomex-me/atomex.client.desktop/releases/download/{targetVer}/Atomex.{targetVer}.dmg -Lo {Path.Combine(Path.GetTempPath(), $"Atomex.{targetVer}.dmg")} && " +
                                $"hdiutil attach {Path.Combine(Path.GetTempPath(), $"Atomex.{targetVer}.dmg")} && " +
                                $"rm -rf {applicationFolder} && " +
@@ -351,7 +362,7 @@ namespace Atomex.Client.Desktop.Common
                                $"touch {applicationFolder} && " +
                                $"rm {Path.Combine(Path.GetTempPath(), $"Atomex.{targetVer}.dmg")} && " +
                                $"touch {applicationFolder}/Contents/MacOS/deeplinks_activated";
-            
+
             Exec(updateScript);
             Log.Error("Deeplink script executed\n{Script}", updateScript);
             //
