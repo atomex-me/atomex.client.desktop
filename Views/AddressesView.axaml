@@ -11,183 +11,191 @@
              xmlns:abstract="clr-namespace:Atomex.Client.Desktop.ViewModels.Abstract"
              xmlns:common="clr-namespace:Atomex.Common;assembly=Atomex.Common">
 
-    <Design.DataContext>
-        <vm:AddressesViewModel />
-    </Design.DataContext>
+  <Design.DataContext>
+    <vm:AddressesViewModel/>
+  </Design.DataContext>
 
-    <Grid RowDefinitions="Auto,*"
-          Name="DesignGrid">
-        <Border Grid.Row="0"
-                Background="{DynamicResource LightDefaultOpacity6}"
-                CornerRadius="{DynamicResource AtomexCornerRadius}"
-                VerticalAlignment="Top"
-                Height="34"
-                Margin="0 16 0 0"
-                Padding="12 0">
+  <Grid RowDefinitions="Auto,*"
+        Name="DesignGrid">
+    <Border Grid.Row="0"
+            Background="{DynamicResource LightDefaultOpacity6}"
+            CornerRadius="{DynamicResource AtomexCornerRadius}"
+            VerticalAlignment="Top"
+            Height="34"
+            Margin="0 16 0 0"
+            Padding="12 0">
 
-            <Grid Name="HeaderGrid"
-                  ColumnDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto"
-                  VerticalAlignment="Stretch">
+      <Grid Name="HeaderGrid"
+            ColumnDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto"
+            VerticalAlignment="Stretch">
 
-                <Button Grid.Column="0"
-                        Padding="0"
-                        VerticalAlignment="Stretch"
-                        VerticalContentAlignment="Center"
-                        IsEnabled="False"
-                        Classes="EmptyBtnWithContent">
-                    <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
-                               FontSize="13"
-                               Text="Address" />
-                </Button>
+        <StackPanel Grid.Column="0"
+                    Orientation="Horizontal">
+          <Button Padding="0"
+                  VerticalAlignment="Stretch"
+                  VerticalContentAlignment="Center"
+                  IsEnabled="False"
+                  Classes="EmptyBtnWithContent">
+            <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
+                       FontSize="13"
+                       Text="Address"/>
+          </Button>
 
-                <controls:SortButton Grid.Column="1"
-                                     Title="Path"
-                                     Command="{Binding SetSortTypeCommand}"
-                                     CommandParameter="{x:Static abstract:AddressesSortField.ByPath}">
-                    <controls:SortButton.SortIsAsc>
-                        <MultiBinding Converter="{x:Static BoolConverters.And}">
-                            <Binding Path="CurrentSortDirection"
-                                     Converter="{x:Static converters:EnumToStringEqualConverter.Instance}"
-                                     ConverterParameter="{x:Static common:SortDirection.Asc}" />
-                            <Binding Path="CurrentSortField"
-                                     Converter="{x:Static converters:EnumToStringEqualConverter.Instance}"
-                                     ConverterParameter="{x:Static abstract:AddressesSortField.ByPath}" />
-                        </MultiBinding>
-                    </controls:SortButton.SortIsAsc>
-                    <controls:SortButton.SortIsDesc>
-                        <MultiBinding Converter="{x:Static BoolConverters.And}">
-                            <Binding Path="CurrentSortDirection"
-                                     Converter="{x:Static converters:EnumToStringEqualConverter.Instance}"
-                                     ConverterParameter="{x:Static common:SortDirection.Desc}" />
-                            <Binding Path="CurrentSortField"
-                                     Converter="{x:Static converters:EnumToStringEqualConverter.Instance}"
-                                     ConverterParameter="{x:Static abstract:AddressesSortField.ByPath}" />
-                        </MultiBinding>
-                    </controls:SortButton.SortIsDesc>
-                </controls:SortButton>
+          <controls:IconButton Classes="Plus"
+                               Margin="3 0 0 0"
+                               HorizontalAlignment="Left"
+                               Command="{Binding AddNewAddress}"
+                               ToolText="Add new address"/>
+        </StackPanel>
 
-                <Button Grid.Column="2"
-                        Padding="0"
-                        VerticalAlignment="Stretch"
-                        VerticalContentAlignment="Center"
-                        IsEnabled="False"
-                        Classes="EmptyBtnWithContent">
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
-                                   FontSize="13"
-                                   Text="Type" />
-                    </StackPanel>
-                </Button>
+        <controls:SortButton Grid.Column="1"
+                             Title="Path"
+                             Command="{Binding SetSortTypeCommand}"
+                             CommandParameter="{x:Static abstract:AddressesSortField.ByPath}">
+          <controls:SortButton.SortIsAsc>
+            <MultiBinding Converter="{x:Static BoolConverters.And}">
+              <Binding Path="CurrentSortDirection"
+                       Converter="{x:Static converters:EnumToStringEqualConverter.Instance}"
+                       ConverterParameter="{x:Static common:SortDirection.Asc}"/>
+              <Binding Path="CurrentSortField"
+                       Converter="{x:Static converters:EnumToStringEqualConverter.Instance}"
+                       ConverterParameter="{x:Static abstract:AddressesSortField.ByPath}"/>
+            </MultiBinding>
+          </controls:SortButton.SortIsAsc>
+          <controls:SortButton.SortIsDesc>
+            <MultiBinding Converter="{x:Static BoolConverters.And}">
+              <Binding Path="CurrentSortDirection"
+                       Converter="{x:Static converters:EnumToStringEqualConverter.Instance}"
+                       ConverterParameter="{x:Static common:SortDirection.Desc}"/>
+              <Binding Path="CurrentSortField"
+                       Converter="{x:Static converters:EnumToStringEqualConverter.Instance}"
+                       ConverterParameter="{x:Static abstract:AddressesSortField.ByPath}"/>
+            </MultiBinding>
+          </controls:SortButton.SortIsDesc>
+        </controls:SortButton>
 
-                <controls:SortButton Grid.Column="3"
-                                     Title="Balance"
-                                     Command="{Binding SetSortTypeCommand}"
-                                     CommandParameter="{x:Static abstract:AddressesSortField.ByBalance}">
-                    <controls:SortButton.SortIsAsc>
-                        <MultiBinding Converter="{x:Static BoolConverters.And}">
-                            <Binding Path="CurrentSortDirection"
-                                     Converter="{x:Static converters:EnumToStringEqualConverter.Instance}"
-                                     ConverterParameter="{x:Static common:SortDirection.Asc}" />
-                            <Binding Path="CurrentSortField"
-                                     Converter="{x:Static converters:EnumToStringEqualConverter.Instance}"
-                                     ConverterParameter="{x:Static abstract:AddressesSortField.ByBalance}" />
-                        </MultiBinding>
-                    </controls:SortButton.SortIsAsc>
-                    <controls:SortButton.SortIsDesc>
-                        <MultiBinding Converter="{x:Static BoolConverters.And}">
-                            <Binding Path="CurrentSortDirection"
-                                     Converter="{x:Static converters:EnumToStringEqualConverter.Instance}"
-                                     ConverterParameter="{x:Static common:SortDirection.Desc}" />
-                            <Binding Path="CurrentSortField"
-                                     Converter="{x:Static converters:EnumToStringEqualConverter.Instance}"
-                                     ConverterParameter="{x:Static abstract:AddressesSortField.ByBalance}" />
-                        </MultiBinding>
-                    </controls:SortButton.SortIsDesc>
-                </controls:SortButton>
+        <Button Grid.Column="2"
+                Padding="0"
+                VerticalAlignment="Stretch"
+                VerticalContentAlignment="Center"
+                IsEnabled="False"
+                Classes="EmptyBtnWithContent">
+          <StackPanel Orientation="Horizontal">
+            <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
+                       FontSize="13"
+                       Text="Type"/>
+          </StackPanel>
+        </Button>
 
-                <controls:SortButton Grid.Column="4"
-                                     Title="Tokens"
-                                     Command="{Binding SetSortTypeCommand}"
-                                     CommandParameter="{x:Static abstract:AddressesSortField.ByTokenBalance}">
-                    <controls:SortButton.SortIsAsc>
-                        <MultiBinding Converter="{x:Static BoolConverters.And}">
-                            <Binding Path="CurrentSortDirection"
-                                     Converter="{x:Static converters:EnumToStringEqualConverter.Instance}"
-                                     ConverterParameter="{x:Static common:SortDirection.Asc}" />
-                            <Binding Path="CurrentSortField"
-                                     Converter="{x:Static converters:EnumToStringEqualConverter.Instance}"
-                                     ConverterParameter="{x:Static abstract:AddressesSortField.ByTokenBalance}" />
-                        </MultiBinding>
-                    </controls:SortButton.SortIsAsc>
-                    <controls:SortButton.SortIsDesc>
-                        <MultiBinding Converter="{x:Static BoolConverters.And}">
-                            <Binding Path="CurrentSortDirection"
-                                     Converter="{x:Static converters:EnumToStringEqualConverter.Instance}"
-                                     ConverterParameter="{x:Static common:SortDirection.Desc}" />
-                            <Binding Path="CurrentSortField"
-                                     Converter="{x:Static converters:EnumToStringEqualConverter.Instance}"
-                                     ConverterParameter="{x:Static abstract:AddressesSortField.ByTokenBalance}" />
-                        </MultiBinding>
-                    </controls:SortButton.SortIsDesc>
-                </controls:SortButton>
-                <Button Grid.Column="5"
-                        Padding="0"
-                        VerticalAlignment="Stretch"
-                        VerticalContentAlignment="Center"
-                        IsEnabled="False"
-                        Classes="EmptyBtnWithContent">
-                    <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
-                               FontSize="13"
-                               Text="Key" />
-                </Button>
+        <controls:SortButton Grid.Column="3"
+                             Title="Balance"
+                             Command="{Binding SetSortTypeCommand}"
+                             CommandParameter="{x:Static abstract:AddressesSortField.ByBalance}">
+          <controls:SortButton.SortIsAsc>
+            <MultiBinding Converter="{x:Static BoolConverters.And}">
+              <Binding Path="CurrentSortDirection"
+                       Converter="{x:Static converters:EnumToStringEqualConverter.Instance}"
+                       ConverterParameter="{x:Static common:SortDirection.Asc}"/>
+              <Binding Path="CurrentSortField"
+                       Converter="{x:Static converters:EnumToStringEqualConverter.Instance}"
+                       ConverterParameter="{x:Static abstract:AddressesSortField.ByBalance}"/>
+            </MultiBinding>
+          </controls:SortButton.SortIsAsc>
+          <controls:SortButton.SortIsDesc>
+            <MultiBinding Converter="{x:Static BoolConverters.And}">
+              <Binding Path="CurrentSortDirection"
+                       Converter="{x:Static converters:EnumToStringEqualConverter.Instance}"
+                       ConverterParameter="{x:Static common:SortDirection.Desc}"/>
+              <Binding Path="CurrentSortField"
+                       Converter="{x:Static converters:EnumToStringEqualConverter.Instance}"
+                       ConverterParameter="{x:Static abstract:AddressesSortField.ByBalance}"/>
+            </MultiBinding>
+          </controls:SortButton.SortIsDesc>
+        </controls:SortButton>
 
-                <Button Grid.Column="6"
-                        Padding="0"
-                        VerticalAlignment="Stretch"
-                        VerticalContentAlignment="Center"
-                        IsEnabled="False"
-                        Classes="EmptyBtnWithContent">
-                    <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
-                               FontSize="13"
-                               Text="Update" />
-                </Button>
-            </Grid>
-        </Border>
+        <controls:SortButton Grid.Column="4"
+                             Title="Tokens"
+                             Command="{Binding SetSortTypeCommand}"
+                             CommandParameter="{x:Static abstract:AddressesSortField.ByTokenBalance}">
+          <controls:SortButton.SortIsAsc>
+            <MultiBinding Converter="{x:Static BoolConverters.And}">
+              <Binding Path="CurrentSortDirection"
+                       Converter="{x:Static converters:EnumToStringEqualConverter.Instance}"
+                       ConverterParameter="{x:Static common:SortDirection.Asc}"/>
+              <Binding Path="CurrentSortField"
+                       Converter="{x:Static converters:EnumToStringEqualConverter.Instance}"
+                       ConverterParameter="{x:Static abstract:AddressesSortField.ByTokenBalance}"/>
+            </MultiBinding>
+          </controls:SortButton.SortIsAsc>
+          <controls:SortButton.SortIsDesc>
+            <MultiBinding Converter="{x:Static BoolConverters.And}">
+              <Binding Path="CurrentSortDirection"
+                       Converter="{x:Static converters:EnumToStringEqualConverter.Instance}"
+                       ConverterParameter="{x:Static common:SortDirection.Desc}"/>
+              <Binding Path="CurrentSortField"
+                       Converter="{x:Static converters:EnumToStringEqualConverter.Instance}"
+                       ConverterParameter="{x:Static abstract:AddressesSortField.ByTokenBalance}"/>
+            </MultiBinding>
+          </controls:SortButton.SortIsDesc>
+        </controls:SortButton>
+        <Button Grid.Column="5"
+                Padding="0"
+                VerticalAlignment="Stretch"
+                VerticalContentAlignment="Center"
+                IsEnabled="False"
+                Classes="EmptyBtnWithContent">
+          <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
+                     FontSize="13"
+                     Text="Key"/>
+        </Button>
 
-        <ListBox Grid.Row="1"
-                 Name="AddressesListBox"
-                 Margin="0 1 0 0"
-                 Background="{DynamicResource AlmostTransparentBrush}"
-                 Items="{Binding Addresses}"
-                 HorizontalAlignment="Stretch"
-                 VerticalAlignment="Stretch">
-            <ListBox.Styles>
-                <Style Selector="ListBoxItem">
-                    <Setter Property="Padding" Value="0" />
-                    <Setter Property="Height" Value="48" />
-                    <Setter Property="VerticalContentAlignment" Value="Stretch" />
-                    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-                    <Setter Property="BorderThickness" Value="0 0 0 1" />
-                    <Setter Property="BorderBrush" Value="{DynamicResource LightDefaultOpacity10}" />
-                </Style>
-                <Style Selector="ListBoxItem:selected /template/ ContentPresenter">
-                    <Setter Property="Background" Value="{DynamicResource AlmostTransparentBrush}" />
-                </Style>
-                <Style Selector="ListBoxItem:not(:selected) /template/ ContentPresenter">
-                    <Setter Property="Background" Value="{DynamicResource AlmostTransparentBrush}" />
-                </Style>
+        <Button Grid.Column="6"
+                Padding="0"
+                VerticalAlignment="Stretch"
+                VerticalContentAlignment="Center"
+                IsEnabled="False"
+                Classes="EmptyBtnWithContent">
+          <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
+                     FontSize="13"
+                     Text="Update"/>
+        </Button>
+      </Grid>
+    </Border>
 
-                <Style Selector="ListBoxItem:pointerover /template/ ContentPresenter">
-                    <Setter Property="Background" Value="{DynamicResource ListBoxItemPointeroverBrush}" />
-                    <Setter Property="CornerRadius" Value="8" />
-                </Style>
-            </ListBox.Styles>
+    <ListBox Grid.Row="1"
+             Name="AddressesListBox"
+             Margin="0 1 0 0"
+             Background="{DynamicResource AlmostTransparentBrush}"
+             Items="{Binding Addresses}"
+             HorizontalAlignment="Stretch"
+             VerticalAlignment="Stretch">
+      <ListBox.Styles>
+        <Style Selector="ListBoxItem">
+          <Setter Property="Padding" Value="0"/>
+          <Setter Property="Height" Value="48"/>
+          <Setter Property="VerticalContentAlignment" Value="Stretch"/>
+          <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+          <Setter Property="BorderThickness" Value="0 0 0 1"/>
+          <Setter Property="BorderBrush" Value="{DynamicResource LightDefaultOpacity10}"/>
+        </Style>
+        <Style Selector="ListBoxItem:selected /template/ ContentPresenter">
+          <Setter Property="Background" Value="{DynamicResource AlmostTransparentBrush}"/>
+        </Style>
+        <Style Selector="ListBoxItem:not(:selected) /template/ ContentPresenter">
+          <Setter Property="Background" Value="{DynamicResource AlmostTransparentBrush}"/>
+        </Style>
 
-            <ListBox.ItemTemplate>
-                <DataTemplate>
-                    <views:AddressView DataContext="{Binding}" />
-                </DataTemplate>
-            </ListBox.ItemTemplate>
-        </ListBox>
-    </Grid>
+        <Style Selector="ListBoxItem:pointerover /template/ ContentPresenter">
+          <Setter Property="Background" Value="{DynamicResource ListBoxItemPointeroverBrush}"/>
+          <Setter Property="CornerRadius" Value="8"/>
+        </Style>
+      </ListBox.Styles>
+
+      <ListBox.ItemTemplate>
+        <DataTemplate>
+          <views:AddressView DataContext="{Binding}"/>
+        </DataTemplate>
+      </ListBox.ItemTemplate>
+    </ListBox>
+  </Grid>
 </UserControl>

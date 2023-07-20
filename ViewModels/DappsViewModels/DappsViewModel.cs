@@ -195,8 +195,18 @@ namespace Atomex.Client.Desktop.ViewModels.DappsViewModels
                         var disconnectViewModel = new DisconnectViewModel
                         {
                             DappName = permissionInfo.AppMetadata.Name,
-                            OnDisconnect = async () => await _beaconWalletClient
-                                .RemovePeerAsync(disconnectPeer.SenderId)
+                            OnDisconnect = async () =>
+                            {
+                                try
+                                {
+                                    await _beaconWalletClient
+                                        .RemovePeerAsync(disconnectPeer.SenderId);
+                                }
+                                catch (Exception e)
+                                {
+                                    Log.Error(e, "Can't remove peer with sender id {@id}", disconnectPeer.SenderId);
+                                }
+                            }
                         };
 
                         App.DialogService.Show(disconnectViewModel);

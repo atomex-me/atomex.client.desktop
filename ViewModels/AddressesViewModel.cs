@@ -124,6 +124,26 @@ namespace Atomex.Client.Desktop.ViewModels
             _app.LocalStorage.BalanceChanged += OnBalanceChangedEventHandler;
         }
 
+        private ReactiveCommand<Unit, Unit>? _addNewAddressCommand;
+        public ReactiveCommand<Unit, Unit> AddNewAddress => _addNewAddressCommand ??= ReactiveCommand.Create(() =>
+        {
+            try
+            {
+                var account = _app.Account
+                    .GetCurrencyAccount(_currency.Name);
+
+                _ = account
+                    .AddNewExternalAddressAsync()
+                    .WaitForResult();
+
+                _ = ReloadAddresses();
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Error while add new address");
+            }
+        });
+
         private async Task ReloadAddresses()
         {
             try
