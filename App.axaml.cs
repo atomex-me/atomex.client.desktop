@@ -78,21 +78,8 @@ namespace Atomex.Client.Desktop
                 var currenciesProvider = new CurrenciesProvider(CurrenciesConfigurationString);
                 var symbolsProvider = new SymbolsProvider(SymbolsConfiguration);
 
-                var bitfinexQuotesProvider = new BitfinexQuotesProvider(
-                    currencies: currenciesProvider
-                        .GetCurrencies(Network.MainNet)
-                        .GetOrderedPreset()
-                        .Select(c => c.Name),
-                    baseCurrency: QuotesProvider.Usd,
-                    log: LoggerFactory.CreateLogger<BitfinexQuotesProvider>());
-
-                var tezToolsQuotesProvider = new TezToolsQuotesProvider(
-                    log: LoggerFactory.CreateLogger<TezToolsQuotesProvider>());
-
                 var quotesProvider = new MultiSourceQuotesProvider(
-                    log: LoggerFactory.CreateLogger<MultiSourceQuotesProvider>(),
-                    bitfinexQuotesProvider,
-                    tezToolsQuotesProvider);
+                    log: LoggerFactory.CreateLogger<MultiSourceQuotesProvider>());
 
                 // init Atomex client app
                 AtomexApp = new AtomexApp(logger: LoggerFactory.CreateLogger("AtomexApp"))
@@ -101,6 +88,25 @@ namespace Atomex.Client.Desktop
                     .UseCurrenciesUpdater(new CurrenciesUpdater(currenciesProvider))
                     .UseSymbolsUpdater(new SymbolsUpdater(symbolsProvider))
                     .UseQuotesProvider(quotesProvider);
+
+                quotesProvider.ConfigureOnStart = provider =>
+                {
+                    if (AtomexApp?.Account?.Network == Network.MainNet)
+                    {
+                        var bitfinexQuotesProvider = new BitfinexQuotesProvider(
+                            currencies: AtomexApp.CurrenciesProvider
+                                .GetCurrencies(Network.MainNet)
+                                .GetOrderedPreset()
+                                .Select(c => c.Name),
+                            baseCurrency: QuotesProvider.Usd,
+                            log: LoggerFactory.CreateLogger<BitfinexQuotesProvider>());
+
+                        var tezToolsQuotesProvider = new TezToolsQuotesProvider(
+                            log: LoggerFactory.CreateLogger<TezToolsQuotesProvider>());
+
+                        provider.AddProviders(bitfinexQuotesProvider, tezToolsQuotesProvider);
+                    }
+                };
 
                 var mainWindow = new MainWindow();
                 DialogService = new DialogService();

@@ -74,6 +74,17 @@ namespace Atomex.Client.Desktop.ViewModels
 
                         ShowContent(_walletMainViewModel);
 
+                        if (app.Account?.Network == Core.Network.TestNet)
+                        {
+                            var messageViewModel = MessageViewModel.Message(
+                                title: "Warning",
+                                text: Resources.TestNetWalletWarning,
+                                nextTitle: "Ok",
+                                nextAction: () => App.DialogService.Close());
+
+                            App.DialogService.Show(messageViewModel);
+                        }
+
                         if (AccountRestored)
                         {
                             var restoreViewModel = new RestoreDialogViewModel(_app)
@@ -162,7 +173,9 @@ namespace Atomex.Client.Desktop.ViewModels
         private async void OnUpdateClick()
         {
             await SignOut(withAppUpdate: true);
-            if (_app.AtomexClient != null) return;
+
+            if (_app.AtomexClient != null)
+                return;
 
             OnUpdateAction?.Invoke();
             UpdateStarted = true;

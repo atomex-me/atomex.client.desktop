@@ -747,6 +747,15 @@ namespace Atomex.Client.Desktop.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на WARNING! You are using a test wallet (TestNet), the coins on which have no real monetary value! Be careful and beware of scammers!.
+        /// </summary>
+        internal static string TestNetWalletWarning {
+            get {
+                return ResourceManager.GetString("TestNetWalletWarning", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Warning.
         /// </summary>
         internal static string Warning {
